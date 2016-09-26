@@ -1,7 +1,11 @@
 package siri
 
 import (
-	"fmt"
+	"bytes"
+	"log"
+	"runtime"
+	"text/template"
+	"time"
 
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
@@ -10,21 +14,83 @@ import (
 
 type XMLCheckStatusRequest struct {
 	content []byte
+	node    *xml.XmlNode
+
+	requestorRef      string
+	requestTimestamp  time.Time
+	messageIdentifier string
 }
 
-func NewXMLCheckStatusRequest(content []byte) *XMLCheckStatusRequest {
-	return &XMLCheckStatusRequest{content: content}
+type SIRICheckStatusRequest struct {
+	RequestorRef      string
+	RequestTimestamp  time.Time
+	MessageIdentifier string
 }
 
-func (request *XMLCheckStatusRequest) Document() *xml.XmlDocument {
-	doc, _ := gokogiri.ParseXml(request.content)
-	// defer doc.Free()
-	return doc
+const SIRITemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+	<Request>
+		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
+		<ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
+		<ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
+	</Request>
+	<RequestExtension/>
+</ns7:CheckStatus>`
+
+func NewXMLCheckStatusRequest(node *xml.XmlNode) *XMLCheckStatusRequest {
+	return &XMLCheckStatusRequest{node: node}
 }
 
+func NewXMLCheckStatusRequestFromContent(content []byte) *XMLCheckStatusRequest {
+	doc, _ := gokogiri.ParseXml(content)
+	request := NewXMLCheckStatusRequest(doc.Root().XmlNode)
+	finalizer := func(request *XMLCheckStatusRequest) {
+		doc.Free()
+	}
+	runtime.SetFinalizer(request, finalizer)
+	return request
+}
+
+func NewSIRICheckStatusRequest(RequestorRef string, RequestTimestamp time.Time, MessageIdentifier string) *SIRICheckStatusRequest {
+	return &SIRICheckStatusRequest{RequestorRef: RequestorRef, RequestTimestamp: RequestTimestamp, MessageIdentifier: MessageIdentifier}
+}
+
+// TODO : Handle errors
 func (request *XMLCheckStatusRequest) RequestorRef() string {
-	path := xpath.Compile("//*[local-name()='RequestorRef']")
-	nodes, _ := request.Document().Root().Search(path)
-	fmt.Println(nodes)
-	return nodes[0].Content()
+	if request.requestorRef == "" {
+		path := xpath.Compile("//*[local-name()='RequestorRef']")
+		nodes, _ := request.node.Search(path)
+		request.requestorRef = nodes[0].Content()
+	}
+	return request.requestorRef
+}
+
+// TODO : Handle errors
+func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
+	if request.requestTimestamp.IsZero() {
+		path := xpath.Compile("//*[local-name()='RequestTimestamp']")
+		nodes, _ := request.node.Search(path)
+		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", nodes[0].Content())
+		request.requestTimestamp = t
+	}
+	return request.requestTimestamp
+}
+
+// TODO : Handle errors
+func (request *XMLCheckStatusRequest) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		path := xpath.Compile("//*[local-name()='MessageIdentifier']")
+		nodes, _ := request.node.Search(path)
+		request.messageIdentifier = nodes[0].Content()
+	}
+	return request.messageIdentifier
+}
+
+// TODO : Handle errors
+func (request *SIRICheckStatusRequest) BuildXML() string {
+	var buffer bytes.Buffer
+	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRITemplate))
+	if err := siriRequest.Execute(&buffer, request); err != nil {
+		log.Fatal(err)
+	}
+	return buffer.String()
 }
