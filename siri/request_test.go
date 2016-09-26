@@ -34,7 +34,7 @@ func Test_XMLCheckStatusRequest_RequestTimestamp(t *testing.T) {
 	}
 
 	request := NewXMLCheckStatusRequestFromContent(content)
-	if expected := time.Date(2016, time.September, 07, 9, 11, 25, 174000000, time.UTC); request.RequestTimestamp() != expected {
+	if expected := time.Date(2016, time.September, 7, 9, 11, 25, 174000000, time.UTC); request.RequestTimestamp() != expected {
 		t.Errorf("Wrong RequestTimestamp :\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
 	}
 }

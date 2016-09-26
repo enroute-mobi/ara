@@ -1,0 +1,25 @@
+<ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
+												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+												 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+												 xmlns:ns6="http://scma/siri"
+												 xmlns:ns7="http://wsdl.siri.org.uk"
+												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
+	<CheckStatusAnswerInfo>
+		<ns2:ResponseTimestamp>
+		2016-09-21T20:14:46.238+02:00</ns2:ResponseTimestamp>
+		<ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
+		<ns2:Address>
+		http://appli.chouette.mobi/siri_france/siri</ns2:Address>
+		<ns2:ResponseMessageIdentifier>
+		e7a062c5-eb95-4e4e-bc4f-6792fa008c23</ns2:ResponseMessageIdentifier>
+		<ns2:RequestMessageRef>
+		CheckStatus:Test:0</ns2:RequestMessageRef>
+	</CheckStatusAnswerInfo>
+	<Answer>
+		<ns2:Status>true</ns2:Status>
+		<ns2:ServiceStartedTime>
+		2016-09-21T03:30:22.996+02:00</ns2:ServiceStartedTime>
+	</Answer>
+	<AnswerExtension />
+</ns7:CheckStatusResponse>

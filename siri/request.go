@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"runtime"
+	"strings"
 	"text/template"
 	"time"
 
@@ -13,21 +14,20 @@ import (
 )
 
 type XMLCheckStatusRequest struct {
-	content []byte
-	node    *xml.XmlNode
+	node *xml.XmlNode
 
+	messageIdentifier string
 	requestorRef      string
 	requestTimestamp  time.Time
-	messageIdentifier string
 }
 
 type SIRICheckStatusRequest struct {
+	MessageIdentifier string
 	RequestorRef      string
 	RequestTimestamp  time.Time
-	MessageIdentifier string
 }
 
-const SIRITemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
 	<Request>
 		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
 		<ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
@@ -59,7 +59,7 @@ func (request *XMLCheckStatusRequest) RequestorRef() string {
 	if request.requestorRef == "" {
 		path := xpath.Compile("//*[local-name()='RequestorRef']")
 		nodes, _ := request.node.Search(path)
-		request.requestorRef = nodes[0].Content()
+		request.requestorRef = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.requestorRef
 }
@@ -69,7 +69,7 @@ func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
 	if request.requestTimestamp.IsZero() {
 		path := xpath.Compile("//*[local-name()='RequestTimestamp']")
 		nodes, _ := request.node.Search(path)
-		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", nodes[0].Content())
+		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
 		request.requestTimestamp = t
 	}
 	return request.requestTimestamp
@@ -80,7 +80,7 @@ func (request *XMLCheckStatusRequest) MessageIdentifier() string {
 	if request.messageIdentifier == "" {
 		path := xpath.Compile("//*[local-name()='MessageIdentifier']")
 		nodes, _ := request.node.Search(path)
-		request.messageIdentifier = nodes[0].Content()
+		request.messageIdentifier = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.messageIdentifier
 }
@@ -88,7 +88,7 @@ func (request *XMLCheckStatusRequest) MessageIdentifier() string {
 // TODO : Handle errors
 func (request *SIRICheckStatusRequest) BuildXML() string {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRITemplate))
+	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRIRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
 		log.Fatal(err)
 	}
