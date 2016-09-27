@@ -70,3 +70,29 @@ func Test_SIRICheckStatusRequest_BuildXML(t *testing.T) {
 		t.Errorf("Wrong XML for Request :\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
 	}
 }
+
+func BenchmarkParseRequest(b *testing.B) {
+	file, err := os.Open("testdata/checkstatus_request.xml")
+	if err != nil {
+		b.Fatal(err)
+	}
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		b.Fatal(err)
+	}
+	for n := 0; n < b.N; n++ {
+		r := NewXMLCheckStatusRequestFromContent(content)
+		r.MessageIdentifier()
+		r.RequestorRef()
+		r.RequestTimestamp()
+	}
+}
+
+func BenchmarkGenerateRequest(b *testing.B) {
+	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+
+	for n := 0; n < b.N; n++ {
+		r := NewSIRICheckStatusRequest("test", date, "test")
+		r.BuildXML()
+	}
+}
