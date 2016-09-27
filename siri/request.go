@@ -10,7 +10,6 @@ import (
 
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
-	"github.com/jbowtie/gokogiri/xpath"
 )
 
 type XMLCheckStatusRequest struct {
@@ -43,10 +42,12 @@ func NewXMLCheckStatusRequest(node *xml.XmlNode) *XMLCheckStatusRequest {
 func NewXMLCheckStatusRequestFromContent(content []byte) *XMLCheckStatusRequest {
 	doc, _ := gokogiri.ParseXml(content)
 	request := NewXMLCheckStatusRequest(doc.Root().XmlNode)
+
 	finalizer := func(request *XMLCheckStatusRequest) {
 		doc.Free()
 	}
 	runtime.SetFinalizer(request, finalizer)
+
 	return request
 }
 
@@ -57,8 +58,7 @@ func NewSIRICheckStatusRequest(RequestorRef string, RequestTimestamp time.Time, 
 // TODO : Handle errors
 func (request *XMLCheckStatusRequest) RequestorRef() string {
 	if request.requestorRef == "" {
-		path := xpath.Compile("//*[local-name()='RequestorRef']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='RequestorRef']")
 		request.requestorRef = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.requestorRef
@@ -67,8 +67,7 @@ func (request *XMLCheckStatusRequest) RequestorRef() string {
 // TODO : Handle errors
 func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
 	if request.requestTimestamp.IsZero() {
-		path := xpath.Compile("//*[local-name()='RequestTimestamp']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='RequestTimestamp']")
 		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
 		request.requestTimestamp = t
 	}
@@ -78,8 +77,7 @@ func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
 // TODO : Handle errors
 func (request *XMLCheckStatusRequest) MessageIdentifier() string {
 	if request.messageIdentifier == "" {
-		path := xpath.Compile("//*[local-name()='MessageIdentifier']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='MessageIdentifier']")
 		request.messageIdentifier = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.messageIdentifier

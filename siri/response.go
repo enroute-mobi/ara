@@ -11,7 +11,6 @@ import (
 
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
-	"github.com/jbowtie/gokogiri/xpath"
 )
 
 type XMLCheckStatusResponse struct {
@@ -42,20 +41,15 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 												 xmlns:ns7="http://wsdl.siri.org.uk"
 												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
-		<ns2:ResponseTimestamp>
-		{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ResponseTimestamp>
+		<ns2:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>{{.ProducerRef}}</ns2:ProducerRef>
-		<ns2:Address>
-		http://appli.chouette.mobi/siri_france/siri</ns2:Address>
-		<ns2:ResponseMessageIdentifier>
-		{{.ResponseMessageIdentifier}}</ns2:ResponseMessageIdentifier>
-		<ns2:RequestMessageRef>
-		{{.RequestMessageRef}}</ns2:RequestMessageRef>
+		<ns2:Address>http://appli.chouette.mobi/siri_france/siri</ns2:Address>
+		<ns2:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ns2:ResponseMessageIdentifier>
+		<ns2:RequestMessageRef>{{.RequestMessageRef}}</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>
 		<ns2:Status>{{.Status}}</ns2:Status>
-		<ns2:ServiceStartedTime>
-		{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ServiceStartedTime>
+		<ns2:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ServiceStartedTime>
 	</Answer>
 	<AnswerExtension />
 </ns7:CheckStatusResponse>`
@@ -93,8 +87,7 @@ func NewSIRICheckStatusResponse(
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) ProducerRef() string {
 	if request.producerRef == "" {
-		path := xpath.Compile("//*[local-name()='ProducerRef']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='ProducerRef']")
 		request.producerRef = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.producerRef
@@ -103,8 +96,7 @@ func (request *XMLCheckStatusResponse) ProducerRef() string {
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) RequestMessageRef() string {
 	if request.requestMessageRef == "" {
-		path := xpath.Compile("//*[local-name()='RequestMessageRef']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='RequestMessageRef']")
 		request.requestMessageRef = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.requestMessageRef
@@ -113,8 +105,7 @@ func (request *XMLCheckStatusResponse) RequestMessageRef() string {
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
 	if request.responseMessageIdentifier == "" {
-		path := xpath.Compile("//*[local-name()='ResponseMessageIdentifier']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='ResponseMessageIdentifier']")
 		request.responseMessageIdentifier = strings.TrimSpace(nodes[0].Content())
 	}
 	return request.responseMessageIdentifier
@@ -123,8 +114,7 @@ func (request *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) Status() bool {
 	if !request.status {
-		path := xpath.Compile("//*[local-name()='Status']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='Status']")
 		s, _ := strconv.ParseBool(nodes[0].Content())
 		request.status = s
 	}
@@ -134,8 +124,7 @@ func (request *XMLCheckStatusResponse) Status() bool {
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
 	if request.responseTimestamp.IsZero() {
-		path := xpath.Compile("//*[local-name()='ResponseTimestamp']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='ResponseTimestamp']")
 		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
 		request.responseTimestamp = t
 	}
@@ -145,8 +134,7 @@ func (request *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
 // TODO : Handle errors
 func (request *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 	if request.serviceStartedTime.IsZero() {
-		path := xpath.Compile("//*[local-name()='ServiceStartedTime']")
-		nodes, _ := request.node.Search(path)
+		nodes, _ := request.node.Search("//*[local-name()='ServiceStartedTime']")
 		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
 		request.serviceStartedTime = t
 	}

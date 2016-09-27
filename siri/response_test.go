@@ -112,20 +112,15 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 												 xmlns:ns7="http://wsdl.siri.org.uk"
 												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
-		<ns2:ResponseTimestamp>
-		2016-09-21T20:14:46.000Z</ns2:ResponseTimestamp>
+		<ns2:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>test</ns2:ProducerRef>
-		<ns2:Address>
-		http://appli.chouette.mobi/siri_france/siri</ns2:Address>
-		<ns2:ResponseMessageIdentifier>
-		test</ns2:ResponseMessageIdentifier>
-		<ns2:RequestMessageRef>
-		test</ns2:RequestMessageRef>
+		<ns2:Address>http://appli.chouette.mobi/siri_france/siri</ns2:Address>
+		<ns2:ResponseMessageIdentifier>test</ns2:ResponseMessageIdentifier>
+		<ns2:RequestMessageRef>test</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>
 		<ns2:Status>true</ns2:Status>
-		<ns2:ServiceStartedTime>
-		2016-09-21T03:30:22.000Z</ns2:ServiceStartedTime>
+		<ns2:ServiceStartedTime>2016-09-21T03:30:22.000Z</ns2:ServiceStartedTime>
 	</Answer>
 	<AnswerExtension />
 </ns7:CheckStatusResponse>`
