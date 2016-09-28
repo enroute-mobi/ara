@@ -7,6 +7,22 @@ import (
 	"time"
 )
 
+func Test_XMLCheckStatusRequest_Address(t *testing.T) {
+	file, err := os.Open("testdata/checkstatus_response.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
+	if expected := "http://appli.chouette.mobi/siri_france/siri"; response.Address() != expected {
+		t.Errorf("Wrong Address :\n got: %v\nwant: %v", response.Address(), expected)
+	}
+}
+
 func Test_XMLCheckStatusRequest_ProducerRef(t *testing.T) {
 	file, err := os.Open("testdata/checkstatus_response.xml")
 	if err != nil {
@@ -17,7 +33,7 @@ func Test_XMLCheckStatusRequest_ProducerRef(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := "NINOXE:default"; response.ProducerRef() != expected {
 		t.Errorf("Wrong ProducerRef :\n got: %v\nwant: %v", response.ProducerRef(), expected)
 	}
@@ -33,7 +49,7 @@ func Test_XMLCheckStatusRequest_RequestMessageRef(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := "CheckStatus:Test:0"; response.RequestMessageRef() != expected {
 		t.Errorf("Wrong RequestMessageRef :\n got: %v\nwant: %v", response.RequestMessageRef(), expected)
 	}
@@ -49,7 +65,7 @@ func Test_XMLCheckStatusRequest_ResponseMessageIdentifier(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := "e7a062c5-eb95-4e4e-bc4f-6792fa008c23"; response.ResponseMessageIdentifier() != expected {
 		t.Errorf("Wrong ResponseMessageIdentifier :\n got: %v\nwant: %v", response.ResponseMessageIdentifier(), expected)
 	}
@@ -65,7 +81,7 @@ func Test_XMLCheckStatusRequest_Status(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := true; response.Status() != expected {
 		t.Errorf("Wrong Status :\n got: %v\nwant: %v", response.Status(), expected)
 	}
@@ -81,7 +97,7 @@ func Test_XMLCheckStatusRequest_ResponseTimestamp(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := time.Date(2016, time.September, 21, 18, 14, 46, 238000000, time.UTC); !response.ResponseTimestamp().Equal(expected) {
 		t.Errorf("Wrong ResponseTimestamp :\n got: %v\nwant: %v", response.ResponseTimestamp(), expected)
 	}
@@ -97,7 +113,7 @@ func Test_XMLCheckStatusRequest_ServiceStartedTime(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := NewXMLCheckStatusResponseFromContent(content)
+	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := time.Date(2016, time.September, 21, 1, 30, 22, 996000000, time.UTC); !response.ServiceStartedTime().Equal(expected) {
 		t.Errorf("Wrong ServiceStartedTime :\n got: %v\nwant: %v", response.ServiceStartedTime(), expected)
 	}
@@ -114,7 +130,7 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>test</ns2:ProducerRef>
-		<ns2:Address>http://appli.chouette.mobi/siri_france/siri</ns2:Address>
+		<ns2:Address>test</ns2:Address>
 		<ns2:ResponseMessageIdentifier>test</ns2:ResponseMessageIdentifier>
 		<ns2:RequestMessageRef>test</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
@@ -126,7 +142,7 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 </ns7:CheckStatusResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	serviceStartedTime := time.Date(2016, time.September, 21, 3, 30, 22, 0, time.UTC)
-	request := NewSIRICheckStatusResponse("test", "test", "test", true, responseTimestamp, serviceStartedTime)
+	request := NewSIRICheckStatusResponse("test", "test", "test", "test", true, responseTimestamp, serviceStartedTime)
 	if expectedXML != request.BuildXML() {
 		t.Errorf("Wrong XML for Request :\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
 	}
@@ -143,7 +159,8 @@ func BenchmarkParseResponse(b *testing.B) {
 	}
 
 	for n := 0; n < b.N; n++ {
-		r := NewXMLCheckStatusResponseFromContent(content)
+		r, _ := NewXMLCheckStatusResponseFromContent(content)
+		r.Address()
 		r.ProducerRef()
 		r.RequestMessageRef()
 		r.ResponseMessageIdentifier()
@@ -158,7 +175,7 @@ func BenchmarkGenerateResponse(b *testing.B) {
 	serviceStartedTime := time.Date(2016, time.September, 21, 3, 30, 22, 0, time.UTC)
 
 	for n := 0; n < b.N; n++ {
-		r := NewSIRICheckStatusResponse("test", "test", "test", true, responseTimestamp, serviceStartedTime)
+		r := NewSIRICheckStatusResponse("Address", "test", "test", "test", true, responseTimestamp, serviceStartedTime)
 		r.BuildXML()
 	}
 }

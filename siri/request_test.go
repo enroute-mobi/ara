@@ -17,7 +17,7 @@ func Test_XMLCheckStatusRequest_RequestorRef(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	request := NewXMLCheckStatusRequestFromContent(content)
+	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := "NINOXE:default"; request.RequestorRef() != expected {
 		t.Errorf("Wrong RequestorRef :\n got: %v\nwant: %v", request.RequestorRef(), expected)
 	}
@@ -33,7 +33,7 @@ func Test_XMLCheckStatusRequest_RequestTimestamp(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	request := NewXMLCheckStatusRequestFromContent(content)
+	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := time.Date(2016, time.September, 7, 9, 11, 25, 174000000, time.UTC); request.RequestTimestamp() != expected {
 		t.Errorf("Wrong RequestTimestamp :\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
 	}
@@ -49,7 +49,7 @@ func Test_XMLCheckStatusRequest_MessageIdentifier(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	request := NewXMLCheckStatusRequestFromContent(content)
+	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := "CheckStatus:Test:0"; request.MessageIdentifier() != expected {
 		t.Errorf("Wrong MessageIdentifier :\n got: %v\nwant: %v", request.MessageIdentifier(), expected)
 	}
@@ -81,7 +81,7 @@ func BenchmarkParseRequest(b *testing.B) {
 		b.Fatal(err)
 	}
 	for n := 0; n < b.N; n++ {
-		r := NewXMLCheckStatusRequestFromContent(content)
+		r, _ := NewXMLCheckStatusRequestFromContent(content)
 		r.MessageIdentifier()
 		r.RequestorRef()
 		r.RequestTimestamp()

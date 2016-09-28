@@ -39,16 +39,17 @@ func NewXMLCheckStatusRequest(node *xml.XmlNode) *XMLCheckStatusRequest {
 	return &XMLCheckStatusRequest{node: node}
 }
 
-func NewXMLCheckStatusRequestFromContent(content []byte) *XMLCheckStatusRequest {
-	doc, _ := gokogiri.ParseXml(content)
+func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
 	request := NewXMLCheckStatusRequest(doc.Root().XmlNode)
-
 	finalizer := func(request *XMLCheckStatusRequest) {
 		doc.Free()
 	}
 	runtime.SetFinalizer(request, finalizer)
-
-	return request
+	return request, nil
 }
 
 func NewSIRICheckStatusRequest(RequestorRef string, RequestTimestamp time.Time, MessageIdentifier string) *SIRICheckStatusRequest {

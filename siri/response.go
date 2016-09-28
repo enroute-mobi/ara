@@ -16,6 +16,7 @@ import (
 type XMLCheckStatusResponse struct {
 	node *xml.XmlNode
 
+	address                   string
 	producerRef               string
 	requestMessageRef         string
 	responseMessageIdentifier string
@@ -25,6 +26,7 @@ type XMLCheckStatusResponse struct {
 }
 
 type SIRICheckStatusResponse struct {
+	Address                   string
 	ProducerRef               string
 	RequestMessageRef         string
 	ResponseMessageIdentifier string
@@ -43,7 +45,7 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>{{.ProducerRef}}</ns2:ProducerRef>
-		<ns2:Address>http://appli.chouette.mobi/siri_france/siri</ns2:Address>
+		<ns2:Address>{{.Address}}</ns2:Address>
 		<ns2:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ns2:ResponseMessageIdentifier>
 		<ns2:RequestMessageRef>{{.RequestMessageRef}}</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
@@ -58,17 +60,21 @@ func NewXMLCheckStatusResponse(node *xml.XmlNode) *XMLCheckStatusResponse {
 	return &XMLCheckStatusResponse{node: node}
 }
 
-func NewXMLCheckStatusResponseFromContent(content []byte) *XMLCheckStatusResponse {
-	doc, _ := gokogiri.ParseXml(content)
+func NewXMLCheckStatusResponseFromContent(content []byte) (*XMLCheckStatusResponse, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
 	request := NewXMLCheckStatusResponse(doc.Root().XmlNode)
 	finalizer := func(request *XMLCheckStatusResponse) {
 		doc.Free()
 	}
 	runtime.SetFinalizer(request, finalizer)
-	return request
+	return request, nil
 }
 
 func NewSIRICheckStatusResponse(
+	address string,
 	producerRef string,
 	requestMessageRef string,
 	responseMessageIdentifier string,
@@ -76,12 +82,22 @@ func NewSIRICheckStatusResponse(
 	responseTimestamp time.Time,
 	serviceStartedTime time.Time) *SIRICheckStatusResponse {
 	return &SIRICheckStatusResponse{
+		Address:                   address,
 		ProducerRef:               producerRef,
 		RequestMessageRef:         requestMessageRef,
 		ResponseMessageIdentifier: responseMessageIdentifier,
 		Status:             status,
 		ResponseTimestamp:  responseTimestamp,
 		ServiceStartedTime: serviceStartedTime}
+}
+
+// TODO : Handle errors
+func (request *XMLCheckStatusResponse) Address() string {
+	if request.address == "" {
+		nodes, _ := request.node.Search("//*[local-name()='Address']")
+		request.address = strings.TrimSpace(nodes[0].Content())
+	}
+	return request.address
 }
 
 // TODO : Handle errors
