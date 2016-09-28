@@ -1,13 +1,13 @@
 package siri
 
 import (
-	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
-	"text/template"
+	"time"
 )
 
 type SOAPClient struct {
@@ -18,36 +18,37 @@ func NewSOAPClient(url string) *SOAPClient {
 	return &SOAPClient{url: url}
 }
 
-const SOAPRequestTemplate = `<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-	<S:Body>
-	{{.BuildXML}}
-	</S:Body>
-</S:Envelope>`
+// Temp
+func WrapSoap(s string) string {
+	soap := strings.Join([]string{
+		"<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\t<S:Body>\n}",
+		s,
+		"\n\t</S:Body>\n</S:Envelope>"}, "")
+	return soap
+}
 
 func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLCheckStatusResponse, error) {
-	// Wrap soap Request
-	var buffer bytes.Buffer
-	var soapRequest = template.Must(template.New("soapRequest").Parse(SOAPRequestTemplate))
-	if err := soapRequest.Execute(&buffer, request); err != nil {
-		return nil, err
-	}
+	// Wrap the request XML
+	soapRequest := WrapSoap(request.BuildXML())
 
 	// Create http request
-	httpRequest, err := http.NewRequest("POST", "http://server/siri", bytes.NewReader(buffer.Bytes()))
+	httpRequest, err := http.NewRequest("POST", client.url, strings.NewReader(soapRequest))
 	if err != nil {
 		return nil, err
 	}
 	httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
 	httpRequest.Header.Set("Content-Type", "text/xml")
 
+	// Send http request
 	response, err := http.DefaultClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
 
+	// Check response status
 	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(strings.Join([]string{"Request error, response status code :", strconv.Itoa(resp.StatusCode)}, " "))
+		return nil, errors.New(strings.Join([]string{"Request error, response status code: ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
 	// Create XMLCheckStatusResponse
@@ -55,8 +56,32 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	if err != nil {
 		return nil, err
 	}
+	xmlResponse, err := NewXMLCheckStatusResponseFromContent(responseContent)
+	if err != nil {
+		return nil, err
+	}
 
-	xmlRequest := NewXMLCheckStatusResponseFromContent(responseContent)
+	return xmlResponse, nil
+}
 
-	return xmlRequest, nil
+func CheckStatusHandler(w http.ResponseWriter, r *http.Request) {
+	requestContent, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		//Handle error
+	}
+	xmlRequest, err := NewXMLCheckStatusRequestFromContent(requestContent)
+	if err != nil {
+		// Handle error
+	}
+
+	response := new(SIRICheckStatusResponse)
+	response.Address = strings.Join([]string{r.URL.Host, r.URL.Path}, "")
+	response.ProducerRef = "Edwig"
+	response.RequestMessageRef = xmlRequest.MessageIdentifier()
+	response.ResponseMessageIdentifier = "c464f588-5128-46c8-ac3f-8b8a465692ab" // uuid - Temp
+	response.Status = true                                                      // Temp
+	response.ResponseTimestamp = time.Now()
+	response.ServiceStartedTime = time.Now() //Temp
+
+	fmt.Fprintf(w, response.BuildXML())
 }
