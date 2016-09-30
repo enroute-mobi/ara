@@ -21,7 +21,7 @@ func NewSOAPClient(url string) *SOAPClient {
 // Temp
 func WrapSoap(s string) string {
 	soap := strings.Join([]string{
-		"<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\t<S:Body>\n}",
+		"<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\t<S:Body>\n",
 		s,
 		"\n\t</S:Body>\n</S:Envelope>"}, "")
 	return soap
