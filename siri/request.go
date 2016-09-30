@@ -28,7 +28,7 @@ type SIRICheckStatusRequest struct {
 
 const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
 	<Request>
-		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
+		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z"}}</ns2:RequestTimestamp>
 		<ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
 		<ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
 	</Request>
