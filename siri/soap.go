@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/af83/edwig/api"
 )
 
 type SOAPClient struct {
@@ -16,6 +18,25 @@ type SOAPClient struct {
 
 func NewSOAPClient(url string) *SOAPClient {
 	return &SOAPClient{url: url}
+}
+
+// ResponseMessageIdentifier generator
+type responseMessageIdentifierGenerator struct {
+	uuidGenerator api.UUIDGenerator
+}
+
+func NewResponseMessageIdentifierGenerator() *responseMessageIdentifierGenerator {
+	return &responseMessageIdentifierGenerator{
+		uuidGenerator: api.DefaultUUIDGenerator(),
+	}
+}
+
+func (generator *responseMessageIdentifierGenerator) SetUUIDGenerator(uuidGenerator api.UUIDGenerator) {
+	generator.uuidGenerator = uuidGenerator
+}
+
+func (generator *responseMessageIdentifierGenerator) NewIdentifier() string {
+	return fmt.Sprintf("Edwig:ResponseMessage:%s:LOC", generator.uuidGenerator.NewUUID())
 }
 
 // Temp
@@ -74,12 +95,14 @@ func CheckStatusHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 	}
 
+	messageIdentifierGenerator := NewResponseMessageIdentifierGenerator()
+
 	response := new(SIRICheckStatusResponse)
 	response.Address = strings.Join([]string{r.URL.Host, r.URL.Path}, "")
 	response.ProducerRef = "Edwig"
 	response.RequestMessageRef = xmlRequest.MessageIdentifier()
-	response.ResponseMessageIdentifier = "c464f588-5128-46c8-ac3f-8b8a465692ab" // uuid - Temp
-	response.Status = true                                                      // Temp
+	response.ResponseMessageIdentifier = messageIdentifierGenerator.NewIdentifier()
+	response.Status = true // Temp
 	response.ResponseTimestamp = time.Now()
 	response.ServiceStartedTime = time.Now() //Temp
 
