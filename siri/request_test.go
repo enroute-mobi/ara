@@ -24,7 +24,7 @@ func Test_XMLCheckStatusRequest_RequestorRef(t *testing.T) {
 
 	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := "NINOXE:default"; request.RequestorRef() != expected {
-		t.Errorf("Wrong RequestorRef :\n got: %v\nwant: %v", request.RequestorRef(), expected)
+		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", request.RequestorRef(), expected)
 	}
 }
 
@@ -41,7 +41,7 @@ func Test_XMLCheckStatusRequest_RequestTimestamp(t *testing.T) {
 
 	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := time.Date(2016, time.September, 7, 9, 11, 25, 174000000, time.UTC); request.RequestTimestamp() != expected {
-		t.Errorf("Wrong RequestTimestamp :\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
+		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
 	}
 }
 
@@ -58,7 +58,7 @@ func Test_XMLCheckStatusRequest_MessageIdentifier(t *testing.T) {
 
 	request, _ := NewXMLCheckStatusRequestFromContent(content)
 	if expected := "CheckStatus:Test:0"; request.MessageIdentifier() != expected {
-		t.Errorf("Wrong MessageIdentifier :\n got: %v\nwant: %v", request.MessageIdentifier(), expected)
+		t.Errorf("Wrong MessageIdentifier:\n got: %v\nwant: %v", request.MessageIdentifier(), expected)
 	}
 }
 
@@ -74,7 +74,7 @@ func Test_SIRICheckStatusRequest_BuildXML(t *testing.T) {
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := NewSIRICheckStatusRequest("test", date, "test")
 	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request :\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
 	}
 }
 
@@ -86,7 +86,7 @@ func Test_SIRICheckStatusRequest_GenerateMessageIdentifier(t *testing.T) {
 	request.GenerateMessageIdentifier()
 
 	if expected := fmt.Sprintf("Edwig:Message::%s:LOC", uuidGenerator.LastUUID()); expected != request.MessageIdentifier {
-		t.Errorf("Wrong Message identifier :\n got:\n%v\nwant:\n%v", expected, request.MessageIdentifier)
+		t.Errorf("Wrong Message identifier:\n got:\n%v\nwant:\n%v", expected, request.MessageIdentifier)
 	}
 }
 
@@ -99,7 +99,7 @@ func Test_SIRICheckStatusRequest_SetRequestTimestamp(t *testing.T) {
 	request.SetRequestTimestamp()
 
 	if !request.RequestTimestamp.Equal(expected) {
-		t.Errorf("Wrong Request Timestamp :\n got:\n%v\nwant:\n%v", expected, request.RequestTimestamp)
+		t.Errorf("Wrong Request Timestamp:\n got:\n%v\nwant:\n%v", expected, request.RequestTimestamp)
 	}
 }
 

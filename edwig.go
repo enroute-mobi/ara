@@ -27,9 +27,9 @@ func main() {
 func checkStatus(url string) error {
 	client := siri.NewSOAPClient(url)
 	request := &siri.SIRICheckStatusRequest{
-		RequestorRef:      "NINOXE:default",
+		RequestorRef:      "Edwig",
 		RequestTimestamp:  api.DefaultClock().Now(),
-		MessageIdentifier: "CheckStatus:Test:0",
+		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
 	response, err := client.CheckStatus(request)
 	if err != nil {

@@ -75,7 +75,10 @@ func CheckStatusHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 	}
 
+	w.Header().Set("Content-Type", "text/xml")
+
 	response := new(SIRICheckStatusResponse)
+
 	response.Address = strings.Join([]string{r.URL.Host, r.URL.Path}, "")
 	response.ProducerRef = "Edwig"
 	response.RequestMessageRef = xmlRequest.MessageIdentifier()
