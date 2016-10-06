@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/af83/edwig/api"
+	"github.com/jonboulle/clockwork"
 )
 
 func Test_XMLCheckStatusRequest_RequestorRef(t *testing.T) {
@@ -86,6 +87,19 @@ func Test_SIRICheckStatusRequest_GenerateMessageIdentifier(t *testing.T) {
 
 	if expected := fmt.Sprintf("Edwig:Message::%s:LOC", uuidGenerator.LastUUID()); expected != request.MessageIdentifier {
 		t.Errorf("Wrong Message identifier :\n got:\n%v\nwant:\n%v", expected, request.MessageIdentifier)
+	}
+}
+
+func Test_SIRICheckStatusRequest_SetRequestTimestamp(t *testing.T) {
+	request := new(SIRICheckStatusRequest)
+
+	expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
+	clock := clockwork.NewFakeClockAt(expected)
+	request.SetClock(clock)
+	request.SetRequestTimestamp()
+
+	if !request.RequestTimestamp.Equal(expected) {
+		t.Errorf("Wrong Request Timestamp :\n got:\n%v\nwant:\n%v", expected, request.RequestTimestamp)
 	}
 }
 

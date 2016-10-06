@@ -32,6 +32,7 @@ type XMLCheckStatusResponse struct {
 
 type SIRICheckStatusResponse struct {
 	api.UUIDConsumer
+	api.ClockConsumer
 
 	Address                   string
 	ProducerRef               string
@@ -261,4 +262,8 @@ func (response *SIRICheckStatusResponse) BuildXML() string {
 
 func (response *SIRICheckStatusResponse) GenerateMessageIdentifier() {
 	response.ResponseMessageIdentifier = fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", response.NewUUID())
+}
+
+func (response *SIRICheckStatusResponse) SetResponseTimestamp() {
+	response.ResponseTimestamp = response.Clock().Now()
 }

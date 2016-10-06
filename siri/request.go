@@ -24,6 +24,7 @@ type XMLCheckStatusRequest struct {
 
 type SIRICheckStatusRequest struct {
 	api.UUIDConsumer
+	api.ClockConsumer
 
 	MessageIdentifier string
 	RequestorRef      string
@@ -100,4 +101,8 @@ func (request *SIRICheckStatusRequest) BuildXML() string {
 
 func (request *SIRICheckStatusRequest) GenerateMessageIdentifier() {
 	request.MessageIdentifier = fmt.Sprintf("Edwig:Message::%s:LOC", request.NewUUID())
+}
+
+func (request *SIRICheckStatusRequest) SetRequestTimestamp() {
+	request.RequestTimestamp = request.Clock().Now()
 }

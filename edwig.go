@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/siri"
-	"time"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func checkStatus(url string) error {
 	client := siri.NewSOAPClient(url)
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      "NINOXE:default",
-		RequestTimestamp:  time.Now(), // FIXME Use clock. See #1735
+		RequestTimestamp:  api.DefaultClock().Now(),
 		MessageIdentifier: "CheckStatus:Test:0",
 	}
 	response, err := client.CheckStatus(request)

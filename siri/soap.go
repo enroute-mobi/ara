@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/af83/edwig/api"
 )
 
 type SOAPClient struct {
@@ -80,8 +81,8 @@ func CheckStatusHandler(w http.ResponseWriter, r *http.Request) {
 	response.RequestMessageRef = xmlRequest.MessageIdentifier()
 	response.GenerateMessageIdentifier()
 	response.Status = true // Temp
-	response.ResponseTimestamp = time.Now()
-	response.ServiceStartedTime = time.Now() //Temp
+	response.SetResponseTimestamp()
+	response.ServiceStartedTime = api.DefaultClock().Now() //Temp
 
 	fmt.Fprintf(w, response.BuildXML())
 }
