@@ -12,6 +12,7 @@ func Test_XMLCheckStatusRequest_RequestorRef(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
@@ -28,6 +29,7 @@ func Test_XMLCheckStatusRequest_RequestTimestamp(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
@@ -44,6 +46,7 @@ func Test_XMLCheckStatusRequest_MessageIdentifier(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
@@ -76,6 +79,7 @@ func BenchmarkParseRequest(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		b.Fatal(err)

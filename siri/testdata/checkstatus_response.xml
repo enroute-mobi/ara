@@ -13,7 +13,12 @@
 		<ns2:RequestMessageRef>CheckStatus:Test:0</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>
-		<ns2:Status>true</ns2:Status>
+		<ns2:Status>false</ns2:Status>
+		<ns2:ErrorCondition>
+			<ns2:OtherError number="103">
+				<ns2:ErrorText>UNAVAILABLE</ns2:ErrorText>
+			</ns2:ServiceNotAvailableError>
+		</ns2:ErrorCondition>
 		<ns2:ServiceStartedTime>2016-09-21T03:30:22.996+02:00</ns2:ServiceStartedTime>
 	</Answer>
 	<AnswerExtension />
