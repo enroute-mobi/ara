@@ -1,10 +1,13 @@
 package siri
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/af83/edwig/api"
 )
 
 func Test_XMLCheckStatusRequest_RequestorRef(t *testing.T) {
@@ -74,6 +77,18 @@ func Test_SIRICheckStatusRequest_BuildXML(t *testing.T) {
 	}
 }
 
+func Test_SIRICheckStatusRequest_GenerateMessageIdentifier(t *testing.T) {
+	request := new(SIRICheckStatusRequest)
+
+	uuidGenerator := api.NewFakeUUIDGenerator()
+	request.SetUUIDGenerator(uuidGenerator)
+	request.GenerateMessageIdentifier()
+
+	if expected := fmt.Sprintf("Edwig:Message::%s:LOC", uuidGenerator.LastUUID()); expected != request.MessageIdentifier {
+		t.Errorf("Wrong Message identifier :\n got:\n%v\nwant:\n%v", expected, request.MessageIdentifier)
+	}
+}
+
 func BenchmarkParseRequest(b *testing.B) {
 	file, err := os.Open("testdata/checkstatus_request.xml")
 	if err != nil {
@@ -97,6 +112,7 @@ func BenchmarkGenerateRequest(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		r := NewSIRICheckStatusRequest("test", date, "test")
+		r.GenerateMessageIdentifier()
 		r.BuildXML()
 	}
 }

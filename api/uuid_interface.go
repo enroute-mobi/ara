@@ -60,3 +60,22 @@ func (generator *FakeUUIDGenerator) NewUUID() string {
 func (generator *FakeUUIDGenerator) LastUUID() string {
 	return generator.lastUUID
 }
+
+type UUIDConsumer struct {
+	uuidGenerator UUIDGenerator
+}
+
+func (consumer *UUIDConsumer) SetUUIDGenerator(uuidGenerator UUIDGenerator) {
+	consumer.uuidGenerator = uuidGenerator
+}
+
+func (consumer *UUIDConsumer) UUIDGenerator() UUIDGenerator {
+	if consumer.uuidGenerator == nil {
+		consumer.uuidGenerator = DefaultUUIDGenerator()
+	}
+	return consumer.uuidGenerator
+}
+
+func (consumer *UUIDConsumer) NewUUID() string {
+	return consumer.UUIDGenerator().NewUUID()
+}

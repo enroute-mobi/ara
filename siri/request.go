@@ -2,12 +2,14 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"runtime"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/af83/edwig/api"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -21,6 +23,8 @@ type XMLCheckStatusRequest struct {
 }
 
 type SIRICheckStatusRequest struct {
+	api.UUIDConsumer
+
 	MessageIdentifier string
 	RequestorRef      string
 	RequestTimestamp  time.Time
@@ -92,4 +96,8 @@ func (request *SIRICheckStatusRequest) BuildXML() string {
 		log.Fatal(err)
 	}
 	return buffer.String()
+}
+
+func (request *SIRICheckStatusRequest) GenerateMessageIdentifier() {
+	request.MessageIdentifier = fmt.Sprintf("Edwig:Message::%s:LOC", request.NewUUID())
 }

@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"runtime"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/api"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -29,6 +31,8 @@ type XMLCheckStatusResponse struct {
 }
 
 type SIRICheckStatusResponse struct {
+	api.UUIDConsumer
+
 	Address                   string
 	ProducerRef               string
 	RequestMessageRef         string
@@ -77,12 +81,12 @@ func NewXMLCheckStatusResponseFromContent(content []byte) (*XMLCheckStatusRespon
 	if err != nil {
 		return nil, err
 	}
-	request := NewXMLCheckStatusResponse(doc.Root().XmlNode)
-	finalizer := func(request *XMLCheckStatusResponse) {
+	response := NewXMLCheckStatusResponse(doc.Root().XmlNode)
+	finalizer := func(response *XMLCheckStatusResponse) {
 		doc.Free()
 	}
-	runtime.SetFinalizer(request, finalizer)
-	return request, nil
+	runtime.SetFinalizer(response, finalizer)
+	return response, nil
 }
 
 func NewSIRICheckStatusResponse(
@@ -110,57 +114,57 @@ func NewSIRICheckStatusResponse(
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) Address() string {
-	if request.address == "" {
-		nodes, err := request.node.Search("//*[local-name()='Address']")
+func (response *XMLCheckStatusResponse) Address() string {
+	if response.address == "" {
+		nodes, err := response.node.Search("//*[local-name()='Address']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.address = strings.TrimSpace(nodes[0].Content())
+		response.address = strings.TrimSpace(nodes[0].Content())
 	}
-	return request.address
+	return response.address
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) ProducerRef() string {
-	if request.producerRef == "" {
-		nodes, err := request.node.Search("//*[local-name()='ProducerRef']")
+func (response *XMLCheckStatusResponse) ProducerRef() string {
+	if response.producerRef == "" {
+		nodes, err := response.node.Search("//*[local-name()='ProducerRef']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.producerRef = strings.TrimSpace(nodes[0].Content())
+		response.producerRef = strings.TrimSpace(nodes[0].Content())
 	}
-	return request.producerRef
+	return response.producerRef
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) RequestMessageRef() string {
-	if request.requestMessageRef == "" {
-		nodes, err := request.node.Search("//*[local-name()='RequestMessageRef']")
+func (response *XMLCheckStatusResponse) RequestMessageRef() string {
+	if response.requestMessageRef == "" {
+		nodes, err := response.node.Search("//*[local-name()='RequestMessageRef']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.requestMessageRef = strings.TrimSpace(nodes[0].Content())
+		response.requestMessageRef = strings.TrimSpace(nodes[0].Content())
 	}
-	return request.requestMessageRef
+	return response.requestMessageRef
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
-	if request.responseMessageIdentifier == "" {
-		nodes, err := request.node.Search("//*[local-name()='ResponseMessageIdentifier']")
+func (response *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
+	if response.responseMessageIdentifier == "" {
+		nodes, err := response.node.Search("//*[local-name()='ResponseMessageIdentifier']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.responseMessageIdentifier = strings.TrimSpace(nodes[0].Content())
+		response.responseMessageIdentifier = strings.TrimSpace(nodes[0].Content())
 	}
-	return request.responseMessageIdentifier
+	return response.responseMessageIdentifier
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) Status() bool {
-	if !request.status {
-		nodes, err := request.node.Search("//*[local-name()='Status']")
+func (response *XMLCheckStatusResponse) Status() bool {
+	if !response.status {
+		nodes, err := response.node.Search("//*[local-name()='Status']")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -168,27 +172,27 @@ func (request *XMLCheckStatusResponse) Status() bool {
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.status = s
+		response.status = s
 	}
-	return request.status
+	return response.status
 }
 
 // TODO : Handle errors and see what to do if status is true
-func (request *XMLCheckStatusResponse) ErrorType() string {
-	if !request.Status() && request.errorType == "" {
-		nodes, err := request.node.Search("//*[local-name()='ErrorText']")
+func (response *XMLCheckStatusResponse) ErrorType() string {
+	if !response.Status() && response.errorType == "" {
+		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.errorType = nodes[0].Parent().Name()
+		response.errorType = nodes[0].Parent().Name()
 	}
-	return request.errorType
+	return response.errorType
 }
 
 // TODO : Handle errors and see what to do if status is true
-func (request *XMLCheckStatusResponse) ErrorNumber() int {
-	if !request.Status() && request.ErrorType() == "OtherError" && request.errorNumber == 0 {
-		nodes, err := request.node.Search("//*[local-name()='ErrorText']")
+func (response *XMLCheckStatusResponse) ErrorNumber() int {
+	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
+		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -196,27 +200,27 @@ func (request *XMLCheckStatusResponse) ErrorNumber() int {
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.errorNumber = n
+		response.errorNumber = n
 	}
-	return request.errorNumber
+	return response.errorNumber
 }
 
 // TODO : Handle errors and see what to do if status is true
-func (request *XMLCheckStatusResponse) ErrorText() string {
-	if !request.Status() && request.errorText == "" {
-		nodes, err := request.node.Search("//*[local-name()='ErrorText']")
+func (response *XMLCheckStatusResponse) ErrorText() string {
+	if !response.Status() && response.errorText == "" {
+		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.errorText = strings.TrimSpace(nodes[0].Content())
+		response.errorText = strings.TrimSpace(nodes[0].Content())
 	}
-	return request.errorText
+	return response.errorText
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
-	if request.responseTimestamp.IsZero() {
-		nodes, err := request.node.Search("//*[local-name()='ResponseTimestamp']")
+func (response *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
+	if response.responseTimestamp.IsZero() {
+		nodes, err := response.node.Search("//*[local-name()='ResponseTimestamp']")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -224,15 +228,15 @@ func (request *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.responseTimestamp = t
+		response.responseTimestamp = t
 	}
-	return request.responseTimestamp
+	return response.responseTimestamp
 }
 
 // TODO : Handle errors
-func (request *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
-	if request.serviceStartedTime.IsZero() {
-		nodes, err := request.node.Search("//*[local-name()='ServiceStartedTime']")
+func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
+	if response.serviceStartedTime.IsZero() {
+		nodes, err := response.node.Search("//*[local-name()='ServiceStartedTime']")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -240,17 +244,21 @@ func (request *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 		if err != nil {
 			log.Fatal(err)
 		}
-		request.serviceStartedTime = t
+		response.serviceStartedTime = t
 	}
-	return request.serviceStartedTime
+	return response.serviceStartedTime
 }
 
 // TODO : Handle errors
-func (request *SIRICheckStatusResponse) BuildXML() string {
+func (response *SIRICheckStatusResponse) BuildXML() string {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(SIRIResponseTemplate))
-	if err := siriResponse.Execute(&buffer, request); err != nil {
+	if err := siriResponse.Execute(&buffer, response); err != nil {
 		log.Fatal(err)
 	}
 	return buffer.String()
+}
+
+func (response *SIRICheckStatusResponse) GenerateMessageIdentifier() {
+	response.ResponseMessageIdentifier = fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", response.NewUUID())
 }
