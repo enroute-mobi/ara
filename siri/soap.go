@@ -1,8 +1,10 @@
 package siri
 
 import (
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -52,8 +54,20 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 		return nil, errors.New(strings.Join([]string{"Request error, response status code: ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
+	// Check if response is gzip
+	var responseReader io.ReadCloser
+	if response.Header.Get("Content-Encoding") == "gzip" {
+		responseReader, err = gzip.NewReader(response.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer responseReader.Close()
+	} else {
+		responseReader = response.Body
+	}
+
 	// Create XMLCheckStatusResponse
-	responseContent, err := ioutil.ReadAll(response.Body)
+	responseContent, err := ioutil.ReadAll(responseReader)
 	if err != nil {
 		return nil, err
 	}
@@ -66,19 +80,22 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 }
 
 func CheckStatusHandler(w http.ResponseWriter, r *http.Request) {
+	// Try to read and parse request body
 	requestContent, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		//Handle error
+		http.Error(w, "Invalid request: can't read content", 500)
+		return
 	}
 	xmlRequest, err := NewXMLCheckStatusRequestFromContent(requestContent)
 	if err != nil {
-		// Handle error
+		http.Error(w, "Invalid request: can't parse content", 500)
+		return
 	}
 
+	// Set Content-Type header and create a SIRICheckStatusResponse
 	w.Header().Set("Content-Type", "text/xml")
 
 	response := new(SIRICheckStatusResponse)
-
 	response.Address = strings.Join([]string{r.URL.Host, r.URL.Path}, "")
 	response.ProducerRef = "Edwig"
 	response.RequestMessageRef = xmlRequest.MessageIdentifier()
