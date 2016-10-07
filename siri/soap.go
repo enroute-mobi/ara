@@ -14,6 +14,8 @@ import (
 )
 
 type SOAPClient struct {
+	api.ClockConsumer
+
 	url string
 }
 
@@ -43,11 +45,13 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	httpRequest.Header.Set("Content-Type", "text/xml")
 
 	// Send http request
+	startTime := client.Clock().Now()
 	response, err := http.DefaultClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+	responseTime := client.Clock().Since(startTime)
 
 	// Check response status
 	if response.StatusCode != http.StatusOK {
@@ -75,6 +79,19 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	if err != nil {
 		return nil, err
 	}
+
+	// Log
+	if xmlResponse.Status() {
+		fmt.Print("SIRI OK - status true - ")
+	} else {
+		fmt.Print("SIRI CRITICAL: status false - ")
+		if xmlResponse.ErrorType() == "OtherError" {
+			fmt.Printf("%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())
+		} else {
+			fmt.Printf("%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())
+		}
+	}
+	fmt.Printf("%.3f seconds response time\n", responseTime.Seconds())
 
 	return xmlResponse, nil
 }
