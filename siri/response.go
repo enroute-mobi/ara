@@ -186,6 +186,14 @@ func (response *XMLCheckStatusResponse) ErrorType() string {
 			log.Fatal(err)
 		}
 		response.errorType = nodes[0].Parent().Name()
+		response.errorText = strings.TrimSpace(nodes[0].Content())
+		if response.errorType == "OtherError" {
+			n, err := strconv.Atoi(nodes[0].Parent().Attr("number"))
+			if err != nil {
+				log.Fatal(err)
+			}
+			response.errorNumber = n
+		}
 	}
 	return response.errorType
 }

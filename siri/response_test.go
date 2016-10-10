@@ -111,6 +111,14 @@ func Test_XMLCheckStatusRequest_ErrorType(t *testing.T) {
 	if expected := "OtherError"; response.ErrorType() != expected {
 		t.Errorf("Wrong Error type:\n got: %v\nwant: %v", response.ErrorType(), expected)
 	}
+
+	if expected := 103; response.ErrorNumber() != expected {
+		t.Errorf("Wrong Error number when calling ErrorType:\n got: %v\nwant: %v", response.ErrorNumber(), expected)
+	}
+
+	if expected := "UNAVAILABLE"; response.ErrorText() != expected {
+		t.Errorf("Wrong Error text when calling ErrorType:\n got: %v\nwant: %v", response.ErrorText(), expected)
+	}
 }
 
 func Test_XMLCheckStatusRequest_ErrorNumber(t *testing.T) {
@@ -126,7 +134,7 @@ func Test_XMLCheckStatusRequest_ErrorNumber(t *testing.T) {
 
 	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := 103; response.ErrorNumber() != expected {
-		t.Errorf("Wrong Error type:\n got: %v\nwant: %v", response.ErrorNumber(), expected)
+		t.Errorf("Wrong Error number:\n got: %v\nwant: %v", response.ErrorNumber(), expected)
 	}
 }
 
@@ -143,7 +151,7 @@ func Test_XMLCheckStatusRequest_ErrorText(t *testing.T) {
 
 	response, _ := NewXMLCheckStatusResponseFromContent(content)
 	if expected := "UNAVAILABLE"; response.ErrorText() != expected {
-		t.Errorf("Wrong Error type:\n got: %v\nwant: %v", response.ErrorText(), expected)
+		t.Errorf("Wrong Error text:\n got: %v\nwant: %v", response.ErrorText(), expected)
 	}
 }
 
