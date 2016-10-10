@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -81,17 +82,19 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	}
 
 	// Log
+	var logMessage []byte
 	if xmlResponse.Status() {
-		fmt.Print("SIRI OK - status true - ")
+		logMessage = []byte("SIRI OK - status true - ")
 	} else {
-		fmt.Print("SIRI CRITICAL: status false - ")
+		logMessage = []byte("SIRI CRITICAL: status false - ")
 		if xmlResponse.ErrorType() == "OtherError" {
-			fmt.Printf("%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())
+			logMessage = append(logMessage, fmt.Sprintf("%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())...)
 		} else {
-			fmt.Printf("%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())
+			logMessage = append(logMessage, fmt.Sprintf("%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())...)
 		}
 	}
-	fmt.Printf("%.3f seconds response time\n", responseTime.Seconds())
+	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
+	log.Println(string(logMessage[:]))
 
 	return xmlResponse, nil
 }
