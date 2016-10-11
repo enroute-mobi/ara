@@ -3,21 +3,29 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/siri"
+	"github.com/jonboulle/clockwork"
 )
 
 func main() {
 	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
+	clockPtr := flag.String("testclock", "", "use a fake clock at time given. Format 20060102-1504")
 
 	flag.Parse()
 
 	if *uuidPtr {
 		api.SetDefaultUUIDGenerator(api.NewFakeUUIDGenerator())
 	}
-
-	fmt.Println(api.DefaultUUIDGenerator().NewUUID())
+	if *clockPtr != "" {
+		testTime, err := time.Parse("20060102-1504", *clockPtr)
+		if err != nil {
+			panic(err)
+		}
+		api.SetDefaultClock(clockwork.NewFakeClockAt(testTime))
+	}
 
 	command := flag.Args()[0]
 
