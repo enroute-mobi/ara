@@ -9,7 +9,15 @@ import (
 )
 
 func main() {
+	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
+
 	flag.Parse()
+
+	if *uuidPtr {
+		api.SetDefaultUUIDGenerator(api.NewFakeUUIDGenerator())
+	}
+
+	fmt.Println(api.DefaultUUIDGenerator().NewUUID())
 
 	command := flag.Args()[0]
 
