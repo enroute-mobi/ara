@@ -1,0 +1,26 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header />
+  <S:Body>
+    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
+                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+      <ServiceRequestInfo>
+        <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
+        <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
+        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+      </ServiceRequestInfo>
+
+      <Request version="2.0:FR-IDF-2.4">
+        <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
+        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+        <ns2:StartTime>2016-09-22T07:54:52.977Z</ns2:StartTime>
+        <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+        <ns2:StopVisitTypes>arrivals</ns2:StopVisitTypes>
+      </Request>
+      <RequestExtension />
+    </ns7:GetStopMonitoring>
+  </S:Body>
+</S:Envelope>
