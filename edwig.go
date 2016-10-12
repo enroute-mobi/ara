@@ -30,7 +30,7 @@ func main() {
 		api.SetDefaultClock(clockwork.NewFakeClockAt(testTime))
 	}
 
-	if len(flag.Args()) < 2 {
+	if len(flag.Args()) < 1 {
 		fmt.Printf("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n             check <url>\n")
 		os.Exit(0)
 	}
@@ -41,6 +41,8 @@ func main() {
 	switch command {
 	case "check":
 		err = checkStatus(flag.Args()[1], *requestorRefPtr)
+	case "api":
+		err = api.NewServer("localhost:8080").ListenAndServe()
 	}
 
 	if err != nil {
