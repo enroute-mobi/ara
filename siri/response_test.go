@@ -1,14 +1,10 @@
 package siri
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
-
-	"github.com/af83/edwig/api"
-	"github.com/jonboulle/clockwork"
 )
 
 func Test_XMLCheckStatusRequest_Address(t *testing.T) {
@@ -223,30 +219,30 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 	}
 }
 
-func Test_SIRICheckStatusResponse_GenerateMessageIdentifier(t *testing.T) {
-	response := new(SIRICheckStatusResponse)
+// func Test_SIRICheckStatusResponse_GenerateMessageIdentifier(t *testing.T) {
+// 	response := new(SIRICheckStatusResponse)
 
-	uuidGenerator := api.NewFakeUUIDGenerator()
-	response.SetUUIDGenerator(uuidGenerator)
-	response.GenerateMessageIdentifier()
+// 	uuidGenerator := api.NewFakeUUIDGenerator()
+// 	response.SetUUIDGenerator(uuidGenerator)
+// 	response.GenerateMessageIdentifier()
 
-	if expected := fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", uuidGenerator.LastUUID()); expected != response.ResponseMessageIdentifier {
-		t.Errorf("Wrong Message identifier:\n got:\n%v\nwant:\n%v", expected, response.ResponseMessageIdentifier)
-	}
-}
+// 	if expected := fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", uuidGenerator.LastUUID()); expected != response.ResponseMessageIdentifier {
+// 		t.Errorf("Wrong Message identifier:\n got:\n%v\nwant:\n%v", expected, response.ResponseMessageIdentifier)
+// 	}
+// }
 
-func Test_SIRICheckStatusResponse_SetResponseTimestamp(t *testing.T) {
-	response := new(SIRICheckStatusResponse)
+// func Test_SIRICheckStatusResponse_SetResponseTimestamp(t *testing.T) {
+// 	response := new(SIRICheckStatusResponse)
 
-	expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
-	clock := clockwork.NewFakeClockAt(expected)
-	response.SetClock(clock)
-	response.SetResponseTimestamp()
+// 	expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
+// 	clock := clockwork.NewFakeClockAt(expected)
+// 	response.SetClock(clock)
+// 	response.SetResponseTimestamp()
 
-	if !response.ResponseTimestamp.Equal(expected) {
-		t.Errorf("Wrong Response Timestamp:\n got:\n%v\nwant:\n%v", expected, response.ResponseTimestamp)
-	}
-}
+// 	if !response.ResponseTimestamp.Equal(expected) {
+// 		t.Errorf("Wrong Response Timestamp:\n got:\n%v\nwant:\n%v", expected, response.ResponseTimestamp)
+// 	}
+// }
 
 func BenchmarkParseResponse(b *testing.B) {
 	file, err := os.Open("testdata/checkstatus_response.xml")
@@ -280,7 +276,6 @@ func BenchmarkGenerateResponse(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		r := NewSIRICheckStatusResponse("address", "producer", "ref", "identifier", false, "error", 103, "text", responseTimestamp, serviceStartedTime)
-		r.GenerateMessageIdentifier()
 		r.BuildXML()
 	}
 }
