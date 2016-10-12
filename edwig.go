@@ -58,11 +58,30 @@ func checkStatus(url string, requestorRef string) error {
 		RequestTimestamp:  api.DefaultClock().Now(),
 		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
-	fmt.Println(request)
-	response, err := client.CheckStatus(request)
+
+	startTime := time.Now()
+
+	xmlResponse, err := client.CheckStatus(request)
 	if err != nil {
 		return err
 	}
-	fmt.Println(response)
+
+	responseTime := time.Since(startTime)
+
+	// Log
+	var logMessage []byte
+	if xmlResponse.Status() {
+		logMessage = []byte("SIRI OK - status true - ")
+	} else {
+		logMessage = []byte("SIRI CRITICAL: status false - ")
+		if xmlResponse.ErrorType() == "OtherError" {
+			logMessage = append(logMessage, fmt.Sprintf("%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())...)
+		} else {
+			logMessage = append(logMessage, fmt.Sprintf("%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())...)
+		}
+	}
+	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
+	log.Println(string(logMessage[:]))
+
 	return nil
 }
