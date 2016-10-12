@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/af83/edwig/api"
@@ -13,6 +15,7 @@ import (
 func main() {
 	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "use a fake clock at time given. Format 20060102-1504")
+	requestorRefPtr := flag.String("requestor-ref", "Edwig", "Specify requestorRef")
 
 	flag.Parse()
 
@@ -27,26 +30,35 @@ func main() {
 		api.SetDefaultClock(clockwork.NewFakeClockAt(testTime))
 	}
 
+	if len(flag.Args()) < 2 {
+		fmt.Printf("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n             check <url>\n")
+		os.Exit(0)
+	}
+
 	command := flag.Args()[0]
 
 	var err error
 	switch command {
 	case "check":
-		err = checkStatus(flag.Args()[1])
+		err = checkStatus(flag.Args()[1], *requestorRefPtr)
 	}
 
 	if err != nil {
-		panic(err)
+		if _, ok := err.(*siri.SiriError); !ok {
+			panic(err)
+		}
+		log.Println(err)
 	}
 }
 
-func checkStatus(url string) error {
+func checkStatus(url string, requestorRef string) error {
 	client := siri.NewSOAPClient(url)
 	request := &siri.SIRICheckStatusRequest{
-		RequestorRef:      "Edwig",
+		RequestorRef:      requestorRef,
 		RequestTimestamp:  api.DefaultClock().Now(),
 		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
+	fmt.Println(request)
 	response, err := client.CheckStatus(request)
 	if err != nil {
 		return err

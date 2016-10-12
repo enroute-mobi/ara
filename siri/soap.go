@@ -2,7 +2,6 @@ package siri
 
 import (
 	"compress/gzip"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -22,6 +21,19 @@ type SOAPClient struct {
 
 func NewSOAPClient(url string) *SOAPClient {
 	return &SOAPClient{url: url}
+}
+
+// Handle SIRI CRITICAL errors
+type SiriError struct {
+	message string
+}
+
+func (e *SiriError) Error() string {
+	return e.message
+}
+
+func newSiriError(message string) error {
+	return &SiriError{message: message}
 }
 
 // Temp
@@ -56,7 +68,7 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 
 	// Check response status
 	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(strings.Join([]string{"Request error, response status code: ", strconv.Itoa(response.StatusCode)}, ""))
+		return nil, newSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
 	// Check if response is gzip
