@@ -9,7 +9,6 @@ import (
 
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/siri"
-	"github.com/jonboulle/clockwork"
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		api.SetDefaultClock(clockwork.NewFakeClockAt(testTime))
+		api.SetDefaultClock(api.NewFakeClockAt(testTime))
 	}
 
 	if len(flag.Args()) < 1 {

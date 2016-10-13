@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/af83/edwig/siri"
-	"github.com/jonboulle/clockwork"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -10,7 +9,7 @@ import (
 	"time"
 )
 
-func NewTestServer(clock clockwork.Clock) *Server {
+func NewTestServer(clock Clock) *Server {
 	server := Server{}
 	server.SetClock(clock)
 	server.startedTime = server.Clock().Now()
@@ -18,7 +17,7 @@ func NewTestServer(clock clockwork.Clock) *Server {
 }
 
 func Test_CheckStatusHandler(t *testing.T) {
-	server := NewTestServer(clockwork.NewFakeClock())
+	server := NewTestServer(NewFakeClock())
 
 	// Set the fake clock and UUID generator
 	server.SetUUIDGenerator(NewFakeUUIDGenerator())
