@@ -14,7 +14,6 @@ import (
 func main() {
 	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "use a fake clock at time given. Format 20060102-1504")
-	requestorRefPtr := flag.String("requestor-ref", "Edwig", "Specify requestorRef")
 
 	flag.Parse()
 
@@ -29,8 +28,10 @@ func main() {
 		api.SetDefaultClock(api.NewFakeClockAt(testTime))
 	}
 
-	if len(flag.Args()) < 1 {
-		fmt.Printf("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n             <command> [<args>]\n")
+	if len(flag.Args()) == 0 {
+		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n")
+		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
+		fmt.Println("\tapi")
 		os.Exit(1)
 	}
 
@@ -39,7 +40,11 @@ func main() {
 	var err error
 	switch command {
 	case "check":
-		err = checkStatus(flag.Args()[1], *requestorRefPtr)
+		checkFlags := flag.NewFlagSet("check", flag.ExitOnError)
+		requestorRefPtr := checkFlags.String("requestor-ref", "Edwig", "Specify requestorRef")
+		checkFlags.Parse(flag.Args()[1:])
+
+		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
 	case "api":
 		err = api.NewServer("localhost:8080").ListenAndServe()
 	}
