@@ -30,8 +30,8 @@ func main() {
 	}
 
 	if len(flag.Args()) < 1 {
-		fmt.Printf("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n             check <url>\n")
-		os.Exit(0)
+		fmt.Printf("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n             <command> [<args>]\n")
+		os.Exit(1)
 	}
 
 	command := flag.Args()[0]
@@ -49,7 +49,10 @@ func main() {
 			panic(err)
 		}
 		log.Println(err)
+		os.Exit(2)
 	}
+
+	os.Exit(0)
 }
 
 func checkStatus(url string, requestorRef string) error {
