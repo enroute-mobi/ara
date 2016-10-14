@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/jonboulle/clockwork"
 	"time"
+
+	"github.com/jonboulle/clockwork"
 )
 
 type Clock interface {

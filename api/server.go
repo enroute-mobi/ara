@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
-	"github.com/af83/edwig/siri"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/af83/edwig/siri"
 )
 
 type Server struct {
@@ -56,5 +57,5 @@ func (server *Server) checkStatusHandler(w http.ResponseWriter, r *http.Request)
 	response.ResponseTimestamp = server.Clock().Now()
 	response.ServiceStartedTime = server.startedTime
 
-	fmt.Fprintf(w, response.BuildXML())
+	fmt.Fprintf(w, siri.WrapSoap(response.BuildXML()))
 }

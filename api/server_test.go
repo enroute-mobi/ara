@@ -1,12 +1,13 @@
 package api
 
 import (
-	"github.com/af83/edwig/siri"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/af83/edwig/siri"
 )
 
 func NewTestServer(clock Clock) *Server {

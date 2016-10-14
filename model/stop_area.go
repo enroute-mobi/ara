@@ -3,18 +3,18 @@ package model
 type StopAreaId int64
 
 type StopArea struct {
-    id StopAreaId
+	id StopAreaId
 
-    // Name string
-    // ...
+	// Name string
+	// ...
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
-   return stopArea.id
+	return stopArea.id
 }
 
 type MemoryStopAreas struct {
-	byIdentifier map[StopAreaId]*StopArea
+	byIdentifier   map[StopAreaId]*StopArea
 	lastIdentifier StopAreaId
 }
 

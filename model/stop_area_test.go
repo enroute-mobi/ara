@@ -1,7 +1,7 @@
 package model
 
 import (
-    "testing"
+	"testing"
 )
 
 func Test_StopArea_Id(t *testing.T) {
@@ -10,31 +10,31 @@ func Test_StopArea_Id(t *testing.T) {
 	}
 
 	if stopArea.Id() != 42 {
-   	 	t.Errorf("StopArea.Id() returns wrong value, got: %v, required: %v", stopArea.Id(), 42)
-   	}
+		t.Errorf("StopArea.Id() returns wrong value, got: %v, required: %v", stopArea.Id(), 42)
+	}
 }
 
 func Test_MemoryStopAreas_New(t *testing.T) {
-    stopAreas := NewMemoryStopAreas()
+	stopAreas := NewMemoryStopAreas()
 
-    stopArea := stopAreas.New()
-    if stopArea.Id() != 0 {
-        t.Errorf("New StopArea identifier should be zero, got: %d", stopArea.Id())
-    }
+	stopArea := stopAreas.New()
+	if stopArea.Id() != 0 {
+		t.Errorf("New StopArea identifier should be zero, got: %d", stopArea.Id())
+	}
 }
 
 func Test_MemoryStopAreas_Save(t *testing.T) {
-    stopAreas := NewMemoryStopAreas()
+	stopAreas := NewMemoryStopAreas()
 
-    stopArea := stopAreas.New()
+	stopArea := stopAreas.New()
 
-    if success := stopAreas.Save(&stopArea); !success {
-        t.Errorf("Save should return true")
-    }
+	if success := stopAreas.Save(&stopArea); !success {
+		t.Errorf("Save should return true")
+	}
 
-    if stopArea.Id() == 0 {
-        t.Errorf("New StopArea identifier shouldn't be zero")
-    }
+	if stopArea.Id() == 0 {
+		t.Errorf("New StopArea identifier shouldn't be zero")
+	}
 }
 
 func Test_MemoryStopAreas_Save_NextIdentifier(t *testing.T) {
@@ -45,34 +45,34 @@ func Test_MemoryStopAreas_Save_NextIdentifier(t *testing.T) {
 		stopAreas.Save(&stopArea)
 
 		if stopArea.Id() != StopAreaId(expectedIdentifier) {
-	        t.Errorf("New StopArea identifier should be %v, got: %v", expectedIdentifier, stopArea.Id())
-	    }
+			t.Errorf("New StopArea identifier should be %v, got: %v", expectedIdentifier, stopArea.Id())
+		}
 	}
 }
 
 func Test_MemoryStopAreas_Find_NotFound(t *testing.T) {
-    stopAreas := NewMemoryStopAreas()
-    _, ok := stopAreas.Find(1)
-    if ok {
-        t.Errorf("Find should return false when StopArea isn't found")
-    }
+	stopAreas := NewMemoryStopAreas()
+	_, ok := stopAreas.Find(1)
+	if ok {
+		t.Errorf("Find should return false when StopArea isn't found")
+	}
 }
 
 func Test_MemoryStopAreas_Find(t *testing.T) {
-    stopAreas := NewMemoryStopAreas()
+	stopAreas := NewMemoryStopAreas()
 
-    existingStopArea := stopAreas.New()
-    stopAreas.Save(&existingStopArea)
+	existingStopArea := stopAreas.New()
+	stopAreas.Save(&existingStopArea)
 
-    stopAreaId := existingStopArea.Id()
+	stopAreaId := existingStopArea.Id()
 
-    stopArea, ok := stopAreas.Find(stopAreaId)
-    if !ok {
-        t.Errorf("Find should return true when StopArea is found")
-    }
-    if stopArea.Id() != stopAreaId {
-        t.Errorf("Find should return a StopArea with the given Id")
-    }
+	stopArea, ok := stopAreas.Find(stopAreaId)
+	if !ok {
+		t.Errorf("Find should return true when StopArea is found")
+	}
+	if stopArea.Id() != stopAreaId {
+		t.Errorf("Find should return a StopArea with the given Id")
+	}
 }
 
 func Test_MemoryStopAreas_Delete(t *testing.T) {
@@ -84,7 +84,7 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas.Delete(&existingStopArea)
 
 	_, ok := stopAreas.Find(existingStopArea.Id())
-    if ok {
-        t.Errorf("Deleted StopArea should be findable")
-    }
+	if ok {
+		t.Errorf("Deleted StopArea should be findable")
+	}
 }
