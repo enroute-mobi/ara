@@ -11,7 +11,8 @@ import (
 )
 
 func Test_WrapSoap(t *testing.T) {
-	expected := `<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+	expected := `<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
 	<S:Body>
 test
 	</S:Body>
@@ -67,7 +68,7 @@ func Test_SOAPClient_CheckStatus(t *testing.T) {
 	}
 
 	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T03:30:32+02:00"); !response.ServiceStartedTime().Equal(expected) {
-		t.Errorf("Wrong ResponseTimestamp in response:\n got: %v\n want: %v", response.ServiceStartedTime(), expected)
+		t.Errorf("Wrong ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime(), expected)
 	}
 }
 

@@ -33,7 +33,7 @@ func newSiriError(message string) error {
 // Temp
 func WrapSoap(s string) string {
 	soap := strings.Join([]string{
-		"<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\t<S:Body>\n",
+		"<?xml version='1.0' encoding='utf-8'?>\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n\t<S:Body>\n",
 		s,
 		"\n\t</S:Body>\n</S:Envelope>"}, "")
 	return soap
