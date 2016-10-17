@@ -13,7 +13,7 @@ import (
 )
 
 type XMLCheckStatusRequest struct {
-	node *xml.XmlNode
+	node xml.Node
 
 	messageIdentifier string
 	requestorRef      string
@@ -35,7 +35,7 @@ const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/
 	<RequestExtension/>
 </ns7:CheckStatus>`
 
-func NewXMLCheckStatusRequest(node *xml.XmlNode) *XMLCheckStatusRequest {
+func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
 	return &XMLCheckStatusRequest{node: node}
 }
 

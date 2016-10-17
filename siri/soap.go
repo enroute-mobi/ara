@@ -2,11 +2,17 @@ package siri
 
 import (
 	"compress/gzip"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/jbowtie/gokogiri"
+	"github.com/jbowtie/gokogiri/xml"
 )
 
 type SOAPClient struct {
@@ -15,6 +21,50 @@ type SOAPClient struct {
 
 func NewSOAPClient(url string) *SOAPClient {
 	return &SOAPClient{url: url}
+}
+
+// Need to check if all are needed
+type SOAPEnvelope struct {
+	body xml.Node
+
+	bodyType string
+}
+
+func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
+	// Attempt to read the body
+	content, err := ioutil.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the XML and store the body
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	nodes, err := doc.Root().Search("//*[local-name()='Body']/*")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	soapEnvelope := &SOAPEnvelope{body: nodes[0]}
+	finalizer := func(document *xml.XmlDocument) {
+		document.Free()
+	}
+	runtime.SetFinalizer(doc, finalizer)
+
+	return soapEnvelope, nil
+}
+
+func (envelope *SOAPEnvelope) BodyType() string {
+	if envelope.bodyType == "" {
+		envelope.bodyType = envelope.body.Name()
+	}
+	return envelope.bodyType
+}
+
+func (envelope *SOAPEnvelope) Body() xml.Node {
+	return envelope.body
 }
 
 // Handle SIRI CRITICAL errors
@@ -76,14 +126,13 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	}
 
 	// Create XMLCheckStatusResponse
-	responseContent, err := ioutil.ReadAll(responseReader)
-	if err != nil {
-		return nil, err
-	}
-	xmlResponse, err := NewXMLCheckStatusResponseFromContent(responseContent)
-	if err != nil {
-		return nil, err
+	envelope, err := NewSOAPEnvelope(responseReader)
+
+	if envelope.BodyType() != "CheckStatusResponse" {
+		return nil, newSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 	}
 
-	return xmlResponse, nil
+	checkStatus := NewXMLCheckStatusResponse(envelope.Body())
+
+	return checkStatus, nil
 }

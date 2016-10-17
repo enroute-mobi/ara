@@ -14,7 +14,7 @@ import (
 )
 
 type XMLCheckStatusResponse struct {
-	node *xml.XmlNode
+	node xml.Node
 
 	address                   string
 	producerRef               string
@@ -68,7 +68,7 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 	<AnswerExtension />
 </ns7:CheckStatusResponse>`
 
-func NewXMLCheckStatusResponse(node *xml.XmlNode) *XMLCheckStatusResponse {
+func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
 	return &XMLCheckStatusResponse{node: node}
 }
 
