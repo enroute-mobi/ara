@@ -1,6 +1,7 @@
 package siri
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -10,11 +11,14 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
-// Need to check if all are needed
 type SOAPEnvelope struct {
 	body xml.Node
 
 	bodyType string
+}
+
+type SOAPEnvelopeBuffer struct {
+	buffer bytes.Buffer
 }
 
 func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
@@ -52,4 +56,24 @@ func (envelope *SOAPEnvelope) BodyType() string {
 
 func (envelope *SOAPEnvelope) Body() xml.Node {
 	return envelope.body
+}
+
+func NewSOAPEnvelopeBuffer() *SOAPEnvelopeBuffer {
+	return &SOAPEnvelopeBuffer{}
+}
+
+func (writer *SOAPEnvelopeBuffer) WriteXML(xml string) {
+	writer.buffer.WriteString("<?xml version='1.0' encoding='utf-8'?>\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<S:Body>\n")
+	writer.buffer.WriteString(xml)
+	writer.buffer.WriteString("\n</S:Body>\n</S:Envelope>")
+}
+
+func (writer *SOAPEnvelopeBuffer) Read(p []byte) (n int, err error) {
+	n, err = writer.buffer.Read(p)
+	return
+}
+
+func (writer *SOAPEnvelopeBuffer) WriteTo(w io.Writer) (n int64, err error) {
+	n, err = writer.buffer.WriteTo(w)
+	return
 }

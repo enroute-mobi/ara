@@ -29,7 +29,7 @@ func main() {
 	}
 
 	if len(flag.Args()) == 0 {
-		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]\n")
+		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi")
 		os.Exit(1)
