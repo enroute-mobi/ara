@@ -1,6 +1,7 @@
 package siri
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,10 +11,19 @@ import (
 	"time"
 )
 
+func testSOAPFile(name string) (*os.File, error) {
+	// Create a new SOAPEnvelope
+	file, err := os.Open(fmt.Sprintf("testdata/%s-soap.xml", name))
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
 func Test_SOAPClient_CheckStatus(t *testing.T) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("testdata/checkstatus-soap-response.xml")
+		file, err := testSOAPFile("checkstatus-response")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -63,7 +73,7 @@ func Test_SOAPClient_CheckStatus(t *testing.T) {
 func Test_SOAPClient_CheckStatus_GzipResponse(t *testing.T) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("testdata/checkstatus-soap-response.xml.gz")
+		file, err := os.Open("testdata/checkstatus-response-soap.xml.gz")
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -1,20 +1,28 @@
 package siri
 
 import (
-	"os"
 	"runtime"
 	"testing"
 )
 
-// Test the persistance of request body
-func Test_SOAPEnvelope_Finalizer(t *testing.T) {
+func testSOAPEnvelope(name string) (*SOAPEnvelope, error) {
 	// Create a new SOAPEnvelope
-	file, err := os.Open("testdata/checkstatus-soap-response.xml")
+	file, err := testSOAPFile(name)
 	if err != nil {
-		t.Fatal(err)
+		return nil, err
 	}
 	defer file.Close()
+
 	envelope, err := NewSOAPEnvelope(file)
+	if err != nil {
+		return nil, err
+	}
+	return envelope, nil
+}
+
+// Test the persistance of request body
+func Test_SOAPEnvelope_Finalizer(t *testing.T) {
+	envelope, err := testSOAPEnvelope("checkstatus-response")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,12 +51,7 @@ func Test_SOAPEnvelope_Finalizer(t *testing.T) {
 }
 
 func Test_SOAPEnvelope_BodyType(t *testing.T) {
-	file, err := os.Open("testdata/checkstatus-soap-response.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer file.Close()
-	envelope, err := NewSOAPEnvelope(file)
+	envelope, err := testSOAPEnvelope("checkstatus-response")
 	if err != nil {
 		t.Fatal(err)
 	}
