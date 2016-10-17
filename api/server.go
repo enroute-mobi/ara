@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -31,17 +30,18 @@ func (server *Server) ListenAndServe() error {
 }
 
 func (server *Server) checkStatusHandler(w http.ResponseWriter, r *http.Request) {
-	// Try to read and parse request body
-	requestContent, err := ioutil.ReadAll(r.Body)
+	// Create XMLCheckStatusResponse
+	envelope, err := siri.NewSOAPEnvelope(r.Body)
 	if err != nil {
-		http.Error(w, "Invalid request: can't read content", 500)
+		http.Error(w, "Invalid request: can't read content", 400)
 		return
 	}
-	xmlRequest, err := siri.NewXMLCheckStatusRequestFromContent(requestContent)
-	if err != nil {
-		http.Error(w, "Invalid request: can't parse content", 500)
+	if envelope.BodyType() != "CheckStatus" {
+		fmt.Println(envelope.BodyType())
+		http.Error(w, "Invalid request: not a checkstatus", 400)
 		return
 	}
+	xmlRequest := siri.NewXMLCheckStatusRequest(envelope.Body())
 
 	fmt.Printf("CheckStatus %s\n", xmlRequest.MessageIdentifier())
 
