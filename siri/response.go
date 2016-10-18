@@ -14,7 +14,7 @@ import (
 )
 
 type XMLCheckStatusResponse struct {
-	node xml.Node
+	XMLStructure
 
 	address                   string
 	producerRef               string
@@ -69,7 +69,7 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 </ns7:CheckStatusResponse>`
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
-	return &XMLCheckStatusResponse{node: node}
+	return &XMLCheckStatusResponse{XMLStructure: XMLStructure{node: node}}
 }
 
 func NewXMLCheckStatusResponseFromContent(content []byte) (*XMLCheckStatusResponse, error) {
@@ -109,81 +109,53 @@ func NewSIRICheckStatusResponse(
 		ServiceStartedTime: serviceStartedTime}
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) Address() string {
 	if response.address == "" {
-		nodes, err := response.node.Search("//*[local-name()='Address']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.address = strings.TrimSpace(nodes[0].Content())
+		response.address = response.findStringChildContent("Address")
 	}
 	return response.address
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) ProducerRef() string {
 	if response.producerRef == "" {
-		nodes, err := response.node.Search("//*[local-name()='ProducerRef']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.producerRef = strings.TrimSpace(nodes[0].Content())
+		response.producerRef = response.findStringChildContent("ProducerRef")
 	}
 	return response.producerRef
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) RequestMessageRef() string {
 	if response.requestMessageRef == "" {
-		nodes, err := response.node.Search("//*[local-name()='RequestMessageRef']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.requestMessageRef = strings.TrimSpace(nodes[0].Content())
+		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
 	}
 	return response.requestMessageRef
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
 	if response.responseMessageIdentifier == "" {
-		nodes, err := response.node.Search("//*[local-name()='ResponseMessageIdentifier']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.responseMessageIdentifier = strings.TrimSpace(nodes[0].Content())
+		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
 	}
 	return response.responseMessageIdentifier
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) Status() bool {
 	if !response.status {
-		nodes, err := response.node.Search("//*[local-name()='Status']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		s, err := strconv.ParseBool(strings.TrimSpace(nodes[0].Content()))
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.status = s
+		response.status = response.findBoolChildContent("Status")
 	}
 	return response.status
 }
 
-// TODO : Handle errors and see what to do if status is true
+// TODO: See what to do if status is true
+// we can't access directly the node, we search for errorText and get parent
+// Gokogiri FirstChild() or LastChild()  doesn't work
 func (response *XMLCheckStatusResponse) ErrorType() string {
 	if !response.Status() && response.errorType == "" {
-		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.errorType = nodes[0].Parent().Name()
-		response.errorText = strings.TrimSpace(nodes[0].Content())
+		node := response.findNode("ErrorText")
+		response.errorType = node.Parent().Name()
+
+		// Find errorText and errorNumber to avoir too much parsing
+		response.errorText = strings.TrimSpace(node.Content())
 		if response.errorType == "OtherError" {
-			n, err := strconv.Atoi(nodes[0].Parent().Attr("number"))
+			n, err := strconv.Atoi(node.Parent().Attr("number"))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -193,14 +165,11 @@ func (response *XMLCheckStatusResponse) ErrorType() string {
 	return response.errorType
 }
 
-// TODO : Handle errors and see what to do if status is true
+// TODO: See what to do if status is true
 func (response *XMLCheckStatusResponse) ErrorNumber() int {
 	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
-		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		n, err := strconv.Atoi(nodes[0].Parent().Attr("number"))
+		node := response.findNode("ErrorText")
+		n, err := strconv.Atoi(node.Parent().Attr("number"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -209,46 +178,24 @@ func (response *XMLCheckStatusResponse) ErrorNumber() int {
 	return response.errorNumber
 }
 
-// TODO : Handle errors and see what to do if status is true
+// TODO: See what to do if status is true
 func (response *XMLCheckStatusResponse) ErrorText() string {
 	if !response.Status() && response.errorText == "" {
-		nodes, err := response.node.Search("//*[local-name()='ErrorText']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.errorText = strings.TrimSpace(nodes[0].Content())
+		response.errorText = response.findStringChildContent("ErrorText")
 	}
 	return response.errorText
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
 	if response.responseTimestamp.IsZero() {
-		nodes, err := response.node.Search("//*[local-name()='ResponseTimestamp']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		t, err := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.responseTimestamp = t
+		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
 	}
 	return response.responseTimestamp
 }
 
-// TODO : Handle errors
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 	if response.serviceStartedTime.IsZero() {
-		nodes, err := response.node.Search("//*[local-name()='ServiceStartedTime']")
-		if err != nil {
-			log.Fatal(err)
-		}
-		t, err := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.serviceStartedTime = t
+		response.serviceStartedTime = response.findTimeChildContent("ServiceStartedTime")
 	}
 	return response.serviceStartedTime
 }
@@ -262,11 +209,3 @@ func (response *SIRICheckStatusResponse) BuildXML() string {
 	}
 	return buffer.String()
 }
-
-// func (response *SIRICheckStatusResponse) GenerateMessageIdentifier() {
-// 	response.ResponseMessageIdentifier = fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", response.NewUUID())
-// }
-
-// func (response *SIRICheckStatusResponse) SetResponseTimestamp() {
-// 	response.ResponseTimestamp = response.Clock().Now()
-// }

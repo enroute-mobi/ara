@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"log"
 	"runtime"
-	"strings"
 	"text/template"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 )
 
 type XMLCheckStatusRequest struct {
-	node xml.Node
+	XMLStructure
 
 	messageIdentifier string
 	requestorRef      string
@@ -36,7 +35,7 @@ const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/
 </ns7:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
-	return &XMLCheckStatusRequest{node: node}
+	return &XMLCheckStatusRequest{XMLStructure: XMLStructure{node: node}}
 }
 
 func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest, error) {
@@ -56,32 +55,25 @@ func NewSIRICheckStatusRequest(RequestorRef string, RequestTimestamp time.Time, 
 	return &SIRICheckStatusRequest{RequestorRef: RequestorRef, RequestTimestamp: RequestTimestamp, MessageIdentifier: MessageIdentifier}
 }
 
-// TODO : Handle errors
+func (request *XMLCheckStatusRequest) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
 func (request *XMLCheckStatusRequest) RequestorRef() string {
 	if request.requestorRef == "" {
-		nodes, _ := request.node.Search("//*[local-name()='RequestorRef']")
-		request.requestorRef = strings.TrimSpace(nodes[0].Content())
+		request.requestorRef = request.findStringChildContent("RequestorRef")
 	}
 	return request.requestorRef
 }
 
-// TODO : Handle errors
 func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
 	if request.requestTimestamp.IsZero() {
-		nodes, _ := request.node.Search("//*[local-name()='RequestTimestamp']")
-		t, _ := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(nodes[0].Content()))
-		request.requestTimestamp = t
+		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
 	}
 	return request.requestTimestamp
-}
-
-// TODO : Handle errors
-func (request *XMLCheckStatusRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		nodes, _ := request.node.Search("//*[local-name()='MessageIdentifier']")
-		request.messageIdentifier = strings.TrimSpace(nodes[0].Content())
-	}
-	return request.messageIdentifier
 }
 
 // TODO : Handle errors
