@@ -2,11 +2,12 @@ package siri
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"runtime"
 
+	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -35,7 +36,11 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 	}
 	nodes, err := doc.Root().Search("//*[local-name()='Body']/*")
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while parsing XML: %v", err)
+	}
+
+	if len(nodes) == 0 {
+		return nil, errors.New("Unable to find body when parsing SOAP request")
 	}
 
 	soapEnvelope := &SOAPEnvelope{body: nodes[0]}

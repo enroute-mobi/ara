@@ -3,19 +3,21 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/af83/edwig/api"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
 
 func main() {
-	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
-	clockPtr := flag.String("testclock", "", "use a fake clock at time given. Format 20060102-1504")
-	pidPtr := flag.String("pidfile", "", "write processus pid in given file")
+	uuidPtr := flag.Bool("testuuid", false, "Use the test uuid generator")
+	clockPtr := flag.String("testclock", "", "Use a fake clock at time given. Format 20060102-1504")
+	pidPtr := flag.String("pidfile", "", "Write processus pid in given file")
+	flag.BoolVar(&logger.Log.Debug, "debug", false, "Enable debug messages")
+	flag.BoolVar(&logger.Log.Syslog, "syslog", false, "Redirect messages to syslog")
 
 	flag.Parse()
 
@@ -39,7 +41,7 @@ func main() {
 	if *pidPtr != "" {
 		f, err := os.Create(*pidPtr)
 		if err != nil {
-			fmt.Println("Error: Unable to create a file at given path")
+			logger.Log.Printf("Error: Unable to create a file at given path")
 			os.Exit(2)
 		}
 		defer f.Close()
@@ -65,9 +67,10 @@ func main() {
 
 	if err != nil {
 		if _, ok := err.(*siri.SiriError); !ok {
-			panic(err)
+			logger.Log.Panicf("Error while running: %v", err)
 		}
-		log.Println(err)
+		// Siri errors
+		logger.Log.Printf("%v", err)
 		os.Exit(2)
 	}
 
@@ -104,7 +107,7 @@ func checkStatus(url string, requestorRef string) error {
 		}
 	}
 	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
-	log.Println(string(logMessage[:]))
+	logger.Log.Printf(string(logMessage[:]))
 
 	return nil
 }

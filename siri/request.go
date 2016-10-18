@@ -2,11 +2,11 @@ package siri
 
 import (
 	"bytes"
-	"log"
 	"runtime"
 	"text/template"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -81,7 +81,7 @@ func (request *SIRICheckStatusRequest) BuildXML() string {
 	var buffer bytes.Buffer
 	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRIRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while using request template: %v", err)
 	}
 	return buffer.String()
 }

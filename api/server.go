@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
 
@@ -25,7 +26,7 @@ func NewServer(bind string) *Server {
 
 func (server *Server) ListenAndServe() error {
 	http.HandleFunc("/siri", server.checkStatusHandler)
-	fmt.Printf("Starting server on %s\n", server.bind)
+	logger.Log.Debugf("Starting server on %s\n", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }
 
@@ -37,13 +38,12 @@ func (server *Server) checkStatusHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if envelope.BodyType() != "CheckStatus" {
-		fmt.Println(envelope.BodyType())
 		http.Error(w, "Invalid request: not a checkstatus", 400)
 		return
 	}
 	xmlRequest := siri.NewXMLCheckStatusRequest(envelope.Body())
 
-	fmt.Printf("CheckStatus %s\n", xmlRequest.MessageIdentifier())
+	logger.Log.Debugf("CheckStatus %s\n", xmlRequest.MessageIdentifier())
 
 	// Set Content-Type header and create a SIRICheckStatusResponse
 	w.Header().Set("Content-Type", "text/xml")

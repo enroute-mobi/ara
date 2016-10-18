@@ -2,11 +2,11 @@ package siri
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -18,7 +18,7 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf("//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.Search(xpath)
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
 	return nodes[0]
 }
@@ -33,7 +33,7 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 	node := xmlStruct.findNode(localName)
 	t, err := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(node.Content()))
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
 	return t
 }
@@ -42,7 +42,7 @@ func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
 	node := xmlStruct.findNode(localName)
 	s, err := strconv.ParseBool(strings.TrimSpace(node.Content()))
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
 	return s
 }

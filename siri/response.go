@@ -3,12 +3,12 @@ package siri
 import (
 	"bytes"
 	"html/template"
-	"log"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -157,7 +157,7 @@ func (response *XMLCheckStatusResponse) ErrorType() string {
 		if response.errorType == "OtherError" {
 			n, err := strconv.Atoi(node.Parent().Attr("number"))
 			if err != nil {
-				log.Fatal(err)
+				logger.Log.Panicf("Error while parsing error number: %v", err)
 			}
 			response.errorNumber = n
 		}
@@ -171,7 +171,7 @@ func (response *XMLCheckStatusResponse) ErrorNumber() int {
 		node := response.findNode("ErrorText")
 		n, err := strconv.Atoi(node.Parent().Attr("number"))
 		if err != nil {
-			log.Fatal(err)
+			logger.Log.Panicf("Error while using response template: %v", err)
 		}
 		response.errorNumber = n
 	}
@@ -205,7 +205,7 @@ func (response *SIRICheckStatusResponse) BuildXML() string {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(SIRIResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
-		log.Fatal(err)
+		logger.Log.Panicf("Error while using response template: %v", err)
 	}
 	return buffer.String()
 }
