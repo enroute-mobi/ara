@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/af83/edwig/api"
@@ -14,8 +15,16 @@ import (
 func main() {
 	uuidPtr := flag.Bool("testuuid", false, "use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "use a fake clock at time given. Format 20060102-1504")
+	pidPtr := flag.String("pidfile", "", "write processus pid in given file")
 
 	flag.Parse()
+
+	if len(flag.Args()) == 0 {
+		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
+		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
+		fmt.Println("\tapi")
+		os.Exit(1)
+	}
 
 	if *uuidPtr {
 		api.SetDefaultUUIDGenerator(api.NewFakeUUIDGenerator())
@@ -27,12 +36,17 @@ func main() {
 		}
 		api.SetDefaultClock(api.NewFakeClockAt(testTime))
 	}
-
-	if len(flag.Args()) == 0 {
-		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-requestor-ref=<requestor>]")
-		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
-		fmt.Println("\tapi")
-		os.Exit(1)
+	if *pidPtr != "" {
+		f, err := os.Create(*pidPtr)
+		if err != nil {
+			fmt.Println("Error: Unable to create a file at given path")
+			os.Exit(2)
+		}
+		defer f.Close()
+		_, err = f.WriteString(strconv.Itoa(os.Getpid()))
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	command := flag.Args()[0]
