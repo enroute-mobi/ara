@@ -57,5 +57,12 @@ func (server *Server) checkStatusHandler(w http.ResponseWriter, r *http.Request)
 	response.ResponseTimestamp = server.Clock().Now()
 	response.ServiceStartedTime = server.startedTime
 
-	fmt.Fprintf(w, siri.WrapSoap(response.BuildXML()))
+	// Wrap soap and send response
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope.WriteXML(response.BuildXML())
+
+	_, err = soapEnvelope.WriteTo(w)
+	if err != nil {
+		http.Error(w, "Service internal error", 500)
+	}
 }

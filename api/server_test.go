@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"time"
 
@@ -18,18 +17,18 @@ func NewTestServer(clock Clock) *Server {
 }
 
 func Test_CheckStatusHandler(t *testing.T) {
+	// create a server with a fake clock and fake UUID generator
 	server := NewTestServer(NewFakeClock())
-
-	// Set the fake clock and UUID generator
 	server.SetUUIDGenerator(NewFakeUUIDGenerator())
 
 	// Generate the request Body
-	requestBody := siri.WrapSoap(siri.NewSIRICheckStatusRequest("Edwig",
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope.WriteXML(siri.NewSIRICheckStatusRequest("Edwig",
 		DefaultClock().Now(),
 		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
 
 	// Create a request
-	request, err := http.NewRequest("POST", "/siri", strings.NewReader(requestBody))
+	request, err := http.NewRequest("POST", "/siri", soapEnvelope)
 	if err != nil {
 		t.Fatal(err)
 	}

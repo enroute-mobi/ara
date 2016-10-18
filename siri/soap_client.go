@@ -19,10 +19,11 @@ func NewSOAPClient(url string) *SOAPClient {
 
 func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLCheckStatusResponse, error) {
 	// Wrap the request XML
-	soapRequest := WrapSoap(request.BuildXML())
+	soapEnvelope := NewSOAPEnvelopeBuffer()
+	soapEnvelope.WriteXML(request.BuildXML())
 
 	// Create http request
-	httpRequest, err := http.NewRequest("POST", client.url, strings.NewReader(soapRequest))
+	httpRequest, err := http.NewRequest("POST", client.url, soapEnvelope)
 	if err != nil {
 		return nil, err
 	}
