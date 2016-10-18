@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-	<S:Body>
+<S:Body>
 <ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
 												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
 												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
@@ -21,5 +21,5 @@
 	</Answer>
 	<AnswerExtension />
 </ns7:CheckStatusResponse>
-	</S:Body>
+</S:Body>
 </S:Envelope>
