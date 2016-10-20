@@ -108,7 +108,7 @@ func checkStatus(url string, requestorRef string) error {
 		}
 	}
 	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
-	logger.Log.Printf(string(logMessage[:]))
+	logger.Log.Printf(string(logMessage))
 
 	return nil
 }

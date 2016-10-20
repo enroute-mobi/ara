@@ -17,14 +17,14 @@ type Server struct {
 
 	bind        string
 	startedTime time.Time
-}
 
-var memoryStopAreas *model.MemoryStopAreas
+	stopAreaController *StopAreaController
+}
 
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
-	memoryStopAreas = model.NewMemoryStopAreas()
+	server.stopAreaController = NewStopAreaController()
 	return &server
 }
 
