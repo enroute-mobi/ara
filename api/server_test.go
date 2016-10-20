@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
-func NewTestServer(clock Clock) *Server {
+func NewTestServer(clock model.Clock) *Server {
 	server := Server{}
 	server.SetClock(clock)
 	server.startedTime = server.Clock().Now()
@@ -18,13 +19,13 @@ func NewTestServer(clock Clock) *Server {
 
 func Test_CheckStatusHandler(t *testing.T) {
 	// create a server with a fake clock and fake UUID generator
-	server := NewTestServer(NewFakeClock())
-	server.SetUUIDGenerator(NewFakeUUIDGenerator())
+	server := NewTestServer(model.NewFakeClock())
+	server.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(siri.NewSIRICheckStatusRequest("Edwig",
-		DefaultClock().Now(),
+		model.DefaultClock().Now(),
 		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
 
 	// Create a request

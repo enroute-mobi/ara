@@ -7,20 +7,24 @@ import (
 	"time"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
 type Server struct {
-	UUIDConsumer
-	ClockConsumer
+	model.UUIDConsumer
+	model.ClockConsumer
 
 	bind        string
 	startedTime time.Time
 }
 
+var memoryStopAreas *model.MemoryStopAreas
+
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
+	memoryStopAreas = model.NewMemoryStopAreas()
 	return &server
 }
 

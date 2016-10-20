@@ -9,6 +9,7 @@ import (
 
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
@@ -29,14 +30,14 @@ func main() {
 	}
 
 	if *uuidPtr {
-		api.SetDefaultUUIDGenerator(api.NewFakeUUIDGenerator())
+		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
 	}
 	if *clockPtr != "" {
 		testTime, err := time.Parse("20060102-1504", *clockPtr)
 		if err != nil {
 			panic(err)
 		}
-		api.SetDefaultClock(api.NewFakeClockAt(testTime))
+		model.SetDefaultClock(model.NewFakeClockAt(testTime))
 	}
 	if *pidPtr != "" {
 		f, err := os.Create(*pidPtr)
@@ -81,7 +82,7 @@ func checkStatus(url string, requestorRef string) error {
 	client := siri.NewSOAPClient(url)
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
-		RequestTimestamp:  api.DefaultClock().Now(),
+		RequestTimestamp:  model.DefaultClock().Now(),
 		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
 

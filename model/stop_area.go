@@ -1,11 +1,10 @@
 package model
 
-type StopAreaId int64
+type StopAreaId string
 
 type StopArea struct {
-	id StopAreaId
-
-	// Name string
+	id   StopAreaId
+	Name string
 	// ...
 }
 
@@ -14,8 +13,9 @@ func (stopArea *StopArea) Id() StopAreaId {
 }
 
 type MemoryStopAreas struct {
-	byIdentifier   map[StopAreaId]*StopArea
-	lastIdentifier StopAreaId
+	UUIDConsumer
+
+	byIdentifier map[StopAreaId]*StopArea
 }
 
 func NewMemoryStopAreas() *MemoryStopAreas {
@@ -38,9 +38,8 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 }
 
 func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
-	if stopArea.Id() == 0 {
-		stopArea.id = manager.lastIdentifier + 1
-		manager.lastIdentifier = stopArea.id
+	if stopArea.Id() == "" {
+		stopArea.id = StopAreaId(manager.NewUUID())
 	}
 	manager.byIdentifier[stopArea.Id()] = stopArea
 	return true
