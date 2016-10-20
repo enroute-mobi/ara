@@ -62,6 +62,21 @@ func Test_MemoryStopAreas_Find(t *testing.T) {
 	}
 }
 
+func Test_MemoryStopAreas_FindAll(t *testing.T) {
+	stopAreas := NewMemoryStopAreas()
+
+	for i := 0; i < 5; i++ {
+		existingStopArea := stopAreas.New()
+		stopAreas.Save(&existingStopArea)
+	}
+
+	foundStopAreas := stopAreas.FindAll()
+
+	if len(foundStopAreas) != 5 {
+		t.Errorf("FindAll should return all stopAreas")
+	}
+}
+
 func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 

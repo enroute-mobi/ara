@@ -37,6 +37,13 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 	}
 }
 
+func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
+	for _, stopArea := range manager.byIdentifier {
+		stopAreas = append(stopAreas, *stopArea)
+	}
+	return
+}
+
 func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
