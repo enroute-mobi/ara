@@ -1,5 +1,7 @@
 package model
 
+import "encoding/json"
+
 type StopAreaId string
 
 type StopArea struct {
@@ -10,6 +12,13 @@ type StopArea struct {
 
 func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
+}
+
+func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Id":   stopArea.id,
+		"Name": stopArea.Name,
+	})
 }
 
 type MemoryStopAreas struct {

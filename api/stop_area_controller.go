@@ -94,7 +94,7 @@ func (controller *StopAreaController) Show(response http.ResponseWriter, identif
 	}
 	logger.Log.Debugf("Get stopArea %s", identifier)
 
-	jsonBytes, _ := json.Marshal(stopArea)
+	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
@@ -106,7 +106,7 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 	}
 	logger.Log.Debugf("Delete stopArea %s", identifier)
 
-	jsonBytes, _ := json.Marshal(stopArea)
+	jsonBytes, _ := stopArea.MarshalJSON()
 	controller.memoryStopAreas.Delete(&stopArea)
 	response.Write(jsonBytes)
 }
@@ -126,8 +126,8 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		return
 	}
 
-	jsonBytes, _ := json.Marshal(stopArea)
 	controller.memoryStopAreas.Save(&stopArea)
+	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
@@ -146,7 +146,7 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		return
 	}
 
-	jsonBytes, _ := json.Marshal(stopArea)
 	controller.memoryStopAreas.Save(&stopArea)
+	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }

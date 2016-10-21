@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -65,7 +64,7 @@ func Test_StopAreaController_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("StopArea shouldn't be found after DELETE request")
 	}
-	if expected, _ := json.Marshal(stopArea); responseRecorder.Body.String() != string(expected) {
+	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
@@ -87,7 +86,7 @@ func Test_StopAreaController_Update(t *testing.T) {
 	if expected := "Yet another test"; updatedStopArea.Name != expected {
 		t.Errorf("StopArea name should be updated after PUT request:\n got: %v\n want: %v", updatedStopArea.Name, expected)
 	}
-	if expected, _ := json.Marshal(updatedStopArea); responseRecorder.Body.String() != string(expected) {
+	if expected, _ := updatedStopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
@@ -100,7 +99,7 @@ func Test_StopAreaController_Show(t *testing.T) {
 	checkResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := json.Marshal(stopArea); responseRecorder.Body.String() != string(expected) {
+	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
@@ -123,7 +122,7 @@ func Test_StopAreaController_Create(t *testing.T) {
 	if expected := "test"; stopArea.Name != expected {
 		t.Errorf("Invalid stopArea name after POST request:\n got: %v\n want: %v", stopArea.Name, expected)
 	}
-	if expected, _ := json.Marshal(stopArea); responseRecorder.Body.String() != string(expected) {
+	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
@@ -136,7 +135,7 @@ func Test_StopAreaController_Index(t *testing.T) {
 	checkResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Name":"First StopArea"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"First StopArea"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
