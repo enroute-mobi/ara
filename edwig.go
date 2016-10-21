@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/af83/edwig/api"
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -94,6 +95,17 @@ func checkStatus(url string, requestorRef string) error {
 	}
 
 	responseTime := time.Since(startTime)
+
+	// Logstash
+	logstashDatas := make(map[string]string)
+	logstashDatas["requestXML"] = request.BuildXML()
+	logstashDatas["responseXML"] = checkStatus.RawXML()
+	logstashDatas["processingDuration"] = responseTime
+	// ...
+	err = audit.CurrentLogStash().WriteEvent(logstashDatas)
+	if err != nil {
+		logger.Log.Panicf("Error while sending datas to Logstash: %v", err)
+	}
 
 	// Log
 	var logMessage []byte

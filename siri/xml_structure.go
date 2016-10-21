@@ -46,3 +46,7 @@ func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
 	}
 	return s
 }
+
+func (xmlStruct *XMLStructure) RawXML() string {
+	return xmlStruct.node.String()
+}
