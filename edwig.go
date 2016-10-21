@@ -99,8 +99,8 @@ func checkStatus(url string, requestorRef string) error {
 	// Logstash
 	logstashDatas := make(map[string]string)
 	logstashDatas["requestXML"] = request.BuildXML()
-	logstashDatas["responseXML"] = checkStatus.RawXML()
-	logstashDatas["processingDuration"] = responseTime
+	logstashDatas["responseXML"] = xmlResponse.RawXML()
+	logstashDatas["processingDuration"] = responseTime.String()
 	// ...
 	err = audit.CurrentLogStash().WriteEvent(logstashDatas)
 	if err != nil {

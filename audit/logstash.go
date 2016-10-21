@@ -26,7 +26,7 @@ func NewNullLogStash() LogStash {
 
 var currentLogStash LogStash = NewNullLogStash()
 
-func CurrentLogStash() {
+func CurrentLogStash() LogStash {
 	return currentLogStash
 }
 
@@ -52,7 +52,7 @@ func (logStash *FakeLogStash) WriteEvent(event LogStashEvent) error {
 }
 
 func (logStash *FakeLogStash) Events() []LogStashEvent {
-	return logstash.events
+	return logStash.events
 }
 
 func (logStash *TCPLogStash) WriteEvent(datas LogStashEvent) error {
