@@ -5,9 +5,18 @@ import "encoding/json"
 type StopAreaId string
 
 type StopArea struct {
-	id   StopAreaId
+	id StopAreaId
+
 	Name string
 	// ...
+}
+
+type StopAreas interface {
+	New() StopArea
+	Find(id StopAreaId) (StopArea, bool)
+	FindAll() []StopArea
+	Save(stopArea *StopArea) bool
+	Delete(stopArea *StopArea) bool
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
@@ -23,6 +32,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 
 type MemoryStopAreas struct {
 	UUIDConsumer
+
+	model *MemoryModel
 
 	byIdentifier map[StopAreaId]*StopArea
 }
