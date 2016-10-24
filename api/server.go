@@ -30,6 +30,7 @@ func NewServer(bind string) *Server {
 
 func (server *Server) ListenAndServe() error {
 	http.HandleFunc("/siri", server.checkStatusHandler)
+	http.HandleFunc("/stop_areas", server.stopAreaController.ServeHTTP)
 	logger.Log.Debugf("Starting server on %s\n", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }
