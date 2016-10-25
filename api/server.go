@@ -28,9 +28,14 @@ func NewServer(bind string) *Server {
 	return &server
 }
 
-func (server *Server) ListenAndServe() error {
-	http.HandleFunc("/siri", server.checkStatusHandler)
-	http.HandleFunc("/stop_areas", server.stopAreaController.ServeHTTP)
+func (server *Server) ListenAndServe(slug model.ReferentialSlug) error {
+	// Temp #1852: Create a default referential
+	referential := model.CurrentReferentials().New(slug)
+	referential.Save()
+	server.stopAreaController.SetReferential(&referential)
+
+	http.HandleFunc(fmt.Sprintf("/%s/siri", slug), server.checkStatusHandler)
+	http.HandleFunc(fmt.Sprintf("/%s/stop_areas", slug), server.stopAreaController.ServeHTTP)
 	logger.Log.Debugf("Starting server on %s\n", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }

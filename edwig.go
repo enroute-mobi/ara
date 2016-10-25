@@ -64,7 +64,7 @@ func main() {
 
 		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
 	case "api":
-		err = api.NewServer("localhost:8080").ListenAndServe()
+		err = api.NewServer("localhost:8080").ListenAndServe("default")
 	}
 
 	if err != nil {

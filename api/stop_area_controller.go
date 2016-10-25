@@ -12,11 +12,16 @@ import (
 )
 
 type StopAreaController struct {
-	memoryStopAreas *model.MemoryStopAreas
+	referential *model.Referential
 }
 
 func NewStopAreaController() (controller *StopAreaController) {
-	return &StopAreaController{memoryStopAreas: model.NewMemoryStopAreas()}
+	return &StopAreaController{}
+}
+
+func (controller *StopAreaController) SetReferential(referential *model.Referential) {
+	controller.referential = referential
+	return
 }
 
 func (controller *StopAreaController) ServeHTTP(response http.ResponseWriter, request *http.Request) {
@@ -82,12 +87,12 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 func (controller *StopAreaController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("StopAreas Index")
 
-	jsonBytes, _ := json.Marshal(controller.memoryStopAreas.FindAll())
+	jsonBytes, _ := json.Marshal(controller.referential.Model().StopAreas().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Show(response http.ResponseWriter, identifier model.StopAreaId) {
-	stopArea, ok := controller.memoryStopAreas.Find(identifier)
+	stopArea, ok := controller.referential.Model().StopAreas().Find(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
 		return
@@ -99,7 +104,7 @@ func (controller *StopAreaController) Show(response http.ResponseWriter, identif
 }
 
 func (controller *StopAreaController) Delete(response http.ResponseWriter, identifier model.StopAreaId) {
-	stopArea, ok := controller.memoryStopAreas.Find(identifier)
+	stopArea, ok := controller.referential.Model().StopAreas().Find(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
 		return
@@ -107,12 +112,12 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete stopArea %s", identifier)
 
 	jsonBytes, _ := stopArea.MarshalJSON()
-	controller.memoryStopAreas.Delete(&stopArea)
+	controller.referential.Model().StopAreas().Delete(&stopArea)
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Update(response http.ResponseWriter, identifier model.StopAreaId, body []byte) {
-	stopArea, ok := controller.memoryStopAreas.Find(identifier)
+	stopArea, ok := controller.referential.Model().StopAreas().Find(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
 		return
@@ -126,7 +131,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		return
 	}
 
-	controller.memoryStopAreas.Save(&stopArea)
+	controller.referential.Model().StopAreas().Save(&stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
@@ -134,7 +139,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 func (controller *StopAreaController) Create(response http.ResponseWriter, body []byte) {
 	logger.Log.Debugf("Create stopArea: %s", string(body))
 
-	stopArea := controller.memoryStopAreas.New()
+	stopArea := controller.referential.Model().StopAreas().New()
 
 	err := json.Unmarshal(body, &stopArea)
 	if err != nil {
@@ -146,7 +151,7 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		return
 	}
 
-	controller.memoryStopAreas.Save(&stopArea)
+	controller.referential.Model().StopAreas().Save(&stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }

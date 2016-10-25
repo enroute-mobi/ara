@@ -23,15 +23,20 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 }
 
 func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, controller *StopAreaController) {
+	// Create a referential
+	referentials := model.NewMemoryReferentials()
+	referential := referentials.New("default")
+	referential.Save()
 	// Create a stopAreaController
 	controller = NewStopAreaController()
+	controller.SetReferential(&referential)
+
 	// Initialize the stopAreas manager
-	controller.memoryStopAreas = model.NewMemoryStopAreas()
-	controller.memoryStopAreas.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	controller.referential.Model().StopAreas().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	// Save a new stopArea
-	stopArea = controller.memoryStopAreas.New()
+	stopArea = controller.referential.Model().StopAreas().New()
 	stopArea.Name = "First StopArea"
-	controller.memoryStopAreas.Save(&stopArea)
+	controller.referential.Model().StopAreas().Save(&stopArea)
 
 	// Create a request
 	address := []byte("/stop_areas")
@@ -60,7 +65,7 @@ func Test_StopAreaController_Delete(t *testing.T) {
 	checkResponseStatus(responseRecorder, t)
 
 	//Test Results
-	_, ok := controller.memoryStopAreas.Find(stopArea.Id())
+	_, ok := controller.referential.Model().StopAreas().Find(stopArea.Id())
 	if ok {
 		t.Errorf("StopArea shouldn't be found after DELETE request")
 	}
@@ -78,7 +83,7 @@ func Test_StopAreaController_Update(t *testing.T) {
 	checkResponseStatus(responseRecorder, t)
 
 	// Test Results
-	updatedStopArea, ok := controller.memoryStopAreas.Find(stopArea.Id())
+	updatedStopArea, ok := controller.referential.Model().StopAreas().Find(stopArea.Id())
 	if !ok {
 		t.Errorf("StopArea should be found after PUT request")
 	}
@@ -115,7 +120,7 @@ func Test_StopAreaController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// stopArea should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	stopArea, ok := controller.memoryStopAreas.Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	stopArea, ok := controller.referential.Model().StopAreas().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	if !ok {
 		t.Errorf("StopArea should be found after POST request")
 	}
