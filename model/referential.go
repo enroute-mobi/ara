@@ -5,10 +5,10 @@ import "encoding/json"
 type ReferentialSlug string
 
 type Referential struct {
-	manager *MemoryReferentials
+	slug ReferentialSlug
 
-	slug  ReferentialSlug
-	model *MemoryModel
+	manager Referentials
+	model   Model
 }
 
 type Referentials interface {

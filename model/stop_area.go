@@ -5,12 +5,16 @@ import "encoding/json"
 type StopAreaId string
 
 type StopArea struct {
-	model *MemoryModel
+	model Model
 
 	id StopAreaId
 
 	Name string
 	// ...
+}
+
+func NewStopArea(model Model) *StopArea {
+	return &StopArea{model: model}
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
@@ -32,7 +36,7 @@ func (stopArea *StopArea) Save() (ok bool) {
 type MemoryStopAreas struct {
 	UUIDConsumer
 
-	model *MemoryModel
+	model Model
 
 	byIdentifier map[StopAreaId]*StopArea
 }
