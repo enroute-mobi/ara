@@ -42,7 +42,7 @@ func Test_StopArea_Save(t *testing.T) {
 	stopArea.Name = "Chatelet"
 	ok := stopArea.Save()
 	if !ok {
-		t.Errorf("Save stopArea should succeed")
+		t.Errorf("stopArea.Save() should succeed")
 	}
 	_, ok = model.StopAreas().Find(stopArea.Id())
 	if !ok {

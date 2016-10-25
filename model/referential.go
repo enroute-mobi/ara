@@ -1,8 +1,12 @@
 package model
 
+import "encoding/json"
+
 type ReferentialSlug string
 
 type Referential struct {
+	manager *MemoryReferentials
+
 	slug  ReferentialSlug
 	model *MemoryModel
 }
@@ -24,6 +28,17 @@ func (referential *Referential) Model() Model {
 	return referential.model
 }
 
+func (referential *Referential) Save() (ok bool) {
+	ok = referential.manager.Save(referential)
+	return
+}
+
+func (referential *Referential) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Slug": referential.slug,
+	})
+}
+
 type MemoryReferentials struct {
 	model *MemoryModel
 
@@ -41,14 +56,28 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
-	return Referential{}
+	return Referential{slug: slug, manager: manager}
 }
+
 func (manager *MemoryReferentials) Find(slug ReferentialSlug) (Referential, bool) {
-	return Referential{}, false
+	referential, ok := manager.bySlug[slug]
+	if ok {
+		return *referential, true
+	} else {
+		return Referential{}, false
+	}
 }
-func (manager *MemoryReferentials) Save(stopArea *Referential) bool {
-	return false
+
+func (manager *MemoryReferentials) Save(referential *Referential) bool {
+	if referential.Slug() == "" {
+		return false
+	}
+	referential.manager = manager
+	manager.bySlug[referential.Slug()] = referential
+	return true
 }
-func (manager *MemoryReferentials) Delete(stopArea *Referential) bool {
-	return false
+
+func (manager *MemoryReferentials) Delete(referential *Referential) bool {
+	delete(manager.bySlug, referential.Slug())
+	return true
 }
