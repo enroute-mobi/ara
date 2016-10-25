@@ -65,6 +65,12 @@ type UUIDConsumer struct {
 	uuidGenerator UUIDGenerator
 }
 
+type UUIDInterface interface {
+	SetUUIDGenerator(uuidGenerator UUIDGenerator)
+	UUIDGenerator() UUIDGenerator
+	NewUUID() string
+}
+
 func (consumer *UUIDConsumer) SetUUIDGenerator(uuidGenerator UUIDGenerator) {
 	consumer.uuidGenerator = uuidGenerator
 }

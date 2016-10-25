@@ -13,14 +13,6 @@ type StopArea struct {
 	// ...
 }
 
-type StopAreas interface {
-	New() StopArea
-	Find(id StopAreaId) (StopArea, bool)
-	FindAll() []StopArea
-	Save(stopArea *StopArea) bool
-	Delete(stopArea *StopArea) bool
-}
-
 func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
 }
@@ -43,6 +35,16 @@ type MemoryStopAreas struct {
 	model *MemoryModel
 
 	byIdentifier map[StopAreaId]*StopArea
+}
+
+type StopAreas interface {
+	UUIDInterface
+
+	New() StopArea
+	Find(id StopAreaId) (StopArea, bool)
+	FindAll() []StopArea
+	Save(stopArea *StopArea) bool
+	Delete(stopArea *StopArea) bool
 }
 
 func NewMemoryStopAreas() *MemoryStopAreas {
