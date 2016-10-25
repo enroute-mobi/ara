@@ -40,8 +40,6 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 }
 
 type MemoryReferentials struct {
-	model *MemoryModel
-
 	bySlug map[ReferentialSlug]*Referential
 }
 
@@ -56,7 +54,8 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
-	return Referential{slug: slug, manager: manager}
+	model := NewMemoryModel()
+	return Referential{slug: slug, manager: manager, model: model}
 }
 
 func (manager *MemoryReferentials) Find(slug ReferentialSlug) (Referential, bool) {
