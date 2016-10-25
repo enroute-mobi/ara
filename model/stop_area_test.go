@@ -14,6 +14,42 @@ func Test_StopArea_Id(t *testing.T) {
 	}
 }
 
+func Test_StopArea_MarshalJSON(t *testing.T) {
+	stopArea := StopArea{
+		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		Name: "Test",
+	}
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"Test"}`
+	jsonBytes, err := stopArea.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	jsonString := string(jsonBytes)
+	if jsonString != expected {
+		t.Errorf("StopArea.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
+}
+
+func Test_StopArea_Save(t *testing.T) {
+	model := NewMemoryModel()
+	stopArea := model.StopAreas().New()
+
+	if stopArea.model != model {
+		t.Errorf("New stopArea model should be memoryStopAreas model")
+	}
+
+	stopArea.Name = "Chatelet"
+	ok := stopArea.Save()
+	if !ok {
+		t.Errorf("Save stopArea should succeed")
+	}
+	_, ok = model.StopAreas().Find(stopArea.Id())
+	if !ok {
+		t.Errorf("New StopArea should be found in memoryStopAreas")
+	}
+}
+
 func Test_MemoryStopAreas_New(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 

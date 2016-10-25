@@ -5,6 +5,8 @@ import "encoding/json"
 type StopAreaId string
 
 type StopArea struct {
+	model *MemoryModel
+
 	id StopAreaId
 
 	Name string
@@ -30,6 +32,11 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (stopArea *StopArea) Save() (ok bool) {
+	ok = stopArea.model.StopAreas().Save(stopArea)
+	return
+}
+
 type MemoryStopAreas struct {
 	UUIDConsumer
 
@@ -45,7 +52,7 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 }
 
 func (manager *MemoryStopAreas) New() StopArea {
-	return StopArea{}
+	return StopArea{model: manager.model}
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
@@ -68,6 +75,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
+	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
 	return true
 }
