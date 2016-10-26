@@ -9,7 +9,6 @@ import (
 
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -33,10 +32,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := config.LoadConfig(*configPtr)
-	if err != nil {
-		logger.Log.Panicf("Error while loading configuration: %v", err)
-	}
+	var err error
+	// err = config.LoadConfig(*configPtr)
+	// if err != nil {
+	// 	logger.Log.Panicf("Error while loading configuration: %v", err)
+	// }
 
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
