@@ -2,6 +2,16 @@ package model
 
 import "testing"
 
+func Test_Referential_Id(t *testing.T) {
+	referential := Referential{
+		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+	}
+
+	if expected := ReferentialId("6ba7b814-9dad-11d1-0-00c04fd430c8"); referential.Id() != expected {
+		t.Errorf("Referential.Slug() returns wrong value, got: %s, required: %s", referential.Id(), expected)
+	}
+}
+
 func Test_Referential_Slug(t *testing.T) {
 	referential := Referential{
 		slug: "referential",
@@ -24,9 +34,10 @@ func Test_Referential_Model(t *testing.T) {
 
 func Test_Referential_MarshalJSON(t *testing.T) {
 	referential := Referential{
+		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		slug: "referential",
 	}
-	expected := `{"Slug":"referential"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"referential"}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +61,7 @@ func Test_Referential_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("referential.Save() should succeed")
 	}
-	_, ok = referentials.Find(referential.Slug())
+	_, ok = referentials.Find(referential.Id())
 	if !ok {
 		t.Errorf("New Referential should be found in Referentials manager")
 	}
@@ -61,7 +72,10 @@ func Test_MemoryReferentials_New(t *testing.T) {
 	referential := referentials.New(ReferentialSlug("referential"))
 
 	if referential.Slug() != "referential" {
-		t.Errorf("Wrong new Referential slug:\n got: %s\n want: %s", referential.Slug(), "referential")
+		t.Errorf("New should create a referential with given slug slug:\n got: %s\n want: %s", referential.Slug(), "referential")
+	}
+	if referential.Id() != "" {
+		t.Errorf("New Referential identifier should be an empty string, got: %s", referential.Id())
 	}
 }
 
@@ -72,11 +86,15 @@ func Test_MemoryReferentials_Save(t *testing.T) {
 	if success := referentials.Save(&referential); !success {
 		t.Errorf("Save should return true")
 	}
+
+	if referential.Id() == "" {
+		t.Errorf("New Referential identifier should not be an empty string")
+	}
 }
 
 func Test_MemoryReferentials_Find_NotFound(t *testing.T) {
 	referentials := NewMemoryReferentials()
-	_, ok := referentials.Find("test")
+	_, ok := referentials.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if ok {
 		t.Errorf("Find should return false when Referential isn't found")
 	}
@@ -87,13 +105,14 @@ func Test_MemoryReferentials_Find(t *testing.T) {
 
 	existingReferential := referentials.New(ReferentialSlug("referential"))
 	referentials.Save(&existingReferential)
+	referentialId := existingReferential.Id()
 
-	referential, ok := referentials.Find("referential")
+	referential, ok := referentials.Find(referentialId)
 	if !ok {
 		t.Errorf("Find should return true when Referential is found")
 	}
-	if referential.Slug() != ReferentialSlug("referential") {
-		t.Errorf("Find should return a Referential with the given Slug")
+	if referential.Id() != referentialId {
+		t.Errorf("Find should return a Referential with the given Id")
 	}
 }
 
@@ -103,9 +122,11 @@ func Test_MemoryReferentials_Delete(t *testing.T) {
 	existingReferential := referentials.New(ReferentialSlug("referential"))
 	referentials.Save(&existingReferential)
 
+	referentialId := existingReferential.Id()
+
 	referentials.Delete(&existingReferential)
 
-	_, ok := referentials.Find("referential")
+	_, ok := referentials.Find(referentialId)
 	if ok {
 		t.Errorf("Deleted Referential should not be findable")
 	}

@@ -2,9 +2,11 @@ package model
 
 import "encoding/json"
 
+type ReferentialId string
 type ReferentialSlug string
 
 type Referential struct {
+	id   ReferentialId
 	slug ReferentialSlug
 
 	manager Referentials
@@ -13,12 +15,16 @@ type Referential struct {
 
 type Referentials interface {
 	New(slug ReferentialSlug) Referential
-	Find(slug ReferentialSlug) (Referential, bool)
+	Find(id ReferentialId) (Referential, bool)
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 }
 
 var referentials = NewMemoryReferentials()
+
+func (referential *Referential) Id() ReferentialId {
+	return referential.id
+}
 
 func (referential *Referential) Slug() ReferentialSlug {
 	return referential.slug
@@ -35,17 +41,20 @@ func (referential *Referential) Save() (ok bool) {
 
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
+		"Id":   referential.id,
 		"Slug": referential.slug,
 	})
 }
 
 type MemoryReferentials struct {
-	bySlug map[ReferentialSlug]*Referential
+	UUIDConsumer
+
+	byId map[ReferentialId]*Referential
 }
 
 func NewMemoryReferentials() *MemoryReferentials {
 	return &MemoryReferentials{
-		bySlug: make(map[ReferentialSlug]*Referential),
+		byId: make(map[ReferentialId]*Referential),
 	}
 }
 
@@ -58,8 +67,8 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
 	return Referential{slug: slug, manager: manager, model: model}
 }
 
-func (manager *MemoryReferentials) Find(slug ReferentialSlug) (Referential, bool) {
-	referential, ok := manager.bySlug[slug]
+func (manager *MemoryReferentials) Find(id ReferentialId) (Referential, bool) {
+	referential, ok := manager.byId[id]
 	if ok {
 		return *referential, true
 	} else {
@@ -68,15 +77,15 @@ func (manager *MemoryReferentials) Find(slug ReferentialSlug) (Referential, bool
 }
 
 func (manager *MemoryReferentials) Save(referential *Referential) bool {
-	if referential.Slug() == "" {
-		return false
+	if referential.Id() == "" {
+		referential.id = ReferentialId(manager.NewUUID())
 	}
 	referential.manager = manager
-	manager.bySlug[referential.Slug()] = referential
+	manager.byId[referential.Id()] = referential
 	return true
 }
 
 func (manager *MemoryReferentials) Delete(referential *Referential) bool {
-	delete(manager.bySlug, referential.Slug())
+	delete(manager.byId, referential.Id())
 	return true
 }
