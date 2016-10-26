@@ -59,15 +59,17 @@ func (manager *TransactionalStopAreas) Delete(stopArea *StopArea) bool {
 	return true
 }
 
-func (manager *TransactionalStopAreas) Commit() {
+func (manager *TransactionalStopAreas) Commit() error {
 	for _, stopAera := range manager.deleted {
 		manager.model.StopAreas().Delete(stopAera)
 	}
 	for _, stopAera := range manager.saved {
 		manager.model.StopAreas().Save(stopAera)
 	}
+	return nil
 }
 
-func (manager *TransactionalStopAreas) Rollback() {
+func (manager *TransactionalStopAreas) Rollback() error {
 	manager.resetCaches()
+	return nil
 }

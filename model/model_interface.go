@@ -19,6 +19,10 @@ func NewMemoryModel() *MemoryModel {
 	return model
 }
 
-func (memoryModel *MemoryModel) StopAreas() StopAreas {
-	return memoryModel.stopAreas
+func (model *MemoryModel) StopAreas() StopAreas {
+	return model.stopAreas
+}
+
+func (model *MemoryModel) NewTransaction() *Transaction {
+	return NewTransaction(model)
 }
