@@ -9,6 +9,7 @@ import (
 
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -18,6 +19,7 @@ func main() {
 	uuidPtr := flag.Bool("testuuid", false, "Use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "Use a fake clock at time given. Format 20060102-1504")
 	pidPtr := flag.String("pidfile", "", "Write processus pid in given file")
+	configPtr := flag.String("config", "", "Config directory")
 	flag.BoolVar(&logger.Log.Debug, "debug", false, "Enable debug messages")
 	flag.BoolVar(&logger.Log.Syslog, "syslog", false, "Redirect messages to syslog")
 
@@ -25,9 +27,15 @@ func main() {
 
 	if len(flag.Args()) == 0 {
 		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
+		fmt.Println("             [-config=<path>] [-debug] [-syslog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi")
 		os.Exit(1)
+	}
+
+	err := config.LoadConfig(*configPtr)
+	if err != nil {
+		logger.Log.Panicf("Error while loading configuration: %v", err)
 	}
 
 	if *uuidPtr {
@@ -55,7 +63,6 @@ func main() {
 
 	command := flag.Args()[0]
 
-	var err error
 	switch command {
 	case "check":
 		checkFlags := flag.NewFlagSet("check", flag.ExitOnError)

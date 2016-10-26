@@ -37,6 +37,12 @@
 			"path": "github.com/jbowtie/gokogiri/xpath",
 			"revision": "e2644e49d5b4a4d2382d1a4b28dfbb313a4ffb0c",
 			"revisionTime": "2016-07-04T00:25:24Z"
+		},
+		{
+			"checksumSHA1": "12GqsW8PiRPnezDDy0v4brZrndM=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "a5b47d31c556af34a302ce5d659e6fea44d90de0",
+			"revisionTime": "2016-09-28T15:37:09Z"
 		}
 	],
 	"rootPath": "github.com/af83/edwig"

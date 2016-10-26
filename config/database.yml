@@ -1,0 +1,4 @@
+name: dbName
+user: user
+password: password
+port: 8080
