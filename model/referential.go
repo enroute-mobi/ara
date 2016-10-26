@@ -16,6 +16,7 @@ type Referential struct {
 type Referentials interface {
 	New(slug ReferentialSlug) Referential
 	Find(id ReferentialId) (Referential, bool)
+	FindBySlug(slug ReferentialSlug) (Referential, bool)
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 }
@@ -74,6 +75,15 @@ func (manager *MemoryReferentials) Find(id ReferentialId) (Referential, bool) {
 	} else {
 		return Referential{}, false
 	}
+}
+
+func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) (Referential, bool) {
+	for _, referential := range manager.byId {
+		if referential.slug == slug {
+			return *referential, true
+		}
+	}
+	return Referential{}, false
 }
 
 func (manager *MemoryReferentials) Save(referential *Referential) bool {

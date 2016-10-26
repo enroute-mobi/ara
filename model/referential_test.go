@@ -116,6 +116,22 @@ func Test_MemoryReferentials_Find(t *testing.T) {
 	}
 }
 
+func Test_MemoryReferentials_FindBySlug(t *testing.T) {
+	referentials := NewMemoryReferentials()
+
+	referentialSlug := ReferentialSlug("referential")
+	existingReferential := referentials.New(referentialSlug)
+	referentials.Save(&existingReferential)
+
+	referential, ok := referentials.FindBySlug(referentialSlug)
+	if !ok {
+		t.Errorf("FindBySlug should return true when Referential is found")
+	}
+	if referential.Slug() != referentialSlug {
+		t.Errorf("FindBySlug should return a Referential with the given Slug")
+	}
+}
+
 func Test_MemoryReferentials_Delete(t *testing.T) {
 	referentials := NewMemoryReferentials()
 
