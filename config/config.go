@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -35,20 +36,24 @@ func LoadConfig(path string) error {
 	}
 	logger.Log.Debugf("Loading %s configuration", env)
 
+	configPath, err := getConfigDirectory(path)
+	if err != nil {
+		return err
+	}
 	// general config
-	data, err := getConfigFileContent(path, "config.yml")
+	data, err := getConfigFileContent(configPath, "config.yml")
 	if err != nil {
 		return err
 	}
 	yaml.Unmarshal(data, &Config)
 	// database
-	data, err = getConfigFileContent(path, "database.yml")
+	data, err = getConfigFileContent(configPath, "database.yml")
 	if err != nil {
 		return err
 	}
 	yaml.Unmarshal(data, &Config.DB)
 	// environement
-	data, err = getConfigFileContent(path, fmt.Sprintf("%s.yml", env))
+	data, err = getConfigFileContent(configPath, fmt.Sprintf("%s.yml", env))
 	if err != nil {
 		return err
 	}
@@ -57,11 +62,36 @@ func LoadConfig(path string) error {
 	return nil
 }
 
+func getConfigDirectory(path string) (string, error) {
+	paths := [3]string{
+		path,
+		os.Getenv("EDWIG_CONFIG"),
+		fmt.Sprintf("%s/src/github.com/af83/edwig/config", os.Getenv("GOPATH")),
+	}
+	for _, directoryPath := range paths {
+		if found := checkDirectory(directoryPath); found {
+			return directoryPath, nil
+		}
+	}
+	return "", errors.New("Cant find config directory")
+}
+
+func checkDirectory(path string) bool {
+	if path == "" {
+		return false
+	}
+	if _, err := os.Stat(path); err == nil {
+		logger.Log.Debugf("Found config directory at %s", path)
+		return true
+	}
+	logger.Log.Debugf("Can't find config directory at %s", path)
+	return false
+}
+
 func getConfigFileContent(path, file string) ([]byte, error) {
 	// Check file at location
 	filePath := strings.Join([]string{path, file}, "/")
 	if _, err := os.Stat(filePath); err == nil {
-		logger.Log.Debugf("Found %s config file at %s", file, filePath)
 		data, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			return nil, err
@@ -69,18 +99,6 @@ func getConfigFileContent(path, file string) ([]byte, error) {
 		return data, nil
 	}
 
-	// Check file in default location
-	gopath := os.Getenv("GOPATH")
-	filePath = strings.Join([]string{gopath, "src/github.com/af83/edwig/config", file}, "/")
-	if _, err := os.Stat(filePath); err == nil {
-		logger.Log.Debugf("Found %s config file at %s", file, filePath)
-		data, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			return nil, err
-		}
-		return data, nil
-	}
-
-	logger.Log.Debugf("Can't find %s config file", file)
+	logger.Log.Debugf("Can't find %s config file in %s", file, path)
 	return nil, fmt.Errorf("Can't find %s configuration file", file)
 }

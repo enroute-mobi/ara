@@ -32,6 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Load configuration files
 	var err error
 	// err = config.LoadConfig(*configPtr)
 	// if err != nil {
