@@ -30,6 +30,10 @@ func CurrentLogStash() LogStash {
 	return currentLogStash
 }
 
+func SetCurrentLogstash(logStash LogStash) {
+	currentLogStash = logStash
+}
+
 type TCPLogStash struct {
 	address string
 }

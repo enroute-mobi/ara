@@ -46,6 +46,9 @@ func main() {
 		logger.Log.Panicf("Error while loading configuration: %v", err)
 	}
 
+	// Configure logstash
+	audit.SetCurrentLogstash(audit.NewTCPLogStash(config.Config.LogStash))
+
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
 	}
