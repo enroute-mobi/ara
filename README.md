@@ -61,4 +61,4 @@ edwig -config=config/directory/path [...]
 ```
 You need to specify 3 files : `config.yml`, `database.yml`, `<environment>.yml`
 
-Default directory is `/config`
+Configuration try the given path if it exists, then the environment variable EDWIG_CONFIG, then `/config`
