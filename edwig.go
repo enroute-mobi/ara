@@ -47,7 +47,9 @@ func main() {
 	}
 
 	// Configure logstash
-	audit.SetCurrentLogstash(audit.NewTCPLogStash(config.Config.LogStash))
+	if config.Config.LogStash != "" {
+		audit.SetCurrentLogstash(audit.NewTCPLogStash(config.Config.LogStash))
+	}
 
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
