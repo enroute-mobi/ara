@@ -24,7 +24,7 @@ func main() {
 	uuidPtr := flag.Bool("testuuid", false, "Use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "Use a fake clock at time given. Format 20060102-1504")
 	pidPtr := flag.String("pidfile", "", "Write processus pid in given file")
-	// configPtr := flag.String("config", "", "Config directory")
+	configPtr := flag.String("config", "", "Config directory")
 	flag.BoolVar(&logger.Log.Debug, "debug", false, "Enable debug messages")
 	flag.BoolVar(&logger.Log.Syslog, "syslog", false, "Redirect messages to syslog")
 
@@ -41,10 +41,10 @@ func main() {
 
 	// Load configuration files
 	var err error
-	// err = config.LoadConfig(*configPtr)
-	// if err != nil {
-	// 	logger.Log.Panicf("Error while loading configuration: %v", err)
-	// }
+	err = config.LoadConfig(*configPtr)
+	if err != nil {
+		logger.Log.Panicf("Error while loading configuration: %v", err)
+	}
 
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
