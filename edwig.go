@@ -1,17 +1,23 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/rubenv/sql-migrate"
+
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -29,6 +35,7 @@ func main() {
 		fmt.Println("             [-config=<path>] [-debug] [-syslog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi")
+		fmt.Println("\tmigrate [-path=<path>] <up|down>")
 		os.Exit(1)
 	}
 
@@ -73,6 +80,12 @@ func main() {
 		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
 	case "api":
 		err = api.NewServer("localhost:8080").ListenAndServe("default")
+	case "migrate":
+		checkFlags := flag.NewFlagSet("migrate", flag.ExitOnError)
+		migrationFilesPtr := checkFlags.String("path", "db/migrations", "Specify migration files path")
+		checkFlags.Parse(flag.Args()[1:])
+
+		err = applyMigrations(checkFlags.Args()[0], *migrationFilesPtr)
 	}
 
 	if err != nil {
@@ -129,6 +142,37 @@ func checkStatus(url string, requestorRef string) error {
 	}
 	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
 	logger.Log.Printf(string(logMessage))
+
+	return nil
+}
+
+func applyMigrations(operation, path string) error {
+	migrations := &migrate.FileMigrationSource{
+		Dir: path,
+	}
+
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+		config.Config.DB.User,
+		config.Config.DB.Password,
+		config.Config.DB.Name,
+	)
+	db, err := sql.Open("postgres", dbinfo)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	var n int
+	switch operation {
+	case "up":
+		n, err = migrate.Exec(db, "postgres", migrations, migrate.Up)
+	case "down":
+		n, err = migrate.Exec(db, "postgres", migrations, migrate.Down)
+	}
+	if err != nil {
+		return err
+	}
+	logger.Log.Debugf("Applied %d migrations\n", n)
 
 	return nil
 }
