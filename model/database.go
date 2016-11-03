@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/gorp.v1"
@@ -13,14 +14,7 @@ import (
 
 var Database *gorp.DbMap
 
-type DatabaseConfig struct {
-	Name     string
-	User     string
-	Password string
-	Port     uint
-}
-
-func InitDB(config DatabaseConfig) *gorp.DbMap {
+func InitDB(config config.DatabaseConfig) *gorp.DbMap {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 		config.User,
 		config.Password,
@@ -32,7 +26,7 @@ func InitDB(config DatabaseConfig) *gorp.DbMap {
 	}
 	logger.Log.Debugf("Connected to Database %s", config.Name)
 	// construct a gorp DbMap
-	database := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+	database := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 
 	return database
 }

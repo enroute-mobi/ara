@@ -1,6 +1,10 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/af83/edwig/logger"
+)
 
 type ReferentialId string
 type ReferentialSlug string
@@ -121,5 +125,6 @@ func (manager *MemoryReferentials) Load() error {
 		manager.Save(&referential)
 	}
 
+	logger.Log.Debugf("Loaded Referentials from database")
 	return nil
 }

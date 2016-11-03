@@ -147,3 +147,36 @@ func Test_MemoryReferentials_Delete(t *testing.T) {
 		t.Errorf("Deleted Referential should not be findable")
 	}
 }
+
+func Test_MemoryReferentials_Load(t *testing.T) {
+	initTestDb(t)
+	defer cleanTestDb(t)
+
+	// Insert Data in the test db
+	var databaseReferential = struct {
+		Referential_id string `db:"referential_id"`
+		Slug           string `db:"slug"`
+	}{
+		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Slug:           "ratp",
+	}
+	Database.AddTableWithName(databaseReferential, "referentials")
+	err := Database.Insert(&databaseReferential)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	referentials := NewMemoryReferentials()
+	referentials.Load()
+
+	referentialId := ReferentialId(databaseReferential.Referential_id)
+	referential, ok := referentials.Find(referentialId)
+	if !ok {
+		t.Errorf("Loaded Referentials should be found")
+	}
+
+	if referential.Id() != referentialId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", referential.Id(), referentialId)
+	}
+}

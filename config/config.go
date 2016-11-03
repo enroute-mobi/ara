@@ -8,14 +8,20 @@ import (
 	"strings"
 
 	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
 
 	"gopkg.in/yaml.v2"
 )
 
+type DatabaseConfig struct {
+	Name     string
+	User     string
+	Password string
+	Port     uint
+}
+
 var Config = struct {
-	DB     model.DatabaseConfig
-	TestDB model.DatabaseConfig
+	DB     DatabaseConfig
+	TestDB DatabaseConfig
 
 	LogStash string
 	Syslog   bool
