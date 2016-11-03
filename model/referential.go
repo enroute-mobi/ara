@@ -108,8 +108,8 @@ func (manager *MemoryReferentials) Delete(referential *Referential) bool {
 
 func (manager *MemoryReferentials) Load() error {
 	var selectReferentials []struct {
-		Id   string `db:"referential_id"`
-		Slug string
+		Referential_id string
+		Slug           string
 	}
 	_, err := Database.Select(&selectReferentials, "select * from referentials")
 	if err != nil {
@@ -117,7 +117,7 @@ func (manager *MemoryReferentials) Load() error {
 	}
 
 	for _, r := range selectReferentials {
-		referential := manager.NewWithId(ReferentialSlug(r.Slug), ReferentialId(r.Id))
+		referential := manager.NewWithId(ReferentialSlug(r.Slug), ReferentialId(r.Referential_id))
 		manager.Save(&referential)
 	}
 
