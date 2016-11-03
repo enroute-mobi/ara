@@ -8,20 +8,16 @@ import (
 	"strings"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 
 	"gopkg.in/yaml.v2"
 )
 
 var Config = struct {
+	DB model.DatabaseConfig
+
 	LogStash string
 	Syslog   bool
-
-	DB struct {
-		Name     string
-		User     string
-		Password string
-		Port     uint
-	}
 }{}
 
 func LoadConfig(path string) error {
