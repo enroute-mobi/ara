@@ -34,6 +34,10 @@ Migration folder can be specified with
 ```
 edwig migrate -path=path/to/migrate/files [...]
 ```
+#### Populate
+```
+psql -U edwig -d edwig -a -f model/populate.sql
+```
 
 ## Run Edwig
 
