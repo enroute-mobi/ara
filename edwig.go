@@ -80,8 +80,8 @@ func main() {
 		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
 	case "api":
 		// Init Database
-		model.InitDB(config.Config.DB)
-		defer model.CloseDB()
+		model.Database = model.InitDB(config.Config.DB)
+		defer model.CloseDB(model.Database)
 
 		err = model.CurrentReferentials().Load()
 		if err != nil {
@@ -96,16 +96,16 @@ func main() {
 		migrationFilesPtr := checkFlags.String("path", "db/migrations", "Specify migration files path")
 		checkFlags.Parse(flag.Args()[1:])
 
-		model.InitDB(config.Config.DB)
-		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, model.Database.Db)
-		model.CloseDB()
+		database := model.InitDB(config.Config.DB)
+		defer model.CloseDB(database)
+		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, database.Db)
 		if err != nil {
 			break
 		}
 
-		model.InitDB(config.Config.TestDB)
-		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, model.Database.Db)
-		model.CloseDB()
+		testDatabase := model.InitDB(config.Config.TestDB)
+		defer model.CloseDB(testDatabase)
+		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, testDatabase.Db)
 	}
 
 	if err != nil {

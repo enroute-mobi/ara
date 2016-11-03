@@ -20,7 +20,7 @@ type DatabaseConfig struct {
 	Port     uint
 }
 
-func InitDB(config DatabaseConfig) {
+func InitDB(config DatabaseConfig) *gorp.DbMap {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 		config.User,
 		config.Password,
@@ -32,11 +32,13 @@ func InitDB(config DatabaseConfig) {
 	}
 	logger.Log.Debugf("Connected to Database %s", config.Name)
 	// construct a gorp DbMap
-	Database = &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+	database := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+
+	return database
 }
 
-func CloseDB() {
-	Database.Db.Close()
+func CloseDB(database *gorp.DbMap) {
+	database.Db.Close()
 }
 
 func ApplyMigrations(operation, path string, database *sql.DB) error {
