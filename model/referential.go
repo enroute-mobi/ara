@@ -19,6 +19,7 @@ type Referentials interface {
 	FindBySlug(slug ReferentialSlug) (Referential, bool)
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
+	Load() error
 }
 
 var referentials = NewMemoryReferentials()
@@ -68,6 +69,11 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
 	return Referential{slug: slug, manager: manager, model: model}
 }
 
+func (manager *MemoryReferentials) NewWithId(slug ReferentialSlug, id ReferentialId) Referential {
+	model := NewMemoryModel()
+	return Referential{id: id, slug: slug, manager: manager, model: model}
+}
+
 func (manager *MemoryReferentials) Find(id ReferentialId) (Referential, bool) {
 	referential, ok := manager.byId[id]
 	if ok {
@@ -98,4 +104,22 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 func (manager *MemoryReferentials) Delete(referential *Referential) bool {
 	delete(manager.byId, referential.Id())
 	return true
+}
+
+func (manager *MemoryReferentials) Load() error {
+	var selectReferentials []struct {
+		Id   string `db:"referential_id"`
+		Slug string
+	}
+	_, err := Database.Select(&selectReferentials, "select * from referentials")
+	if err != nil {
+		return err
+	}
+
+	for _, r := range selectReferentials {
+		referential := manager.NewWithId(ReferentialSlug(r.Slug), ReferentialId(r.Id))
+		manager.Save(&referential)
+	}
+
+	return nil
 }

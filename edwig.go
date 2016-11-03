@@ -85,6 +85,11 @@ func main() {
 		model.InitDB(config.Config.DB)
 		defer model.CloseDB()
 
+		err = model.CurrentReferentials().Load()
+		if err != nil {
+			logger.Log.Panicf("Error while loading Referentials: %v", err)
+		}
+
 		err = api.NewServer("localhost:8080").ListenAndServe("default")
 	case "migrate":
 		// Init Database
@@ -157,6 +162,7 @@ func checkStatus(url string, requestorRef string) error {
 }
 
 func applyMigrations(operation, path string) error {
+	logger.Log.Debug = true
 	migrations := &migrate.FileMigrationSource{
 		Dir: path,
 	}
