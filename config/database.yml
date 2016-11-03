@@ -1,4 +1,11 @@
-name: edwig
-user: edwig
-password: edwig
-port: 8080
+db:
+  name: edwig
+  user: edwig
+  password: edwig
+  port: 8080
+
+testdb:
+  name: edwig_test
+  user: edwig
+  password: edwig
+  port: 8080

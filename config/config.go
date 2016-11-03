@@ -14,7 +14,8 @@ import (
 )
 
 var Config = struct {
-	DB model.DatabaseConfig
+	DB     model.DatabaseConfig
+	TestDB model.DatabaseConfig
 
 	LogStash string
 	Syslog   bool
@@ -37,23 +38,14 @@ func LoadConfig(path string) error {
 		return err
 	}
 	// general config
-	data, err := getConfigFileContent(configPath, "config.yml")
-	if err != nil {
-		return err
+	files := []string{"config.yml", "database.yml", fmt.Sprintf("%s.yml", env)}
+	for _, file := range files {
+		data, err := getConfigFileContent(configPath, file)
+		if err != nil {
+			return err
+		}
+		yaml.Unmarshal(data, &Config)
 	}
-	yaml.Unmarshal(data, &Config)
-	// database
-	data, err = getConfigFileContent(configPath, "database.yml")
-	if err != nil {
-		return err
-	}
-	yaml.Unmarshal(data, &Config.DB)
-	// environement
-	data, err = getConfigFileContent(configPath, fmt.Sprintf("%s.yml", env))
-	if err != nil {
-		return err
-	}
-	yaml.Unmarshal(data, &Config)
 
 	return nil
 }

@@ -17,8 +17,10 @@ postgres=# CREATE USER "edwig" SUPERUSER PASSWORD 'edwig';
 CREATE ROLE
 postgres=# CREATE DATABASE edwig;
 CREATE DATABASE
+postgres=# CREATE DATABASE edwig_test;
+CREATE DATABASE
 ```
-Database configuration can be defined in config/database.yml
+Database configuration can be defined in `config/database.yml`
 
 #### Apply migrations
 ```
