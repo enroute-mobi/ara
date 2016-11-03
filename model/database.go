@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	"github.com/af83/edwig/logger"
-	_ "github.com/lib/pq"
+	"github.com/rubenv/sql-migrate"
 	"gopkg.in/gorp.v1"
+
+	_ "github.com/lib/pq"
 )
 
 var Database *gorp.DbMap
@@ -35,4 +37,25 @@ func InitDB(config DatabaseConfig) {
 
 func CloseDB() {
 	Database.Db.Close()
+}
+
+func ApplyMigrations(operation, path string, database *sql.DB) error {
+	migrations := &migrate.FileMigrationSource{
+		Dir: path,
+	}
+
+	var n int
+	var err error
+	switch operation {
+	case "up":
+		n, err = migrate.Exec(database, "postgres", migrations, migrate.Up)
+	case "down":
+		n, err = migrate.Exec(database, "postgres", migrations, migrate.Down)
+	}
+	if err != nil {
+		return err
+	}
+	logger.Log.Debugf("Applied %d migrations\n", n)
+
+	return nil
 }

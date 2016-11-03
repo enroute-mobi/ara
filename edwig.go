@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/rubenv/sql-migrate"
-
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/config"
@@ -92,15 +90,22 @@ func main() {
 
 		err = api.NewServer("localhost:8080").ListenAndServe("default")
 	case "migrate":
-		// Init Database
-		model.InitDB(config.Config.DB)
-		defer model.CloseDB()
+		logger.Log.Debug = true
 
 		checkFlags := flag.NewFlagSet("migrate", flag.ExitOnError)
 		migrationFilesPtr := checkFlags.String("path", "db/migrations", "Specify migration files path")
 		checkFlags.Parse(flag.Args()[1:])
 
-		err = applyMigrations(checkFlags.Args()[0], *migrationFilesPtr)
+		model.InitDB(config.Config.DB)
+		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, model.Database.Db)
+		model.CloseDB()
+		if err != nil {
+			break
+		}
+
+		model.InitDB(config.Config.TestDB)
+		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, model.Database.Db)
+		model.CloseDB()
 	}
 
 	if err != nil {
@@ -157,28 +162,6 @@ func checkStatus(url string, requestorRef string) error {
 	}
 	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
 	logger.Log.Printf(string(logMessage))
-
-	return nil
-}
-
-func applyMigrations(operation, path string) error {
-	logger.Log.Debug = true
-	migrations := &migrate.FileMigrationSource{
-		Dir: path,
-	}
-
-	var n int
-	var err error
-	switch operation {
-	case "up":
-		n, err = migrate.Exec(model.Database.Db, "postgres", migrations, migrate.Up)
-	case "down":
-		n, err = migrate.Exec(model.Database.Db, "postgres", migrations, migrate.Down)
-	}
-	if err != nil {
-		return err
-	}
-	logger.Log.Debugf("Applied %d migrations\n", n)
 
 	return nil
 }

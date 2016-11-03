@@ -28,7 +28,7 @@ func LoadConfig(path string) error {
 
 	env := os.Getenv("EDWIG_ENV")
 	if env == "" {
-		logger.Log.Debugf("EDWIG_ENV not set")
+		logger.Log.Debugf("EDWIG_ENV not set, default environment is development")
 		env = "development"
 	}
 	logger.Log.Debugf("Loading %s configuration", env)
