@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	"github.com/af83/edwig/logger"
-
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type DatabaseConfig struct {
@@ -20,8 +19,7 @@ type DatabaseConfig struct {
 }
 
 var Config = struct {
-	DB     DatabaseConfig
-	TestDB DatabaseConfig
+	DB DatabaseConfig
 
 	LogStash string
 	Syslog   bool
@@ -32,19 +30,16 @@ func LoadConfig(path string) error {
 	Config.Syslog = false
 	// ...
 
-	env := os.Getenv("EDWIG_ENV")
-	if env == "" {
-		logger.Log.Debugf("EDWIG_ENV not set, default environment is development")
-		env = "development"
-	}
+	env := Environment()
 	logger.Log.Debugf("Loading %s configuration", env)
 
 	configPath, err := getConfigDirectory(path)
 	if err != nil {
 		return err
 	}
+
 	// general config
-	files := []string{"config.yml", "database.yml", fmt.Sprintf("%s.yml", env)}
+	files := []string{"config.yml", fmt.Sprintf("%s.yml", env)}
 	for _, file := range files {
 		data, err := getConfigFileContent(configPath, file)
 		if err != nil {
@@ -52,6 +47,50 @@ func LoadConfig(path string) error {
 		}
 		yaml.Unmarshal(data, &Config)
 	}
+
+	// database config
+	LoadDatabaseConfig(configPath)
+
+	return nil
+}
+
+var environment string
+
+func SetEnvironment(env string) {
+	environment = env
+}
+
+func Environment() string {
+	if environment == "" {
+		env := os.Getenv("EDWIG_ENV")
+		if env == "" {
+			logger.Log.Debugf("EDWIG_ENV not set, default environment is development")
+			env = "development"
+		}
+		environment = env
+	}
+	return environment
+}
+
+func LoadDatabaseConfig(configPath string) error {
+	data, err := getConfigFileContent(configPath, "database.yml")
+	if err != nil {
+		return err
+	}
+
+	rawYaml := make(map[interface{}]interface{})
+
+	err = yaml.Unmarshal(data, &rawYaml)
+	if err != nil {
+		return err
+	}
+
+	databaseYaml := rawYaml[Environment()].(map[interface{}]interface{})
+
+	Config.DB.Name = databaseYaml["name"].(string)
+	Config.DB.User = databaseYaml["user"].(string)
+	Config.DB.Password = databaseYaml["password"].(string)
+	Config.DB.Port = uint(databaseYaml["port"].(int))
 
 	return nil
 }

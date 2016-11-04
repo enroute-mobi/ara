@@ -1,10 +1,10 @@
-db:
+development:
   name: edwig
   user: edwig
   password: edwig
   port: 8080
 
-testdb:
+test:
   name: edwig_test
   user: edwig
   password: edwig

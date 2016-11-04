@@ -7,6 +7,7 @@ import (
 )
 
 func initTestDb(t *testing.T) {
+	config.SetEnvironment("test")
 	// Load configuration
 	err := config.LoadConfig("")
 	if err != nil {
@@ -14,7 +15,7 @@ func initTestDb(t *testing.T) {
 	}
 
 	// Initialize Database
-	Database = InitDB(config.Config.TestDB)
+	Database = InitDB(config.Config.DB)
 }
 
 func cleanTestDb(t *testing.T) {

@@ -102,10 +102,6 @@ func main() {
 		if err != nil {
 			break
 		}
-
-		testDatabase := model.InitDB(config.Config.TestDB)
-		defer model.CloseDB(testDatabase)
-		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, testDatabase.Db)
 	}
 
 	if err != nil {
