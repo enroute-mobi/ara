@@ -97,16 +97,16 @@ func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) (Referential
 }
 
 func (manager *MemoryReferentials) Save(referential *Referential) bool {
-	if referential.Id() == "" {
+	if referential.id == "" {
 		referential.id = ReferentialId(manager.NewUUID())
 	}
 	referential.manager = manager
-	manager.byId[referential.Id()] = referential
+	manager.byId[referential.id] = referential
 	return true
 }
 
 func (manager *MemoryReferentials) Delete(referential *Referential) bool {
-	delete(manager.byId, referential.Id())
+	delete(manager.byId, referential.id)
 	return true
 }
 

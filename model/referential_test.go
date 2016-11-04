@@ -8,7 +8,7 @@ func Test_Referential_Id(t *testing.T) {
 	}
 
 	if expected := ReferentialId("6ba7b814-9dad-11d1-0-00c04fd430c8"); referential.Id() != expected {
-		t.Errorf("Referential.Slug() returns wrong value, got: %s, required: %s", referential.Id(), expected)
+		t.Errorf("Referential.Id() returns wrong value, got: %s, required: %s", referential.Id(), expected)
 	}
 }
 
