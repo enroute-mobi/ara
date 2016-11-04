@@ -9,7 +9,7 @@ Before('@server') do
   time_limit = Time.now + 10
   begin
     sleep 2
-    system "go run edwig.go check http://localhost:8080/siri"
+    system "go run edwig.go check http://localhost:8080/default/siri"
     raise "Timeout" if Time.now > time_limit
   end until $?.exitstatus == 0
 end
