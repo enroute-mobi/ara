@@ -2,6 +2,14 @@ package model
 
 import "encoding/json"
 
+type OperationnalStatus int
+
+const (
+	UNKNOWN OperationnalStatus = iota
+	UP
+	DOWN
+)
+
 type PartnerId string
 
 type Partners interface {
@@ -13,8 +21,9 @@ type Partners interface {
 }
 
 type Partner struct {
-	id   PartnerId
-	name string
+	id                 PartnerId
+	name               string
+	operationnalStatus OperationnalStatus
 
 	manager Partners
 }
@@ -31,6 +40,10 @@ func (partner *Partner) Id() PartnerId {
 
 func (partner *Partner) Name() string {
 	return partner.name
+}
+
+func (partner *Partner) OperationnalStatus() OperationnalStatus {
+	return partner.operationnalStatus
 }
 
 func (partner *Partner) Save() (ok bool) {

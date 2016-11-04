@@ -22,6 +22,16 @@ func Test_Partner_Name(t *testing.T) {
 	}
 }
 
+func Test_Partner_OperationnalStatus(t *testing.T) {
+	partner := Partner{
+		name: "partner",
+	}
+
+	if expected := UNKNOWN; partner.OperationnalStatus() != expected {
+		t.Errorf("Partner.OperationnalStatus() returns wrong status, got: %s, required: %s", partner.OperationnalStatus(), expected)
+	}
+}
+
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
