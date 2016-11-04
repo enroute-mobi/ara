@@ -1,2 +1,4 @@
 # Ignore tempfiles
 /tmp/*
+
+/.ruby-version
