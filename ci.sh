@@ -17,6 +17,7 @@ ruby_bin_dir=`ls -d /var/lib/gems/*/bin | tail -1`
 bundle=$ruby_bin_dir/bundle
 
 if [ -x $bundle ]; then
+    cd $source_dir
     $bundle install --deployment
     $bundle exec cucumber
 else
