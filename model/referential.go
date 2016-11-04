@@ -13,8 +13,9 @@ type Referential struct {
 	id   ReferentialId
 	slug ReferentialSlug
 
-	manager Referentials
-	model   Model
+	manager  Referentials
+	model    Model
+	partners Partners
 }
 
 type Referentials interface {
@@ -38,6 +39,10 @@ func (referential *Referential) Slug() ReferentialSlug {
 
 func (referential *Referential) Model() Model {
 	return referential.model
+}
+
+func (referential *Referential) Partners() Partners {
+	return referential.partners
 }
 
 func (referential *Referential) Save() (ok bool) {
@@ -70,12 +75,14 @@ func CurrentReferentials() Referentials {
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
 	model := NewMemoryModel()
-	return Referential{slug: slug, manager: manager, model: model}
+	partners := NewPartnerManager()
+	return Referential{slug: slug, manager: manager, model: model, partners: partners}
 }
 
 func (manager *MemoryReferentials) NewWithId(slug ReferentialSlug, id ReferentialId) Referential {
 	model := NewMemoryModel()
-	return Referential{id: id, slug: slug, manager: manager, model: model}
+	partners := NewPartnerManager()
+	return Referential{id: id, slug: slug, manager: manager, model: model, partners: partners}
 }
 
 func (manager *MemoryReferentials) Find(id ReferentialId) (Referential, bool) {

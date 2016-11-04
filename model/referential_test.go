@@ -32,6 +32,16 @@ func Test_Referential_Model(t *testing.T) {
 	}
 }
 
+func Test_Referential_Partners(t *testing.T) {
+	partners := NewPartnerManager()
+	referential := Referential{
+		partners: partners,
+	}
+	if referential.Partners() != partners {
+		t.Errorf("Referential.Partners() returns wrong value, got: %v, required: %v", referential.Partners(), partners)
+	}
+}
+
 func Test_Referential_MarshalJSON(t *testing.T) {
 	referential := Referential{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
