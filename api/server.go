@@ -18,7 +18,7 @@ type Server struct {
 	bind        string
 	startedTime time.Time
 
-	stopAreaController *StopAreaController
+	stopAreaController *Controller
 }
 
 func NewServer(bind string) *Server {

@@ -22,21 +22,21 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 	}
 }
 
-func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, controller *StopAreaController) {
+func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential model.Referential) {
 	// Create a referential
 	referentials := model.NewMemoryReferentials()
-	referential := referentials.New("default")
+	referential = referentials.New("default")
 	referential.Save()
 	// Create a stopAreaController
-	controller = NewStopAreaController()
+	controller := NewStopAreaController()
 	controller.SetReferential(&referential)
 
 	// Initialize the stopAreas manager
-	controller.referential.Model().StopAreas().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	referential.Model().StopAreas().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	// Save a new stopArea
-	stopArea = controller.referential.Model().StopAreas().New()
+	stopArea = referential.Model().StopAreas().New()
 	stopArea.Name = "First StopArea"
-	controller.referential.Model().StopAreas().Save(&stopArea)
+	referential.Model().StopAreas().Save(&stopArea)
 
 	// Create a request
 	address := []byte("/stop_areas")
@@ -59,13 +59,13 @@ func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.
 
 func Test_StopAreaController_Delete(t *testing.T) {
 	// Send request
-	stopArea, responseRecorder, controller := prepareRequest("DELETE", true, nil, t)
+	stopArea, responseRecorder, referential := prepareRequest("DELETE", true, nil, t)
 
 	// Test response
 	checkResponseStatus(responseRecorder, t)
 
 	//Test Results
-	_, ok := controller.referential.Model().StopAreas().Find(stopArea.Id())
+	_, ok := referential.Model().StopAreas().Find(stopArea.Id())
 	if ok {
 		t.Errorf("StopArea shouldn't be found after DELETE request")
 	}
@@ -77,13 +77,13 @@ func Test_StopAreaController_Delete(t *testing.T) {
 func Test_StopAreaController_Update(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Name": "Yet another test" }`)
-	stopArea, responseRecorder, controller := prepareRequest("PUT", true, body, t)
+	stopArea, responseRecorder, referential := prepareRequest("PUT", true, body, t)
 
 	// Check response
 	checkResponseStatus(responseRecorder, t)
 
 	// Test Results
-	updatedStopArea, ok := controller.referential.Model().StopAreas().Find(stopArea.Id())
+	updatedStopArea, ok := referential.Model().StopAreas().Find(stopArea.Id())
 	if !ok {
 		t.Errorf("StopArea should be found after PUT request")
 	}
@@ -112,7 +112,7 @@ func Test_StopAreaController_Show(t *testing.T) {
 func Test_StopAreaController_Create(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Name": "test" }`)
-	_, responseRecorder, controller := prepareRequest("POST", false, body, t)
+	_, responseRecorder, referential := prepareRequest("POST", false, body, t)
 
 	// Check response
 	checkResponseStatus(responseRecorder, t)
@@ -120,7 +120,7 @@ func Test_StopAreaController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// stopArea should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	stopArea, ok := controller.referential.Model().StopAreas().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	stopArea, ok := referential.Model().StopAreas().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	if !ok {
 		t.Errorf("StopArea should be found after POST request")
 	}
