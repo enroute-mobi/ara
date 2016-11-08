@@ -25,11 +25,13 @@ Database configuration can be defined in `config/database.yml`
 #### Apply migrations
 ```
 edwig migrate up
+EDWIG_ENV=test edwig migrate up
 ```
 
 #### Rollback migrations
 ```
 edwig migrate down
+EDWIG_ENV=test edwig migrate down
 ```
 
 Migration folder can be specified with
