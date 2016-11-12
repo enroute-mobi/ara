@@ -9,7 +9,7 @@
       <Request>
         <ns2:RequestTimestamp>2016-09-22T07:39:21.359Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
-        <ns2:MessageIdentifier>CheckStatus:Test:0</ns2:MessageIdentifier>
+        <ns2:MessageIdentifier>Edwig:Message::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:MessageIdentifier>
       </Request>
       <RequestExtension />
     </ns7:CheckStatus>

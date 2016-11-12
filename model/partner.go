@@ -33,6 +33,7 @@ type Partner struct {
 	Settings           map[string]string
 	operationnalStatus OperationnalStatus
 
+	// WIP
 	checkStatusClient CheckStatusClient
 
 	manager Partners
@@ -58,6 +59,9 @@ func (partner *Partner) OperationnalStatus() OperationnalStatus {
 }
 
 func (partner *Partner) Save() (ok bool) {
+	// WIP
+	partner.RefreshConnectors()
+
 	return partner.manager.Save(partner)
 }
 
@@ -71,7 +75,8 @@ func (partner *Partner) MarshalJSON() ([]byte, error) {
 // Refresh Connector instances according to connector type list
 func (partner *Partner) RefreshConnectors() {
 	// WIP
-	if partner.checkStatusClient != nil {
+	logger.Log.Debugf("Initialize Connectors for %s", partner.Name)
+	if partner.checkStatusClient == nil {
 		siriPartner := NewSIRIPartner(partner)
 		partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
 	}
@@ -85,7 +90,13 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 func (partner *Partner) CheckStatus() {
 	logger.Log.Debugf("Check '%s' partner status", partner.Name)
 
-	partner.operationnalStatus, _ = partner.CheckStatusClient().Status()
+	status, err := partner.CheckStatusClient().Status()
+	if err != nil {
+		logger.Log.Printf("Error while checking status: %v", err)
+	}
+
+	partner.operationnalStatus = status
+	logger.Log.Debugf("Partner status is %v", partner.operationnalStatus)
 }
 
 func NewPartnerManager() *PartnerManager {
