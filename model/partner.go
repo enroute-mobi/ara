@@ -30,6 +30,7 @@ type Partners interface {
 type Partner struct {
 	id                 PartnerId
 	Name               string
+	Settings           map[string]string
 	operationnalStatus OperationnalStatus
 
 	checkStatusClient CheckStatusClient
@@ -46,6 +47,10 @@ type PartnerManager struct {
 
 func (partner *Partner) Id() PartnerId {
 	return partner.id
+}
+
+func (partner *Partner) Setting(key string) string {
+	return partner.Settings[key]
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
