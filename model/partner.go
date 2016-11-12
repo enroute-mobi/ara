@@ -16,6 +16,7 @@ type Partners interface {
 	New(name string) Partner
 	Find(id PartnerId) (Partner, bool)
 	FindByName(name string) (Partner, bool)
+	FindAll() []Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 }
@@ -24,6 +25,8 @@ type Partner struct {
 	id                 PartnerId
 	name               string
 	operationnalStatus OperationnalStatus
+
+	checkStatusClient CheckStatusClient
 
 	manager Partners
 }
@@ -58,6 +61,24 @@ func (partner *Partner) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// Refresh Connector instances according to connector type list
+func (partner *Partner) RefreshConnectors() {
+	// WIP
+	if partner.checkStatusClient != nil {
+		siriPartner := NewSIRIPartner(partner)
+		partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+	}
+}
+
+func (partner *Partner) CheckStatusClient() CheckStatusClient {
+	// WIP
+	return partner.checkStatusClient
+}
+
+func (partner *Partner) CheckStatus() {
+	partner.operationnalStatus, _ = partner.CheckStatusClient().Status()
+}
+
 func NewPartnerManager() *PartnerManager {
 	return &PartnerManager{
 		byId: make(map[PartnerId]*Partner),
@@ -83,6 +104,13 @@ func (manager *PartnerManager) FindByName(name string) (Partner, bool) {
 		}
 	}
 	return Partner{}, false
+}
+
+func (manager *PartnerManager) FindAll() (partners []Partner) {
+	for _, partner := range manager.byId {
+		partners = append(partners, *partner)
+	}
+	return
 }
 
 func (manager *PartnerManager) Save(partner *Partner) bool {
