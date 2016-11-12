@@ -29,6 +29,7 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	}
 	httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
 	httpRequest.Header.Set("Content-Type", "text/xml")
+	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
 	response, err := http.DefaultClient.Do(httpRequest)

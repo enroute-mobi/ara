@@ -23,6 +23,10 @@ func testSOAPFile(name string) (*os.File, error) {
 func Test_SOAPClient_CheckStatus(t *testing.T) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ContentLength <= 0 {
+			t.Errorf("Request ContentLength should be zero")
+		}
+
 		file, err := testSOAPFile("checkstatus-response")
 		if err != nil {
 			t.Fatal(err)

@@ -82,3 +82,11 @@ func (writer *SOAPEnvelopeBuffer) WriteTo(w io.Writer) (n int64, err error) {
 	n, err = writer.buffer.WriteTo(w)
 	return
 }
+
+func (writer *SOAPEnvelopeBuffer) String() string {
+	return writer.buffer.String()
+}
+
+func (writer *SOAPEnvelopeBuffer) Length() int64 {
+	return int64(writer.buffer.Len())
+}
