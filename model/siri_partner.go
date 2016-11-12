@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
 
@@ -8,6 +9,8 @@ type SIRIPartner struct {
 	MessageIdentifierConsumer
 
 	partner *Partner
+
+	soapClient *siri.SOAPClient
 }
 
 func NewSIRIPartner(partner *Partner) *SIRIPartner {
@@ -15,9 +18,14 @@ func NewSIRIPartner(partner *Partner) *SIRIPartner {
 }
 
 func (connector *SIRIPartner) SOAPClient() *siri.SOAPClient {
-	return nil
+	if connector.soapClient == nil {
+		siriUrl := connector.partner.Setting("remote_url")
+		logger.Log.Debugf("Create SIRI SOAPClient to %s", siriUrl)
+		connector.soapClient = siri.NewSOAPClient(siriUrl)
+	}
+	return connector.soapClient
 }
 
 func (connector *SIRIPartner) RequestorRef() string {
-	return ""
+	return connector.partner.Setting("remote_credential")
 }
