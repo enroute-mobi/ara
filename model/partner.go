@@ -13,10 +13,9 @@ const (
 type PartnerId string
 
 type Partners interface {
-	New(name string) Partner
-	Find(id PartnerId) (Partner, bool)
-	FindByName(name string) (Partner, bool)
-	FindAll() []Partner
+	New(name string) *Partner
+	Find(id PartnerId) *Partner
+	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 }
@@ -50,8 +49,7 @@ func (partner *Partner) OperationnalStatus() OperationnalStatus {
 }
 
 func (partner *Partner) Save() (ok bool) {
-	ok = partner.manager.Save(partner)
-	return
+	return partner.manager.Save(partner)
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
@@ -85,30 +83,18 @@ func NewPartnerManager() *PartnerManager {
 	}
 }
 
-func (manager *PartnerManager) New(name string) Partner {
-	return Partner{name: name, manager: manager}
+func (manager *PartnerManager) New(name string) *Partner {
+	return &Partner{name: name, manager: manager}
 }
 
-func (manager *PartnerManager) Find(id PartnerId) (Partner, bool) {
-	partner, ok := manager.byId[id]
-	if ok {
-		return *partner, true
-	}
-	return Partner{}, false
+func (manager *PartnerManager) Find(id PartnerId) *Partner {
+	partner, _ := manager.byId[id]
+	return partner
 }
 
-func (manager *PartnerManager) FindByName(name string) (Partner, bool) {
+func (manager *PartnerManager) FindAll() (partners []*Partner) {
 	for _, partner := range manager.byId {
-		if partner.name == name {
-			return *partner, true
-		}
-	}
-	return Partner{}, false
-}
-
-func (manager *PartnerManager) FindAll() (partners []Partner) {
-	for _, partner := range manager.byId {
-		partners = append(partners, *partner)
+		partners = append(partners, partner)
 	}
 	return
 }

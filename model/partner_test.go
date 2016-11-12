@@ -61,8 +61,8 @@ func Test_Partner_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("partner.Save() should succeed")
 	}
-	_, ok = partners.Find(partner.Id())
-	if !ok {
+	partner = partners.Find(partner.Id())
+	if partner == nil {
 		t.Errorf("New Partner should be found in Partners manager")
 	}
 }
@@ -83,7 +83,7 @@ func Test_PartnerManager_Save(t *testing.T) {
 	partners := NewPartnerManager()
 	partner := partners.New("partner")
 
-	if success := partners.Save(&partner); !success {
+	if success := partners.Save(partner); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -94,8 +94,8 @@ func Test_PartnerManager_Save(t *testing.T) {
 
 func Test_PartnerManager_Find_NotFound(t *testing.T) {
 	partners := NewPartnerManager()
-	_, ok := partners.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
-	if ok {
+	partner := partners.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if partner != nil {
 		t.Errorf("Find should return false when Partner isn't found")
 	}
 }
@@ -104,31 +104,15 @@ func Test_PartnerManager_Find(t *testing.T) {
 	partners := NewPartnerManager()
 
 	existingPartner := partners.New("partner")
-	partners.Save(&existingPartner)
+	partners.Save(existingPartner)
 	partnerId := existingPartner.Id()
 
-	partner, ok := partners.Find(partnerId)
-	if !ok {
-		t.Errorf("Find should return true when Partner is found")
+	partner := partners.Find(partnerId)
+	if partner == nil {
+		t.Fatal("Find should return true when Partner is found")
 	}
 	if partner.Id() != partnerId {
 		t.Errorf("Find should return a Partner with the given Id")
-	}
-}
-
-func Test_PartnerManager_FindByName(t *testing.T) {
-	partners := NewPartnerManager()
-
-	partnerName := "partner"
-	existingPartner := partners.New(partnerName)
-	partners.Save(&existingPartner)
-
-	partner, ok := partners.FindByName(partnerName)
-	if !ok {
-		t.Errorf("FindByName should return true when Partner is found")
-	}
-	if partner.Name() != partnerName {
-		t.Errorf("FindByName should return a Partner with the given Name")
 	}
 }
 
@@ -136,14 +120,14 @@ func Test_PartnerManager_Delete(t *testing.T) {
 	partners := NewPartnerManager()
 
 	existingPartner := partners.New("partner")
-	partners.Save(&existingPartner)
+	partners.Save(existingPartner)
 
 	partnerId := existingPartner.Id()
 
-	partners.Delete(&existingPartner)
+	partners.Delete(existingPartner)
 
-	_, ok := partners.Find(partnerId)
-	if ok {
+	partner := partners.Find(partnerId)
+	if partner != nil {
 		t.Errorf("Deleted Partner should not be findable")
 	}
 }
