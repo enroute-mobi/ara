@@ -5,9 +5,9 @@ import "encoding/json"
 type OperationnalStatus int
 
 const (
-	UNKNOWN OperationnalStatus = iota
-	UP
-	DOWN
+	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = iota
+	OPERATIONNAL_STATUS_UP
+	OPERATIONNAL_STATUS_DOWN
 )
 
 type PartnerId string

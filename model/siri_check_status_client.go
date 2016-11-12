@@ -27,12 +27,12 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 
 	response, err := connector.partner.SOAPClient().CheckStatus(request)
 	if err != nil {
-		return UNKNOWN, err
+		return OPERATIONNAL_STATUS_UNKNOWN, err
 	}
 
 	if response.Status() {
-		return UP, nil
+		return OPERATIONNAL_STATUS_UP, nil
 	} else {
-		return DOWN, nil
+		return OPERATIONNAL_STATUS_DOWN, nil
 	}
 }

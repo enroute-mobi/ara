@@ -27,7 +27,7 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 		name: "partner",
 	}
 
-	if expected := UNKNOWN; partner.OperationnalStatus() != expected {
+	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.OperationnalStatus() != expected {
 		t.Errorf("Partner.OperationnalStatus() returns wrong status, got: %s, required: %s", partner.OperationnalStatus(), expected)
 	}
 }
