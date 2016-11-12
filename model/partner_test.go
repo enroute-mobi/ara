@@ -51,7 +51,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 
 func Test_Partner_Save(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New("partner")
+	partner := partners.New()
 
 	if partner.manager != partners {
 		t.Errorf("New partner manager should be partners")
@@ -69,11 +69,8 @@ func Test_Partner_Save(t *testing.T) {
 
 func Test_PartnerManager_New(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New("partner")
+	partner := partners.New()
 
-	if partner.Name() != "partner" {
-		t.Errorf("New should create a partner with given name name:\n got: %s\n want: %s", partner.Name(), "partner")
-	}
 	if partner.Id() != "" {
 		t.Errorf("New Partner identifier should be an empty string, got: %s", partner.Id())
 	}
@@ -81,7 +78,7 @@ func Test_PartnerManager_New(t *testing.T) {
 
 func Test_PartnerManager_Save(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New("partner")
+	partner := partners.New()
 
 	if success := partners.Save(partner); !success {
 		t.Errorf("Save should return true")
@@ -103,7 +100,7 @@ func Test_PartnerManager_Find_NotFound(t *testing.T) {
 func Test_PartnerManager_Find(t *testing.T) {
 	partners := NewPartnerManager()
 
-	existingPartner := partners.New("partner")
+	existingPartner := partners.New()
 	partners.Save(existingPartner)
 	partnerId := existingPartner.Id()
 
@@ -119,7 +116,7 @@ func Test_PartnerManager_Find(t *testing.T) {
 func Test_PartnerManager_Delete(t *testing.T) {
 	partners := NewPartnerManager()
 
-	existingPartner := partners.New("partner")
+	existingPartner := partners.New()
 	partners.Save(existingPartner)
 
 	partnerId := existingPartner.Id()

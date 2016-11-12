@@ -13,7 +13,7 @@ const (
 type PartnerId string
 
 type Partners interface {
-	New(name string) *Partner
+	New() *Partner
 	Find(id PartnerId) *Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
@@ -83,8 +83,8 @@ func NewPartnerManager() *PartnerManager {
 	}
 }
 
-func (manager *PartnerManager) New(name string) *Partner {
-	return &Partner{name: name, manager: manager}
+func (manager *PartnerManager) New() *Partner {
+	return &Partner{manager: manager}
 }
 
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
