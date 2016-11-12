@@ -57,6 +57,14 @@ func Test_Partner_Save(t *testing.T) {
 	}
 }
 
+func Test_NewPartnerManager(t *testing.T) {
+	partners := NewPartnerManager()
+
+	if partners.guardian == nil {
+		t.Errorf("New PartnerManager should have a PartnersGuardian")
+	}
+}
+
 func Test_PartnerManager_New(t *testing.T) {
 	partners := NewPartnerManager()
 	partner := partners.New()

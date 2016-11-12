@@ -45,6 +45,10 @@ func (referential *Referential) Partners() Partners {
 	return referential.partners
 }
 
+func (referential *Referential) Start() {
+	referential.partners.Start()
+}
+
 func (referential *Referential) Save() (ok bool) {
 	ok = referential.manager.Save(referential)
 	return

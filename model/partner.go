@@ -1,6 +1,10 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/af83/edwig/logger"
+)
 
 type OperationnalStatus int
 
@@ -14,6 +18,7 @@ type PartnerId string
 
 type Partners interface {
 	UUIDInterface
+	Startable
 
 	New() *Partner
 	Find(id PartnerId) *Partner
@@ -35,7 +40,8 @@ type Partner struct {
 type PartnerManager struct {
 	UUIDConsumer
 
-	byId map[PartnerId]*Partner
+	byId     map[PartnerId]*Partner
+	guardian *PartnersGuardian
 }
 
 func (partner *Partner) Id() PartnerId {
@@ -72,13 +78,21 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 }
 
 func (partner *Partner) CheckStatus() {
+	logger.Log.Debugf("Check '%s' partner status", partner.Name)
+
 	partner.operationnalStatus, _ = partner.CheckStatusClient().Status()
 }
 
 func NewPartnerManager() *PartnerManager {
-	return &PartnerManager{
+	manager := &PartnerManager{
 		byId: make(map[PartnerId]*Partner),
 	}
+	manager.guardian = NewPartnersGuardian(manager)
+	return manager
+}
+
+func (manager *PartnerManager) Start() {
+	manager.guardian.Start()
 }
 
 func (manager *PartnerManager) New() *Partner {

@@ -35,13 +35,15 @@ func (server *Server) ListenAndServe(slug model.ReferentialSlug) error {
 	referential := model.CurrentReferentials().New(slug)
 	referential.Save()
 
+	referential.Start()
+
 	server.stopAreaController.SetReferential(&referential)
 	server.partnerController.SetReferential(&referential)
 
 	http.HandleFunc(fmt.Sprintf("/%s/siri", slug), server.checkStatusHandler)
 	http.HandleFunc(fmt.Sprintf("/%s/stop_areas", slug), server.stopAreaController.ServeHTTP)
 	http.HandleFunc(fmt.Sprintf("/%s/partners", slug), server.partnerController.ServeHTTP)
-	logger.Log.Debugf("Starting server on %s\n", server.bind)
+	logger.Log.Debugf("Starting server on %s", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }
 
