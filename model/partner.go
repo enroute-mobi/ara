@@ -13,6 +13,8 @@ const (
 type PartnerId string
 
 type Partners interface {
+	UUIDInterface
+
 	New() *Partner
 	Find(id PartnerId) *Partner
 	FindAll() []*Partner
@@ -22,7 +24,7 @@ type Partners interface {
 
 type Partner struct {
 	id                 PartnerId
-	name               string
+	Name               string
 	operationnalStatus OperationnalStatus
 
 	checkStatusClient CheckStatusClient
@@ -40,10 +42,6 @@ func (partner *Partner) Id() PartnerId {
 	return partner.id
 }
 
-func (partner *Partner) Name() string {
-	return partner.name
-}
-
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.operationnalStatus
 }
@@ -55,7 +53,7 @@ func (partner *Partner) Save() (ok bool) {
 func (partner *Partner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Id":   partner.id,
-		"Name": partner.name,
+		"Name": partner.Name,
 	})
 }
 
@@ -96,7 +94,7 @@ func (manager *PartnerManager) FindAll() (partners []*Partner) {
 	for _, partner := range manager.byId {
 		partners = append(partners, partner)
 	}
-	return
+	return partners
 }
 
 func (manager *PartnerManager) Save(partner *Partner) bool {

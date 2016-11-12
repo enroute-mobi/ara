@@ -12,19 +12,9 @@ func Test_Partner_Id(t *testing.T) {
 	}
 }
 
-func Test_Partner_Name(t *testing.T) {
-	partner := Partner{
-		name: "partner",
-	}
-
-	if expected := "partner"; partner.Name() != expected {
-		t.Errorf("Partner.Name() returns wrong value, got: %s, required: %s", partner.Name(), expected)
-	}
-}
-
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := Partner{
-		name: "partner",
+		Name: "partner",
 	}
 
 	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.OperationnalStatus() != expected {
@@ -35,7 +25,7 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		name: "partner",
+		Name: "partner",
 	}
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"partner"}`
 	jsonBytes, err := partner.MarshalJSON()
