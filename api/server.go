@@ -37,8 +37,8 @@ func (server *Server) ListenAndServe(slug model.ReferentialSlug) error {
 
 	referential.Start()
 
-	server.stopAreaController.SetReferential(&referential)
-	server.partnerController.SetReferential(&referential)
+	server.stopAreaController.SetReferential(referential)
+	server.partnerController.SetReferential(referential)
 
 	http.HandleFunc(fmt.Sprintf("/%s/siri", slug), server.checkStatusHandler)
 	http.HandleFunc(fmt.Sprintf("/%s/stop_areas", slug), server.stopAreaController.ServeHTTP)

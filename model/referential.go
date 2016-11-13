@@ -19,9 +19,9 @@ type Referential struct {
 }
 
 type Referentials interface {
-	New(slug ReferentialSlug) Referential
-	Find(id ReferentialId) (Referential, bool)
-	FindBySlug(slug ReferentialSlug) (Referential, bool)
+	New(slug ReferentialSlug) *Referential
+	Find(id ReferentialId) *Referential
+	FindBySlug(slug ReferentialSlug) *Referential
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 	Load() error
@@ -77,10 +77,10 @@ func CurrentReferentials() Referentials {
 	return referentials
 }
 
-func (manager *MemoryReferentials) New(slug ReferentialSlug) Referential {
+func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	model := NewMemoryModel()
 	partners := NewPartnerManager()
-	return Referential{slug: slug, manager: manager, model: model, partners: partners}
+	return &Referential{slug: slug, manager: manager, model: model, partners: partners}
 }
 
 func (manager *MemoryReferentials) NewWithId(slug ReferentialSlug, id ReferentialId) Referential {
@@ -89,22 +89,18 @@ func (manager *MemoryReferentials) NewWithId(slug ReferentialSlug, id Referentia
 	return Referential{id: id, slug: slug, manager: manager, model: model, partners: partners}
 }
 
-func (manager *MemoryReferentials) Find(id ReferentialId) (Referential, bool) {
-	referential, ok := manager.byId[id]
-	if ok {
-		return *referential, true
-	} else {
-		return Referential{}, false
-	}
+func (manager *MemoryReferentials) Find(id ReferentialId) *Referential {
+	referential, _ := manager.byId[id]
+	return referential
 }
 
-func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) (Referential, bool) {
+func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) *Referential {
 	for _, referential := range manager.byId {
 		if referential.slug == slug {
-			return *referential, true
+			return referential
 		}
 	}
-	return Referential{}, false
+	return nil
 }
 
 func (manager *MemoryReferentials) Save(referential *Referential) bool {

@@ -22,14 +22,14 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 	}
 }
 
-func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential model.Referential) {
+func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *model.Referential) {
 	// Create a referential
 	referentials := model.NewMemoryReferentials()
 	referential = referentials.New("default")
 	referential.Save()
 	// Create a stopAreaController
 	controller := NewStopAreaController()
-	controller.SetReferential(&referential)
+	controller.SetReferential(referential)
 
 	// Initialize the stopAreas manager
 	referential.Model().StopAreas().SetUUIDGenerator(model.NewFakeUUIDGenerator())

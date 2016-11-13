@@ -22,14 +22,14 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 	}
 }
 
-func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *model.Partner, responseRecorder *httptest.ResponseRecorder, referential model.Referential) {
+func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *model.Partner, responseRecorder *httptest.ResponseRecorder, referential *model.Referential) {
 	// Create a referential
 	referentials := model.NewMemoryReferentials()
 	referential = referentials.New("default")
 	referential.Save()
 	// Create a partnerController
 	controller := NewPartnerController()
-	controller.SetReferential(&referential)
+	controller.SetReferential(referential)
 
 	// Initialize the partners manager
 	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
