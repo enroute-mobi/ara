@@ -23,11 +23,11 @@ var Config = struct {
 
 	LogStash string
 	Syslog   bool
+	Debug    bool
 }{}
 
 func LoadConfig(path string) error {
 	// Default values
-	Config.Syslog = false
 	// ...
 
 	env := Environment()
@@ -50,6 +50,9 @@ func LoadConfig(path string) error {
 
 	// database config
 	LoadDatabaseConfig(configPath)
+
+	logger.Log.Syslog = Config.Syslog
+	logger.Log.Debug = Config.Debug
 
 	return nil
 }
