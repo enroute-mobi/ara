@@ -1,0 +1,5 @@
+production:
+  name: edwig
+  user: edwig
+  password: edwig
+  port: 5432

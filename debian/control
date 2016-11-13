@@ -1,0 +1,12 @@
+Source: edwig
+Section: misc
+Priority: extra
+Maintainer: af83 devs <devs+debian@af83.com>
+Build-Depends: debhelper (>= 8.0.0), golang-go (>= 1.6.1), git-core, pkg-config, libxml2-dev
+Standards-Version: 3.9.4
+Homepage: http://af83.com
+
+Package: edwig
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Realtime Public Transport server

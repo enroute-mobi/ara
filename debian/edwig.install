@@ -1,0 +1,4 @@
+debian/config.yml etc/edwig
+debian/database.yml etc/edwig
+debian/production.yml etc/edwig
+db/migrations usr/share/edwig

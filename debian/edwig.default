@@ -1,0 +1,4 @@
+# Uncomment to enable daemon
+# START="true"
+
+export EDWIG_ENV=production

@@ -1,0 +1,74 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          edwig
+# Required-Start:    $network $named $remote_fs $syslog
+# Required-Stop:     $network $named $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/edwig
+DAEMON_OPTS="--syslog --config=/etc/edwig api"
+MIGRATE_OPTS="--syslog --config=/etc/edwig migrate --path=/usr/share/edwig/migrations up"
+DAEMON_USER="nobody"
+NAME="edwig"
+DESC="Edwig Server"
+
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+test -x $DAEMON || exit 0
+
+. /lib/lsb/init-functions
+
+start_daemon() {
+    if [ -n "$START" -a -n "$DAEMON_USER" -a -n "$DAEMON_OPTS" ] ; then
+	      start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --chuid $DAEMON_USER \
+	          --startas $DAEMON --background --make-pidfile -- $DAEMON_OPTS
+    else
+	      echo ""
+	      echo "$NAME not configured to start, please edit /etc/default/$NAME enable"
+    fi
+}
+
+migrate() {
+    if [ -n "$START" -a -n "$DAEMON_USER" -a -n "$MIGRATE_OPTS" ] ; then
+        log_begin_msg "Migrate $DESC"
+        su $DAEMON_USER -c "$DAEMON $MIGRATE_OPTS"
+        if [ $? != 0 ]; then
+            log_failure_msg "database migration failed"
+        fi
+        log_end_msg 0
+    fi
+}
+
+stop_daemon() {
+	  start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid
+}
+
+case "$1" in
+    start)
+        migrate
+	      log_begin_msg "Starting $DESC"
+	      start_daemon
+	      log_end_msg 0
+	      ;;
+    stop)
+	      log_begin_msg "Stopping $DESC"
+	      stop_daemon
+	      log_end_msg 0
+	      ;;
+    restart|force-reload)
+	      log_begin_msg "Restarting $DESC"
+	      stop_daemon
+	      sleep 1
+	      start_daemon
+	      log_end_msg 0
+	      ;;
+    *)
+	      echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+	      exit 1
+	      ;;
+esac
+
+exit 0
