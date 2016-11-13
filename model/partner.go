@@ -31,6 +31,7 @@ type Partner struct {
 	id                 PartnerId
 	Name               string
 	Settings           map[string]string
+	ConnectorTypes     []string
 	operationnalStatus OperationnalStatus
 
 	// WIP
@@ -66,20 +67,44 @@ func (partner *Partner) Save() (ok bool) {
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	data := map[string]interface{}{
 		"Id":   partner.id,
 		"Name": partner.Name,
-	})
+	}
+
+	if len(partner.Settings) > 0 {
+		data["Settings"] = partner.Settings
+	}
+
+	if len(partner.ConnectorTypes) > 0 {
+		data["ConnectorTypes"] = partner.ConnectorTypes
+	}
+
+	return json.Marshal(data)
 }
 
 // Refresh Connector instances according to connector type list
 func (partner *Partner) RefreshConnectors() {
 	// WIP
-	logger.Log.Debugf("Initialize Connectors for %s", partner.Name)
-	if partner.checkStatusClient == nil {
-		siriPartner := NewSIRIPartner(partner)
-		partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.Name)
+
+	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
+		if partner.checkStatusClient == nil {
+			siriPartner := NewSIRIPartner(partner)
+			partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+		}
+	} else {
+		partner.checkStatusClient = nil
 	}
+}
+
+func (partner *Partner) isConnectorDefined(expected string) bool {
+	for _, connectorType := range partner.ConnectorTypes {
+		if connectorType == expected {
+			return true
+		}
+	}
+	return false
 }
 
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
@@ -89,6 +114,11 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 
 func (partner *Partner) CheckStatus() {
 	logger.Log.Debugf("Check '%s' partner status", partner.Name)
+
+	if partner.CheckStatusClient() == nil {
+		logger.Log.Debugf("No CheckStatusClient connector")
+		return
+	}
 
 	status, err := partner.CheckStatusClient().Status()
 	if err != nil {

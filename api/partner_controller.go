@@ -70,7 +70,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 		return
 	}
 
-	controller.referential.Partners().Save(partner)
+	partner.Save()
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }

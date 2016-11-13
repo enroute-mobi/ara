@@ -8,6 +8,10 @@ type CheckStatusClient interface {
 	Status() (OperationnalStatus, error)
 }
 
+const (
+	SIRI_CHECK_STATUS_CLIENT_TYPE = "siri-check-status-client"
+)
+
 type SIRICheckStatusClient struct {
 	ClockConsumer
 
