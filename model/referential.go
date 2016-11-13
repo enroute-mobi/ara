@@ -78,15 +78,17 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
-	model := NewMemoryModel()
-	partners := NewPartnerManager()
-	return &Referential{slug: slug, manager: manager, model: model, partners: partners}
+	referential := manager.new()
+	referential.slug = slug
+	return referential
 }
 
-func (manager *MemoryReferentials) NewWithId(slug ReferentialSlug, id ReferentialId) Referential {
-	model := NewMemoryModel()
-	partners := NewPartnerManager()
-	return Referential{id: id, slug: slug, manager: manager, model: model, partners: partners}
+func (manager *MemoryReferentials) new() *Referential {
+	return &Referential{
+		manager:  manager,
+		model:    NewMemoryModel(),
+		partners: NewPartnerManager(),
+	}
 }
 
 func (manager *MemoryReferentials) Find(id ReferentialId) *Referential {
@@ -128,8 +130,10 @@ func (manager *MemoryReferentials) Load() error {
 	}
 
 	for _, r := range selectReferentials {
-		referential := manager.NewWithId(ReferentialSlug(r.Slug), ReferentialId(r.Referential_id))
-		manager.Save(&referential)
+		referential := manager.new()
+		referential.id = ReferentialId(r.Referential_id)
+		referential.slug = ReferentialSlug(r.Slug)
+		manager.Save(referential)
 	}
 
 	logger.Log.Debugf("Loaded Referentials from database")
