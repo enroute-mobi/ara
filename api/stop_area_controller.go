@@ -43,7 +43,11 @@ func (controller *StopAreaController) Show(response http.ResponseWriter, identif
 }
 
 func (controller *StopAreaController) Delete(response http.ResponseWriter, identifier string) {
-	stopArea, ok := controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
+	// New transaction
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
+	stopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(identifier))
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
 		return
@@ -51,12 +55,22 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete stopArea %s", identifier)
 
 	jsonBytes, _ := stopArea.MarshalJSON()
-	controller.referential.Model().StopAreas().Delete(&stopArea)
+	tx.Model().StopAreas().Delete(&stopArea)
+	err := tx.Commit()
+	if err != nil {
+		logger.Log.Debugf("Transaction error: %v", err)
+		http.Error(response, "Internal error", 500)
+		return
+	}
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	stopArea, ok := controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
+	// New transaction
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
+	stopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(identifier))
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
 		return
@@ -70,15 +84,25 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		return
 	}
 
-	controller.referential.Model().StopAreas().Save(&stopArea)
+	tx.Model().StopAreas().Save(&stopArea)
+	err = tx.Commit()
+	if err != nil {
+		logger.Log.Debugf("Transaction error: %v", err)
+		http.Error(response, "Internal error", 500)
+		return
+	}
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Create(response http.ResponseWriter, body []byte) {
+	// New transaction
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
 	logger.Log.Debugf("Create stopArea: %s", string(body))
 
-	stopArea := controller.referential.Model().StopAreas().New()
+	stopArea := tx.Model().StopAreas().New()
 
 	err := json.Unmarshal(body, &stopArea)
 	if err != nil {
@@ -90,7 +114,13 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		return
 	}
 
-	controller.referential.Model().StopAreas().Save(&stopArea)
+	tx.Model().StopAreas().Save(&stopArea)
+	err = tx.Commit()
+	if err != nil {
+		logger.Log.Debugf("Transaction error: %v", err)
+		http.Error(response, "Internal error", 500)
+		return
+	}
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }

@@ -31,8 +31,8 @@ func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.
 	controller := NewStopAreaController()
 	controller.SetReferential(referential)
 
-	// Initialize the stopAreas manager
-	referential.Model().StopAreas().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	// Set the fake UUID generator
+	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
 	// Save a new stopArea
 	stopArea = referential.Model().StopAreas().New()
 	stopArea.Name = "First StopArea"

@@ -54,6 +54,10 @@ func (referential *Referential) Save() (ok bool) {
 	return
 }
 
+func (referential *Referential) NewTransaction() *Transaction {
+	return NewTransaction(referential.model)
+}
+
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Id":   referential.id,
