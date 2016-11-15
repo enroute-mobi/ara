@@ -29,7 +29,7 @@ func main() {
 		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
 		fmt.Println("             [-config=<path>] [-debug] [-syslog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
-		fmt.Println("\tapi")
+		fmt.Println("\tapi [-listen=<url>]")
 		fmt.Println("\tmigrate [-path=<path>] <up|down>")
 		os.Exit(1)
 	}
@@ -79,6 +79,10 @@ func main() {
 
 		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
 	case "api":
+		apiFlags := flag.NewFlagSet("api", flag.ExitOnError)
+		serverAddressPtr := apiFlags.String("listen", "localhost:8080", "Specify server port")
+		apiFlags.Parse(flag.Args()[1:])
+
 		// Init Database
 		model.Database = model.InitDB(config.Config.DB)
 		defer model.CloseDB(model.Database)
@@ -88,17 +92,17 @@ func main() {
 			logger.Log.Panicf("Error while loading Referentials: %v", err)
 		}
 
-		err = api.NewServer("localhost:8080").ListenAndServe("default")
+		err = api.NewServer(*serverAddressPtr).ListenAndServe("default")
 	case "migrate":
 		logger.Log.Debug = true
 
-		checkFlags := flag.NewFlagSet("migrate", flag.ExitOnError)
-		migrationFilesPtr := checkFlags.String("path", "db/migrations", "Specify migration files path")
-		checkFlags.Parse(flag.Args()[1:])
+		migrateFlags := flag.NewFlagSet("migrate", flag.ExitOnError)
+		migrationFilesPtr := migrateFlags.String("path", "db/migrations", "Specify migration files path")
+		migrateFlags.Parse(flag.Args()[1:])
 
 		database := model.InitDB(config.Config.DB)
 		defer model.CloseDB(database)
-		err = model.ApplyMigrations(checkFlags.Args()[0], *migrationFilesPtr, database.Db)
+		err = model.ApplyMigrations(migrateFlags.Args()[0], *migrationFilesPtr, database.Db)
 		if err != nil {
 			break
 		}
