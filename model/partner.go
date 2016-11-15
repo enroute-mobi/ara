@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/af83/edwig/logger"
 )
@@ -15,12 +16,13 @@ const (
 )
 
 type PartnerId string
+type PartnerSlug string
 
 type Partners interface {
 	UUIDInterface
 	Startable
 
-	New() *Partner
+	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
@@ -29,7 +31,7 @@ type Partners interface {
 
 type Partner struct {
 	id                 PartnerId
-	Name               string
+	slug               PartnerSlug
 	Settings           map[string]string
 	ConnectorTypes     []string
 	operationnalStatus OperationnalStatus
@@ -40,6 +42,13 @@ type Partner struct {
 	manager Partners
 }
 
+type APIPartner struct {
+	Id             PartnerId
+	Slug           PartnerSlug
+	Settings       map[string]string `json:"Settings,omitempty"`
+	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
+}
+
 type PartnerManager struct {
 	UUIDConsumer
 
@@ -47,8 +56,17 @@ type PartnerManager struct {
 	guardian *PartnersGuardian
 }
 
+// WIP
+func (partner *APIPartner) Validate() error {
+	return nil
+}
+
 func (partner *Partner) Id() PartnerId {
 	return partner.id
+}
+
+func (partner *Partner) Slug() PartnerSlug {
+	return partner.slug
 }
 
 func (partner *Partner) Setting(key string) string {
@@ -67,26 +85,43 @@ func (partner *Partner) Save() (ok bool) {
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
-	data := map[string]interface{}{
-		"Id":   partner.id,
-		"Name": partner.Name,
+	return json.Marshal(APIPartner{
+		partner.id,
+		partner.slug,
+		partner.Settings,
+		partner.ConnectorTypes,
+	})
+}
+
+func (partner *Partner) UnmarshalJSON(b []byte) error {
+	var apiPartner APIPartner
+	if err := json.Unmarshal(b, &apiPartner); err != nil {
+		return fmt.Errorf("Can't parse JSON")
+	}
+	if err := apiPartner.Validate(); err != nil {
+		return fmt.Errorf("Invalid Partner")
 	}
 
-	if len(partner.Settings) > 0 {
-		data["Settings"] = partner.Settings
+	if apiPartner.Id != "" {
+		partner.id = apiPartner.Id
+	}
+	if apiPartner.Slug != "" {
+		partner.slug = apiPartner.Slug
+	}
+	if len(apiPartner.Settings) > 0 {
+		partner.Settings = apiPartner.Settings
+	}
+	if len(apiPartner.ConnectorTypes) > 0 {
+		partner.ConnectorTypes = apiPartner.ConnectorTypes
 	}
 
-	if len(partner.ConnectorTypes) > 0 {
-		data["ConnectorTypes"] = partner.ConnectorTypes
-	}
-
-	return json.Marshal(data)
+	return nil
 }
 
 // Refresh Connector instances according to connector type list
 func (partner *Partner) RefreshConnectors() {
 	// WIP
-	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.Name)
+	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
 
 	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
 		if partner.checkStatusClient == nil {
@@ -113,7 +148,7 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 }
 
 func (partner *Partner) CheckStatus() {
-	logger.Log.Debugf("Check '%s' partner status", partner.Name)
+	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 
 	if partner.CheckStatusClient() == nil {
 		logger.Log.Debugf("No CheckStatusClient connector")
@@ -141,8 +176,8 @@ func (manager *PartnerManager) Start() {
 	manager.guardian.Start()
 }
 
-func (manager *PartnerManager) New() *Partner {
-	return &Partner{manager: manager}
+func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
+	return &Partner{slug: slug, manager: manager}
 }
 
 func (manager *PartnerManager) Find(id PartnerId) *Partner {

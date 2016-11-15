@@ -66,7 +66,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 
 	err := json.Unmarshal(body, &partner)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: %v", err), 400)
 		return
 	}
 
@@ -78,19 +78,18 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 func (controller *PartnerController) Create(response http.ResponseWriter, body []byte) {
 	logger.Log.Debugf("Create partner: %s", string(body))
 
-	partner := controller.referential.Partners().New()
-
+	partner := model.Partner{}
 	err := json.Unmarshal(body, &partner)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: %v", err), 400)
 		return
 	}
 	if partner.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request (Id specified)", 400)
 		return
 	}
 
-	partner.Save()
+	controller.referential.Partners().Save(&partner)
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }

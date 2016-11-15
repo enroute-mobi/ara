@@ -12,9 +12,19 @@ func Test_Partner_Id(t *testing.T) {
 	}
 }
 
+func Test_Partner_Slug(t *testing.T) {
+	partner := Partner{
+		slug: "partner",
+	}
+
+	if expected := PartnerSlug("partner"); partner.Slug() != expected {
+		t.Errorf("Partner.Slug() returns wrong value, got: %s, required: %s", partner.Id(), expected)
+	}
+}
+
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := Partner{
-		Name: "partner",
+		slug: "partner",
 	}
 
 	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.OperationnalStatus() != expected {
@@ -25,9 +35,9 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		Name: "partner",
+		slug: "partner",
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"partner"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner"}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -41,7 +51,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 
 func Test_Partner_Save(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New()
+	partner := partners.New("partner")
 
 	if partner.manager != partners {
 		t.Errorf("New partner manager should be partners")
@@ -67,7 +77,7 @@ func Test_NewPartnerManager(t *testing.T) {
 
 func Test_PartnerManager_New(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New()
+	partner := partners.New("partner")
 
 	if partner.Id() != "" {
 		t.Errorf("New Partner identifier should be an empty string, got: %s", partner.Id())
@@ -76,7 +86,7 @@ func Test_PartnerManager_New(t *testing.T) {
 
 func Test_PartnerManager_Save(t *testing.T) {
 	partners := NewPartnerManager()
-	partner := partners.New()
+	partner := partners.New("partner")
 
 	if success := partners.Save(partner); !success {
 		t.Errorf("Save should return true")
@@ -98,7 +108,7 @@ func Test_PartnerManager_Find_NotFound(t *testing.T) {
 func Test_PartnerManager_Find(t *testing.T) {
 	partners := NewPartnerManager()
 
-	existingPartner := partners.New()
+	existingPartner := partners.New("partner")
 	partners.Save(existingPartner)
 	partnerId := existingPartner.Id()
 
@@ -114,7 +124,7 @@ func Test_PartnerManager_Find(t *testing.T) {
 func Test_PartnerManager_Delete(t *testing.T) {
 	partners := NewPartnerManager()
 
-	existingPartner := partners.New()
+	existingPartner := partners.New("partner")
 	partners.Save(existingPartner)
 
 	partnerId := existingPartner.Id()

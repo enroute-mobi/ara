@@ -34,8 +34,7 @@ func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *t
 	// Initialize the partners manager
 	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	// Save a new partner
-	partner = referential.Partners().New()
-	partner.Name = "First Partner"
+	partner = referential.Partners().New("First Partner")
 	referential.Partners().Save(partner)
 
 	// Create a request
@@ -76,7 +75,7 @@ func Test_PartnerController_Delete(t *testing.T) {
 
 func Test_PartnerController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Name": "Yet another test" }`)
+	body := []byte(`{ "Slug": "Yet another test" }`)
 	partner, responseRecorder, referential := partnerPrepareRequest("PUT", true, body, t)
 
 	// Check response
@@ -88,11 +87,34 @@ func Test_PartnerController_Update(t *testing.T) {
 		t.Errorf("Partner should be found after PUT request")
 	}
 
-	if expected := "Yet another test"; updatedPartner.Name != expected {
-		t.Errorf("Partner name should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Name, expected)
+	if expected := model.PartnerSlug("Yet another test"); updatedPartner.Slug() != expected {
+		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
+	}
+}
+
+func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
+	// Prepare and send request
+	body := []byte(`{ "ConnectorTypes": ["test"] }`)
+	partner, responseRecorder, referential := partnerPrepareRequest("PUT", true, body, t)
+
+	// Check response
+	partnerCheckResponseStatus(responseRecorder, t)
+
+	// Test Results
+	updatedPartner := referential.Partners().Find(partner.Id())
+	if updatedPartner == nil {
+		t.Errorf("Partner should be found after PUT request")
+	}
+
+	if expected := model.PartnerSlug("First Partner"); updatedPartner.Slug() != expected {
+		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
+	}
+
+	if len(updatedPartner.ConnectorTypes) != 1 {
+		t.Errorf("ConnectorTypes should have been updated by POST request:\n got: %v\n want: %v", updatedPartner.ConnectorTypes, []string{"test"})
 	}
 }
 
@@ -111,7 +133,7 @@ func Test_PartnerController_Show(t *testing.T) {
 
 func Test_PartnerController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Name": "test" }`)
+	body := []byte(`{ "Slug": "test" }`)
 	_, responseRecorder, referential := partnerPrepareRequest("POST", false, body, t)
 
 	// Check response
@@ -124,8 +146,8 @@ func Test_PartnerController_Create(t *testing.T) {
 	if partner == nil {
 		t.Errorf("Partner should be found after POST request")
 	}
-	if expected := "test"; partner.Name != expected {
-		t.Errorf("Invalid partner name after POST request:\n got: %v\n want: %v", partner.Name, expected)
+	if expected := model.PartnerSlug("test"); partner.Slug() != expected {
+		t.Errorf("Invalid partner slug after POST request:\n got: %v\n want: %v", partner.Slug(), expected)
 	}
 	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
@@ -140,7 +162,7 @@ func Test_PartnerController_Index(t *testing.T) {
 	partnerCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"First Partner"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"First Partner"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
