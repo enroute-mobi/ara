@@ -64,12 +64,18 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 
 	logger.Log.Debugf("Update partner %s: %s", identifier, string(body))
 
-	err := json.Unmarshal(body, &partner)
+	apiPartner := partner.Definition()
+	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: %v", err), 400)
+		http.Error(response, "Invalid request: can't parse body", 400)
 		return
 	}
 
+	if !apiPartner.Validate() {
+		http.Error(response, "Invalid request: invalid partner", 400)
+	}
+
+	partner.SetDefinition(apiPartner)
 	partner.Save()
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
@@ -79,9 +85,10 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	logger.Log.Debugf("Create partner: %s", string(body))
 
 	partner := model.Partner{}
-	err := json.Unmarshal(body, &partner)
+	apiPartner := partner.Definition()
+	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: %v", err), 400)
+		http.Error(response, "Invalid request: can't parse body", 400)
 		return
 	}
 	if partner.Id() != "" {
@@ -89,6 +96,11 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 		return
 	}
 
+	if !apiPartner.Validate() {
+		http.Error(response, "Invalid request: invalid partner", 400)
+	}
+
+	partner.SetDefinition(apiPartner)
 	controller.referential.Partners().Save(&partner)
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)

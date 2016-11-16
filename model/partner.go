@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/af83/edwig/logger"
 )
@@ -57,8 +56,8 @@ type PartnerManager struct {
 }
 
 // WIP
-func (partner *APIPartner) Validate() error {
-	return nil
+func (partner *APIPartner) Validate() bool {
+	return true
 }
 
 func (partner *Partner) Id() PartnerId {
@@ -93,29 +92,20 @@ func (partner *Partner) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (partner *Partner) UnmarshalJSON(b []byte) error {
-	var apiPartner APIPartner
-	if err := json.Unmarshal(b, &apiPartner); err != nil {
-		return fmt.Errorf("Can't parse JSON")
+func (partner *Partner) Definition() *APIPartner {
+	return &APIPartner{
+		partner.id,
+		partner.slug,
+		partner.Settings,
+		partner.ConnectorTypes,
 	}
-	if err := apiPartner.Validate(); err != nil {
-		return fmt.Errorf("Invalid Partner")
-	}
+}
 
-	if apiPartner.Id != "" {
-		partner.id = apiPartner.Id
-	}
-	if apiPartner.Slug != "" {
-		partner.slug = apiPartner.Slug
-	}
-	if len(apiPartner.Settings) > 0 {
-		partner.Settings = apiPartner.Settings
-	}
-	if len(apiPartner.ConnectorTypes) > 0 {
-		partner.ConnectorTypes = apiPartner.ConnectorTypes
-	}
-
-	return nil
+func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
+	partner.id = apiPartner.Id
+	partner.slug = apiPartner.Slug
+	partner.Settings = apiPartner.Settings
+	partner.ConnectorTypes = apiPartner.ConnectorTypes
 }
 
 // Refresh Connector instances according to connector type list
