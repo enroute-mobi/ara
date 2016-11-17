@@ -192,6 +192,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 	}
 	partner.manager = manager
 	manager.byId[partner.id] = partner
+	partner.RefreshConnectors()
 	return true
 }
 
