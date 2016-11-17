@@ -10,12 +10,29 @@ type CheckStatusClient interface {
 
 const (
 	SIRI_CHECK_STATUS_CLIENT_TYPE = "siri-check-status-client"
+	TEST_CHECK_STATUS_CLIENT_TYPE = "test-check-status-client"
 )
+
+type TestCheckStatusClient struct {
+	status OperationnalStatus
+}
 
 type SIRICheckStatusClient struct {
 	ClockConsumer
 
 	partner *SIRIPartner
+}
+
+func NewTestCheckStatusClient() *TestCheckStatusClient {
+	return &TestCheckStatusClient{status: OPERATIONNAL_STATUS_UP}
+}
+
+func (connector *TestCheckStatusClient) Status() (OperationnalStatus, error) {
+	return connector.status, nil
+}
+
+func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
+	connector.status = status
 }
 
 func NewSIRICheckStatusClient(partner *SIRIPartner) *SIRICheckStatusClient {

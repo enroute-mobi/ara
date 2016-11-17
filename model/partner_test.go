@@ -1,6 +1,9 @@
 package model
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_Partner_Id(t *testing.T) {
 	partner := Partner{
@@ -64,6 +67,26 @@ func Test_Partner_Save(t *testing.T) {
 	partner = partners.Find(partner.Id())
 	if partner == nil {
 		t.Errorf("New Partner should be found in Partners manager")
+	}
+}
+
+func Test_Partner_RefreshConnectors(t *testing.T) {
+	partner := Partner{}
+	partner.RefreshConnectors()
+	if partner.CheckStatusClient() != nil {
+		t.Errorf("Partner CheckStatus client should be nil, got: %v", reflect.TypeOf(partner.CheckStatusClient()))
+	}
+
+	partner.ConnectorTypes = []string{"siri-check-status-client"}
+	partner.RefreshConnectors()
+	if _, ok := partner.CheckStatusClient().(*SIRICheckStatusClient); !ok {
+		t.Errorf("Partner CheckStatus client should be SIRICheckStatusClient, got: %v", reflect.TypeOf(partner.CheckStatusClient()))
+	}
+
+	partner.ConnectorTypes = []string{"test-check-status-client"}
+	partner.RefreshConnectors()
+	if _, ok := partner.CheckStatusClient().(*TestCheckStatusClient); !ok {
+		t.Errorf("Partner CheckStatus client should be TestCheckStatusClient, got: %v", reflect.TypeOf(partner.CheckStatusClient()))
 	}
 }
 

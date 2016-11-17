@@ -114,9 +114,13 @@ func (partner *Partner) RefreshConnectors() {
 	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
 
 	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
-		if partner.checkStatusClient == nil {
+		if _, ok := partner.checkStatusClient.(*SIRICheckStatusClient); !ok {
 			siriPartner := NewSIRIPartner(partner)
 			partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+		}
+	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
+		if _, ok := partner.checkStatusClient.(*TestCheckStatusClient); !ok {
+			partner.checkStatusClient = NewTestCheckStatusClient()
 		}
 	} else {
 		partner.checkStatusClient = nil
