@@ -15,6 +15,7 @@ const (
 
 type TestCheckStatusClient struct {
 	status OperationnalStatus
+	Done   chan bool
 }
 
 type SIRICheckStatusClient struct {
@@ -24,10 +25,14 @@ type SIRICheckStatusClient struct {
 }
 
 func NewTestCheckStatusClient() *TestCheckStatusClient {
-	return &TestCheckStatusClient{status: OPERATIONNAL_STATUS_UP}
+	return &TestCheckStatusClient{
+		status: OPERATIONNAL_STATUS_UP,
+		Done:   make(chan bool, 1),
+	}
 }
 
 func (connector *TestCheckStatusClient) Status() (OperationnalStatus, error) {
+	connector.Done <- true
 	return connector.status, nil
 }
 

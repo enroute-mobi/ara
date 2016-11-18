@@ -9,6 +9,7 @@ import (
 type PartnersGuardian struct {
 	ClockConsumer
 
+	stop     chan struct{}
 	partners Partners
 }
 
@@ -19,15 +20,25 @@ func NewPartnersGuardian(partners Partners) *PartnersGuardian {
 func (guardian *PartnersGuardian) Start() {
 	logger.Log.Debugf("Start partners guardian")
 
+	guardian.stop = make(chan struct{})
 	go guardian.Run()
 }
 
+func (guardian *PartnersGuardian) Stop() {
+	close(guardian.stop)
+}
+
 func (guardian *PartnersGuardian) Run() {
-	ticker := time.NewTicker(30 * time.Second)
-	for _ = range ticker.C {
-		logger.Log.Debugf("Check partners status")
-		for _, partner := range guardian.partners.FindAll() {
-			go guardian.checkPartnerStatus(partner)
+	for {
+		select {
+		case <-guardian.stop:
+			logger.Log.Debugf("Stop Partners Guardian")
+			return
+		case <-guardian.Clock().After(30 * time.Second):
+			logger.Log.Debugf("Check partners status")
+			for _, partner := range guardian.partners.FindAll() {
+				go guardian.checkPartnerStatus(partner)
+			}
 		}
 	}
 }

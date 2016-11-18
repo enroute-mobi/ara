@@ -166,8 +166,16 @@ func NewPartnerManager() *PartnerManager {
 	return manager
 }
 
+func (manager *PartnerManager) Guardian() *PartnersGuardian {
+	return manager.guardian
+}
+
 func (manager *PartnerManager) Start() {
 	manager.guardian.Start()
+}
+
+func (manager *PartnerManager) Stop() {
+	manager.guardian.Stop()
 }
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
