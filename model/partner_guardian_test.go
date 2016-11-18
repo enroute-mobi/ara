@@ -10,9 +10,15 @@ import (
 func Test_PartnerGuardian_Run(t *testing.T) {
 	logger.Log.Debug = true
 	partners := NewPartnerManager()
-	partner := Partner{
-		ConnectorTypes: []string{"test-check-status-client"},
-	}
+	partner := Partner{}
+	partner.SetDefinition(&APIPartner{ConnectorTypes: []string{"test-check-status-client"}})
+
+	logger.Log.Debugf("Partner: %v", partner)
+	logger.Log.Debugf("Partner connectors: %v", partner.connectors)
+
+	// partner := Partner{
+	// 	ConnectorTypes: []string{"test-check-status-client"},
+	// }
 	partners.Save(&partner)
 
 	fakeClock := NewFakeClock()

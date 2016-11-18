@@ -36,16 +36,18 @@ type Partner struct {
 	operationnalStatus OperationnalStatus
 
 	// WIP
-	checkStatusClient CheckStatusClient
+	// checkStatusClient CheckStatusClient
+	connectors map[string]Connector
 
 	manager Partners
 }
 
 type APIPartner struct {
-	Id             PartnerId
+	Id             PartnerId `json:"Id,omitempty"`
 	Slug           PartnerSlug
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
+	factories      map[string]ConnectorFactory
 }
 
 type PartnerManager struct {
@@ -57,7 +59,33 @@ type PartnerManager struct {
 
 // WIP
 func (partner *APIPartner) Validate() bool {
+	partner.setFactories()
+	for _, factory := range partner.factories {
+		if _, ok := factory.Validate(partner); !ok {
+			return false
+		}
+	}
 	return true
+}
+
+func (partner *APIPartner) setFactories() {
+	partner.factories = make(map[string]ConnectorFactory)
+
+	for _, connectorType := range partner.ConnectorTypes {
+		factory := NewConnectorFactory(connectorType)
+		if factory != nil {
+			partner.factories[connectorType] = factory
+		}
+	}
+}
+
+func (partner *APIPartner) isConnectorDefined(expected string) bool {
+	for _, connectorType := range partner.ConnectorTypes {
+		if connectorType == expected {
+			return true
+		}
+	}
+	return false
 }
 
 func (partner *Partner) Id() PartnerId {
@@ -77,27 +105,24 @@ func (partner *Partner) OperationnalStatus() OperationnalStatus {
 }
 
 func (partner *Partner) Save() (ok bool) {
-	// WIP
-	partner.RefreshConnectors()
-
 	return partner.manager.Save(partner)
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(APIPartner{
-		partner.id,
-		partner.slug,
-		partner.Settings,
-		partner.ConnectorTypes,
+		Id:             partner.id,
+		Slug:           partner.slug,
+		Settings:       partner.Settings,
+		ConnectorTypes: partner.ConnectorTypes,
 	})
 }
 
 func (partner *Partner) Definition() *APIPartner {
 	return &APIPartner{
-		partner.id,
-		partner.slug,
-		partner.Settings,
-		partner.ConnectorTypes,
+		Id:             partner.id,
+		Slug:           partner.slug,
+		Settings:       partner.Settings,
+		ConnectorTypes: partner.ConnectorTypes,
 	}
 }
 
@@ -106,26 +131,38 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.slug = apiPartner.Slug
 	partner.Settings = apiPartner.Settings
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
-}
 
-// Refresh Connector instances according to connector type list
-func (partner *Partner) RefreshConnectors() {
-	// WIP
-	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
-
-	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
-		if _, ok := partner.checkStatusClient.(*SIRICheckStatusClient); !ok {
-			siriPartner := NewSIRIPartner(partner)
-			partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+	if apiPartner.factories == nil {
+		apiPartner.setFactories()
+	}
+	if partner.connectors == nil {
+		partner.connectors = make(map[string]Connector)
+	}
+	for id, factory := range apiPartner.factories {
+		if _, ok := partner.connectors[id]; !ok {
+			partner.connectors[id] = factory.CreateConnector(partner)
 		}
-	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
-		if _, ok := partner.checkStatusClient.(*TestCheckStatusClient); !ok {
-			partner.checkStatusClient = NewTestCheckStatusClient()
-		}
-	} else {
-		partner.checkStatusClient = nil
 	}
 }
+
+// // Refresh Connector instances according to connector type list
+// func (partner *Partner) RefreshConnectors() {
+// 	// WIP
+// 	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
+
+// 	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
+// 		if _, ok := partner.checkStatusClient.(*SIRICheckStatusClient); !ok {
+// 			siriPartner := NewSIRIPartner(partner)
+// 			partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
+// 		}
+// 	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
+// 		if _, ok := partner.checkStatusClient.(*TestCheckStatusClient); !ok {
+// 			partner.checkStatusClient = NewTestCheckStatusClient()
+// 		}
+// 	} else {
+// 		partner.checkStatusClient = nil
+// 	}
+// }
 
 func (partner *Partner) isConnectorDefined(expected string) bool {
 	for _, connectorType := range partner.ConnectorTypes {
@@ -138,7 +175,13 @@ func (partner *Partner) isConnectorDefined(expected string) bool {
 
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	// WIP
-	return partner.checkStatusClient
+	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
+		return partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE].(CheckStatusClient)
+	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
+		return partner.connectors[TEST_CHECK_STATUS_CLIENT_TYPE].(CheckStatusClient)
+	} else {
+		return nil
+	}
 }
 
 func (partner *Partner) CheckStatus() {
@@ -200,7 +243,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 	}
 	partner.manager = manager
 	manager.byId[partner.id] = partner
-	partner.RefreshConnectors()
+	// partner.RefreshConnectors()
 	return true
 }
 

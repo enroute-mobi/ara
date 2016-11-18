@@ -8,21 +8,20 @@ type CheckStatusClient interface {
 	Status() (OperationnalStatus, error)
 }
 
-const (
-	SIRI_CHECK_STATUS_CLIENT_TYPE = "siri-check-status-client"
-	TEST_CHECK_STATUS_CLIENT_TYPE = "test-check-status-client"
-)
-
 type TestCheckStatusClient struct {
 	status OperationnalStatus
 	Done   chan bool
 }
+
+type TestCheckStatusClientFactory struct{}
 
 type SIRICheckStatusClient struct {
 	ClockConsumer
 
 	partner *SIRIPartner
 }
+
+type SIRICheckStatusClientFactory struct{}
 
 func NewTestCheckStatusClient() *TestCheckStatusClient {
 	return &TestCheckStatusClient{
@@ -38,6 +37,14 @@ func (connector *TestCheckStatusClient) Status() (OperationnalStatus, error) {
 
 func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
 	connector.status = status
+}
+
+func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) (string, bool) {
+	return "", true
+}
+
+func (factory *TestCheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
+	return NewTestCheckStatusClient()
 }
 
 func NewSIRICheckStatusClient(partner *SIRIPartner) *SIRICheckStatusClient {
@@ -61,4 +68,12 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 	} else {
 		return OPERATIONNAL_STATUS_DOWN, nil
 	}
+}
+
+func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) (string, bool) {
+	return "", true
+}
+
+func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
+	return NewSIRICheckStatusClient(NewSIRIPartner(partner))
 }
