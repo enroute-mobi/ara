@@ -39,8 +39,8 @@ func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
 	connector.status = status
 }
 
-func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) (string, bool) {
-	return "", true
+func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
+	return true
 }
 
 func (factory *TestCheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
@@ -70,8 +70,8 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 	}
 }
 
-func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) (string, bool) {
-	return "", true
+func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
+	return true
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {

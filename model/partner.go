@@ -48,7 +48,9 @@ type APIPartner struct {
 	Slug           PartnerSlug
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
-	factories      map[string]ConnectorFactory
+	Errors         []string          `json:"Errors,omitempty"`
+
+	factories map[string]ConnectorFactory
 }
 
 type PartnerManager struct {
@@ -58,15 +60,15 @@ type PartnerManager struct {
 	guardian *PartnersGuardian
 }
 
-// WIP, add error messages to the return
 func (partner *APIPartner) Validate() bool {
 	partner.setFactories()
+	valid := true
 	for _, factory := range partner.factories {
-		if _, ok := factory.Validate(partner); !ok {
-			return false
+		if !factory.Validate(partner) {
+			valid = false
 		}
 	}
-	return true
+	return valid
 }
 
 func (partner *APIPartner) setFactories() {

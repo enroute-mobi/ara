@@ -18,7 +18,7 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 
 	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
 		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "text/xml")
+			contentType, "application/json")
 	}
 }
 
@@ -151,6 +151,28 @@ func Test_PartnerController_Create(t *testing.T) {
 	}
 	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
+	}
+}
+
+func Test_PartnerController_Create_Invalid(t *testing.T) {
+	// Prepare and send request
+	body := []byte(`{ "Slug": "InvalidSlug", "ConnectorTypes": ["test-validation-connector"] }`)
+	_, responseRecorder, _ := partnerPrepareRequest("POST", false, body, t)
+
+	// Check response
+	if status := responseRecorder.Code; status != http.StatusBadRequest {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusBadRequest)
+	}
+	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
+		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
+			contentType, "application/json")
+	}
+
+	// Test Results
+	expected := `{"Slug":"InvalidSlug","ConnectorTypes":["test-validation-connector"],"Errors":["Partner have an invalid slug"]}`
+	if responseRecorder.Body.String() != expected {
+		t.Errorf("Wrong body for invalid POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
 

@@ -72,7 +72,10 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 	}
 
 	if !apiPartner.Validate() {
-		http.Error(response, "Invalid request: invalid partner", 400)
+		jsonBytes, _ := json.Marshal(apiPartner)
+		response.WriteHeader(http.StatusBadRequest)
+		response.Write(jsonBytes)
+		return
 	}
 
 	partner.SetDefinition(apiPartner)
@@ -97,7 +100,10 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	}
 
 	if !apiPartner.Validate() {
-		http.Error(response, "Invalid request: invalid partner", 400)
+		jsonBytes, _ := json.Marshal(apiPartner)
+		response.WriteHeader(http.StatusBadRequest)
+		response.Write(jsonBytes)
+		return
 	}
 
 	partner.SetDefinition(apiPartner)
