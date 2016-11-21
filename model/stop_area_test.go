@@ -50,6 +50,32 @@ func Test_StopArea_Save(t *testing.T) {
 	}
 }
 
+func Test_StopArea_ObjectId(t *testing.T) {
+	stopArea := StopArea{
+		id:        "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		objectids: make(ObjectIDs),
+	}
+	objectid := NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
+
+	foundObjectId, ok := stopArea.ObjectID("kind")
+	if !ok {
+		t.Errorf("ObjectID should return true if ObjectID exists")
+	}
+	if foundObjectId.Value() != objectid.Value() {
+		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	}
+
+	_, ok = stopArea.ObjectID("wrongkind")
+	if ok {
+		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+	}
+
+	if len(stopArea.ObjectIDs()) != 1 {
+		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", stopArea.ObjectIDs())
+	}
+}
+
 func Test_MemoryStopAreas_New(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 

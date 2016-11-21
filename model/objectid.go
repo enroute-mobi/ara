@@ -7,17 +7,17 @@ type ObjectID struct {
 	value string
 }
 
-func NewObjectID(kind, value string) *ObjectID {
-	return &ObjectID{
+func NewObjectID(kind, value string) ObjectID {
+	return ObjectID{
 		kind,
 		value,
 	}
 }
 
-func (objectID *ObjectID) Kind() string {
-	return objectID.kind
+func (objectid ObjectID) Kind() string {
+	return objectid.kind
 }
 
-func (objectID *ObjectID) Value() string {
-	return objectID.value
+func (objectid ObjectID) Value() string {
+	return objectid.value
 }

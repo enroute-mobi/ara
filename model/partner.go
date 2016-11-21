@@ -36,8 +36,6 @@ type Partner struct {
 	ConnectorTypes     []string
 	operationnalStatus OperationnalStatus
 
-	// WIP
-	// checkStatusClient CheckStatusClient
 	connectors map[string]Connector
 
 	manager Partners

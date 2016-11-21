@@ -7,14 +7,15 @@ type StopAreaId string
 type StopArea struct {
 	model Model
 
-	id StopAreaId
+	id        StopAreaId
+	objectids ObjectIDs
 
 	Name string
 	// ...
 }
 
 func NewStopArea(model Model) *StopArea {
-	return &StopArea{model: model}
+	return &StopArea{model: model, objectids: make(ObjectIDs)}
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
@@ -30,6 +31,25 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 
 func (stopArea *StopArea) Save() (ok bool) {
 	ok = stopArea.model.StopAreas().Save(stopArea)
+	return
+}
+
+func (stopArea *StopArea) ObjectID(kind string) (ObjectID, bool) {
+	objectid, ok := stopArea.objectids[kind]
+	if ok {
+		return objectid, true
+	}
+	return ObjectID{}, false
+}
+
+func (stopArea *StopArea) SetObjectID(objectid ObjectID) {
+	stopArea.objectids[objectid.Kind()] = objectid
+}
+
+func (stopArea *StopArea) ObjectIDs() (objectidArray []ObjectID) {
+	for _, objectid := range stopArea.objectids {
+		objectidArray = append(objectidArray, objectid)
+	}
 	return
 }
 
