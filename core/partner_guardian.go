@@ -1,13 +1,14 @@
-package model
+package core
 
 import (
 	"time"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 )
 
 type PartnersGuardian struct {
-	ClockConsumer
+	model.ClockConsumer
 
 	stop     chan struct{}
 	partners Partners

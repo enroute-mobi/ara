@@ -1,6 +1,7 @@
-package model
+package core
 
 import (
+	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
@@ -16,7 +17,7 @@ type TestCheckStatusClient struct {
 type TestCheckStatusClientFactory struct{}
 
 type SIRICheckStatusClient struct {
-	ClockConsumer
+	model.ClockConsumer
 
 	partner *SIRIPartner
 }

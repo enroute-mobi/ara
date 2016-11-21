@@ -1,9 +1,10 @@
-package model
+package core
 
 import (
 	"encoding/json"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 )
 
 type ReferentialId string
@@ -14,7 +15,7 @@ type Referential struct {
 	slug ReferentialSlug
 
 	manager  Referentials
-	model    Model
+	model    model.Model
 	partners Partners
 }
 
@@ -37,7 +38,7 @@ func (referential *Referential) Slug() ReferentialSlug {
 	return referential.slug
 }
 
-func (referential *Referential) Model() Model {
+func (referential *Referential) Model() model.Model {
 	return referential.model
 }
 
@@ -54,8 +55,8 @@ func (referential *Referential) Save() (ok bool) {
 	return
 }
 
-func (referential *Referential) NewTransaction() *Transaction {
-	return NewTransaction(referential.model)
+func (referential *Referential) NewTransaction() *model.Transaction {
+	return model.NewTransaction(referential.model)
 }
 
 func (referential *Referential) MarshalJSON() ([]byte, error) {
@@ -66,7 +67,7 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 }
 
 type MemoryReferentials struct {
-	UUIDConsumer
+	model.UUIDConsumer
 
 	byId map[ReferentialId]*Referential
 }
@@ -90,7 +91,7 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 func (manager *MemoryReferentials) new() *Referential {
 	return &Referential{
 		manager:  manager,
-		model:    NewMemoryModel(),
+		model:    model.NewMemoryModel(),
 		partners: NewPartnerManager(),
 	}
 }
@@ -128,7 +129,7 @@ func (manager *MemoryReferentials) Load() error {
 		Referential_id string
 		Slug           string
 	}
-	_, err := Database.Select(&selectReferentials, "select * from referentials")
+	_, err := model.Database.Select(&selectReferentials, "select * from referentials")
 	if err != nil {
 		return err
 	}

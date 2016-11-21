@@ -10,6 +10,7 @@ import (
 	"github.com/af83/edwig/api"
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/config"
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -87,7 +88,7 @@ func main() {
 		model.Database = model.InitDB(config.Config.DB)
 		defer model.CloseDB(model.Database)
 
-		err = model.CurrentReferentials().Load()
+		err = core.CurrentReferentials().Load()
 		if err != nil {
 			logger.Log.Panicf("Error while loading Referentials: %v", err)
 		}

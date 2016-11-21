@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"testing"
 
 	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
@@ -33,6 +34,26 @@ func InitDB(config config.DatabaseConfig) *gorp.DbMap {
 
 func CloseDB(database *gorp.DbMap) {
 	database.Db.Close()
+}
+
+func InitTestDb(t *testing.T) {
+	config.SetEnvironment("test")
+	// Load configuration
+	err := config.LoadConfig("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Initialize Database
+	Database = InitDB(config.Config.DB)
+}
+
+func CleanTestDb(t *testing.T) {
+	err := Database.TruncateTables()
+	if err != nil {
+		t.Fatal(err)
+	}
+	CloseDB(Database)
 }
 
 func ApplyMigrations(operation, path string, database *sql.DB) error {

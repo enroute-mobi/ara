@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/model"
 )
 
@@ -22,9 +23,9 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 	}
 }
 
-func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *model.Referential) {
+func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
-	referentials := model.NewMemoryReferentials()
+	referentials := core.NewMemoryReferentials()
 	referential = referentials.New("default")
 	referential.Save()
 	// Create a stopAreaController

@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
 )
 
 type RessourceController interface {
-	SetReferential(referential *model.Referential)
+	SetReferential(referential *core.Referential)
 	Ressources() string
 	Index(response http.ResponseWriter)
 	Show(response http.ResponseWriter, identifier string)
@@ -21,10 +21,10 @@ type RessourceController interface {
 }
 
 type ControllerReferential struct {
-	referential *model.Referential
+	referential *core.Referential
 }
 
-func (controller *ControllerReferential) SetReferential(referential *model.Referential) {
+func (controller *ControllerReferential) SetReferential(referential *core.Referential) {
 	controller.referential = referential
 	return
 }
@@ -33,7 +33,7 @@ type Controller struct {
 	ressourceController RessourceController
 }
 
-func (controller *Controller) SetReferential(referential *model.Referential) {
+func (controller *Controller) SetReferential(referential *core.Referential) {
 	controller.ressourceController.SetReferential(referential)
 	return
 }

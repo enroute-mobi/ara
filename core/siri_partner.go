@@ -1,4 +1,4 @@
-package model
+package core
 
 import (
 	"github.com/af83/edwig/logger"

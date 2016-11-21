@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
 )
 
 type PartnerController struct {
@@ -31,7 +31,7 @@ func (controller *PartnerController) Index(response http.ResponseWriter) {
 }
 
 func (controller *PartnerController) Show(response http.ResponseWriter, identifier string) {
-	partner := controller.referential.Partners().Find(model.PartnerId(identifier))
+	partner := controller.referential.Partners().Find(core.PartnerId(identifier))
 	if partner == nil {
 		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
 		return
@@ -43,7 +43,7 @@ func (controller *PartnerController) Show(response http.ResponseWriter, identifi
 }
 
 func (controller *PartnerController) Delete(response http.ResponseWriter, identifier string) {
-	partner := controller.referential.Partners().Find(model.PartnerId(identifier))
+	partner := controller.referential.Partners().Find(core.PartnerId(identifier))
 	if partner == nil {
 		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
 		return
@@ -56,7 +56,7 @@ func (controller *PartnerController) Delete(response http.ResponseWriter, identi
 }
 
 func (controller *PartnerController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	partner := controller.referential.Partners().Find(model.PartnerId(identifier))
+	partner := controller.referential.Partners().Find(core.PartnerId(identifier))
 	if partner == nil {
 		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
 		return
@@ -87,7 +87,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 func (controller *PartnerController) Create(response http.ResponseWriter, body []byte) {
 	logger.Log.Debugf("Create partner: %s", string(body))
 
-	partner := model.Partner{}
+	partner := core.Partner{}
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {

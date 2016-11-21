@@ -1,6 +1,10 @@
-package model
+package core
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/af83/edwig/model"
+)
 
 func Test_Referential_Id(t *testing.T) {
 	referential := Referential{
@@ -23,7 +27,7 @@ func Test_Referential_Slug(t *testing.T) {
 }
 
 func Test_Referential_Model(t *testing.T) {
-	model := NewMemoryModel()
+	model := model.NewMemoryModel()
 	referential := Referential{
 		model: model,
 	}
@@ -159,8 +163,8 @@ func Test_MemoryReferentials_Delete(t *testing.T) {
 }
 
 func Test_MemoryReferentials_Load(t *testing.T) {
-	initTestDb(t)
-	defer cleanTestDb(t)
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
 
 	// Insert Data in the test db
 	var databaseReferential = struct {
@@ -170,8 +174,8 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Slug:           "ratp",
 	}
-	Database.AddTableWithName(databaseReferential, "referentials")
-	err := Database.Insert(&databaseReferential)
+	model.Database.AddTableWithName(databaseReferential, "referentials")
+	err := model.Database.Insert(&databaseReferential)
 	if err != nil {
 		t.Fatal(err)
 	}

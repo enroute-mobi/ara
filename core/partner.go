@@ -1,10 +1,11 @@
-package model
+package core
 
 import (
 	"encoding/json"
 	"sort"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 )
 
 type OperationnalStatus int
@@ -19,8 +20,8 @@ type PartnerId string
 type PartnerSlug string
 
 type Partners interface {
-	UUIDInterface
-	Startable
+	model.UUIDInterface
+	model.Startable
 
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
@@ -52,7 +53,7 @@ type APIPartner struct {
 }
 
 type PartnerManager struct {
-	UUIDConsumer
+	model.UUIDConsumer
 
 	byId     map[PartnerId]*Partner
 	guardian *PartnersGuardian

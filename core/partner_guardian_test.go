@@ -1,10 +1,11 @@
-package model
+package core
 
 import (
 	"testing"
 	"time"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
@@ -20,7 +21,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	logger.Log.Debugf("Partner: %v", partner)
 	logger.Log.Debugf("Partner connectors: %v", partner.connectors)
 
-	fakeClock := NewFakeClock()
+	fakeClock := model.NewFakeClock()
 	partners.Guardian().SetClock(fakeClock)
 
 	partners.Start()

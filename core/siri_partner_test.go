@@ -1,6 +1,10 @@
-package model
+package core
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/af83/edwig/model"
+)
 
 func Test_SIRIPartner_SOAPClient(t *testing.T) {
 	partner := &Partner{
@@ -35,7 +39,7 @@ func Test_SIRIPartner_NewMessageIdentifier(t *testing.T) {
 
 	// Set MessageIdentifierGenerator
 	midGenerator := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
-	midGenerator.SetUUIDGenerator(NewFakeUUIDGenerator())
+	midGenerator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetMessageIdentifierGenerator(midGenerator)
 
 	mid := connector.NewMessageIdentifier()

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/model"
 )
 
@@ -22,9 +23,9 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 	}
 }
 
-func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *model.Partner, responseRecorder *httptest.ResponseRecorder, referential *model.Referential) {
+func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *core.Partner, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
-	referentials := model.NewMemoryReferentials()
+	referentials := core.NewMemoryReferentials()
 	referential = referentials.New("default")
 	referential.Save()
 	// Create a partnerController
@@ -87,7 +88,7 @@ func Test_PartnerController_Update(t *testing.T) {
 		t.Errorf("Partner should be found after PUT request")
 	}
 
-	if expected := model.PartnerSlug("Yet another test"); updatedPartner.Slug() != expected {
+	if expected := core.PartnerSlug("Yet another test"); updatedPartner.Slug() != expected {
 		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
@@ -109,7 +110,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 		t.Errorf("Partner should be found after PUT request")
 	}
 
-	if expected := model.PartnerSlug("First Partner"); updatedPartner.Slug() != expected {
+	if expected := core.PartnerSlug("First Partner"); updatedPartner.Slug() != expected {
 		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 
@@ -146,7 +147,7 @@ func Test_PartnerController_Create(t *testing.T) {
 	if partner == nil {
 		t.Errorf("Partner should be found after POST request")
 	}
-	if expected := model.PartnerSlug("test"); partner.Slug() != expected {
+	if expected := core.PartnerSlug("test"); partner.Slug() != expected {
 		t.Errorf("Invalid partner slug after POST request:\n got: %v\n want: %v", partner.Slug(), expected)
 	}
 	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {

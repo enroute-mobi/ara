@@ -1,7 +1,9 @@
-package model
+package core
 
 import (
 	"fmt"
+
+	"github.com/af83/edwig/model"
 )
 
 type MessageIdentifierGenerator interface {
@@ -15,7 +17,7 @@ func DefaultMessageIdentifierGenerator() MessageIdentifierGenerator {
 }
 
 type FormatMessageIdentifierGenerator struct {
-	UUIDConsumer
+	model.UUIDConsumer
 
 	format string
 }

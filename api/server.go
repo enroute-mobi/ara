@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -30,9 +31,9 @@ func NewServer(bind string) *Server {
 	return &server
 }
 
-func (server *Server) ListenAndServe(slug model.ReferentialSlug) error {
+func (server *Server) ListenAndServe(slug core.ReferentialSlug) error {
 	// Temp #1852: Create a default referential
-	referential := model.CurrentReferentials().New(slug)
+	referential := core.CurrentReferentials().New(slug)
 	referential.Save()
 
 	referential.Start()
