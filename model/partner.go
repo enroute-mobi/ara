@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"sort"
 
 	"github.com/af83/edwig/logger"
 )
@@ -57,7 +58,7 @@ type PartnerManager struct {
 	guardian *PartnersGuardian
 }
 
-// WIP
+// WIP, add error messages to the return
 func (partner *APIPartner) Validate() bool {
 	partner.setFactories()
 	for _, factory := range partner.factories {
@@ -69,8 +70,6 @@ func (partner *APIPartner) Validate() bool {
 }
 
 func (partner *APIPartner) setFactories() {
-	partner.factories = make(map[string]ConnectorFactory)
-
 	for _, connectorType := range partner.ConnectorTypes {
 		factory := NewConnectorFactory(connectorType)
 		if factory != nil {
@@ -123,46 +122,48 @@ func (partner *Partner) Definition() *APIPartner {
 		Slug:           partner.slug,
 		Settings:       partner.Settings,
 		ConnectorTypes: partner.ConnectorTypes,
+		factories:      make(map[string]ConnectorFactory),
 	}
 }
 
+// APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id
 	partner.slug = apiPartner.Slug
 	partner.Settings = apiPartner.Settings
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
 
-	if apiPartner.factories == nil {
-		apiPartner.setFactories()
-	}
-	if partner.connectors == nil {
-		partner.connectors = make(map[string]Connector)
-	}
 	for id, factory := range apiPartner.factories {
 		if _, ok := partner.connectors[id]; !ok {
 			partner.connectors[id] = factory.CreateConnector(partner)
 		}
 	}
+	partner.cleanConnectors()
 }
 
-// // Refresh Connector instances according to connector type list
-// func (partner *Partner) RefreshConnectors() {
-// 	// WIP
-// 	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
+// Test method, refresh Connector instances according to connector type list without validation
+func (partner *Partner) RefreshConnectors() {
+	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
 
-// 	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
-// 		if _, ok := partner.checkStatusClient.(*SIRICheckStatusClient); !ok {
-// 			siriPartner := NewSIRIPartner(partner)
-// 			partner.checkStatusClient = NewSIRICheckStatusClient(siriPartner)
-// 		}
-// 	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
-// 		if _, ok := partner.checkStatusClient.(*TestCheckStatusClient); !ok {
-// 			partner.checkStatusClient = NewTestCheckStatusClient()
-// 		}
-// 	} else {
-// 		partner.checkStatusClient = nil
-// 	}
-// }
+	for _, connectorType := range partner.ConnectorTypes {
+		if _, ok := partner.connectors[connectorType]; !ok {
+			partner.connectors[connectorType] = NewConnectorFactory(connectorType).CreateConnector(partner)
+		}
+	}
+	partner.cleanConnectors()
+}
+
+// Delete from partner.Connectors connectors not in partner.ConnectorTypes
+func (partner *Partner) cleanConnectors() {
+	sort.Strings(partner.ConnectorTypes)
+
+	for connector, _ := range partner.connectors {
+		found := sort.SearchStrings(partner.ConnectorTypes, connector)
+		if found == len(partner.ConnectorTypes) {
+			delete(partner.connectors, connector)
+		}
+	}
+}
 
 func (partner *Partner) isConnectorDefined(expected string) bool {
 	for _, connectorType := range partner.ConnectorTypes {
@@ -243,7 +244,6 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 	}
 	partner.manager = manager
 	manager.byId[partner.id] = partner
-	// partner.RefreshConnectors()
 	return true
 }
 
