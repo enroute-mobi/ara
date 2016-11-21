@@ -66,3 +66,7 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 
 	return checkStatus, nil
 }
+
+func (client *SOAPClient) StopMonitoring(request *SIRIStopMonitoringRequest) (*XMLStopMonitoringResponse, error) {
+	return nil, nil
+}
