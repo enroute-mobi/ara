@@ -81,13 +81,9 @@ func (partner *APIPartner) setFactories() {
 	}
 }
 
-func (partner *APIPartner) isConnectorDefined(expected string) bool {
-	for _, connectorType := range partner.ConnectorTypes {
-		if connectorType == expected {
-			return true
-		}
-	}
-	return false
+func (partner *APIPartner) IsSettingDefined(setting string) (ok bool) {
+	_, ok = partner.Settings[setting]
+	return
 }
 
 func (partner *Partner) Id() PartnerId {
