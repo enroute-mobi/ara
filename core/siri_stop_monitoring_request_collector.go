@@ -7,7 +7,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type StopAreaUpdateRequestCollector interface {
+type StopMonitoringRequestCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error)
 }
 

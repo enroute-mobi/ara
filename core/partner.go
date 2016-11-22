@@ -185,6 +185,10 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	}
 }
 
+func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
+	return partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
+}
+
 func (partner *Partner) CheckStatus() {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 
