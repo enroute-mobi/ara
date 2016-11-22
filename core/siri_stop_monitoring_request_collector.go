@@ -35,18 +35,24 @@ func NewSIRIStopMonitoringRequestCollector(partner *SIRIPartner) *SIRIStopMonito
 	}
 }
 
-func (collector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
-	stopArea, ok := collector.partner.Partner().Model().StopAreas().Find(request.StopAreaId())
+func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
+	stopArea, ok := connector.partner.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
 	}
-	objectid, ok := stopArea.ObjectID(collector.objectid_kind)
+	objectid, ok := stopArea.ObjectID(connector.objectid_kind)
 	if !ok {
-		return nil, fmt.Errorf("stopArea doesn't have an ojbectID of type %s", collector.objectid_kind)
+		return nil, fmt.Errorf("stopArea doesn't have an ojbectID of type %s", connector.objectid_kind)
 	}
-	siriStopMonitoringRequest := siri.NewSIRIStopMonitoringRequest(objectid.Value())
 
-	xmlStopMonitoringResponse, err := collector.partner.SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
+		MessageIdentifier: connector.partner.NewMessageIdentifier(),
+		MonitoringRef:     objectid.Value(),
+		RequestorRef:      connector.partner.RequestorRef(),
+		RequestTimestamp:  connector.Clock().Now(),
+	}
+
+	xmlStopMonitoringResponse, err := connector.partner.SOAPClient().StopMonitoring(siriStopMonitoringRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +71,10 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *A
 	}
 	if !apiPartner.IsSettingDefined("remote_url") {
 		apiPartner.Errors = append(apiPartner.Errors, "StopMonitoringRequestCollector needs partner to have 'remote_url' setting defined")
+		ok = false
+	}
+	if !apiPartner.IsSettingDefined("remote_credential") {
+		apiPartner.Errors = append(apiPartner.Errors, "StopMonitoringRequestCollector needs partner to have 'remote_credential' setting defined")
 		ok = false
 	}
 	return ok

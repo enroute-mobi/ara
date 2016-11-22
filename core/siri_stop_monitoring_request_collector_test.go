@@ -11,13 +11,14 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
-	if len(apiPartner.Errors) != 2 {
-		t.Errorf("apiPartner should have 2 errors when remote_url and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+	if len(apiPartner.Errors) != 3 {
+		t.Errorf("apiPartner should have three errors when remote_url and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
 		"remote_url":           "remote_url",
 		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_credential":    "remote_credential",
 	}
 	apiPartner.Validate()
 	if len(apiPartner.Errors) != 0 {
