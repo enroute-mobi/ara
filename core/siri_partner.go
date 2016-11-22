@@ -29,3 +29,7 @@ func (connector *SIRIPartner) SOAPClient() *siri.SOAPClient {
 func (connector *SIRIPartner) RequestorRef() string {
 	return connector.partner.Setting("remote_credential")
 }
+
+func (connector *SIRIPartner) Partner() *Partner {
+	return connector.partner
+}

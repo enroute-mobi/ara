@@ -89,10 +89,11 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 }
 
 func (manager *MemoryReferentials) new() *Referential {
+	model := model.NewMemoryModel()
 	return &Referential{
 		manager:  manager,
-		model:    model.NewMemoryModel(),
-		partners: NewPartnerManager(),
+		model:    model,
+		partners: NewPartnerManager(model),
 	}
 }
 

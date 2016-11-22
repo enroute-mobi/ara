@@ -28,6 +28,7 @@ type Partners interface {
 	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
+	Model() model.Model
 }
 
 type Partner struct {
@@ -57,6 +58,7 @@ type PartnerManager struct {
 
 	byId     map[PartnerId]*Partner
 	guardian *PartnersGuardian
+	model    model.Model
 }
 
 func (partner *APIPartner) Validate() bool {
@@ -203,9 +205,14 @@ func (partner *Partner) CheckStatus() {
 	logger.Log.Debugf("Partner status is %v", partner.operationnalStatus)
 }
 
-func NewPartnerManager() *PartnerManager {
+func (partner *Partner) Model() model.Model {
+	return partner.manager.Model()
+}
+
+func NewPartnerManager(model model.Model) *PartnerManager {
 	manager := &PartnerManager{
-		byId: make(map[PartnerId]*Partner),
+		byId:  make(map[PartnerId]*Partner),
+		model: model,
 	}
 	manager.guardian = NewPartnersGuardian(manager)
 	return manager
@@ -251,4 +258,8 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 func (manager *PartnerManager) Delete(partner *Partner) bool {
 	delete(manager.byId, partner.id)
 	return true
+}
+
+func (manager *PartnerManager) Model() model.Model {
+	return manager.model
 }

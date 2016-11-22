@@ -10,7 +10,7 @@ import (
 
 func Test_PartnerGuardian_Run(t *testing.T) {
 	logger.Log.Debug = true
-	partners := NewPartnerManager()
+	partners := NewPartnerManager(model.NewMemoryModel())
 	partner := Partner{
 		ConnectorTypes: []string{"test-check-status-client"},
 		connectors:     make(map[string]Connector),
