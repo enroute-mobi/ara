@@ -51,8 +51,15 @@ func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest
 	return request, nil
 }
 
-func NewSIRICheckStatusRequest(RequestorRef string, RequestTimestamp time.Time, MessageIdentifier string) *SIRICheckStatusRequest {
-	return &SIRICheckStatusRequest{RequestorRef: RequestorRef, RequestTimestamp: RequestTimestamp, MessageIdentifier: MessageIdentifier}
+func NewSIRICheckStatusRequest(
+	RequestorRef string,
+	RequestTimestamp time.Time,
+	MessageIdentifier string) *SIRICheckStatusRequest {
+	return &SIRICheckStatusRequest{
+		RequestorRef:      RequestorRef,
+		RequestTimestamp:  RequestTimestamp,
+		MessageIdentifier: MessageIdentifier,
+	}
 }
 
 func (request *XMLCheckStatusRequest) MessageIdentifier() string {
