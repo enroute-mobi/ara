@@ -72,7 +72,12 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 }
 
 func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
-	return true
+	ok := true
+	if !apiPartner.IsSettingDefined("remote_url") {
+		apiPartner.Errors = append(apiPartner.Errors, "SIRICheckStatusClient needs partner to have 'remote_url' setting defined")
+		ok = false
+	}
+	return ok
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
