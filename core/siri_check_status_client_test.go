@@ -54,3 +54,24 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 		t.Errorf("Wrong status found:\n got: %v\n expected: 2", status)
 	}
 }
+
+func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
+	partner := &Partner{
+		Settings:       make(map[string]string),
+		ConnectorTypes: []string{"siri-check-status-client"},
+		connectors:     make(map[string]Connector),
+	}
+	apiPartner := partner.Definition()
+	apiPartner.Validate()
+	if len(apiPartner.Errors) != 1 {
+		t.Errorf("apiPartner should have an error when remote_url isn't set, got: %v", apiPartner.Errors)
+	}
+
+	apiPartner.Settings = map[string]string{
+		"remote_url": "remote_url",
+	}
+	apiPartner.Validate()
+	if len(apiPartner.Errors) != 0 {
+		t.Errorf("apiPartner shouldn't have any error when remote_url is set, got: %v", apiPartner.Errors)
+	}
+}

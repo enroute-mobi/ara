@@ -62,6 +62,7 @@ type PartnerManager struct {
 }
 
 func (partner *APIPartner) Validate() bool {
+	partner.Errors = []string{}
 	partner.setFactories()
 	valid := true
 	for _, factory := range partner.factories {
