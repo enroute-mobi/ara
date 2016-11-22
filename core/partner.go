@@ -227,7 +227,12 @@ func (manager *PartnerManager) Stop() {
 }
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
-	return &Partner{slug: slug, manager: manager}
+	return &Partner{
+		slug:       slug,
+		manager:    manager,
+		Settings:   make(map[string]string),
+		connectors: make(map[string]Connector),
+	}
 }
 
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
