@@ -14,10 +14,10 @@ type StopAreaUpdateRequest struct {
 	createdAt  time.Time
 }
 
-func NewStopAreaUpdateRequest(givenStopAreaId model.StopAreaId) *StopAreaUpdateRequest {
+func NewStopAreaUpdateRequest(stopAreaId model.StopAreaId) *StopAreaUpdateRequest {
 	return &StopAreaUpdateRequest{
 		id:         StopAreaUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
-		stopAreaId: givenStopAreaId,
+		stopAreaId: stopAreaId,
 		createdAt:  model.DefaultClock().Now(),
 	}
 }
