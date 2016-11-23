@@ -7,7 +7,30 @@ const (
 	TEST_VALIDATION_CONNECTOR              = "test-validation-connector"
 )
 
+const (
+	SIRI_PARTNER = "siri-partner"
+)
+
 type Connector interface{}
+
+type BaseConnector struct {
+	partner *Partner
+}
+
+func (connector *BaseConnector) Partner() *Partner {
+	return connector.partner
+}
+
+type SIRIConnector struct {
+	BaseConnector
+}
+
+func (connector *SIRIConnector) SIRIPartner() *SIRIPartner {
+	if !connector.Partner().Context().IsDefined(SIRI_PARTNER) {
+		connector.Partner().Context().SetValue(SIRI_PARTNER, NewSIRIPartner(connector.Partner()))
+	}
+	return connector.Partner().Context().Value(SIRI_PARTNER).(*SIRIPartner)
+}
 
 type ConnectorFactory interface {
 	Validate(*APIPartner) bool

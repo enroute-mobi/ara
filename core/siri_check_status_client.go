@@ -19,7 +19,7 @@ type TestCheckStatusClientFactory struct{}
 type SIRICheckStatusClient struct {
 	model.ClockConsumer
 
-	partner *SIRIPartner
+	SIRIConnector
 }
 
 type SIRICheckStatusClientFactory struct{}
@@ -48,18 +48,20 @@ func (factory *TestCheckStatusClientFactory) CreateConnector(partner *Partner) C
 	return NewTestCheckStatusClient()
 }
 
-func NewSIRICheckStatusClient(partner *SIRIPartner) *SIRICheckStatusClient {
-	return &SIRICheckStatusClient{partner: partner}
+func NewSIRICheckStatusClient(partner *Partner) *SIRICheckStatusClient {
+	siriCheckStatusClient := &SIRICheckStatusClient{}
+	siriCheckStatusClient.partner = partner
+	return siriCheckStatusClient
 }
 
 func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 	request := &siri.SIRICheckStatusRequest{
-		RequestorRef:      connector.partner.RequestorRef(),
+		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
-		MessageIdentifier: connector.partner.NewMessageIdentifier(),
+		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
 	}
 
-	response, err := connector.partner.SOAPClient().CheckStatus(request)
+	response, err := connector.SIRIPartner().SOAPClient().CheckStatus(request)
 	if err != nil {
 		return OPERATIONNAL_STATUS_UNKNOWN, err
 	}
@@ -85,5 +87,5 @@ func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) bo
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
-	return NewSIRICheckStatusClient(NewSIRIPartner(partner))
+	return NewSIRICheckStatusClient(partner)
 }

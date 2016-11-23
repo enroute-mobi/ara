@@ -34,13 +34,14 @@ type Partners interface {
 type Partner struct {
 	id                 PartnerId
 	slug               PartnerSlug
-	Settings           map[string]string
-	ConnectorTypes     []string
 	operationnalStatus OperationnalStatus
 
-	connectors map[string]Connector
+	ConnectorTypes []string
+	Settings       map[string]string
 
-	manager Partners
+	connectors map[string]Connector
+	context    Context
+	manager    Partners
 }
 
 type APIPartner struct {
@@ -101,6 +102,10 @@ func (partner *Partner) Setting(key string) string {
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.operationnalStatus
+}
+
+func (partner *Partner) Context() *Context {
+	return &partner.context
 }
 
 func (partner *Partner) Save() (ok bool) {
@@ -237,6 +242,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		manager:    manager,
 		Settings:   make(map[string]string),
 		connectors: make(map[string]Connector),
+		context:    make(Context),
 	}
 }
 

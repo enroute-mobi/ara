@@ -25,12 +25,12 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Operat
 
 	// Create a CheckStatusClient
 	partner := &Partner{
+		context: make(Context),
 		Settings: map[string]string{
 			"remote_url": ts.URL,
 		},
 	}
-	siriPartner := NewSIRIPartner(partner)
-	checkStatusClient := NewSIRICheckStatusClient(siriPartner)
+	checkStatusClient := NewSIRICheckStatusClient(partner)
 
 	status, err := checkStatusClient.Status()
 

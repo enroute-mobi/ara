@@ -14,7 +14,8 @@ type StopMonitoringRequestCollector interface {
 type SIRIStopMonitoringRequestCollector struct {
 	model.ClockConsumer
 
-	partner       *SIRIPartner
+	SIRIConnector
+
 	objectid_kind string
 }
 
@@ -28,15 +29,16 @@ func NewStopAreaUpdateEvent(response *siri.XMLStopMonitoringResponse) *StopAreaU
 	return &StopAreaUpdateEvent{}
 }
 
-func NewSIRIStopMonitoringRequestCollector(partner *SIRIPartner) *SIRIStopMonitoringRequestCollector {
-	return &SIRIStopMonitoringRequestCollector{
-		partner:       partner,
-		objectid_kind: partner.Partner().Setting("remote_objectid_kind"),
+func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {
+	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{
+		objectid_kind: partner.Setting("remote_objectid_kind"),
 	}
+	siriStopMonitoringRequestCollector.partner = partner
+	return siriStopMonitoringRequestCollector
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
-	stopArea, ok := connector.partner.Partner().Model().StopAreas().Find(request.StopAreaId())
+	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
 	}
@@ -46,13 +48,13 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
-		MessageIdentifier: connector.partner.NewMessageIdentifier(),
+		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
 		MonitoringRef:     objectid.Value(),
-		RequestorRef:      connector.partner.RequestorRef(),
+		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
 	}
 
-	xmlStopMonitoringResponse, err := connector.partner.SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -81,5 +83,5 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *A
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {
-	return NewSIRIStopMonitoringRequestCollector(NewSIRIPartner(partner))
+	return NewSIRIStopMonitoringRequestCollector(partner)
 }
