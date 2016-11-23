@@ -63,7 +63,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
-	if len(apiPartner.Errors) != 2 {
+	if apiPartner.Errors.Empty() {
 		t.Errorf("apiPartner should have two errors when remote_url isn't set, got: %v", apiPartner.Errors)
 	}
 
@@ -72,7 +72,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 		"remote_credential": "remote_credential",
 	}
 	apiPartner.Validate()
-	if len(apiPartner.Errors) != 0 {
+	if !apiPartner.Errors.Empty() {
 		t.Errorf("apiPartner shouldn't have any error when remote_url is set, got: %v", apiPartner.Errors)
 	}
 }

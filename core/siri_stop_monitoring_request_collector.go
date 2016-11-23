@@ -66,19 +66,9 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := true
-	if !apiPartner.IsSettingDefined("remote_objectid_kind") {
-		apiPartner.Errors = append(apiPartner.Errors, "StopMonitoringRequestCollector needs partner to have 'remote_objectid_kind' setting defined")
-		ok = false
-	}
-	if !apiPartner.IsSettingDefined("remote_url") {
-		apiPartner.Errors = append(apiPartner.Errors, "StopMonitoringRequestCollector needs partner to have 'remote_url' setting defined")
-		ok = false
-	}
-	if !apiPartner.IsSettingDefined("remote_credential") {
-		apiPartner.Errors = append(apiPartner.Errors, "StopMonitoringRequestCollector needs partner to have 'remote_credential' setting defined")
-		ok = false
-	}
+	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
 	return ok
 }
 

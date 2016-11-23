@@ -11,7 +11,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
-	if len(apiPartner.Errors) != 3 {
+	if apiPartner.Errors.Empty() {
 		t.Errorf("apiPartner should have three errors when remote_url and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
 	}
 
@@ -21,7 +21,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 		"remote_credential":    "remote_credential",
 	}
 	apiPartner.Validate()
-	if len(apiPartner.Errors) != 0 {
+	if !apiPartner.Errors.Empty() {
 		t.Errorf("apiPartner shouldn't have any error when remote_url is set, got: %v", apiPartner.Errors)
 	}
 }

@@ -171,7 +171,7 @@ func Test_PartnerController_Create_Invalid(t *testing.T) {
 	}
 
 	// Test Results
-	expected := `{"Slug":"InvalidSlug","ConnectorTypes":["test-validation-connector"],"Errors":["Partner have an invalid slug"]}`
+	expected := `{"Slug":"InvalidSlug","ConnectorTypes":["test-validation-connector"],"Errors":{"slug":["Invalid format"]}}`
 	if responseRecorder.Body.String() != expected {
 		t.Errorf("Wrong body for invalid POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

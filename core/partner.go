@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	"github.com/af83/edwig/logger"
@@ -49,7 +50,7 @@ type APIPartner struct {
 	Slug           PartnerSlug
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
-	Errors         []string          `json:"Errors,omitempty"`
+	Errors         Errors            `json:"Errors,omitempty"`
 
 	factories map[string]ConnectorFactory
 }
@@ -63,7 +64,7 @@ type PartnerManager struct {
 }
 
 func (partner *APIPartner) Validate() bool {
-	partner.Errors = []string{}
+	partner.Errors = NewErrors()
 	partner.setFactories()
 	valid := true
 	for _, factory := range partner.factories {
@@ -86,6 +87,14 @@ func (partner *APIPartner) setFactories() {
 func (partner *APIPartner) IsSettingDefined(setting string) (ok bool) {
 	_, ok = partner.Settings[setting]
 	return
+}
+
+func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
+	if !partner.IsSettingDefined(setting) {
+		partner.Errors.Add(fmt.Sprintf("Setting %s", setting), ERROR_BLANK)
+		return false
+	}
+	return true
 }
 
 func (partner *Partner) Id() PartnerId {
@@ -128,6 +137,7 @@ func (partner *Partner) Definition() *APIPartner {
 		Settings:       partner.Settings,
 		ConnectorTypes: partner.ConnectorTypes,
 		factories:      make(map[string]ConnectorFactory),
+		Errors:         NewErrors(),
 	}
 }
 

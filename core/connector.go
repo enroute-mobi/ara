@@ -57,7 +57,7 @@ type TestValidationConnector struct{}
 
 func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) bool {
 	if apiPartner.Slug == PartnerSlug("InvalidSlug") {
-		apiPartner.Errors = append(apiPartner.Errors, "Partner have an invalid slug")
+		apiPartner.Errors.Add("slug", "Invalid format")
 		return false
 	}
 	return true
