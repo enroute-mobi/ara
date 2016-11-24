@@ -11,6 +11,11 @@ type StopMonitoringRequestCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error)
 }
 
+type TestStopMonitoringRequestCollector struct {
+}
+
+type TestStopMonitoringRequestCollectorFactory struct{}
+
 type SIRIStopMonitoringRequestCollector struct {
 	model.ClockConsumer
 
@@ -27,6 +32,24 @@ type StopAreaUpdateEvent struct {
 
 func NewStopAreaUpdateEvent(response *siri.XMLStopMonitoringResponse) *StopAreaUpdateEvent {
 	return &StopAreaUpdateEvent{}
+}
+
+func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector {
+	return &TestStopMonitoringRequestCollector{}
+}
+
+// WIP
+func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
+	stopAreaUpdateEvent := NewStopAreaUpdateEvent(&siri.XMLStopMonitoringResponse{})
+	return stopAreaUpdateEvent, nil
+}
+
+func (factory *TestStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
+	return true
+}
+
+func (factory *TestStopMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {
+	return NewTestStopMonitoringRequestCollector()
 }
 
 func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {

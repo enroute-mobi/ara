@@ -201,7 +201,14 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 }
 
 func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
-	return partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
+	// WIP
+	if partner.isConnectorDefined(SIRI_STOP_MONITORING_REQUEST_COLLECTOR) {
+		return partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
+	} else if partner.isConnectorDefined(TEST_STOP_MONITORING_REQUEST_COLLECTOR) {
+		return partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
+	} else {
+		return nil
+	}
 }
 
 func (partner *Partner) CheckStatus() {

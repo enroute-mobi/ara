@@ -2,6 +2,7 @@ package core
 
 const (
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR = "siri-stop-monitoring-request-collector"
+	TEST_STOP_MONITORING_REQUEST_COLLECTOR = "test-stop-monitoring-request-collector"
 	SIRI_CHECK_STATUS_CLIENT_TYPE          = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE          = "test-check-status-client"
 	TEST_VALIDATION_CONNECTOR              = "test-validation-connector"
@@ -41,6 +42,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
 	case SIRI_STOP_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIStopMonitoringRequestCollectorFactory{}
+	case TEST_STOP_MONITORING_REQUEST_COLLECTOR:
+		return &TestStopMonitoringRequestCollectorFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
 		return &SIRICheckStatusClientFactory{}
 	case TEST_CHECK_STATUS_CLIENT_TYPE:
