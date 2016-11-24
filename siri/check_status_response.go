@@ -14,18 +14,13 @@ import (
 )
 
 type XMLCheckStatusResponse struct {
-	XMLStructure
+	ResponseXMLStructure
 
-	address                   string
-	producerRef               string
-	requestMessageRef         string
-	responseMessageIdentifier string
-	status                    bool
-	errorType                 string
-	errorNumber               int
-	errorText                 string
-	responseTimestamp         time.Time
-	serviceStartedTime        time.Time
+	status             bool
+	errorType          string
+	errorNumber        int
+	errorText          string
+	serviceStartedTime time.Time
 }
 
 type SIRICheckStatusResponse struct {
@@ -69,7 +64,9 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 </ns7:CheckStatusResponse>`
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
-	return &XMLCheckStatusResponse{XMLStructure: XMLStructure{node: node}}
+	xmlCheckStatusResponse := &XMLCheckStatusResponse{}
+	xmlCheckStatusResponse.node = node
+	return xmlCheckStatusResponse
 }
 
 func NewXMLCheckStatusResponseFromContent(content []byte) (*XMLCheckStatusResponse, error) {
@@ -107,34 +104,6 @@ func NewSIRICheckStatusResponse(
 		ErrorText:          errorText,
 		ResponseTimestamp:  responseTimestamp,
 		ServiceStartedTime: serviceStartedTime}
-}
-
-func (response *XMLCheckStatusResponse) Address() string {
-	if response.address == "" {
-		response.address = response.findStringChildContent("Address")
-	}
-	return response.address
-}
-
-func (response *XMLCheckStatusResponse) ProducerRef() string {
-	if response.producerRef == "" {
-		response.producerRef = response.findStringChildContent("ProducerRef")
-	}
-	return response.producerRef
-}
-
-func (response *XMLCheckStatusResponse) RequestMessageRef() string {
-	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
-	}
-	return response.requestMessageRef
-}
-
-func (response *XMLCheckStatusResponse) ResponseMessageIdentifier() string {
-	if response.responseMessageIdentifier == "" {
-		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
-	}
-	return response.responseMessageIdentifier
 }
 
 func (response *XMLCheckStatusResponse) Status() bool {
@@ -184,13 +153,6 @@ func (response *XMLCheckStatusResponse) ErrorText() string {
 		response.errorText = response.findStringChildContent("ErrorText")
 	}
 	return response.errorText
-}
-
-func (response *XMLCheckStatusResponse) ResponseTimestamp() time.Time {
-	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
-	}
-	return response.responseTimestamp
 }
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
