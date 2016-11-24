@@ -78,7 +78,7 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 }
 
 func (manager *MemoryStopAreas) New() StopArea {
-	return StopArea{model: manager.model}
+	return StopArea{model: manager.model, objectids: make(ObjectIDs)}
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
