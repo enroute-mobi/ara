@@ -1,7 +1,5 @@
 package core
 
-import "fmt"
-
 type CollectManager struct {
 	partners Partners
 
@@ -48,7 +46,6 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 }
 
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
-	fmt.Println("***************************************")
 	event, err := partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 	if err != nil {
 		return nil, err

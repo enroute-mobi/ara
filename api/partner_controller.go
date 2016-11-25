@@ -13,7 +13,7 @@ type PartnerController struct {
 	ControllerReferential
 }
 
-func NewPartnerController() (controller *Controller) {
+func NewPartnerController() *Controller {
 	return &Controller{
 		ressourceController: &PartnerController{},
 	}

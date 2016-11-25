@@ -13,7 +13,7 @@ type StopAreaController struct {
 	ControllerReferential
 }
 
-func NewStopAreaController() (controller *Controller) {
+func NewStopAreaController() *Controller {
 	return &Controller{
 		ressourceController: &StopAreaController{},
 	}

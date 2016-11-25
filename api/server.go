@@ -19,15 +19,18 @@ type Server struct {
 	bind        string
 	startedTime time.Time
 
-	stopAreaController *Controller
-	partnerController  *Controller
+	controllers map[string]*Controller
 }
 
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
-	server.stopAreaController = NewStopAreaController()
-	server.partnerController = NewPartnerController()
+
+	server.controllers = make(map[string]*Controller)
+	server.controllers = map[string]*Controller{
+		"stop_areas": NewStopAreaController(),
+		"partners":   NewPartnerController(),
+	}
 	return &server
 }
 
@@ -38,15 +41,13 @@ func (server *Server) ListenAndServe(slug core.ReferentialSlug) error {
 
 	referential.Start()
 
-	server.stopAreaController.SetReferential(referential)
-	server.partnerController.SetReferential(referential)
-
 	http.HandleFunc(fmt.Sprintf("/%s/siri", slug), server.checkStatusHandler)
-	http.HandleFunc(fmt.Sprintf("/%s/stop_areas", slug), server.stopAreaController.ServeHTTP)
-	http.HandleFunc(fmt.Sprintf("/%s/stop_areas/", slug), server.stopAreaController.ServeHTTP)
 
-	http.HandleFunc(fmt.Sprintf("/%s/partners", slug), server.partnerController.ServeHTTP)
-	http.HandleFunc(fmt.Sprintf("/%s/partners/", slug), server.partnerController.ServeHTTP)
+	for resource, controller := range server.controllers {
+		controller.SetReferential(referential)
+		http.HandleFunc(fmt.Sprintf("/%s/%s", slug, resource), controller.ServeHTTP)
+		http.HandleFunc(fmt.Sprintf("/%s/%s/", slug, resource), controller.ServeHTTP)
+	}
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
 	return http.ListenAndServe(server.bind, nil)

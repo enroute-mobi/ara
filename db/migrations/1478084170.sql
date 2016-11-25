@@ -5,4 +5,4 @@ CREATE TABLE stop_areas (id UUID, name text);
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back
-DROP TABLE stop_areas;
+DROP TABLE IF EXISTS stop_areas;
