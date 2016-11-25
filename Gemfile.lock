@@ -15,18 +15,31 @@ GEM
     cucumber-wire (0.0.1)
     diff-lcs (1.2.5)
     gherkin (4.0.0)
+    httparty (0.14.0)
+      multi_xml (>= 0.5.2)
+    license_finder (2.1.2)
+      bundler
+      httparty
+      rubyzip
+      thor
+      xml-simple
     multi_json (1.11.2)
     multi_test (0.1.2)
+    multi_xml (0.5.5)
     rspec-expectations (3.1.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
+    rubyzip (1.2.0)
+    thor (0.19.1)
+    xml-simple (1.1.5)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   cucumber
+  license_finder
   rspec-expectations
 
 BUNDLED WITH

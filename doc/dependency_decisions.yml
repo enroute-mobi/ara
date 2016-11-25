@@ -1,0 +1,25 @@
+---
+- - :whitelist
+  - MIT
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2016-11-24 19:20:44.234538030 Z
+- - :whitelist
+  - Apache 2.0
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2016-11-24 19:22:34.204014570 Z
+- - :approve
+  - rubyzip
+  - :who: 
+    :why: same license as ruby
+    :versions: []
+    :when: 2016-11-24 19:28:09.721206759 Z
+- - :whitelist
+  - ruby
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2016-11-24 19:28:24.076987741 Z
