@@ -63,6 +63,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 // Test Factory Validate
 func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	partner := &Partner{
+		slug:           "partner",
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{"siri-stop-monitoring-request-collector"},
 		connectors:     make(map[string]Connector),

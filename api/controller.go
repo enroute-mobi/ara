@@ -7,7 +7,11 @@ import (
 	"github.com/af83/edwig/core"
 )
 
-var newControllerMap = map[string](func(*core.Referential) *Controller){
+var newControllerMap = map[string](func(*Server) *Controller){
+	"_referentials": NewReferentialController,
+}
+
+var newWithReferentialControllerMap = map[string](func(*core.Referential) *Controller){
 	"stop_areas": NewStopAreaController,
 	"partners":   NewPartnerController,
 }

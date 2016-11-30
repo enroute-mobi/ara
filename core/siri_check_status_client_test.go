@@ -57,6 +57,7 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 	partner := &Partner{
+		slug:           "partner",
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{"siri-check-status-client"},
 		connectors:     make(map[string]Connector),

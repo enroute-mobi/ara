@@ -26,7 +26,9 @@ func (guardian *PartnersGuardian) Start() {
 }
 
 func (guardian *PartnersGuardian) Stop() {
-	close(guardian.stop)
+	if guardian.stop != nil {
+		close(guardian.stop)
+	}
 }
 
 func (guardian *PartnersGuardian) Run() {

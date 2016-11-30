@@ -23,6 +23,7 @@ type PartnerSlug string
 type Partners interface {
 	model.UUIDInterface
 	model.Startable
+	model.Stopable
 
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
@@ -65,8 +66,13 @@ type PartnerManager struct {
 
 func (partner *APIPartner) Validate() bool {
 	partner.Errors = NewErrors()
-	partner.setFactories()
 	valid := true
+	if partner.Slug == "" {
+		partner.Errors.Add("Slug", ERROR_BLANK)
+		valid = false
+	}
+
+	partner.setFactories()
 	for _, factory := range partner.factories {
 		if !factory.Validate(partner) {
 			valid = false
@@ -272,7 +278,7 @@ func (manager *PartnerManager) FindAll() (partners []*Partner) {
 	for _, partner := range manager.byId {
 		partners = append(partners, partner)
 	}
-	return partners
+	return
 }
 
 func (manager *PartnerManager) Save(partner *Partner) bool {

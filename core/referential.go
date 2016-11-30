@@ -24,12 +24,28 @@ type Referentials interface {
 	New(slug ReferentialSlug) *Referential
 	Find(id ReferentialId) *Referential
 	FindBySlug(slug ReferentialSlug) *Referential
+	FindAll() []*Referential
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 	Load() error
 }
 
 var referentials = NewMemoryReferentials()
+
+type APIReferential struct {
+	Id     ReferentialId `json:"Id,omitempty"`
+	Slug   ReferentialSlug
+	Errors Errors `json:"Errors,omitempty"`
+}
+
+func (referential *APIReferential) Validate() bool {
+	valid := true
+	if referential.Slug == "" {
+		referential.Errors.Add("Slug", ERROR_BLANK)
+		valid = false
+	}
+	return valid
+}
 
 func (referential *Referential) Id() ReferentialId {
 	return referential.id
@@ -56,6 +72,10 @@ func (referential *Referential) Start() {
 	referential.partners.Start()
 }
 
+func (referential *Referential) Stop() {
+	referential.partners.Stop()
+}
+
 func (referential *Referential) Save() (ok bool) {
 	ok = referential.manager.Save(referential)
 	return
@@ -70,6 +90,19 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 		"Id":   referential.id,
 		"Slug": referential.slug,
 	})
+}
+
+func (referential *Referential) Definition() *APIReferential {
+	return &APIReferential{
+		Id:     referential.id,
+		Slug:   referential.slug,
+		Errors: NewErrors(),
+	}
+}
+
+func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
+	referential.id = apiReferential.Id
+	referential.slug = apiReferential.Slug
 }
 
 type MemoryReferentials struct {
@@ -117,6 +150,13 @@ func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) *Referential
 		}
 	}
 	return nil
+}
+
+func (manager *MemoryReferentials) FindAll() (referentials []*Referential) {
+	for _, referential := range manager.byId {
+		referentials = append(referentials, referential)
+	}
+	return
 }
 
 func (manager *MemoryReferentials) Save(referential *Referential) bool {

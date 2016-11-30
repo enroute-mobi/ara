@@ -62,9 +62,17 @@ func (server *Server) APIHandler(response http.ResponseWriter, request *http.Req
 	}
 }
 
-// WIP
 func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, ressource, id string) {
-	http.Error(response, "Invalid request", 400)
+	newController, ok := newControllerMap[ressource]
+	if !ok {
+		http.Error(response, "Invalid ressource", 500)
+		return
+	}
+
+	logger.Log.Debugf("%s controller request: %s", ressource[1:], request)
+
+	controller := newController(server)
+	controller.serve(response, request, id)
 }
 
 func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, referential, ressource, id string) {
@@ -73,7 +81,7 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 		http.Error(response, "Referential not found", 500)
 		return
 	}
-	newController, ok := newControllerMap[ressource]
+	newController, ok := newWithReferentialControllerMap[ressource]
 	if !ok {
 		http.Error(response, "Invalid ressource", 500)
 		return
