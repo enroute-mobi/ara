@@ -10,17 +10,15 @@ import (
 )
 
 type PartnerController struct {
-	ControllerReferential
+	referential *core.Referential
 }
 
-func NewPartnerController() *Controller {
+func NewPartnerController(referential *core.Referential) *Controller {
 	return &Controller{
-		ressourceController: &PartnerController{},
+		restfulRessource: &PartnerController{
+			referential: referential,
+		},
 	}
-}
-
-func (controller *PartnerController) Ressources() string {
-	return "partners"
 }
 
 func (controller *PartnerController) Index(response http.ResponseWriter) {

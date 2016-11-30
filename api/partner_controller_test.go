@@ -26,11 +26,10 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *core.Partner, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
 	referential = referentials.New("default")
 	referential.Save()
-	// Create a partnerController
-	controller := NewPartnerController()
-	controller.SetReferential(referential)
 
 	// Initialize the partners manager
 	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -39,7 +38,7 @@ func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *t
 	referential.Partners().Save(partner)
 
 	// Create a request
-	address := []byte("/partners")
+	address := []byte("/default/partners")
 	if sendIdentifier {
 		address = append(address, fmt.Sprintf("/%s", partner.Id())...)
 	}
@@ -51,8 +50,8 @@ func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *t
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
-	controller.ServeHTTP(responseRecorder, request)
+	// Call APIHandler method and pass in our Request and ResponseRecorder.
+	server.APIHandler(responseRecorder, request)
 
 	return
 }

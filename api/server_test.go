@@ -29,14 +29,14 @@ func Test_CheckStatusHandler(t *testing.T) {
 		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
 
 	// Create a request
-	request, err := http.NewRequest("POST", "/siri", soapEnvelope)
+	request, err := http.NewRequest("POST", "/default/siri", soapEnvelope)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.checkStatusHandler)
+	handler := http.HandlerFunc(server.APIHandler)
 
 	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(responseRecorder, request)
@@ -58,7 +58,7 @@ func Test_CheckStatusHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "/siri"; response.Address() != expected {
+	if expected := "/default/siri"; response.Address() != expected {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
 	}
 

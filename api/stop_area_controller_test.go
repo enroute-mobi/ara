@@ -19,18 +19,17 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 
 	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
 		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "text/xml")
+			contentType, "application/json")
 	}
 }
 
 func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
 	referential = referentials.New("default")
 	referential.Save()
-	// Create a stopAreaController
-	controller := NewStopAreaController()
-	controller.SetReferential(referential)
 
 	// Set the fake UUID generator
 	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -40,7 +39,7 @@ func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.
 	referential.Model().StopAreas().Save(&stopArea)
 
 	// Create a request
-	address := []byte("/stop_areas")
+	address := []byte("/default/stop_areas")
 	if sendIdentifier {
 		address = append(address, fmt.Sprintf("/%s", stopArea.Id())...)
 	}
@@ -52,8 +51,8 @@ func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
-	controller.ServeHTTP(responseRecorder, request)
+	// Call APIHandler method and pass in our Request and ResponseRecorder.
+	server.APIHandler(responseRecorder, request)
 
 	return
 }

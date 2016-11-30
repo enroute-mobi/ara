@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,45 +16,76 @@ import (
 type Server struct {
 	model.UUIDConsumer
 	model.ClockConsumer
+	core.ReferentialsConsumer
 
 	bind        string
 	startedTime time.Time
-
-	controllers map[string]*Controller
 }
 
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
 
-	server.controllers = make(map[string]*Controller)
-	server.controllers = map[string]*Controller{
-		"stop_areas": NewStopAreaController(),
-		"partners":   NewPartnerController(),
-	}
 	return &server
 }
 
 func (server *Server) ListenAndServe(slug core.ReferentialSlug) error {
 	// Temp #1852: Create a default referential
-	referential := core.CurrentReferentials().New(slug)
+	referential := server.CurrentReferentials().New(slug)
 	referential.Save()
-
 	referential.Start()
 
-	http.HandleFunc(fmt.Sprintf("/%s/siri", slug), server.checkStatusHandler)
-
-	for resource, controller := range server.controllers {
-		controller.SetReferential(referential)
-		http.HandleFunc(fmt.Sprintf("/%s/%s", slug, resource), controller.ServeHTTP)
-		http.HandleFunc(fmt.Sprintf("/%s/%s/", slug, resource), controller.ServeHTTP)
-	}
+	http.HandleFunc("/", server.APIHandler)
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }
 
-func (server *Server) checkStatusHandler(w http.ResponseWriter, r *http.Request) {
+func (server *Server) APIHandler(response http.ResponseWriter, request *http.Request) {
+	path := request.URL.Path
+	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+))?"
+	pattern := regexp.MustCompile(pathRegexp)
+	foundStrings := pattern.FindStringSubmatch(path)
+	if foundStrings[1] == "" {
+		http.Error(response, "Invalid request", 400)
+		return
+	}
+
+	response.Header().Set("Content-Type", "application/json")
+
+	if foundStrings[2] == "siri" {
+		server.handleCheckStatus(response, request, foundStrings[1])
+	} else if strings.HasPrefix(foundStrings[1], "_") {
+		server.handleControllers(response, request, foundStrings[1], foundStrings[2])
+	} else {
+		server.handleWithReferentialControllers(response, request, foundStrings[1], foundStrings[2], foundStrings[3])
+	}
+}
+
+// WIP
+func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, ressource, id string) {
+	http.Error(response, "Invalid request", 400)
+}
+
+func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, referential, ressource, id string) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", 500)
+		return
+	}
+	newController, ok := newControllerMap[ressource]
+	if !ok {
+		http.Error(response, "Invalid ressource", 500)
+		return
+	}
+
+	logger.Log.Debugf("%s controller request: %s", ressource, request)
+
+	controller := newController(foundReferential)
+	controller.serve(response, request, id)
+}
+
+func (server *Server) handleCheckStatus(w http.ResponseWriter, r *http.Request, referential string) {
 	// Create XMLCheckStatusResponse
 	envelope, err := siri.NewSOAPEnvelope(r.Body)
 	if err != nil {

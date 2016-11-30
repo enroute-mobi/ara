@@ -1,18 +1,18 @@
 package api
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 
 	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
 )
 
-type RessourceController interface {
-	SetReferential(referential *core.Referential)
-	Ressources() string
+var newControllerMap = map[string](func(*core.Referential) *Controller){
+	"stop_areas": NewStopAreaController,
+	"partners":   NewPartnerController,
+}
+
+type RestfulRessource interface {
 	Index(response http.ResponseWriter)
 	Show(response http.ResponseWriter, identifier string)
 	Delete(response http.ResponseWriter, identifier string)
@@ -20,22 +20,8 @@ type RessourceController interface {
 	Create(response http.ResponseWriter, body []byte)
 }
 
-type ControllerReferential struct {
-	referential *core.Referential
-}
-
-func (controller *ControllerReferential) SetReferential(referential *core.Referential) {
-	controller.referential = referential
-	return
-}
-
 type Controller struct {
-	ressourceController RessourceController
-}
-
-func (controller *Controller) SetReferential(referential *core.Referential) {
-	controller.ressourceController.SetReferential(referential)
-	return
+	restfulRessource RestfulRessource
 }
 
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {
@@ -51,29 +37,20 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 	return body
 }
 
-func (controller *Controller) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	logger.Log.Debugf("%s controller request: %s", controller.ressourceController.Ressources(), request)
-
-	path := request.URL.Path
-	ressourcePath := fmt.Sprintf("/%s(?:/([0-9a-zA-Z-]+))?", controller.ressourceController.Ressources())
-	resourcePathPattern := regexp.MustCompile(ressourcePath)
-	identifier := resourcePathPattern.FindStringSubmatch(path)[1]
-
-	response.Header().Set("Content-Type", "application/json")
-
+func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, identifier string) {
 	switch {
 	case request.Method == "GET":
 		if identifier == "" {
-			controller.ressourceController.Index(response)
+			controller.restfulRessource.Index(response)
 		} else {
-			controller.ressourceController.Show(response, identifier)
+			controller.restfulRessource.Show(response, identifier)
 		}
 	case request.Method == "DELETE":
 		if identifier == "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		controller.ressourceController.Delete(response, identifier)
+		controller.restfulRessource.Delete(response, identifier)
 	case request.Method == "PUT":
 		if identifier == "" {
 			http.Error(response, "Invalid request", 400)
@@ -84,7 +61,7 @@ func (controller *Controller) ServeHTTP(response http.ResponseWriter, request *h
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		controller.ressourceController.Update(response, identifier, body)
+		controller.restfulRessource.Update(response, identifier, body)
 	case request.Method == "POST":
 		if identifier != "" {
 			http.Error(response, "Invalid request", 400)
@@ -95,6 +72,6 @@ func (controller *Controller) ServeHTTP(response http.ResponseWriter, request *h
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		controller.ressourceController.Create(response, body)
+		controller.restfulRessource.Create(response, body)
 	}
 }

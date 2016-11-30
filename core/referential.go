@@ -153,3 +153,18 @@ func (manager *MemoryReferentials) Load() error {
 	logger.Log.Debugf("Loaded Referentials from database")
 	return nil
 }
+
+type ReferentialsConsumer struct {
+	referentials Referentials
+}
+
+func (consumer *ReferentialsConsumer) SetReferentials(referentials Referentials) {
+	consumer.referentials = referentials
+}
+
+func (consumer *ReferentialsConsumer) CurrentReferentials() Referentials {
+	if consumer.referentials == nil {
+		consumer.referentials = CurrentReferentials()
+	}
+	return consumer.referentials
+}

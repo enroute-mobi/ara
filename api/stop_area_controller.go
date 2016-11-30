@@ -5,22 +5,21 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
 
 type StopAreaController struct {
-	ControllerReferential
+	referential *core.Referential
 }
 
-func NewStopAreaController() *Controller {
+func NewStopAreaController(referential *core.Referential) *Controller {
 	return &Controller{
-		ressourceController: &StopAreaController{},
+		restfulRessource: &StopAreaController{
+			referential: referential,
+		},
 	}
-}
-
-func (controller *StopAreaController) Ressources() string {
-	return "stop_areas"
 }
 
 func (controller *StopAreaController) Index(response http.ResponseWriter) {
