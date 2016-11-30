@@ -18,7 +18,7 @@ bundle=$ruby_bin_dir/bundle
 
 if [ -x $bundle ]; then
     cd $source_dir
-    $bundle install --deployment
+    $bundle install --deployment --path $GOPATH/tmp
     $bundle exec license_finder
     $bundle exec cucumber
 else
