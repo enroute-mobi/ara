@@ -14,9 +14,10 @@ type Referential struct {
 	id   ReferentialId
 	slug ReferentialSlug
 
-	collectManager *CollectManager
+	collectManager CollectManagerInterface
 	manager        Referentials
 	model          model.Model
+	modelGuardian  *ModelGuardian
 	partners       Partners
 }
 
@@ -56,12 +57,16 @@ func (referential *Referential) Slug() ReferentialSlug {
 }
 
 // WIP: Interface ?
-func (referential *Referential) CollectManager() *CollectManager {
+func (referential *Referential) CollectManager() CollectManagerInterface {
 	return referential.collectManager
 }
 
 func (referential *Referential) Model() model.Model {
 	return referential.model
+}
+
+func (referential *Referential) ModelGuardian() *ModelGuardian {
+	return referential.modelGuardian
 }
 
 func (referential *Referential) Partners() Partners {
@@ -70,10 +75,12 @@ func (referential *Referential) Partners() Partners {
 
 func (referential *Referential) Start() {
 	referential.partners.Start()
+	referential.modelGuardian.Start()
 }
 
 func (referential *Referential) Stop() {
 	referential.partners.Stop()
+	referential.modelGuardian.Stop()
 }
 
 func (referential *Referential) Save() (ok bool) {
@@ -124,6 +131,7 @@ func CurrentReferentials() Referentials {
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	referential := manager.new()
 	referential.slug = slug
+	referential.modelGuardian = NewModelGuardian(referential)
 	return referential
 }
 

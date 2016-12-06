@@ -1,14 +1,19 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type StopAreaId string
 
 type StopArea struct {
 	model Model
 
-	id        StopAreaId
-	objectids ObjectIDs
+	id          StopAreaId
+	objectids   ObjectIDs
+	requestedAt time.Time
+	updatedAt   time.Time
 
 	Name string
 	// ...
@@ -20,6 +25,18 @@ func NewStopArea(model Model) *StopArea {
 
 func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
+}
+
+func (stopArea *StopArea) RequestedAt() time.Time {
+	return stopArea.requestedAt
+}
+
+func (stopArea *StopArea) Requested(requestTime time.Time) {
+	stopArea.requestedAt = requestTime
+}
+
+func (stopArea *StopArea) UpdatedAt() time.Time {
+	return stopArea.updatedAt
 }
 
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {

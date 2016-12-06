@@ -4,12 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
-	logger.Log.Debug = true
 	partners := NewPartnerManager(model.NewMemoryModel())
 	partner := Partner{
 		ConnectorTypes: []string{"test-check-status-client"},
@@ -17,9 +15,6 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	}
 	partner.RefreshConnectors()
 	partners.Save(&partner)
-
-	logger.Log.Debugf("Partner: %v", partner)
-	logger.Log.Debugf("Partner connectors: %v", partner.connectors)
 
 	fakeClock := model.NewFakeClock()
 	partners.Guardian().SetClock(fakeClock)

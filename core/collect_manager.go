@@ -1,13 +1,49 @@
 package core
 
+type CollectManagerInterface interface {
+	UpdateStopArea(request *StopAreaUpdateRequest)
+	Partners() Partners
+	Events() []*StopAreaUpdateEvent
+}
+
 type CollectManager struct {
 	partners Partners
 
-	Events []*StopAreaUpdateEvent
+	events []*StopAreaUpdateEvent
 }
 
-func NewCollectManager(partners Partners) *CollectManager {
+type TestCollectManager struct {
+	Done   chan bool
+	events []*StopAreaUpdateEvent
+}
+
+func NewTestCollectManager() CollectManagerInterface {
+	return &TestCollectManager{
+		Done: make(chan bool, 1),
+	}
+}
+
+func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
+	event := &StopAreaUpdateEvent{}
+	manager.events = append(manager.events, event)
+
+	manager.Done <- true
+}
+
+func (manager *TestCollectManager) Partners() Partners {
+	return nil
+}
+
+func (manager *TestCollectManager) Events() []*StopAreaUpdateEvent {
+	return manager.events
+}
+
+func NewCollectManager(partners Partners) CollectManagerInterface {
 	return &CollectManager{partners: partners}
+}
+
+func (manager *CollectManager) Events() []*StopAreaUpdateEvent {
+	return manager.events
 }
 
 func (manager *CollectManager) Partners() Partners {
@@ -27,7 +63,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		return
 	}
 
-	manager.Events = append(manager.Events, event)
+	manager.events = append(manager.events, event)
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
