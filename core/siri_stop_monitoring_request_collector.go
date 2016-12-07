@@ -8,7 +8,7 @@ import (
 )
 
 type StopMonitoringRequestCollector interface {
-	RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error)
+	RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error)
 }
 
 type TestStopMonitoringRequestCollector struct {
@@ -26,21 +26,13 @@ type SIRIStopMonitoringRequestCollector struct {
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}
 
-type StopAreaUpdateEvent struct {
-	// WIP
-}
-
-func NewStopAreaUpdateEvent(response *siri.XMLStopMonitoringResponse) *StopAreaUpdateEvent {
-	return &StopAreaUpdateEvent{}
-}
-
 func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector {
 	return &TestStopMonitoringRequestCollector{}
 }
 
 // WIP
-func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
-	stopAreaUpdateEvent := NewStopAreaUpdateEvent(&siri.XMLStopMonitoringResponse{})
+func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
+	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(&siri.XMLStopMonitoringResponse{})
 	return stopAreaUpdateEvent, nil
 }
 
@@ -60,7 +52,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 	return siriStopMonitoringRequestCollector
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
+func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
@@ -83,7 +75,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	// WIP
-	stopAreaUpdateEvent := NewStopAreaUpdateEvent(xmlStopMonitoringResponse)
+	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(xmlStopMonitoringResponse)
 
 	return stopAreaUpdateEvent, nil
 }

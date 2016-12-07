@@ -1,20 +1,22 @@
 package core
 
+import "github.com/af83/edwig/model"
+
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
 	Partners() Partners
-	Events() []*StopAreaUpdateEvent
+	Events() []*model.StopAreaUpdateEvent
 }
 
 type CollectManager struct {
 	partners Partners
 
-	events []*StopAreaUpdateEvent
+	events []*model.StopAreaUpdateEvent
 }
 
 type TestCollectManager struct {
 	Done   chan bool
-	events []*StopAreaUpdateEvent
+	events []*model.StopAreaUpdateEvent
 }
 
 func NewTestCollectManager() CollectManagerInterface {
@@ -24,7 +26,7 @@ func NewTestCollectManager() CollectManagerInterface {
 }
 
 func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
-	event := &StopAreaUpdateEvent{}
+	event := &model.StopAreaUpdateEvent{}
 	manager.events = append(manager.events, event)
 
 	manager.Done <- true
@@ -34,7 +36,7 @@ func (manager *TestCollectManager) Partners() Partners {
 	return nil
 }
 
-func (manager *TestCollectManager) Events() []*StopAreaUpdateEvent {
+func (manager *TestCollectManager) Events() []*model.StopAreaUpdateEvent {
 	return manager.events
 }
 
@@ -42,7 +44,7 @@ func NewCollectManager(partners Partners) CollectManagerInterface {
 	return &CollectManager{partners: partners}
 }
 
-func (manager *CollectManager) Events() []*StopAreaUpdateEvent {
+func (manager *CollectManager) Events() []*model.StopAreaUpdateEvent {
 	return manager.events
 }
 
@@ -81,7 +83,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 	return nil
 }
 
-func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*StopAreaUpdateEvent, error) {
+func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
 	event, err := partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 	if err != nil {
 		return nil, err
