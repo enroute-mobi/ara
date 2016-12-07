@@ -30,17 +30,26 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
+	if len(nodes) == 0 {
+		return nil
+	}
 	return nodes[0]
 }
 
 // TODO: See how to handle errors
 func (xmlStruct *XMLStructure) findStringChildContent(localName string) string {
 	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return ""
+	}
 	return strings.TrimSpace(node.Content())
 }
 
 func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time {
 	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return time.Time{}
+	}
 	t, err := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(node.Content()))
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
@@ -50,6 +59,9 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 
 func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
 	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return false
+	}
 	s, err := strconv.ParseBool(strings.TrimSpace(node.Content()))
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
