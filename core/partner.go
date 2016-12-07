@@ -298,3 +298,11 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 func (manager *PartnerManager) Model() model.Model {
 	return manager.model
 }
+
+func NewPartner() *Partner {
+	return &Partner{
+		Settings:   make(map[string]string),
+		connectors: make(map[string]Connector),
+		context:    make(Context),
+	}
+}

@@ -85,7 +85,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 func (controller *PartnerController) Create(response http.ResponseWriter, body []byte) {
 	logger.Log.Debugf("Create partner: %s", string(body))
 
-	partner := core.Partner{}
+	partner := core.NewPartner()
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
@@ -105,7 +105,7 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	}
 
 	partner.SetDefinition(apiPartner)
-	controller.referential.Partners().Save(&partner)
+	controller.referential.Partners().Save(partner)
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }
