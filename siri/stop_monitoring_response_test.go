@@ -65,3 +65,49 @@ func Test_XMLStopMonitoringRequest_ResponseTimestamp(t *testing.T) {
 		t.Errorf("Wrong ResponseTimestamp:\n got: %v\nwant: %v", response.ResponseTimestamp(), expected)
 	}
 }
+
+func Test_XMLStopMonitoringRequest_XMLMonitoredStopVisit(t *testing.T) {
+	content := getStopMonitoringResponseBody(t)
+
+	response, _ := NewXMLStopMonitoringResponseFromContent(content)
+
+	monitoredStopVisits := response.XMLMonitoredStopVisit()
+
+	if len(monitoredStopVisits) != 2 {
+		t.Errorf("Incorrect number of MonitoredStopVisit, expected 2 got %d", len(monitoredStopVisits))
+	}
+}
+
+func Test_XMLMonitoredStopVisit(t *testing.T) {
+	content := getStopMonitoringResponseBody(t)
+	response, _ := NewXMLStopMonitoringResponseFromContent(content)
+	monitoredStopVisit := response.XMLMonitoredStopVisit()[0]
+
+	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; monitoredStopVisit.ItemIdentifier() != expected {
+		t.Errorf("Incorrect ItemIdentifier for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ItemIdentifier())
+	}
+	if expected := ""; monitoredStopVisit.DepartureStatus() != expected {
+		t.Errorf("Incorrect DepartureStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.DepartureStatus())
+	}
+	if expected := "arrived"; monitoredStopVisit.ArrivalStatus() != expected {
+		t.Errorf("Incorrect ArrivalStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.ArrivalStatus())
+	}
+	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.AimedArrivalTime().Equal(expected) {
+		t.Errorf("Incorrect AimedArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.AimedArrivalTime())
+	}
+	if !monitoredStopVisit.ExpectedArrivalTime().IsZero() {
+		t.Errorf("Incorrect ExpectedArrivalTime for stopVisit, should be zero got: %v", monitoredStopVisit.ExpectedArrivalTime())
+	}
+	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.ActualArrivalTime().Equal(expected) {
+		t.Errorf("Incorrect ActualArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ActualArrivalTime())
+	}
+	if !monitoredStopVisit.AimedDepartureTime().IsZero() {
+		t.Errorf("Incorrect AimedDepartureTime for stopVisit, should be zero got: %v", monitoredStopVisit.AimedDepartureTime())
+	}
+	if !monitoredStopVisit.ExpectedDepartureTime().IsZero() {
+		t.Errorf("Incorrect ExpectedDepartureTime for stopVisit, should be zero got: %v", monitoredStopVisit.ExpectedDepartureTime())
+	}
+	if !monitoredStopVisit.ActualDepartureTime().IsZero() {
+		t.Errorf("Incorrect ActualDepartureTime for stopVisit, should be zero got: %v", monitoredStopVisit.ActualDepartureTime())
+	}
+}

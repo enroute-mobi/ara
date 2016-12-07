@@ -23,7 +23,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 	partner.RefreshConnectors()
 	partners.Save(partner)
 
-	foundPartner := collectManager.bestPartner(NewStopAreaUpdateRequest(model.StopAreaId("id")))
+	foundPartner := collectManager.(*CollectManager).bestPartner(NewStopAreaUpdateRequest(model.StopAreaId("id")))
 
 	if foundPartner != partner {
 		t.Errorf("collectManager.bestPartner should return correct partner:\n got: %v\n want: %v", foundPartner, partner)
@@ -44,7 +44,7 @@ func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	collectManager.UpdateStopArea(request)
 
 	// Check Events
-	if len(collectManager.Events) != 1 {
+	if len(collectManager.Events()) != 1 {
 		t.Error("CollectManager UpdateStopArea should generate a stopAreaUpdateEvent")
 	}
 }
