@@ -38,29 +38,33 @@ func (guardian *ModelGuardian) Run() {
 		case <-guardian.stop:
 			return
 		case <-guardian.Clock().After(10 * time.Second):
-			// Open a new transaction
-			tx := guardian.referential.NewTransaction()
-
-			logger.Log.Debugf("Check StopAreas status")
-
-			for _, stopArea := range tx.Model().StopAreas().FindAll() {
-				now := guardian.Clock().Now()
-				outdated := now.Add(-1 * time.Minute)
-
-				if stopArea.RequestedAt().Before(outdated) && stopArea.UpdatedAt().Before(outdated) {
-					stopAreaUpdateRequest := &StopAreaUpdateRequest{
-						id:         StopAreaUpdateRequestId(guardian.NewUUID()),
-						stopAreaId: stopArea.Id(),
-						createdAt:  guardian.Clock().Now(),
-					}
-					guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
-
-					stopArea.Requested(now)
-					stopArea.Save()
-				}
-			}
-			tx.Commit()
-			tx.Close()
+			guardian.refreshStopAreas()
 		}
 	}
+}
+
+func (guardian *ModelGuardian) refreshStopAreas() {
+	// Open a new transaction
+	tx := guardian.referential.NewTransaction()
+	defer tx.Close()
+
+	logger.Log.Debugf("Check StopAreas status")
+
+	for _, stopArea := range tx.Model().StopAreas().FindAll() {
+		now := guardian.Clock().Now()
+		outdated := now.Add(-1 * time.Minute)
+
+		if stopArea.RequestedAt().Before(outdated) && stopArea.UpdatedAt().Before(outdated) {
+			stopAreaUpdateRequest := &StopAreaUpdateRequest{
+				id:         StopAreaUpdateRequestId(guardian.NewUUID()),
+				stopAreaId: stopArea.Id(),
+				createdAt:  guardian.Clock().Now(),
+			}
+			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+
+			stopArea.Requested(now)
+			stopArea.Save()
+		}
+	}
+	tx.Commit()
 }
