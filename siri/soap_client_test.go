@@ -87,6 +87,7 @@ func Test_SOAPClient_CheckStatus_GzipResponse(t *testing.T) {
 		}
 		defer file.Close()
 		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Content-Type", "text/xml")
 		io.Copy(w, file)
 	}))
 	defer ts.Close()

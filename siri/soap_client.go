@@ -51,7 +51,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 		return nil, newSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
-	if response.Header.Get("Content-Type") != "text/xml" {
+	if !strings.Contains(response.Header.Get("Content-Type"), "text/xml") {
 		return nil, newSiriError(fmt.Sprintf("SIRI CRITICAL: HTTP Content-Type %v", response.Header.Get("Content-Type")))
 	}
 
