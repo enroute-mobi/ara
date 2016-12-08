@@ -131,19 +131,20 @@ func CurrentReferentials() Referentials {
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	referential := manager.new()
 	referential.slug = slug
-	referential.modelGuardian = NewModelGuardian(referential)
 	return referential
 }
 
 func (manager *MemoryReferentials) new() *Referential {
 	model := model.NewMemoryModel()
 	partners := NewPartnerManager(model)
-	return &Referential{
+	referential := &Referential{
 		manager:        manager,
 		model:          model,
 		partners:       partners,
 		collectManager: NewCollectManager(partners),
 	}
+	referential.modelGuardian = NewModelGuardian(referential)
+	return referential
 }
 
 func (manager *MemoryReferentials) Find(id ReferentialId) *Referential {
