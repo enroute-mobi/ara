@@ -36,6 +36,18 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	return nodes[0]
 }
 
+func (xmlStruct *XMLStructure) findNodes(localName string) []xml.Node {
+	xpath := fmt.Sprintf("//*[local-name()='%s']", localName)
+	nodes, err := xmlStruct.node.Search(xpath)
+	if err != nil {
+		logger.Log.Panicf("Error while parsing XML: %v", err)
+	}
+	if len(nodes) == 0 {
+		return nil
+	}
+	return nodes
+}
+
 // TODO: See how to handle errors
 func (xmlStruct *XMLStructure) findStringChildContent(localName string) string {
 	node := xmlStruct.findNode(localName)
