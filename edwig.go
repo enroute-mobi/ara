@@ -89,11 +89,14 @@ func main() {
 		defer model.CloseDB(model.Database)
 
 		err = core.CurrentReferentials().Load()
+
 		if err != nil {
 			logger.Log.Panicf("Error while loading Referentials: %v", err)
 		}
 
-		err = api.NewServer(*serverAddressPtr).ListenAndServe("default")
+		core.CurrentReferentials().Start()
+
+		err = api.NewServer(*serverAddressPtr).ListenAndServe()
 	case "migrate":
 		logger.Log.Debug = true
 

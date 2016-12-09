@@ -22,6 +22,8 @@ type Referential struct {
 }
 
 type Referentials interface {
+	model.Startable
+
 	New(slug ReferentialSlug) *Referential
 	Find(id ReferentialId) *Referential
 	FindBySlug(slug ReferentialSlug) *Referential
@@ -196,11 +198,18 @@ func (manager *MemoryReferentials) Load() error {
 		referential := manager.new()
 		referential.id = ReferentialId(r.Referential_id)
 		referential.slug = ReferentialSlug(r.Slug)
+		referential.Partners().Load(referential.id)
 		manager.Save(referential)
 	}
 
 	logger.Log.Debugf("Loaded Referentials from database")
 	return nil
+}
+
+func (manager *MemoryReferentials) Start() {
+	for _, referential := range manager.byId {
+		referential.Start()
+	}
 }
 
 type ReferentialsConsumer struct {

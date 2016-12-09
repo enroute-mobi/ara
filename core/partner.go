@@ -31,6 +31,7 @@ type Partners interface {
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 	Model() model.Model
+	Load(refId ReferentialId) error
 }
 
 type Partner struct {
@@ -297,6 +298,34 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 
 func (manager *PartnerManager) Model() model.Model {
 	return manager.model
+}
+
+func (manager *PartnerManager) Load(refId ReferentialId) error {
+	var selectPartners []struct {
+		Id             string
+		ReferentialId  string `db:"referential_id"`
+		Slug           string
+		Settings       string
+		ConnectorTypes string `db:"connector_types"`
+	}
+	SqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", refId)
+	_, err := model.Database.Select(&selectPartners, SqlQuery)
+	if err != nil {
+		logger.Log.Debugf("[partner] Error: %v", err)
+		return err
+	}
+	var SettingsJson map[string]string
+	var ConnectorTypesJson []string
+	for _, r := range selectPartners {
+		partner := manager.New(PartnerSlug(r.Slug))
+		json.Unmarshal([]byte(r.Settings), &SettingsJson)
+		partner.Settings = SettingsJson
+		json.Unmarshal([]byte(r.ConnectorTypes), &ConnectorTypesJson)
+		partner.ConnectorTypes = ConnectorTypesJson
+		partner.RefreshConnectors()
+		manager.Save(partner)
+	}
+	return nil
 }
 
 func NewPartner() *Partner {

@@ -29,12 +29,7 @@ func NewServer(bind string) *Server {
 	return &server
 }
 
-func (server *Server) ListenAndServe(slug core.ReferentialSlug) error {
-	// Temp #1852: Create a default referential
-	referential := server.CurrentReferentials().New(slug)
-	referential.Save()
-	referential.Start()
-
+func (server *Server) ListenAndServe() error {
 	http.HandleFunc("/", server.APIHandler)
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
