@@ -1,6 +1,9 @@
 package core
 
-import "github.com/af83/edwig/model"
+import (
+	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
+)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
@@ -62,6 +65,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	event, err := manager.requestStopAreaUpdate(partner, request)
 	if err != nil {
 		// WIP: Handle error
+		logger.Log.Printf("Can't request stop area update : %v", err)
 		return
 	}
 
@@ -84,6 +88,8 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 }
 
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
+	logger.Log.Debugf("RequestStopAreaUpdate %#v", request)
+
 	event, err := partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 	if err != nil {
 		return nil, err
