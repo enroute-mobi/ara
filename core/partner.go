@@ -31,7 +31,7 @@ type Partners interface {
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 	Model() model.Model
-	Load(refId ReferentialId) error
+	Load() error
 }
 
 type Partner struct {
@@ -60,9 +60,9 @@ type APIPartner struct {
 type PartnerManager struct {
 	model.UUIDConsumer
 
-	byId     map[PartnerId]*Partner
-	guardian *PartnersGuardian
-	model    model.Model
+	byId        map[PartnerId]*Partner
+	guardian    *PartnersGuardian
+	referential *Referential
 }
 
 func (partner *APIPartner) Validate() bool {
@@ -239,10 +239,10 @@ func (partner *Partner) Model() model.Model {
 	return partner.manager.Model()
 }
 
-func NewPartnerManager(model model.Model) *PartnerManager {
+func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
-		byId:  make(map[PartnerId]*Partner),
-		model: model,
+		byId:        make(map[PartnerId]*Partner),
+		referential: referential,
 	}
 	manager.guardian = NewPartnersGuardian(manager)
 	return manager
@@ -297,10 +297,10 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 }
 
 func (manager *PartnerManager) Model() model.Model {
-	return manager.model
+	return manager.referential.Model()
 }
 
-func (manager *PartnerManager) Load(refId ReferentialId) error {
+func (manager *PartnerManager) Load() error {
 	var selectPartners []struct {
 		Id             string
 		ReferentialId  string `db:"referential_id"`
@@ -308,10 +308,9 @@ func (manager *PartnerManager) Load(refId ReferentialId) error {
 		Settings       string
 		ConnectorTypes string `db:"connector_types"`
 	}
-	SqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", refId)
+	SqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", manager.referential.Id())
 	_, err := model.Database.Select(&selectPartners, SqlQuery)
 	if err != nil {
-		logger.Log.Debugf("[partner] Error: %v", err)
 		return err
 	}
 	var SettingsJson map[string]string

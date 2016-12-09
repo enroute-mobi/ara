@@ -7,7 +7,7 @@ import (
 )
 
 func Test_CollectManager_Partners(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	collectManager := NewCollectManager(partners)
 
 	if collectManager.Partners() != partners {
@@ -16,7 +16,7 @@ func Test_CollectManager_Partners(t *testing.T) {
 }
 
 func Test_CollectManager_BestPartner(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	collectManager := NewCollectManager(partners)
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
@@ -33,7 +33,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 // WIP
 func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	collectManager := NewCollectManager(partners)
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}

@@ -3,9 +3,13 @@ package core
 import (
 	"reflect"
 	"testing"
-
-	"github.com/af83/edwig/model"
 )
+
+func createTestPartnerManager() *PartnerManager {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	return NewPartnerManager(referential)
+}
 
 func Test_Partner_Id(t *testing.T) {
 	partner := Partner{
@@ -55,7 +59,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 }
 
 func Test_Partner_Save(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	partner := partners.New("partner")
 
 	if partner.manager != partners {
@@ -93,7 +97,7 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 }
 
 func Test_NewPartnerManager(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 
 	if partners.guardian == nil {
 		t.Errorf("New PartnerManager should have a PartnersGuardian")
@@ -101,7 +105,7 @@ func Test_NewPartnerManager(t *testing.T) {
 }
 
 func Test_PartnerManager_New(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	partner := partners.New("partner")
 
 	if partner.Id() != "" {
@@ -110,7 +114,7 @@ func Test_PartnerManager_New(t *testing.T) {
 }
 
 func Test_PartnerManager_Save(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	partner := partners.New("partner")
 
 	if success := partners.Save(partner); !success {
@@ -123,7 +127,7 @@ func Test_PartnerManager_Save(t *testing.T) {
 }
 
 func Test_PartnerManager_Find_NotFound(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	partner := partners.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if partner != nil {
 		t.Errorf("Find should return false when Partner isn't found")
@@ -131,7 +135,7 @@ func Test_PartnerManager_Find_NotFound(t *testing.T) {
 }
 
 func Test_PartnerManager_Find(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
 	partners.Save(existingPartner)
@@ -147,7 +151,7 @@ func Test_PartnerManager_Find(t *testing.T) {
 }
 
 func Test_PartnerManager_Delete(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
 	partners.Save(existingPartner)

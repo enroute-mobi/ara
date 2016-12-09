@@ -138,13 +138,15 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 
 func (manager *MemoryReferentials) new() *Referential {
 	model := model.NewMemoryModel()
-	partners := NewPartnerManager(model)
+
 	referential := &Referential{
-		manager:        manager,
-		model:          model,
-		partners:       partners,
-		collectManager: NewCollectManager(partners),
+		manager: manager,
+		model:   model,
 	}
+
+	referential.partners = NewPartnerManager(referential)
+	referential.collectManager = NewCollectManager(referential.partners)
+
 	referential.modelGuardian = NewModelGuardian(referential)
 	return referential
 }
@@ -198,7 +200,7 @@ func (manager *MemoryReferentials) Load() error {
 		referential := manager.new()
 		referential.id = ReferentialId(r.Referential_id)
 		referential.slug = ReferentialSlug(r.Slug)
-		referential.Partners().Load(referential.id)
+		referential.Partners().Load()
 		manager.Save(referential)
 	}
 

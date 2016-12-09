@@ -37,7 +37,7 @@ func Test_Referential_Model(t *testing.T) {
 }
 
 func Test_Referential_Partners(t *testing.T) {
-	partners := NewPartnerManager(model.NewMemoryModel())
+	partners := createTestPartnerManager()
 	referential := Referential{
 		partners: partners,
 	}
