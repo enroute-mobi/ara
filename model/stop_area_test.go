@@ -52,9 +52,9 @@ func Test_StopArea_Save(t *testing.T) {
 
 func Test_StopArea_ObjectId(t *testing.T) {
 	stopArea := StopArea{
-		id:        "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		objectids: make(ObjectIDs),
+		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
+	stopArea.objectids = make(ObjectIDs)
 	objectid := NewObjectID("kind", "value")
 	stopArea.SetObjectID(objectid)
 
