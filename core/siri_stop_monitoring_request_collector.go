@@ -61,7 +61,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 	objectid, ok := stopArea.ObjectID(connector.objectid_kind)
 	if !ok {
-		return nil, fmt.Errorf("stopArea doesn't have an ojbectID of type %s", connector.objectid_kind)
+		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), connector.objectid_kind)
 	}
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
