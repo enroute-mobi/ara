@@ -71,7 +71,7 @@ func Test_XMLStopMonitoringRequest_XMLMonitoredStopVisit(t *testing.T) {
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
 
-	monitoredStopVisits := response.XMLMonitoredStopVisit()
+	monitoredStopVisits := response.XMLMonitoredStopVisits()
 
 	if len(monitoredStopVisits) != 2 {
 		t.Errorf("Incorrect number of MonitoredStopVisit, expected 2 got %d", len(monitoredStopVisits))
@@ -81,7 +81,7 @@ func Test_XMLStopMonitoringRequest_XMLMonitoredStopVisit(t *testing.T) {
 func Test_XMLMonitoredStopVisit(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
-	monitoredStopVisit := response.XMLMonitoredStopVisit()[0]
+	monitoredStopVisit := response.XMLMonitoredStopVisits()[0]
 
 	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; monitoredStopVisit.ItemIdentifier() != expected {
 		t.Errorf("Incorrect ItemIdentifier for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ItemIdentifier())

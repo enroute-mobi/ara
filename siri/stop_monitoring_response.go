@@ -4,7 +4,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -50,12 +49,11 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 	return response, nil
 }
 
-func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisit() []*XMLMonitoredStopVisit {
+func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
 	if len(response.monitoredStopVisits) == 0 {
-		xpath := "//*[local-name()='MonitoredStopVisit']"
-		nodes, err := response.node.Search(xpath)
-		if err != nil {
-			logger.Log.Panicf("Error while parsing XML: %v", err)
+		nodes := response.findNodes("MonitoredStopVisit")
+		if nodes == nil {
+			return response.monitoredStopVisits
 		}
 		for _, stopVisitNode := range nodes {
 			response.monitoredStopVisits = append(response.monitoredStopVisits, NewXMLMonitoredStopVisitFromContent(stopVisitNode))

@@ -8,10 +8,10 @@ import (
 type StopAreaId string
 
 type StopArea struct {
+	ObjectIDConsumer
 	model Model
 
 	id          StopAreaId
-	objectids   ObjectIDs
 	requestedAt time.Time
 	updatedAt   time.Time
 
@@ -20,7 +20,9 @@ type StopArea struct {
 }
 
 func NewStopArea(model Model) *StopArea {
-	return &StopArea{model: model, objectids: make(ObjectIDs)}
+	stopArea := &StopArea{model: model}
+	stopArea.objectids = make(ObjectIDs)
+	return stopArea
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
@@ -51,25 +53,6 @@ func (stopArea *StopArea) Save() (ok bool) {
 	return
 }
 
-func (stopArea *StopArea) ObjectID(kind string) (ObjectID, bool) {
-	objectid, ok := stopArea.objectids[kind]
-	if ok {
-		return objectid, true
-	}
-	return ObjectID{}, false
-}
-
-func (stopArea *StopArea) SetObjectID(objectid ObjectID) {
-	stopArea.objectids[objectid.Kind()] = objectid
-}
-
-func (stopArea *StopArea) ObjectIDs() (objectidArray []ObjectID) {
-	for _, objectid := range stopArea.objectids {
-		objectidArray = append(objectidArray, objectid)
-	}
-	return
-}
-
 type MemoryStopAreas struct {
 	UUIDConsumer
 
@@ -95,7 +78,8 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 }
 
 func (manager *MemoryStopAreas) New() StopArea {
-	return StopArea{model: manager.model, objectids: make(ObjectIDs)}
+	stopArea := NewStopArea(manager.model)
+	return *stopArea
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {

@@ -12,12 +12,14 @@ type StopMonitoringRequestCollector interface {
 }
 
 type TestStopMonitoringRequestCollector struct {
+	model.UUIDConsumer
 }
 
 type TestStopMonitoringRequestCollectorFactory struct{}
 
 type SIRIStopMonitoringRequestCollector struct {
 	model.ClockConsumer
+	model.UUIDConsumer
 
 	SIRIConnector
 
@@ -32,7 +34,7 @@ func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector
 
 // WIP
 func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
-	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(&siri.XMLStopMonitoringResponse{})
+	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
 	return stopAreaUpdateEvent, nil
 }
 
@@ -75,9 +77,32 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	// WIP
-	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(xmlStopMonitoringResponse)
+	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
+	connector.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
 
 	return stopAreaUpdateEvent, nil
+}
+
+func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(event *model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
+	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
+	if len(xmlStopVisitEvents) == 0 {
+		return
+	}
+	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
+		stopVisitEvent := &model.StopVisitUpdateEvent{
+			Id:                  connector.NewUUID(),
+			Created_at:          connector.Clock().Now(),
+			Stop_visit_objectid: model.NewObjectID(connector.objectid_kind, xmlStopVisitEvent.ItemIdentifier()),
+			Schedules:           make(model.StopVisitSchedules),
+			DepartureStatus:     model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
+			ArrivalStatuts:      model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
+		}
+		stopVisitEvent.Schedules = model.NewStopVisitSchedules()
+		stopVisitEvent.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
+		stopVisitEvent.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, xmlStopVisitEvent.ExpectedDepartureTime(), xmlStopVisitEvent.ExpectedArrivalTime())
+		stopVisitEvent.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
+		event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
+	}
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {

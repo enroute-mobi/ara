@@ -59,6 +59,7 @@ func (manager *TransactionalStopAreas) Delete(stopArea *StopArea) bool {
 	return true
 }
 
+// WIP: Handle errors
 func (manager *TransactionalStopAreas) Commit() error {
 	for _, stopAera := range manager.deleted {
 		manager.model.StopAreas().Delete(stopAera)
