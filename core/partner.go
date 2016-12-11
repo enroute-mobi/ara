@@ -313,14 +313,17 @@ func (manager *PartnerManager) Load() error {
 	if err != nil {
 		return err
 	}
-	var SettingsJson map[string]string
-	var ConnectorTypesJson []string
 	for _, r := range selectPartners {
 		partner := manager.New(PartnerSlug(r.Slug))
-		json.Unmarshal([]byte(r.Settings), &SettingsJson)
-		partner.Settings = SettingsJson
-		json.Unmarshal([]byte(r.ConnectorTypes), &ConnectorTypesJson)
-		partner.ConnectorTypes = ConnectorTypesJson
+
+		if err = json.Unmarshal([]byte(r.Settings), &partner.Settings); err != nil {
+			return err
+		}
+
+		if err = json.Unmarshal([]byte(r.ConnectorTypes), &partner.ConnectorTypes); err != nil {
+			return err
+		}
+
 		partner.RefreshConnectors()
 		manager.Save(partner)
 	}
