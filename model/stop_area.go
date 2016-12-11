@@ -48,6 +48,24 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		Name      string
+		ObjectIDs ObjectIDs
+	}{
+		ObjectIDs: make(ObjectIDs),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	stopArea.Name = aux.Name
+	stopArea.ObjectIDConsumer.objectids = aux.ObjectIDs
+
+	return nil
+}
+
 func (stopArea *StopArea) Save() (ok bool) {
 	ok = stopArea.model.StopAreas().Save(stopArea)
 	return

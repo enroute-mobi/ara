@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"reflect"
 	"testing"
 )
 
@@ -28,6 +30,38 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 	jsonString := string(jsonBytes)
 	if jsonString != expected {
 		t.Errorf("StopArea.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
+}
+
+func Test_StopArea_UnmarshalJSON(t *testing.T) {
+	text := `{
+    "Name":"Test",
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+  }`
+
+	stopArea := StopArea{}
+	err := json.Unmarshal([]byte(text), &stopArea)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if expected := "Test"; stopArea.Name != expected {
+		t.Errorf("Wrong StopArea Name after UnmarshalJSON():\n got: %s\n want: %s", stopArea.Name, expected)
+	}
+
+	expectedObjectIds := []ObjectID{
+		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewObjectID("hastus", "sqypis"),
+	}
+
+	for _, expectedObjectId := range expectedObjectIds {
+		objectId, found := stopArea.ObjectID(expectedObjectId.Kind())
+		if !found {
+			t.Errorf("Missing StopArea ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+		}
+		if !reflect.DeepEqual(expectedObjectId, objectId) {
+			t.Errorf("Wrong StopArea ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		}
 	}
 }
 
