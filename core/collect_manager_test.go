@@ -22,7 +22,6 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 }
 
 func Test_CollectManager_UpdateStopArea(t *testing.T) {
-	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
 	partners := createTestPartnerManager()
 	collectManager := &CollectManager{
 		partners:                   partners,
