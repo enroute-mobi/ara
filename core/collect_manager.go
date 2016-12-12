@@ -5,21 +5,20 @@ import (
 	"github.com/af83/edwig/model"
 )
 
+type StopVisitUpdateSubscriber func(model.StopVisitUpdateEvent)
+
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
-	Partners() Partners
-	Events() []*model.StopAreaUpdateEvent
 }
 
 type CollectManager struct {
-	partners Partners
-
-	events []*model.StopAreaUpdateEvent
+	partners              Partners
+	stopVisitUpdateEvents chan model.StopVisitUpdateEvent
 }
 
 type TestCollectManager struct {
 	Done   chan bool
-	events []*model.StopAreaUpdateEvent
+	Events []*model.StopAreaUpdateEvent
 }
 
 func NewTestCollectManager() CollectManagerInterface {
@@ -30,46 +29,40 @@ func NewTestCollectManager() CollectManagerInterface {
 
 func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	event := &model.StopAreaUpdateEvent{}
-	manager.events = append(manager.events, event)
+	manager.Events = append(manager.Events, event)
 
 	manager.Done <- true
 }
 
-func (manager *TestCollectManager) Partners() Partners {
-	return nil
-}
-
-func (manager *TestCollectManager) Events() []*model.StopAreaUpdateEvent {
-	return manager.events
-}
-
 func NewCollectManager(partners Partners) CollectManagerInterface {
-	return &CollectManager{partners: partners}
+	return &CollectManager{
+		partners:              partners,
+		stopVisitUpdateEvents: make(chan model.StopVisitUpdateEvent),
+	}
 }
 
-func (manager *CollectManager) Events() []*model.StopAreaUpdateEvent {
-	return manager.events
-}
-
-func (manager *CollectManager) Partners() Partners {
-	return manager.partners
+func (manager *CollectManager) HandleStopVisitUpdateEvent(stopVisitUpdateSubscriber StopVisitUpdateSubscriber) {
+	for stopVisitUpdateEvent := range manager.stopVisitUpdateEvents {
+		stopVisitUpdateSubscriber(stopVisitUpdateEvent)
+	}
 }
 
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	partner := manager.bestPartner(request)
 	if partner == nil {
-		// WIP
+		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
 		return
 	}
 
 	event, err := manager.requestStopAreaUpdate(partner, request)
 	if err != nil {
-		// WIP: Handle error
 		logger.Log.Printf("Can't request stop area update : %v", err)
 		return
 	}
 
-	manager.events = append(manager.events, event)
+	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
+		manager.stopVisitUpdateEvents <- *stopVisitUpdateEvent
+	}
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {

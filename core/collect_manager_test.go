@@ -6,15 +6,6 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-func Test_CollectManager_Partners(t *testing.T) {
-	partners := createTestPartnerManager()
-	collectManager := NewCollectManager(partners)
-
-	if collectManager.Partners() != partners {
-		t.Errorf("CollectManager Partners() should return correct value")
-	}
-}
-
 func Test_CollectManager_BestPartner(t *testing.T) {
 	partners := createTestPartnerManager()
 	collectManager := NewCollectManager(partners)
@@ -31,20 +22,17 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 }
 
 // WIP
-func Test_CollectManager_UpdateStopArea(t *testing.T) {
-	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
-	partners := createTestPartnerManager()
-	collectManager := NewCollectManager(partners)
-	partner := partners.New("partner")
-	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
-	partner.RefreshConnectors()
-	partners.Save(partner)
+// func Test_CollectManager_UpdateStopArea(t *testing.T) {
+// 	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
+// 	partners := createTestPartnerManager()
+// 	collectManager := NewCollectManager(partners)
+// 	partner := partners.New("partner")
+// 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
+// 	partner.RefreshConnectors()
+// 	partners.Save(partner)
 
-	request := &StopAreaUpdateRequest{}
-	collectManager.UpdateStopArea(request)
+// 	request := &StopAreaUpdateRequest{}
+// 	collectManager.UpdateStopArea(request)
 
-	// Check Events
-	if len(collectManager.Events()) != 1 {
-		t.Error("CollectManager UpdateStopArea should generate a stopAreaUpdateEvent")
-	}
-}
+// 	// WIP: Test results
+// }
