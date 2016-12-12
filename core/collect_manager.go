@@ -9,6 +9,7 @@ type StopVisitUpdateSubscriber func(*model.StopVisitUpdateEvent)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
+	HandleStopVisitUpdateEvent(StopVisitUpdateSubscriber)
 }
 
 type CollectManager struct {
@@ -16,9 +17,11 @@ type CollectManager struct {
 	stopVisitUpdateSubscribers []StopVisitUpdateSubscriber
 }
 
+// TestCollectManager has a test StopVisitUpdateSubscriber method
 type TestCollectManager struct {
-	Done   chan bool
-	Events []*model.StopAreaUpdateEvent
+	Done            chan bool
+	Events          []*model.StopAreaUpdateEvent
+	StopVisitEvents []*model.StopVisitUpdateEvent
 }
 
 func NewTestCollectManager() CollectManagerInterface {
@@ -33,6 +36,12 @@ func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest
 
 	manager.Done <- true
 }
+
+func (manager *TestCollectManager) TestStopVisitUpdateSubscriber(event *model.StopVisitUpdateEvent) {
+	manager.StopVisitEvents = append(manager.StopVisitEvents, event)
+}
+
+func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopVisitUpdateSubscriber) {}
 
 func NewCollectManager(partners Partners) CollectManagerInterface {
 	return &CollectManager{

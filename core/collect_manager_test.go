@@ -21,18 +21,29 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 	}
 }
 
-// WIP
-// func Test_CollectManager_UpdateStopArea(t *testing.T) {
-// 	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
-// 	partners := createTestPartnerManager()
-// 	collectManager := NewCollectManager(partners)
-// 	partner := partners.New("partner")
-// 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
-// 	partner.RefreshConnectors()
-// 	partners.Save(partner)
+func Test_CollectManager_UpdateStopArea(t *testing.T) {
+	// func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest)
+	partners := createTestPartnerManager()
+	collectManager := &CollectManager{
+		partners:                   partners,
+		stopVisitUpdateSubscribers: make([]StopVisitUpdateSubscriber, 0),
+	}
+	partner := partners.New("partner")
+	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
+	partner.RefreshConnectors()
+	partners.Save(partner)
 
-// 	request := &StopAreaUpdateRequest{}
-// 	collectManager.UpdateStopArea(request)
+	testManager := &TestCollectManager{}
+	collectManager.HandleStopVisitUpdateEvent(testManager.TestStopVisitUpdateSubscriber)
 
-// 	// WIP: Test results
-// }
+	if len(collectManager.stopVisitUpdateSubscribers) != 1 {
+		t.Error("CollectManager should have a subscriber after HandleStopVisitUpdateEvent call")
+	}
+
+	request := &StopAreaUpdateRequest{}
+	collectManager.UpdateStopArea(request)
+
+	if len(testManager.StopVisitEvents) != 1 {
+		t.Errorf("Subscriber should be called by CollectManager UpdateStopArea %v", len(testManager.Events))
+	}
+}

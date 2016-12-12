@@ -35,6 +35,7 @@ func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector
 // WIP
 func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
+	stopAreaUpdateEvent.StopVisitUpdateEvents = append(stopAreaUpdateEvent.StopVisitUpdateEvents, &model.StopVisitUpdateEvent{})
 	return stopAreaUpdateEvent, nil
 }
 
