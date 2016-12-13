@@ -68,6 +68,8 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 func Test_StopArea_Save(t *testing.T) {
 	model := NewMemoryModel()
 	stopArea := model.StopAreas().New()
+	objectid := NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
 
 	if stopArea.model != model {
 		t.Errorf("New stopArea model should be memoryStopAreas model")
@@ -81,6 +83,10 @@ func Test_StopArea_Save(t *testing.T) {
 	_, ok = model.StopAreas().Find(stopArea.Id())
 	if !ok {
 		t.Errorf("New StopArea should be found in memoryStopAreas")
+	}
+	_, ok = model.StopAreas().FindByObjectId(objectid)
+	if !ok {
+		t.Errorf("New StopArea should be found by objectid in memoryStopAreas")
 	}
 }
 
@@ -175,8 +181,9 @@ func Test_MemoryStopAreas_FindAll(t *testing.T) {
 
 func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
-
 	existingStopArea := stopAreas.New()
+	objectid := NewObjectID("kind", "value")
+	existingStopArea.SetObjectID(objectid)
 	stopAreas.Save(&existingStopArea)
 
 	stopAreas.Delete(&existingStopArea)
@@ -184,5 +191,9 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	_, ok := stopAreas.Find(existingStopArea.Id())
 	if ok {
 		t.Errorf("Deleted StopArea should not be findable")
+	}
+	_, ok = stopAreas.FindByObjectId(objectid)
+	if ok {
+		t.Errorf("Deleted StopArea should not be findable by objectid")
 	}
 }

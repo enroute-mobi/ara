@@ -71,6 +71,8 @@ func Test_TransactionalStopAreas_Save(t *testing.T) {
 	stopAreas := NewTransactionalStopAreas(model)
 
 	stopArea := stopAreas.New()
+	objectid := NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
 
 	if success := stopAreas.Save(&stopArea); !success {
 		t.Errorf("Save should return true")
@@ -81,6 +83,9 @@ func Test_TransactionalStopAreas_Save(t *testing.T) {
 	if _, ok := model.StopAreas().Find(stopArea.Id()); ok {
 		t.Errorf("StopArea shouldn't be saved before commit")
 	}
+	if _, ok := model.StopAreas().FindByObjectId(objectid); ok {
+		t.Errorf("StopArea shouldn't be findable by objectid before commit")
+	}
 }
 
 func Test_TransactionalStopAreas_Delete(t *testing.T) {
@@ -88,13 +93,17 @@ func Test_TransactionalStopAreas_Delete(t *testing.T) {
 	stopAreas := NewTransactionalStopAreas(model)
 
 	existingStopArea := model.StopAreas().New()
+	objectid := NewObjectID("kind", "value")
+	existingStopArea.SetObjectID(objectid)
 	model.StopAreas().Save(&existingStopArea)
 
 	stopAreas.Delete(&existingStopArea)
 
-	_, ok := stopAreas.Find(existingStopArea.Id())
-	if !ok {
+	if _, ok := stopAreas.Find(existingStopArea.Id()); !ok {
 		t.Errorf("StopArea should not be deleted before commit")
+	}
+	if _, ok := stopAreas.FindByObjectId(objectid); !ok {
+		t.Errorf("StopArea should be findable by objectid before commit")
 	}
 }
 
@@ -104,10 +113,14 @@ func Test_TransactionalStopAreas_Commit(t *testing.T) {
 
 	// Test Save
 	stopArea := stopAreas.New()
+	objectid := NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
 	stopAreas.Save(&stopArea)
 
 	// Test Delete
 	existingStopArea := model.StopAreas().New()
+	secondObjectid := NewObjectID("kind2", "value")
+	existingStopArea.SetObjectID(secondObjectid)
 	model.StopAreas().Save(&existingStopArea)
 	stopAreas.Delete(&existingStopArea)
 
@@ -116,9 +129,15 @@ func Test_TransactionalStopAreas_Commit(t *testing.T) {
 	if _, ok := model.StopAreas().Find(stopArea.Id()); !ok {
 		t.Errorf("StopArea should be saved after commit")
 	}
-	_, ok := stopAreas.Find(existingStopArea.Id())
-	if ok {
+	if _, ok := model.StopAreas().FindByObjectId(objectid); !ok {
+		t.Errorf("StopArea should be findable by ObjectId after commit")
+	}
+
+	if _, ok := stopAreas.Find(existingStopArea.Id()); ok {
 		t.Errorf("StopArea should be deleted after commit")
+	}
+	if _, ok := stopAreas.FindByObjectId(secondObjectid); ok {
+		t.Errorf("StopArea shouldn't be findable by ObjectID after commit")
 	}
 }
 
@@ -127,6 +146,8 @@ func Test_TransactionalStopAreas_Rollback(t *testing.T) {
 	stopAreas := NewTransactionalStopAreas(model)
 
 	stopArea := stopAreas.New()
+	objectid := NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
 	stopAreas.Save(&stopArea)
 
 	stopAreas.Rollback()
@@ -134,5 +155,8 @@ func Test_TransactionalStopAreas_Rollback(t *testing.T) {
 
 	if _, ok := model.StopAreas().Find(stopArea.Id()); ok {
 		t.Errorf("StopArea should not be saved with a rollback")
+	}
+	if _, ok := model.StopAreas().FindByObjectId(objectid); ok {
+		t.Errorf("StopArea should not be findable by ObjectID with a rollback")
 	}
 }
