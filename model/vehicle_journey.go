@@ -8,7 +8,8 @@ type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model
 
-	id VehicleJourneyId
+	id     VehicleJourneyId
+	lineId LineId
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -19,6 +20,11 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 
 func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
+}
+
+func (vehicleJourney *VehicleJourney) Line() Line {
+	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.lineId)
+	return line
 }
 
 // WIP
