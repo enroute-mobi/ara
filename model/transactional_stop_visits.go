@@ -81,11 +81,11 @@ func (manager *TransactionalStopVisits) Delete(stopVisit *StopVisit) bool {
 }
 
 func (manager *TransactionalStopVisits) Commit() error {
-	for _, stopAera := range manager.deleted {
-		manager.model.StopVisits().Delete(stopAera)
+	for _, stopVisit := range manager.deleted {
+		manager.model.StopVisits().Delete(stopVisit)
 	}
-	for _, stopAera := range manager.saved {
-		manager.model.StopVisits().Save(stopAera)
+	for _, stopVisit := range manager.saved {
+		manager.model.StopVisits().Save(stopVisit)
 	}
 	return nil
 }
