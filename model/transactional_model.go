@@ -6,6 +6,7 @@ type TransactionalModel struct {
 	stopAreas       *TransactionalStopAreas
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
+	lines           *TransactionalLines
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
@@ -13,6 +14,7 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 	model.stopAreas = NewTransactionalStopAreas(parent)
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
+	model.lines = NewTransactionalLines(parent)
 	return model
 }
 
@@ -26,6 +28,10 @@ func (model *TransactionalModel) StopVisits() StopVisits {
 
 func (model *TransactionalModel) VehicleJourneys() VehicleJourneys {
 	return model.vehicleJourneys
+}
+
+func (model *TransactionalModel) Lines() Lines {
+	return model.lines
 }
 
 func (model *TransactionalModel) NewTransaction() *Transaction {
@@ -42,6 +48,9 @@ func (model *TransactionalModel) Commit() error {
 	if err := model.vehicleJourneys.Commit(); err != nil {
 		return err
 	}
+	if err := model.lines.Commit(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -53,6 +62,9 @@ func (model *TransactionalModel) Rollback() error {
 		return err
 	}
 	if err := model.vehicleJourneys.Rollback(); err != nil {
+		return err
+	}
+	if err := model.lines.Rollback(); err != nil {
 		return err
 	}
 	return nil

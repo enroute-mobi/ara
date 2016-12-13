@@ -41,6 +41,19 @@ func Test_TransactionalModel_VehicleJourneys(t *testing.T) {
 	}
 }
 
+func Test_TransactionalModel_Lines(t *testing.T) {
+	model := NewMemoryModel()
+	existingLine := model.Lines().New()
+	model.Lines().Save(&existingLine)
+	lineId := existingLine.Id()
+
+	transactionnalModel := NewTransactionalModel(model)
+
+	if _, ok := transactionnalModel.Lines().Find(lineId); !ok {
+		t.Errorf("TransactionalModel should have same Lines as parent model")
+	}
+}
+
 func Test_TransactionalModel_Commit(t *testing.T) {
 	model := NewMemoryModel()
 	transactionnalModel := NewTransactionalModel(model)
@@ -48,10 +61,12 @@ func Test_TransactionalModel_Commit(t *testing.T) {
 	stopArea := transactionnalModel.StopAreas().New()
 	stopVisit := transactionnalModel.StopVisits().New()
 	vehicleJourney := transactionnalModel.VehicleJourneys().New()
+	line := transactionnalModel.Lines().New()
 
 	success := transactionnalModel.StopAreas().Save(&stopArea)
 	success = success && transactionnalModel.StopVisits().Save(&stopVisit)
 	success = success && transactionnalModel.VehicleJourneys().Save(&vehicleJourney)
+	success = success && transactionnalModel.Lines().Save(&line)
 	if !success {
 		t.Errorf("Save should return true")
 	}
@@ -64,6 +79,9 @@ func Test_TransactionalModel_Commit(t *testing.T) {
 	if vehicleJourney.Id() == "" {
 		t.Errorf("New VehicleJourney identifier shouldn't be an empty string")
 	}
+	if line.Id() == "" {
+		t.Errorf("New Line identifier shouldn't be an empty string")
+	}
 
 	if _, ok := model.StopAreas().Find(stopArea.Id()); ok {
 		t.Errorf("StopArea shouldn't be saved before commit")
@@ -73,6 +91,9 @@ func Test_TransactionalModel_Commit(t *testing.T) {
 	}
 	if _, ok := model.VehicleJourneys().Find(vehicleJourney.Id()); ok {
 		t.Errorf("VehicleJourney shouldn't be saved before commit")
+	}
+	if _, ok := model.Lines().Find(line.Id()); ok {
+		t.Errorf("Line shouldn't be saved before commit")
 	}
 
 	transactionnalModel.Commit()
@@ -85,6 +106,9 @@ func Test_TransactionalModel_Commit(t *testing.T) {
 	if _, ok := model.VehicleJourneys().Find(vehicleJourney.Id()); !ok {
 		t.Errorf("VehicleJourney should be saved after commit")
 	}
+	if _, ok := model.Lines().Find(line.Id()); !ok {
+		t.Errorf("Line should be saved after commit")
+	}
 }
 
 func Test_TransactionalModel_Rollback(t *testing.T) {
@@ -94,6 +118,12 @@ func Test_TransactionalModel_Rollback(t *testing.T) {
 	stopArea := transactionnalModel.StopAreas().New()
 	stopVisit := transactionnalModel.StopVisits().New()
 	vehicleJourney := transactionnalModel.VehicleJourneys().New()
+	line := transactionnalModel.Lines().New()
+
+	transactionnalModel.StopAreas().Save(&stopArea)
+	transactionnalModel.StopVisits().Save(&stopVisit)
+	transactionnalModel.VehicleJourneys().Save(&vehicleJourney)
+	transactionnalModel.Lines().Save(&line)
 
 	transactionnalModel.Rollback()
 	transactionnalModel.Commit()
@@ -106,5 +136,8 @@ func Test_TransactionalModel_Rollback(t *testing.T) {
 	}
 	if _, ok := model.VehicleJourneys().Find(vehicleJourney.Id()); ok {
 		t.Errorf("VehicleJourney shouldn't be saved with a rollback")
+	}
+	if _, ok := model.Lines().Find(line.Id()); ok {
+		t.Errorf("Line shouldn't be saved with a rollback")
 	}
 }
