@@ -8,13 +8,14 @@ type StopVisit struct {
 	ObjectIDConsumer
 	model Model
 
-	id              StopVisitId
-	stopAreaId      StopAreaId
+	id               StopVisitId
+	stopAreaId       StopAreaId
+	vehicleJourneyId VehicleJourneyId
+
 	schedules       StopVisitSchedules
 	departureStatus StopVisitDepartureStatus
 	arrivalStatus   StopVisitArrivalStatus
-
-	// WIP: Add VehiculeJourney ref and passage order
+	passageOrder    int
 }
 
 func NewStopVisit(model Model) *StopVisit {
@@ -32,6 +33,11 @@ func (stopVisit *StopVisit) StopArea() StopArea {
 	return stopArea
 }
 
+func (stopVisit *StopVisit) VehicleJourney() VehicleJourney {
+	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.vehicleJourneyId)
+	return vehicleJourney
+}
+
 func (stopVisit *StopVisit) Schedules() StopVisitSchedules {
 	return stopVisit.schedules
 }
@@ -42,6 +48,10 @@ func (stopVisit *StopVisit) DepartureStatus() StopVisitDepartureStatus {
 
 func (stopVisit *StopVisit) ArrivalStatus() StopVisitArrivalStatus {
 	return stopVisit.arrivalStatus
+}
+
+func (stopVisit *StopVisit) PassageOrder() int {
+	return stopVisit.passageOrder
 }
 
 // WIP
