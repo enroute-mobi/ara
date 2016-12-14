@@ -157,6 +157,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 
 	for id, factory := range apiPartner.factories {
 		if _, ok := partner.connectors[id]; !ok {
+			logger.Log.Debugf("Create connector %v for partner %v", id, partner.slug)
 			partner.connectors[id] = factory.CreateConnector(partner)
 		}
 	}
