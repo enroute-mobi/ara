@@ -1,6 +1,10 @@
 package model
 
-import "testing"
+import (
+	"encoding/json"
+	"reflect"
+	"testing"
+)
 
 func Test_Line_Id(t *testing.T) {
 	line := Line{
@@ -26,6 +30,33 @@ func Test_Line_MarshalJSON(t *testing.T) {
 	jsonString := string(jsonBytes)
 	if jsonString != expected {
 		t.Errorf("Line.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
+}
+
+func Test_Line_UnmarshalJSON(t *testing.T) {
+	text := `{
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+  }`
+
+	line := Line{}
+	err := json.Unmarshal([]byte(text), &line)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedObjectIds := []ObjectID{
+		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewObjectID("hastus", "sqypis"),
+	}
+
+	for _, expectedObjectId := range expectedObjectIds {
+		objectId, found := line.ObjectID(expectedObjectId.Kind())
+		if !found {
+			t.Errorf("Missing Line ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+		}
+		if !reflect.DeepEqual(expectedObjectId, objectId) {
+			t.Errorf("Wrong Line ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		}
 	}
 }
 

@@ -28,6 +28,22 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (line *Line) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		ObjectIDs ObjectIDs
+	}{
+		ObjectIDs: make(ObjectIDs),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	line.ObjectIDConsumer.objectids = aux.ObjectIDs
+
+	return nil
+}
+
 func (line *Line) Save() (ok bool) {
 	ok = line.model.Lines().Save(line)
 	return
