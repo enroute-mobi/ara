@@ -18,7 +18,7 @@ func NewSIRIPartner(partner *Partner) *SIRIPartner {
 }
 
 func (connector *SIRIPartner) SOAPClient() *siri.SOAPClient {
-	if connector.soapClient == nil {
+	if connector.soapClient == nil || connector.soapClient.URL() != connector.partner.Setting("remote_url") {
 		siriUrl := connector.partner.Setting("remote_url")
 		logger.Log.Debugf("Create SIRI SOAPClient to %s", siriUrl)
 		connector.soapClient = siri.NewSOAPClient(siriUrl)

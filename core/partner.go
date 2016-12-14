@@ -9,12 +9,12 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type OperationnalStatus int
+type OperationnalStatus string
 
 const (
-	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = iota
-	OPERATIONNAL_STATUS_UP
-	OPERATIONNAL_STATUS_DOWN
+	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = "unknown"
+	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
+	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
 )
 
 type PartnerId string

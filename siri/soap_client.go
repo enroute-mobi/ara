@@ -22,6 +22,9 @@ type SOAPClient struct {
 func NewSOAPClient(url string) *SOAPClient {
 	return &SOAPClient{url: url}
 }
+func (client *SOAPClient) URL() string {
+	return client.url
+}
 
 func (client *SOAPClient) prepareAndSendRequest(request Request, resource string, acceptGzip bool) (xml.Node, error) {
 	// Wrap the request XML
