@@ -276,6 +276,9 @@ func (manager *PartnerManager) Find(id PartnerId) *Partner {
 }
 
 func (manager *PartnerManager) FindAll() (partners []*Partner) {
+	if len(manager.byId) == 0 {
+		return []*Partner{}
+	}
 	for _, partner := range manager.byId {
 		partners = append(partners, partner)
 	}

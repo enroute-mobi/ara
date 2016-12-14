@@ -103,6 +103,9 @@ func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
 }
 
 func (manager *MemoryLines) FindAll() (lines []Line) {
+	if len(manager.byIdentifier) == 0 {
+		return []Line{}
+	}
 	for _, line := range manager.byIdentifier {
 		lines = append(lines, *line)
 	}

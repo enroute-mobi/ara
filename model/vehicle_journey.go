@@ -93,6 +93,9 @@ func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (Vehicle
 }
 
 func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
+	if len(manager.byIdentifier) == 0 {
+		return []VehicleJourney{}
+	}
 	for _, vehicleJourney := range manager.byIdentifier {
 		vehicleJourneys = append(vehicleJourneys, *vehicleJourney)
 	}

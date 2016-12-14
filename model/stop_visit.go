@@ -132,6 +132,9 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, b
 }
 
 func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
+	if len(manager.byIdentifier) == 0 {
+		return []StopVisit{}
+	}
 	for _, stopVisit := range manager.byIdentifier {
 		stopVisits = append(stopVisits, *stopVisit)
 	}

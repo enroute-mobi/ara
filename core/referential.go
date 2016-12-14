@@ -166,6 +166,9 @@ func (manager *MemoryReferentials) FindBySlug(slug ReferentialSlug) *Referential
 }
 
 func (manager *MemoryReferentials) FindAll() (referentials []*Referential) {
+	if len(manager.byId) == 0 {
+		return []*Referential{}
+	}
 	for _, referential := range manager.byId {
 		referentials = append(referentials, referential)
 	}

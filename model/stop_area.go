@@ -125,6 +125,9 @@ func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, boo
 }
 
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
+	if len(manager.byIdentifier) == 0 {
+		return []StopArea{}
+	}
 	for _, stopArea := range manager.byIdentifier {
 		stopAreas = append(stopAreas, *stopArea)
 	}
