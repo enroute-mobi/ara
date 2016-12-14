@@ -1,19 +1,30 @@
 package model
 
+type StopVisitUpdateManager struct {
+	model Model
+}
+
 func NewStopVisitUpdateManager(model Model) func(*StopVisitUpdateEvent) {
-	return func(event *StopVisitUpdateEvent) {
-		tx := NewTransaction(model)
-		defer tx.Close()
+	manager := newStopVisitUpdateManager(model)
+	return manager.UpdateStopVisit
+}
 
-		stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.Stop_visit_objectid)
-		if !ok {
-			return
-		}
-		stopVisit.schedules = event.Schedules
-		stopVisit.departureStatus = event.DepartureStatus
-		stopVisit.arrivalStatus = event.ArrivalStatuts
+func newStopVisitUpdateManager(model Model) *StopVisitUpdateManager {
+	return &StopVisitUpdateManager{model: model}
+}
 
-		tx.Model().StopVisits().Save(&stopVisit)
-		tx.Commit()
+func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
+	tx := NewTransaction(manager.model)
+	defer tx.Close()
+
+	stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.Stop_visit_objectid)
+	if !ok {
+		return
 	}
+	stopVisit.schedules = event.Schedules
+	stopVisit.departureStatus = event.DepartureStatus
+	stopVisit.arrivalStatus = event.ArrivalStatuts
+
+	tx.Model().StopVisits().Save(&stopVisit)
+	tx.Commit()
 }
