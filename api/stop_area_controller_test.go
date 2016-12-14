@@ -11,7 +11,7 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
+func checkStopAreaResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
 	if status := responseRecorder.Code; status != http.StatusOK {
 		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
 			status, http.StatusOK)
@@ -23,7 +23,7 @@ func checkResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing
 	}
 }
 
-func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -59,10 +59,10 @@ func prepareRequest(method string, sendIdentifier bool, body []byte, t *testing.
 
 func Test_StopAreaController_Delete(t *testing.T) {
 	// Send request
-	stopArea, responseRecorder, referential := prepareRequest("DELETE", true, nil, t)
+	stopArea, responseRecorder, referential := prepareStopAreaRequest("DELETE", true, nil, t)
 
 	// Test response
-	checkResponseStatus(responseRecorder, t)
+	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
 	_, ok := referential.Model().StopAreas().Find(stopArea.Id())
@@ -77,10 +77,10 @@ func Test_StopAreaController_Delete(t *testing.T) {
 func Test_StopAreaController_Update(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Name": "Yet another test" }`)
-	stopArea, responseRecorder, referential := prepareRequest("PUT", true, body, t)
+	stopArea, responseRecorder, referential := prepareStopAreaRequest("PUT", true, body, t)
 
 	// Check response
-	checkResponseStatus(responseRecorder, t)
+	checkStopAreaResponseStatus(responseRecorder, t)
 
 	// Test Results
 	updatedStopArea, ok := referential.Model().StopAreas().Find(stopArea.Id())
@@ -98,10 +98,10 @@ func Test_StopAreaController_Update(t *testing.T) {
 
 func Test_StopAreaController_Show(t *testing.T) {
 	// Send request
-	stopArea, responseRecorder, _ := prepareRequest("GET", true, nil, t)
+	stopArea, responseRecorder, _ := prepareStopAreaRequest("GET", true, nil, t)
 
 	// Test response
-	checkResponseStatus(responseRecorder, t)
+	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
 	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
@@ -112,10 +112,10 @@ func Test_StopAreaController_Show(t *testing.T) {
 func Test_StopAreaController_Create(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Name": "test" }`)
-	_, responseRecorder, referential := prepareRequest("POST", false, body, t)
+	_, responseRecorder, referential := prepareStopAreaRequest("POST", false, body, t)
 
 	// Check response
-	checkResponseStatus(responseRecorder, t)
+	checkStopAreaResponseStatus(responseRecorder, t)
 
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
@@ -134,10 +134,10 @@ func Test_StopAreaController_Create(t *testing.T) {
 
 func Test_StopAreaController_Index(t *testing.T) {
 	// Send request
-	_, responseRecorder, _ := prepareRequest("GET", false, nil, t)
+	_, responseRecorder, _ := prepareStopAreaRequest("GET", false, nil, t)
 
 	// Test response
-	checkResponseStatus(responseRecorder, t)
+	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
 	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"First StopArea"}]`
