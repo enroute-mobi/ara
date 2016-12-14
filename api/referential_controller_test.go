@@ -91,6 +91,26 @@ func Test_ReferentialController_Update(t *testing.T) {
 	}
 }
 
+func Test_ReferentialController_Update_ExistingSlug(t *testing.T) {
+	// Prepare and send request
+	body := []byte(`{"Slug":"referential"}`)
+	referentialPrepareRequest("POST", false, body, t)
+
+	body = []byte(`{"Slug":"referential"}`)
+	_, responseRecorder, _ := referentialPrepareRequest("POST", true, body, t)
+	// Check response
+	if status := responseRecorder.Code; status != http.StatusBadRequest {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusBadRequest)
+	}
+
+	// Check response
+	if status := responseRecorder.Code; status != http.StatusBadRequest {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
 func Test_ReferentialController_Show(t *testing.T) {
 	// Send request
 	referential, responseRecorder, _ := referentialPrepareRequest("GET", true, nil, t)
@@ -129,7 +149,7 @@ func Test_ReferentialController_Create(t *testing.T) {
 
 func Test_ReferentialController_Create_Invalid(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ }`)
+	body := []byte(`{}`)
 	_, responseRecorder, _ := referentialPrepareRequest("POST", false, body, t)
 
 	// Check response
@@ -143,9 +163,21 @@ func Test_ReferentialController_Create_Invalid(t *testing.T) {
 	}
 
 	// Test Results
-	expected := `{"Slug":"","Errors":{"Slug":["Can't be empty"]}}`
+	expected := `{"Errors":{"Slug":["Can't be empty"]}}`
 	if responseRecorder.Body.String() != expected {
 		t.Errorf("Wrong body for invalid POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
+	}
+}
+
+func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
+	// Prepare and send request
+	body := []byte(`{"Slug":"First Referential"}`)
+	_, responseRecorder, _ := referentialPrepareRequest("POST", false, body, t)
+
+	// Check response
+	if status := responseRecorder.Code; status != http.StatusBadRequest {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusBadRequest)
 	}
 }
 

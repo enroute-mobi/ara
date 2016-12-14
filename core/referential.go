@@ -36,9 +36,9 @@ type Referentials interface {
 var referentials = NewMemoryReferentials()
 
 type APIReferential struct {
-	Id     ReferentialId `json:"Id,omitempty"`
-	Slug   ReferentialSlug
-	Errors Errors `json:"Errors,omitempty"`
+	Id     ReferentialId   `json:"Id,omitempty"`
+	Slug   ReferentialSlug `json:"Slug,omitempty"`
+	Errors Errors          `json:"Errors,omitempty"`
 }
 
 func (referential *APIReferential) Validate() bool {
