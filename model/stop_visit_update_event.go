@@ -63,8 +63,8 @@ func NewStopVisitSchedules() StopVisitSchedules {
 	}
 }
 
-func (event *StopVisitUpdateEvent) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
-	event.Schedules[kind] = StopVisitSchedule{
+func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
+	schedules[kind] = StopVisitSchedule{
 		kind:          kind,
 		departureTime: departureTime,
 		arrivalTime:   arrivalTime,
@@ -72,6 +72,8 @@ func (event *StopVisitUpdateEvent) SetSchedule(kind StopVisitScheduleType, depar
 }
 
 type StopVisitUpdateEvent struct {
+	StopVisitAttributes StopVisitUpdateAttributes
+
 	Id                  string
 	Created_at          time.Time
 	Stop_visit_objectid ObjectID

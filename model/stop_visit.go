@@ -4,6 +4,18 @@ import "encoding/json"
 
 type StopVisitId string
 
+type StopVisitAttributes struct {
+	ObjectId         *ObjectID
+	StopAreaObjectId *ObjectID
+
+	VehicleJourneyObjectId *ObjectID
+	PassageOrder           int
+
+	DepartureStatus StopVisitDepartureStatus
+	ArrivalStatus   StopVisitArrivalStatus
+	Schedules       StopVisitSchedules
+}
+
 type StopVisit struct {
 	ObjectIDConsumer
 	model Model

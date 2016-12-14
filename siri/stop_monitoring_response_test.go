@@ -20,7 +20,7 @@ func getStopMonitoringResponseBody(t *testing.T) []byte {
 	return content
 }
 
-func Test_XMLStopMonitoringRequest_Address(t *testing.T) {
+func Test_XMLStopMonitoringResponse_Address(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -29,7 +29,7 @@ func Test_XMLStopMonitoringRequest_Address(t *testing.T) {
 	}
 }
 
-func Test_XMLStopMonitoringRequest_ProducerRef(t *testing.T) {
+func Test_XMLStopMonitoringResponse_ProducerRef(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -38,7 +38,7 @@ func Test_XMLStopMonitoringRequest_ProducerRef(t *testing.T) {
 	}
 }
 
-func Test_XMLStopMonitoringRequest_RequestMessageRef(t *testing.T) {
+func Test_XMLStopMonitoringResponse_RequestMessageRef(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -47,7 +47,7 @@ func Test_XMLStopMonitoringRequest_RequestMessageRef(t *testing.T) {
 	}
 }
 
-func Test_XMLStopMonitoringRequest_ResponseMessageIdentifier(t *testing.T) {
+func Test_XMLStopMonitoringResponse_ResponseMessageIdentifier(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -56,7 +56,7 @@ func Test_XMLStopMonitoringRequest_ResponseMessageIdentifier(t *testing.T) {
 	}
 }
 
-func Test_XMLStopMonitoringRequest_ResponseTimestamp(t *testing.T) {
+func Test_XMLStopMonitoringResponse_ResponseTimestamp(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -66,7 +66,7 @@ func Test_XMLStopMonitoringRequest_ResponseTimestamp(t *testing.T) {
 	}
 }
 
-func Test_XMLStopMonitoringRequest_XMLMonitoredStopVisit(t *testing.T) {
+func Test_XMLStopMonitoringResponse_XMLMonitoredStopVisit(t *testing.T) {
 	content := getStopMonitoringResponseBody(t)
 
 	response, _ := NewXMLStopMonitoringResponseFromContent(content)
@@ -86,11 +86,20 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; monitoredStopVisit.ItemIdentifier() != expected {
 		t.Errorf("Incorrect ItemIdentifier for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ItemIdentifier())
 	}
+	if expected := "NINOXE:StopPoint:SP:24:LOC"; monitoredStopVisit.MonitoringRef() != expected {
+		t.Errorf("Incorrect MonitoringRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.MonitoringRef())
+	}
+	if expected := "NINOXE:VehicleJourney:201"; monitoredStopVisit.DatedVehicleJourneyRef() != expected {
+		t.Errorf("Incorrect DatedVehicleJourneyRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.DatedVehicleJourneyRef())
+	}
 	if expected := ""; monitoredStopVisit.DepartureStatus() != expected {
 		t.Errorf("Incorrect DepartureStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.DepartureStatus())
 	}
 	if expected := "arrived"; monitoredStopVisit.ArrivalStatus() != expected {
 		t.Errorf("Incorrect ArrivalStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.ArrivalStatus())
+	}
+	if expected := 4; monitoredStopVisit.Order() != expected {
+		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.Order())
 	}
 	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.AimedArrivalTime().Equal(expected) {
 		t.Errorf("Incorrect AimedArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.AimedArrivalTime())

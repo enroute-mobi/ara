@@ -17,9 +17,13 @@ type XMLStopMonitoringResponse struct {
 type XMLMonitoredStopVisit struct {
 	XMLStructure
 
-	itemIdentifier  string
-	departureStatus string
-	arrivalStatus   string
+	itemIdentifier         string
+	monitoringRef          string
+	datedVehicleJourneyRef string
+	departureStatus        string
+	arrivalStatus          string
+
+	order int
 
 	aimedArrivalTime    time.Time
 	expectedArrivalTime time.Time
@@ -75,6 +79,20 @@ func (visit *XMLMonitoredStopVisit) ItemIdentifier() string {
 	return visit.itemIdentifier
 }
 
+func (visit *XMLMonitoredStopVisit) MonitoringRef() string {
+	if visit.monitoringRef == "" {
+		visit.monitoringRef = visit.findStringChildContent("MonitoringRef")
+	}
+	return visit.monitoringRef
+}
+
+func (visit *XMLMonitoredStopVisit) DatedVehicleJourneyRef() string {
+	if visit.datedVehicleJourneyRef == "" {
+		visit.datedVehicleJourneyRef = visit.findStringChildContent("DatedVehicleJourneyRef")
+	}
+	return visit.datedVehicleJourneyRef
+}
+
 func (visit *XMLMonitoredStopVisit) DepartureStatus() string {
 	if visit.departureStatus == "" {
 		visit.departureStatus = visit.findStringChildContent("DepartureStatus")
@@ -87,6 +105,13 @@ func (visit *XMLMonitoredStopVisit) ArrivalStatus() string {
 		visit.arrivalStatus = visit.findStringChildContent("ArrivalStatus")
 	}
 	return visit.arrivalStatus
+}
+
+func (visit *XMLMonitoredStopVisit) Order() int {
+	if visit.order == 0 {
+		visit.order = visit.findIntChildContent("Order")
+	}
+	return visit.order
 }
 
 func (visit *XMLMonitoredStopVisit) AimedArrivalTime() time.Time {

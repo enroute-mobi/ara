@@ -81,6 +81,18 @@ func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
 	return s
 }
 
+func (xmlStruct *XMLStructure) findIntChildContent(localName string) int {
+	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return 0
+	}
+	s, err := strconv.Atoi(strings.TrimSpace(node.Content()))
+	if err != nil {
+		logger.Log.Panicf("Error while parsing XML: %v", err)
+	}
+	return s
+}
+
 func (xmlStruct *XMLStructure) RawXML() string {
 	return xmlStruct.node.String()
 }
