@@ -3,6 +3,10 @@ source 'https://rubygems.org'
 group :test do
   gem 'cucumber'
   gem 'rspec-expectations'
+  gem 'mime-types'
+  gem 'netrc'
+  gem 'http-cookie'
+  gem 'rest-client'
 end
 
 group :development do

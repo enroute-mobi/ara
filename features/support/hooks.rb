@@ -8,7 +8,7 @@ Before('@server') do
   end
   system "go run edwig.go -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 &"
 
-  time_limit = Time.now + 10
+  time_limit = Time.now + 30
   begin
     sleep 2
     system "go run edwig.go check #{$server}/default/siri"
