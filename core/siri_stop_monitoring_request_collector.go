@@ -22,8 +22,6 @@ type SIRIStopMonitoringRequestCollector struct {
 	model.UUIDConsumer
 
 	SIRIConnector
-
-	objectid_kind string
 }
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}
@@ -48,9 +46,7 @@ func (factory *TestStopMonitoringRequestCollectorFactory) CreateConnector(partne
 }
 
 func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {
-	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{
-		objectid_kind: partner.Setting("remote_objectid_kind"),
-	}
+	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{}
 	siriStopMonitoringRequestCollector.partner = partner
 	return siriStopMonitoringRequestCollector
 }
@@ -60,9 +56,9 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
 	}
-	objectid, ok := stopArea.ObjectID(connector.objectid_kind)
+	objectid, ok := stopArea.ObjectID(connector.partner.Setting("remote_objectid_kind"))
 	if !ok {
-		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), connector.objectid_kind)
+		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), connector.partner.Setting("remote_objectid_kind"))
 	}
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
@@ -93,11 +89,11 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 		stopVisitEvent := &model.StopVisitUpdateEvent{
 			Id:                  connector.NewUUID(),
 			Created_at:          connector.Clock().Now(),
-			Stop_visit_objectid: model.NewObjectID(connector.objectid_kind, xmlStopVisitEvent.ItemIdentifier()),
+			Stop_visit_objectid: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
 			Schedules:           make(model.StopVisitSchedules),
 			DepartureStatus:     model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
 			ArrivalStatuts:      model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
-			StopVisitAttributes: NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisitEvent, connector.objectid_kind),
+			StopVisitAttributes: NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisitEvent, connector.partner.Setting("remote_objectid_kind")),
 		}
 		stopVisitEvent.Schedules = model.NewStopVisitSchedules()
 		stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
