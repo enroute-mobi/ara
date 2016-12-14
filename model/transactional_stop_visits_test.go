@@ -71,6 +71,8 @@ func Test_TransactionalStopVisits_Save(t *testing.T) {
 	stopVisits := NewTransactionalStopVisits(model)
 
 	stopVisit := stopVisits.New()
+	objectid := NewObjectID("kind", "value")
+	stopVisit.SetObjectID(objectid)
 
 	if success := stopVisits.Save(&stopVisit); !success {
 		t.Errorf("Save should return true")
@@ -81,6 +83,9 @@ func Test_TransactionalStopVisits_Save(t *testing.T) {
 	if _, ok := model.StopVisits().Find(stopVisit.Id()); ok {
 		t.Errorf("StopVisit shouldn't be saved before commit")
 	}
+	if _, ok := model.StopVisits().FindByObjectId(objectid); ok {
+		t.Errorf("StopVisit shouldn't be found by objectid before commit")
+	}
 }
 
 func Test_TransactionalStopVisits_Delete(t *testing.T) {
@@ -88,6 +93,8 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 	stopVisits := NewTransactionalStopVisits(model)
 
 	existingStopVisit := model.StopVisits().New()
+	objectid := NewObjectID("kind", "value")
+	existingStopVisit.SetObjectID(objectid)
 	model.StopVisits().Save(&existingStopVisit)
 
 	stopVisits.Delete(&existingStopVisit)
@@ -95,6 +102,10 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 	_, ok := stopVisits.Find(existingStopVisit.Id())
 	if !ok {
 		t.Errorf("StopVisit should not be deleted before commit")
+	}
+	_, ok = stopVisits.FindByObjectId(objectid)
+	if !ok {
+		t.Errorf("StopVisit should be found by objectid before commit")
 	}
 }
 
@@ -104,10 +115,14 @@ func Test_TransactionalStopVisits_Commit(t *testing.T) {
 
 	// Test Save
 	stopVisit := stopVisits.New()
+	objectid := NewObjectID("kind", "value")
+	stopVisit.SetObjectID(objectid)
 	stopVisits.Save(&stopVisit)
 
 	// Test Delete
 	existingStopVisit := model.StopVisits().New()
+	secondObjectid := NewObjectID("kind", "value2")
+	existingStopVisit.SetObjectID(secondObjectid)
 	model.StopVisits().Save(&existingStopVisit)
 	stopVisits.Delete(&existingStopVisit)
 
@@ -116,9 +131,15 @@ func Test_TransactionalStopVisits_Commit(t *testing.T) {
 	if _, ok := model.StopVisits().Find(stopVisit.Id()); !ok {
 		t.Errorf("StopVisit should be saved after commit")
 	}
-	_, ok := stopVisits.Find(existingStopVisit.Id())
-	if ok {
+	if _, ok := model.StopVisits().FindByObjectId(objectid); !ok {
+		t.Errorf("StopVisit should be found by objectid after commit")
+	}
+
+	if _, ok := stopVisits.Find(existingStopVisit.Id()); ok {
 		t.Errorf("StopVisit should be deleted after commit")
+	}
+	if _, ok := stopVisits.FindByObjectId(secondObjectid); ok {
+		t.Errorf("StopVisit should not be foundable by objectid after commit")
 	}
 }
 
@@ -127,6 +148,8 @@ func Test_TransactionalStopVisits_Rollback(t *testing.T) {
 	stopVisits := NewTransactionalStopVisits(model)
 
 	stopVisit := stopVisits.New()
+	objectid := NewObjectID("kind", "value")
+	stopVisit.SetObjectID(objectid)
 	stopVisits.Save(&stopVisit)
 
 	stopVisits.Rollback()
@@ -134,5 +157,8 @@ func Test_TransactionalStopVisits_Rollback(t *testing.T) {
 
 	if _, ok := model.StopVisits().Find(stopVisit.Id()); ok {
 		t.Errorf("StopVisit should not be saved with a rollback")
+	}
+	if _, ok := model.StopVisits().FindByObjectId(objectid); ok {
+		t.Errorf("StopVisit should not be foundable by objectid with a rollback")
 	}
 }

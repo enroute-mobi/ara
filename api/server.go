@@ -41,7 +41,7 @@ func (server *Server) APIHandler(response http.ResponseWriter, request *http.Req
 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+))?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(path)
-	if foundStrings[1] == "" {
+	if foundStrings == nil || foundStrings[1] == "" {
 		http.Error(response, "Invalid request", 400)
 		return
 	}

@@ -3,9 +3,10 @@ package model
 type TransactionalStopVisits struct {
 	UUIDConsumer
 
-	model   Model
-	saved   map[StopVisitId]*StopVisit
-	deleted map[StopVisitId]*StopVisit
+	model           Model
+	saved           map[StopVisitId]*StopVisit
+	savedByObjectId map[string]map[string]StopVisitId
+	deleted         map[StopVisitId]*StopVisit
 }
 
 func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
@@ -16,6 +17,7 @@ func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
 
 func (manager *TransactionalStopVisits) resetCaches() {
 	manager.saved = make(map[StopVisitId]*StopVisit)
+	manager.savedByObjectId = make(map[string]map[string]StopVisitId)
 	manager.deleted = make(map[StopVisitId]*StopVisit)
 }
 
@@ -30,6 +32,18 @@ func (manager *TransactionalStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 	}
 
 	return manager.model.StopVisits().Find(id)
+}
+
+func (manager *TransactionalStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
+	valueMap, ok := manager.savedByObjectId[objectid.Kind()]
+	if !ok {
+		return manager.model.StopVisits().FindByObjectId(objectid)
+	}
+	id, ok := valueMap[objectid.Value()]
+	if !ok {
+		return manager.model.StopVisits().FindByObjectId(objectid)
+	}
+	return *manager.saved[id], true
 }
 
 func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {
@@ -51,6 +65,13 @@ func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 	manager.saved[stopVisit.Id()] = stopVisit
+	for _, objectid := range stopVisit.ObjectIDs() {
+		_, ok := manager.savedByObjectId[objectid.Kind()]
+		if !ok {
+			manager.savedByObjectId[objectid.Kind()] = make(map[string]StopVisitId)
+		}
+		manager.savedByObjectId[objectid.Kind()][objectid.Value()] = stopVisit.Id()
+	}
 	return true
 }
 
@@ -60,11 +81,11 @@ func (manager *TransactionalStopVisits) Delete(stopVisit *StopVisit) bool {
 }
 
 func (manager *TransactionalStopVisits) Commit() error {
-	for _, stopAera := range manager.deleted {
-		manager.model.StopVisits().Delete(stopAera)
+	for _, stopVisit := range manager.deleted {
+		manager.model.StopVisits().Delete(stopVisit)
 	}
-	for _, stopAera := range manager.saved {
-		manager.model.StopVisits().Save(stopAera)
+	for _, stopVisit := range manager.saved {
+		manager.model.StopVisits().Save(stopVisit)
 	}
 	return nil
 }

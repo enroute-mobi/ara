@@ -77,6 +77,7 @@ type MemoryStopAreas struct {
 	model Model
 
 	byIdentifier map[StopAreaId]*StopArea
+	byObjectId   map[string]map[string]StopAreaId
 }
 
 type StopAreas interface {
@@ -84,6 +85,7 @@ type StopAreas interface {
 
 	New() StopArea
 	Find(id StopAreaId) (StopArea, bool)
+	FindByObjectId(objectid ObjectID) (StopArea, bool)
 	FindAll() []StopArea
 	Save(stopArea *StopArea) bool
 	Delete(stopArea *StopArea) bool
@@ -92,6 +94,7 @@ type StopAreas interface {
 func NewMemoryStopAreas() *MemoryStopAreas {
 	return &MemoryStopAreas{
 		byIdentifier: make(map[StopAreaId]*StopArea),
+		byObjectId:   make(map[string]map[string]StopAreaId),
 	}
 }
 
@@ -109,6 +112,18 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 	}
 }
 
+func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
+	valueMap, ok := manager.byObjectId[objectid.Kind()]
+	if !ok {
+		return StopArea{}, false
+	}
+	id, ok := valueMap[objectid.Value()]
+	if !ok {
+		return StopArea{}, false
+	}
+	return *manager.byIdentifier[id], true
+}
+
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
 	for _, stopArea := range manager.byIdentifier {
 		stopAreas = append(stopAreas, *stopArea)
@@ -122,10 +137,21 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 	}
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
+	for _, objectid := range stopArea.ObjectIDs() {
+		_, ok := manager.byObjectId[objectid.Kind()]
+		if !ok {
+			manager.byObjectId[objectid.Kind()] = make(map[string]StopAreaId)
+		}
+		manager.byObjectId[objectid.Kind()][objectid.Value()] = stopArea.Id()
+	}
 	return true
 }
 
 func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	delete(manager.byIdentifier, stopArea.Id())
+	for _, objectid := range stopArea.ObjectIDs() {
+		valueMap := manager.byObjectId[objectid.Kind()]
+		delete(valueMap, objectid.Value())
+	}
 	return true
 }

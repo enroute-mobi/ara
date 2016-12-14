@@ -35,6 +35,8 @@ func Test_StopVisit_Id(t *testing.T) {
 func Test_StopVisit_Save(t *testing.T) {
 	model := NewMemoryModel()
 	stopVisit := model.StopVisits().New()
+	objectid := NewObjectID("kind", "value")
+	stopVisit.SetObjectID(objectid)
 
 	if stopVisit.model != model {
 		t.Errorf("New stopVisit model should be memoryStopVisits model")
@@ -47,6 +49,10 @@ func Test_StopVisit_Save(t *testing.T) {
 	_, ok = model.StopVisits().Find(stopVisit.Id())
 	if !ok {
 		t.Errorf("New StopVisit should be found in memoryStopVisits")
+	}
+	_, ok = model.StopVisits().FindByObjectId(objectid)
+	if !ok {
+		t.Errorf("New StopVisit should be found by objectid in memoryStopVisits")
 	}
 }
 
@@ -141,8 +147,9 @@ func Test_MemoryStopVisits_FindAll(t *testing.T) {
 
 func Test_MemoryStopVisits_Delete(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
-
 	existingStopVisit := stopVisits.New()
+	objectid := NewObjectID("kind", "value")
+	existingStopVisit.SetObjectID(objectid)
 	stopVisits.Save(&existingStopVisit)
 
 	stopVisits.Delete(&existingStopVisit)
@@ -150,5 +157,9 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 	_, ok := stopVisits.Find(existingStopVisit.Id())
 	if ok {
 		t.Errorf("Deleted StopVisit should not be findable")
+	}
+	_, ok = stopVisits.FindByObjectId(objectid)
+	if ok {
+		t.Errorf("New StopVisit should not be findable by objectid")
 	}
 }

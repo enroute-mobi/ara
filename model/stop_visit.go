@@ -8,13 +8,14 @@ type StopVisit struct {
 	ObjectIDConsumer
 	model Model
 
-	id              StopVisitId
-	stopAreaId      StopAreaId
+	id               StopVisitId
+	stopAreaId       StopAreaId
+	vehicleJourneyId VehicleJourneyId
+
 	schedules       StopVisitSchedules
 	departureStatus StopVisitDepartureStatus
 	arrivalStatus   StopVisitArrivalStatus
-
-	// WIP: Add VehiculeJourney ref and passage order
+	passageOrder    int
 }
 
 func NewStopVisit(model Model) *StopVisit {
@@ -32,6 +33,11 @@ func (stopVisit *StopVisit) StopArea() StopArea {
 	return stopArea
 }
 
+func (stopVisit *StopVisit) VehicleJourney() VehicleJourney {
+	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.vehicleJourneyId)
+	return vehicleJourney
+}
+
 func (stopVisit *StopVisit) Schedules() StopVisitSchedules {
 	return stopVisit.schedules
 }
@@ -42,6 +48,10 @@ func (stopVisit *StopVisit) DepartureStatus() StopVisitDepartureStatus {
 
 func (stopVisit *StopVisit) ArrivalStatus() StopVisitArrivalStatus {
 	return stopVisit.arrivalStatus
+}
+
+func (stopVisit *StopVisit) PassageOrder() int {
+	return stopVisit.passageOrder
 }
 
 // WIP
@@ -62,6 +72,7 @@ type MemoryStopVisits struct {
 	model Model
 
 	byIdentifier map[StopVisitId]*StopVisit
+	byObjectId   map[string]map[string]StopVisitId
 }
 
 type StopVisits interface {
@@ -69,6 +80,7 @@ type StopVisits interface {
 
 	New() StopVisit
 	Find(id StopVisitId) (StopVisit, bool)
+	FindByObjectId(objectid ObjectID) (StopVisit, bool)
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
@@ -77,6 +89,7 @@ type StopVisits interface {
 func NewMemoryStopVisits() *MemoryStopVisits {
 	return &MemoryStopVisits{
 		byIdentifier: make(map[StopVisitId]*StopVisit),
+		byObjectId:   make(map[string]map[string]StopVisitId),
 	}
 }
 
@@ -94,6 +107,18 @@ func (manager *MemoryStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 	}
 }
 
+func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
+	valueMap, ok := manager.byObjectId[objectid.Kind()]
+	if !ok {
+		return StopVisit{}, false
+	}
+	id, ok := valueMap[objectid.Value()]
+	if !ok {
+		return StopVisit{}, false
+	}
+	return *manager.byIdentifier[id], true
+}
+
 func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.byIdentifier {
 		stopVisits = append(stopVisits, *stopVisit)
@@ -107,10 +132,21 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	}
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.Id()] = stopVisit
+	for _, objectid := range stopVisit.ObjectIDs() {
+		_, ok := manager.byObjectId[objectid.Kind()]
+		if !ok {
+			manager.byObjectId[objectid.Kind()] = make(map[string]StopVisitId)
+		}
+		manager.byObjectId[objectid.Kind()][objectid.Value()] = stopVisit.Id()
+	}
 	return true
 }
 
 func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	delete(manager.byIdentifier, stopVisit.Id())
+	for _, objectid := range stopVisit.ObjectIDs() {
+		valueMap := manager.byObjectId[objectid.Kind()]
+		delete(valueMap, objectid.Value())
+	}
 	return true
 }
