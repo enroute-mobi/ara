@@ -104,6 +104,15 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	return true
 }
 
+func NewPartner() *Partner {
+	return &Partner{
+		Settings:           make(map[string]string),
+		connectors:         make(map[string]Connector),
+		context:            make(Context),
+		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+	}
+}
+
 func (partner *Partner) Id() PartnerId {
 	return partner.id
 }
@@ -263,11 +272,12 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	return &Partner{
-		slug:       slug,
-		manager:    manager,
-		Settings:   make(map[string]string),
-		connectors: make(map[string]Connector),
-		context:    make(Context),
+		slug:               slug,
+		manager:            manager,
+		Settings:           make(map[string]string),
+		connectors:         make(map[string]Connector),
+		context:            make(Context),
+		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 	}
 }
 
@@ -332,12 +342,4 @@ func (manager *PartnerManager) Load() error {
 		manager.Save(partner)
 	}
 	return nil
-}
-
-func NewPartner() *Partner {
-	return &Partner{
-		Settings:   make(map[string]string),
-		connectors: make(map[string]Connector),
-		context:    make(Context),
-	}
 }

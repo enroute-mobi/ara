@@ -32,9 +32,7 @@ func Test_Partner_Slug(t *testing.T) {
 }
 
 func Test_Partner_OperationnalStatus(t *testing.T) {
-	partner := Partner{
-		slug: "partner",
-	}
+	partner := NewPartner()
 
 	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.OperationnalStatus() != expected {
 		t.Errorf("Partner.OperationnalStatus() returns wrong status, got: %s, required: %s", partner.OperationnalStatus(), expected)
