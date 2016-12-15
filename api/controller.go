@@ -12,9 +12,10 @@ var newControllerMap = map[string](func(*Server) *Controller){
 }
 
 var newWithReferentialControllerMap = map[string](func(*core.Referential) *Controller){
-	"stop_areas": NewStopAreaController,
-	"partners":   NewPartnerController,
-	"lines":      NewLineController,
+	"stop_areas":  NewStopAreaController,
+	"partners":    NewPartnerController,
+	"lines":       NewLineController,
+	"stop_visits": NewStopVisitController,
 }
 
 type RestfulRessource interface {

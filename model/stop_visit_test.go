@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"reflect"
 	"testing"
 )
 
@@ -31,6 +33,33 @@ func Test_StopVisit_Id(t *testing.T) {
 // 		t.Errorf("StopVisit.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
 // 	}
 // }
+
+func Test_StopVisit_UnmarshalJSON(t *testing.T) {
+	text := `{
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+  }`
+
+	stopVisit := StopVisit{}
+	err := json.Unmarshal([]byte(text), &stopVisit)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedObjectIds := []ObjectID{
+		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewObjectID("hastus", "sqypis"),
+	}
+
+	for _, expectedObjectId := range expectedObjectIds {
+		objectId, found := stopVisit.ObjectID(expectedObjectId.Kind())
+		if !found {
+			t.Errorf("Missing StopVisit ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+		}
+		if !reflect.DeepEqual(expectedObjectId, objectId) {
+			t.Errorf("Wrong StopVisit ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		}
+	}
+}
 
 func Test_StopVisit_Save(t *testing.T) {
 	model := NewMemoryModel()

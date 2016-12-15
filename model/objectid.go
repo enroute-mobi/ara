@@ -35,6 +35,13 @@ func (objectid ObjectID) Value() string {
 	return objectid.value
 }
 
+func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Kind":  objectid.kind,
+		"Value": objectid.value,
+	})
+}
+
 type ObjectIDConsumer struct {
 	objectids ObjectIDs
 }
