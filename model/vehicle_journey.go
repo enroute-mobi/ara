@@ -5,16 +5,16 @@ import "encoding/json"
 type VehicleJourneyId string
 
 type VehicleJourneyAttributes struct {
-	ObjectId               *ObjectID
-	VehicleJourneyObjectId *ObjectID
+	ObjectId     *ObjectID
+	LineObjectId *ObjectID
 }
 
 type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model
 
-	id               VehicleJourneyId
-	vehicleJourneyId VehicleJourneyId
+	id     VehicleJourneyId
+	lineId LineId
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -27,9 +27,9 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
 }
 
-func (vehicleJourney *VehicleJourney) VehicleJourney() VehicleJourney {
-	vehicleJourney, _ := vehicleJourney.model.VehicleJourneys().Find(vehicleJourney.vehicleJourneyId)
-	return vehicleJourney
+func (vehicleJourney *VehicleJourney) Line() Line {
+	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.lineId)
+	return line
 }
 
 // WIP
