@@ -20,7 +20,7 @@ func NewSIRIStopMonitoringStopVisitAttributes(response *siri.XMLMonitoredStopVis
 // WIP
 func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *model.StopVisitAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.ItemIdentifier())
-	stopAreaObjectid := model.NewObjectID("Reflex", attributes.response.StopPointRef())
+	stopAreaObjectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
 	vehicleJourneyObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 
 	stopVisitAttributes := &model.StopVisitAttributes{
@@ -40,7 +40,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *
 	return stopVisitAttributes
 }
 
-func (attributes *SIRIStopMonitoringStopVisitAttributes) VehiculeJourneyAttributes() *model.VehicleJourneyAttributes {
+func (attributes *SIRIStopMonitoringStopVisitAttributes) VehicleJourneyAttributes() *model.VehicleJourneyAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 	lineObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 

@@ -2,7 +2,7 @@ package model
 
 type StopVisitUpdateAttributes interface {
 	StopVisitAttributes() *StopVisitAttributes
-	VehiculeJourneyAttributes() *VehicleJourneyAttributes
+	VehicleJourneyAttributes() *VehicleJourneyAttributes
 	LineAttributes() *LineAttributes
 	StopAreaAttributes() *StopAreaAttributes
 }
