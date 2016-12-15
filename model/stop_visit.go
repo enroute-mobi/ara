@@ -96,7 +96,9 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	stopVisit.ObjectIDConsumer.objectids = aux.ObjectIDs
+	if len(aux.ObjectIDs) != 0 {
+		stopVisit.ObjectIDConsumer.objectids = aux.ObjectIDs
+	}
 
 	return nil
 }

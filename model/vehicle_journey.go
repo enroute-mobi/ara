@@ -5,16 +5,16 @@ import "encoding/json"
 type VehicleJourneyId string
 
 type VehicleJourneyAttributes struct {
-	ObjectId     *ObjectID
-	LineObjectId *ObjectID
+	ObjectId               *ObjectID
+	VehicleJourneyObjectId *ObjectID
 }
 
 type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model
 
-	id     VehicleJourneyId
-	lineId LineId
+	id               VehicleJourneyId
+	vehicleJourneyId VehicleJourneyId
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -27,9 +27,9 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
 }
 
-func (vehicleJourney *VehicleJourney) Line() Line {
-	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.lineId)
-	return line
+func (vehicleJourney *VehicleJourney) VehicleJourney() VehicleJourney {
+	vehicleJourney, _ := vehicleJourney.model.VehicleJourneys().Find(vehicleJourney.vehicleJourneyId)
+	return vehicleJourney
 }
 
 // WIP
@@ -37,6 +37,24 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Id": vehicleJourney.id,
 	})
+}
+
+func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		ObjectIDs ObjectIDs
+	}{
+		ObjectIDs: make(ObjectIDs),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if len(aux.ObjectIDs) != 0 {
+		vehicleJourney.ObjectIDConsumer.objectids = aux.ObjectIDs
+	}
+
+	return nil
 }
 
 func (vehicleJourney *VehicleJourney) Save() (ok bool) {

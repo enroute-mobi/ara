@@ -43,7 +43,9 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	line.ObjectIDConsumer.objectids = aux.ObjectIDs
+	if len(aux.ObjectIDs) != 0 {
+		line.ObjectIDConsumer.objectids = aux.ObjectIDs
+	}
 
 	return nil
 }
