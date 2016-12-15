@@ -4,6 +4,10 @@ import "encoding/json"
 
 type LineId string
 
+type LineAttributes struct {
+	ObjectId *ObjectID
+}
+
 type Line struct {
 	ObjectIDConsumer
 	model Model

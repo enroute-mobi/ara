@@ -86,11 +86,17 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; monitoredStopVisit.ItemIdentifier() != expected {
 		t.Errorf("Incorrect ItemIdentifier for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ItemIdentifier())
 	}
-	if expected := "NINOXE:StopPoint:SP:24:LOC"; monitoredStopVisit.MonitoringRef() != expected {
-		t.Errorf("Incorrect MonitoringRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.MonitoringRef())
+	if expected := "NINOXE:StopPoint:Q:50:LOC"; monitoredStopVisit.StopPointRef() != expected {
+		t.Errorf("Incorrect StopPointRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.StopPointRef())
+	}
+	if expected := "Elf Sylvain - Métro (R)"; monitoredStopVisit.StopPointName() != expected {
+		t.Errorf("Incorrect StopPointName for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.StopPointName())
 	}
 	if expected := "NINOXE:VehicleJourney:201"; monitoredStopVisit.DatedVehicleJourneyRef() != expected {
 		t.Errorf("Incorrect DatedVehicleJourneyRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.DatedVehicleJourneyRef())
+	}
+	if expected := "NINOXE:Line:3:LOC"; monitoredStopVisit.LineRef() != expected {
+		t.Errorf("Incorrect LineRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.LineRef())
 	}
 	if expected := ""; monitoredStopVisit.DepartureStatus() != expected {
 		t.Errorf("Incorrect DepartureStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.DepartureStatus())

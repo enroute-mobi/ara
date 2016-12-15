@@ -7,6 +7,11 @@ import (
 
 type StopAreaId string
 
+type StopAreaAttributes struct {
+	ObjectId *ObjectID
+	Name     string
+}
+
 type StopArea struct {
 	ObjectIDConsumer
 	model Model
@@ -42,10 +47,20 @@ func (stopArea *StopArea) UpdatedAt() time.Time {
 }
 
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	stopAreaMap := map[string]interface{}{
 		"Id":   stopArea.id,
 		"Name": stopArea.Name,
-	})
+	}
+	if !stopArea.requestedAt.IsZero() {
+		stopAreaMap["RequestedAt"] = stopArea.requestedAt
+	}
+	if !stopArea.updatedAt.IsZero() {
+		stopAreaMap["UpdatedAt"] = stopArea.updatedAt
+	}
+	if stopArea.ObjectIDs() != nil {
+		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
+	}
+	return json.Marshal(stopAreaMap)
 }
 
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {

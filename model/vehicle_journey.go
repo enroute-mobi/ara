@@ -4,6 +4,11 @@ import "encoding/json"
 
 type VehicleJourneyId string
 
+type VehicleJourneyAttributes struct {
+	ObjectId     *ObjectID
+	LineObjectId *ObjectID
+}
+
 type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model

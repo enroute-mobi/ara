@@ -17,9 +17,10 @@ func NewSIRIStopMonitoringStopVisitAttributes(response *siri.XMLMonitoredStopVis
 	}
 }
 
+// WIP
 func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *model.StopVisitAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.ItemIdentifier())
-	stopAreaObjectid := model.NewObjectID(attributes.objectid_kind, attributes.response.MonitoringRef())
+	stopAreaObjectid := model.NewObjectID("Reflex", attributes.response.StopPointRef())
 	vehicleJourneyObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 
 	stopVisitAttributes := &model.StopVisitAttributes{
@@ -39,11 +40,35 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *
 	return stopVisitAttributes
 }
 
-// func (attributes *SIRIStopMonitoringStopVisitAttributes) VehiculeJourneyAttributes() *model.VehiculeJourneyAttributes {
-// }
+func (attributes *SIRIStopMonitoringStopVisitAttributes) VehiculeJourneyAttributes() *model.VehicleJourneyAttributes {
+	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
+	lineObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 
-// func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model.LineAttributes {
-// }
+	vehicleJourneyAttributes := &model.VehicleJourneyAttributes{
+		ObjectId:     &objectid,
+		LineObjectId: &lineObjectId,
+	}
 
-// func (attributes *SIRIStopMonitoringStopVisitAttributes) StopAreaAttributes() *model.StopAreaAttributes {
-// }
+	return vehicleJourneyAttributes
+}
+
+func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model.LineAttributes {
+	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
+
+	lineAttributes := &model.LineAttributes{
+		ObjectId: &objectid,
+	}
+
+	return lineAttributes
+}
+
+func (attributes *SIRIStopMonitoringStopVisitAttributes) StopAreaAttributes() *model.StopAreaAttributes {
+	objectid := model.NewObjectID("Reflex", attributes.response.StopPointRef())
+
+	stopAreaAttributes := &model.StopAreaAttributes{
+		ObjectId: &objectid,
+		Name:     attributes.response.StopPointName(),
+	}
+
+	return stopAreaAttributes
+}

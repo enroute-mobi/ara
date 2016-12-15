@@ -18,8 +18,10 @@ type XMLMonitoredStopVisit struct {
 	XMLStructure
 
 	itemIdentifier         string
-	monitoringRef          string
+	stopPointRef           string
+	stopPointName          string
 	datedVehicleJourneyRef string
+	lineRef                string
 	departureStatus        string
 	arrivalStatus          string
 
@@ -79,11 +81,18 @@ func (visit *XMLMonitoredStopVisit) ItemIdentifier() string {
 	return visit.itemIdentifier
 }
 
-func (visit *XMLMonitoredStopVisit) MonitoringRef() string {
-	if visit.monitoringRef == "" {
-		visit.monitoringRef = visit.findStringChildContent("MonitoringRef")
+func (visit *XMLMonitoredStopVisit) StopPointRef() string {
+	if visit.stopPointRef == "" {
+		visit.stopPointRef = visit.findStringChildContent("StopPointRef")
 	}
-	return visit.monitoringRef
+	return visit.stopPointRef
+}
+
+func (visit *XMLMonitoredStopVisit) StopPointName() string {
+	if visit.stopPointName == "" {
+		visit.stopPointName = visit.findStringChildContent("StopPointName")
+	}
+	return visit.stopPointName
 }
 
 func (visit *XMLMonitoredStopVisit) DatedVehicleJourneyRef() string {
@@ -91,6 +100,13 @@ func (visit *XMLMonitoredStopVisit) DatedVehicleJourneyRef() string {
 		visit.datedVehicleJourneyRef = visit.findStringChildContent("DatedVehicleJourneyRef")
 	}
 	return visit.datedVehicleJourneyRef
+}
+
+func (visit *XMLMonitoredStopVisit) LineRef() string {
+	if visit.lineRef == "" {
+		visit.lineRef = visit.findStringChildContent("LineRef")
+	}
+	return visit.lineRef
 }
 
 func (visit *XMLMonitoredStopVisit) DepartureStatus() string {
