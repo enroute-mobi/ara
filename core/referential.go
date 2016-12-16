@@ -96,8 +96,9 @@ func (referential *Referential) NewTransaction() *model.Transaction {
 
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Id":   referential.id,
-		"Slug": referential.slug,
+		"Id":       referential.id,
+		"Slug":     referential.slug,
+		"Partners": referential.partners,
 	})
 }
 

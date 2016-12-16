@@ -63,7 +63,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model
 }
 
 func (attributes *SIRIStopMonitoringStopVisitAttributes) StopAreaAttributes() *model.StopAreaAttributes {
-	objectid := model.NewObjectID("Reflex", attributes.response.StopPointRef())
+	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
 
 	stopAreaAttributes := &model.StopAreaAttributes{
 		ObjectId: &objectid,

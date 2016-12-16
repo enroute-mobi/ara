@@ -94,7 +94,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 }
 
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
-	logger.Log.Debugf("RequestStopAreaUpdate %#v", request)
+	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
 	event, err := partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 	if err != nil {

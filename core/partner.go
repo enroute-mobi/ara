@@ -281,6 +281,14 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	}
 }
 
+func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
+	partnersId := []PartnerId{}
+	for id, _ := range manager.byId {
+		partnersId = append(partnersId, id)
+	}
+	return json.Marshal(partnersId)
+}
+
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
 	partner, _ := manager.byId[id]
 	return partner

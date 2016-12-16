@@ -1,5 +1,7 @@
 package model
 
+import "github.com/af83/edwig/logger"
+
 type StopVisitUpdateManager struct {
 	model Model
 }
@@ -19,6 +21,7 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 
 	stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.Stop_visit_objectid)
 	if ok {
+		logger.Log.Debugf("Update StopVisit %v", stopVisit.Id())
 		stopVisit.schedules = event.Schedules
 		stopVisit.departureStatus = event.DepartureStatus
 		stopVisit.arrivalStatus = event.ArrivalStatuts
@@ -33,6 +36,9 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 	manager.findOrCreateVehicleJourney(event.StopVisitAttributes.VehicleJourneyAttributes())
 
 	stopVisitAttributes := event.StopVisitAttributes.StopVisitAttributes()
+
+	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
+
 	stopVisit = tx.Model().StopVisits().New()
 	foundStopArea, _ := tx.Model().StopAreas().FindByObjectId(*stopVisitAttributes.StopAreaObjectId)
 	stopVisit.stopAreaId = foundStopArea.Id()
@@ -56,6 +62,8 @@ func (manager *StopVisitUpdateManager) findOrCreateStopArea(stopAreaAttributes *
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 
+	logger.Log.Debugf("Create new StopArea %v, objectid: %v", stopAreaAttributes.Name, *stopAreaAttributes.ObjectId)
+
 	stopArea = tx.Model().StopAreas().New()
 	stopArea.SetObjectID(*stopAreaAttributes.ObjectId)
 	stopArea.Name = stopAreaAttributes.Name
@@ -71,6 +79,8 @@ func (manager *StopVisitUpdateManager) findOrCreateLine(lineAttributes *LineAttr
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 
+	logger.Log.Debugf("Create new Line, objectid: %v", *lineAttributes.ObjectId)
+
 	line = tx.Model().Lines().New()
 	line.SetObjectID(*lineAttributes.ObjectId)
 	tx.Model().Lines().Save(&line)
@@ -84,6 +94,8 @@ func (manager *StopVisitUpdateManager) findOrCreateVehicleJourney(vehicleJourney
 	}
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
+
+	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", *vehicleJourneyAttributes.ObjectId)
 
 	vehicleJourney = tx.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(*vehicleJourneyAttributes.ObjectId)

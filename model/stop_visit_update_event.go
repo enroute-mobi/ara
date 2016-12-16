@@ -27,50 +27,6 @@ const (
 	STOP_VISIT_ARRIVAL_UNDEFINED    StopVisitArrivalStatus = ""
 )
 
-type StopVisitScheduleType int
-
-const (
-	STOP_VISIT_SCHEDULE_AIMED StopVisitScheduleType = iota
-	STOP_VISIT_SCHEDULE_EXPECTED
-	STOP_VISIT_SCHEDULE_ACTUAL
-)
-
-type StopVisitSchedule struct {
-	kind          StopVisitScheduleType
-	departureTime time.Time
-	arrivalTime   time.Time
-}
-
-func (schedule *StopVisitSchedule) Kind() StopVisitScheduleType {
-	return schedule.kind
-}
-
-func (schedule *StopVisitSchedule) DepartureTime() time.Time {
-	return schedule.departureTime
-}
-
-func (schedule *StopVisitSchedule) ArrivalTime() time.Time {
-	return schedule.arrivalTime
-}
-
-type StopVisitSchedules map[StopVisitScheduleType]StopVisitSchedule
-
-func NewStopVisitSchedules() StopVisitSchedules {
-	return map[StopVisitScheduleType]StopVisitSchedule{
-		STOP_VISIT_SCHEDULE_AIMED:    StopVisitSchedule{},
-		STOP_VISIT_SCHEDULE_EXPECTED: StopVisitSchedule{},
-		STOP_VISIT_SCHEDULE_ACTUAL:   StopVisitSchedule{},
-	}
-}
-
-func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
-	schedules[kind] = StopVisitSchedule{
-		kind:          kind,
-		departureTime: departureTime,
-		arrivalTime:   arrivalTime,
-	}
-}
-
 type StopVisitUpdateEvent struct {
 	StopVisitAttributes StopVisitUpdateAttributes
 
