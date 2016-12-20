@@ -25,7 +25,7 @@ type ResponseXMLStructure struct {
 }
 
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
-	xpath := fmt.Sprintf("//*[local-name()='%s']", localName)
+	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.Search(xpath)
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
@@ -37,7 +37,7 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 }
 
 func (xmlStruct *XMLStructure) findNodes(localName string) []xml.Node {
-	xpath := fmt.Sprintf("//*[local-name()='%s']", localName)
+	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.Search(xpath)
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
