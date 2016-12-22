@@ -20,7 +20,7 @@ if [ -x $bundle ]; then
     cd $source_dir
     $bundle install --deployment --path $GOPATH/tmp
     $bundle exec license_finder
-    $bundle exec cucumber
+    $bundle exec cucumber --format json --out cucumber.json --format html --out cucumber.html --format pretty --no-color
 else
     echo "Bundle not detected, cucumber tests are skipped"
 fi
