@@ -46,6 +46,10 @@ func (stopArea *StopArea) UpdatedAt() time.Time {
 	return stopArea.updatedAt
 }
 
+func (stopArea *StopArea) Updated(updateTime time.Time) {
+	stopArea.updatedAt = updateTime
+}
+
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	stopAreaMap := map[string]interface{}{
 		"Id":   stopArea.id,

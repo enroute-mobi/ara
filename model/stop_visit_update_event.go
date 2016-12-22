@@ -30,10 +30,11 @@ const (
 type StopVisitUpdateEvent struct {
 	StopVisitAttributes StopVisitUpdateAttributes
 
-	Id                  string
-	Created_at          time.Time
-	Stop_visit_objectid ObjectID
-	Schedules           StopVisitSchedules
-	DepartureStatus     StopVisitDepartureStatus
-	ArrivalStatuts      StopVisitArrivalStatus
+	Id                string
+	Created_at        time.Time
+	StopVisitObjectid ObjectID
+	StopAreaObjectId  ObjectID
+	Schedules         StopVisitSchedules
+	DepartureStatus   StopVisitDepartureStatus
+	ArrivalStatuts    StopVisitArrivalStatus
 }

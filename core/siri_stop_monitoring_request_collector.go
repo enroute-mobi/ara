@@ -89,7 +89,8 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 		stopVisitEvent := &model.StopVisitUpdateEvent{
 			Id:                  connector.NewUUID(),
 			Created_at:          connector.Clock().Now(),
-			Stop_visit_objectid: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
+			StopVisitObjectid:   model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
+			StopAreaObjectId:    model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
 			Schedules:           make(model.StopVisitSchedules),
 			DepartureStatus:     model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
 			ArrivalStatuts:      model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),

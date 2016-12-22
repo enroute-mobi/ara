@@ -3,6 +3,8 @@ package model
 import "github.com/af83/edwig/logger"
 
 type StopVisitUpdateManager struct {
+	ClockConsumer
+
 	model Model
 }
 
@@ -19,9 +21,11 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 
-	stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.Stop_visit_objectid)
+	stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectid)
 	if ok {
 		logger.Log.Debugf("Update StopVisit %v", stopVisit.Id())
+		stopArea, _ := tx.Model().StopAreas().FindByObjectId(event.StopAreaObjectId)
+		stopArea.Updated(manager.Clock().Now())
 		stopVisit.schedules = event.Schedules
 		stopVisit.departureStatus = event.DepartureStatus
 		stopVisit.arrivalStatus = event.ArrivalStatuts
@@ -67,6 +71,8 @@ func (manager *StopVisitUpdateManager) findOrCreateStopArea(stopAreaAttributes *
 	stopArea = tx.Model().StopAreas().New()
 	stopArea.SetObjectID(*stopAreaAttributes.ObjectId)
 	stopArea.Name = stopAreaAttributes.Name
+	stopArea.Requested(manager.Clock().Now())
+	stopArea.Updated(manager.Clock().Now())
 	tx.Model().StopAreas().Save(&stopArea)
 	tx.Commit()
 }

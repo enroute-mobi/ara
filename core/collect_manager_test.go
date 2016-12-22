@@ -62,9 +62,9 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	stopVisit.Save()
 
 	stopVisitUpdateEvent := &model.StopVisitUpdateEvent{
-		Stop_visit_objectid: objectid,
-		DepartureStatus:     model.STOP_VISIT_DEPARTURE_ONTIME,
-		ArrivalStatuts:      model.STOP_VISIT_ARRIVAL_ARRIVED,
+		StopVisitObjectid: objectid,
+		DepartureStatus:   model.STOP_VISIT_DEPARTURE_ONTIME,
+		ArrivalStatuts:    model.STOP_VISIT_ARRIVAL_ARRIVED,
 	}
 	referential.collectManager.(*CollectManager).broadcastStopVisitUpdateEvent(stopVisitUpdateEvent)
 
