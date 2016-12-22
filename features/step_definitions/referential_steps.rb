@@ -32,3 +32,4 @@ Then(/^a Referential "([^"]+)" should not exists$/) do |referential|
 
 	expect(responseHash.find{|a| a["Slug"] == referential}).to be_nil
 end
+
