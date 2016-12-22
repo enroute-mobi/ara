@@ -107,6 +107,7 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 func NewPartner() *Partner {
 	return &Partner{
 		Settings:           make(map[string]string),
+		ConnectorTypes:     []string{},
 		connectors:         make(map[string]Connector),
 		context:            make(Context),
 		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
@@ -138,12 +139,15 @@ func (partner *Partner) Save() (ok bool) {
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
-	return json.Marshal(APIPartner{
-		Id:             partner.id,
-		Slug:           partner.slug,
-		Settings:       partner.Settings,
-		ConnectorTypes: partner.ConnectorTypes,
-	})
+	partnerMap := map[string]interface{}{
+		"Id":                 partner.id,
+		"Slug":               partner.slug,
+		"Settings":           partner.Settings,
+		"ConnectorTypes":     partner.ConnectorTypes,
+		"OperationnalStatus": partner.operationnalStatus,
+	}
+	return json.Marshal(partnerMap)
+
 }
 
 func (partner *Partner) Definition() *APIPartner {
@@ -278,6 +282,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		connectors:         make(map[string]Connector),
 		context:            make(Context),
 		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		ConnectorTypes:     []string{},
 	}
 }
 

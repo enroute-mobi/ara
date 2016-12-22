@@ -75,7 +75,7 @@ func Test_VehicleJourneyController_Delete(t *testing.T) {
 
 func Test_VehicleJourneyController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" } }`)
+	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	vehicleJourney, responseRecorder, referential := prepareVehicleJourneyRequest("PUT", true, body, t)
 
 	// Check response
@@ -107,7 +107,7 @@ func Test_VehicleJourneyController_Show(t *testing.T) {
 
 func Test_VehicleJourneyController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" } }`)
+	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareVehicleJourneyRequest("POST", false, body, t)
 
 	// Check response
