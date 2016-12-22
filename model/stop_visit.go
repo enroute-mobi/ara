@@ -55,7 +55,7 @@ func (stopVisit *StopVisit) Schedules() (scheduleSlice []StopVisitSchedule) {
 		return []StopVisitSchedule{}
 	}
 	for _, schedule := range stopVisit.schedules {
-		scheduleSlice = append(scheduleSlice, schedule)
+		scheduleSlice = append(scheduleSlice, *schedule)
 	}
 	return
 }
