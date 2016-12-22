@@ -11,12 +11,6 @@ def model_attributes(table)
 	attributes
 end
 
-Given(/^a StopArea exists with the following attributes :$/) do |stopArea|
-	RestClient.post url, model_attributes(stopArea).to_json, {content_type: :json, accept: :json}
-	response = RestClient.get url
-	responseHash = JSON.parse(response.body)
-	expect(responseHash.find{|a| a["ObjectIds"] = stopArea}).to be_truthy
-end
 
 When(/^a StopArea is created with the following attributes :$/) do |stopArea|
 	RestClient.post url, model_attributes(stopArea).to_json, {content_type: :json, accept: :json}
@@ -35,13 +29,9 @@ Then(/^a StopArea "([^"]+)":"([^"]+)" should exist$/) do |kind, objectid|
 	puts responseHash.find{|a| a[kind] = objectid}
 end
 
-
-When(/^the StopArea "([^"]+)":"([^"]+)" is destroy :$/) do |kind, objectid|
-	response = RestClient.get url
-	responseHash = JSON.parse(response.body)
-
-	responseHash.select{|a| a["Kind"] = kind}
-	id = responseHash.select{|a| puts a["\"ObjectIDs\"=>[{\"Value\"}]"] = objectid}
-
-	RestClient.delete "#{url}/#{id}" 
-end	
+# Given(/^a StopArea exists with the following attributes :$/) do |stopArea|
+# 	RestClient.post url, model_attributes(stopArea).to_json, {content_type: :json, accept: :json}
+# 	response = RestClient.get url
+# 	responseHash = JSON.parse(response.body)
+# 	expect(responseHash.find{|a| a["ObjectIds"] = stopArea}).to be_truthy
+# end
