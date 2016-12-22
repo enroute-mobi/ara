@@ -18,9 +18,12 @@ end
 
 Then(/^one StopArea has the following attributes:$/) do |stopArea|
 	response = RestClient.get url
-	responseHash = JSON.parse(response.body)
-	expect(responseHash.find{|a| a["ObjectIds"] = stopArea}).to be_truthy
+	puts responseHash = JSON.parse(response.body)
+	expectation = responseHash.find{|a| puts a[model_attributes(stopArea)] == a[stopArea]}
+
+	expect(expectation).to be_truthy
 end
+
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should exist$/) do |kind, objectid|
 	response = RestClient.get url
