@@ -85,6 +85,9 @@ func Test_SIRIStopMonitoringStopVisitAttributes_LineAttributes(t *testing.T) {
 	if lineAttributes.ObjectId.Kind() != expected["kind"] || lineAttributes.ObjectId.Value() != expected["value"] {
 		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], lineAttributes.ObjectId.Kind(), lineAttributes.ObjectId.Value())
 	}
+	if expected := "Ligne 3 Metro"; lineAttributes.Name != expected {
+		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, lineAttributes.Name)
+	}
 }
 
 func Test_SIRIStopMonitoringStopVisitAttributes_StopAreaAttributes(t *testing.T) {
@@ -99,5 +102,4 @@ func Test_SIRIStopMonitoringStopVisitAttributes_StopAreaAttributes(t *testing.T)
 	if expected := "Elf Sylvain - Métro (R)"; stopAreaAttributes.Name != expected {
 		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, stopAreaAttributes.Name)
 	}
-
 }

@@ -83,6 +83,7 @@ func (manager *StopVisitUpdateManager) findOrCreateLine(lineAttributes *LineAttr
 
 	line = tx.Model().Lines().New()
 	line.SetObjectID(*lineAttributes.ObjectId)
+	line.Name = lineAttributes.Name
 	tx.Model().Lines().Save(&line)
 	tx.Commit()
 }

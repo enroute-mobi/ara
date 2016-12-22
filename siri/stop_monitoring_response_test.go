@@ -98,6 +98,9 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := "NINOXE:Line:3:LOC"; monitoredStopVisit.LineRef() != expected {
 		t.Errorf("Incorrect LineRef for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.LineRef())
 	}
+	if expected := "Ligne 3 Metro"; monitoredStopVisit.PublishedLineName() != expected {
+		t.Errorf("Incorrect PublishedLineName for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.PublishedLineName())
+	}
 	if expected := ""; monitoredStopVisit.DepartureStatus() != expected {
 		t.Errorf("Incorrect DepartureStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.DepartureStatus())
 	}

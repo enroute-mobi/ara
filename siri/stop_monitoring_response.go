@@ -22,6 +22,7 @@ type XMLMonitoredStopVisit struct {
 	stopPointName          string
 	datedVehicleJourneyRef string
 	lineRef                string
+	publishedLineName      string
 	departureStatus        string
 	arrivalStatus          string
 
@@ -107,6 +108,13 @@ func (visit *XMLMonitoredStopVisit) LineRef() string {
 		visit.lineRef = visit.findStringChildContent("LineRef")
 	}
 	return visit.lineRef
+}
+
+func (visit *XMLMonitoredStopVisit) PublishedLineName() string {
+	if visit.publishedLineName == "" {
+		visit.publishedLineName = visit.findStringChildContent("PublishedLineName")
+	}
+	return visit.publishedLineName
 }
 
 func (visit *XMLMonitoredStopVisit) DepartureStatus() string {
