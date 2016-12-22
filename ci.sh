@@ -17,11 +17,14 @@ ruby_bin_dir=`ls -d /var/lib/gems/*/bin | tail -1`
 bundle=$ruby_bin_dir/bundle
 
 if [ -x $bundle ]; then
+		tmp_dir=$GOPATH/tmp
+
     cd $source_dir
-    $bundle install --deployment --path $GOPATH/tmp
+    $bundle install --deployment --path $tmp_dir
     $bundle exec license_finder
-		mkdir -p tmp/cucumber
-    $bundle exec cucumber --format json --out tmp/cucumber/cucumber.json --format html --out tmp/cucumber/index.html --format pretty --no-color
+
+		mkdir -p $tmp_dir/cucumber
+    $bundle exec cucumber --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
 else
     echo "Bundle not detected, cucumber tests are skipped"
 fi
