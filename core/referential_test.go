@@ -47,11 +47,12 @@ func Test_Referential_Partners(t *testing.T) {
 }
 
 func Test_Referential_MarshalJSON(t *testing.T) {
-	referential := Referential{
+	referential := &Referential{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		slug: "referential",
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":null,"Slug":"referential"}`
+	referential.partners = NewPartnerManager(referential)
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":[],"Slug":"referential"}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

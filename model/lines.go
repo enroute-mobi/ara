@@ -6,6 +6,7 @@ type LineId string
 
 type LineAttributes struct {
 	ObjectId *ObjectID
+	Name     string
 }
 
 type Line struct {
@@ -13,6 +14,8 @@ type Line struct {
 	model Model
 
 	id LineId
+
+	Name string
 }
 
 func NewLine(model Model) *Line {
@@ -25,18 +28,25 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
-// WIP
 func (line *Line) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		"Id": line.id,
-	})
+	lineMap := map[string]interface{}{
+		"Id":   line.id,
+		"Name": line.Name,
+	}
+	if line.ObjectIDs() != nil {
+		lineMap["ObjectIDs"] = line.ObjectIDs()
+	}
+	return json.Marshal(lineMap)
 }
 
 func (line *Line) UnmarshalJSON(data []byte) error {
+	type Alias Line
 	aux := &struct {
 		ObjectIDs ObjectIDs
+		*Alias
 	}{
 		ObjectIDs: make(ObjectIDs),
+		Alias:     (*Alias)(line),
 	}
 	err := json.Unmarshal(data, aux)
 	if err != nil {

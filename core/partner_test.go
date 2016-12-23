@@ -41,10 +41,13 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
-		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		slug: "partner",
+		id:                 "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		slug:               "partner",
+		Settings:           make(map[string]string),
+		ConnectorTypes:     []string{},
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner"}`
+	expected := `{"ConnectorTypes":[],"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","OperationnalStatus":"unknown","Settings":{},"Slug":"partner"}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

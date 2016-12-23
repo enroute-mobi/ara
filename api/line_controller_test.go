@@ -75,7 +75,7 @@ func Test_LineController_Delete(t *testing.T) {
 
 func Test_LineController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" } }`)
+	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	line, responseRecorder, referential := prepareLineRequest("PUT", true, body, t)
 
 	// Check response
@@ -107,7 +107,7 @@ func Test_LineController_Show(t *testing.T) {
 
 func Test_LineController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" } }`)
+	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareLineRequest("POST", false, body, t)
 
 	// Check response
@@ -133,7 +133,7 @@ func Test_LineController_Index(t *testing.T) {
 	checkLineResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":""}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

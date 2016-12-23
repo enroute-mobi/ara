@@ -32,11 +32,14 @@ func (vehicleJourney *VehicleJourney) Line() Line {
 	return line
 }
 
-// WIP
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	vehicleJourneyMap := map[string]interface{}{
 		"Id": vehicleJourney.id,
-	})
+	}
+	if vehicleJourney.ObjectIDs() != nil {
+		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
+	}
+	return json.Marshal(vehicleJourneyMap)
 }
 
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {

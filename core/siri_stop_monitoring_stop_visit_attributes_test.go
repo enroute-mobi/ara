@@ -1,0 +1,105 @@
+package core
+
+import (
+	"io/ioutil"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/af83/edwig/model"
+	"github.com/af83/edwig/siri"
+)
+
+func getMonitoredStopVisit(t *testing.T) *siri.XMLMonitoredStopVisit {
+	file, err := os.Open("testdata/stopmonitoring-response-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, _ := siri.NewXMLStopMonitoringResponseFromContent(content)
+	return response.XMLMonitoredStopVisits()[0]
+}
+
+func Test_SIRIStopMonitoringStopVisitAttributes_StopVisitAttributes(t *testing.T) {
+	xmlStopVisit := getMonitoredStopVisit(t)
+	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
+	stopVisitAttributes := SIRIStopVisitAttributes.StopVisitAttributes()
+
+	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"}
+	if stopVisitAttributes.ObjectId.Kind() != expected["kind"] || stopVisitAttributes.ObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], stopVisitAttributes.ObjectId.Kind(), stopVisitAttributes.ObjectId.Value())
+	}
+	expected["value"] = "NINOXE:StopPoint:Q:50:LOC"
+	if stopVisitAttributes.StopAreaObjectId.Kind() != expected["kind"] || stopVisitAttributes.StopAreaObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong StopAreaObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], stopVisitAttributes.StopAreaObjectId.Kind(), stopVisitAttributes.StopAreaObjectId.Value())
+	}
+	expected["value"] = "NINOXE:VehicleJourney:201"
+	if stopVisitAttributes.VehicleJourneyObjectId.Kind() != expected["kind"] || stopVisitAttributes.VehicleJourneyObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong VehicleJourneyObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], stopVisitAttributes.VehicleJourneyObjectId.Kind(), stopVisitAttributes.VehicleJourneyObjectId.Value())
+	}
+	if expected := 4; stopVisitAttributes.PassageOrder != expected {
+		t.Errorf("Wrong PassageOrder:\n expected: %v\n got: %v", expected, stopVisitAttributes.PassageOrder)
+	}
+	if expected := model.STOP_VISIT_DEPARTURE_UNDEFINED; stopVisitAttributes.DepartureStatus != expected {
+		t.Errorf("Wrong DepartureStatus:\n expected: %v\n got: %v", expected, stopVisitAttributes.DepartureStatus)
+	}
+	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisitAttributes.ArrivalStatus != expected {
+		t.Errorf("Wrong ArrivalStatus:\n expected: %v\n got: %v", expected, stopVisitAttributes.ArrivalStatus)
+	}
+	if expected := time.Date(2016, time.September, 22, 9, 54, 00, 000000000, time.UTC); !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].DepartureTime().IsZero() || stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].ArrivalTime().Equal(expected) {
+		t.Errorf("Wrong Aimed Schedule:\n expected: departure: %v arrival: %v\n got: departure: %v arrival: %v", time.Time{}, expected, stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].ArrivalTime())
+	}
+	if expected := time.Date(2016, time.September, 22, 9, 54, 00, 000000000, time.UTC); !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].DepartureTime().IsZero() || stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].ArrivalTime().Equal(expected) {
+		t.Errorf("Wrong Actual Schedule:\n expected: departure: %v arrival: %v\n got: departure: %v arrival: %v", time.Time{}, expected, stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].ArrivalTime())
+	}
+	if !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].DepartureTime().IsZero() || !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].ArrivalTime().IsZero() {
+		t.Errorf("Wrong Expected Schedule:\n expected: departure: %v arrival: %v\n got: departure: %v arrival: %v", time.Time{}, time.Time{}, stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].ArrivalTime())
+	}
+}
+
+func Test_SIRIStopMonitoringStopVisitAttributes_VehicleJourneyAttributes(t *testing.T) {
+	xmlStopVisit := getMonitoredStopVisit(t)
+	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
+	vehicleJourneyAttributes := SIRIStopVisitAttributes.VehicleJourneyAttributes()
+
+	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:VehicleJourney:201"}
+	if vehicleJourneyAttributes.ObjectId.Kind() != expected["kind"] || vehicleJourneyAttributes.ObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], vehicleJourneyAttributes.ObjectId.Kind(), vehicleJourneyAttributes.ObjectId.Value())
+	}
+	expected["value"] = "NINOXE:Line:3:LOC"
+	if vehicleJourneyAttributes.LineObjectId.Kind() != expected["kind"] || vehicleJourneyAttributes.LineObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong LineObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], vehicleJourneyAttributes.LineObjectId.Kind(), vehicleJourneyAttributes.LineObjectId.Value())
+	}
+}
+
+func Test_SIRIStopMonitoringStopVisitAttributes_LineAttributes(t *testing.T) {
+	xmlStopVisit := getMonitoredStopVisit(t)
+	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
+	lineAttributes := SIRIStopVisitAttributes.LineAttributes()
+
+	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:Line:3:LOC"}
+	if lineAttributes.ObjectId.Kind() != expected["kind"] || lineAttributes.ObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], lineAttributes.ObjectId.Kind(), lineAttributes.ObjectId.Value())
+	}
+	if expected := "Ligne 3 Metro"; lineAttributes.Name != expected {
+		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, lineAttributes.Name)
+	}
+}
+
+func Test_SIRIStopMonitoringStopVisitAttributes_StopAreaAttributes(t *testing.T) {
+	xmlStopVisit := getMonitoredStopVisit(t)
+	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
+	stopAreaAttributes := SIRIStopVisitAttributes.StopAreaAttributes()
+
+	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:StopPoint:Q:50:LOC"}
+	if stopAreaAttributes.ObjectId.Kind() != expected["kind"] || stopAreaAttributes.ObjectId.Value() != expected["value"] {
+		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], stopAreaAttributes.ObjectId.Kind(), stopAreaAttributes.ObjectId.Value())
+	}
+	if expected := "Elf Sylvain - Métro (R)"; stopAreaAttributes.Name != expected {
+		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, stopAreaAttributes.Name)
+	}
+}

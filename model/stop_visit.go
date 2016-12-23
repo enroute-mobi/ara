@@ -55,7 +55,7 @@ func (stopVisit *StopVisit) Schedules() (scheduleSlice []StopVisitSchedule) {
 		return []StopVisitSchedule{}
 	}
 	for _, schedule := range stopVisit.schedules {
-		scheduleSlice = append(scheduleSlice, schedule)
+		scheduleSlice = append(scheduleSlice, *schedule)
 	}
 	return
 }
@@ -72,9 +72,8 @@ func (stopVisit *StopVisit) PassageOrder() int {
 	return stopVisit.passageOrder
 }
 
-// WIP
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	stopVisitMap := map[string]interface{}{
 		"Id":              stopVisit.id,
 		"StopArea":        stopVisit.stopAreaId,
 		"VehicleJourney":  stopVisit.vehicleJourneyId,
@@ -82,7 +81,11 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"Schedules":       stopVisit.Schedules(),
 		"DepartureStatus": stopVisit.departureStatus,
 		"ArrivalStatus":   stopVisit.arrivalStatus,
-	})
+	}
+	if stopVisit.ObjectIDs() != nil {
+		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
+	}
+	return json.Marshal(stopVisitMap)
 }
 
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {

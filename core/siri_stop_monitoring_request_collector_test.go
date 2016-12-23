@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/af83/edwig/model"
-	"github.com/jonboulle/clockwork"
 )
 
 func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) *model.StopAreaUpdateEvent {
@@ -45,7 +44,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	partners.Model().StopAreas().Save(&stopArea)
 
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
-	siriStopMonitoringRequestCollector.SetClock(clockwork.NewFakeClock())
+	siriStopMonitoringRequestCollector.SetClock(model.NewFakeClock())
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	stopAreaUpdateEvent, err := siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 	if err != nil {
@@ -75,8 +74,8 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if expected := model.STOP_VISIT_DEPARTURE_UNDEFINED; stopVisitEvent.DepartureStatus != expected {
 		t.Errorf("Wrong DepartureStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.DepartureStatus)
 	}
-	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.Stop_visit_objectid.Value() != expected {
-		t.Errorf("Wrong ObjectID for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Stop_visit_objectid.Value())
+	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.StopVisitObjectid.Value() != expected {
+		t.Errorf("Wrong ObjectID for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.StopVisitObjectid.Value())
 	}
 	// Aimed schedule
 	schedule := stopVisitEvent.Schedules[model.STOP_VISIT_SCHEDULE_AIMED]

@@ -184,7 +184,7 @@ func Test_PartnerController_Index(t *testing.T) {
 	partnerCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"First Partner"}]`
+	expected := `[{"ConnectorTypes":[],"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","OperationnalStatus":"unknown","Settings":{},"Slug":"First Partner"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

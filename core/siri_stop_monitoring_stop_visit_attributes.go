@@ -57,6 +57,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model
 
 	lineAttributes := &model.LineAttributes{
 		ObjectId: &objectid,
+		Name:     attributes.response.PublishedLineName(),
 	}
 
 	return lineAttributes
