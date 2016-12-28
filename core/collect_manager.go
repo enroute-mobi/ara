@@ -81,16 +81,13 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
 	var testPartner *Partner
 	for _, partner := range manager.partners.FindAll() {
-		if partner.isConnectorDefined(SIRI_STOP_MONITORING_REQUEST_COLLECTOR) {
+		if partner.isConnectorDefined(SIRI_STOP_MONITORING_REQUEST_COLLECTOR) && partner.OperationnalStatus() == OPERATIONNAL_STATUS_UP {
 			return partner
 		} else if partner.isConnectorDefined(TEST_STOP_MONITORING_REQUEST_COLLECTOR) {
 			testPartner = partner
 		}
 	}
-	if testPartner != nil {
-		return testPartner
-	}
-	return nil
+	return testPartner
 }
 
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {

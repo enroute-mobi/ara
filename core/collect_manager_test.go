@@ -12,6 +12,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
+	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
 	partners.Save(partner)
 
 	foundPartner := collectManager.(*CollectManager).bestPartner(NewStopAreaUpdateRequest(model.StopAreaId("id")))
