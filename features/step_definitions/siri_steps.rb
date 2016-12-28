@@ -1,8 +1,20 @@
-# Given(/^we send a checkstatus request with body "([^"]+)"$/) do |filename|
-#   system "rm features/testdata/response.xml"
-#   system "curl -s -H 'Content-Type: text/xml' #{$server}/default/siri --data @features/testdata/#{filename} > features/testdata/response.xml"
-# end
+require 'rest-client'
+require 'rexml/document'
+require 'rexml/xpath'
 
-# Then(/^we should recieve a checkstatus response with body "([^"]+)"$/) do |filename|
-#   expect(IO.read("features/testdata/response.xml")).to eq(IO.read("features/testdata/#{filename}"))
-# end
+working_directory = "features/testdata"
+
+Given(/^we send a checkstatus request for referential "([^"]+)"$/) do |referential|
+  system "rm #{working_directory}/response.xml"
+  xmlBody = File.read("#{working_directory}/checkstatus-soap-request.xml")
+  response = RestClient.post "#{$server}/#{referential}/siri", xmlBody, {content_type: :xml}
+  File.write("#{working_directory}/response.xml", response.body)
+end
+
+Then(/^we should recieve a positive checkstatus response$/) do
+  xmlBody = File.read("#{working_directory}/response.xml")
+  doc = REXML::Document.new xmlBody
+  status = REXML::XPath.first(doc, "//*[local-name()='Status']")
+
+  expect(status.text).to eq("true")
+end

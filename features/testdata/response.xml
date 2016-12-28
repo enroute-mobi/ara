@@ -11,8 +11,8 @@
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>Edwig</ns2:ProducerRef>
-		<ns2:Address>/default/siri</ns2:Address>
-		<ns2:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns2:ResponseMessageIdentifier>
+		<ns2:Address>/test/siri</ns2:Address>
+		<ns2:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns2:ResponseMessageIdentifier>
 		<ns2:RequestMessageRef>CheckStatus:Test:0</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>

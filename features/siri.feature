@@ -2,5 +2,6 @@ Feature: Siri server
 
   @server
   Scenario: Handle a SIRI Checkstatus request
-    Given we send a checkstatus request with body "checkstatus-soap-request.xml"
-    Then we should recieve a checkstatus response with body "checkstatus-soap-response.xml"
+    Given a Referential "test" exists
+      And we send a checkstatus request for referential "test"
+    Then we should recieve a positive checkstatus response
