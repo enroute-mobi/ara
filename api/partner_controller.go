@@ -68,6 +68,10 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 		http.Error(response, "Invalid request: can't parse body", 400)
 		return
 	}
+	if apiPartner.Id != partner.Id() {
+		http.Error(response, "Invalid request (Id specified)", 400)
+		return
+	}
 
 	if !apiPartner.Validate() {
 		jsonBytes, _ := json.Marshal(apiPartner)
@@ -92,7 +96,7 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 		http.Error(response, "Invalid request: can't parse body", 400)
 		return
 	}
-	if partner.Id() != "" {
+	if apiPartner.Id != "" {
 		http.Error(response, "Invalid request (Id specified)", 400)
 		return
 	}
