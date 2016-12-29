@@ -21,16 +21,16 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 
-	stopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectid)
+	existingStopVisit, ok := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectid)
 	if ok {
-		logger.Log.Debugf("Update StopVisit %v", stopVisit.Id())
+		logger.Log.Debugf("Update StopVisit %v", existingStopVisit.Id())
 		stopArea, _ := tx.Model().StopAreas().FindByObjectId(event.StopAreaObjectId)
 		stopArea.Updated(manager.Clock().Now())
-		stopVisit.schedules = event.Schedules
-		stopVisit.departureStatus = event.DepartureStatus
-		stopVisit.arrivalStatus = event.ArrivalStatuts
+		existingStopVisit.schedules = event.Schedules
+		existingStopVisit.departureStatus = event.DepartureStatus
+		existingStopVisit.arrivalStatus = event.ArrivalStatuts
 
-		tx.Model().StopVisits().Save(&stopVisit)
+		tx.Model().StopVisits().Save(&existingStopVisit)
 		tx.Commit()
 		return
 	}
@@ -43,7 +43,7 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 
 	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
-	stopVisit = tx.Model().StopVisits().New()
+	stopVisit := tx.Model().StopVisits().New()
 	foundStopArea, _ := tx.Model().StopAreas().FindByObjectId(*stopVisitAttributes.StopAreaObjectId)
 	stopVisit.stopAreaId = foundStopArea.Id()
 	foundVehicleJourney, _ := tx.Model().VehicleJourneys().FindByObjectId(*stopVisitAttributes.VehicleJourneyObjectId)
@@ -59,7 +59,7 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 }
 
 func (manager *StopVisitUpdateManager) findOrCreateStopArea(stopAreaAttributes *StopAreaAttributes) {
-	stopArea, ok := manager.model.StopAreas().FindByObjectId(*stopAreaAttributes.ObjectId)
+	_, ok := manager.model.StopAreas().FindByObjectId(*stopAreaAttributes.ObjectId)
 	if ok {
 		return
 	}
@@ -68,7 +68,7 @@ func (manager *StopVisitUpdateManager) findOrCreateStopArea(stopAreaAttributes *
 
 	logger.Log.Debugf("Create new StopArea %v, objectid: %v", stopAreaAttributes.Name, *stopAreaAttributes.ObjectId)
 
-	stopArea = tx.Model().StopAreas().New()
+	stopArea := tx.Model().StopAreas().New()
 	stopArea.SetObjectID(*stopAreaAttributes.ObjectId)
 	stopArea.Name = stopAreaAttributes.Name
 	stopArea.Requested(manager.Clock().Now())
@@ -78,7 +78,7 @@ func (manager *StopVisitUpdateManager) findOrCreateStopArea(stopAreaAttributes *
 }
 
 func (manager *StopVisitUpdateManager) findOrCreateLine(lineAttributes *LineAttributes) {
-	line, ok := manager.model.Lines().FindByObjectId(*lineAttributes.ObjectId)
+	_, ok := manager.model.Lines().FindByObjectId(*lineAttributes.ObjectId)
 	if ok {
 		return
 	}
@@ -87,7 +87,7 @@ func (manager *StopVisitUpdateManager) findOrCreateLine(lineAttributes *LineAttr
 
 	logger.Log.Debugf("Create new Line, objectid: %v", *lineAttributes.ObjectId)
 
-	line = tx.Model().Lines().New()
+	line := tx.Model().Lines().New()
 	line.SetObjectID(*lineAttributes.ObjectId)
 	line.Name = lineAttributes.Name
 	tx.Model().Lines().Save(&line)
@@ -95,7 +95,7 @@ func (manager *StopVisitUpdateManager) findOrCreateLine(lineAttributes *LineAttr
 }
 
 func (manager *StopVisitUpdateManager) findOrCreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) {
-	vehicleJourney, ok := manager.model.VehicleJourneys().FindByObjectId(*vehicleJourneyAttributes.ObjectId)
+	_, ok := manager.model.VehicleJourneys().FindByObjectId(*vehicleJourneyAttributes.ObjectId)
 	if ok {
 		return
 	}
@@ -104,7 +104,7 @@ func (manager *StopVisitUpdateManager) findOrCreateVehicleJourney(vehicleJourney
 
 	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", *vehicleJourneyAttributes.ObjectId)
 
-	vehicleJourney = tx.Model().VehicleJourneys().New()
+	vehicleJourney := tx.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(*vehicleJourneyAttributes.ObjectId)
 	foundLine, _ := tx.Model().Lines().FindByObjectId(*vehicleJourneyAttributes.LineObjectId)
 	vehicleJourney.lineId = foundLine.Id()

@@ -63,7 +63,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 
 			stopArea.Requested(now)
-			stopArea.Save()
+			tx.Model().StopAreas().Save(&stopArea)
 		}
 	}
 	tx.Commit()
