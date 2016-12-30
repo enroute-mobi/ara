@@ -2,7 +2,9 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -52,6 +54,11 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
+	logStashEvent := make(audit.LogStashEvent)
+	startTime := connector.Clock().Now()
+
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
@@ -68,14 +75,22 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		RequestTimestamp:  connector.Clock().Now(),
 	}
 
+	logStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
+
 	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
+		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
 		return nil, err
 	}
+
+	logStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
 	// WIP
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
 	connector.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
+
+	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
 
 	return stopAreaUpdateEvent, nil
 }
@@ -119,4 +134,29 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *A
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRIStopMonitoringRequestCollector(partner)
+}
+
+func logStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+	logStashEvent["monitoringRef"] = request.MonitoringRef
+	logStashEvent["requestorRef"] = request.RequestorRef
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+	logStashEvent["requestXML"] = request.BuildXML()
+}
+
+func logStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringResponse) {
+	logStashEvent["address"] = response.Address()
+	logStashEvent["producerRef"] = response.ProducerRef()
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
+	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
+	logStashEvent["responseXML"] = response.RawXML()
+}
+
+func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateEvent *model.StopAreaUpdateEvent) {
+	var idArray []string
+	for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
+		idArray = append(idArray, stopVisitUpdateEvent.Id)
+	}
+	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
 }

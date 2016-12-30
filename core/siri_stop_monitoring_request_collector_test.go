@@ -2,16 +2,20 @@ package core
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
+	"github.com/af83/edwig/siri"
 )
 
 func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) *model.StopAreaUpdateEvent {
+	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -52,6 +56,16 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	}
 
 	return stopAreaUpdateEvent
+}
+
+func testStopMonitoringLogStash(t *testing.T) {
+	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
+	if len(events) != 1 {
+		t.Errorf("Logstash should have recieved an event, got: %v", events)
+	}
+	if len(events[0]) != 12 {
+		t.Errorf("LogstashEvent should have 12 values, got: %v", events[0])
+	}
 }
 
 // WIP
@@ -122,5 +136,72 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {
 		t.Errorf("apiPartner shouldn't have any error when remote_url is set, got: %v", apiPartner.Errors)
+	}
+}
+
+func Test_SIRICheckStatusClient_LogStopMonitoringRequest(t *testing.T) {
+	logStashEvent := make(audit.LogStashEvent)
+	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+	request := &siri.SIRIStopMonitoringRequest{
+		MessageIdentifier: "0000-0000-0000-0000",
+		MonitoringRef:     "test",
+		RequestorRef:      "Edwig",
+		RequestTimestamp:  time,
+	}
+
+	logStopMonitoringRequest(logStashEvent, request)
+	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
+		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
+	}
+	if logStashEvent["requestorRef"] != "Edwig" {
+		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: Edwig", logStashEvent["requestorRef"])
+	}
+	if logStashEvent["monitoringRef"] != "test" {
+		t.Errorf("Wrong monitoringRef logged:\n got: %v\n expected: test", logStashEvent["monitoringRef"])
+	}
+	if expected := time.String(); logStashEvent["requestTimestamp"] != expected {
+		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: %v", logStashEvent["requestTimestamp"], expected)
+	}
+	if logStashEvent["requestXML"] != request.BuildXML() {
+		t.Errorf("Wrong requestXML logged:\n got: %v\n expected: %v", logStashEvent["requestXML"], request.BuildXML())
+	}
+}
+
+func Test_SIRICheckStatusClient_LogStopMonitoringResponse(t *testing.T) {
+	logStashEvent := make(audit.LogStashEvent)
+
+	file, err := os.Open("testdata/stopmonitoring-response-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := siri.NewXMLStopMonitoringResponseFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logStopMonitoringResponse(logStashEvent, response)
+
+	if logStashEvent["address"] != "http://appli.chouette.mobi/siri_france/siri" {
+		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])
+	}
+	if logStashEvent["producerRef"] != "NINOXE:default" {
+		t.Errorf("Wrong producerRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["producerRef"])
+	}
+	if logStashEvent["requestMessageRef"] != "StopMonitoring:Test:0" {
+		t.Errorf("Wrong requestMessageRef logged:\n got: %v\n expected: StopMonitoring:Test:0", logStashEvent["requestMessageRef"])
+	}
+	if logStashEvent["responseMessageIdentifier"] != "fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26" {
+		t.Errorf("Wrong responseMessageIdentifier logged:\n got: %v\n expected: fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26", logStashEvent["responseMessageIdentifier"])
+	}
+	if logStashEvent["responseTimestamp"] != "2016-09-22 08:01:20.227 +0200 CEST" {
+		t.Errorf("Wrong responseTimestamp logged:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", logStashEvent["responseTimestamp"])
+	}
+	if logStashEvent["responseXML"] != response.RawXML() {
+		t.Errorf("Wrong responseXML logged:\n got: %v\n expected: %v", logStashEvent["responseXML"], response.RawXML())
 	}
 }

@@ -47,7 +47,7 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Operat
 	return status
 }
 
-func testLogStash(t *testing.T) {
+func testCheckStatusLogStash(t *testing.T) {
 	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
 	if len(events) != 1 {
 		t.Errorf("Logstash should have recieved an event, got: %v", events)
@@ -62,7 +62,7 @@ func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
 	if status != OPERATIONNAL_STATUS_UP {
 		t.Errorf("Wrong status found:\n got: %v\n expected: up", status)
 	}
-	testLogStash(t)
+	testCheckStatusLogStash(t)
 }
 
 func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 	if status != OPERATIONNAL_STATUS_DOWN {
 		t.Errorf("Wrong status found:\n got: %v\n expected: down", status)
 	}
-	testLogStash(t)
+	testCheckStatusLogStash(t)
 }
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
@@ -96,7 +96,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 	}
 }
 
-func Test_SIRICheckStatusClient_LogRequest(t *testing.T) {
+func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &siri.SIRICheckStatusRequest{
@@ -104,7 +104,7 @@ func Test_SIRICheckStatusClient_LogRequest(t *testing.T) {
 		RequestTimestamp:  time,
 		MessageIdentifier: "0000-0000-0000-0000",
 	}
-	logRequest(logStashEvent, request)
+	logCheckStatusRequest(logStashEvent, request)
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
@@ -119,7 +119,7 @@ func Test_SIRICheckStatusClient_LogRequest(t *testing.T) {
 	}
 }
 
-func Test_SIRICheckStatusClient_LogResponse(t *testing.T) {
+func Test_SIRICheckStatusClient_LogCheckStatusResponse(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
 	file, err := os.Open("testdata/checkstatus-response-soap.xml")
@@ -136,7 +136,7 @@ func Test_SIRICheckStatusClient_LogResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	logResponse(logStashEvent, response)
+	logCheckStatusResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "http://appli.chouette.mobi/siri_france/siri" {
 		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])
