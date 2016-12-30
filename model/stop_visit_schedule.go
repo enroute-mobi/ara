@@ -42,14 +42,15 @@ func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
 type StopVisitSchedules map[StopVisitScheduleType]*StopVisitSchedule
 
 func NewStopVisitSchedules() StopVisitSchedules {
-	return map[StopVisitScheduleType]*StopVisitSchedule{
-		STOP_VISIT_SCHEDULE_AIMED:    &StopVisitSchedule{},
-		STOP_VISIT_SCHEDULE_EXPECTED: &StopVisitSchedule{},
-		STOP_VISIT_SCHEDULE_ACTUAL:   &StopVisitSchedule{},
-	}
+	schedules := make(StopVisitSchedules)
+	return schedules
 }
 
 func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
+	_, ok := schedules[kind]
+	if !ok {
+		schedules[kind] = &StopVisitSchedule{}
+	}
 	schedules[kind] = &StopVisitSchedule{
 		kind:          kind,
 		departureTime: departureTime,

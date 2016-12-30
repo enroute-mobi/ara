@@ -86,12 +86,9 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 		t.Errorf("Wrong AimedArrivalTime for stopVisitEvent:\n expected: %v\n got: %v", expected, schedule.ArrivalTime())
 	}
 	// Expected schedule
-	schedule = stopVisitEvent.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED]
-	if !schedule.DepartureTime().IsZero() {
-		t.Errorf("ExpectedDepartureTime for stopVisitEvent should be zero, got: %v", schedule.DepartureTime())
-	}
-	if !schedule.ArrivalTime().IsZero() {
-		t.Errorf("ExpectedArrivalTime for stopVisitEvent should be zero, got: %v", schedule.ArrivalTime())
+	_, ok := stopVisitEvent.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED]
+	if ok {
+		t.Errorf("Expected Schedule shouldn't be created, got: %v", stopVisitEvent.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED])
 	}
 	// Actual schedule
 	schedule = stopVisitEvent.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL]

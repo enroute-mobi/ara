@@ -56,8 +56,8 @@ func Test_SIRIStopMonitoringStopVisitAttributes_StopVisitAttributes(t *testing.T
 	if expected := time.Date(2016, time.September, 22, 9, 54, 00, 000000000, time.UTC); !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].DepartureTime().IsZero() || stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].ArrivalTime().Equal(expected) {
 		t.Errorf("Wrong Actual Schedule:\n expected: departure: %v arrival: %v\n got: departure: %v arrival: %v", time.Time{}, expected, stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL].ArrivalTime())
 	}
-	if !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].DepartureTime().IsZero() || !stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].ArrivalTime().IsZero() {
-		t.Errorf("Wrong Expected Schedule:\n expected: departure: %v arrival: %v\n got: departure: %v arrival: %v", time.Time{}, time.Time{}, stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].ArrivalTime())
+	if _, ok := stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED]; ok {
+		t.Errorf("Expected Schedule shouldn't be created, got: departure: %v arrival: %v", stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].DepartureTime(), stopVisitAttributes.Schedules[model.STOP_VISIT_SCHEDULE_EXPECTED].ArrivalTime())
 	}
 }
 
