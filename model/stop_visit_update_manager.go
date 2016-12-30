@@ -31,6 +31,7 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 		existingStopVisit.arrivalStatus = event.ArrivalStatuts
 
 		tx.Model().StopVisits().Save(&existingStopVisit)
+		tx.Model().StopAreas().Save(&stopArea)
 		tx.Commit()
 		return
 	}
