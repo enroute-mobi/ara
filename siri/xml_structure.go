@@ -8,11 +8,65 @@ import (
 	"time"
 
 	"github.com/af83/edwig/logger"
+	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
+type XMLNode interface {
+	NativeNode() xml.Node
+}
+
+func NewXMLNode(nativeNode xml.Node) XMLNode {
+	node := &RootXMLNode{rootNode: nativeNode}
+
+	finalizer := func(node *RootXMLNode) {
+		node.Free()
+	}
+	logger.Log.Debugf("Set finalizer for %#v", node)
+	runtime.SetFinalizer(node, finalizer)
+
+	return node
+}
+
+func NewXMLNodeFromContent(content []byte) (XMLNode, error) {
+	document, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	return NewXMLNode(document.Root().XmlNode), nil
+}
+
+type RootXMLNode struct {
+	rootNode xml.Node
+}
+
+func (node *RootXMLNode) NativeNode() xml.Node {
+	return node.rootNode
+}
+
+func (node *RootXMLNode) Free() {
+	if node.rootNode != nil {
+		logger.Log.Debugf("Free %#v gokogiri document", node)
+		node.rootNode.MyDocument().Free()
+		node.rootNode = nil
+	}
+}
+
+type SubXMLNode struct {
+	parent     XMLNode
+	nativeNode xml.Node
+}
+
+func (node *SubXMLNode) NativeNode() xml.Node {
+	return node.nativeNode
+}
+
+func NewSubXMLNode(nativeNode xml.Node) *SubXMLNode {
+	return &SubXMLNode{nativeNode: nativeNode}
+}
+
 type XMLStructure struct {
-	node xml.Node
+	node XMLNode
 }
 
 type ResponseXMLStructure struct {
@@ -25,20 +79,9 @@ type ResponseXMLStructure struct {
 	responseTimestamp         time.Time
 }
 
-func (xmlStruct *XMLStructure) SetFinalizer() {
-	finalizer := func(xmlStruct *XMLStructure) {
-		logger.Log.Debugf("Free %v gokogiri document", xmlStruct)
-		if xmlStruct.node != nil {
-			xmlStruct.node.MyDocument().Free()
-			xmlStruct.node = nil
-		}
-	}
-	runtime.SetFinalizer(xmlStruct, finalizer)
-}
-
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
-	nodes, err := xmlStruct.node.Search(xpath)
+	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
@@ -48,16 +91,24 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	return nodes[0]
 }
 
-func (xmlStruct *XMLStructure) findNodes(localName string) []xml.Node {
+func (xmlStruct *XMLStructure) findNodes(localName string) []XMLNode {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
-	nodes, err := xmlStruct.node.Search(xpath)
+	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
 		logger.Log.Panicf("Error while parsing XML: %v", err)
 	}
 	if len(nodes) == 0 {
 		return nil
 	}
-	return nodes
+
+	xmlNodes := make([]XMLNode, 0)
+	for _, node := range nodes {
+		subNode := NewSubXMLNode(node)
+		subNode.parent = xmlStruct.node
+		xmlNodes = append(xmlNodes, subNode)
+	}
+
+	return xmlNodes
 }
 
 // TODO: See how to handle errors
@@ -106,7 +157,7 @@ func (xmlStruct *XMLStructure) findIntChildContent(localName string) int {
 }
 
 func (xmlStruct *XMLStructure) RawXML() string {
-	return xmlStruct.node.String()
+	return xmlStruct.node.NativeNode().String()
 }
 
 func (response *ResponseXMLStructure) Address() string {

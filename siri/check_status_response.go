@@ -64,7 +64,7 @@ const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.sir
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
 	xmlCheckStatusResponse := &XMLCheckStatusResponse{}
-	xmlCheckStatusResponse.node = node
+	xmlCheckStatusResponse.node = NewXMLNode(node)
 	return xmlCheckStatusResponse
 }
 
@@ -74,7 +74,6 @@ func NewXMLCheckStatusResponseFromContent(content []byte) (*XMLCheckStatusRespon
 		return nil, err
 	}
 	response := NewXMLCheckStatusResponse(doc.Root().XmlNode)
-	response.SetFinalizer()
 	return response, nil
 }
 

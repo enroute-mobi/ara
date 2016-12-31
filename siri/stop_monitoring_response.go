@@ -16,6 +16,8 @@ type XMLStopMonitoringResponse struct {
 type XMLMonitoredStopVisit struct {
 	XMLStructure
 
+	// parent *XMLStopMonitoringResponse
+
 	itemIdentifier         string
 	stopPointRef           string
 	stopPointName          string
@@ -38,7 +40,7 @@ type XMLMonitoredStopVisit struct {
 
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {
 	xmlStopMonitoringResponse := &XMLStopMonitoringResponse{}
-	xmlStopMonitoringResponse.node = node
+	xmlStopMonitoringResponse.node = NewXMLNode(node)
 	return xmlStopMonitoringResponse
 }
 
@@ -48,7 +50,6 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 		return nil, err
 	}
 	response := NewXMLStopMonitoringResponse(doc.Root().XmlNode)
-	response.SetFinalizer()
 	return response, nil
 }
 
@@ -59,13 +60,13 @@ func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonito
 			return response.monitoredStopVisits
 		}
 		for _, stopVisitNode := range nodes {
-			response.monitoredStopVisits = append(response.monitoredStopVisits, NewXMLMonitoredStopVisitFromContent(stopVisitNode))
+			response.monitoredStopVisits = append(response.monitoredStopVisits, NewXMLMonitoredStopVisit(stopVisitNode))
 		}
 	}
 	return response.monitoredStopVisits
 }
 
-func NewXMLMonitoredStopVisitFromContent(node xml.Node) *XMLMonitoredStopVisit {
+func NewXMLMonitoredStopVisit(node XMLNode) *XMLMonitoredStopVisit {
 	stopVisit := &XMLMonitoredStopVisit{}
 	stopVisit.node = node
 	return stopVisit

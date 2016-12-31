@@ -34,7 +34,7 @@ const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/
 </ns7:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
-	return &XMLCheckStatusRequest{XMLStructure: XMLStructure{node: node}}
+	return &XMLCheckStatusRequest{XMLStructure: XMLStructure{node: NewXMLNode(node)}}
 }
 
 func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest, error) {
@@ -43,7 +43,6 @@ func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest
 		return nil, err
 	}
 	request := NewXMLCheckStatusRequest(doc.Root().XmlNode)
-	request.SetFinalizer()
 	return request, nil
 }
 
