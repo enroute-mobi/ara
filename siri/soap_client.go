@@ -86,6 +86,7 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	}
 
 	checkStatus := NewXMLCheckStatusResponse(node)
+	checkStatus.SetFinalizer()
 	return checkStatus, nil
 }
 
@@ -97,5 +98,6 @@ func (client *SOAPClient) StopMonitoring(request *SIRIStopMonitoringRequest) (*X
 	}
 
 	stopMonitoring := NewXMLStopMonitoringResponse(node)
+	stopMonitoring.SetFinalizer()
 	return stopMonitoring, nil
 }

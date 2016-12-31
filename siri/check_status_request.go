@@ -2,7 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"runtime"
 	"text/template"
 	"time"
 
@@ -44,10 +43,7 @@ func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest
 		return nil, err
 	}
 	request := NewXMLCheckStatusRequest(doc.Root().XmlNode)
-	finalizer := func(request *XMLCheckStatusRequest) {
-		doc.Free()
-	}
-	runtime.SetFinalizer(request, finalizer)
+	request.SetFinalizer()
 	return request, nil
 }
 

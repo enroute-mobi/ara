@@ -2,6 +2,7 @@ package siri
 
 import (
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +23,17 @@ type ResponseXMLStructure struct {
 	requestMessageRef         string
 	responseMessageIdentifier string
 	responseTimestamp         time.Time
+}
+
+func (xmlStruct *XMLStructure) SetFinalizer() {
+	finalizer := func(xmlStruct *XMLStructure) {
+		logger.Log.Debugf("Free %v gokogiri document", xmlStruct)
+		if xmlStruct.node != nil {
+			xmlStruct.node.MyDocument().Free()
+			xmlStruct.node = nil
+		}
+	}
+	runtime.SetFinalizer(xmlStruct, finalizer)
 }
 
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {

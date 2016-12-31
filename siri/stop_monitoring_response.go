@@ -1,7 +1,6 @@
 package siri
 
 import (
-	"runtime"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
@@ -49,10 +48,7 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 		return nil, err
 	}
 	response := NewXMLStopMonitoringResponse(doc.Root().XmlNode)
-	finalizer := func(response *XMLStopMonitoringResponse) {
-		doc.Free()
-	}
-	runtime.SetFinalizer(response, finalizer)
+	response.SetFinalizer()
 	return response, nil
 }
 

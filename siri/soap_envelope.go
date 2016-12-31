@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"runtime"
 
 	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
@@ -44,11 +43,6 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 	}
 
 	soapEnvelope := &SOAPEnvelope{body: nodes[0]}
-	finalizer := func(document *xml.XmlDocument) {
-		document.Free()
-	}
-	runtime.SetFinalizer(doc, finalizer)
-
 	return soapEnvelope, nil
 }
 
