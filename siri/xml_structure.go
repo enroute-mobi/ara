@@ -22,7 +22,6 @@ func NewXMLNode(nativeNode xml.Node) XMLNode {
 	finalizer := func(node *RootXMLNode) {
 		node.Free()
 	}
-	logger.Log.Debugf("Set finalizer for %#v", node)
 	runtime.SetFinalizer(node, finalizer)
 
 	return node
@@ -46,7 +45,6 @@ func (node *RootXMLNode) NativeNode() xml.Node {
 
 func (node *RootXMLNode) Free() {
 	if node.rootNode != nil {
-		logger.Log.Debugf("Free %#v gokogiri document", node)
 		node.rootNode.MyDocument().Free()
 		node.rootNode = nil
 	}
