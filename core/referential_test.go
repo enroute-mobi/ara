@@ -183,7 +183,10 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 
 	// Fetch data from the db
 	referentials := NewMemoryReferentials()
-	referentials.Load()
+	err = referentials.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	referentialId := ReferentialId(databaseReferential.Referential_id)
 	referential := referentials.Find(referentialId)

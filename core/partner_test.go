@@ -3,6 +3,8 @@ package core
 import (
 	"reflect"
 	"testing"
+
+	"github.com/af83/edwig/model"
 )
 
 func createTestPartnerManager() *PartnerManager {
@@ -164,5 +166,50 @@ func Test_PartnerManager_Delete(t *testing.T) {
 	partner := partners.Find(partnerId)
 	if partner != nil {
 		t.Errorf("Deleted Partner should not be findable")
+	}
+}
+
+func Test_MemoryPartners_Load(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	referentials.Save(referential)
+
+	// Insert Data in the test db
+	var databasePartner = struct {
+		Id             string `db:"id"`
+		ReferentialId  string `db:"referential_id"`
+		Slug           string `db:"slug"`
+		Settings       string `db:"settings"`
+		ConnectorTypes string `db:"connector_types"`
+	}{
+		Id:             "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId:  string(referential.Id()),
+		Slug:           "ratp",
+		Settings:       "{}",
+		ConnectorTypes: "[]",
+	}
+
+	model.Database.AddTableWithName(databasePartner, "partners")
+	err := model.Database.Insert(&databasePartner)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	partners := NewPartnerManager(referential)
+	err = partners.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	partnerId := PartnerId(databasePartner.Id)
+	partner := partners.Find(partnerId)
+	if partner == nil {
+		t.Errorf("Loaded Partners should be found")
+	} else if partner.Id() != partnerId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", partner.Id(), partnerId)
 	}
 }

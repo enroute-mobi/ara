@@ -335,19 +335,20 @@ func (manager *PartnerManager) Load() error {
 		Settings       string
 		ConnectorTypes string `db:"connector_types"`
 	}
-	SqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", manager.referential.Id())
-	_, err := model.Database.Select(&selectPartners, SqlQuery)
+	sqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", manager.referential.Id())
+	_, err := model.Database.Select(&selectPartners, sqlQuery)
 	if err != nil {
 		return err
 	}
-	for _, r := range selectPartners {
-		partner := manager.New(PartnerSlug(r.Slug))
+	for _, p := range selectPartners {
+		partner := manager.New(PartnerSlug(p.Slug))
+		partner.id = PartnerId(p.Id)
 
-		if err = json.Unmarshal([]byte(r.Settings), &partner.Settings); err != nil {
+		if err = json.Unmarshal([]byte(p.Settings), &partner.Settings); err != nil {
 			return err
 		}
 
-		if err = json.Unmarshal([]byte(r.ConnectorTypes), &partner.ConnectorTypes); err != nil {
+		if err = json.Unmarshal([]byte(p.ConnectorTypes), &partner.ConnectorTypes); err != nil {
 			return err
 		}
 
