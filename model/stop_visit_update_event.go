@@ -28,8 +28,6 @@ const (
 )
 
 type StopVisitUpdateEvent struct {
-	StopVisitAttributes StopVisitUpdateAttributes
-
 	Id                string
 	Created_at        time.Time
 	StopVisitObjectid ObjectID
@@ -37,4 +35,6 @@ type StopVisitUpdateEvent struct {
 	Schedules         StopVisitSchedules
 	DepartureStatus   StopVisitDepartureStatus
 	ArrivalStatuts    StopVisitArrivalStatus
+
+	Attributes StopVisitUpdateAttributes
 }

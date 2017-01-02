@@ -24,10 +24,10 @@ func getMonitoredStopVisit(t *testing.T) *siri.XMLMonitoredStopVisit {
 	return response.XMLMonitoredStopVisits()[0]
 }
 
-func Test_SIRIStopMonitoringStopVisitAttributes_StopVisitAttributes(t *testing.T) {
+func Test_SIRIStopVisitUpdateAttributes_StopVisitAttributes(t *testing.T) {
 	xmlStopVisit := getMonitoredStopVisit(t)
-	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
-	stopVisitAttributes := SIRIStopVisitAttributes.StopVisitAttributes()
+	stopVisitUpdateAttributes := NewSIRIStopVisitUpdateAttributes(xmlStopVisit, "objectidKind")
+	stopVisitAttributes := stopVisitUpdateAttributes.StopVisitAttributes()
 
 	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"}
 	if stopVisitAttributes.ObjectId.Kind() != expected["kind"] || stopVisitAttributes.ObjectId.Value() != expected["value"] {
@@ -61,10 +61,10 @@ func Test_SIRIStopMonitoringStopVisitAttributes_StopVisitAttributes(t *testing.T
 	}
 }
 
-func Test_SIRIStopMonitoringStopVisitAttributes_VehicleJourneyAttributes(t *testing.T) {
+func Test_SIRIStopVisitUpdateAttributes_VehicleJourneyAttributes(t *testing.T) {
 	xmlStopVisit := getMonitoredStopVisit(t)
-	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
-	vehicleJourneyAttributes := SIRIStopVisitAttributes.VehicleJourneyAttributes()
+	stopVisitUpdateAttributes := NewSIRIStopVisitUpdateAttributes(xmlStopVisit, "objectidKind")
+	vehicleJourneyAttributes := stopVisitUpdateAttributes.VehicleJourneyAttributes()
 
 	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:VehicleJourney:201"}
 	if vehicleJourneyAttributes.ObjectId.Kind() != expected["kind"] || vehicleJourneyAttributes.ObjectId.Value() != expected["value"] {
@@ -76,10 +76,10 @@ func Test_SIRIStopMonitoringStopVisitAttributes_VehicleJourneyAttributes(t *test
 	}
 }
 
-func Test_SIRIStopMonitoringStopVisitAttributes_LineAttributes(t *testing.T) {
+func Test_SIRIStopVisitUpdateAttributes_LineAttributes(t *testing.T) {
 	xmlStopVisit := getMonitoredStopVisit(t)
-	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
-	lineAttributes := SIRIStopVisitAttributes.LineAttributes()
+	stopVisitUpdateAttributes := NewSIRIStopVisitUpdateAttributes(xmlStopVisit, "objectidKind")
+	lineAttributes := stopVisitUpdateAttributes.LineAttributes()
 
 	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:Line:3:LOC"}
 	if lineAttributes.ObjectId.Kind() != expected["kind"] || lineAttributes.ObjectId.Value() != expected["value"] {
@@ -90,10 +90,10 @@ func Test_SIRIStopMonitoringStopVisitAttributes_LineAttributes(t *testing.T) {
 	}
 }
 
-func Test_SIRIStopMonitoringStopVisitAttributes_StopAreaAttributes(t *testing.T) {
+func Test_SIRIStopVisitUpdateAttributes_StopAreaAttributes(t *testing.T) {
 	xmlStopVisit := getMonitoredStopVisit(t)
-	SIRIStopVisitAttributes := NewSIRIStopMonitoringStopVisitAttributes(xmlStopVisit, "objectidKind")
-	stopAreaAttributes := SIRIStopVisitAttributes.StopAreaAttributes()
+	stopVisitUpdateAttributes := NewSIRIStopVisitUpdateAttributes(xmlStopVisit, "objectidKind")
+	stopAreaAttributes := stopVisitUpdateAttributes.StopAreaAttributes()
 
 	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:StopPoint:Q:50:LOC"}
 	if stopAreaAttributes.ObjectId.Kind() != expected["kind"] || stopAreaAttributes.ObjectId.Value() != expected["value"] {

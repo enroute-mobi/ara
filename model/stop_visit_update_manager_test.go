@@ -35,8 +35,8 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 
 	event := &StopVisitUpdateEvent{
-		StopVisitAttributes: &TestStopVisitUpdateAttributes{},
-		StopVisitObjectid:   objectid,
+		Attributes:        &TestStopVisitUpdateAttributes{},
+		StopVisitObjectid: objectid,
 	}
 
 	manager.UpdateStopVisit(event)

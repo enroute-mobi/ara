@@ -5,20 +5,20 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type SIRIStopMonitoringStopVisitAttributes struct {
+type SIRIStopVisitUpdateAttributes struct {
 	objectid_kind string
 	response      *siri.XMLMonitoredStopVisit
 }
 
-func NewSIRIStopMonitoringStopVisitAttributes(response *siri.XMLMonitoredStopVisit, objectid_kind string) *SIRIStopMonitoringStopVisitAttributes {
-	return &SIRIStopMonitoringStopVisitAttributes{
+func NewSIRIStopVisitUpdateAttributes(response *siri.XMLMonitoredStopVisit, objectid_kind string) *SIRIStopVisitUpdateAttributes {
+	return &SIRIStopVisitUpdateAttributes{
 		objectid_kind: objectid_kind,
 		response:      response,
 	}
 }
 
 // WIP
-func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *model.StopVisitAttributes {
+func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.StopVisitAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.ItemIdentifier())
 	stopAreaObjectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
 	vehicleJourneyObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
@@ -46,7 +46,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) StopVisitAttributes() *
 	return stopVisitAttributes
 }
 
-func (attributes *SIRIStopMonitoringStopVisitAttributes) VehicleJourneyAttributes() *model.VehicleJourneyAttributes {
+func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *model.VehicleJourneyAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 	lineObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 
@@ -58,7 +58,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) VehicleJourneyAttribute
 	return vehicleJourneyAttributes
 }
 
-func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model.LineAttributes {
+func (attributes *SIRIStopVisitUpdateAttributes) LineAttributes() *model.LineAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 
 	lineAttributes := &model.LineAttributes{
@@ -69,7 +69,7 @@ func (attributes *SIRIStopMonitoringStopVisitAttributes) LineAttributes() *model
 	return lineAttributes
 }
 
-func (attributes *SIRIStopMonitoringStopVisitAttributes) StopAreaAttributes() *model.StopAreaAttributes {
+func (attributes *SIRIStopVisitUpdateAttributes) StopAreaAttributes() *model.StopAreaAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
 
 	stopAreaAttributes := &model.StopAreaAttributes{

@@ -36,11 +36,11 @@ func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEve
 		return
 	}
 
-	manager.findOrCreateStopArea(event.StopVisitAttributes.StopAreaAttributes())
-	manager.findOrCreateLine(event.StopVisitAttributes.LineAttributes())
-	manager.findOrCreateVehicleJourney(event.StopVisitAttributes.VehicleJourneyAttributes())
+	manager.findOrCreateStopArea(event.Attributes.StopAreaAttributes())
+	manager.findOrCreateLine(event.Attributes.LineAttributes())
+	manager.findOrCreateVehicleJourney(event.Attributes.VehicleJourneyAttributes())
 
-	stopVisitAttributes := event.StopVisitAttributes.StopVisitAttributes()
+	stopVisitAttributes := event.Attributes.StopVisitAttributes()
 
 	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
