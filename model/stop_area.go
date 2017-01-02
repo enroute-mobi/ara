@@ -8,7 +8,7 @@ import (
 type StopAreaId string
 
 type StopAreaAttributes struct {
-	ObjectId *ObjectID
+	ObjectId ObjectID
 	Name     string
 }
 

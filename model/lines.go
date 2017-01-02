@@ -5,7 +5,7 @@ import "encoding/json"
 type LineId string
 
 type LineAttributes struct {
-	ObjectId *ObjectID
+	ObjectId ObjectID
 	Name     string
 }
 

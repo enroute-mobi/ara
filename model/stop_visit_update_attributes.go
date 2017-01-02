@@ -12,9 +12,9 @@ type TestStopVisitUpdateAttributes struct{}
 func (t *TestStopVisitUpdateAttributes) StopVisitAttributes() *StopVisitAttributes {
 	objectid := NewObjectID("kind", "value")
 	return &StopVisitAttributes{
-		ObjectId:               &objectid,
-		StopAreaObjectId:       &objectid,
-		VehicleJourneyObjectId: &objectid,
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
 		PassageOrder:           1,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_CANCELLED,
@@ -25,15 +25,15 @@ func (t *TestStopVisitUpdateAttributes) StopVisitAttributes() *StopVisitAttribut
 func (t *TestStopVisitUpdateAttributes) VehicleJourneyAttributes() *VehicleJourneyAttributes {
 	objectid := NewObjectID("kind", "value")
 	return &VehicleJourneyAttributes{
-		ObjectId:     &objectid,
-		LineObjectId: &objectid,
+		ObjectId:     objectid,
+		LineObjectId: objectid,
 	}
 }
 
 func (t *TestStopVisitUpdateAttributes) LineAttributes() *LineAttributes {
 	objectid := NewObjectID("kind", "value")
 	return &LineAttributes{
-		ObjectId: &objectid,
+		ObjectId: objectid,
 		Name:     "line",
 	}
 }
@@ -41,7 +41,7 @@ func (t *TestStopVisitUpdateAttributes) LineAttributes() *LineAttributes {
 func (t *TestStopVisitUpdateAttributes) StopAreaAttributes() *StopAreaAttributes {
 	objectid := NewObjectID("kind", "value")
 	return &StopAreaAttributes{
-		ObjectId: &objectid,
+		ObjectId: objectid,
 		Name:     "StopArea",
 	}
 }

@@ -5,10 +5,10 @@ import "encoding/json"
 type StopVisitId string
 
 type StopVisitAttributes struct {
-	ObjectId         *ObjectID
-	StopAreaObjectId *ObjectID
+	ObjectId         ObjectID
+	StopAreaObjectId ObjectID
 
-	VehicleJourneyObjectId *ObjectID
+	VehicleJourneyObjectId ObjectID
 	PassageOrder           int
 
 	DepartureStatus StopVisitDepartureStatus

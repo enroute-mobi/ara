@@ -74,7 +74,7 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea_found(t *testing.T) {
 	model.StopAreas().Save(&stopArea)
 	// Create manager and attributes
 	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	stopAreaAttributes := &StopAreaAttributes{ObjectId: &objectid}
+	stopAreaAttributes := &StopAreaAttributes{ObjectId: objectid}
 	stopVisitUpdateManager.findOrCreateStopArea(stopAreaAttributes)
 
 	if len(model.StopAreas().FindAll()) != 1 {
@@ -91,7 +91,7 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 	stopVisitUpdateManager.SetClock(NewFakeClock())
 	stopAreaAttributes := &StopAreaAttributes{
 		Name:     "stopArea",
-		ObjectId: &objectid,
+		ObjectId: objectid,
 	}
 	stopVisitUpdateManager.findOrCreateStopArea(stopAreaAttributes)
 
@@ -120,7 +120,7 @@ func Test_StopVisitUpdateManager_findOrCreateLine_found(t *testing.T) {
 	model.Lines().Save(&line)
 	// Create manager and attributes
 	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	lineAttributes := &LineAttributes{ObjectId: &objectid}
+	lineAttributes := &LineAttributes{ObjectId: objectid}
 	stopVisitUpdateManager.findOrCreateLine(lineAttributes)
 
 	if len(model.Lines().FindAll()) != 1 {
@@ -136,7 +136,7 @@ func Test_StopVisitUpdateManager_findOrCreateLine(t *testing.T) {
 	stopVisitUpdateManager := newStopVisitUpdateManager(model)
 	LineAttributes := &LineAttributes{
 		Name:     "line",
-		ObjectId: &objectid,
+		ObjectId: objectid,
 	}
 	stopVisitUpdateManager.findOrCreateLine(LineAttributes)
 
@@ -158,7 +158,7 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney_found(t *testing.T) 
 	model.VehicleJourneys().Save(&vehicleJourney)
 	// Create manager and attributes
 	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	vehicleJourneyAttributes := &VehicleJourneyAttributes{ObjectId: &objectid}
+	vehicleJourneyAttributes := &VehicleJourneyAttributes{ObjectId: objectid}
 	stopVisitUpdateManager.findOrCreateVehicleJourney(vehicleJourneyAttributes)
 
 	if len(model.VehicleJourneys().FindAll()) != 1 {
@@ -176,8 +176,8 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney(t *testing.T) {
 	// Create manager and attributes
 	stopVisitUpdateManager := newStopVisitUpdateManager(model)
 	VehicleJourneyAttributes := &VehicleJourneyAttributes{
-		ObjectId:     &objectid,
-		LineObjectId: &objectid,
+		ObjectId:     objectid,
+		LineObjectId: objectid,
 	}
 	stopVisitUpdateManager.findOrCreateVehicleJourney(VehicleJourneyAttributes)
 

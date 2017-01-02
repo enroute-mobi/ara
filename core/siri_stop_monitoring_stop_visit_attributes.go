@@ -24,10 +24,10 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 	vehicleJourneyObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 
 	stopVisitAttributes := &model.StopVisitAttributes{
-		ObjectId:         &objectid,
-		StopAreaObjectId: &stopAreaObjectid,
+		ObjectId:         objectid,
+		StopAreaObjectId: stopAreaObjectid,
 
-		VehicleJourneyObjectId: &vehicleJourneyObjectId,
+		VehicleJourneyObjectId: vehicleJourneyObjectId,
 		PassageOrder:           attributes.response.Order(),
 
 		DepartureStatus: model.StopVisitDepartureStatus(attributes.response.DepartureStatus()),
@@ -51,8 +51,8 @@ func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *mod
 	lineObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 
 	vehicleJourneyAttributes := &model.VehicleJourneyAttributes{
-		ObjectId:     &objectid,
-		LineObjectId: &lineObjectId,
+		ObjectId:     objectid,
+		LineObjectId: lineObjectId,
 	}
 
 	return vehicleJourneyAttributes
@@ -62,7 +62,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) LineAttributes() *model.LineAtt
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
 
 	lineAttributes := &model.LineAttributes{
-		ObjectId: &objectid,
+		ObjectId: objectid,
 		Name:     attributes.response.PublishedLineName(),
 	}
 
@@ -73,7 +73,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopAreaAttributes() *model.Sto
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
 
 	stopAreaAttributes := &model.StopAreaAttributes{
-		ObjectId: &objectid,
+		ObjectId: objectid,
 		Name:     attributes.response.StopPointName(),
 	}
 
