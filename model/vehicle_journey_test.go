@@ -14,10 +14,22 @@ func Test_VehicleJourney_Id(t *testing.T) {
 
 // WIP: Determine what to return in JSON
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
-	vehicleJourney := VehicleJourney{
-		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
-	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+	model := NewMemoryModel()
+	generator := NewFakeUUIDGenerator()
+	// Create a StopVisit
+	model.StopVisits().SetUUIDGenerator(generator)
+	stopVisit := model.StopVisits().New()
+	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
+	model.StopVisits().Save(&stopVisit)
+
+	// Create the vehicleJourney
+	model.VehicleJourneys().SetUUIDGenerator(generator)
+	vehicleJourney := model.VehicleJourneys().New()
+	objectid := NewObjectID("kind", "value")
+	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.Save()
+
+	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","ObjectIDs":[{"Kind":"kind","Value":"value"}],"StopVisits":["6ba7b814-9dad-11d1-0-00c04fd430c8"]}`
 	jsonBytes, err := vehicleJourney.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

@@ -33,8 +33,13 @@ func (vehicleJourney *VehicleJourney) Line() Line {
 }
 
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
+	stopVisitIds := []StopVisitId{}
+	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
+		stopVisitIds = append(stopVisitIds, stopVisit.Id())
+	}
 	vehicleJourneyMap := map[string]interface{}{
-		"Id": vehicleJourney.id,
+		"Id":         vehicleJourney.id,
+		"StopVisits": stopVisitIds,
 	}
 	if vehicleJourney.ObjectIDs() != nil {
 		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
