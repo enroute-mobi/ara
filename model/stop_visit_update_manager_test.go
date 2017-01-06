@@ -72,10 +72,13 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea_found(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	stopArea.SetObjectID(objectid)
 	model.StopAreas().Save(&stopArea)
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
+	// Create attributes and updater
 	stopAreaAttributes := &StopAreaAttributes{ObjectId: objectid}
-	stopVisitUpdateManager.findOrCreateStopArea(stopAreaAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.findOrCreateStopArea(stopAreaAttributes)
+	tx.Commit()
 
 	if len(model.StopAreas().FindAll()) != 1 {
 		t.Errorf("StopArea shouldn't be created by findOrCreateStopArea")
@@ -86,14 +89,17 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 	// Setup
 	model := NewMemoryModel()
 	objectid := NewObjectID("kind", "value")
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	stopVisitUpdateManager.SetClock(NewFakeClock())
+	// Create attributes and updater
 	stopAreaAttributes := &StopAreaAttributes{
 		Name:     "stopArea",
 		ObjectId: objectid,
 	}
-	stopVisitUpdateManager.findOrCreateStopArea(stopAreaAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.SetClock(NewFakeClock())
+	stopVisitUpdater.findOrCreateStopArea(stopAreaAttributes)
+	tx.Commit()
 
 	stopArea, ok := model.StopAreas().FindByObjectId(objectid)
 	if !ok {
@@ -118,10 +124,13 @@ func Test_StopVisitUpdateManager_findOrCreateLine_found(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	line.SetObjectID(objectid)
 	model.Lines().Save(&line)
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
+	// Create attributes and updater
 	lineAttributes := &LineAttributes{ObjectId: objectid}
-	stopVisitUpdateManager.findOrCreateLine(lineAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.findOrCreateLine(lineAttributes)
+	tx.Commit()
 
 	if len(model.Lines().FindAll()) != 1 {
 		t.Errorf("Line shouldn't be created by findOrCreateLine")
@@ -132,13 +141,16 @@ func Test_StopVisitUpdateManager_findOrCreateLine(t *testing.T) {
 	// Setup
 	model := NewMemoryModel()
 	objectid := NewObjectID("kind", "value")
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	LineAttributes := &LineAttributes{
+	// Create attributes and updater
+	lineAttributes := &LineAttributes{
 		Name:     "line",
 		ObjectId: objectid,
 	}
-	stopVisitUpdateManager.findOrCreateLine(LineAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.findOrCreateLine(lineAttributes)
+	tx.Commit()
 
 	line, ok := model.Lines().FindByObjectId(objectid)
 	if !ok {
@@ -156,10 +168,13 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney_found(t *testing.T) 
 	objectid := NewObjectID("kind", "value")
 	vehicleJourney.SetObjectID(objectid)
 	model.VehicleJourneys().Save(&vehicleJourney)
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
+	// Create attributes and updater
 	vehicleJourneyAttributes := &VehicleJourneyAttributes{ObjectId: objectid}
-	stopVisitUpdateManager.findOrCreateVehicleJourney(vehicleJourneyAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.findOrCreateVehicleJourney(vehicleJourneyAttributes)
+	tx.Commit()
 
 	if len(model.VehicleJourneys().FindAll()) != 1 {
 		t.Errorf("VehicleJourney shouldn't be created by findOrCreateVehicleJourney")
@@ -173,13 +188,16 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney(t *testing.T) {
 	line := model.Lines().New()
 	line.SetObjectID(objectid)
 	model.Lines().Save(&line)
-	// Create manager and attributes
-	stopVisitUpdateManager := newStopVisitUpdateManager(model)
-	VehicleJourneyAttributes := &VehicleJourneyAttributes{
+	// Create attributes and updater
+	vehicleJourneyAttributes := &VehicleJourneyAttributes{
 		ObjectId:     objectid,
 		LineObjectId: objectid,
 	}
-	stopVisitUpdateManager.findOrCreateVehicleJourney(VehicleJourneyAttributes)
+	tx := NewTransaction(model)
+	defer tx.Close()
+	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater.findOrCreateVehicleJourney(vehicleJourneyAttributes)
+	tx.Commit()
 
 	vehicleJourney, ok := model.VehicleJourneys().FindByObjectId(objectid)
 	if !ok {
