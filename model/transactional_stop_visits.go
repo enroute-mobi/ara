@@ -3,10 +3,11 @@ package model
 type TransactionalStopVisits struct {
 	UUIDConsumer
 
-	model           Model
-	saved           map[StopVisitId]*StopVisit
-	savedByObjectId map[string]map[string]StopVisitId
-	deleted         map[StopVisitId]*StopVisit
+	model                   Model
+	saved                   map[StopVisitId]*StopVisit
+	savedByObjectId         map[string]map[string]StopVisitId
+	savedByVehicleJourneyId map[VehicleJourneyId][]StopVisitId
+	deleted                 map[StopVisitId]*StopVisit
 }
 
 func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
@@ -18,6 +19,7 @@ func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
 func (manager *TransactionalStopVisits) resetCaches() {
 	manager.saved = make(map[StopVisitId]*StopVisit)
 	manager.savedByObjectId = make(map[string]map[string]StopVisitId)
+	manager.savedByVehicleJourneyId = make(map[VehicleJourneyId][]StopVisitId)
 	manager.deleted = make(map[StopVisitId]*StopVisit)
 }
 
@@ -46,6 +48,18 @@ func (manager *TransactionalStopVisits) FindByObjectId(objectid ObjectID) (StopV
 	return *manager.saved[id], true
 }
 
+func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit {
+	stopVisitIds, ok := manager.savedByVehicleJourneyId[id]
+	if ok {
+		var stopVisits []StopVisit
+		for _, stopVisitId := range stopVisitIds {
+			stopVisits = append(stopVisits, *manager.saved[stopVisitId])
+		}
+		return stopVisits
+	}
+	return manager.model.StopVisits().FindByVehicleJourneyId(id)
+}
+
 func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.saved {
 		stopVisits = append(stopVisits, *stopVisit)
@@ -65,6 +79,7 @@ func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 	manager.saved[stopVisit.Id()] = stopVisit
+	manager.savedByVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.savedByVehicleJourneyId[stopVisit.vehicleJourneyId], stopVisit.id)
 	for _, objectid := range stopVisit.ObjectIDs() {
 		_, ok := manager.savedByObjectId[objectid.Kind()]
 		if !ok {

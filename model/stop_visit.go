@@ -116,8 +116,9 @@ type MemoryStopVisits struct {
 
 	model Model
 
-	byIdentifier map[StopVisitId]*StopVisit
-	byObjectId   map[string]map[string]StopVisitId
+	byIdentifier       map[StopVisitId]*StopVisit
+	byObjectId         map[string]map[string]StopVisitId
+	byVehicleJourneyId map[VehicleJourneyId][]StopVisitId
 }
 
 type StopVisits interface {
@@ -126,6 +127,7 @@ type StopVisits interface {
 	New() StopVisit
 	Find(id StopVisitId) (StopVisit, bool)
 	FindByObjectId(objectid ObjectID) (StopVisit, bool)
+	FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
@@ -133,8 +135,9 @@ type StopVisits interface {
 
 func NewMemoryStopVisits() *MemoryStopVisits {
 	return &MemoryStopVisits{
-		byIdentifier: make(map[StopVisitId]*StopVisit),
-		byObjectId:   make(map[string]map[string]StopVisitId),
+		byIdentifier:       make(map[StopVisitId]*StopVisit),
+		byObjectId:         make(map[string]map[string]StopVisitId),
+		byVehicleJourneyId: make(map[VehicleJourneyId][]StopVisitId),
 	}
 }
 
@@ -164,6 +167,17 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, b
 	return *manager.byIdentifier[id], true
 }
 
+func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+	stopVisitIds, ok := manager.byVehicleJourneyId[id]
+	if !ok {
+		return []StopVisit{}
+	}
+	for _, stopVisitId := range stopVisitIds {
+		stopVisits = append(stopVisits, *manager.byIdentifier[stopVisitId])
+	}
+	return
+}
+
 func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 	if len(manager.byIdentifier) == 0 {
 		return []StopVisit{}
@@ -175,11 +189,12 @@ func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 }
 
 func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
-	if stopVisit.Id() == "" {
+	if stopVisit.id == "" {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 	stopVisit.model = manager.model
-	manager.byIdentifier[stopVisit.Id()] = stopVisit
+	manager.byIdentifier[stopVisit.id] = stopVisit
+	manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.vehicleJourneyId], stopVisit.id)
 	for _, objectid := range stopVisit.ObjectIDs() {
 		_, ok := manager.byObjectId[objectid.Kind()]
 		if !ok {
@@ -192,9 +207,17 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 
 func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	delete(manager.byIdentifier, stopVisit.Id())
+	// Delete in byObjectId
 	for _, objectid := range stopVisit.ObjectIDs() {
 		valueMap := manager.byObjectId[objectid.Kind()]
 		delete(valueMap, objectid.Value())
+	}
+	// Delete in byVehicleJourneyId
+	for i, stopVisitId := range manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] {
+		if stopVisitId == stopVisit.id {
+			manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.vehicleJourneyId][:i], manager.byVehicleJourneyId[stopVisit.vehicleJourneyId][i+1:]...)
+			break
+		}
 	}
 	return true
 }

@@ -1,8 +1,6 @@
 package model
 
-import (
-	"testing"
-)
+import "testing"
 
 func Test_TransactionalStopVisits_Find_NotFound(t *testing.T) {
 	model := NewMemoryModel()
@@ -73,6 +71,7 @@ func Test_TransactionalStopVisits_Save(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
+	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
 	if success := stopVisits.Save(&stopVisit); !success {
 		t.Errorf("Save should return true")
@@ -86,6 +85,10 @@ func Test_TransactionalStopVisits_Save(t *testing.T) {
 	if _, ok := model.StopVisits().FindByObjectId(objectid); ok {
 		t.Errorf("StopVisit shouldn't be found by objectid before commit")
 	}
+	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if len(foundStopVisits) != 0 {
+		t.Errorf("StopVisit shouldn't be found by VehicleJourneyId before commit")
+	}
 }
 
 func Test_TransactionalStopVisits_Delete(t *testing.T) {
@@ -95,6 +98,7 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 	existingStopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	existingStopVisit.SetObjectID(objectid)
+	existingStopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	model.StopVisits().Save(&existingStopVisit)
 
 	stopVisits.Delete(&existingStopVisit)
@@ -107,6 +111,10 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 	if !ok {
 		t.Errorf("StopVisit should be found by objectid before commit")
 	}
+	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if len(foundStopVisits) == 0 || foundStopVisits[0].Id() != existingStopVisit.Id() {
+		t.Errorf("StopVisit should be found by VehicleJourneyId before commit")
+	}
 }
 
 func Test_TransactionalStopVisits_Commit(t *testing.T) {
@@ -117,12 +125,14 @@ func Test_TransactionalStopVisits_Commit(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
+	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisits.Save(&stopVisit)
 
 	// Test Delete
 	existingStopVisit := model.StopVisits().New()
 	secondObjectid := NewObjectID("kind", "value2")
 	existingStopVisit.SetObjectID(secondObjectid)
+	existingStopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
 	model.StopVisits().Save(&existingStopVisit)
 	stopVisits.Delete(&existingStopVisit)
 
@@ -134,12 +144,20 @@ func Test_TransactionalStopVisits_Commit(t *testing.T) {
 	if _, ok := model.StopVisits().FindByObjectId(objectid); !ok {
 		t.Errorf("StopVisit should be found by objectid after commit")
 	}
+	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if len(foundStopVisits) == 0 || foundStopVisits[0].Id() != stopVisit.Id() {
+		t.Errorf("StopVisit should be found by VehicleJourneyId after commit")
+	}
 
-	if _, ok := stopVisits.Find(existingStopVisit.Id()); ok {
+	if _, ok := model.StopVisits().Find(existingStopVisit.Id()); ok {
 		t.Errorf("StopVisit should be deleted after commit")
 	}
-	if _, ok := stopVisits.FindByObjectId(secondObjectid); ok {
-		t.Errorf("StopVisit should not be foundable by objectid after commit")
+	if _, ok := model.StopVisits().FindByObjectId(secondObjectid); ok {
+		t.Errorf("StopVisit shouldn't be found by objectid after commit")
+	}
+	foundStopVisits = model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	if len(foundStopVisits) != 0 {
+		t.Errorf("StopVisit shouldn't be found by VehicleJourneyId after commit")
 	}
 }
 
@@ -150,6 +168,7 @@ func Test_TransactionalStopVisits_Rollback(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
+	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisits.Save(&stopVisit)
 
 	stopVisits.Rollback()
@@ -159,6 +178,10 @@ func Test_TransactionalStopVisits_Rollback(t *testing.T) {
 		t.Errorf("StopVisit should not be saved with a rollback")
 	}
 	if _, ok := model.StopVisits().FindByObjectId(objectid); ok {
-		t.Errorf("StopVisit should not be foundable by objectid with a rollback")
+		t.Errorf("StopVisit shouldn't be found by objectid with a rollback")
+	}
+	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if len(foundStopVisits) != 0 {
+		t.Errorf("StopVisit shouldn't be found by VehicleJourneyId with a rollback")
 	}
 }

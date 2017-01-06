@@ -66,6 +66,7 @@ func Test_StopVisit_Save(t *testing.T) {
 	stopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
+	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
 	if stopVisit.model != model {
 		t.Errorf("New stopVisit model should be memoryStopVisits model")
@@ -82,6 +83,10 @@ func Test_StopVisit_Save(t *testing.T) {
 	_, ok = model.StopVisits().FindByObjectId(objectid)
 	if !ok {
 		t.Errorf("New StopVisit should be found by objectid in memoryStopVisits")
+	}
+	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	if len(foundStopVisits) == 0 || foundStopVisits[0].Id() != stopVisit.id {
+		t.Errorf("New StopVisit should be found by vehicleJourneyId in memoryStopVisits")
 	}
 }
 
