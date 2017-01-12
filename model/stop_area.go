@@ -81,7 +81,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(aux.ObjectIDs) != 0 {
+	if aux.ObjectIDs != nil {
 		stopArea.ObjectIDConsumer.objectids = aux.ObjectIDs
 	}
 

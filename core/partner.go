@@ -104,6 +104,27 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	return true
 }
 
+func (partner *APIPartner) UnmarshalJSON(data []byte) error {
+	type Alias APIPartner
+	aux := &struct {
+		Settings map[string]string
+		*Alias
+	}{
+		Settings: make(map[string]string),
+		Alias:    (*Alias)(partner),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.Settings != nil {
+		partner.Settings = aux.Settings
+	}
+
+	return nil
+}
+
 func NewPartner() *Partner {
 	return &Partner{
 		Settings:           make(map[string]string),
