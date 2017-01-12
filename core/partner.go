@@ -110,8 +110,7 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 		Settings map[string]string
 		*Alias
 	}{
-		Settings: make(map[string]string),
-		Alias:    (*Alias)(partner),
+		Alias: (*Alias)(partner),
 	}
 	err := json.Unmarshal(data, aux)
 	if err != nil {

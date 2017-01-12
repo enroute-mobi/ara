@@ -49,17 +49,15 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		ObjectIDs ObjectIDs
-	}{
-		ObjectIDs: make(ObjectIDs),
-	}
+		ObjectIDs map[string]string
+	}{}
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
 	}
 
 	if aux.ObjectIDs != nil {
-		vehicleJourney.ObjectIDConsumer.objectids = aux.ObjectIDs
+		vehicleJourney.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
 	return nil

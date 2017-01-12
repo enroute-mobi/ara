@@ -4,16 +4,24 @@ import "encoding/json"
 
 type ObjectIDs map[string]ObjectID
 
-func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
-	var definitions map[string]string
-	if err := json.Unmarshal(text, &definitions); err != nil {
-		return err
+func NewObjectIDsFromMap(objectIdMap map[string]string) (objectids ObjectIDs) {
+	objectids = make(ObjectIDs)
+	for key, value := range objectIdMap {
+		objectids[key] = NewObjectID(key, value)
 	}
-	for key, value := range definitions {
-		identifiers[key] = NewObjectID(key, value)
-	}
-	return nil
+	return objectids
 }
+
+// func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
+// 	var definitions map[string]string
+// 	if err := json.Unmarshal(text, &definitions); err != nil {
+// 		return err
+// 	}
+// 	for key, value := range definitions {
+// 		identifiers[key] = NewObjectID(key, value)
+// 	}
+// 	return nil
+// }
 
 type ObjectID struct {
 	kind  string

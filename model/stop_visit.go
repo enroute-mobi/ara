@@ -90,17 +90,15 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		ObjectIDs ObjectIDs
-	}{
-		ObjectIDs: make(ObjectIDs),
-	}
+		ObjectIDs map[string]string
+	}{}
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
 	}
 
 	if aux.ObjectIDs != nil {
-		stopVisit.ObjectIDConsumer.objectids = aux.ObjectIDs
+		stopVisit.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
 	return nil

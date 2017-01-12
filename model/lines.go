@@ -42,11 +42,10 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 func (line *Line) UnmarshalJSON(data []byte) error {
 	type Alias Line
 	aux := &struct {
-		ObjectIDs ObjectIDs
+		ObjectIDs map[string]string
 		*Alias
 	}{
-		ObjectIDs: make(ObjectIDs),
-		Alias:     (*Alias)(line),
+		Alias: (*Alias)(line),
 	}
 	err := json.Unmarshal(data, aux)
 	if err != nil {
@@ -54,7 +53,7 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.ObjectIDs != nil {
-		line.ObjectIDConsumer.objectids = aux.ObjectIDs
+		line.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
 	return nil

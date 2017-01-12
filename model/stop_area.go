@@ -70,11 +70,10 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
-		ObjectIDs ObjectIDs
+		ObjectIDs map[string]string
 		*Alias
 	}{
-		ObjectIDs: make(ObjectIDs),
-		Alias:     (*Alias)(stopArea),
+		Alias: (*Alias)(stopArea),
 	}
 	err := json.Unmarshal(data, aux)
 	if err != nil {
@@ -82,7 +81,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.ObjectIDs != nil {
-		stopArea.ObjectIDConsumer.objectids = aux.ObjectIDs
+		stopArea.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
 	return nil
