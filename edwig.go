@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"runtime/pprof"
 	"strconv"
 	"time"
 
@@ -17,6 +19,9 @@ import (
 )
 
 func main() {
+	cpuProfile := flag.String("cpuprofile", "", "Write cpu profile to file")
+	memProfile := flag.String("memprofile", "", "Write memory profile to this file")
+
 	uuidPtr := flag.Bool("testuuid", false, "Use the test uuid generator")
 	clockPtr := flag.String("testclock", "", "Use a fake clock at time given. Format 20060102-1504")
 	pidPtr := flag.String("pidfile", "", "Write processus pid in given file")
@@ -40,6 +45,19 @@ func main() {
 	err = config.LoadConfig(*configPtr)
 	if err != nil {
 		logger.Log.Panicf("Error while loading configuration: %v", err)
+	}
+
+	if *cpuProfile != "" {
+		err = enableCpuProfile(*cpuProfile)
+		if err != nil {
+			logger.Log.Panicf("Error while configuring cpu profile: %v", err)
+		}
+	}
+	if *memProfile != "" {
+		err = enableMemoryProfile(*memProfile)
+		if err != nil {
+			logger.Log.Panicf("Error while configuring memory profile: %v", err)
+		}
 	}
 
 	// Configure logstash
@@ -166,6 +184,47 @@ func checkStatus(url string, requestorRef string) error {
 	}
 	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
 	logger.Log.Printf(string(logMessage))
+
+	return nil
+}
+
+func enableCpuProfile(file string) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			logger.Log.Debugf("Receive interrupt signal: %v", sig)
+			pprof.StopCPUProfile()
+			os.Exit(0)
+		}
+	}()
+
+	return nil
+}
+
+func enableMemoryProfile(file string) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			logger.Log.Debugf("Receive interrupt signal: %v", sig)
+			pprof.WriteHeapProfile(f)
+			f.Close()
+			os.Exit(0)
+		}
+	}()
 
 	return nil
 }
