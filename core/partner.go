@@ -213,43 +213,43 @@ func (partner *Partner) RefreshConnectors() {
 func (partner *Partner) cleanConnectors() {
 	sort.Strings(partner.ConnectorTypes)
 
-	for connector, _ := range partner.connectors {
-		found := sort.SearchStrings(partner.ConnectorTypes, connector)
-		if found == len(partner.ConnectorTypes) {
-			delete(partner.connectors, connector)
+	for connectorType, _ := range partner.connectors {
+		found := sort.SearchStrings(partner.ConnectorTypes, connectorType)
+		if found == len(partner.ConnectorTypes) || partner.ConnectorTypes[found] != connectorType {
+			delete(partner.connectors, connectorType)
 		}
 	}
 }
 
-func (partner *Partner) isConnectorDefined(expected string) bool {
-	for _, connectorType := range partner.ConnectorTypes {
-		if connectorType == expected {
-			return true
-		}
-	}
-	return false
+func (partner *Partner) Connector(connectorType string) (Connector, bool) {
+	connector, ok := partner.connectors[connectorType]
+	return connector, ok
 }
 
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	// WIP
-	if partner.isConnectorDefined(SIRI_CHECK_STATUS_CLIENT_TYPE) {
-		return partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE].(CheckStatusClient)
-	} else if partner.isConnectorDefined(TEST_CHECK_STATUS_CLIENT_TYPE) {
-		return partner.connectors[TEST_CHECK_STATUS_CLIENT_TYPE].(CheckStatusClient)
-	} else {
-		return nil
+	client, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]
+	if ok {
+		return client.(CheckStatusClient)
 	}
+	client, ok = partner.connectors[TEST_CHECK_STATUS_CLIENT_TYPE]
+	if ok {
+		return client.(CheckStatusClient)
+	}
+	return nil
 }
 
 func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
 	// WIP
-	if partner.isConnectorDefined(SIRI_STOP_MONITORING_REQUEST_COLLECTOR) {
-		return partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
-	} else if partner.isConnectorDefined(TEST_STOP_MONITORING_REQUEST_COLLECTOR) {
-		return partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR].(StopMonitoringRequestCollector)
-	} else {
-		return nil
+	client, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return client.(StopMonitoringRequestCollector)
 	}
+	client, ok = partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return client.(StopMonitoringRequestCollector)
+	}
+	return nil
 }
 
 func (partner *Partner) CheckStatus() {
