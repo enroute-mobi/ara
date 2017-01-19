@@ -79,6 +79,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{"siri-check-status-client"},
 		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()

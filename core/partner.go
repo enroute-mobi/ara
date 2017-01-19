@@ -27,6 +27,7 @@ type Partners interface {
 
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
+	FindByLocalCredential(credential string) (*Partner, bool)
 	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
@@ -55,6 +56,7 @@ type APIPartner struct {
 	Errors         Errors            `json:"Errors,omitempty"`
 
 	factories map[string]ConnectorFactory
+	manager   Partners
 }
 
 type PartnerManager struct {
@@ -67,19 +69,32 @@ type PartnerManager struct {
 
 func (partner *APIPartner) Validate() bool {
 	partner.Errors = NewErrors()
-	valid := true
+
+	// Check if slug is non null
 	if partner.Slug == "" {
 		partner.Errors.Add("Slug", ERROR_BLANK)
-		valid = false
 	}
 
+	// Check factories
 	partner.setFactories()
 	for _, factory := range partner.factories {
-		if !factory.Validate(partner) {
-			valid = false
+		factory.Validate(partner)
+	}
+
+	// Check local_credential and Slug uniqueness
+	credentials, ok := partner.Settings["local_credential"]
+	for _, existingPartner := range partner.manager.FindAll() {
+		if existingPartner.id != partner.Id {
+			if partner.Slug == existingPartner.slug {
+				partner.Errors.Add("Slug", ERROR_UNIQUE)
+			}
+			if ok && credentials == existingPartner.Settings["local_credential"] {
+				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
+			}
 		}
 	}
-	return valid
+
+	return len(partner.Errors) == 0
 }
 
 func (partner *APIPartner) setFactories() {
@@ -178,6 +193,7 @@ func (partner *Partner) Definition() *APIPartner {
 		ConnectorTypes: partner.ConnectorTypes,
 		factories:      make(map[string]ConnectorFactory),
 		Errors:         NewErrors(),
+		manager:        partner.manager,
 	}
 }
 
@@ -317,6 +333,15 @@ func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
 	partner, _ := manager.byId[id]
 	return partner
+}
+
+func (manager *PartnerManager) FindByLocalCredential(credential string) (*Partner, bool) {
+	for _, partner := range manager.byId {
+		if partner.Setting("local_credential") == credential {
+			return partner, true
+		}
+	}
+	return nil, false
 }
 
 func (manager *PartnerManager) FindAll() (partners []*Partner) {

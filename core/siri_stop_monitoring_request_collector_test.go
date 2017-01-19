@@ -38,6 +38,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 			"remote_url":           ts.URL,
 			"remote_objectid_kind": "test kind",
 		},
+		manager: partners,
 	}
 	partners.Save(partner)
 
@@ -121,6 +122,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{"siri-stop-monitoring-request-collector"},
 		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()

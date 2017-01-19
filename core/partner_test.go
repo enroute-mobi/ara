@@ -2,6 +2,7 @@ package core
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/af83/edwig/model"
@@ -10,6 +11,7 @@ import (
 func createTestPartnerManager() *PartnerManager {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
+	referentials.Save(referential)
 	return NewPartnerManager(referential)
 }
 
@@ -99,6 +101,76 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 	}
 }
 
+func Test_APIPartner_SetFactories(t *testing.T) {
+	partner := &APIPartner{
+		ConnectorTypes: []string{"unexistant-factory", "test-check-status-client"},
+		factories:      make(map[string]ConnectorFactory),
+	}
+	partner.setFactories()
+
+	if len(partner.factories) != 1 {
+		t.Errorf("Factories should have been successfully created by setFactories")
+	}
+}
+
+func Test_APIPartner_Validate(t *testing.T) {
+	partners := createTestPartnerManager()
+	// Check empty Slug
+	apiPartner := &APIPartner{
+		manager: partners,
+	}
+	valid := apiPartner.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiPartner.Errors) != 1 {
+		t.Errorf("apiPartner Errors should not be empty")
+	}
+	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_BLANK {
+		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
+	}
+
+	// Check Already Used Slug and local_credential
+	partner := partners.New("slug")
+	partner.Settings["local_credential"] = "cred"
+	partners.Save(partner)
+	apiPartner = &APIPartner{
+		Slug:     "slug",
+		Settings: map[string]string{"local_credential": "cred"},
+		manager:  partners,
+	}
+	valid = apiPartner.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiPartner.Errors) != 2 {
+		t.Errorf("apiPartner Errors should not be empty")
+	}
+	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_UNIQUE {
+		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
+	}
+	if len(apiPartner.Errors["Settings[\"local_credential\"]"]) != 1 || apiPartner.Errors["Settings[\"local_credential\"]"][0] != ERROR_UNIQUE {
+		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors)
+	}
+
+	// Check ok
+	apiPartner = &APIPartner{
+		Slug:     "slug2",
+		Settings: map[string]string{"local_credential": "cred2"},
+		manager:  partners,
+	}
+	valid = apiPartner.Validate()
+
+	if !valid {
+		t.Errorf("Validate should return true")
+	}
+	if len(apiPartner.Errors) != 0 {
+		t.Errorf("apiPartner Errors should be empty")
+	}
+}
+
 func Test_NewPartnerManager(t *testing.T) {
 	partners := createTestPartnerManager()
 
@@ -150,6 +222,37 @@ func Test_PartnerManager_Find(t *testing.T) {
 	}
 	if partner.Id() != partnerId {
 		t.Errorf("Find should return a Partner with the given Id")
+	}
+}
+
+func Test_PartnerManager_FindByCredential(t *testing.T) {
+	partners := createTestPartnerManager()
+
+	existingPartner := partners.New("partner")
+	existingPartner.Settings["local_credential"] = "cred"
+	partners.Save(existingPartner)
+
+	partner, ok := partners.FindByLocalCredential("cred")
+	if !ok {
+		t.Fatal("FindByLocalCredential should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindByLocalCredential should return a Partner with the given local_credential")
+	}
+}
+
+func Test_PartnerManager_FindAll(t *testing.T) {
+	partners := createTestPartnerManager()
+
+	for i := 0; i < 5; i++ {
+		existingPartner := partners.New(PartnerSlug(strconv.Itoa(i)))
+		partners.Save(existingPartner)
+	}
+
+	foundPartners := partners.FindAll()
+
+	if len(foundPartners) != 5 {
+		t.Errorf("FindAll should return all partners")
 	}
 }
 

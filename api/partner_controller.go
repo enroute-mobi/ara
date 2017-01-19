@@ -89,7 +89,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 func (controller *PartnerController) Create(response http.ResponseWriter, body []byte) {
 	logger.Log.Debugf("Create partner: %s", string(body))
 
-	partner := core.NewPartner()
+	partner := controller.referential.Partners().New("")
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {

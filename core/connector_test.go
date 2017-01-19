@@ -11,6 +11,7 @@ func Test_Factories_CreateConnector(t *testing.T) {
 			"test-validation-connector",
 		},
 		connectors: make(map[string]Connector),
+		manager:    NewPartnerManager(nil),
 	}
 	partner.Settings = map[string]string{
 		"remote_url":           "remote_url",

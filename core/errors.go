@@ -11,8 +11,9 @@ func (errors Errors) Empty() bool {
 }
 
 const (
-	ERROR_BLANK = "Can't be empty"
-	ERROR_ZERO  = "Can't be zero"
+	ERROR_BLANK  = "Can't be empty"
+	ERROR_ZERO   = "Can't be zero"
+	ERROR_UNIQUE = "Is already in use"
 )
 
 func (errors Errors) Add(attribute string, message string) {
