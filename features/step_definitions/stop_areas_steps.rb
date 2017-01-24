@@ -1,21 +1,13 @@
-require 'rest-client'
-require 'json'
-
-def url(referential = "test")
-  referential ||= "test"
-  "#{$server}/#{referential}/stop_areas"
+def stop_areas_path(attributes = {})
+  url_for_model(attributes.merge(resource: 'stop_area'))
 end
 
-def model_attributes table
-  attributes = table.rows_hash
-  if attributes["ObjectIds"]
-    attributes["ObjectIds"] = JSON.parse("{#{attributes["ObjectIds"]}}")
-  end
-  attributes
+def stop_area_path(id, attributes = {})
+  url_for_model(attributes.merge(resource: 'stop_area', id: id))
 end
 
 Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
-  RestClient.post url(referential), model_attributes(stopArea).to_json, {content_type: :json}
+  RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json}
 end
 
 When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
@@ -27,15 +19,15 @@ When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following at
 end
 
 When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
-  response = RestClient.get url(referential)
+  response = RestClient.get stop_areas_path(referential: referential)
   responseArray = JSON.parse(response.body)
   expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
 
-  RestClient.delete "#{url(referential)}/#{expectedStopArea["Id"]}"
+  RestClient.delete stop_area_path expectedStopArea["Id"]
 end
 
 Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, stopArea|
-  response = RestClient.get url(referential)
+  response = RestClient.get stop_areas_path(referential: referential)
   responseArray = JSON.parse(response.body)
 
   stopAreaHash = model_attributes(stopArea)
@@ -51,7 +43,7 @@ end
 
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should (not )?exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
-  response = RestClient.get url(referential)
+  response = RestClient.get stop_areas_path(referential: referential)
   responseArray = JSON.parse(response.body)
   expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
 

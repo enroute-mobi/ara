@@ -1,10 +1,13 @@
-require 'rest-client'
-require 'json'
+def referentials_path
+  url_for(path: "_referentials")
+end
 
-url = "#{$server}/_referentials"
+def referential_path(id)
+  url_for(path: "_referentials/#{id}")
+end
 
 Given(/^a Referential "([^"]+)" exists$/) do |referential|
-  RestClient.post url, "{\"slug\":\"#{referential}\"}", {content_type: :json}
+  RestClient.post referentials_path, "{\"slug\":\"#{referential}\"}", {content_type: :json}
 end
 
 When(/^a Referential "([^"]+)" is created$/) do |referential|
@@ -12,15 +15,15 @@ When(/^a Referential "([^"]+)" is created$/) do |referential|
 end
 
 When(/^the Referential "([^"]+)" is destroyed$/) do |referential|
-  response = RestClient.get url
+  response = RestClient.get referentials_path
   responseHash = JSON.parse(response.body)
 
   id = responseHash.find{|a| a["Slug"] == referential}["Id"]
-  RestClient.delete "#{url}/#{id}"
+  RestClient.delete referential_path(id)
 end
 
 Then(/^a Referential "([^"]+)" should (not )?exist$/) do |referential, condition|
-  response = RestClient.get url
+  response = RestClient.get referentials_path
   responseHash = JSON.parse(response.body)
 
   if condition.nil?
