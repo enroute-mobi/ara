@@ -32,7 +32,7 @@ func (controller *LineController) Index(response http.ResponseWriter) {
 func (controller *LineController) Show(response http.ResponseWriter, identifier string) {
 	line, ok := controller.referential.Model().Lines().Find(model.LineId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Get line %s", identifier)
@@ -48,7 +48,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 
 	line, ok := tx.Model().Lines().Find(model.LineId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Delete line %s", identifier)
@@ -71,7 +71,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	line, ok := tx.Model().Lines().Find(model.LineId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return
 	}
 

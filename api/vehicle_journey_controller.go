@@ -32,7 +32,7 @@ func (controller *VehicleJourneyController) Index(response http.ResponseWriter) 
 func (controller *VehicleJourneyController) Show(response http.ResponseWriter, identifier string) {
 	vehicleJourney, ok := controller.referential.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Get vehicleJourney %s", identifier)
@@ -48,7 +48,7 @@ func (controller *VehicleJourneyController) Delete(response http.ResponseWriter,
 
 	vehicleJourney, ok := tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Delete vehicleJourney %s", identifier)
@@ -71,7 +71,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	vehicleJourney, ok := tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return
 	}
 

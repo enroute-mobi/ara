@@ -32,7 +32,7 @@ func (controller *StopVisitController) Index(response http.ResponseWriter) {
 func (controller *StopVisitController) Show(response http.ResponseWriter, identifier string) {
 	stopVisit, ok := controller.referential.Model().StopVisits().Find(model.StopVisitId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Get stopVisit %s", identifier)
@@ -48,7 +48,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 
 	stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return
 	}
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
@@ -71,7 +71,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(identifier))
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return
 	}
 
