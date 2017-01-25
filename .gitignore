@@ -1,4 +1,7 @@
 # Ignore tempfiles
 /tmp/*
 
+# Ignore log files
+/log/*
+
 /.ruby-version
