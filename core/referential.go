@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -19,6 +20,7 @@ type Referential struct {
 	model          model.Model
 	modelGuardian  *ModelGuardian
 	partners       Partners
+	startedAt      time.Time
 }
 
 type Referentials interface {
@@ -58,6 +60,10 @@ func (referential *Referential) Slug() ReferentialSlug {
 	return referential.slug
 }
 
+func (referential *Referential) StartedAt() time.Time {
+	return referential.startedAt
+}
+
 // WIP: Interface ?
 func (referential *Referential) CollectManager() CollectManagerInterface {
 	return referential.collectManager
@@ -76,6 +82,8 @@ func (referential *Referential) Partners() Partners {
 }
 
 func (referential *Referential) Start() {
+	referential.startedAt = model.DefaultClock().Now()
+
 	referential.partners.Start()
 	referential.modelGuardian.Start()
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -287,6 +288,10 @@ func (partner *Partner) CheckStatus() {
 
 func (partner *Partner) Model() model.Model {
 	return partner.manager.Model()
+}
+
+func (partner *Partner) StartedAt() time.Time {
+	return partner.manager.referential.StartedAt()
 }
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
