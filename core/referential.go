@@ -39,15 +39,27 @@ type APIReferential struct {
 	Id     ReferentialId   `json:"Id,omitempty"`
 	Slug   ReferentialSlug `json:"Slug,omitempty"`
 	Errors Errors          `json:"Errors,omitempty"`
+
+	manager Referentials
 }
 
 func (referential *APIReferential) Validate() bool {
-	valid := true
+	referential.Errors = NewErrors()
+
 	if referential.Slug == "" {
 		referential.Errors.Add("Slug", ERROR_BLANK)
-		valid = false
 	}
-	return valid
+
+	// Check Slug uniqueness
+	for _, existingReferential := range referential.manager.FindAll() {
+		if existingReferential.id != referential.Id {
+			if referential.Slug == existingReferential.slug {
+				referential.Errors.Add("Slug", ERROR_UNIQUE)
+			}
+		}
+	}
+
+	return len(referential.Errors) == 0
 }
 
 func (referential *Referential) Id() ReferentialId {
@@ -104,9 +116,10 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 
 func (referential *Referential) Definition() *APIReferential {
 	return &APIReferential{
-		Id:     referential.id,
-		Slug:   referential.slug,
-		Errors: NewErrors(),
+		Id:      referential.id,
+		Slug:    referential.slug,
+		Errors:  NewErrors(),
+		manager: referential.manager,
 	}
 }
 

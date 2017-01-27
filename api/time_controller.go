@@ -52,9 +52,6 @@ func (controller *TimeController) get(response http.ResponseWriter) {
 }
 
 func (controller *TimeController) advance(response http.ResponseWriter, body []byte) {
-	// var responseBody struct {
-	// 	Duration time.Duration
-	// }
 	var responseBody map[string]string
 	if err := json.Unmarshal(body, &responseBody); err != nil {
 		http.Error(response, "Invalid request: can't parse body", 400)

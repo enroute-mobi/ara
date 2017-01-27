@@ -82,6 +82,58 @@ func Test_Referential_Save(t *testing.T) {
 	}
 }
 
+func Test_APIReferential_Validate(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	// Check empty Slug
+	apiReferential := &APIReferential{
+		manager: referentials,
+	}
+	valid := apiReferential.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiReferential.Errors) != 1 {
+		t.Errorf("apiReferential Errors should not be empty")
+	}
+	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_BLANK {
+		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
+	}
+
+	// Check Already Used Slug
+	referential := referentials.New("slug")
+	referentials.Save(referential)
+	apiReferential = &APIReferential{
+		Slug:    "slug",
+		manager: referentials,
+	}
+	valid = apiReferential.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiReferential.Errors) != 1 {
+		t.Errorf("apiReferential Errors should not be empty")
+	}
+	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_UNIQUE {
+		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
+	}
+
+	// Check ok
+	apiReferential = &APIReferential{
+		Slug:    "slug2",
+		manager: referentials,
+	}
+	valid = apiReferential.Validate()
+
+	if !valid {
+		t.Errorf("Validate should return true")
+	}
+	if len(apiReferential.Errors) != 0 {
+		t.Errorf("apiReferential Errors should be empty")
+	}
+}
+
 func Test_MemoryReferentials_New(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
