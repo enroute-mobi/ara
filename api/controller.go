@@ -7,11 +7,12 @@ import (
 	"github.com/af83/edwig/core"
 )
 
-var newControllerMap = map[string](func(*Server) *Controller){
+var newControllerMap = map[string](func(*Server) ControllerInterface){
 	"_referentials": NewReferentialController,
+	"_time":         NewTimeController,
 }
 
-var newWithReferentialControllerMap = map[string](func(*core.Referential) *Controller){
+var newWithReferentialControllerMap = map[string](func(*core.Referential) ControllerInterface){
 	"stop_areas":       NewStopAreaController,
 	"partners":         NewPartnerController,
 	"lines":            NewLineController,
@@ -25,6 +26,10 @@ type RestfulRessource interface {
 	Delete(response http.ResponseWriter, identifier string)
 	Update(response http.ResponseWriter, identifier string, body []byte)
 	Create(response http.ResponseWriter, body []byte)
+}
+
+type ControllerInterface interface {
+	serve(response http.ResponseWriter, request *http.Request, value string)
 }
 
 type Controller struct {
@@ -65,7 +70,6 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 		}
 		body := getRequestBody(response, request)
 		if body == nil {
-			http.Error(response, "Invalid request", 400)
 			return
 		}
 		controller.restfulRessource.Update(response, identifier, body)
@@ -76,7 +80,6 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 		}
 		body := getRequestBody(response, request)
 		if body == nil {
-			http.Error(response, "Invalid request", 400)
 			return
 		}
 		controller.restfulRessource.Create(response, body)

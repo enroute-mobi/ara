@@ -14,7 +14,7 @@ type StopVisitController struct {
 	referential *core.Referential
 }
 
-func NewStopVisitController(referential *core.Referential) *Controller {
+func NewStopVisitController(referential *core.Referential) ControllerInterface {
 	return &Controller{
 		restfulRessource: &StopVisitController{
 			referential: referential,

@@ -13,7 +13,7 @@ type ReferentialController struct {
 	server *Server
 }
 
-func NewReferentialController(server *Server) *Controller {
+func NewReferentialController(server *Server) ControllerInterface {
 	return &Controller{
 		restfulRessource: &ReferentialController{
 			server: server,

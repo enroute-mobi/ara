@@ -13,7 +13,7 @@ type PartnerController struct {
 	referential *core.Referential
 }
 
-func NewPartnerController(referential *core.Referential) *Controller {
+func NewPartnerController(referential *core.Referential) ControllerInterface {
 	return &Controller{
 		restfulRessource: &PartnerController{
 			referential: referential,

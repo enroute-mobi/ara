@@ -14,7 +14,7 @@ type VehicleJourneyController struct {
 	referential *core.Referential
 }
 
-func NewVehicleJourneyController(referential *core.Referential) *Controller {
+func NewVehicleJourneyController(referential *core.Referential) ControllerInterface {
 	return &Controller{
 		restfulRessource: &VehicleJourneyController{
 			referential: referential,
