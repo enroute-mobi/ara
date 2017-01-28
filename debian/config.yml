@@ -1,2 +1,2 @@
-#logstash: localhost:10000
+logstash: localhost:10000
 syslog:   true
