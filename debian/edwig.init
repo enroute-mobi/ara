@@ -27,7 +27,6 @@ start_daemon() {
         if [ -f $OUTPUT_FILE ]; then
             touch $OUTPUT_FILE && chown $DAEMON_USER $OUTPUT_FILE
 	      fi
-        echo "`date '+%F %T'` Start edwig" >> $OUTPUT_FILE
 	      start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --chuid $DAEMON_USER \
 													--startas /bin/bash --background --make-pidfile -- -c "exec $DAEMON $DAEMON_OPTS >> $OUTPUT_FILE 2>&1"
     else
