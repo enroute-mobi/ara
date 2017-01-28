@@ -1,3 +1,4 @@
 etc/edwig
 usr/bin
 usr/share/edwig
+var/log/edwig
