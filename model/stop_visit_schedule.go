@@ -32,11 +32,16 @@ func (schedule *StopVisitSchedule) ArrivalTime() time.Time {
 }
 
 func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		"Kind":          schedule.kind,
-		"DepartureTime": schedule.departureTime,
-		"ArrivalTime":   schedule.arrivalTime,
-	})
+	jsonSchedule := map[string]interface{}{
+		"Kind": schedule.kind,
+	}
+	if !schedule.departureTime.IsZero() {
+		jsonSchedule["DepartureTime"] = schedule.departureTime
+	}
+	if !schedule.arrivalTime.IsZero() {
+		jsonSchedule["ArrivalTime"] = schedule.arrivalTime
+	}
+	return json.Marshal(jsonSchedule)
 }
 
 type StopVisitSchedules map[StopVisitScheduleType]*StopVisitSchedule
