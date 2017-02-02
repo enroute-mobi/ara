@@ -23,6 +23,10 @@ func SetDefaultClock(clock clockwork.Clock) {
 	defaultClock = clock
 }
 
+func NewRealClock() clockwork.Clock {
+	return clockwork.NewRealClock()
+}
+
 func NewFakeClockAt(time time.Time) clockwork.FakeClock {
 	return clockwork.NewFakeClockAt(time)
 }
