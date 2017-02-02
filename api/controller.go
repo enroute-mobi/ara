@@ -10,6 +10,7 @@ import (
 var newControllerMap = map[string](func(*Server) ControllerInterface){
 	"_referentials": NewReferentialController,
 	"_time":         NewTimeController,
+	"_status":       NewStatusController,
 }
 
 var newWithReferentialControllerMap = map[string](func(*core.Referential) ControllerInterface){
