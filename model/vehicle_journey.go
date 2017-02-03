@@ -39,6 +39,7 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	}
 	vehicleJourneyMap := map[string]interface{}{
 		"Id":         vehicleJourney.id,
+		"Line":       vehicleJourney.lineId,
 		"StopVisits": stopVisitIds,
 	}
 	if vehicleJourney.ObjectIDs() != nil {
