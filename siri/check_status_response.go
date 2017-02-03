@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
