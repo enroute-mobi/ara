@@ -2,7 +2,7 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/af83/edwig/logger"
