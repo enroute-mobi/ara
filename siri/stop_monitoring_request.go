@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"html/template"
 	"time"
-
-	"github.com/af83/edwig/logger"
 )
 
 type SIRIStopMonitoringRequest struct {
@@ -35,11 +33,11 @@ const StopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://
 	<RequestExtension />
 </ns7:GetStopMonitoring>`
 
-func (request *SIRIStopMonitoringRequest) BuildXML() string {
+func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriRequest = template.Must(template.New("siriRequest").Parse(StopMonitoringRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
-		logger.Log.Panicf("Error while using request template: %v", err)
+		return "", err
 	}
-	return buffer.String()
+	return buffer.String(), nil
 }

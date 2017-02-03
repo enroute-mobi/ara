@@ -12,7 +12,7 @@ import (
 )
 
 type Request interface {
-	BuildXML() (xml string)
+	BuildXML() (string, error)
 }
 
 type SOAPClient struct {
@@ -29,8 +29,12 @@ func (client *SOAPClient) URL() string {
 func (client *SOAPClient) prepareAndSendRequest(request Request, resource string, acceptGzip bool) (xml.Node, error) {
 	// Wrap the request XML
 	soapEnvelope := NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(request.BuildXML())
+	xml, err := request.BuildXML()
+	if err != nil {
+		return nil, err
+	}
 
+	soapEnvelope.WriteXML(xml)
 	// Create http request
 	httpRequest, err := http.NewRequest("POST", client.url, soapEnvelope)
 	if err != nil {

@@ -24,9 +24,16 @@ func Test_CheckStatusHandler(t *testing.T) {
 
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(siri.NewSIRICheckStatusRequest("Edwig",
+
+	siriRequest := siri.NewSIRICheckStatusRequest("Edwig",
 		model.DefaultClock().Now(),
-		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
+		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC")
+
+	xmlRequest, err := siriRequest.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(xmlRequest)
 
 	// Create a request
 	request, err := http.NewRequest("POST", "/default/siri", soapEnvelope)

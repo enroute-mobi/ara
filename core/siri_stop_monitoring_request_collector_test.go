@@ -164,8 +164,12 @@ func Test_SIRICheckStatusClient_LogStopMonitoringRequest(t *testing.T) {
 	if expected := time.String(); logStashEvent["requestTimestamp"] != expected {
 		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: %v", logStashEvent["requestTimestamp"], expected)
 	}
-	if logStashEvent["requestXML"] != request.BuildXML() {
-		t.Errorf("Wrong requestXML logged:\n got: %v\n expected: %v", logStashEvent["requestXML"], request.BuildXML())
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if logStashEvent["requestXML"] != xml {
+		t.Errorf("Wrong requestXML logged:\n got: %v\n expected: %v", logStashEvent["requestXML"], xml)
 	}
 }
 

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -81,7 +80,7 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return nil
 	}
 	if len(nodes) == 0 {
 		return nil
@@ -93,7 +92,7 @@ func (xmlStruct *XMLStructure) findNodes(localName string) []XMLNode {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return nil
 	}
 	if len(nodes) == 0 {
 		return nil
@@ -125,7 +124,7 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 	}
 	t, err := time.Parse("2006-01-02T15:04:05.000Z07:00", strings.TrimSpace(node.Content()))
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return time.Time{}
 	}
 	return t
 }
@@ -137,7 +136,7 @@ func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
 	}
 	s, err := strconv.ParseBool(strings.TrimSpace(node.Content()))
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return false
 	}
 	return s
 }
@@ -149,7 +148,7 @@ func (xmlStruct *XMLStructure) findIntChildContent(localName string) int {
 	}
 	s, err := strconv.Atoi(strings.TrimSpace(node.Content()))
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return 0
 	}
 	return s
 }

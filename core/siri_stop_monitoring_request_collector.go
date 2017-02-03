@@ -141,7 +141,12 @@ func logStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.S
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	logStashEvent["requestXML"] = request.BuildXML()
+	xml, err := request.BuildXML()
+	if err != nil {
+		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["requestXML"] = xml
 }
 
 func logStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringResponse) {

@@ -102,7 +102,12 @@ func logCheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRI
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	logStashEvent["requestXML"] = request.BuildXML()
+	xml, err := request.BuildXML()
+	if err != nil {
+		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["requestXML"] = xml
 }
 
 func logCheckStatusResponse(logStashEvent audit.LogStashEvent, response *siri.XMLCheckStatusResponse) {

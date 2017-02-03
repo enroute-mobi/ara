@@ -5,7 +5,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -79,11 +78,11 @@ func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
 }
 
 // TODO : Handle errors
-func (request *SIRICheckStatusRequest) BuildXML() string {
+func (request *SIRICheckStatusRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRIRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
-		logger.Log.Panicf("Error while using request template: %v", err)
+		return "", err
 	}
-	return buffer.String()
+	return buffer.String(), nil
 }

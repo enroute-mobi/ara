@@ -32,7 +32,11 @@ func Test_SIRIStopMonitoringRequest_BuildXML(t *testing.T) {
 		RequestorRef:      "test",
 		RequestTimestamp:  date,
 	}
-	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }

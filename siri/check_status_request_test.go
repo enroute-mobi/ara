@@ -69,8 +69,12 @@ func Test_SIRICheckStatusRequest_BuildXML(t *testing.T) {
 </ns7:CheckStatus>`
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := NewSIRICheckStatusRequest("test", date, "test")
-	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }
 

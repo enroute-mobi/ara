@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -35,7 +34,7 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 	}
 	nodes, err := doc.Root().Search("//*[local-name()='Body']/*")
 	if err != nil {
-		logger.Log.Panicf("Error while parsing XML: %v", err)
+		return nil, err
 	}
 
 	if len(nodes) == 0 {

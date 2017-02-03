@@ -161,7 +161,12 @@ func checkStatus(url string, requestorRef string) error {
 
 	// Logstash
 	logstashDatas := make(map[string]string)
-	logstashDatas["requestXML"] = request.BuildXML()
+	xml, err := request.BuildXML()
+	if err != nil {
+		logstashDatas["requestXML"] = fmt.Sprintf("%v", err)
+		return err
+	}
+	logstashDatas["requestXML"] = xml
 	logstashDatas["responseXML"] = xmlResponse.RawXML()
 	logstashDatas["processingDuration"] = responseTime.String()
 	// ...
