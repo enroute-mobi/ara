@@ -35,7 +35,7 @@ type SIRICheckStatusResponse struct {
 	ServiceStartedTime        time.Time
 }
 
-const SIRIResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
+const checkStatusResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
 												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
 												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
 												 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -160,7 +160,7 @@ func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 // TODO : Handle errors
 func (response *SIRICheckStatusResponse) BuildXML() string {
 	var buffer bytes.Buffer
-	var siriResponse = template.Must(template.New("siriResponse").Parse(SIRIResponseTemplate))
+	var siriResponse = template.Must(template.New("siriResponse").Parse(checkStatusResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
 		logger.Log.Panicf("Error while using response template: %v", err)
 	}

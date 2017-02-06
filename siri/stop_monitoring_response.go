@@ -1,8 +1,11 @@
 package siri
 
 import (
+	"bytes"
+	"text/template"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -38,6 +41,48 @@ type XMLMonitoredStopVisit struct {
 	actualDepartureTime   time.Time
 }
 
+type SIRIStopMonitoringResponse struct {
+	Address                   string
+	ProducerRef               string
+	RequestMessageRef         string
+	ResponseMessageIdentifier string
+	Status                    bool
+	// ErrorType                 string
+	// ErrorNumber               int
+	// ErrorText                 string
+	ResponseTimestamp time.Time
+
+	MonitoredStopVisits []*SIRIMonitoredStopVisit
+}
+
+type SIRIMonitoredStopVisit struct{}
+
+const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+                               xmlns:ns4="http://www.ifopt.org.uk/acsb"
+                               xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+                               xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+                               xmlns:ns7="http://scma/siri"
+                               xmlns:ns8="http://wsdl.siri.org.uk"
+                               xmlns:ns9="http://wsdl.siri.org.uk/siri">
+  <ServiceDeliveryInfo>
+    <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
+    <ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>
+    <ns3:Address>{{ .Address }}</ns3:Address>
+    <ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
+    <ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Answer>
+    <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+      <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
+      <ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+      <ns3:Status>{{ .Status }}</ns3:Status>{{ range .MonitoredStopVisits }}
+      <ns3:MonitoredStopVisit>
+      </ns3:MonitoredStopVisit>{{ end }}
+    </ns3:StopMonitoringDelivery>
+  </Answer>
+  <AnswerExtension />
+</ns8:GetStopMonitoringResponse>`
+
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {
 	xmlStopMonitoringResponse := &XMLStopMonitoringResponse{}
 	xmlStopMonitoringResponse.node = NewXMLNode(node)
@@ -51,6 +96,29 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 	}
 	response := NewXMLStopMonitoringResponse(doc.Root().XmlNode)
 	return response, nil
+}
+
+func NewSIRIStopMonitoringResponse(
+	address string,
+	producerRef string,
+	requestMessageRef string,
+	responseMessageIdentifier string,
+	status bool,
+	// errorType string,
+	// errorNumber int,
+	// errorText string,
+	responseTimestamp time.Time) *SIRIStopMonitoringResponse {
+	return &SIRIStopMonitoringResponse{
+		Address:                   address,
+		ProducerRef:               producerRef,
+		RequestMessageRef:         requestMessageRef,
+		ResponseMessageIdentifier: responseMessageIdentifier,
+		Status: status,
+		// ErrorType:          errorType,
+		// ErrorNumber:        errorNumber,
+		// ErrorText:          errorText,
+		ResponseTimestamp: responseTimestamp,
+	}
 }
 
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
@@ -175,4 +243,13 @@ func (visit *XMLMonitoredStopVisit) ActualDepartureTime() time.Time {
 		visit.actualDepartureTime = visit.findTimeChildContent("ActualDepartureTime")
 	}
 	return visit.actualDepartureTime
+}
+
+func (response *SIRIStopMonitoringResponse) BuildXML() string {
+	var buffer bytes.Buffer
+	var siriResponse = template.Must(template.New("siriResponse").Parse(stopMonitoringResponseTemplate))
+	if err := siriResponse.Execute(&buffer, response); err != nil {
+		logger.Log.Panicf("Error while using response template: %v", err)
+	}
+	return buffer.String()
 }

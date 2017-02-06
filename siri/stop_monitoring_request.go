@@ -23,7 +23,7 @@ type SIRIStopMonitoringRequest struct {
 	RequestTimestamp  time.Time
 }
 
-const StopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
+const stopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
 													 xmlns:ns3="http://www.ifopt.org.uk/acsb"
 													 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
 													 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -67,7 +67,7 @@ func (request *XMLStopMonitoringRequest) MonitoringRef() string {
 
 func (request *SIRIStopMonitoringRequest) BuildXML() string {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(StopMonitoringRequestTemplate))
+	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
 		logger.Log.Panicf("Error while using request template: %v", err)
 	}

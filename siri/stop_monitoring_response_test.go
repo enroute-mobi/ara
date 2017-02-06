@@ -116,3 +116,34 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 		t.Errorf("Incorrect ActualDepartureTime for stopVisit, should be zero got: %v", monitoredStopVisit.ActualDepartureTime())
 	}
 }
+
+func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
+	expectedXML := `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+                               xmlns:ns4="http://www.ifopt.org.uk/acsb"
+                               xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+                               xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+                               xmlns:ns7="http://scma/siri"
+                               xmlns:ns8="http://wsdl.siri.org.uk"
+                               xmlns:ns9="http://wsdl.siri.org.uk/siri">
+  <ServiceDeliveryInfo>
+    <ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+    <ns3:ProducerRef>producer</ns3:ProducerRef>
+    <ns3:Address>address</ns3:Address>
+    <ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
+    <ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Answer>
+    <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+      <ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+      <ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+      <ns3:Status>true</ns3:Status>
+    </ns3:StopMonitoringDelivery>
+  </Answer>
+  <AnswerExtension />
+</ns8:GetStopMonitoringResponse>`
+	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
+	request := NewSIRIStopMonitoringResponse("address", "producer", "ref", "identifier", true, responseTimestamp)
+	if expectedXML != request.BuildXML() {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	}
+}
