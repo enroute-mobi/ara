@@ -11,11 +11,7 @@ import (
 )
 
 type XMLCheckStatusRequest struct {
-	XMLStructure
-
-	messageIdentifier string
-	requestorRef      string
-	requestTimestamp  time.Time
+	RequestXMLStructure
 }
 
 type SIRICheckStatusRequest struct {
@@ -34,7 +30,9 @@ const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/
 </ns7:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
-	return &XMLCheckStatusRequest{XMLStructure: XMLStructure{node: NewXMLNode(node)}}
+	xmlCheckStatusRequest := &XMLCheckStatusRequest{}
+	xmlCheckStatusRequest.node = NewXMLNode(node)
+	return xmlCheckStatusRequest
 }
 
 func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest, error) {
@@ -55,27 +53,6 @@ func NewSIRICheckStatusRequest(
 		RequestTimestamp:  RequestTimestamp,
 		MessageIdentifier: MessageIdentifier,
 	}
-}
-
-func (request *XMLCheckStatusRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLCheckStatusRequest) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent("RequestorRef")
-	}
-	return request.requestorRef
-}
-
-func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
 }
 
 // TODO : Handle errors

@@ -6,7 +6,15 @@ import (
 	"time"
 
 	"github.com/af83/edwig/logger"
+	"github.com/jbowtie/gokogiri"
+	"github.com/jbowtie/gokogiri/xml"
 )
+
+type XMLStopMonitoringRequest struct {
+	RequestXMLStructure
+
+	monitoringRef string
+}
 
 type SIRIStopMonitoringRequest struct {
 	MessageIdentifier string
@@ -34,6 +42,28 @@ const StopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://
 	</Request>
 	<RequestExtension />
 </ns7:GetStopMonitoring>`
+
+func NewXMLStopMonitoringRequest(node xml.Node) *XMLStopMonitoringRequest {
+	xmlStopMonitoringRequest := &XMLStopMonitoringRequest{}
+	xmlStopMonitoringRequest.node = NewXMLNode(node)
+	return xmlStopMonitoringRequest
+}
+
+func NewXMLStopMonitoringRequestFromContent(content []byte) (*XMLStopMonitoringRequest, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	request := NewXMLStopMonitoringRequest(doc.Root().XmlNode)
+	return request, nil
+}
+
+func (request *XMLStopMonitoringRequest) MonitoringRef() string {
+	if request.monitoringRef == "" {
+		request.monitoringRef = request.findStringChildContent("MonitoringRef")
+	}
+	return request.monitoringRef
+}
 
 func (request *SIRIStopMonitoringRequest) BuildXML() string {
 	var buffer bytes.Buffer

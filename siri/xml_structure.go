@@ -77,6 +77,14 @@ type ResponseXMLStructure struct {
 	responseTimestamp         time.Time
 }
 
+type RequestXMLStructure struct {
+	XMLStructure
+
+	messageIdentifier string
+	requestorRef      string
+	requestTimestamp  time.Time
+}
+
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
@@ -158,6 +166,27 @@ func (xmlStruct *XMLStructure) RawXML() string {
 	return xmlStruct.node.NativeNode().String()
 }
 
+func (request *RequestXMLStructure) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
+func (request *RequestXMLStructure) RequestorRef() string {
+	if request.requestorRef == "" {
+		request.requestorRef = request.findStringChildContent("RequestorRef")
+	}
+	return request.requestorRef
+}
+
+func (request *RequestXMLStructure) RequestTimestamp() time.Time {
+	if request.requestTimestamp.IsZero() {
+		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
+	}
+	return request.requestTimestamp
+}
+
 func (response *ResponseXMLStructure) Address() string {
 	if response.address == "" {
 		response.address = response.findStringChildContent("Address")
@@ -171,6 +200,7 @@ func (response *ResponseXMLStructure) ProducerRef() string {
 	}
 	return response.producerRef
 }
+
 func (response *ResponseXMLStructure) RequestMessageRef() string {
 	if response.requestMessageRef == "" {
 		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
