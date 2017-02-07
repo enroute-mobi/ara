@@ -26,6 +26,7 @@ type XMLMonitoredStopVisit struct {
 	publishedLineName      string
 	departureStatus        string
 	arrivalStatus          string
+	recordedAt             time.Time
 
 	order int
 
@@ -126,6 +127,13 @@ func (visit *XMLMonitoredStopVisit) ArrivalStatus() string {
 		visit.arrivalStatus = visit.findStringChildContent("ArrivalStatus")
 	}
 	return visit.arrivalStatus
+}
+
+func (visit *XMLMonitoredStopVisit) RecordedAt() time.Time {
+	if visit.recordedAt.IsZero() {
+		visit.recordedAt = visit.findTimeChildContent("RecordedAtTime")
+	}
+	return visit.recordedAt
 }
 
 func (visit *XMLMonitoredStopVisit) Order() int {

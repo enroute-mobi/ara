@@ -45,6 +45,7 @@ func (updater *StopVisitUpdater) Update() {
 		existingStopVisit.schedules = updater.event.Schedules
 		existingStopVisit.departureStatus = updater.event.DepartureStatus
 		existingStopVisit.arrivalStatus = updater.event.ArrivalStatuts
+		existingStopVisit.recordedAt = updater.event.RecordedAt
 
 		updater.tx.Model().StopVisits().Save(&existingStopVisit)
 		updater.tx.Model().StopAreas().Save(&stopArea)
@@ -63,6 +64,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.stopAreaId = foundStopArea.Id()
 	stopVisit.vehicleJourneyId = foundVehicleJourney.Id()
 	stopVisit.passageOrder = stopVisitAttributes.PassageOrder
+	stopVisit.recordedAt = stopVisitAttributes.RecordedAt
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.schedules = stopVisitAttributes.Schedules
 	stopVisit.departureStatus = stopVisitAttributes.DepartureStatus

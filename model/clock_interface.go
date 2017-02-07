@@ -34,9 +34,11 @@ func NewFakeClockAt(time time.Time) clockwork.FakeClock {
 	return clockwork.NewFakeClockAt(time)
 }
 
+var FAKE_CLOCK_INITIAL_DATE = time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
+
 func NewFakeClock() clockwork.FakeClock {
 	// use a fixture that does not fulfill Time.IsZero()
-	return NewFakeClockAt(time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC))
+	return NewFakeClockAt(FAKE_CLOCK_INITIAL_DATE)
 }
 
 type ClockConsumer struct {

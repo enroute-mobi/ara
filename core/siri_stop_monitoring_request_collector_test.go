@@ -79,9 +79,13 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 		t.Errorf("RequestStopAreaUpdate should have 2 StopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.StopVisitUpdateEvents))
 	}
 	stopVisitEvent := stopAreaUpdateEvent.StopVisitUpdateEvents[0]
+
 	// Date is time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC) with fake clock
-	if expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC); stopVisitEvent.Created_at != expected {
+	if expected := model.FAKE_CLOCK_INITIAL_DATE; stopVisitEvent.Created_at != expected {
 		t.Errorf("Wrong Created_At for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Created_at)
+	}
+	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:56:53+02:00"); !stopVisitEvent.RecordedAt.Equal(expected) {
+		t.Errorf("Wrong RecorderAt for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.RecordedAt)
 	}
 	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisitEvent.ArrivalStatuts != expected {
 		t.Errorf("Wrong ArrivalStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.ArrivalStatuts)
@@ -97,7 +101,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if !schedule.DepartureTime().IsZero() {
 		t.Errorf("AimedDepartureTime for stopVisitEvent should be zero, got: %v", schedule.DepartureTime())
 	}
-	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 0, time.UTC); !schedule.ArrivalTime().Equal(expected) {
+	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:54:00+02:00"); !schedule.ArrivalTime().Equal(expected) {
 		t.Errorf("Wrong AimedArrivalTime for stopVisitEvent:\n expected: %v\n got: %v", expected, schedule.ArrivalTime())
 	}
 	// Expected schedule
@@ -110,7 +114,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if !schedule.DepartureTime().IsZero() {
 		t.Errorf("ActualDepartureTime for stopVisitEvent should be zero, got: %v", schedule.DepartureTime())
 	}
-	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 0, time.UTC); !schedule.ArrivalTime().Equal(expected) {
+	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:54:00+02:00"); !schedule.ArrivalTime().Equal(expected) {
 		t.Errorf("Wrong ActualArrivalTime for stopVisitEvent:\n expected: %v\n got: %v", expected, schedule.ArrivalTime())
 	}
 }

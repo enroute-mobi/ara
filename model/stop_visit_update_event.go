@@ -30,6 +30,7 @@ const (
 type StopVisitUpdateEvent struct {
 	Id                string
 	Created_at        time.Time
+	RecordedAt        time.Time
 	StopVisitObjectid ObjectID
 	StopAreaObjectId  ObjectID
 	Schedules         StopVisitSchedules

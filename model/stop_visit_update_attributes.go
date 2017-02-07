@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type StopVisitUpdateAttributes interface {
 	StopVisitAttributes() *StopVisitAttributes
 	VehicleJourneyAttributes() *VehicleJourneyAttributes
@@ -15,6 +17,7 @@ func (t *TestStopVisitUpdateAttributes) StopVisitAttributes() *StopVisitAttribut
 		ObjectId:               objectid,
 		StopAreaObjectId:       objectid,
 		VehicleJourneyObjectId: objectid,
+		RecordedAt:             time.Time{},
 		PassageOrder:           1,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_CANCELLED,

@@ -78,7 +78,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	logStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
 
 	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
-	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+	logStashEvent["responseTi	me"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
 		return nil, err
@@ -104,6 +104,7 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 		stopVisitEvent := &model.StopVisitUpdateEvent{
 			Id:                connector.NewUUID(),
 			Created_at:        connector.Clock().Now(),
+			RecordedAt:        xmlStopVisitEvent.RecordedAt(),
 			StopVisitObjectid: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
 			StopAreaObjectId:  model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
 			Schedules:         make(model.StopVisitSchedules),

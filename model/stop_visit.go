@@ -1,6 +1,9 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type StopVisitId string
 
@@ -11,6 +14,7 @@ type StopVisitAttributes struct {
 	VehicleJourneyObjectId ObjectID
 	PassageOrder           int
 
+	RecordedAt      time.Time
 	DepartureStatus StopVisitDepartureStatus
 	ArrivalStatus   StopVisitArrivalStatus
 	Schedules       StopVisitSchedules
@@ -24,6 +28,7 @@ type StopVisit struct {
 	stopAreaId       StopAreaId
 	vehicleJourneyId VehicleJourneyId
 
+	recordedAt      time.Time
 	schedules       StopVisitSchedules
 	departureStatus StopVisitDepartureStatus
 	arrivalStatus   StopVisitArrivalStatus
@@ -72,12 +77,17 @@ func (stopVisit *StopVisit) PassageOrder() int {
 	return stopVisit.passageOrder
 }
 
+func (stopVisit *StopVisit) RecordedAt() time.Time {
+	return stopVisit.recordedAt
+}
+
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	stopVisitMap := map[string]interface{}{
 		"Id":              stopVisit.id,
 		"StopArea":        stopVisit.stopAreaId,
 		"VehicleJourney":  stopVisit.vehicleJourneyId,
 		"PassageOrder":    stopVisit.passageOrder,
+		"RecordedAt":      stopVisit.recordedAt,
 		"Schedules":       stopVisit.Schedules(),
 		"DepartureStatus": stopVisit.departureStatus,
 		"ArrivalStatus":   stopVisit.arrivalStatus,
