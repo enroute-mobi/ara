@@ -1,0 +1,475 @@
+2017-02-07 14:50:04.045289404 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 14:50:04.047412428 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 14:50:04.047448802 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 14:50:05.411496105 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 14:50:05.426331321 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118b00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32940 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:50:05.426366872 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 14:50:05.426415744 +0100 CET [33mStart partners guardian[39m
+2017-02-07 14:50:05.426425962 +0100 CET [33mStart models guardian[39m
+2017-02-07 14:50:05.430362813 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[214] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc820134140 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=214) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32941 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:50:05.430402868 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client"," siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 14:50:05.430470057 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 14:50:05.432347007 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201346c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32942 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:50:05.432419203 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:50:05.432449229 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:50:05.432450894 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:50:05.432530219 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 14:50:05.434288694 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc8201190a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32944 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:50:05.435859771 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 14:50:05.436307446 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:50:05.438406502 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc8201c4320 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32945 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:50:05.43851466 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:50:05.438546919 +0100 CET [33mCan't find a partner for StopArea 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 14:50:05.438564481 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:50:05.438623651 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:50:05.483305693 +0100 CET [33mPartner status is up[39m
+signal: killed
+2017-02-07 14:53:42.41374441 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 14:53:42.415877968 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 14:53:42.415917018 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 14:53:43.826474316 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 14:53:43.83944675 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*]] %!s(*http.body=&{0xc820118820 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32949 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:53:43.839486822 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 14:53:43.839541207 +0100 CET [33mStart partners guardian[39m
+2017-02-07 14:53:43.83955398 +0100 CET [33mStart models guardian[39m
+2017-02-07 14:53:43.843929721 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[214]] %!s(*http.body=&{0xc82013c440 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=214) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32950 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:53:43.843964349 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client"," siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 14:53:43.844033507 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 14:53:43.845750757 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc82013c960 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32951 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:53:43.845826104 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:53:43.845862006 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:53:43.845843544 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:53:43.845957369 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 14:53:43.847690927 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc82019e0c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32953 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:53:43.849181949 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 14:53:43.84955311 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:53:43.851052076 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc82013d240 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32954 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:53:43.8510986 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:53:43.851133123 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:53:43.851140556 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:53:43.851213135 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{" siri-stop-monitoring-request-collector", "siri-check-status-client"}, Settings:map[string]string{"remote_credential":"test", "remote_objectid_kind":"internal", "remote_url":"http://localhost:8090"}, connectors:map[string]core.Connector{"siri-check-status-client":(*core.SIRICheckStatusClient)(0xc82013c760)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc82013cc00)}, manager:(*core.PartnerManager)(0xc820117410)}
+[39m
+2017-02-07 14:53:43.85122579 +0100 CET [33mCan't find a partner for StopArea 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 14:53:43.891464673 +0100 CET [33mPartner status is up[39m
+signal: killed
+2017-02-07 14:55:22.529848368 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 14:55:22.531997379 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 14:55:22.532033245 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 14:55:23.759182517 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 14:55:23.771389454 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc820120760 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32959 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.77142267 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 14:55:23.771480952 +0100 CET [33mStart partners guardian[39m
+2017-02-07 14:55:23.771491905 +0100 CET [33mStart models guardian[39m
+2017-02-07 14:55:23.77483236 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820118500 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32960 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.774869761 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 14:55:23.774945055 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 14:55:23.774953802 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 14:55:23.776769133 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820118a80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32961 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.776826465 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:55:23.776848272 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:55:23.776885845 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:55:23.777004096 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 14:55:23.778592861 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc820120d20 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32963 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.780199047 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 14:55:23.780820177 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:55:23.782442912 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc8201a0380 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32964 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.782502267 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:55:23.782526144 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:55:23.782564709 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:55:23.782614753 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}, Settings:map[string]string{"remote_url":"http://localhost:8090", "remote_credential":"test", "remote_objectid_kind":"internal"}, connectors:map[string]core.Connector{"siri-stop-monitoring-request-collector":(*core.SIRIStopMonitoringRequestCollector)(0xc8201168d0), "siri-check-status-client":(*core.SIRICheckStatusClient)(0xc820118840)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc820118d20)}, manager:(*core.PartnerManager)(0xc820127350)}
+[39m
+2017-02-07 14:55:23.782628628 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 14:55:23.786730466 +0100 CET [32mCan't request stop area update : SIRI CRITICAL: Wrong Soap from server: ns8:GetStopMonitoringResponse[39m
+2017-02-07 14:55:23.789989373 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32966 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:55:23.790042808 +0100 CET [33mStopVisits Index[39m
+signal: killed
+2017-02-07 14:58:56.21365103 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 14:58:56.215901238 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 14:58:56.215939742 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 14:58:57.614444343 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 14:58:57.62655174 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82011a660 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32983 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:57.6266036 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 14:58:57.626696018 +0100 CET [33mStart partners guardian[39m
+2017-02-07 14:58:57.626716792 +0100 CET [33mStart models guardian[39m
+2017-02-07 14:58:57.630124831 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213] Accept:[application/json]] %!s(*http.body=&{0xc820146640 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32984 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:57.630156395 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 14:58:57.630225407 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 14:58:57.630235319 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 14:58:57.63221371 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820146b80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32985 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:57.632325426 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:58:57.632346232 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:58:57.632423195 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:58:57.632524477 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 14:58:57.634124235 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc82011aba0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32987 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:57.635613007 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 14:58:57.636093874 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:58:57.637473771 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc82011b4a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32988 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:57.637526606 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:58:57.637552153 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:58:57.63758686 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:58:57.637632411 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}, Settings:map[string]string{"remote_url":"http://localhost:8090", "remote_credential":"test", "remote_objectid_kind":"internal"}, connectors:map[string]core.Connector{"siri-check-status-client":(*core.SIRICheckStatusClient)(0xc820146960), "siri-stop-monitoring-request-collector":(*core.SIRIStopMonitoringRequestCollector)(0xc82013b3e0)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc8201ba0e0)}, manager:(*core.PartnerManager)(0xc82011e870)}
+[39m
+2017-02-07 14:58:57.637646231 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 14:58:57.64204435 +0100 CET [32mCan't request stop area update : SIRI CRITICAL: Wrong Soap from server: ns8:GetStopMonitoringResponse[39m
+2017-02-07 14:58:57.679302336 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:58:58.644062461 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32990 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:58:58.644118332 +0100 CET [33mStopVisits Index[39m
+signal: killed
+2017-02-07 14:59:40.873289186 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 14:59:40.875574046 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 14:59:40.875625813 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 14:59:42.249045125 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 14:59:42.266117797 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820120760 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32993 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.266167899 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 14:59:42.26624812 +0100 CET [33mStart partners guardian[39m
+2017-02-07 14:59:42.266266181 +0100 CET [33mStart models guardian[39m
+2017-02-07 14:59:42.270088274 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820118500 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32994 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.270139492 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 14:59:42.270229135 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 14:59:42.270242915 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 14:59:42.272420788 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820120c80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32995 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.272542898 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:59:42.272555363 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:59:42.272587792 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:59:42.272686266 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 14:59:42.276747498 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:59:42.277010035 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc8201a20c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32997 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.277231637 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 14:59:42.27957436 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8201217a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:32998 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.279649051 +0100 CET [33mCheck partners status[39m
+2017-02-07 14:59:42.279699137 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 14:59:42.279707874 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 14:59:42.279801259 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}, Settings:map[string]string{"remote_url":"http://localhost:8090", "remote_credential":"test", "remote_objectid_kind":"internal"}, connectors:map[string]core.Connector{"siri-check-status-client":(*core.SIRICheckStatusClient)(0xc820118820), "siri-stop-monitoring-request-collector":(*core.SIRIStopMonitoringRequestCollector)(0xc820116900)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc820120f20)}, manager:(*core.PartnerManager)(0xc820127350)}
+[39m
+2017-02-07 14:59:42.279817754 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 14:59:42.284323937 +0100 CET [32mCan't request stop area update : SIRI CRITICAL: Wrong Soap from server: ns8:GetStopMonitoringResponse[39m
+2017-02-07 14:59:42.319541492 +0100 CET [33mPartner status is up[39m
+2017-02-07 14:59:42.784914112 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33000 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 14:59:42.784969384 +0100 CET [33mStopVisits Index[39m
+signal: killed
+2017-02-07 15:02:58.551952668 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:02:58.554013899 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:02:58.554054347 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:02:59.980308241 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:02:59.995006613 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118640 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33003 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:02:59.995054952 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:02:59.995106118 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:02:59.995122925 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:02:59.999354955 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc820120620 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33004 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:02:59.999392549 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:02:59.999467099 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:02:59.999477136 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:03:00.001383423 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820118ae0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33005 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:03:00.001474912 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:03:00.001485839 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:03:00.001529428 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:03:00.001649063 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:03:00.003542729 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8201b20c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33007 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:03:00.005247314 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:03:00.005819928 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:03:00.007403394 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc820119140 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33008 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:03:00.007456893 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:03:00.007500491 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:03:00.007503263 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:03:00.007591928 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}, Settings:map[string]string{"remote_url":"http://localhost:8090", "remote_credential":"test", "remote_objectid_kind":"internal"}, connectors:map[string]core.Connector{"siri-check-status-client":(*core.SIRICheckStatusClient)(0xc820120940), "siri-stop-monitoring-request-collector":(*core.SIRIStopMonitoringRequestCollector)(0xc8201272f0)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc820118d80)}, manager:(*core.PartnerManager)(0xc820116990)}
+[39m
+2017-02-07 15:03:00.007605415 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:03:00.012198946 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:03:00.012295395 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:03:00.01234477 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:03:00.012593517 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:03:00.047345828 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:03:00.513612196 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33010 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:03:00.513665139 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:03:00.520431412 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33011 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:03:00.520469884 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:04:47.037535866 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:04:47.039795478 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:04:47.039838614 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:04:48.549857914 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:04:48.564887549 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118b00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33014 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:48.564932624 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:04:48.56499316 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:04:48.565008212 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:04:48.570229721 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc820134180 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33015 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:48.570275675 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:04:48.570366128 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:04:48.570377728 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:04:48.572516582 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820134720 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33016 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:48.572636624 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:04:48.572649253 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:04:48.572771748 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:04:48.57292647 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:04:48.574741764 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820118fe0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33018 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:48.574787974 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:04:48.577085987 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:04:48.578785158 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820119960 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33019 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:48.578878809 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:04:48.578911401 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:04:48.57894819 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:04:48.579020128 +0100 CET [32mPartner &core.Partner{id:"6ba7b814-9dad-11d1-2-00c04fd430c8", slug:"test", operationnalStatus:"up", ConnectorTypes:[]string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}, Settings:map[string]string{"remote_credential":"test", "remote_objectid_kind":"internal", "remote_url":"http://localhost:8090"}, connectors:map[string]core.Connector{"siri-stop-monitoring-request-collector":(*core.SIRIStopMonitoringRequestCollector)(0xc820130510), "siri-check-status-client":(*core.SIRICheckStatusClient)(0xc8201344e0)}, context:core.Context{"siri-partner":(*core.SIRIPartner)(0xc8201a00e0)}, manager:(*core.PartnerManager)(0xc820117710)}
+[39m
+2017-02-07 15:04:48.579036085 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:04:48.584733375 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:04:48.584904536 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:04:48.58495752 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:04:48.585201085 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:04:48.619237327 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:04:49.085317043 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33021 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:49.085373106 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:04:49.092756793 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33022 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:04:49.092805292 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:11:23.0674223 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:11:23.069979444 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:11:23.07001395 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:11:24.320768159 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:11:24.332921392 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118b00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33037 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.332956995 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:11:24.333006098 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:11:24.333017018 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:11:24.337157473 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820134140 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33038 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.337197562 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:11:24.337267447 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:11:24.337276162 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:11:24.339040472 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc8201346e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33039 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.339096866 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:11:24.339114078 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:11:24.339155452 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:11:24.339275436 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:11:24.341000969 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc820134d40 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33041 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.341034482 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:11:24.343066701 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:11:24.344780234 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820119040 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33042 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.344847761 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:11:24.34488411 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:11:24.34495435 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:11:24.344993273 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:11:24.349517218 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:11:24.349607656 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:11:24.349653334 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:11:24.349919135 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:11:24.387266234 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:11:24.849061448 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33044 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.849088175 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:11:24.852056958 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33045 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:11:24.852084639 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:12:02.07827 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:12:02.080783449 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:12:02.08083303 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:12:03.011933451 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:12:03.028705538 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820126ce0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33048 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.028743602 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:12:03.028800937 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:12:03.028814022 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:12:03.033592143 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc8200c9f20 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33049 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.033629991 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:12:03.033699649 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:12:03.033708815 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:12:03.035424615 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc8201924a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33050 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.035512776 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:12:03.035494807 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:12:03.035547144 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:12:03.035630154 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:12:03.037919425 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820192b20 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33052 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.037954897 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:12:03.041633872 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:12:03.044580975 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820193420 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33053 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.044691532 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:12:03.044649319 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:12:03.044730156 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:12:03.044735172 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:12:03.049091946 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:12:03.049179179 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:12:03.049228556 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:12:03.04946253 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:12:03.083429334 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:12:03.548668504 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33055 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.548698152 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:12:03.55248209 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33056 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:12:03.552509044 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:15:38.453598432 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:15:38.455730336 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:15:38.455770552 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:15:39.88244424 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:15:39.895717813 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc82015a040 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33064 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:39.895757696 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:15:39.895817979 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:15:39.895837535 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:15:39.899693966 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc8201466c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33065 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:39.899721652 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:15:39.899784617 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:15:39.899792723 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:15:39.901441271 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc820146c00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33066 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:39.901487967 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:15:39.901521721 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:15:39.901543658 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:15:39.901687764 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:15:39.903581227 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc820118a80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33068 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:39.905877328 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:15:39.906527926 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:15:39.908228786 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc820119400 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33069 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:39.908320559 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:15:39.908360586 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:15:39.90878463 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:15:39.90882195 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:15:39.912071226 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:15:39.952120993 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:15:39.952224695 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:15:39.952278213 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:15:39.952526216 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:15:40.411160534 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33071 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:40.41118831 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:15:40.414245447 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33072 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:15:40.414268384 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:16:39.840736185 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:16:39.843511835 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:16:39.843562809 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:16:40.980663012 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:16:40.99563552 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*]] %!s(*http.body=&{0xc820114d40 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33075 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:16:40.995745367 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:16:40.995819413 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:16:40.995832023 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:16:41.000757241 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213] Accept:[application/json]] %!s(*http.body=&{0xc82016a140 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33076 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:16:41.000809013 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:16:41.000929664 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:16:41.000939563 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:16:41.003205681 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc8201151e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33077 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:16:41.003369656 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:16:41.003409927 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:16:41.003532839 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:16:41.003771569 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:16:41.006258824 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71] Accept:[*/*]] %!s(*http.body=&{0xc82016a800 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33079 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:16:41.006462259 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:16:41.012504264 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201158c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33080 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:16:41.012681034 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:16:41.012716408 +0100 CET [33mCan't find a partner for StopArea 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:16:41.012734709 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:16:41.012768143 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:16:41.017309685 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:16:41.018496927 +0100 CET [33mPartner status is up[39m
+signal: killed
+2017-02-07 15:17:04.381726381 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:17:04.384075273 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:17:04.384117418 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:17:05.105381643 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:17:05.120650917 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82000ec60 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33084 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.120691272 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:17:05.120759344 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:17:05.120771553 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:17:05.125139983 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc82000f120 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33085 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.125179132 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:17:05.125251405 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:17:05.125260434 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:17:05.127395018 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc82000f660 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33086 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.127464304 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:17:05.127485614 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:17:05.127515324 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:17:05.127607769 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:17:05.129215405 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc8201b80c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33088 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.130834027 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:17:05.131191531 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:17:05.133109088 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8201b8760 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33089 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.133221543 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:17:05.133249963 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:17:05.133437273 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:17:05.133464855 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:17:05.142911209 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33091 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:05.142973738 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:17:05.144342462 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:17:05.144496808 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:17:05.144579829 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:17:05.144976989 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+signal: killed
+2017-02-07 15:17:54.932284235 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:17:54.934981152 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:17:54.935020577 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:17:56.206499501 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:17:56.225300037 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820120760 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33097 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.225339152 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:17:56.225399466 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:17:56.225412343 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:17:56.231318195 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820120c20 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33098 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.231353924 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:17:56.231421612 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:17:56.231430489 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:17:56.234024393 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201184e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33099 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.234096752 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:17:56.234217019 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:17:56.234246944 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:17:56.234346122 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:17:56.243017861 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc820121200 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33101 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.243058824 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:17:56.243348653 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:17:56.245287106 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc820121640 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33102 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.245349677 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:17:56.245375625 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:17:56.245387826 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:17:56.245414455 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:17:56.250026507 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:17:56.250138573 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:17:56.250188287 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:17:56.250448306 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:17:56.2872993 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:17:56.748642598 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33104 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.748667918 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:17:56.753034118 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33105 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.753058029 +0100 CET [33mLines Index[39m
+2017-02-07 15:17:56.755349942 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33106 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:17:56.755374457 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed
+2017-02-07 15:18:36.240583417 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:18:36.244373232 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:18:36.244425189 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:18:37.568287027 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:18:37.583609209 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82011c800 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33113 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:37.583648086 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:18:37.583717767 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:18:37.583728941 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:18:37.588098505 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc82017c040 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33114 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:37.588138006 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:18:37.588206812 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:18:37.588215565 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:18:37.590126598 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc820118480 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33115 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:37.590181447 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:18:37.59023274 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:18:37.590230779 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:18:37.590353677 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:18:37.592269787 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc82017ca40 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33117 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:37.594390061 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:18:37.594505806 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:18:37.596769365 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc82017d0c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33118 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:37.596836329 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:18:37.596869463 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:18:37.596882013 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:18:37.596895181 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:18:37.602591541 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:18:37.60270389 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:18:37.602756535 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:18:37.603066451 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:18:37.639416655 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:18:38.102343063 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33120 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:38.102370246 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:18:38.108338188 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33121 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:38.108365548 +0100 CET [33mLines Index[39m
+2017-02-07 15:18:38.111378809 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33122 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:18:38.111417799 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed

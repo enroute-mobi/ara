@@ -27,7 +27,7 @@ def url_for_model(attributes = {})
   url_for(attributes.merge(path: path))
 end
 
-def model_attributes table
+def model_attributes(table)
   attributes = table.rows_hash
   if attributes["ObjectIds"]
     attributes["ObjectIds"] = JSON.parse("{#{attributes["ObjectIds"]}}")
@@ -55,4 +55,11 @@ end
 After do
   pid = IO.read("tmp/pid")
   Process.kill('KILL',pid.to_i)
+end
+
+After do
+  if @webrick_server
+    puts "stop server"
+    @webrick_server.shutdown 
+  end
 end
