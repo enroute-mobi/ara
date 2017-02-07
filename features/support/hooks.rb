@@ -59,7 +59,6 @@ end
 
 After do
   if @webrick_server
-    puts "stop server"
     @webrick_server.shutdown 
   end
 end

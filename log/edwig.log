@@ -473,3 +473,464 @@ signal: killed
 2017-02-07 15:18:38.111378809 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33122 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
 2017-02-07 15:18:38.111417799 +0100 CET [33mVehicleJourneys Index[39m
 signal: killed
+2017-02-07 15:28:14.77881607 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:28:14.781669114 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:28:14.781720844 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:28:15.950219751 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:28:15.967071181 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc82011c800 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33221 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.967137219 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:28:15.9672346 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:28:15.967266329 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:28:15.975524654 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc820118440 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33222 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.97556793 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:28:15.975663569 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:28:15.975678389 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:28:15.978829001 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc82011cca0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33223 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.978999142 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:28:15.979041935 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:28:15.979162769 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:28:15.979414024 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:28:15.985059978 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc82011d380 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33225 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.98552598 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:28:15.985628519 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:28:15.988566392 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc82011d980 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33226 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.988764378 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:28:15.988808282 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:28:15.989268461 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:28:15.989313465 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:28:15.995175981 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:28:15.995871325 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33228 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:15.995908304 +0100 CET [33mStopVisits Index[39m
+signal: killed
+2017-02-07 15:28:46.721244878 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:28:46.72407199 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:28:46.724198619 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:28:47.576941058 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:28:47.591652483 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820148760 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33232 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:47.591702351 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:28:47.591779782 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:28:47.591798637 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:28:47.596656383 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc820107460 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33233 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:47.596696336 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:28:47.596771278 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:28:47.596782806 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:28:47.598522754 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201079e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33234 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:47.598621377 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:28:47.598636348 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:28:47.598666084 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:28:47.598790141 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:28:47.600450876 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc8200cb180 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33236 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:47.600501291 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:28:47.60301944 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:28:47.605793791 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201d4040 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33237 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:47.605909844 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:28:47.605949016 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:28:47.606383986 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:28:47.606427212 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:28:47.610712005 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:28:47.64792739 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:28:47.648024322 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:28:47.648072631 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:28:47.648309708 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:28:48.108958841 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33239 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:48.108990485 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:28:48.112807864 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33240 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:48.112838068 +0100 CET [33mLines Index[39m
+2017-02-07 15:28:48.115129482 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33241 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:28:48.115251036 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed
+2017-02-07 15:29:34.889562748 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:29:34.891754995 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:29:34.891801584 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:29:36.132042399 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:29:36.145429971 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82010ab00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33244 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.145474523 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:29:36.145524743 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:29:36.145536082 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:29:36.149831403 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc820126140 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33245 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.149875088 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:29:36.149944929 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:29:36.149954725 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:29:36.151742868 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc8201266e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33246 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.151930906 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:29:36.152008655 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:29:36.151973397 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:29:36.152135 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:29:36.153844738 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc82010b1e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33248 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.15389342 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:29:36.156169164 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:29:36.158723274 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc820126c20 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33249 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.158812169 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:29:36.15884294 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:29:36.15888308 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:29:36.158941037 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:29:36.16383862 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:29:36.163983834 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:29:36.164043637 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:29:36.164283841 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:29:36.199321923 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:29:36.661774084 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33251 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.661806535 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:29:36.66566949 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33252 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.665698908 +0100 CET [33mLines Index[39m
+2017-02-07 15:29:36.667466463 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33253 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:29:36.667490653 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed
+2017-02-07 15:32:01.656294294 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:32:01.668379193 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:32:01.668432415 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:32:02.876960935 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:32:02.891017836 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118b00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33260 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:02.891085508 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:32:02.891170319 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:32:02.891187338 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:32:02.895517295 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[213] Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc820118fc0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33261 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:02.89556534 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:32:02.895640802 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:32:02.895653243 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:32:02.897380863 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc820119500 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33262 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:02.897463845 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:32:02.897489795 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:32:02.897513765 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:32:02.897640457 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:32:02.899126394 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[71] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc820119b80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33264 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:02.899156986 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:32:02.901314199 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:32:02.902892442 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc8201780a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33265 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:02.902950201 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:32:02.90298331 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:32:02.902997243 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:32:02.903023337 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:32:02.908665786 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:32:02.908782523 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:32:02.908842952 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:32:02.909096532 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:32:02.943324775 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:32:04.405840966 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33267 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:04.405886471 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:32:04.40937312 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33268 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:04.409401606 +0100 CET [33mLines Index[39m
+2017-02-07 15:32:04.411468934 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33269 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:04.411503416 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed
+2017-02-07 15:32:20.726017357 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:32:20.728828484 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:32:20.72888275 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:32:22.173817549 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:32:22.188009515 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820134800 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33272 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:22.188053743 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:32:22.188125601 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:32:22.188141218 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:32:22.193858564 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc820134cc0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33273 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:22.193905163 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:32:22.193990498 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:32:22.19400623 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:32:22.196881345 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc82011a620 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33274 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:22.197009685 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:32:22.197047809 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:32:22.197152788 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:32:22.19736355 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:32:22.199112105 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71] Accept:[*/*]] %!s(*http.body=&{0xc8200bde80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33276 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:22.199279685 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:32:22.202951105 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:32:22.203435268 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded]] %!s(*http.body=&{0xc8201dc0a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33277 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:22.203553798 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:32:22.203562801 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:32:22.203605672 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:32:22.203605669 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:32:22.208742734 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:32:22.208843498 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:32:22.208892948 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:32:22.209128598 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:32:22.243309726 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:32:23.708325733 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33279 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:23.708359112 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:32:23.712649364 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33280 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:23.71267953 +0100 CET [33mLines Index[39m
+2017-02-07 15:32:23.714266402 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33281 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:32:23.714293028 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed
+2017-02-07 15:33:10.440520095 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:33:10.443293673 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:33:10.443358962 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:33:11.820123099 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:33:11.83546899 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82016a0c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33284 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:11.83551638 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:33:11.835583857 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:11.835600153 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:11.837988298 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[47]] %!s(*http.body=&{0xc82016a5c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=47) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33285 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:11.838031842 +0100 CET [33mCreate line: {"Name":"Test","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:33:11.840076992 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33286 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:11.84010788 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:33:21.88468563 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:33:21.887383766 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:33:21.887435502 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:33:22.851082809 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:33:22.86158835 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*]] %!s(*http.body=&{0xc820116aa0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33290 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:22.861627342 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:33:22.861679293 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:22.86169137 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:22.8635571 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49] Accept:[*/*]] %!s(*http.body=&{0xc8201061a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33291 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:22.863606791 +0100 CET [33mCreate line: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:33:22.86556658 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[49] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8201066e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33292 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:22.865595621 +0100 CET [33mCreate line: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:33:22.867045598 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33293 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:22.867065424 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:22.86856286 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33294 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:22.86858595 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:33:33.668586659 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:33:33.67130283 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:33:33.671354994 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:33:34.967766426 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:33:34.976603698 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc8200e9f80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33308 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:34.976644938 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:33:34.976716794 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:34.97673333 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:34.978461484 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[66]] %!s(*http.body=&{0xc82013e820 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=66) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33309 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:34.978518149 +0100 CET [33mCreate line: {"Name":"Test 1","ObjectIds":{"internal":"1234","external":"abc"}}[39m
+2017-02-07 15:33:34.980295133 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33310 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:34.980316853 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:34.981648801 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33311 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:34.981673565 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:33:45.392499856 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:33:45.395520706 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:33:45.395587343 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:33:46.175078927 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:33:46.185504584 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82000f260 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33325 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.185541546 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:33:46.185597215 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:46.185609916 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:46.186864139 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc82000f7a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33326 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.186895846 +0100 CET [33mCreate line: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:33:46.188560916 +0100 CET [33mlines controller request: &{POST /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49]] %!s(*http.body=&{0xc82000fc80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33327 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.188590842 +0100 CET [33mCreate line: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:33:46.189960304 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33328 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.190003892 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:46.190857589 +0100 CET [33mlines controller request: &{DELETE /test/lines/6ba7b814-9dad-11d1-2-00c04fd430c8 HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33329 /test/lines/6ba7b814-9dad-11d1-2-00c04fd430c8 %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.190879925 +0100 CET [33mDelete line 6ba7b814-9dad-11d1-2-00c04fd430c8[39m
+2017-02-07 15:33:46.191962658 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33330 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.191978738 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:46.193595112 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33331 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:46.193661212 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:33:56.246049563 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:33:56.248308513 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:33:56.248355569 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:33:57.79527883 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:33:57.804161698 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8200bdf00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33334 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.804198941 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:33:57.804249389 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:57.804262364 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:57.805376648 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[16]] %!s(*http.body=&{0xc82010cd60 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=16) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33335 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.8054024 +0100 CET [33mCreate referential: {"slug":"test1"}[39m
+2017-02-07 15:33:57.805437335 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:57.805451745 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:57.806847301 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[16]] %!s(*http.body=&{0xc820170480 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=16) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33336 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.806882478 +0100 CET [33mCreate referential: {"slug":"test2"}[39m
+2017-02-07 15:33:57.806913973 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:33:57.806930123 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:33:57.808360805 +0100 CET [33mlines controller request: &{POST /test1/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc82010d160 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33337 /test1/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.808390526 +0100 CET [33mCreate line: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:33:57.810451427 +0100 CET [33mlines controller request: &{POST /test2/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[49] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc8201707e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33338 /test2/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.810488417 +0100 CET [33mCreate line: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:33:57.812608929 +0100 CET [33mlines controller request: &{GET /test1/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33339 /test1/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.812632324 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:57.814335175 +0100 CET [33mlines controller request: &{GET /test2/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33340 /test2/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.814354539 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:57.8159545 +0100 CET [33mlines controller request: &{GET /test2/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33341 /test2/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.81597495 +0100 CET [33mLines Index[39m
+2017-02-07 15:33:57.817601177 +0100 CET [33mlines controller request: &{GET /test1/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33342 /test1/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:33:57.817639996 +0100 CET [33mLines Index[39m
+signal: killed
+2017-02-07 15:34:07.95864841 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:34:07.961405869 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:34:07.961521169 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:34:09.233983148 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:34:09.243225116 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820114d40 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33350 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:09.243270407 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:34:09.243327508 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:34:09.243340369 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:34:09.244855624 +0100 CET [33mreferentials controller request: &{GET /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33351 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:09.244877408 +0100 CET [33mReferentials Index[39m
+signal: killed
+2017-02-07 15:34:19.213605743 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:34:19.218084366 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:34:19.218196663 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:34:20.523987661 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:34:20.534819322 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc82000e8e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33355 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:20.534895386 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:34:20.534979515 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:34:20.534995888 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:34:20.536950467 +0100 CET [33mreferentials controller request: &{GET /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33356 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:20.536977289 +0100 CET [33mReferentials Index[39m
+2017-02-07 15:34:20.537851255 +0100 CET [33mreferentials controller request: &{DELETE /_referentials/6ba7b814-9dad-11d1-1-00c04fd430c8 HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33357 /_referentials/6ba7b814-9dad-11d1-1-00c04fd430c8 %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:20.537876978 +0100 CET [33mDelete referential 6ba7b814-9dad-11d1-1-00c04fd430c8[39m
+2017-02-07 15:34:20.537908129 +0100 CET [33mStop Partners Guardian[39m
+2017-02-07 15:34:20.539063409 +0100 CET [33mreferentials controller request: &{GET /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33358 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:20.539080701 +0100 CET [33mReferentials Index[39m
+signal: killed
+2017-02-07 15:34:30.128666205 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:34:30.130808853 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:34:30.130872473 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:34:31.523587977 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:34:31.532838602 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*]] %!s(*http.body=&{0xc820118ce0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33361 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:31.532876423 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:34:31.532933977 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:34:31.532946349 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:34:31.534734818 +0100 CET [33mCheckStatus CheckStatus:Test:0
+[39m
+signal: killed
+2017-02-07 15:34:42.107415181 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:34:42.109716238 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:34:42.109770024 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:34:43.140188343 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:34:43.149573596 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820138040 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33368 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:43.149621897 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:34:43.149692718 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:34:43.149710328 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:34:43.152068911 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Length:[47] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json]] %!s(*http.body=&{0xc820118c00 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=47) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33369 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:43.152113069 +0100 CET [33mCreate stopArea: {"Name":"Test","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:34:43.153670209 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33370 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:43.153694647 +0100 CET [33mStopAreas Index[39m
+signal: killed
+2017-02-07 15:34:53.159325471 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:34:53.164764899 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:34:53.164810568 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:34:54.449462065 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:34:54.460373175 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc820118ce0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33373 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:54.460416361 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:34:54.460491026 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:34:54.460507044 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:34:54.462287178 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[49] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8201191a0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33374 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:54.462333909 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:34:54.464636945 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49] Accept:[*/*]] %!s(*http.body=&{0xc8200c9f60 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33375 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:54.46467878 +0100 CET [33mCreate stopArea: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:34:54.466411486 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33376 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:54.46643278 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:34:54.46824325 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33377 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:34:54.468277041 +0100 CET [33mStopAreas Index[39m
+signal: killed
+2017-02-07 15:35:04.349639095 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:35:04.351836686 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:35:04.351894959 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:35:05.893664801 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:35:05.906980775 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc820138480 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33380 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:05.907044257 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:35:05.907119285 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:05.90713542 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:05.908731852 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[66]] %!s(*http.body=&{0xc8201882e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=66) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33381 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:05.908766594 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"1234","external":"abc"}}[39m
+2017-02-07 15:35:05.910517648 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33382 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:05.910543889 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:05.912050939 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33383 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:05.912078786 +0100 CET [33mStopAreas Index[39m
+signal: killed
+2017-02-07 15:35:15.64995454 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:35:15.653697457 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:35:15.653743043 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:35:16.759480483 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:35:16.772843604 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc8201340c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33386 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.772893063 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:35:16.772951149 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:16.7729646 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:16.774263881 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49]] %!s(*http.body=&{0xc820118b80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33387 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.77429286 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:35:16.775939212 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49]] %!s(*http.body=&{0xc820119060 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33388 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.775972518 +0100 CET [33mCreate stopArea: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:35:16.777680123 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33389 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.777708062 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:16.778715526 +0100 CET [33mstop_areas controller request: &{DELETE /test/stop_areas/6ba7b814-9dad-11d1-2-00c04fd430c8 HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33390 /test/stop_areas/6ba7b814-9dad-11d1-2-00c04fd430c8 %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.778741454 +0100 CET [33mDelete stopArea 6ba7b814-9dad-11d1-2-00c04fd430c8[39m
+2017-02-07 15:35:16.780121994 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33391 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.780141957 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:16.781621021 +0100 CET [33mstop_areas controller request: &{GET /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33392 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:16.781646237 +0100 CET [33mStopAreas Index[39m
+signal: killed
+2017-02-07 15:35:26.517066057 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:35:26.519597747 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:35:26.519644432 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:35:27.903558926 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:35:27.914429246 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15]] %!s(*http.body=&{0xc8201763c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33396 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.914468906 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:35:27.914525441 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:27.914538202 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:27.916472796 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/json] Content-Length:[16] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*http.body=&{0xc8200e1a80 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=16) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33397 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.916504233 +0100 CET [33mCreate referential: {"slug":"test1"}[39m
+2017-02-07 15:35:27.916531412 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:27.91654336 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:27.918283057 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[16] Accept:[*/*]] %!s(*http.body=&{0xc8201768e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=16) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33398 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.918314707 +0100 CET [33mCreate referential: {"slug":"test2"}[39m
+2017-02-07 15:35:27.918342084 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:27.918353708 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:27.919969329 +0100 CET [33mstop_areas controller request: &{POST /test1/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49]] %!s(*http.body=&{0xc8200e1ec0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33399 /test1/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.920007691 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"1234"}}[39m
+2017-02-07 15:35:27.921876889 +0100 CET [33mstop_areas controller request: &{POST /test2/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[49]] %!s(*http.body=&{0xc8201fc3c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=49) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33400 /test2/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.921908595 +0100 CET [33mCreate stopArea: {"Name":"Test 2","ObjectIds":{"internal":"2345"}}[39m
+2017-02-07 15:35:27.923305313 +0100 CET [33mstop_areas controller request: &{GET /test1/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33401 /test1/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.923323914 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:27.924467031 +0100 CET [33mstop_areas controller request: &{GET /test2/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33402 /test2/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.924486437 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:27.925660685 +0100 CET [33mstop_areas controller request: &{GET /test2/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33403 /test2/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.925678292 +0100 CET [33mStopAreas Index[39m
+2017-02-07 15:35:27.927049482 +0100 CET [33mstop_areas controller request: &{GET /test1/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33404 /test1/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:27.927072426 +0100 CET [33mStopAreas Index[39m
+signal: killed
+2017-02-07 15:35:37.947125717 +0100 CET [33mConnected to Database edwig_test[39m
+2017-02-07 15:35:37.94986827 +0100 CET [33mLoaded Referentials from database[39m
+2017-02-07 15:35:37.949920305 +0100 CET [33mStarting server on localhost:8081[39m
+2017-02-07 15:35:38.949868105 +0100 CET [33mCheckStatus Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC
+[39m
+2017-02-07 15:35:38.958894055 +0100 CET [33mreferentials controller request: &{POST /_referentials HTTP/1.1 %!s(int=1) %!s(int=1) map[User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[15] Accept:[*/*] Accept-Encoding:[gzip, deflate]] %!s(*http.body=&{0xc8201183e0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=15) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33408 /_referentials %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:38.958940289 +0100 CET [33mCreate referential: {"slug":"test"}[39m
+2017-02-07 15:35:38.959008461 +0100 CET [33mStart partners guardian[39m
+2017-02-07 15:35:38.959027852 +0100 CET [33mStart models guardian[39m
+2017-02-07 15:35:38.964233145 +0100 CET [33mpartners controller request: &{POST /test/partners HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[application/json] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[213]] %!s(*http.body=&{0xc82011c880 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=213) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33409 /test/partners %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:38.964279634 +0100 CET [33mCreate partner: {"slug":"test","connectorTypes":["siri-check-status-client","siri-stop-monitoring-request-collector"],"settings":{"remote_url":"http://localhost:8090","remote_credential":"test","remote_objectid_kind":"internal"}}[39m
+2017-02-07 15:35:38.96437323 +0100 CET [33mCreate connector siri-check-status-client for partner test[39m
+2017-02-07 15:35:38.964387994 +0100 CET [33mCreate connector siri-stop-monitoring-request-collector for partner test[39m
+2017-02-07 15:35:38.966699379 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18] Content-Type:[application/x-www-form-urlencoded] Accept:[*/*]] %!s(*http.body=&{0xc8201188c0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33410 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:38.966790911 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:35:38.966879377 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:35:38.967089162 +0100 CET [33mCreate SIRI SOAPClient to http://localhost:8090[39m
+2017-02-07 15:35:38.967362964 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:35:38.971241855 +0100 CET [33mstop_areas controller request: &{POST /test/stop_areas HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Type:[application/json] Content-Length:[71]] %!s(*http.body=&{0xc820118fc0 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=71) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33412 /test/stop_areas %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:38.972666955 +0100 CET [33mCreate stopArea: {"Name":"Test 1","ObjectIds":{"internal":"NINOXE:StopPoint:SP:24:LOC"}}[39m
+2017-02-07 15:35:38.972882055 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:35:38.974498612 +0100 CET [33mtime controller request: &{POST /_time/advance HTTP/1.1 %!s(int=1) %!s(int=1) map[Content-Type:[application/x-www-form-urlencoded] Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319] Content-Length:[18]] %!s(*http.body=&{0xc820119640 <nil> <nil> false true {0 0} false false false <nil>}) %!s(int64=18) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33413 /_time/advance %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:38.974553514 +0100 CET [33mCheck partners status[39m
+2017-02-07 15:35:38.974597157 +0100 CET [33mCheck 'test' partner status[39m
+2017-02-07 15:35:38.974595184 +0100 CET [33mCheck StopAreas status[39m
+2017-02-07 15:35:38.97463828 +0100 CET [33mRequestStopAreaUpdate 6ba7b814-9dad-11d1-4-00c04fd430c8[39m
+2017-02-07 15:35:38.980040823 +0100 CET [33mCreate new StopArea Elf Sylvain - Métro (R), objectid: {internal NINOXE:StopPoint:Q:50:LOC}[39m
+2017-02-07 15:35:38.980182816 +0100 CET [33mCreate new Line, objectid: {internal NINOXE:Line:3:LOC}[39m
+2017-02-07 15:35:38.980266404 +0100 CET [33mCreate new VehicleJourney, objectid: {internal NINOXE:VehicleJourney:201}[39m
+2017-02-07 15:35:38.980644217 +0100 CET [33mCreate new StopVisit, objectid: {internal NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3}[39m
+2017-02-07 15:35:39.015264826 +0100 CET [33mPartner status is up[39m
+2017-02-07 15:35:40.479419975 +0100 CET [33mstop_visits controller request: &{GET /test/stop_visits HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33415 /test/stop_visits %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:40.479462076 +0100 CET [33mStopVisits Index[39m
+2017-02-07 15:35:40.481756495 +0100 CET [33mlines controller request: &{GET /test/lines HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33416 /test/lines %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:40.481789478 +0100 CET [33mLines Index[39m
+2017-02-07 15:35:40.484073397 +0100 CET [33mvehicle_journeys controller request: &{GET /test/vehicle_journeys HTTP/1.1 %!s(int=1) %!s(int=1) map[Accept:[*/*] Accept-Encoding:[gzip, deflate] User-Agent:[rest-client/2.0.0 (linux-gnu x86_64) ruby/2.2.5p319]] %!s(*struct { http.eofReaderWithWriteTo; io.Closer }=&{{} {<nil>}}) %!s(int64=0) [] %!s(bool=false) localhost:8081 map[] map[] %!s(*multipart.Form=<nil>) map[] 127.0.0.1:33417 /test/vehicle_journeys %!s(*tls.ConnectionState=<nil>) %!s(<-chan struct {}=<nil>)}[39m
+2017-02-07 15:35:40.484104404 +0100 CET [33mVehicleJourneys Index[39m
+signal: killed

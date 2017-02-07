@@ -2,7 +2,6 @@ require 'webrick'
 require 'json'
 
 def create_webrick_server(address, response)
-	puts "start server"
 	@webrick_server = WEBrick::HTTPServer.new(Port: 8090)
 	@webrick_requests = []
 
@@ -60,8 +59,7 @@ end
 
 Given(/^a Partner "([^"]*)" exists with connectors \[([^"\]]*)\] and the following settings:$/) do |partner, connectors, settings|
 	attributes = {"slug" => partner, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => model_attributes(settings)}
-	puts partners_path, attributes.inspect
-	puts RestClient.post partners_path, attributes.to_json, {content_type: :json, accept: :json}
+	RestClient.post partners_path, attributes.to_json, {content_type: :json, accept: :json}
 end
 
 def time_path(action = "")
@@ -71,7 +69,6 @@ def time_path(action = "")
 end
 
 When(/^a minute has passed$/) do
-	puts time_path("advance"), { "duration" => "60s" }.to_json
 	RestClient.post(time_path("advance"), { "duration" => "60s" }.to_json)
 end
 
@@ -83,6 +80,7 @@ When(/^the SIRI server should have receive a GetStopMonitoring request$/) do
 
 		sleep 0.5
 	end
+	sleep 1 # don't blame me
 end
 
 def stop_visits_path(attributes = {})
