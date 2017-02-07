@@ -88,7 +88,7 @@ Feature: Manage StopMonitoring
       | Name      | Test 1                                   |
       | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
-    And the SIRI server should have receive a GetStopMonitoring request
+    And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
       | ObjectIds    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder |                                                                    4 |

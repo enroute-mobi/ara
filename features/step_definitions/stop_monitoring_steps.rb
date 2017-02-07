@@ -70,9 +70,10 @@ end
 
 When(/^a minute has passed$/) do
 	RestClient.post(time_path("advance"), { "duration" => "60s" }.to_json)
+	sleep 1 # don't blame me
 end
 
-When(/^the SIRI server should have receive a GetStopMonitoring request$/) do
+When(/^the SIRI server has received a GetStopMonitoring request$/) do
 	try_count = 0
 	while @webrick_requests.empty?
 		try_count += 1
@@ -80,7 +81,6 @@ When(/^the SIRI server should have receive a GetStopMonitoring request$/) do
 
 		sleep 0.5
 	end
-	sleep 1 # don't blame me
 end
 
 def stop_visits_path(attributes = {})
