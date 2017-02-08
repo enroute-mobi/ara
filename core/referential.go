@@ -14,6 +14,8 @@ type Referential struct {
 	id   ReferentialId
 	slug ReferentialSlug
 
+	Settings map[string]string
+
 	collectManager CollectManagerInterface
 	manager        Referentials
 	model          model.Model
@@ -36,9 +38,10 @@ type Referentials interface {
 var referentials = NewMemoryReferentials()
 
 type APIReferential struct {
-	Id     ReferentialId   `json:"Id,omitempty"`
-	Slug   ReferentialSlug `json:"Slug,omitempty"`
-	Errors Errors          `json:"Errors,omitempty"`
+	Id       ReferentialId     `json:"Id,omitempty"`
+	Slug     ReferentialSlug   `json:"Slug,omitempty"`
+	Errors   Errors            `json:"Errors,omitempty"`
+	Settings map[string]string `json:"Settings,omitempty"`
 
 	manager Referentials
 }
@@ -68,6 +71,10 @@ func (referential *Referential) Id() ReferentialId {
 
 func (referential *Referential) Slug() ReferentialSlug {
 	return referential.slug
+}
+
+func (referential *Referential) Setting(key string) string {
+	return referential.Settings[key]
 }
 
 // WIP: Interface ?
@@ -110,22 +117,25 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Id":       referential.id,
 		"Slug":     referential.slug,
+		"Settings": referential.Settings,
 		"Partners": referential.partners,
 	})
 }
 
 func (referential *Referential) Definition() *APIReferential {
 	return &APIReferential{
-		Id:      referential.id,
-		Slug:    referential.slug,
-		Errors:  NewErrors(),
-		manager: referential.manager,
+		Id:       referential.id,
+		Slug:     referential.slug,
+		Settings: referential.Settings,
+		Errors:   NewErrors(),
+		manager:  referential.manager,
 	}
 }
 
 func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 	referential.id = apiReferential.Id
 	referential.slug = apiReferential.Slug
+	referential.Settings = apiReferential.Settings
 }
 
 type MemoryReferentials struct {
@@ -154,8 +164,9 @@ func (manager *MemoryReferentials) new() *Referential {
 	model := model.NewMemoryModel()
 
 	referential := &Referential{
-		manager: manager,
-		model:   model,
+		manager:  manager,
+		model:    model,
+		Settings: make(map[string]string),
 	}
 
 	referential.partners = NewPartnerManager(referential)
@@ -208,7 +219,9 @@ func (manager *MemoryReferentials) Load() error {
 	var selectReferentials []struct {
 		Referential_id string
 		Slug           string
+		Settings       string
 	}
+
 	_, err := model.Database.Select(&selectReferentials, "select * from referentials")
 	if err != nil {
 		return err
@@ -218,7 +231,12 @@ func (manager *MemoryReferentials) Load() error {
 		referential := manager.new()
 		referential.id = ReferentialId(r.Referential_id)
 		referential.slug = ReferentialSlug(r.Slug)
+
 		referential.Partners().Load()
+
+		if err = json.Unmarshal([]byte(r.Settings), &referential.Settings); err != nil {
+			return err
+		}
 		manager.Save(referential)
 	}
 

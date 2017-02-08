@@ -47,12 +47,14 @@ func Test_Referential_Partners(t *testing.T) {
 }
 
 func Test_Referential_MarshalJSON(t *testing.T) {
+
 	referential := &Referential{
-		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		slug: "referential",
+		id:       "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		slug:     "referential",
+		Settings: map[string]string{"key": "value"},
 	}
 	referential.partners = NewPartnerManager(referential)
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":[],"Slug":"referential"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":[],"Settings":{"key":"value"},"Slug":"referential"}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -223,10 +225,13 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	var databaseReferential = struct {
 		Referential_id string `db:"referential_id"`
 		Slug           string `db:"slug"`
+		Settings       string `db:"settings"`
 	}{
 		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Slug:           "ratp",
+		Settings:       "{}",
 	}
+
 	model.Database.AddTableWithName(databaseReferential, "referentials")
 	err := model.Database.Insert(&databaseReferential)
 	if err != nil {
