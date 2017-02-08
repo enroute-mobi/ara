@@ -13,6 +13,10 @@ const (
 )
 
 type Connector interface{}
+type SIRIConnector interface {
+	Partner() *Partner
+	SIRIPartner() *SIRIPartner
+}
 
 type BaseConnector struct {
 	partner *Partner
@@ -22,11 +26,11 @@ func (connector *BaseConnector) Partner() *Partner {
 	return connector.partner
 }
 
-type SIRIConnector struct {
+type siriConnector struct {
 	BaseConnector
 }
 
-func (connector *SIRIConnector) SIRIPartner() *SIRIPartner {
+func (connector *siriConnector) SIRIPartner() *SIRIPartner {
 	if !connector.Partner().Context().IsDefined(SIRI_PARTNER) {
 		connector.Partner().Context().SetValue(SIRI_PARTNER, NewSIRIPartner(connector.Partner()))
 	}
@@ -67,5 +71,5 @@ func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) bool {
 }
 
 func (factory *TestValidationFactory) CreateConnector(partner *Partner) Connector {
-	return &TestValidationFactory{}
+	return &TestValidationConnector{}
 }

@@ -242,6 +242,15 @@ func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	return connector, ok
 }
 
+func (partner *Partner) SIRIConnector(connectorType string) (SIRIConnector, bool) {
+	connector, ok := partner.connectors[connectorType]
+	if !ok {
+		return nil, ok
+	}
+	siriConnector, ok := connector.(SIRIConnector)
+	return siriConnector, ok
+}
+
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	// WIP
 	client, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]
