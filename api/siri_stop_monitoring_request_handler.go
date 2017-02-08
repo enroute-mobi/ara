@@ -27,7 +27,7 @@ func (handler *SIRIStopMonitoringRequestHandler) XMLResponse(connector core.Conn
 	response.Address = connector.(*core.SIRICheckStatusClient).Partner().Setting("Address")
 	response.ProducerRef = "Edwig"
 	response.RequestMessageRef = handler.xmlRequest.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.(*core.SIRICheckStatusClient).SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.(*core.SIRIStopMonitoringRequestCollector).SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = model.DefaultClock().Now()
 

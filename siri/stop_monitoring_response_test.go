@@ -119,30 +119,128 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 
 func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	expectedXML := `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-                               xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                               xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                               xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                               xmlns:ns7="http://scma/siri"
-                               xmlns:ns8="http://wsdl.siri.org.uk"
-                               xmlns:ns9="http://wsdl.siri.org.uk/siri">
-  <ServiceDeliveryInfo>
-    <ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-    <ns3:ProducerRef>producer</ns3:ProducerRef>
-    <ns3:Address>address</ns3:Address>
-    <ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
-    <ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
-  </ServiceDeliveryInfo>
-  <Answer>
-    <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-      <ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-      <ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
-      <ns3:Status>true</ns3:Status>
-    </ns3:StopMonitoringDelivery>
-  </Answer>
-  <AnswerExtension />
+															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
+															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+															 xmlns:ns7="http://scma/siri"
+															 xmlns:ns8="http://wsdl.siri.org.uk"
+															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>producer</ns3:ProducerRef>
+		<ns3:Address>address</ns3:Address>
+		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+			<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+			<ns3:Status>true</ns3:Status>
+		</ns3:StopMonitoringDelivery>
+	</Answer>
+	<AnswerExtension />
 </ns8:GetStopMonitoringResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	request := NewSIRIStopMonitoringResponse("address", "producer", "ref", "identifier", true, responseTimestamp)
+	if expectedXML != request.BuildXML() {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	}
+
+	expectedXML = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
+															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+															 xmlns:ns7="http://scma/siri"
+															 xmlns:ns8="http://wsdl.siri.org.uk"
+															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>producer</ns3:ProducerRef>
+		<ns3:Address>address</ns3:Address>
+		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+			<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+			<ns3:Status>true</ns3:Status>
+			<ns3:MonitoredStopVisit>
+				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
+				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
+				<ns3:MonitoredVehicleJourney>
+					<ns3:LineRef>lineRef</ns3:LineRef>
+					<ns3:DirectionRef>TBD</ns3:DirectionRef>
+					<ns3:FramedVehicleJourneyRef>
+						<ns3:DataFrameRef>TBD</ns3:DataFrameRef>
+						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
+					</ns3:FramedVehicleJourneyRef>
+					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
+					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
+					<ns3:DirectionName>TBD</ns3:DirectionName>
+					<ns3:ExternalLineRef>TBD</ns3:ExternalLineRef>
+					<ns3:OperatorRef>TBD</ns3:OperatorRef>
+					<ns3:ProductCategoryRef>TBD</ns3:ProductCategoryRef>
+					<ns3:VehicleFeatureRef>TBD</ns3:VehicleFeatureRef>
+					<ns3:OriginRef>TBD</ns3:OriginRef>
+					<ns3:OriginName>TBD</ns3:OriginName>
+					<ns3:DestinationRef>TBD</ns3:DestinationRef>
+					<ns3:DestinationName>TBD</ns3:DestinationName>
+					<ns3:OriginAimedDepartureTime>TBD</ns3:OriginAimedDepartureTime>
+					<ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
+					<ns3:Monitored>TBD</ns3:Monitored>
+					<ns3:ProgressRate>TBD</ns3:ProgressRate>
+					<ns3:Delay>TBD</ns3:Delay>
+					<ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
+					<ns3:VehicleRef>TBD</ns3:VehicleRef>
+					<ns3:MonitoredCall>
+						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
+						<ns3:Order>1</ns3:Order>
+						<ns3:StopPointName>TBD</ns3:StopPointName>
+						<ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
+						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
+						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
+						<ns3:ArrivalStatus>arrStatus</ns3:ArrivalStatus>
+						<ns3:ArrivalBoardingActivity>TBD</ns3:ArrivalBoardingActivity>
+						<ns3:ArrivalStopAssignment>
+							<ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
+							<ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
+						</ns3:ArrivalStopAssignment>
+						<ns3:AimedDepartureTime>2019-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
+						<ns3:ExpectedDepartureTime>2020-09-21T20:14:46.000Z</ns3:ExpectedDepartureTime>
+						<ns3:DepartureStatus>depStatus</ns3:DepartureStatus>
+						<ns3:DepartureBoardingActivity>TBD</ns3:DepartureBoardingActivity>
+						<ns3:DepartureStopAssignment>
+							<ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
+							<ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
+						</ns3:DepartureStopAssignment>
+					</ns3:MonitoredCall>
+				</ns3:MonitoredVehicleJourney>
+			</ns3:MonitoredStopVisit>
+		</ns3:StopMonitoringDelivery>
+	</Answer>
+	<AnswerExtension />
+</ns8:GetStopMonitoringResponse>`
+	siriMonitoredStopVisit := &SIRIMonitoredStopVisit{
+		ItemIdentifier:         "itemId",
+		StopPointRef:           "stopPointRef",
+		StopPointName:          "stopPointName",
+		DatedVehicleJourneyRef: "vehicleJourneyRef",
+		LineRef:                "lineRef",
+		PublishedLineName:      "lineName",
+		DepartureStatus:        "depStatus",
+		ArrivalStatus:          "arrStatus",
+		Order:                  1,
+		AimedArrivalTime:       time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
+		// ExpectedArrivalTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ActualArrivalTime:     time.Date(2018, time.September, 21, 20, 14, 46, 0, time.UTC),
+		AimedDepartureTime:    time.Date(2019, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ExpectedDepartureTime: time.Date(2020, time.September, 21, 20, 14, 46, 0, time.UTC),
+		// ActualDepartureTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+	}
+	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	if expectedXML != request.BuildXML() {
 		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
 	}
