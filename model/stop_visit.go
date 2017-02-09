@@ -126,6 +126,7 @@ type StopVisits interface {
 	Find(id StopVisitId) (StopVisit, bool)
 	FindByObjectId(objectid ObjectID) (StopVisit, bool)
 	FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit
+	FindByStopAreaId(id StopAreaId) []StopVisit
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
@@ -172,6 +173,16 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 	}
 	for _, stopVisitId := range stopVisitIds {
 		stopVisits = append(stopVisits, *manager.byIdentifier[stopVisitId])
+	}
+	return
+}
+
+// Temp
+func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+	for _, stopVisit := range manager.byIdentifier {
+		if stopVisit.stopAreaId == id {
+			stopVisits = append(stopVisits, *stopVisit)
+		}
 	}
 	return
 }
