@@ -58,6 +58,19 @@ func NewXMLStopMonitoringRequestFromContent(content []byte) (*XMLStopMonitoringR
 	return request, nil
 }
 
+func NewSIRIStopMonitoringRequest(
+	messageIdentifier,
+	monitoringRef,
+	requestorRef string,
+	requestTimestamp time.Time) *SIRIStopMonitoringRequest {
+	return &SIRIStopMonitoringRequest{
+		MessageIdentifier: messageIdentifier,
+		MonitoringRef:     monitoringRef,
+		RequestorRef:      requestorRef,
+		RequestTimestamp:  requestTimestamp,
+	}
+}
+
 func (request *XMLStopMonitoringRequest) MonitoringRef() string {
 	if request.monitoringRef == "" {
 		request.monitoringRef = request.findStringChildContent("MonitoringRef")

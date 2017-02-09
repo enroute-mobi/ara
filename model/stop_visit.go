@@ -31,13 +31,20 @@ type StopVisit struct {
 }
 
 func NewStopVisit(model Model) *StopVisit {
-	stopVisit := &StopVisit{model: model}
+	stopVisit := &StopVisit{
+		model:     model,
+		schedules: NewStopVisitSchedules(),
+	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
 }
 
 func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
+}
+
+func (stopVisit *StopVisit) SetStopAreaId(id StopAreaId) {
+	stopVisit.stopAreaId = id
 }
 
 func (stopVisit *StopVisit) StopArea() StopArea {
@@ -50,14 +57,8 @@ func (stopVisit *StopVisit) VehicleJourney() VehicleJourney {
 	return vehicleJourney
 }
 
-func (stopVisit *StopVisit) Schedules() (scheduleSlice []StopVisitSchedule) {
-	if len(stopVisit.schedules) == 0 {
-		return []StopVisitSchedule{}
-	}
-	for _, schedule := range stopVisit.schedules {
-		scheduleSlice = append(scheduleSlice, *schedule)
-	}
-	return
+func (stopVisit *StopVisit) Schedules() StopVisitSchedules {
+	return stopVisit.schedules
 }
 
 func (stopVisit *StopVisit) DepartureStatus() StopVisitDepartureStatus {
@@ -73,12 +74,17 @@ func (stopVisit *StopVisit) PassageOrder() int {
 }
 
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
+	scheduleSlice := []StopVisitSchedule{}
+	for _, schedule := range stopVisit.schedules {
+		scheduleSlice = append(scheduleSlice, *schedule)
+	}
+
 	stopVisitMap := map[string]interface{}{
 		"Id":              stopVisit.id,
 		"StopArea":        stopVisit.stopAreaId,
 		"VehicleJourney":  stopVisit.vehicleJourneyId,
 		"PassageOrder":    stopVisit.passageOrder,
-		"Schedules":       stopVisit.Schedules(),
+		"Schedules":       scheduleSlice,
 		"DepartureStatus": stopVisit.departureStatus,
 		"ArrivalStatus":   stopVisit.arrivalStatus,
 	}

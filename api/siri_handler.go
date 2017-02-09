@@ -29,7 +29,7 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 			referential: handler.referential,
 			xmlRequest:  siri.NewXMLCheckStatusRequest(envelope.Body()),
 		}
-	case "StopMonitoring":
+	case "GetStopMonitoring":
 		return &SIRIStopMonitoringRequestHandler{
 			referential: handler.referential,
 			xmlRequest:  siri.NewXMLStopMonitoringRequest(envelope.Body()),

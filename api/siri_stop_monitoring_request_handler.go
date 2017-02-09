@@ -26,15 +26,16 @@ func (handler *SIRIStopMonitoringRequestHandler) ConnectorType() string {
 func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.SIRIConnector, rw http.ResponseWriter) {
 	logger.Log.Debugf("StopMonitoring %s\n", handler.xmlRequest.MessageIdentifier())
 
-	// tx := handler.referential.NewTransaction()
-	// defer tx.Close()
+	tx := handler.referential.NewTransaction()
+	defer tx.Close()
 
-	// objectid := model.NewObjectID(connector.(core.SIRIConnector).Partner().Setting("remote_objectid_kind"), handler.xmlRequest.MonitoringRef())
-	// stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
-	// if !ok {
-	// 	siriError("NotFound", "StopArea not found", rw)
-	// 	return
-	// }
+	objectidKind := connector.(core.SIRIConnector).Partner().Setting("remote_objectid_kind")
+	objectid := model.NewObjectID(objectidKind, handler.xmlRequest.MonitoringRef())
+	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+	if !ok {
+		siriError("NotFound", "StopArea not found", rw)
+		return
+	}
 
 	response := new(siri.SIRIStopMonitoringResponse)
 	response.Address = connector.(core.SIRIConnector).Partner().Setting("Address")
@@ -45,6 +46,32 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.SIRIConn
 	response.ResponseTimestamp = model.DefaultClock().Now()
 
 	// Fill StopVisits
+	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
+		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
+		if !ok {
+			siriError("InternalServiceError", "", rw)
+			return
+		}
+		schedules := stopVisit.Schedules()
+		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
+			ItemIdentifier: stopVisitId.Value(),
+			StopPointRef:   objectid.Value(),
+			StopPointName:  stopArea.Name,
+			// DatedVehicleJourneyRef: stopVisit
+			// LineRef                string
+			// PublishedLineName      string
+			DepartureStatus:       string(stopVisit.DepartureStatus()),
+			ArrivalStatus:         string(stopVisit.ArrivalStatus()),
+			Order:                 stopVisit.PassageOrder(),
+			AimedArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
+			ExpectedArrivalTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
+			ActualArrivalTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),
+			AimedDepartureTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime(),
+			ExpectedDepartureTime: schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
+			ActualDepartureTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
+		}
+		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
+	}
 
 	xmlResponse := response.BuildXML()
 

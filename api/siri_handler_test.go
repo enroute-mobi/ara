@@ -11,7 +11,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-func siriHandler_Request(soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
+func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	model.SetDefaultClock(model.NewFakeClock())
 	defer model.SetDefaultClock(model.NewRealClock())
 
@@ -25,10 +25,11 @@ func siriHandler_Request(soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *h
 
 	partner := referential.Partners().New("partner")
 	partner.Settings = map[string]string{
-		"remote_url":        "",
-		"remote_credential": "",
-		"local_credential":  "Edwig",
-		"Address":           "edwig.edwig",
+		"remote_url":           "",
+		"remote_credential":    "",
+		"remote_objectid_kind": "objectidKind",
+		"local_credential":     "Edwig",
+		"Address":              "edwig.edwig",
 	}
 	partner.ConnectorTypes = []string{"siri-check-status-client", "siri-stop-monitoring-request-collector"}
 	partner.RefreshConnectors()
@@ -40,6 +41,13 @@ func siriHandler_Request(soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *h
 
 	partner.Save()
 	referential.Save()
+
+	return server, referential
+}
+
+func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
+	model.SetDefaultClock(model.NewFakeClock())
+	defer model.SetDefaultClock(model.NewRealClock())
 
 	// Create a request
 	request, err := http.NewRequest("POST", "/default/siri", soapEnvelope)
@@ -75,7 +83,8 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 		model.DefaultClock().Now(),
 		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
 
-	responseRecorder := siriHandler_Request(soapEnvelope, t)
+	server, _ := siriHandler_PrepareServer()
+	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
 	// Check the response body is what we expect.
 	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
@@ -110,5 +119,54 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 
 	if !response.ServiceStartedTime().Equal(expectedDate) {
 		t.Errorf("Wrong ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime(), expectedDate)
+	}
+}
+
+func Test_SIRIHandler_StopMonitoring(t *testing.T) {
+	// Generate the request Body
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope.WriteXML(siri.NewSIRIStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
+		"objectidValue",
+		"Edwig",
+		model.DefaultClock().Now()).BuildXML())
+
+	server, referential := siriHandler_PrepareServer()
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("objectidKind", "objectidValue")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.SetStopAreaId(stopArea.Id())
+	stopVisit.SetObjectID(objectid)
+	stopVisit.Save()
+
+	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+
+	// Check the response body is what we expect.
+	response, err := siri.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if expected := "edwig.edwig"; response.Address() != expected {
+		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
+	}
+
+	if expected := "Edwig"; response.ProducerRef() != expected {
+		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: %v", response.ProducerRef(), expected)
+	}
+
+	if expected := "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
+		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: %v", response.RequestMessageRef(), expected)
+	}
+
+	if expected := "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
+		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: %v", response.ResponseMessageIdentifier(), expected)
+	}
+
+	expectedDate := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
+	if !response.ResponseTimestamp().Equal(expectedDate) {
+		t.Errorf("Wrong ResponseTimestamp in response:\n got: %v\n want: %v", response.ResponseTimestamp(), expectedDate)
 	}
 }
