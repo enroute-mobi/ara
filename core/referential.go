@@ -242,8 +242,10 @@ func (manager *MemoryReferentials) Load() error {
 
 		referential.Partners().Load()
 
-		if err = json.Unmarshal([]byte(r.Settings), &referential.Settings); err != nil {
-			return err
+		if len(r.Settings) > 0 {
+			if err = json.Unmarshal([]byte(r.Settings), &referential.Settings); err != nil {
+				return err
+			}
 		}
 		manager.Save(referential)
 	}
