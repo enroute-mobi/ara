@@ -79,9 +79,13 @@ func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, 
 func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(siri.NewSIRICheckStatusRequest("Edwig",
+	request, err := siri.NewSIRICheckStatusRequest("Edwig",
 		model.DefaultClock().Now(),
-		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML())
+		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer()
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
@@ -125,10 +129,14 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(siri.NewSIRIStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
+	request, err := siri.NewSIRIStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
 		"Edwig",
-		model.DefaultClock().Now()).BuildXML())
+		model.DefaultClock().Now()).BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(request)
 
 	server, referential := siriHandler_PrepareServer()
 	stopArea := referential.Model().StopAreas().New()
