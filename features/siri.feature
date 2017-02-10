@@ -23,7 +23,7 @@ Feature: Support SIRI request
 
   @wip
   # See Issue 2564
-  Scenario: Handle a empty SIRI request
+  Scenario: Handle an invalid SIRI request
     When I send this SIRI request
       """
 Invalid Request
