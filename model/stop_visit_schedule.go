@@ -62,3 +62,11 @@ func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, depa
 		arrivalTime:   arrivalTime,
 	}
 }
+
+func (schedules StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVisitSchedule {
+	schedule, ok := schedules[kind]
+	if !ok {
+		return &StopVisitSchedule{}
+	}
+	return schedule
+}

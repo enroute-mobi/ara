@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -10,7 +9,6 @@ import (
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
 )
 
 type Server struct {
@@ -49,7 +47,7 @@ func (server *Server) APIHandler(response http.ResponseWriter, request *http.Req
 	response.Header().Set("Content-Type", "application/json")
 
 	if foundStrings[2] == "siri" {
-		server.handleCheckStatus(response, request, foundStrings[1])
+		server.handleSIRI(response, request, foundStrings[1])
 	} else if strings.HasPrefix(foundStrings[1], "_") {
 		server.handleControllers(response, request, foundStrings[1], foundStrings[2])
 	} else {
@@ -88,39 +86,11 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 	controller.serve(response, request, id)
 }
 
-func (server *Server) handleCheckStatus(w http.ResponseWriter, r *http.Request, referential string) {
-	// Create XMLCheckStatusResponse
-	envelope, err := siri.NewSOAPEnvelope(r.Body)
-	if err != nil {
-		http.Error(w, "Invalid request: can't read content", 400)
-		return
-	}
-	if envelope.BodyType() != "CheckStatus" {
-		http.Error(w, "Invalid request: not a checkstatus", 400)
-		return
-	}
-	xmlRequest := siri.NewXMLCheckStatusRequest(envelope.Body())
+func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, referential string) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
 
-	logger.Log.Debugf("CheckStatus %s\n", xmlRequest.MessageIdentifier())
+	logger.Log.Debugf("SIRI request: %s", request)
 
-	// Set Content-Type header and create a SIRICheckStatusResponse
-	w.Header().Set("Content-Type", "text/xml")
-
-	response := new(siri.SIRICheckStatusResponse)
-	response.Address = strings.Join([]string{r.URL.Host, r.URL.Path}, "")
-	response.ProducerRef = "Edwig"
-	response.RequestMessageRef = xmlRequest.MessageIdentifier()
-	response.ResponseMessageIdentifier = fmt.Sprintf("Edwig:ResponseMessage::%s:LOC", server.NewUUID())
-	response.Status = true // Temp
-	response.ResponseTimestamp = server.Clock().Now()
-	response.ServiceStartedTime = server.startedTime
-
-	// Wrap soap and send response
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(response.BuildXML())
-
-	_, err = soapEnvelope.WriteTo(w)
-	if err != nil {
-		http.Error(w, "Service internal error", 500)
-	}
+	siriHandler := NewSIRIHandler(foundReferential)
+	siriHandler.serve(response, request)
 }

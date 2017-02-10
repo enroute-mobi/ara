@@ -4,7 +4,16 @@ import (
 	"bytes"
 	"text/template"
 	"time"
+
+	"github.com/jbowtie/gokogiri"
+	"github.com/jbowtie/gokogiri/xml"
 )
+
+type XMLStopMonitoringRequest struct {
+	RequestXMLStructure
+
+	monitoringRef string
+}
 
 type SIRIStopMonitoringRequest struct {
 	MessageIdentifier string
@@ -13,7 +22,7 @@ type SIRIStopMonitoringRequest struct {
 	RequestTimestamp  time.Time
 }
 
-const StopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
+const stopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
 													 xmlns:ns3="http://www.ifopt.org.uk/acsb"
 													 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
 													 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -33,9 +42,44 @@ const StopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://
 	<RequestExtension />
 </ns7:GetStopMonitoring>`
 
+func NewXMLStopMonitoringRequest(node xml.Node) *XMLStopMonitoringRequest {
+	xmlStopMonitoringRequest := &XMLStopMonitoringRequest{}
+	xmlStopMonitoringRequest.node = NewXMLNode(node)
+	return xmlStopMonitoringRequest
+}
+
+func NewXMLStopMonitoringRequestFromContent(content []byte) (*XMLStopMonitoringRequest, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	request := NewXMLStopMonitoringRequest(doc.Root().XmlNode)
+	return request, nil
+}
+
+func NewSIRIStopMonitoringRequest(
+	messageIdentifier,
+	monitoringRef,
+	requestorRef string,
+	requestTimestamp time.Time) *SIRIStopMonitoringRequest {
+	return &SIRIStopMonitoringRequest{
+		MessageIdentifier: messageIdentifier,
+		MonitoringRef:     monitoringRef,
+		RequestorRef:      requestorRef,
+		RequestTimestamp:  requestTimestamp,
+	}
+}
+
+func (request *XMLStopMonitoringRequest) MonitoringRef() string {
+	if request.monitoringRef == "" {
+		request.monitoringRef = request.findStringChildContent("MonitoringRef")
+	}
+	return request.monitoringRef
+}
+
 func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(StopMonitoringRequestTemplate))
+	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
 		return "", err
 	}

@@ -51,20 +51,20 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 }
 
 func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, identifier string) {
-	switch {
-	case request.Method == "GET":
+	switch request.Method {
+	case "GET":
 		if identifier == "" {
 			controller.restfulRessource.Index(response)
 		} else {
 			controller.restfulRessource.Show(response, identifier)
 		}
-	case request.Method == "DELETE":
+	case "DELETE":
 		if identifier == "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
 		controller.restfulRessource.Delete(response, identifier)
-	case request.Method == "PUT":
+	case "PUT":
 		if identifier == "" {
 			http.Error(response, "Invalid request", 400)
 			return
@@ -74,7 +74,7 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 			return
 		}
 		controller.restfulRessource.Update(response, identifier, body)
-	case request.Method == "POST":
+	case "POST":
 		if identifier != "" {
 			http.Error(response, "Invalid request", 400)
 			return

@@ -23,7 +23,7 @@ type TestCheckStatusClientFactory struct{}
 type SIRICheckStatusClient struct {
 	model.ClockConsumer
 
-	SIRIConnector
+	siriConnector
 }
 
 type SIRICheckStatusClientFactory struct{}

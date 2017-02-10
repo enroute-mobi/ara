@@ -10,11 +10,7 @@ import (
 )
 
 type XMLCheckStatusRequest struct {
-	XMLStructure
-
-	messageIdentifier string
-	requestorRef      string
-	requestTimestamp  time.Time
+	RequestXMLStructure
 }
 
 type SIRICheckStatusRequest struct {
@@ -23,7 +19,7 @@ type SIRICheckStatusRequest struct {
 	RequestTimestamp  time.Time
 }
 
-const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+const checkStatusRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
 	<Request>
 		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z"}}</ns2:RequestTimestamp>
 		<ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
@@ -33,7 +29,9 @@ const SIRIRequestTemplate = `<ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/
 </ns7:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
-	return &XMLCheckStatusRequest{XMLStructure: XMLStructure{node: NewXMLNode(node)}}
+	xmlCheckStatusRequest := &XMLCheckStatusRequest{}
+	xmlCheckStatusRequest.node = NewXMLNode(node)
+	return xmlCheckStatusRequest
 }
 
 func NewXMLCheckStatusRequestFromContent(content []byte) (*XMLCheckStatusRequest, error) {
@@ -56,31 +54,10 @@ func NewSIRICheckStatusRequest(
 	}
 }
 
-func (request *XMLCheckStatusRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLCheckStatusRequest) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent("RequestorRef")
-	}
-	return request.requestorRef
-}
-
-func (request *XMLCheckStatusRequest) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
-}
-
 // TODO : Handle errors
 func (request *SIRICheckStatusRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(SIRIRequestTemplate))
+	var siriRequest = template.Must(template.New("siriRequest").Parse(checkStatusRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
 		return "", err
 	}

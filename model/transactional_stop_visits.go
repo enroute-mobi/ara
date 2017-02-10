@@ -48,16 +48,40 @@ func (manager *TransactionalStopVisits) FindByObjectId(objectid ObjectID) (StopV
 	return *manager.saved[id], true
 }
 
-func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit {
+func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+	// Check saved StopVisits
 	stopVisitIds, ok := manager.savedByVehicleJourneyId[id]
 	if ok {
-		var stopVisits []StopVisit
 		for _, stopVisitId := range stopVisitIds {
 			stopVisits = append(stopVisits, *manager.saved[stopVisitId])
 		}
-		return stopVisits
 	}
-	return manager.model.StopVisits().FindByVehicleJourneyId(id)
+	// Check model StopVisits
+	for _, modelStopVisit := range manager.model.StopVisits().FindByVehicleJourneyId(id) {
+		_, ok := manager.saved[modelStopVisit.Id()]
+		if !ok {
+			stopVisits = append(stopVisits, modelStopVisit)
+		}
+	}
+	return
+}
+
+// Temp
+func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+	// Check saved StopVisits
+	for _, stopVisit := range manager.saved {
+		if stopVisit.stopAreaId == id {
+			stopVisits = append(stopVisits, *stopVisit)
+		}
+	}
+	// Check model StopVisits
+	for _, modelStopVisit := range manager.model.StopVisits().FindByStopAreaId(id) {
+		_, ok := manager.saved[modelStopVisit.Id()]
+		if !ok {
+			stopVisits = append(stopVisits, modelStopVisit)
+		}
+	}
+	return
 }
 
 func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {

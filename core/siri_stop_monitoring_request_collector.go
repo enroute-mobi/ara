@@ -23,7 +23,7 @@ type SIRIStopMonitoringRequestCollector struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
-	SIRIConnector
+	siriConnector
 }
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}

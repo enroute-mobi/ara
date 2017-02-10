@@ -2,6 +2,7 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/model"
 )
@@ -23,6 +24,21 @@ func Test_Referential_Slug(t *testing.T) {
 
 	if expected := ReferentialSlug("referential"); referential.Slug() != expected {
 		t.Errorf("Referential.Slug() returns wrong value, got: %s, required: %s", referential.Slug(), expected)
+	}
+}
+
+func Test_Referential_StartedAt(t *testing.T) {
+	model.SetDefaultClock(model.NewFakeClock())
+	referential := &Referential{
+		slug: "referential",
+	}
+	referential.partners = NewPartnerManager(referential)
+	referential.modelGuardian = NewModelGuardian(referential)
+	referential.Start()
+	referential.Stop()
+
+	if expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC); referential.StartedAt() != expected {
+		t.Errorf("Referential.StartedAt() returns wrong value, got: %s, required: %s", referential.StartedAt(), expected)
 	}
 }
 
