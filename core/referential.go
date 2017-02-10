@@ -1,6 +1,7 @@
 package core
 
 import (
+	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -227,7 +228,7 @@ func (manager *MemoryReferentials) Load() error {
 	var selectReferentials []struct {
 		Referential_id string
 		Slug           string
-		Settings       string
+		Settings       sql.NullString
 	}
 
 	_, err := model.Database.Select(&selectReferentials, "select * from referentials")
@@ -242,8 +243,8 @@ func (manager *MemoryReferentials) Load() error {
 
 		referential.Partners().Load()
 
-		if len(r.Settings) > 0 {
-			if err = json.Unmarshal([]byte(r.Settings), &referential.Settings); err != nil {
+		if r.Settings.Valid && len(r.Settings.String) > 0 {
+			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
 				return err
 			}
 		}
