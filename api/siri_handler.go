@@ -41,12 +41,11 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 func siriError(errCode, errDescription string, response http.ResponseWriter) {
 	// Wrap soap and send response
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(fmt.Sprintf(`<S:Body>
+	soapEnvelope.WriteXML(fmt.Sprintf(`
   <S:Fault xmlns:ns4="http://www.w3.org/2003/05/soap-envelope">
     <faultcode>S:%s</faultcode>
     <faultstring>%s</faultstring>
-  </S:Fault>
-</S:Body>`, errCode, errDescription))
+  </S:Fault>`, errCode, errDescription))
 
 	soapEnvelope.WriteTo(response)
 }
