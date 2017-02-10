@@ -10,7 +10,7 @@ def siri_path(attributes = {})
   url_for(attributes.merge(path: "siri"))
 end
 
-When(/^I send SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
+When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
   response = RestClient.post siri_path(referential: referential), request, {content_type: :xml}
   @last_siri_response = response.body
 end

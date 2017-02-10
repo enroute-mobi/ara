@@ -11,7 +11,7 @@ Feature: Support SIRI CheckStatus
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | remote_objectid_kind | internal              |
-    When I send SIRI request to the referential "test"
+    When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -64,7 +64,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       """
 
   Scenario: Handle a SIRI Checkstatus request with invalid RequestorRef
-    When I send SIRI request
+    When I send this SIRI request
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"

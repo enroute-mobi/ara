@@ -24,7 +24,7 @@ if [ -x $bundle ]; then
     $bundle exec license_finder
 
 		mkdir -p $tmp_dir/cucumber
-    $bundle exec cucumber --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
+    $bundle exec cucumber --tags "~@wip" --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
 else
     echo "Bundle not detected, cucumber tests are skipped"
 fi
