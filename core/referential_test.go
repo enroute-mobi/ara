@@ -1,6 +1,7 @@
 package core
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -245,7 +246,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	}{
 		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Slug:           "ratp",
-		Settings:       "",
+		Settings:       "{ \"test.key\": \"test-value\" }",
 	}
 
 	model.Database.AddTableWithName(databaseReferential, "referentials")
@@ -269,5 +270,11 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 
 	if referential.Id() != referentialId {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", referential.Id(), referentialId)
+	}
+	if expected := map[string]string{"test.key": "test-value"}; !reflect.DeepEqual(referential.Settings, expected) {
+		t.Errorf("Wrong Settings:\n got: %#v\n expected: %#v", referential.Settings, expected)
+	}
+	if expected := "ratp"; referential.Slug() != ReferentialSlug(expected) {
+		t.Errorf("Wrong Slug:\n got: %v\n expected: %v", referential.Slug(), expected)
 	}
 }
