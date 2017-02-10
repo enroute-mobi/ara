@@ -1,7 +1,3 @@
-# coding: utf-8
-require 'rexml/document'
-require 'rexml/xpath'
-
 def siri_path(attributes = {})
   attributes = {
     referential: 'test'
@@ -10,15 +6,17 @@ def siri_path(attributes = {})
   url_for(attributes.merge(path: "siri"))
 end
 
+Given(/^a SIRI server waits (GetStopMonitoring) request on "([^"]*)" to respond with$/) do |message_type, url, response|
+  (@the_siri_server = SIRIServer.create(url)).expect_request(message_type, response).start
+end
+
+When(/^the SIRI server has received a (GetStopMonitoring) request$/) do |message_type|
+  @the_siri_server.wait_request message_type
+end
+
 When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
   response = RestClient.post siri_path(referential: referential), request, {content_type: :xml}
   @last_siri_response = response.body
-end
-
-def normalized_xml(xml)
-  "".tap do |output|
-    REXML::Document.new(xml).write output: output, indent: 2
-  end
 end
 
 Then(/^I should receive this SIRI reponse$/) do |expected_xml|
