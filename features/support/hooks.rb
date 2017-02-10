@@ -45,11 +45,18 @@ Before do
   system "EDWIG_ENV=test go run edwig.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/edwig.log 2>&1 &"
 
   time_limit = Time.now + 30
-  begin
-    sleep 2
-    system "go run edwig.go check #{$server}/default/siri > /dev/null 2>&1"
+  while
+    sleep 0.5
+
+    begin
+      response = RestClient::Request.execute(method: :get, url: "#{$server}/_status", timeout: 1)
+      break if response.code == 200 && response.body == '{ "status": "ok" }'
+    rescue Exception # => e
+      # puts e.inspect
+    end
+
     raise "Timeout" if Time.now > time_limit
-  end until $?.exitstatus == 0
+  end
 end
 
 After do
@@ -59,6 +66,6 @@ end
 
 After do
   if @webrick_server
-    @webrick_server.shutdown 
+    @webrick_server.shutdown
   end
 end

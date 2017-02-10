@@ -43,7 +43,7 @@ def create_webrick_server(address, response)
 
 		res.content_type = "text/xml"
 	end
-	
+
 	Thread.start do
 		@webrick_server.start
 	end
@@ -51,15 +51,6 @@ end
 
 Given(/^a SIRI server waits GetStopMonitoring request on "([^"]*)" to respond with$/) do |address, response|
 	create_webrick_server(address, response)
-end
-
-def partners_path(attributes = {})
-  url_for_model(attributes.merge(resource: 'partner'))
-end
-
-Given(/^a Partner "([^"]*)" exists with connectors \[([^"\]]*)\] and the following settings:$/) do |partner, connectors, settings|
-	attributes = {"slug" => partner, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => model_attributes(settings)}
-	RestClient.post partners_path, attributes.to_json, {content_type: :json, accept: :json}
 end
 
 def time_path(action = "")
