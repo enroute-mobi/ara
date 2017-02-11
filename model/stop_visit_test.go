@@ -36,7 +36,10 @@ func Test_StopVisit_Id(t *testing.T) {
 
 func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "StopAreaId": "6ba7b814-9dad-11d1-1-00c04fd430c8",
+    "VehicleJourneyId": "6ba7b814-9dad-11d1-2-00c04fd430c8",
+    "PassageOrder": 10
   }`
 
 	stopVisit := StopVisit{}
@@ -58,6 +61,18 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 		if !reflect.DeepEqual(expectedObjectId, objectId) {
 			t.Errorf("Wrong StopVisit ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
 		}
+	}
+
+	if expected := StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8"); stopVisit.stopAreaId != expected {
+		t.Errorf("Wrong StopVisit StopAreaId:\n got: %s\n want: %s", stopVisit.stopAreaId, expected)
+	}
+
+	if expected := VehicleJourneyId("6ba7b814-9dad-11d1-2-00c04fd430c8"); stopVisit.vehicleJourneyId != expected {
+		t.Errorf("Wrong StopVisit VehicleJourneyId:\n got: %s\n want: %s", stopVisit.vehicleJourneyId, expected)
+	}
+
+	if expected := 10; stopVisit.passageOrder != expected {
+		t.Errorf("Wrong StopVisit PassageOrder:\n got: %s\n want: %s", stopVisit.passageOrder, expected)
 	}
 }
 

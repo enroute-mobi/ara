@@ -106,8 +106,12 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		ObjectIDs map[string]string
+		ObjectIDs        map[string]string
+		StopAreaId       string
+		VehicleJourneyId string
+		PassageOrder     int
 	}{}
+
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
@@ -115,6 +119,16 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 
 	if aux.ObjectIDs != nil {
 		stopVisit.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	}
+
+	if aux.StopAreaId != "" {
+		stopVisit.stopAreaId = StopAreaId(aux.StopAreaId)
+	}
+	if aux.VehicleJourneyId != "" {
+		stopVisit.vehicleJourneyId = VehicleJourneyId(aux.VehicleJourneyId)
+	}
+	if aux.PassageOrder > 0 {
+		stopVisit.passageOrder = aux.PassageOrder
 	}
 
 	return nil
