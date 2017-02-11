@@ -1,6 +1,10 @@
 package model
 
-import "testing"
+import (
+	"encoding/json"
+	"reflect"
+	"testing"
+)
 
 func Test_VehicleJourney_Id(t *testing.T) {
 	vehicleJourney := VehicleJourney{
@@ -38,6 +42,38 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	jsonString := string(jsonBytes)
 	if jsonString != expected {
 		t.Errorf("VehicleJourney.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
+}
+
+func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
+	text := `{
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "LineId": "6ba7b814-9dad-11d1-1-00c04fd430c8"
+	}`
+
+	vehicleJourney := VehicleJourney{}
+	err := json.Unmarshal([]byte(text), &vehicleJourney)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedObjectIds := []ObjectID{
+		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewObjectID("hastus", "sqypis"),
+	}
+
+	for _, expectedObjectId := range expectedObjectIds {
+		objectId, found := vehicleJourney.ObjectID(expectedObjectId.Kind())
+		if !found {
+			t.Errorf("Missing VehicleJourney ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+		}
+		if !reflect.DeepEqual(expectedObjectId, objectId) {
+			t.Errorf("Wrong VehicleJourney ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		}
+	}
+
+	if expected := LineId("6ba7b814-9dad-11d1-1-00c04fd430c8"); vehicleJourney.lineId != expected {
+		t.Errorf("Wrong VehicleJourney LineId:\n got: %s\n want: %s", vehicleJourney.lineId, expected)
 	}
 }
 
