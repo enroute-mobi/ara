@@ -1,5 +1,5 @@
 require 'rexml/document'
-#require 'rexml/xpath'
+require 'rexml/xpath'
 
 def normalized_xml(xml)
   "".tap do |output|
