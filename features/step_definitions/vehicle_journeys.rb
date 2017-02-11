@@ -1,9 +1,14 @@
-def vehicle_journey_path(attributes = {})
+def vehicle_journeys_path(attributes = {})
 	url_for_model(attributes.merge(resource: 'vehicle_journey'))
 end
 
+Given(/^a VehicleJourney exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle_journey|
+  response = RestClient.post vehicle_journeys_path(referential: referential), model_attributes(vehicle_journey).to_json, {content_type: :json}
+  # puts response.body
+end
+
 Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
-	response = RestClient.get vehicle_journey_path
+	response = RestClient.get vehicle_journeys_path
 	responseArray = JSON.parse(response.body)
 
 	attributes = model_attributes(attributes)
