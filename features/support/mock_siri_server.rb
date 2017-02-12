@@ -20,7 +20,7 @@ class SIRIServer
     @responses = []
 
     uri = URI.parse(url)
-	  @http_server = WEBrick::HTTPServer.new(Port: uri.port, AccessLog: [])
+	  @http_server = WEBrick::HTTPServer.new(Port: uri.port, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
 
 	  @http_server.mount_proc uri.path do |req, res|
 		  if req.body =~ /ns7:CheckStatus/
