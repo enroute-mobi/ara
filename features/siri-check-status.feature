@@ -3,14 +3,8 @@ Feature: Support SIRI CheckStatus
     Given a Referential "test" is created
 
   Scenario: Handle a SIRI Checkstatus request
-    # FIXME
-    # Given a Partner "test" exists with connectors [siri-check-status-server] and the following settings:
-    #   | local_credential | test |
-    Given a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
+    Given a local Partner "test" exists with connectors [siri-check-status-server]
       | local_credential     | test                  |
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
     When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>

@@ -99,14 +99,8 @@ Feature: Support SIRI StopMonitoring
       | ObjectIds | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
-    # FIXME
-    # Given a Partner "test" exists with connectors [siri-check-status-server, siri-stop-monitoring-request-broadcaster] and the following settings:
-    #   | local_credential | test |
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
+    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential     | test                  |
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -233,14 +227,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       """
 
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
-    # FIXME
-    # Given a Partner "test" exists with connectors [siri-check-status-server, siri-stop-monitoring-request-broadcaster] and the following settings:
-    #   | local_credential | test |
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
+    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential     | test                  |
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |

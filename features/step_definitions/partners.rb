@@ -8,7 +8,7 @@ Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors
 end
 
 Given(/^a local Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors \[([^"\]]*)\]$/) do |slug, referential, connectors, settings|
-  # FIXME
+  # FIXME after #2560 and #2561
   connector_aliases = {
     "siri-check-status-server" => "siri-check-status-client",
     "siri-stop-monitoring-request-broadcaster" => "siri-stop-monitoring-request-collector"
