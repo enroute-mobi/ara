@@ -319,18 +319,65 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Name      | Test                                     |
       | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | ObjectIds    | "internal": "NINOXE:Line:3:LOC"           |
+      | Name         | Ligne 3 Metro                             |
+      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:VehicleJourney:201"              |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC  |
+      | ObjectIds               | "internal": "NINOXE:VehicleJourney:201"         |
+      | Name                    | Magicien Noir - Cimetière (OMNI)                |
+      | LineId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC           |
+      | JourneyNote             | Note de test                                    |
+      | JourneyPatternObjectIDs | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | JourneyPatternName      | TEST                                            |
+      | VehicleMode             | bus                                             |
+      | ProductCategory         | 0                                               |
+      | ServiceFeature          | bus scolaire                                    |
+      | VehicleFeature          | longTrain                                       |
+      | RouteRef                | "internal": "NINOXE:Route:66:LOC"               |
+      | DirectionName           | Mago-Cime OMNI                                  |
+      | OriginObjectIDs         | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | OriginName              | Magicien Noir                                   |
+      | ViaPlaceName            | Saint Bénédicte                                 |
+      | ViaPlaceObjectIDs       | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | DestinationObjectIDs    | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | DestinationName         | Cimetière des Sauvages                          |
     And a StopVisit exists with the following attributes:
       | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | RecordedAt       | 2017-01-01T11:00:00.000Z                                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                       | NINOXE:StopPoint:SP:24:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:RecordedAt                                          | 2017-01-01T11:00:00.000Z          |
+      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DataFrameRef           | 2017-01-01                        |
+      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                | NINOXE:Line:3:LOC                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef      | NINOXE:JourneyPattern:3_42_62:LOC |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName     | TEST                              |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode            | bus                               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName      | Ligne 3 Metro                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef               | NINOXE:Route:66:LOC               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName          | Mago-Cime OMNI                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef            | NINOXE:Company:15563880:LOC       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef     | 0                                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef      | bus scolaire                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef      | longTrain                         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef              | NINOXE:StopPoint:SP:42:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName             | Magicien Noir                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceName          | Saint Bénédicte                   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceRef           | NINOXE:StopPoint:SP:256:LOC       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef         | NINOXE:StopPoint:SP:62:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName        | Cimetière des Sauvages            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName     | Magicien Noir - Cimetière (OMNI)  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote            | Note de test                      |
+
+  @wip
+  Scenario: Manage OperatorRef from Line
+  @wip
+  Scenario: Manage OperatorRef from VehicleJourney
+  @wip
+  Scenario: Manage OperatorRef from StopVisit
