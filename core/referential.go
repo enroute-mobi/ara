@@ -181,8 +181,9 @@ func (manager *MemoryReferentials) new() *Referential {
 	model := model.NewMemoryModel()
 
 	referential := &Referential{
-		manager: manager,
-		model:   model,
+		manager:  manager,
+		model:    model,
+		Settings: make(map[string]string),
 	}
 
 	referential.partners = NewPartnerManager(referential)
