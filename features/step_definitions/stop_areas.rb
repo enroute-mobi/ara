@@ -31,8 +31,8 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
   responseArray = JSON.parse(response.body)
 
   stopAreaHash = model_attributes(stopArea)
-  objectidkind = stopAreaHash["ObjectIds"].keys.first
-  objectid_value = stopAreaHash["ObjectIds"][objectidkind]
+  objectidkind = stopAreaHash["ObjectIDs"].keys.first
+  objectid_value = stopAreaHash["ObjectIDs"][objectidkind]
 
   expectedName = responseArray.find{|a| a["Name"] == stopAreaHash["Name"]}
   expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}

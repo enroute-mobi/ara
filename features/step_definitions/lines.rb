@@ -31,8 +31,8 @@ Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) d
   responseArray = JSON.parse(response.body)
 
   lineHash = model_attributes(line)
-  objectidkind = lineHash["ObjectIds"].keys.first
-  objectid_value = lineHash["ObjectIds"][objectidkind]
+  objectidkind = lineHash["ObjectIDs"].keys.first
+  objectid_value = lineHash["ObjectIDs"][objectidkind]
 
   expectedName = responseArray.find{|a| a["Name"] == lineHash["Name"]}
   expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}

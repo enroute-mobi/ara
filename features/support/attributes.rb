@@ -33,7 +33,7 @@ def model_attributes(table)
     end
   end
 
-  if objectids = (attributes["ObjectIds"] || attributes["ObjectIDs"])
+  if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])
     attributes["ObjectIDs"] = JSON.parse("{ #{objectids} }")
   end
 

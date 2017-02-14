@@ -24,3 +24,19 @@ Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, 
 
   expect(stopVisitAttributes).to include(model_attributes(attributes))
 end
+
+Then(/^one StopVisit has the following attributes:$/) do |attributes|
+  response = RestClient.get stop_visits_path
+  responseArray = JSON.parse(response.body)
+
+  attributes = model_attributes(attributes)
+
+  objectidkind = attributes["ObjectIDs"].keys.first
+  objectid_value = attributes["ObjectIDs"][objectidkind]
+
+  expectedName = responseArray.find{|a| a["Name"] == attributes["Name"]}
+  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}
+
+  expect(expectedName).not_to be_nil
+  expect(expectedAttr).not_to be_nil
+end
