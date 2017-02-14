@@ -114,7 +114,7 @@ Feature: Support SIRI StopMonitoring
       | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -341,6 +341,26 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ViaPlaceObjectIDs       | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
       | DestinationObjectIDs    | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
       | DestinationName         | Cimetière des Sauvages                          |
+      | HeadwayService          | false                                           |
+      | OriginAimedDepartureTime | 2016-09-22T07:54:52.977Z                       |
+      | OriginAimedDestinationTime | 2016-09-22T09:54:52.977Z                     |
+      | FirstOrLastJourney      | first                                           |
+      | Monitored               | true                                            |
+      | MonitoringError         | false                                           |
+      | InCongestion            | false                                           |
+      | InPanic                 | false                                           |
+      | VehicleLocation         | 48.84458710000001;2.2770206000000144            |
+      | Bearing                 | N                                               |
+      | Occupancy               | seatsAvailable                                  |
+      | Delay                   | 30                                              |
+      | TrainNumbers            | 12345                                           |
+      | PlatformTraversal       | false                                           |
+      | DestinationDisplay      | balard                                          |
+      | AimedArrivalTime        | 07:54:52                                        |
+      | ActualArrivalTime       | 07:54:52                                        |
+      | ExpectedArrivalTime     | 07:54:52                                        |
+      | ArrivalStatus           | onTime                                          |
+      
     And a StopVisit exists with the following attributes:
       | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
@@ -374,6 +394,26 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName        | Cimetière des Sauvages            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName     | Magicien Noir - Cimetière (OMNI)  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote            | Note de test                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:HeadwayService         | False                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginAimedDepartureTime | 2016-09-22T07:54:52.977Z        |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginAimedDestinationTime | 2016-09-22T09:54:52.977Z      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney     | first                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored              | true                              |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError        | false                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InCongestion           | false                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InPanic                | false                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleLocation        | 48.84458710000001;2.2770206000000144 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Bearing                | N                                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy              | seatsAvailable                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                  | 30                                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:TrainNumbers           | 12345                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PlatformTraversal      | false                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationDisplay     | balard                            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:AimedArrivalTime       | 07:54:52                          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualArrivalTime      | 07:54:52                          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedArrivalTime    | 07:54:52                          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalStatus          | onTime                            |
+      
 
   @wip
   Scenario: Manage OperatorRef from Line
