@@ -360,6 +360,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ActualArrivalTime       | 07:54:52                                        |
       | ExpectedArrivalTime     | 07:54:52                                        |
       | ArrivalStatus           | onTime                                          |
+      | ArrivalProximyTest      | "à l'approche"                                  |
       
     And a StopVisit exists with the following attributes:
       | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
@@ -413,6 +414,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualArrivalTime      | 07:54:52                          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedArrivalTime    | 07:54:52                          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalStatus          | onTime                            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalProximyTest     | "à l'approche"                    |
       
 
   @wip

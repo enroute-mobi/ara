@@ -13,8 +13,8 @@ Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
 
 	attributes = model_attributes(attributes)
 
-	objectidkind = attributes["ObjectIds"].keys.first
-  objectid_value = attributes["ObjectIds"][objectidkind]
+	objectidkind = attributes["ObjectIDs"].keys.first
+  objectid_value = attributes["ObjectIDs"][objectidkind]
 
   expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}
 
