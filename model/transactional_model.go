@@ -1,5 +1,10 @@
 package model
 
+import (
+	"strconv"
+	"time"
+)
+
 type TransactionalModel struct {
 	parent Model
 
@@ -7,6 +12,7 @@ type TransactionalModel struct {
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
 	lines           *TransactionalLines
+	date            time.Time
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
@@ -15,7 +21,25 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
 	model.lines = NewTransactionalLines(parent)
+	model.date = parent.GetDate()
 	return model
+}
+
+func (model *TransactionalModel) SetDate(reloadHour string) time.Time {
+	hour, minute := 4, 0
+	if len(reloadHour) == 5 {
+		hour, _ = strconv.Atoi(reloadHour[0:2])
+		minute, _ = strconv.Atoi(reloadHour[3:5])
+	}
+	loc_cet, _ := time.LoadLocation("CET")
+	now := time.Now().In(loc_cet)
+	model.date = time.Date(now.Year(), now.Month(), now.Day(), hour, minute, 0, 0, loc_cet)
+
+	return model.date
+}
+
+func (model *TransactionalModel) GetDate() time.Time {
+	return model.date
 }
 
 func (model *TransactionalModel) StopAreas() StopAreas {

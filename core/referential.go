@@ -147,6 +147,14 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 	referential.Settings = apiReferential.Settings
 }
 
+func (referential *Referential) NextReloadAt() time.Time {
+	return referential.model.GetDate()
+}
+
+func (referential *Referential) ReloadModel() {
+	referential.modelGuardian.Reload()
+}
+
 type MemoryReferentials struct {
 	model.UUIDConsumer
 
@@ -248,6 +256,7 @@ func (manager *MemoryReferentials) Load() error {
 				return err
 			}
 		}
+
 		manager.Save(referential)
 	}
 
