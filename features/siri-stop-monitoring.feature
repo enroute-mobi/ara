@@ -308,15 +308,16 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:RequestMessageRef                         | StopMonitoring:Test:0                                  |
-      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | //siri:RequestMessageRef                                                                | StopMonitoring:Test:0                                  |
+      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                        | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:Order | 4                                                      |
 
   @wip
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes (pending part)
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential     | test                  |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Name      | StopArea for test                        |
       | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
       | ObjectIds    | "internal": "NINOXE:Line:3:LOC"           |
@@ -351,29 +352,31 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                       | NINOXE:StopPoint:SP:24:LOC        |
-      | //siri:MonitoredStopVisit[1]/siri:RecordedAt                                          | 2017-01-01T11:00:00.000Z          |
-      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DataFrameRef           | 2017-01-01                        |
-      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201         |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                | NINOXE:Line:3:LOC                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef      | NINOXE:JourneyPattern:3_42_62:LOC |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName     | TEST                              |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode            | bus                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName      | Ligne 3 Metro                     |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef               | NINOXE:Route:66:LOC               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName          | Mago-Cime OMNI                    |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef            | NINOXE:Company:15563880:LOC       |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef     | 0                                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef      | bus scolaire                      |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef      | longTrain                         |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef              | NINOXE:StopPoint:SP:42:LOC        |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName             | Magicien Noir                     |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceName          | Saint Bénédicte                   |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceRef           | NINOXE:StopPoint:SP:256:LOC       |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef         | NINOXE:StopPoint:SP:62:LOC        |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName        | Cimetière des Sauvages            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName     | Magicien Noir - Cimetière (OMNI)  |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote            | Note de test                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                 | NINOXE:StopPoint:SP:24:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:RecordedAt                                                    | 2017-01-01T11:00:00.000Z          |
+      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DataFrameRef                     | 2017-01-01                        |
+      | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef           | NINOXE:VehicleJourney:201         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                          | NINOXE:Line:3:LOC                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                | NINOXE:JourneyPattern:3_42_62:LOC |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName               | TEST                              |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                      | bus                               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                | Ligne 3 Metro                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                         | NINOXE:Route:66:LOC               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                    | Mago-Cime OMNI                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                      | NINOXE:Company:15563880:LOC       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef               | 0                                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                | bus scolaire                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                | longTrain                         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                        | NINOXE:StopPoint:SP:42:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                       | Magicien Noir                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceName                    | Saint Bénédicte                   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceRef                     | NINOXE:StopPoint:SP:256:LOC       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                   | NINOXE:StopPoint:SP:62:LOC        |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                  | Cimetière des Sauvages            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName               | Magicien Noir - Cimetière (OMNI)  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                      | Note de test                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointName | StopArea for test                 |
+
 
   @wip
   Scenario: Manage OperatorRef from Line
