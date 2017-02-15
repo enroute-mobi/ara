@@ -45,8 +45,7 @@ func (objectid ObjectID) Value() string {
 
 func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Kind":  objectid.kind,
-		"Value": objectid.value,
+		objectid.kind: objectid.value,
 	})
 }
 
