@@ -92,7 +92,7 @@ Feature: Support SIRI StopMonitoring
     Then one StopVisit has the following attributes:
 
       | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder |                                                                    4 |
+      | PassageOrder | 4                                                                    |
 
     And one Line has the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
@@ -111,8 +111,8 @@ Feature: Support SIRI StopMonitoring
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
 
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201"              |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC  |
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
 
     And a StopVisit exists with the following attributes:
       | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
@@ -302,14 +302,15 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
 
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201"              |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC  |
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
 
     And a StopVisit exists with the following attributes:
       | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
@@ -322,57 +323,88 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential | test |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Attribute[Name] | Test                                     |
+      | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+     
     And a Line exists with the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
-      | Name         | Ligne 3 Metro                             |
-      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
+      | ObjectIDs               | "internal": "NINOXE:Line:3:LOC"           |
+      | Attribute[Name]         | Ligne 3 Metro                             |
+      | Reference[OperationRef] | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
 
-      | ObjectIds                          | "internal": "NINOXE:VehicleJourney:201"         |
-      | Name                               | Magicien Noir - Cimetière (OMNI)                |
-      | LineId                             | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC           |
-      | Attribute[JourneyNote]            | Note de test                                    |
-      | Reference[JourneyPattern]#ObjectID | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | JourneyPatternName                 | TEST                                            |
-      | VehicleMode                        | bus                                             |
-      | ProductCategory                    | 0                                               |
-      | ServiceFeature                     | bus scolaire                                    |
-      | VehicleFeature                     | longTrain                                       |
-      | RouteRef                           | "internal": "NINOXE:Route:66:LOC"               |
-      | DirectionName                      | Mago-Cime OMNI                                  |
-      | OriginObjectIDs                    | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | OriginName                         | Magicien Noir                                   |
-      | ViaPlaceName                       | Saint Bénédicte                                 |
-      | ViaPlaceObjectIDs                  | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
-      | DestinationObjectIDs               | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | DestinationName                    | Cimetière des Sauvages                          |
-      | HeadwayService                     | false                                           |
-      | OriginAimedDepartureTime           | 2016-09-22T07:54:52.977Z                        |
-      | OriginAimedDestinationTime         | 2016-09-22T09:54:52.977Z                        |
-      | FirstOrLastJourney                 | first                                           |
-      | Monitored                          | true                                            |
-      | MonitoringError                    | false                                           |
-      | InCongestion                       | false                                           |
-      | InPanic                            | false                                           |
-      | VehicleLocation                    | 48.84458710000001;2.2770206000000144            |
-      | Bearing                            | N                                               |
-      | Occupancy                          | seatsAvailable                                  |
-      | Delay                              | 30                                              |
-      | TrainNumbers                       | 12345                                           |
-      | PlatformTraversal                  | false                                           |
-      | DestinationDisplay                 | balard                                          |
-      | ArrivalProximyTest                 | "à l'approche"                                  |
+      | ObjectIds                             | "internal": "NINOXE:VehicleJourney:201"         |
+      | Attribute[Name]                       | Magicien Noir - Cimetière (OMNI)                |
+      | Reference[LineId]                     | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC           |
+      | Attribute[JourneyNote]                | Note de test                                    |
+      | Reference[JourneyPattern]#ObjectID    | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Attribute[JourneyPatternName]         | TEST                                            |
+      | Attribute[VehicleMode]                | bus                                             |
+      | Attribute[ProductCategory]            | 0                                               |
+      | Attribute[ServiceFeature]             | bus scolaire                                    |
+      | Attribute[VehicleFeature]             | longTrain                                       |
+      | Reference[RouteRef]                   | "internal": "NINOXE:Route:66:LOC"               |
+      | Attribute[DirectionName]              | Mago-Cime OMNI                                  |
+      | Reference[OriginObjectIDs]            | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Attribute[OriginName]                 | Magicien Noir                                   |
+      | Attribute[ViaPlaceName]               | Saint Bénédicte                                 |
+      | Reference[ViaPlaceObjectIDs]          | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[DestinationObjectIDs]       | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Attribute[DestinationName]            | Cimetière des Sauvages                          |
+      | Attribute[HeadwayService]             | false                                           |
+      | Attribute[OriginAimedDepartureTime]   | 2016-09-22T07:54:52.977Z                        |
+      | Attribute[OriginAimedDestinationTime] | 2016-09-22T09:54:52.977Z                        |
+      | Attribute[FirstOrLastJourney]         | first                                           |
+      | Attribute[Monitored]                  | true                                            |
+      | Attribute[MonitoringError]            | false                                           |
+      | Attribute[InCongestion]               | false                                           |
+      | Attribute[InPanic]                    | false                                           |
+      | Attribute[VehicleLocation]            | 48.84458710000001;2.2770206000000144            |
+      | Attribute[Bearing]                    | N                                               |
+      | Attribute[Occupancy]                  | seatsAvailable                                  |
+      | Attribute[Delay]                      | 30                                              |
+      | Attribute[TrainNumbers]               | 12345                                           |
+  
       
     And a StopVisit exists with the following attributes:
-      | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder     | 4                                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
-      | RecordedAt       | 2017-01-01T11:00:00.000Z                                             |
-    | Schedule[aimed]#Arrival   | 2017-01-01T13:00:00.000Z          |
-    | Schedule[aimed]#Departure | 2017-01-01T13:02:00.000Z          |
+      | ObjectIDs                                           | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Attribute[PassageOrder]                             | 4                                                                    |
+      | Attribute[StopAreaId]                               | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | Reference[VehicleJourneyId]                         | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | Attribute[RecordedAt]                               | 2017-01-01T11:00:00.000Z                                             |
+      | Attribute[PlatformTraversal]                        | false                                                                |
+      | Attribute[DestinationDisplay]                       | balard                                                               |
+      | Reference[SituationObjectID]                        | 1234556                                                              |
+      | Attribute[ArrivalProximyTest]                       | "à l'approche"                                                       |
+      | Schedule[aimed]#Arrival                             | 2017-01-01T13:00:00.000Z                                             |
+      | Schedule[aimed]#Departure                           | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[actual]#Departure                          | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[actual]#Arrival                            | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[expected]#Departure                        | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[expected]#Arrival                          | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[aimed]#HeadwayInterval                     | 5                                                                    |
+      | Schedule[expected]#HeadwayInterval                  | 5                                                                    |
+      | Attribute[DepartureStatus]                          | onTime                                                               |
+      | Attribute[ArrivalStatus]                            | onTime                                                               |
+      | Attribute[DeparturePlateformName]                   | Duroc                                                                |
+      | Attribute[DepartureBoardingActivity]                | boarding                                                             |
+      | Attribute[ActualQuayName]                           | station                                                              |
+      | Attribute[DistanceFromStop]                         | 800                                                                  |
+      | Attribute[NumberOfStopsAway]                        | 1                                                                    |
+      | Attribute[Cancellation]                             | false                                                                |
+      | Schedule[cancellation]#RecordedAtTime               | 5                                                                    |
+      | Reference[cancellation]#ItemObjectID                | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | Reference[cancellation]#MonitoringObjectID          | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | Reference[cancellation]#LineObjectID                | "internal": "NINOXE:Line:3:LOC"                                      |
+      | Reference[cancellation]#VehicleObjectID             | ndzeinczepi                                                          |
+      | Reference[cancellation]#VehicleJourneyObjectID      | "internal": "NINOXE:VehicleJourney:201"                              |
+      | Attribute[cancellation]#VehicleJourneyName          | ALBA                                                                 |
+      | Attribute[cancellation]#VehicleMode                 | bus                                                                  |
+      | Reference[cancellation]#RouteObjectID               | noenvoizenrvoeairv                                                   |
+      | Attribute[cancellation]#LineName                    | Ligne 3 Metro                                                        |
+      | Attribute[cancellation]#VehicleJourneyDirectionName | A                                                                    |
+      | Attribute[cancellation]#Reason                      | Incident voyageur                                                    |
+
+
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
@@ -414,13 +446,43 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                  | seatsAvailable                       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                      | 30                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:TrainNumbers               | 12345                                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PlatformTraversal          | false                                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationDisplay         | balard                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:AimedArrivalTime           | -                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualArrivalTime          | -                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedArrivalTime        | -                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalStatus              | onTime                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalProximyTest         | "à l'approche"                       |
+
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PlatformTraversal  | false   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationDisplay | balard  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:SituationObjectID  | 1234556 |
+
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:AimedDepartureTime                      | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:AimedArrivalTime                        | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualDepartureTime                     | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualArrivalTime                       | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedDepartureTimeTime               | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedArrivalTime                     | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedArrivalTime                     | 2016-09-22T08:15:52.977Z                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:AimedHeadwayInterval                    | 5                                       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ExpectedHeadwayInterval                 | 5                                       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DepartureStatus                         | onTime                                  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalStatus                           | onTime                                  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalProximyTest                      | "à l'approche"                          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DeparturePlateformName                  | Ducroc                                  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalPlateformName                    | Ducroc                                  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DepartureBoardingActivity               | boarding                                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ActualQuayName                          | station                                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DistanceFromStop                        | 800                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:NumberOfStopsAway                       | 1                                       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Cancellation                            | false                                   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationItemObjectID                | 6ba7b814-9dad-11d1-2-00c04fd430c8       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationMonitoringObjectID          | 6ba7b814-9dad-11d1-2-00c04fd430c8       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationLineObjectID                | "internal": "NINOXE:Line:3:LOC"         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationVehicleObjectID             | ndzeinczepi                             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationVehicleJourneyObjectID      | "internal": "NINOXE:VehicleJourney:201" |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationVehicleJourneyName          | ALBA                                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationVehicleMode                 | bus                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationRouteObjectID               | noenvoizenrvoeairv                      |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationLineNAme                    | Ligne 3 Metro                           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationVehicleJourneyDirectionName | A                                       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:CancellationReason                      | Incident voyageur                       |
+
+
       
 
 
