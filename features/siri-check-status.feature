@@ -4,7 +4,7 @@ Feature: Support SIRI CheckStatus
 
   Scenario: Handle a SIRI Checkstatus request
     Given a local Partner "test" exists with connectors [siri-check-status-server]
-      | local_credential     | test                  |
+      | Attribute[local_credential] | test |
     When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>
