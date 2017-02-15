@@ -80,23 +80,23 @@ Feature: Support SIRI StopMonitoring
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
+      | Attribute[remote_url]           | http://localhost:8090 |
+      | Attribute[remote_credential]    | test                  |
+      | Attribute[remote_objectid_kind] | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name      | Test 1                                   |
+      | Attribute[Name]      | Test 1                                   |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
 
       | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder | 4                                                                    |
+      | Attribute[PassageOrder] | 4                                                                    |
 
     And one Line has the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Attribute[Name]      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
 
@@ -104,11 +104,11 @@ Feature: Support SIRI StopMonitoring
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential | test |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Attribute[Name]      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Attribute[Name]      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
 
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
@@ -116,9 +116,9 @@ Feature: Support SIRI StopMonitoring
 
     And a StopVisit exists with the following attributes:
       | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder     | 4                                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | Attribute[PassageOrder]     | 4                                                                    |
+      | Reference[StopAreaId]       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | Reference[VehicleJourneyId] | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -232,9 +232,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
 
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+      | Attribute[local_credential] | test |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Attribute[Name]      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When I send this SIRI request
       """
@@ -293,27 +293,27 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
 
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+      | Attribute[local_credential] | test |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Attribute[Name]      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Attribute[Name]      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
 
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
+      | Reference[LineId]    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
 
     And a StopVisit exists with the following attributes:
       | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder     | 4                                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | Attribute[PassageOrder]     | 4                                                                    |
+      | Reference[StopAreaId]       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | Reference[VehicleJourneyId] | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
 
     When I send a SIRI GetStopMonitoring request with
-      | RequestorRef  | test                       |
-      | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
+      | Reference[RequestorRef]  | test                       |
+      | Reference[MonitoringRef] | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:RequestMessageRef                         | StopMonitoring:Test:0                                  |
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
