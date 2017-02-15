@@ -41,12 +41,16 @@ type Referentials interface {
 var referentials = NewMemoryReferentials()
 
 type APIReferential struct {
-	Id       ReferentialId     `json:"Id,omitempty"`
+	id       ReferentialId     `json:"Id,omitempty"`
 	Slug     ReferentialSlug   `json:"Slug,omitempty"`
 	Errors   Errors            `json:"Errors,omitempty"`
 	Settings map[string]string `json:"Settings,omitempty"`
 
 	manager Referentials
+}
+
+func (referential *APIReferential) Id() ReferentialId {
+	return referential.id
 }
 
 func (referential *APIReferential) Validate() bool {
@@ -58,7 +62,7 @@ func (referential *APIReferential) Validate() bool {
 
 	// Check Slug uniqueness
 	for _, existingReferential := range referential.manager.FindAll() {
-		if existingReferential.id != referential.Id {
+		if existingReferential.id != referential.Id() {
 			if referential.Slug == existingReferential.slug {
 				referential.Errors.Add("Slug", ERROR_UNIQUE)
 			}
@@ -133,7 +137,7 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 
 func (referential *Referential) Definition() *APIReferential {
 	return &APIReferential{
-		Id:       referential.id,
+		id:       referential.id,
 		Slug:     referential.slug,
 		Settings: referential.Settings,
 		Errors:   NewErrors(),
@@ -142,7 +146,7 @@ func (referential *Referential) Definition() *APIReferential {
 }
 
 func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
-	referential.id = apiReferential.Id
+	//referential.id = apiReferential.Id
 	referential.slug = apiReferential.Slug
 	referential.Settings = apiReferential.Settings
 }

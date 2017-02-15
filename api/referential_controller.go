@@ -73,12 +73,6 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 		return
 	}
 
-	ref := controller.server.CurrentReferentials().FindBySlug(apiReferential.Slug)
-	if ref != nil && ref.Id() != apiReferential.Id {
-		http.Error(response, "Invalid request: slug already exists", 400)
-		return
-	}
-
 	if !apiReferential.Validate() {
 		jsonBytes, _ := json.Marshal(apiReferential)
 		response.WriteHeader(http.StatusBadRequest)
@@ -100,16 +94,6 @@ func (controller *ReferentialController) Create(response http.ResponseWriter, bo
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
 		http.Error(response, "Invalid request: can't parse body", 400)
-		return
-	}
-	if referential.Id() != "" {
-		http.Error(response, "Invalid request (Id specified)", 400)
-		return
-	}
-
-	ref := controller.server.CurrentReferentials().FindBySlug(apiReferential.Slug)
-	if ref != nil {
-		http.Error(response, "Invalid request: slug already exists", 400)
 		return
 	}
 
