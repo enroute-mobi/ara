@@ -27,6 +27,7 @@ type StopVisit struct {
 	id               StopVisitId
 	stopAreaId       StopAreaId
 	vehicleJourneyId VehicleJourneyId
+	Attributes       map[string]string
 
 	recordedAt      time.Time
 	schedules       StopVisitSchedules
@@ -37,8 +38,9 @@ type StopVisit struct {
 
 func NewStopVisit(model Model) *StopVisit {
 	stopVisit := &StopVisit{
-		model:     model,
-		schedules: NewStopVisitSchedules(),
+		model:      model,
+		schedules:  NewStopVisitSchedules(),
+		Attributes: make(map[string]string),
 	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
@@ -97,6 +99,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"Schedules":       scheduleSlice,
 		"DepartureStatus": stopVisit.departureStatus,
 		"ArrivalStatus":   stopVisit.arrivalStatus,
+		"Attributes":      stopVisit.Attributes,
 	}
 	if stopVisit.ObjectIDs() != nil {
 		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
@@ -105,12 +108,16 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 }
 
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
+	type Alias StopVisit
 	aux := &struct {
 		ObjectIDs        map[string]string
 		StopAreaId       string
 		VehicleJourneyId string
 		PassageOrder     int
-	}{}
+		*Alias
+	}{
+		Alias: (*Alias)(stopVisit),
+	}
 
 	err := json.Unmarshal(data, aux)
 	if err != nil {
@@ -132,6 +139,11 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (stopVisit *StopVisit) Attribute(key string) (string, bool) {
+	value, present := stopVisit.Attributes[key]
+	return value, present
 }
 
 func (stopVisit *StopVisit) Save() (ok bool) {

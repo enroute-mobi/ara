@@ -13,12 +13,16 @@ type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model
 
-	id     VehicleJourneyId
-	lineId LineId
+	id         VehicleJourneyId
+	lineId     LineId
+	Attributes map[string]string
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
-	vehicleJourney := &VehicleJourney{model: model}
+	vehicleJourney := &VehicleJourney{
+		model:      model,
+		Attributes: make(map[string]string),
+	}
 	vehicleJourney.objectids = make(ObjectIDs)
 	return vehicleJourney
 }
@@ -41,6 +45,7 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		"Id":         vehicleJourney.id,
 		"Line":       vehicleJourney.lineId,
 		"StopVisits": stopVisitIds,
+		"Attributes": vehicleJourney.Attributes,
 	}
 	if vehicleJourney.ObjectIDs() != nil {
 		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
@@ -48,11 +53,20 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	return json.Marshal(vehicleJourneyMap)
 }
 
+func (vehicleJourney *VehicleJourney) Attribute(key string) (string, bool) {
+	value, present := vehicleJourney.Attributes[key]
+	return value, present
+}
+
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
+	type Alias VehicleJourney
 	aux := &struct {
 		ObjectIDs map[string]string
 		LineId    string
-	}{}
+		*Alias
+	}{
+		Alias: (*Alias)(vehicleJourney),
+	}
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err

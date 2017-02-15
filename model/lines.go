@@ -15,11 +15,15 @@ type Line struct {
 
 	id LineId
 
-	Name string
+	Name       string
+	Attributes map[string]string
 }
 
 func NewLine(model Model) *Line {
-	line := &Line{model: model}
+	line := &Line{
+		model:      model,
+		Attributes: make(map[string]string),
+	}
 	line.objectids = make(ObjectIDs)
 	return line
 }
@@ -30,8 +34,9 @@ func (line *Line) Id() LineId {
 
 func (line *Line) MarshalJSON() ([]byte, error) {
 	lineMap := map[string]interface{}{
-		"Id":   line.id,
-		"Name": line.Name,
+		"Id":         line.id,
+		"Name":       line.Name,
+		"Attributes": line.Attributes,
 	}
 	if line.ObjectIDs() != nil {
 		lineMap["ObjectIDs"] = line.ObjectIDs()
@@ -57,6 +62,11 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (line *Line) Attribute(key string) (string, bool) {
+	value, present := line.Attributes[key]
+	return value, present
 }
 
 func (line *Line) Save() (ok bool) {

@@ -20,12 +20,16 @@ type StopArea struct {
 	requestedAt time.Time
 	updatedAt   time.Time
 
-	Name string
+	Name       string
+	Attributes map[string]string
 	// ...
 }
 
 func NewStopArea(model Model) *StopArea {
-	stopArea := &StopArea{model: model}
+	stopArea := &StopArea{
+		model:      model,
+		Attributes: make(map[string]string),
+	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
 }
@@ -52,8 +56,9 @@ func (stopArea *StopArea) Updated(updateTime time.Time) {
 
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	stopAreaMap := map[string]interface{}{
-		"Id":   stopArea.id,
-		"Name": stopArea.Name,
+		"Id":         stopArea.id,
+		"Name":       stopArea.Name,
+		"Attributes": stopArea.Attributes,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
@@ -65,6 +70,11 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
 	}
 	return json.Marshal(stopAreaMap)
+}
+
+func (stopArea *StopArea) Attribute(key string) (string, bool) {
+	value, present := stopArea.Attributes[key]
+	return value, present
 }
 
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
