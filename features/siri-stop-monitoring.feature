@@ -312,8 +312,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
 
     When I send a SIRI GetStopMonitoring request with
-      | Reference[RequestorRef]  | test                       |
-      | Reference[MonitoringRef] | NINOXE:StopPoint:SP:24:LOC |
+      | RequestorRef   | test                       |
+      | MonitoringRef  | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:RequestMessageRef                         | StopMonitoring:Test:0                                  |
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
@@ -325,7 +325,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-     
+
     And a Line exists with the following attributes:
       | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
@@ -363,8 +363,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Reference[RouteRef]#ObjectID          | "internal": "NINOXE:Route:66:LOC"               |
       | Reference[ViaPlace]#ObjectID          | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
 
-  
-      
+
+
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
@@ -451,8 +451,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DistanceFromStop           | 800                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:NumberOfStopsAway          | 1                                 |
 
-      
-      
+
+
 
 
   @wip
