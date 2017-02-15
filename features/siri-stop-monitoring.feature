@@ -332,7 +332,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Reference[OperationRef] | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
 
-      | ObjectIds                             | "internal": "NINOXE:VehicleJourney:201"         |
+      | ObjectIDs                             | "internal": "NINOXE:VehicleJourney:201"         |
       | Attribute[Name]                       | Magicien Noir - Cimetière (OMNI)                |
       | Reference[LineId]                     | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC           |
       | Attribute[JourneyNote]                | Note de test                                    |
