@@ -8,24 +8,22 @@ func Test_Factories_CreateConnector(t *testing.T) {
 		ConnectorTypes: []string{
 			"siri-stop-monitoring-request-collector",
 			"siri-check-status-client",
+			"siri-check-status-server",
 			"test-validation-connector",
 		},
 		connectors: make(map[string]Connector),
 		manager:    NewPartnerManager(nil),
 	}
-	partner.Settings = map[string]string{
-		"remote_url":           "remote_url",
-		"remote_objectid_kind": "remote_objectid_kind",
-	}
-	apiPartner := partner.Definition()
-	apiPartner.Validate()
-	partner.SetDefinition(apiPartner)
+	partner.RefreshConnectors()
 
 	if _, ok := partner.Connector("siri-stop-monitoring-request-collector"); !ok {
 		t.Error("siri-stop-monitoring-request-collector connector should be initialized")
 	}
 	if _, ok := partner.Connector("siri-check-status-client"); !ok {
 		t.Error("siri-check-status-client connector should be initialized")
+	}
+	if _, ok := partner.Connector("siri-check-status-server"); !ok {
+		t.Error("siri-check-status-server connector should be initialized")
 	}
 	if _, ok := partner.Connector("test-validation-connector"); !ok {
 		t.Error("test-validation-connector connector should be initialized")

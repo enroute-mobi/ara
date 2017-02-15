@@ -157,11 +157,11 @@ func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 }
 
 // TODO : Handle errors
-func (response *SIRICheckStatusResponse) BuildXML() string {
+func (response *SIRICheckStatusResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(checkStatusResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
-		return ""
+		return "", err
 	}
-	return buffer.String()
+	return buffer.String(), nil
 }

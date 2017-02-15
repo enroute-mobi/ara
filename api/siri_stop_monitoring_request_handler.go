@@ -11,8 +11,7 @@ import (
 )
 
 type SIRIStopMonitoringRequestHandler struct {
-	referential *core.Referential
-	xmlRequest  *siri.XMLStopMonitoringRequest
+	xmlRequest *siri.XMLStopMonitoringRequest
 }
 
 func (handler *SIRIStopMonitoringRequestHandler) RequestorRef() string {
@@ -23,13 +22,13 @@ func (handler *SIRIStopMonitoringRequestHandler) ConnectorType() string {
 	return "siri-stop-monitoring-request-collector"
 }
 
-func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.SIRIConnector, rw http.ResponseWriter) {
+func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("StopMonitoring %s\n", handler.xmlRequest.MessageIdentifier())
 
-	tx := handler.referential.NewTransaction()
+	tx := connector.(*core.SIRIStopMonitoringRequestCollector).Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	objectidKind := connector.(core.SIRIConnector).Partner().Setting("remote_objectid_kind")
+	objectidKind := connector.(*core.SIRIStopMonitoringRequestCollector).Partner().Setting("remote_objectid_kind")
 	objectid := model.NewObjectID(objectidKind, handler.xmlRequest.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
@@ -38,10 +37,10 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.SIRIConn
 	}
 
 	response := new(siri.SIRIStopMonitoringResponse)
-	response.Address = connector.(core.SIRIConnector).Partner().Setting("Address")
+	response.Address = connector.(*core.SIRIStopMonitoringRequestCollector).Partner().Setting("address")
 	response.ProducerRef = "Edwig"
 	response.RequestMessageRef = handler.xmlRequest.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.(core.SIRIConnector).SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.(*core.SIRIStopMonitoringRequestCollector).SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = model.DefaultClock().Now()
 

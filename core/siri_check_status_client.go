@@ -70,7 +70,7 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
 	}
 
-	logCheckStatusRequest(logStashEvent, request)
+	logSIRICheckStatusRequest(logStashEvent, request)
 
 	response, err := connector.SIRIPartner().SOAPClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
@@ -79,7 +79,7 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 		return OPERATIONNAL_STATUS_UNKNOWN, err
 	}
 
-	logCheckStatusResponse(logStashEvent, response)
+	logXMLCheckStatusResponse(logStashEvent, response)
 
 	if response.Status() {
 		return OPERATIONNAL_STATUS_UP, nil
@@ -98,7 +98,7 @@ func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) C
 	return NewSIRICheckStatusClient(partner)
 }
 
-func logCheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRICheckStatusRequest) {
+func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRICheckStatusRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
@@ -110,7 +110,7 @@ func logCheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRI
 	logStashEvent["requestXML"] = xml
 }
 
-func logCheckStatusResponse(logStashEvent audit.LogStashEvent, response *siri.XMLCheckStatusResponse) {
+func logXMLCheckStatusResponse(logStashEvent audit.LogStashEvent, response *siri.XMLCheckStatusResponse) {
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()

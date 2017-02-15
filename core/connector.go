@@ -5,6 +5,7 @@ const (
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR = "test-stop-monitoring-request-collector"
 	SIRI_CHECK_STATUS_CLIENT_TYPE          = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE          = "test-check-status-client"
+	SIRI_CHECK_STATUS_SERVER_TYPE          = "siri-check-status-server"
 	TEST_VALIDATION_CONNECTOR              = "test-validation-connector"
 )
 
@@ -13,10 +14,6 @@ const (
 )
 
 type Connector interface{}
-type SIRIConnector interface {
-	Partner() *Partner
-	SIRIPartner() *SIRIPartner
-}
 
 type BaseConnector struct {
 	partner *Partner
@@ -52,6 +49,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusClientFactory{}
 	case TEST_CHECK_STATUS_CLIENT_TYPE:
 		return &TestCheckStatusClientFactory{}
+	case SIRI_CHECK_STATUS_SERVER_TYPE:
+		return &SIRICheckStatusServerFactory{}
 	case TEST_VALIDATION_CONNECTOR:
 		return &TestValidationFactory{}
 	default:
