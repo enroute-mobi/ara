@@ -86,32 +86,36 @@ Feature: Support SIRI StopMonitoring
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
-      | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
-      | ObjectIds    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder | 4                                                                    |
+
+      | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder |                                                                    4 |
+
     And one Line has the following attributes:
-      | ObjectIds | "internal": "NINOXE:Line:3:LOC" |
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | ObjectIds | "internal": "NINOXE:VehicleJourney:201" |
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
     Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
       | local_credential | test |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:Line:3:LOC" |
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
+
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201"              |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC  |
+
     And a StopVisit exists with the following attributes:
-      | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -231,7 +235,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | local_credential | test |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -292,15 +296,17 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | local_credential | test |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:Line:3:LOC" |
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIds | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
+
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201"              |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC  |
+
     And a StopVisit exists with the following attributes:
-      | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -317,12 +323,13 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | local_credential | test |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIds | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
-      | ObjectIds    | "internal": "NINOXE:Line:3:LOC"           |
+      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
       | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
+
       | ObjectIds                          | "internal": "NINOXE:VehicleJourney:201"         |
       | Name                               | Magicien Noir - Cimetière (OMNI)                |
       | LineId                             | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC           |
@@ -359,7 +366,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ArrivalProximyTest                 | "à l'approche"                                  |
       
     And a StopVisit exists with the following attributes:
-      | ObjectIds        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -370,6 +377,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
+
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                           | NINOXE:StopPoint:SP:24:LOC           |
       | //siri:MonitoredStopVisit[1]/siri:RecordedAt                                              | 2017-01-01T11:00:00.000Z             |
       | //siri:MonitoredStopVisit[1]/siri:FramedVehicleJourneyRef/siri:DataFrameRef               | 2017-01-01                           |
@@ -414,6 +422,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalStatus              | onTime                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ArrivalProximyTest         | "à l'approche"                       |
       
+
 
   @wip
   Scenario: Manage OperatorRef from Line
