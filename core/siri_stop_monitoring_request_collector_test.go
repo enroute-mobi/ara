@@ -145,7 +145,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	}
 }
 
-func Test_SIRICheckStatusClient_LogStopMonitoringRequest(t *testing.T) {
+func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &siri.SIRIStopMonitoringRequest{
@@ -155,7 +155,7 @@ func Test_SIRICheckStatusClient_LogStopMonitoringRequest(t *testing.T) {
 		RequestTimestamp:  time,
 	}
 
-	logStopMonitoringRequest(logStashEvent, request)
+	logSIRIStopMonitoringRequest(logStashEvent, request)
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
@@ -177,7 +177,7 @@ func Test_SIRICheckStatusClient_LogStopMonitoringRequest(t *testing.T) {
 	}
 }
 
-func Test_SIRICheckStatusClient_LogStopMonitoringResponse(t *testing.T) {
+func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringResponse(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
 	file, err := os.Open("testdata/stopmonitoring-response-soap.xml")
@@ -194,7 +194,7 @@ func Test_SIRICheckStatusClient_LogStopMonitoringResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	logStopMonitoringResponse(logStashEvent, response)
+	logXMLStopMonitoringResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "http://appli.chouette.mobi/siri_france/siri" {
 		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])

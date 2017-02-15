@@ -5,7 +5,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/af83/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -325,11 +324,11 @@ func (visit *XMLMonitoredStopVisit) ActualDepartureTime() time.Time {
 	return visit.actualDepartureTime
 }
 
-func (response *SIRIStopMonitoringResponse) BuildXML() string {
+func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(stopMonitoringResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
-		logger.Log.Panicf("Error while using response template: %v", err)
+		return "", err
 	}
-	return buffer.String()
+	return buffer.String(), nil
 }

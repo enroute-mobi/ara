@@ -31,7 +31,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"local_credential":     "Edwig",
 		"address":              "edwig.edwig",
 	}
-	partner.ConnectorTypes = []string{"siri-check-status-server", "siri-stop-monitoring-request-collector"}
+	partner.ConnectorTypes = []string{"siri-check-status-server", "siri-stop-monitoring-request-broadcaster"}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
 	generator := core.NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%v:LOC")

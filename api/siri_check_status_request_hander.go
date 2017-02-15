@@ -27,10 +27,12 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 	response, err := connector.(core.CheckStatusServer).CheckStatus(handler.xmlRequest)
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		return
 	}
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		return
 	}
 
 	// Wrap soap and send response
@@ -40,5 +42,6 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 	_, err = soapEnvelope.WriteTo(rw)
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		return
 	}
 }
