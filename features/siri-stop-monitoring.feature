@@ -101,8 +101,9 @@ Feature: Support SIRI StopMonitoring
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
-    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -231,8 +232,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       """
 
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
-    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -292,8 +294,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       """
 
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes
-    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -320,8 +323,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
 
   @wip
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes (pending part)
-    Given a local Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster]
-      | local_credential | test |
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |

@@ -143,8 +143,12 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 </ns8:GetStopMonitoringResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	request := NewSIRIStopMonitoringResponse("address", "producer", "ref", "identifier", true, responseTimestamp)
-	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 
 	expectedXML = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -241,7 +245,11 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		// ActualDepartureTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 	}
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
-	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	xml, err = request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }

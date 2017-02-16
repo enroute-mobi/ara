@@ -105,7 +105,7 @@ func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 		RequestTimestamp:  time,
 		MessageIdentifier: "0000-0000-0000-0000",
 	}
-	logCheckStatusRequest(logStashEvent, request)
+	logSIRICheckStatusRequest(logStashEvent, request)
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
@@ -141,7 +141,7 @@ func Test_SIRICheckStatusClient_LogCheckStatusResponse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	logCheckStatusResponse(logStashEvent, response)
+	logXMLCheckStatusResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "http://appli.chouette.mobi/siri_france/siri" {
 		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])

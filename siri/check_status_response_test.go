@@ -129,8 +129,12 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	serviceStartedTime := time.Date(2016, time.September, 21, 3, 30, 22, 0, time.UTC)
 	request := NewSIRICheckStatusResponse("address", "producer", "ref", "identifier", false, "OtherError", 103, "text", responseTimestamp, serviceStartedTime)
-	if expectedXML != request.BuildXML() {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", request.BuildXML(), expectedXML)
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }
 

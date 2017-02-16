@@ -11,7 +11,7 @@ import (
 type SIRIRequestHandler interface {
 	RequestorRef() string
 	ConnectorType() string
-	Respond(core.SIRIConnector, http.ResponseWriter)
+	Respond(core.Connector, http.ResponseWriter)
 }
 
 type SIRIHandler struct {
@@ -26,13 +26,11 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
-			referential: handler.referential,
-			xmlRequest:  siri.NewXMLCheckStatusRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLCheckStatusRequest(envelope.Body()),
 		}
 	case "GetStopMonitoring":
 		return &SIRIStopMonitoringRequestHandler{
-			referential: handler.referential,
-			xmlRequest:  siri.NewXMLStopMonitoringRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLStopMonitoringRequest(envelope.Body()),
 		}
 	}
 	return nil
@@ -82,7 +80,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		siriError("UnknownCredential", "RequestorRef Unknown", response)
 		return
 	}
-	connector, ok := partner.SIRIConnector(requestHandler.ConnectorType())
+	connector, ok := partner.Connector(requestHandler.ConnectorType())
 	if !ok {
 		siriError("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), response)
 		return

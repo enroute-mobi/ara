@@ -32,6 +32,7 @@ type Partners interface {
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 	Model() model.Model
+	Referential() *Referential
 	Load() error
 }
 
@@ -149,6 +150,10 @@ func NewPartner() *Partner {
 	}
 }
 
+func (partner *Partner) Referential() *Referential {
+	return partner.manager.Referential()
+}
+
 func (partner *Partner) Id() PartnerId {
 	return partner.id
 }
@@ -240,15 +245,6 @@ func (partner *Partner) cleanConnectors() {
 func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	connector, ok := partner.connectors[connectorType]
 	return connector, ok
-}
-
-func (partner *Partner) SIRIConnector(connectorType string) (SIRIConnector, bool) {
-	connector, ok := partner.connectors[connectorType]
-	if !ok {
-		return nil, ok
-	}
-	siriConnector, ok := connector.(SIRIConnector)
-	return siriConnector, ok
 }
 
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
@@ -379,6 +375,10 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 
 func (manager *PartnerManager) Model() model.Model {
 	return manager.referential.Model()
+}
+
+func (manager *PartnerManager) Referential() *Referential {
+	return manager.referential
 }
 
 func (manager *PartnerManager) Load() error {

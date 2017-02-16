@@ -75,7 +75,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		RequestTimestamp:  connector.Clock().Now(),
 	}
 
-	logStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
+	logSIRIStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
 
 	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
 	logStashEvent["responseTi	me"] = connector.Clock().Since(startTime).String()
@@ -84,7 +84,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return nil, err
 	}
 
-	logStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
+	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
 	// WIP
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
@@ -137,7 +137,7 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIStopMonitoringRequestCollector(partner)
 }
 
-func logStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
+func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -150,7 +150,7 @@ func logStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.S
 	logStashEvent["requestXML"] = xml
 }
 
-func logStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringResponse) {
+func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringResponse) {
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
