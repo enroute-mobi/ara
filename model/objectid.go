@@ -12,16 +12,16 @@ func NewObjectIDsFromMap(objectIdMap map[string]string) (objectids ObjectIDs) {
 	return objectids
 }
 
-// func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
-// 	var definitions map[string]string
-// 	if err := json.Unmarshal(text, &definitions); err != nil {
-// 		return err
-// 	}
-// 	for key, value := range definitions {
-// 		identifiers[key] = NewObjectID(key, value)
-// 	}
-// 	return nil
-// }
+/*func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
+	var definitions map[string]string
+	if err := json.Unmarshal(text, &definitions); err != nil {
+		return err
+	}
+	for key, value := range definitions {
+		identifiers[key] = NewObjectID(key, value)
+	}
+	return nil
+} */
 
 type ObjectID struct {
 	kind  string
@@ -70,4 +70,12 @@ func (consumer *ObjectIDConsumer) ObjectIDs() (objectidArray []ObjectID) {
 		objectidArray = append(objectidArray, objectid)
 	}
 	return
+}
+
+func (consumer *ObjectIDConsumer) ObjectIDsResponse() map[string]string {
+	objectIds := make(map[string]string)
+	for _, object := range consumer.objectids {
+		objectIds[object.Kind()] = object.Value()
+	}
+	return objectIds
 }
