@@ -21,7 +21,7 @@ end
 When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
   response = RestClient.get lines_path(referential: referential)
   responseArray = JSON.parse(response.body)
-  expectedLine = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
+  expectedLine = responseArray.find{|a| a["ObjectIDs"].find{|o| o[kind] == objectid }}
 
   RestClient.delete line_path expectedLine["Id"]
 end
@@ -35,7 +35,7 @@ Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) d
   objectid_value = lineHash["ObjectIDs"][objectidkind]
 
   expectedName = responseArray.find{|a| a["Name"] == lineHash["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}
+  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o[objectidkind] == objectid_value }}
 
   expect(expectedName).not_to be_nil
   expect(expectedAttr).not_to be_nil
@@ -45,7 +45,7 @@ end
 Then(/^a Line "([^"]+)":"([^"]+)" should (not )?exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get lines_path(referential: referential)
   responseArray = JSON.parse(response.body)
-  expectedLine = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
+  expectedLine = responseArray.find{|a| a["ObjectIDs"].find{|o| o[kind] == objectid }}
 
   if condition.nil?
     expect(expectedLine).not_to be_nil

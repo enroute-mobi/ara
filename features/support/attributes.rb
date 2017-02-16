@@ -43,6 +43,8 @@ end
 def api_attributes(json)
   attributes = JSON.parse(json)
 
+  puts attributes.inspect
+
   objectids = attributes["ObjectIDs"]
   if Array === objectids
     attributes["ObjectIDs"] = Hash[objectids.map { |objectid| [objectid["Kind"], objectid["Value"]] }]

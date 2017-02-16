@@ -35,7 +35,7 @@ Then(/^one StopVisit has the following attributes:$/) do |attributes|
   objectid_value = attributes["ObjectIDs"][objectidkind]
 
   expectedName = responseArray.find{|a| a["Name"] == attributes["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}
+  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o[objectidkind] == objectid_value }}
 
   expect(expectedName).not_to be_nil
   expect(expectedAttr).not_to be_nil

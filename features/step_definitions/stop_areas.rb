@@ -21,7 +21,7 @@ end
 When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
   response = RestClient.get stop_areas_path(referential: referential)
   responseArray = JSON.parse(response.body)
-  expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
+  expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o[kind] == objectid }}
 
   RestClient.delete stop_area_path expectedStopArea["Id"]
 end
@@ -35,7 +35,7 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
   objectid_value = stopAreaHash["ObjectIDs"][objectidkind]
 
   expectedName = responseArray.find{|a| a["Name"] == stopAreaHash["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == objectidkind && o["Value"] == objectid_value }}
+  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o[objectidkind] == objectid_value }}
 
   expect(expectedName).not_to be_nil
   expect(expectedAttr).not_to be_nil
@@ -45,7 +45,7 @@ end
 Then(/^a StopArea "([^"]+)":"([^"]+)" should (not )?exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get stop_areas_path(referential: referential)
   responseArray = JSON.parse(response.body)
-  expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o["Kind"] == kind && o["Value"] == objectid }}
+  expectedStopArea = responseArray.find{|a| a["ObjectIDs"].find{|o| o[kind] == objectid }}
 
   if condition.nil?
     expect(expectedStopArea).not_to be_nil
