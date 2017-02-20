@@ -2,8 +2,6 @@ Feature: Support SIRI request
   Background:
     Given a Referential "test" is created
 
-  @wip
-  # See Issue 2564
   Scenario: Handle a empty SIRI request
     When I send this SIRI request
       """
@@ -21,8 +19,6 @@ Feature: Support SIRI request
 </S:Envelope>
       """
 
-  @wip
-  # See Issue 2564
   Scenario: Handle an invalid SIRI request
     When I send this SIRI request
       """

@@ -58,7 +58,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 
 	envelope, err := siri.NewSOAPEnvelope(request.Body)
 	if err != nil {
-		siriError("InvalidRequest", fmt.Sprintf("Cannot read Request Body: %v", err), response)
+		siriError("Client", "Invalid Request", response)
 		return
 	}
 
