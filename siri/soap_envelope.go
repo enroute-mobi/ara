@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -26,9 +25,11 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if len(content) == 0 {
+		return nil, errors.New("Empty body")
+	}
 	// Parse the XML and store the body
-	doc, err := gokogiri.ParseXml(content)
+	doc, err := xml.Parse(content, xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
 	if err != nil {
 		return nil, err
 	}

@@ -74,7 +74,7 @@ Feature: Support SIRI StopMonitoring
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
         </ns3:StopMonitoringDelivery>
-      <Answer>
+      </Answer>
     </ns8:GetStopMonitoringResponse>
   </S:Body>
 </S:Envelope>
@@ -90,10 +90,8 @@ Feature: Support SIRI StopMonitoring
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
-
       | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder | 4                                                                    |
-
     And one Line has the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |

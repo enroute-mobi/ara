@@ -24,8 +24,7 @@ class SIRIServer
 
 	  @http_server.mount_proc uri.path do |req, res|
 		  if req.body =~ /ns7:CheckStatus/
-			  res.body = %Q{
-				<?xml version='1.0' encoding='utf-8'?>
+			  res.body = %Q{<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns8:CheckStatusResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -49,8 +48,7 @@ class SIRIServer
       <AnswerExtension />
     </ns8:CheckStatusResponse>
   </S:Body>
-</S:Envelope>
-			}
+</S:Envelope>}
 		  else
 			  self.requests << req
 		    res.body = self.responses.shift

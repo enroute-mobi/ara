@@ -55,13 +55,10 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		siriError("NotFound", "Referential not found", response)
 		return
 	}
-	if request.Body == nil {
-		siriError("InvalidRequest", "Request Body is empty", response)
-		return
-	}
+
 	envelope, err := siri.NewSOAPEnvelope(request.Body)
 	if err != nil {
-		siriError("InvalidRequest", "Cannot read Request Body", response)
+		siriError("InvalidRequest", fmt.Sprintf("Cannot read Request Body: %v", err), response)
 		return
 	}
 
