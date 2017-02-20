@@ -38,13 +38,13 @@ type Controller struct {
 }
 
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {
-	if request.Body == nil {
-		http.Error(response, "Invalid request: Empty body", 400)
-		return nil
-	}
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		http.Error(response, "Invalid request: Can't read request body", 400)
+		return nil
+	}
+	if len(body) == 0 {
+		http.Error(response, "Invalid request: Empty body", 400)
 		return nil
 	}
 	return body
