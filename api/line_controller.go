@@ -90,7 +90,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 		http.Error(response, "Internal error", 500)
 		return
 	}
-	jsonBytes, _ := line.MarshalJSON()
+	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }
 
@@ -108,6 +108,7 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 		http.Error(response, "Invalid request: can't parse request body", 400)
 		return
 	}
+
 	if line.Id() != "" {
 		http.Error(response, "Invalid request", 400)
 		return
@@ -120,6 +121,6 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 		http.Error(response, "Internal error", 500)
 		return
 	}
-	jsonBytes, _ := line.MarshalJSON()
+	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }

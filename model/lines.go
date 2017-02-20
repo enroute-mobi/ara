@@ -17,13 +17,16 @@ type Line struct {
 
 	Name       string
 	Attributes map[string]string
+	References map[string]Reference
 }
 
 func NewLine(model Model) *Line {
 	line := &Line{
 		model:      model,
 		Attributes: make(map[string]string),
+		References: make(map[string]Reference),
 	}
+
 	line.objectids = make(ObjectIDs)
 	return line
 }
@@ -37,6 +40,7 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 		"Id":         line.id,
 		"Name":       line.Name,
 		"Attributes": line.Attributes,
+		"References": line.References,
 	}
 	if line.ObjectIDs() != nil {
 		lineMap["ObjectIDs"] = line.ObjectIDs()
@@ -46,12 +50,15 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 
 func (line *Line) UnmarshalJSON(data []byte) error {
 	type Alias Line
+
 	aux := &struct {
 		ObjectIDs map[string]string
+		Reference map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(line),
 	}
+
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
@@ -66,6 +73,11 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 
 func (line *Line) Attribute(key string) (string, bool) {
 	value, present := line.Attributes[key]
+	return value, present
+}
+
+func (line *Line) Reference(key string) (Reference, bool) {
+	value, present := line.References[key]
 	return value, present
 }
 

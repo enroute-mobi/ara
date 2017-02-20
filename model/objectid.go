@@ -49,6 +49,24 @@ func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (objectid *ObjectID) UnmarshalJSON(data []byte) error {
+
+	aux := &struct {
+		Kind  string
+		Value string
+	}{}
+
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	objectid.kind = aux.Kind
+	objectid.value = aux.Value
+
+	return nil
+}
+
 type ObjectIDConsumer struct {
 	objectids ObjectIDs
 }

@@ -22,6 +22,7 @@ type StopArea struct {
 
 	Name       string
 	Attributes map[string]string
+	References map[string]Reference
 	// ...
 }
 
@@ -29,6 +30,7 @@ func NewStopArea(model Model) *StopArea {
 	stopArea := &StopArea{
 		model:      model,
 		Attributes: make(map[string]string),
+		References: make(map[string]Reference),
 	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
@@ -59,6 +61,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		"Id":         stopArea.id,
 		"Name":       stopArea.Name,
 		"Attributes": stopArea.Attributes,
+		"References": stopArea.References,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
@@ -77,10 +80,16 @@ func (stopArea *StopArea) Attribute(key string) (string, bool) {
 	return value, present
 }
 
+func (stopArea *StopArea) Reference(key string) (Reference, bool) {
+	value, present := stopArea.References[key]
+	return value, present
+}
+
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
 		ObjectIDs map[string]string
+		Reference map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),

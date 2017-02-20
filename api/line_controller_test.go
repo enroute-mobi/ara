@@ -107,7 +107,10 @@ func Test_LineController_Show(t *testing.T) {
 
 func Test_LineController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ 	"References" : {
+		"JourneyPattern":{"ObjectId":{"Kind":"lol","Value":"lel"}, "Id":"42"}
+	},
+	"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareLineRequest("POST", false, body, t)
 
 	// Check response
@@ -120,7 +123,9 @@ func Test_LineController_Create(t *testing.T) {
 	if !ok {
 		t.Errorf("Line should be found after POST request")
 	}
-	if expected, _ := line.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
+	lineMarshal, _ := line.MarshalJSON()
+	expected := `{"Attributes":{},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"","ObjectIDs":[{"reflex":"FR:77491:ZDE:34004:STIF"}],"References":{"JourneyPattern":{"ObjectId":{"lol":"lel"},"Id":"42"}}}`
+	if responseRecorder.Body.String() != string(expected) && string(lineMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
@@ -133,7 +138,7 @@ func Test_LineController_Index(t *testing.T) {
 	checkLineResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Attributes":{},"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":""}]`
+	expected := `[{"Attributes":{},"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"","References":{}}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

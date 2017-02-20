@@ -28,6 +28,7 @@ type StopVisit struct {
 	stopAreaId       StopAreaId
 	vehicleJourneyId VehicleJourneyId
 	Attributes       map[string]string
+	References       map[string]Reference
 
 	recordedAt      time.Time
 	schedules       StopVisitSchedules
@@ -41,6 +42,7 @@ func NewStopVisit(model Model) *StopVisit {
 		model:      model,
 		schedules:  NewStopVisitSchedules(),
 		Attributes: make(map[string]string),
+		References: make(map[string]Reference),
 	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
@@ -100,6 +102,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"DepartureStatus": stopVisit.departureStatus,
 		"ArrivalStatus":   stopVisit.arrivalStatus,
 		"Attributes":      stopVisit.Attributes,
+		"References":      stopVisit.References,
 	}
 	if stopVisit.ObjectIDs() != nil {
 		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDsResponse()
@@ -111,6 +114,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	type Alias StopVisit
 	aux := &struct {
 		ObjectIDs        map[string]string
+		Reference        map[string]Reference
 		StopAreaId       string
 		VehicleJourneyId string
 		PassageOrder     int
@@ -149,6 +153,11 @@ func (stopVisit *StopVisit) Attribute(key string) (string, bool) {
 func (stopVisit *StopVisit) Save() (ok bool) {
 	ok = stopVisit.model.StopVisits().Save(stopVisit)
 	return
+}
+
+func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
+	value, present := stopVisit.References[key]
+	return value, present
 }
 
 type MemoryStopVisits struct {

@@ -16,12 +16,14 @@ type VehicleJourney struct {
 	id         VehicleJourneyId
 	lineId     LineId
 	Attributes map[string]string
+	References map[string]Reference
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
 	vehicleJourney := &VehicleJourney{
 		model:      model,
 		Attributes: make(map[string]string),
+		References: make(map[string]Reference),
 	}
 	vehicleJourney.objectids = make(ObjectIDs)
 	return vehicleJourney
@@ -46,6 +48,7 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		"Line":       vehicleJourney.lineId,
 		"StopVisits": stopVisitIds,
 		"Attributes": vehicleJourney.Attributes,
+		"References": vehicleJourney.References,
 	}
 	if vehicleJourney.ObjectIDs() != nil {
 		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
@@ -58,10 +61,16 @@ func (vehicleJourney *VehicleJourney) Attribute(key string) (string, bool) {
 	return value, present
 }
 
+func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
+	value, present := vehicleJourney.References[key]
+	return value, present
+}
+
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	type Alias VehicleJourney
 	aux := &struct {
 		ObjectIDs map[string]string
+		Reference map[string]Reference
 		LineId    string
 		*Alias
 	}{
