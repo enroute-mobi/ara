@@ -79,7 +79,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	err := json.Unmarshal(body, &line)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 
 	err := json.Unmarshal(body, &line)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 

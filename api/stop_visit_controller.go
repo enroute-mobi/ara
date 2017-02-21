@@ -79,7 +79,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	if stopVisit.Id() != "" {

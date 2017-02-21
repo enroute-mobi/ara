@@ -42,10 +42,11 @@ end
 Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
   document = REXML::Document.new(@last_siri_response)
 
-  expected.rows_hash.each do |xpath, value|
+  expected.rows_hash.each do |xpath, values|
     node = REXML::XPath.first(document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
     xml_value = node.text if node
 
+    value = Array(values).first
     expect(xml_value).to eq(value)
   end
 end

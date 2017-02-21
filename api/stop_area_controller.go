@@ -79,7 +79,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 
 	err := json.Unmarshal(body, &stopArea)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 
 	err := json.Unmarshal(body, &stopArea)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	if stopArea.Id() != "" {
