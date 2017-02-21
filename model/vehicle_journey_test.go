@@ -23,7 +23,7 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	// Create a StopVisit
 	model.StopVisits().SetUUIDGenerator(generator)
 	stopVisit := model.StopVisits().New()
-	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
+	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
 	model.StopVisits().Save(&stopVisit)
 
 	// Create the vehicleJourney

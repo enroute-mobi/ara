@@ -63,16 +63,16 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 		}
 	}
 
-	if expected := StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8"); stopVisit.stopAreaId != expected {
-		t.Errorf("Wrong StopVisit StopAreaId:\n got: %s\n want: %s", stopVisit.stopAreaId, expected)
+	if expected := StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8"); stopVisit.StopAreaId != expected {
+		t.Errorf("Wrong StopVisit StopAreaId:\n got: %s\n want: %s", stopVisit.StopAreaId, expected)
 	}
 
-	if expected := VehicleJourneyId("6ba7b814-9dad-11d1-2-00c04fd430c8"); stopVisit.vehicleJourneyId != expected {
-		t.Errorf("Wrong StopVisit VehicleJourneyId:\n got: %s\n want: %s", stopVisit.vehicleJourneyId, expected)
+	if expected := VehicleJourneyId("6ba7b814-9dad-11d1-2-00c04fd430c8"); stopVisit.VehicleJourneyId != expected {
+		t.Errorf("Wrong StopVisit VehicleJourneyId:\n got: %s\n want: %s", stopVisit.VehicleJourneyId, expected)
 	}
 
-	if expected := 10; stopVisit.passageOrder != expected {
-		t.Errorf("Wrong StopVisit PassageOrder:\n got: %s\n want: %s", stopVisit.passageOrder, expected)
+	if expected := 10; stopVisit.PassageOrder != expected {
+		t.Errorf("Wrong StopVisit PassageOrder:\n got: %s\n want: %s", stopVisit.PassageOrder, expected)
 	}
 }
 
@@ -81,7 +81,7 @@ func Test_StopVisit_Save(t *testing.T) {
 	stopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
-	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
 	if stopVisit.model != model {
 		t.Errorf("New stopVisit model should be memoryStopVisits model")

@@ -21,10 +21,10 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 
 	manager.UpdateStopVisit(event)
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
-	if updatedStopVisit.DepartureStatus() != STOP_VISIT_DEPARTURE_CANCELLED {
+	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
 		t.Errorf("StopVisit DepartureStatus should be updated")
 	}
-	if updatedStopVisit.ArrivalStatus() != STOP_VISIT_ARRIVAL_ONTIME {
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
 		t.Errorf("StopVisit ArrivalStatus should be updated")
 	}
 }
@@ -54,14 +54,14 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 		t.Errorf("VehicleJourney should be created by findOrCreateStopArea")
 	}
 
-	if stopVisit.DepartureStatus() != STOP_VISIT_DEPARTURE_CANCELLED {
-		t.Errorf("StopVisit DepartureStatus should be cancelled, got: %v", stopVisit.DepartureStatus())
+	if stopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
+		t.Errorf("StopVisit DepartureStatus should be cancelled, got: %v", stopVisit.DepartureStatus)
 	}
-	if stopVisit.ArrivalStatus() != STOP_VISIT_ARRIVAL_CANCELLED {
-		t.Errorf("StopVisit ArrivalStatus should be cancelled, got: %v", stopVisit.ArrivalStatus())
+	if stopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_CANCELLED {
+		t.Errorf("StopVisit ArrivalStatus should be cancelled, got: %v", stopVisit.ArrivalStatus)
 	}
-	if stopVisit.PassageOrder() != 1 {
-		t.Errorf("StopVisit PassageOrder should be 1, got: %v", stopVisit.PassageOrder())
+	if stopVisit.PassageOrder != 1 {
+		t.Errorf("StopVisit PassageOrder should be 1, got: %v", stopVisit.PassageOrder)
 	}
 }
 

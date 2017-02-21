@@ -25,22 +25,22 @@ type StopVisit struct {
 	model Model
 
 	id               StopVisitId
-	stopAreaId       StopAreaId
-	vehicleJourneyId VehicleJourneyId
+	StopAreaId       StopAreaId
+	VehicleJourneyId VehicleJourneyId
 	Attributes       map[string]string
 	References       map[string]Reference
 
-	recordedAt      time.Time
-	schedules       StopVisitSchedules
-	departureStatus StopVisitDepartureStatus
-	arrivalStatus   StopVisitArrivalStatus
-	passageOrder    int
+	RecordedAt      time.Time
+	Schedules       StopVisitSchedules
+	DepartureStatus StopVisitDepartureStatus
+	ArrivalStatus   StopVisitArrivalStatus
+	PassageOrder    int
 }
 
 func NewStopVisit(model Model) *StopVisit {
 	stopVisit := &StopVisit{
 		model:      model,
-		schedules:  NewStopVisitSchedules(),
+		Schedules:  NewStopVisitSchedules(),
 		Attributes: make(map[string]string),
 		References: make(map[string]Reference),
 	}
@@ -52,57 +52,53 @@ func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
 }
 
-func (stopVisit *StopVisit) SetStopAreaId(id StopAreaId) {
-	stopVisit.stopAreaId = id
-}
-
 func (stopVisit *StopVisit) StopArea() StopArea {
-	stopArea, _ := stopVisit.model.StopAreas().Find(stopVisit.stopAreaId)
+	stopArea, _ := stopVisit.model.StopAreas().Find(stopVisit.StopAreaId)
 	return stopArea
 }
 
 func (stopVisit *StopVisit) VehicleJourney() VehicleJourney {
-	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.vehicleJourneyId)
+	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 	return vehicleJourney
 }
 
-func (stopVisit *StopVisit) Schedules() StopVisitSchedules {
-	return stopVisit.schedules
-}
+/* type ResponseInterface map[string]interface{}
 
-func (stopVisit *StopVisit) DepartureStatus() StopVisitDepartureStatus {
-	return stopVisit.departureStatus
-}
-
-func (stopVisit *StopVisit) ArrivalStatus() StopVisitArrivalStatus {
-	return stopVisit.arrivalStatus
-}
-
-func (stopVisit *StopVisit) PassageOrder() int {
-	return stopVisit.passageOrder
-}
-
-func (stopVisit *StopVisit) RecordedAt() time.Time {
-	return stopVisit.recordedAt
-}
+func (orderMap *ResponseInterface) ToJson(order []string) string {
+	orderedJson := &bytes.Buffer{}
+	orderedJson.Write([]byte{'{', '\n'})
+	l := len(order)
+	for i, key := range order {
+		if (*orderMap)[key] == nil {
+			(*orderMap)[key] = ""
+		}
+		fmt.Fprintf(orderedJson, "\t\"%s\": \"%v\"", key, (*orderMap)[key])
+		if i < l { // putting the ',' only if not last
+			orderedJson.WriteByte(',')
+		}
+		orderedJson.WriteByte('\n')
+	}
+	orderedJson.Write([]byte{'}', '\n'})
+	return orderedJson.String()
+} */
 
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	scheduleSlice := []StopVisitSchedule{}
-	for _, schedule := range stopVisit.schedules {
+	for _, schedule := range stopVisit.Schedules {
 		scheduleSlice = append(scheduleSlice, *schedule)
 	}
 
 	stopVisitMap := map[string]interface{}{
-		"Id":              stopVisit.id,
-		"StopArea":        stopVisit.stopAreaId,
-		"VehicleJourney":  stopVisit.vehicleJourneyId,
-		"PassageOrder":    stopVisit.passageOrder,
-		"RecordedAt":      stopVisit.recordedAt,
-		"Schedules":       scheduleSlice,
-		"DepartureStatus": stopVisit.departureStatus,
-		"ArrivalStatus":   stopVisit.arrivalStatus,
-		"Attributes":      stopVisit.Attributes,
-		"References":      stopVisit.References,
+		"Id":               stopVisit.id,
+		"StopAreaId":       stopVisit.StopAreaId,
+		"VehicleJourneyId": stopVisit.VehicleJourneyId,
+		"PassageOrder":     stopVisit.PassageOrder,
+		"RecordedAt":       stopVisit.RecordedAt,
+		"Schedules":        scheduleSlice,
+		"DepartureStatus":  stopVisit.DepartureStatus,
+		"ArrivalStatus":    stopVisit.ArrivalStatus,
+		"Attributes":       stopVisit.Attributes,
+		"References":       stopVisit.References,
 	}
 	if stopVisit.ObjectIDs() != nil {
 		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDsResponse()
@@ -118,6 +114,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		StopAreaId       string
 		VehicleJourneyId string
 		PassageOrder     int
+		Schedules        []StopVisitSchedule
 		*Alias
 	}{
 		Alias: (*Alias)(stopVisit),
@@ -132,14 +129,21 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		stopVisit.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
+	if aux.Schedules != nil {
+		stopVisit.Schedules = NewStopVisitSchedules()
+		for _, schedule := range aux.Schedules {
+			stopVisit.Schedules.SetSchedule(schedule.Kind(), schedule.DepartureTime(), schedule.ArrivalTime())
+		}
+	}
+
 	if aux.StopAreaId != "" {
-		stopVisit.stopAreaId = StopAreaId(aux.StopAreaId)
+		stopVisit.StopAreaId = StopAreaId(aux.StopAreaId)
 	}
 	if aux.VehicleJourneyId != "" {
-		stopVisit.vehicleJourneyId = VehicleJourneyId(aux.VehicleJourneyId)
+		stopVisit.VehicleJourneyId = VehicleJourneyId(aux.VehicleJourneyId)
 	}
 	if aux.PassageOrder > 0 {
-		stopVisit.passageOrder = aux.PassageOrder
+		stopVisit.PassageOrder = aux.PassageOrder
 	}
 
 	return nil
@@ -231,7 +235,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 // Temp
 func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.stopAreaId == id {
+		if stopVisit.StopAreaId == id {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
@@ -254,7 +258,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	}
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
-	manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.vehicleJourneyId], stopVisit.id)
+	manager.byVehicleJourneyId[stopVisit.VehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.VehicleJourneyId], stopVisit.id)
 	for _, objectid := range stopVisit.ObjectIDs() {
 		_, ok := manager.byObjectId[objectid.Kind()]
 		if !ok {
@@ -273,9 +277,9 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 		delete(valueMap, objectid.Value())
 	}
 	// Delete in byVehicleJourneyId
-	for i, stopVisitId := range manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] {
+	for i, stopVisitId := range manager.byVehicleJourneyId[stopVisit.VehicleJourneyId] {
 		if stopVisitId == stopVisit.id {
-			manager.byVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.vehicleJourneyId][:i], manager.byVehicleJourneyId[stopVisit.vehicleJourneyId][i+1:]...)
+			manager.byVehicleJourneyId[stopVisit.VehicleJourneyId] = append(manager.byVehicleJourneyId[stopVisit.VehicleJourneyId][:i], manager.byVehicleJourneyId[stopVisit.VehicleJourneyId][i+1:]...)
 			break
 		}
 	}

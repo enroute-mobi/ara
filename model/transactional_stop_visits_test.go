@@ -71,7 +71,7 @@ func Test_TransactionalStopVisits_Save(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
-	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
 	if success := stopVisits.Save(&stopVisit); !success {
 		t.Errorf("Save should return true")
@@ -98,7 +98,7 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 	existingStopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	existingStopVisit.SetObjectID(objectid)
-	existingStopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	existingStopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	model.StopVisits().Save(&existingStopVisit)
 
 	stopVisits.Delete(&existingStopVisit)
@@ -125,14 +125,14 @@ func Test_TransactionalStopVisits_Commit(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
-	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisits.Save(&stopVisit)
 
 	// Test Delete
 	existingStopVisit := model.StopVisits().New()
 	secondObjectid := NewObjectID("kind", "value2")
 	existingStopVisit.SetObjectID(secondObjectid)
-	existingStopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
+	existingStopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
 	model.StopVisits().Save(&existingStopVisit)
 	stopVisits.Delete(&existingStopVisit)
 
@@ -168,7 +168,7 @@ func Test_TransactionalStopVisits_Rollback(t *testing.T) {
 	stopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
-	stopVisit.vehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisits.Save(&stopVisit)
 
 	stopVisits.Rollback()

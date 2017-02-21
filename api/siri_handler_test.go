@@ -145,7 +145,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.SetStopAreaId(stopArea.Id())
+	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
 

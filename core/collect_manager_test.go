@@ -70,7 +70,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	referential.collectManager.(*CollectManager).broadcastStopVisitUpdateEvent(stopVisitUpdateEvent)
 
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())
-	if updatedStopVisit.ArrivalStatus() != model.STOP_VISIT_ARRIVAL_ARRIVED {
-		t.Errorf("Wrong ArrivalStatus stopVisit should have been updated\n expected: %v\n got: %v", model.STOP_VISIT_ARRIVAL_ARRIVED, updatedStopVisit.ArrivalStatus())
+	if updatedStopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_ARRIVED {
+		t.Errorf("Wrong ArrivalStatus stopVisit should have been updated\n expected: %v\n got: %v", model.STOP_VISIT_ARRIVAL_ARRIVED, updatedStopVisit.ArrivalStatus)
 	}
 }

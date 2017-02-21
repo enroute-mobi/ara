@@ -42,10 +42,10 @@ func (updater *StopVisitUpdater) Update() {
 		logger.Log.Debugf("Update StopVisit %v", existingStopVisit.Id())
 		stopArea, _ := updater.tx.Model().StopAreas().FindByObjectId(updater.event.StopAreaObjectId)
 		stopArea.Updated(updater.Clock().Now())
-		existingStopVisit.schedules = updater.event.Schedules
-		existingStopVisit.departureStatus = updater.event.DepartureStatus
-		existingStopVisit.arrivalStatus = updater.event.ArrivalStatuts
-		existingStopVisit.recordedAt = updater.event.RecordedAt
+		existingStopVisit.Schedules = updater.event.Schedules
+		existingStopVisit.DepartureStatus = updater.event.DepartureStatus
+		existingStopVisit.ArrivalStatus = updater.event.ArrivalStatuts
+		existingStopVisit.RecordedAt = updater.event.RecordedAt
 
 		updater.tx.Model().StopVisits().Save(&existingStopVisit)
 		updater.tx.Model().StopAreas().Save(&stopArea)
@@ -61,14 +61,14 @@ func (updater *StopVisitUpdater) Update() {
 	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
 	stopVisit := updater.tx.Model().StopVisits().New()
-	stopVisit.stopAreaId = foundStopArea.Id()
-	stopVisit.vehicleJourneyId = foundVehicleJourney.Id()
-	stopVisit.passageOrder = stopVisitAttributes.PassageOrder
-	stopVisit.recordedAt = stopVisitAttributes.RecordedAt
+	stopVisit.StopAreaId = foundStopArea.Id()
+	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()
+	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
+	stopVisit.RecordedAt = stopVisitAttributes.RecordedAt
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
-	stopVisit.schedules = stopVisitAttributes.Schedules
-	stopVisit.departureStatus = stopVisitAttributes.DepartureStatus
-	stopVisit.arrivalStatus = stopVisitAttributes.ArrivalStatus
+	stopVisit.Schedules = stopVisitAttributes.Schedules
+	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
+	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 
 	updater.tx.Model().StopVisits().Save(&stopVisit)
 }

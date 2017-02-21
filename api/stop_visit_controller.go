@@ -90,6 +90,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 		http.Error(response, "Internal error", 500)
 		return
 	}
+
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }

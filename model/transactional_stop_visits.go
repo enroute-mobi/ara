@@ -70,7 +70,7 @@ func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourney
 func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	// Check saved StopVisits
 	for _, stopVisit := range manager.saved {
-		if stopVisit.stopAreaId == id {
+		if stopVisit.StopAreaId == id {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
@@ -103,7 +103,7 @@ func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 	manager.saved[stopVisit.Id()] = stopVisit
-	manager.savedByVehicleJourneyId[stopVisit.vehicleJourneyId] = append(manager.savedByVehicleJourneyId[stopVisit.vehicleJourneyId], stopVisit.id)
+	manager.savedByVehicleJourneyId[stopVisit.VehicleJourneyId] = append(manager.savedByVehicleJourneyId[stopVisit.VehicleJourneyId], stopVisit.id)
 	for _, objectid := range stopVisit.ObjectIDs() {
 		_, ok := manager.savedByObjectId[objectid.Kind()]
 		if !ok {

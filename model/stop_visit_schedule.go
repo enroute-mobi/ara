@@ -44,6 +44,26 @@ func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jsonSchedule)
 }
 
+func (schedule *StopVisitSchedule) UnmarshalJSON(data []byte) error {
+
+	aux := &struct {
+		Kind          StopVisitScheduleType
+		DepartureTime time.Time
+		ArrivalTime   time.Time
+	}{}
+
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	schedule.kind = aux.Kind
+	schedule.departureTime = aux.DepartureTime
+	schedule.arrivalTime = aux.ArrivalTime
+
+	return nil
+}
+
 type StopVisitSchedules map[StopVisitScheduleType]*StopVisitSchedule
 
 func NewStopVisitSchedules() StopVisitSchedules {

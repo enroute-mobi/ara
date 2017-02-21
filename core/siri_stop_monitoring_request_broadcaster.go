@@ -56,7 +56,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		if !ok {
 			continue
 		}
-		schedules := stopVisit.Schedules()
+		schedules := stopVisit.Schedules
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 			ItemIdentifier: stopVisitId.Value(),
 			StopPointRef:   objectid.Value(),
@@ -64,9 +64,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			// DatedVehicleJourneyRef: stopVisit
 			// LineRef                string
 			// PublishedLineName      string
-			DepartureStatus:       string(stopVisit.DepartureStatus()),
-			ArrivalStatus:         string(stopVisit.ArrivalStatus()),
-			Order:                 stopVisit.PassageOrder(),
+			DepartureStatus:       string(stopVisit.DepartureStatus),
+			ArrivalStatus:         string(stopVisit.ArrivalStatus),
+			Order:                 stopVisit.PassageOrder,
 			AimedArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
 			ExpectedArrivalTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
 			ActualArrivalTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),

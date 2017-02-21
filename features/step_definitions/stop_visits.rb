@@ -33,7 +33,7 @@ Then(/^one StopVisit has the following attributes:$/) do |attributes|
 
   objectidkind = attributes["ObjectIDs"].keys.first
   objectid_value = attributes["ObjectIDs"][objectidkind]
-  
+
 
   expectedName = responseArray.find{|a| a["Name"] == attributes["Name"]}
   expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o|
