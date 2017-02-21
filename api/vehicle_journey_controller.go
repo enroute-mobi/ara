@@ -79,7 +79,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	err := json.Unmarshal(body, &vehicleJourney)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (controller *VehicleJourneyController) Create(response http.ResponseWriter,
 
 	err := json.Unmarshal(body, &vehicleJourney)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse request body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	if vehicleJourney.Id() != "" {

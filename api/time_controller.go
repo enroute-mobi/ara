@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -54,7 +55,7 @@ func (controller *TimeController) get(response http.ResponseWriter) {
 func (controller *TimeController) advance(response http.ResponseWriter, body []byte) {
 	var responseBody map[string]string
 	if err := json.Unmarshal(body, &responseBody); err != nil {
-		http.Error(response, "Invalid request: can't parse body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	duration, ok := responseBody["duration"]
@@ -64,7 +65,7 @@ func (controller *TimeController) advance(response http.ResponseWriter, body []b
 	}
 	parsedDuration, err := time.ParseDuration(duration)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse duration", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse duration: %v", err), 400)
 		return
 	}
 	controller.server.Clock().(model.FakeClock).Advance(parsedDuration)

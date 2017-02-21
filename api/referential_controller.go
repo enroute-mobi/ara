@@ -69,7 +69,7 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 	apiReferential := referential.Definition()
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (controller *ReferentialController) Create(response http.ResponseWriter, bo
 	apiReferential := referential.Definition()
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 

@@ -65,7 +65,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	if apiPartner.Id != partner.Id() {
@@ -93,7 +93,7 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, "Invalid request: can't parse body", 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
 	if apiPartner.Id != "" {
