@@ -468,18 +468,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-        <ns5:ResponseTimestamp>2016-12-16T10:47:15.627+01:00</ns5:ResponseTimestamp>
+        <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:StopMonitoringDelivery version="1.3">
-          <ns5:ResponseTimestamp>2016-12-16T10:47:15.628+01:00</ns5:ResponseTimestamp>
+          <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
           <ns5:Status>true</ns5:Status>
           <ns5:MonitoredStopVisit>
-            <ns5:RecordedAtTime>2016-12-16T10:47:15.600+01:00</ns5:RecordedAtTime>
+            <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
             <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
             <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
             <ns5:MonitoredVehicleJourney>
@@ -501,11 +501,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns5:StopPointName>Arletty</ns5:StopPointName>
                 <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
                 <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
-                <ns5:AimedArrivalTime>2016-12-16T11:43:05.000+01:00</ns5:AimedArrivalTime>
-                <ns5:ExpectedArrivalTime>2016-12-16T11:43:05.000+01:00</ns5:ExpectedArrivalTime>
+                <ns5:AimedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:AimedArrivalTime>
+                <ns5:ExpectedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedArrivalTime>
                 <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
-                <ns5:AimedDepartureTime>2016-12-16T11:43:05.000+01:00</ns5:AimedDepartureTime>
-                <ns5:ExpectedDepartureTime>2016-12-16T11:43:05.000+01:00</ns5:ExpectedDepartureTime>
+                <ns5:AimedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:AimedDepartureTime>
+                <ns5:ExpectedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedDepartureTime>
                 <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney>
