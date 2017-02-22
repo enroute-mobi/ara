@@ -142,7 +142,14 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	<AnswerExtension />
 </ns8:GetStopMonitoringResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
-	request := NewSIRIStopMonitoringResponse("address", "producer", "ref", "identifier", true, responseTimestamp)
+	request := &SIRIStopMonitoringResponse{
+		Address:                   "address",
+		ProducerRef:               "producer",
+		RequestMessageRef:         "ref",
+		ResponseMessageIdentifier: "identifier",
+		Status:            true,
+		ResponseTimestamp: responseTimestamp,
+	}
 	xml, err := request.BuildXML()
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +203,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
 					<ns3:Monitored>TBD</ns3:Monitored>
 					<ns3:ProgressRate>TBD</ns3:ProgressRate>
-					<ns3:Delay>TBD</ns3:Delay>
+					<ns3:Delay>30</ns3:Delay>
 					<ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
 					<ns3:VehicleRef>TBD</ns3:VehicleRef>
 					<ns3:MonitoredCall>
@@ -243,7 +250,9 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		AimedDepartureTime:    time.Date(2019, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ExpectedDepartureTime: time.Date(2020, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ActualDepartureTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		Attributes: make(map[string]string),
 	}
+	siriMonitoredStopVisit.Attributes["Delay"] = "30"
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()
 	if err != nil {

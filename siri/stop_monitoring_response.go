@@ -39,6 +39,9 @@ type XMLMonitoredStopVisit struct {
 	aimedDepartureTime    time.Time
 	expectedDepartureTime time.Time
 	actualDepartureTime   time.Time
+
+	// Attributes
+	delay string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -74,6 +77,9 @@ type SIRIMonitoredStopVisit struct {
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
 	ActualDepartureTime   time.Time
+
+	// Attributes
+	Attributes map[string]string
 }
 
 const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -120,8 +126,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:OriginAimedDepartureTime>TBD</ns3:OriginAimedDepartureTime>
 					<ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
 					<ns3:Monitored>TBD</ns3:Monitored>
-					<ns3:ProgressRate>TBD</ns3:ProgressRate>
-					<ns3:Delay>TBD</ns3:Delay>
+					<ns3:ProgressRate>TBD</ns3:ProgressRate>{{ if .Attributes.Delay }}
+					<ns3:Delay>{{ .Attributes.Delay }}</ns3:Delay>{{ end }}
 					<ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
 					<ns3:VehicleRef>TBD</ns3:VehicleRef>
 					<ns3:MonitoredCall>
@@ -168,29 +174,6 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 	}
 	response := NewXMLStopMonitoringResponse(doc.Root().XmlNode)
 	return response, nil
-}
-
-func NewSIRIStopMonitoringResponse(
-	address string,
-	producerRef string,
-	requestMessageRef string,
-	responseMessageIdentifier string,
-	status bool,
-	// errorType string,
-	// errorNumber int,
-	// errorText string,
-	responseTimestamp time.Time) *SIRIStopMonitoringResponse {
-	return &SIRIStopMonitoringResponse{
-		Address:                   address,
-		ProducerRef:               producerRef,
-		RequestMessageRef:         requestMessageRef,
-		ResponseMessageIdentifier: responseMessageIdentifier,
-		Status: status,
-		// ErrorType:          errorType,
-		// ErrorNumber:        errorNumber,
-		// ErrorText:          errorText,
-		ResponseTimestamp: responseTimestamp,
-	}
 }
 
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
@@ -322,6 +305,14 @@ func (visit *XMLMonitoredStopVisit) ActualDepartureTime() time.Time {
 		visit.actualDepartureTime = visit.findTimeChildContent("ActualDepartureTime")
 	}
 	return visit.actualDepartureTime
+}
+
+// Attributes
+func (visit *XMLMonitoredStopVisit) Delay() string {
+	if visit.delay == "" {
+		visit.delay = visit.findStringChildContent("Delay")
+	}
+	return visit.delay
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
