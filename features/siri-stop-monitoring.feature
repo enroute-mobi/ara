@@ -583,34 +583,34 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
           <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
-            <ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
-            <ns3:ItemIdentifier>boaarle_ext</ns3:ItemIdentifier>
-            <ns3:MonitoringRef>TBD</ns3:MonitoringRef>
+            <ns3:RecordedAtTime>2017-01-01T11:59:25.000Z</ns3:RecordedAtTime>
+            <ns3:ItemIdentifier>RATPDEV:Item::%{checksum:objectid}:LOC</ns3:ItemIdentifier>
+            <ns3:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
-              <ns3:LineRef></ns3:LineRef>
+              <ns3:LineRef>STIF:CODIFLIGNE:Line:C00001</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
-                <ns3:DataFrameRef>TBD</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef>TBD</ns3:DatedVehicleJourneyRef>
+                <ns3:DataFrameRef>SQYBUS:Version:1.0:LOC</ns3:DataFrameRef>
+                <ns3:DatedVehicleJourneyRef>1STD721687165983</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
-              <ns3:PublishedLineName></ns3:PublishedLineName>
-              <ns3:DirectionName>TBD</ns3:DirectionName>
-              <ns3:OperatorRef>TBD</ns3:OperatorRef>
-              <ns3:DestinationRef>TBD</ns3:DestinationRef>
-              <ns3:DestinationName>TBD</ns3:DestinationName>
-              <ns3:Monitored>TBD</ns3:Monitored>
+              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::%{checksum:objectid}:LOC</ns3:JourneyPatternRef>
+              <ns3:PublishedLineName>415</ns3:PublishedLineName>
+              <ns3:DirectionName>Aller</ns3:DirectionName>
+              <ns3:OperatorRef>Identifiant_STIF_pour_RATPDev</ns3:OperatorRef>
+              <ns3:DestinationRef>FR:78073:ZDE:50090348:STIF</ns3:DestinationRef>
+              <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
+              <ns3:Monitored>true</ns3:Monitored>
               <ns3:MonitoredCall>
-                <ns3:StopPointRef>boaarle_ext</ns3:StopPointRef>
-                <ns3:Order>4</ns3:Order>
-                <ns3:StopPointName>TBD</ns3:StopPointName>
-                <ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
-                <ns3:DestinationDisplay>TBD</ns3:DestinationDisplay>
-                <ns3:AimedArrivalTime>TBD</ns3:AimedArrivalTime>
-                <ns3:ExpectedArrivalTime>TBD</ns3:ExpectedArrivalTime>
-                <ns3:ArrivalStatus>TBD</ns3:ArrivalStatus>
-                <ns3:AimedDepartureTime>TBD</ns3:AimedDepartureTime>
-                <ns3:ExpectedDepartureTime>TBD</ns3:ExpectedDepartureTime>
-                <ns3:DepartureStatus></ns3:DepartureStatus>
+                <ns3:StopPointRef>FR:78073:ZDE:50089971:STIF</ns3:StopPointRef>
+                <ns3:Order>44</ns3:Order>
+                <ns3:StopPointName>Arletty</ns3:StopPointName>
+                <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+                <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
+                <ns3:AimedArrivalTime>2016-12-16T11:43:05.000+01:00</ns3:AimedArrivalTime>
+                <ns3:ExpectedArrivalTime>2016-12-16T11:43:05.000+01:00</ns3:ExpectedArrivalTime>
+                <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
+                <ns3:AimedDepartureTime>2016-12-16T11:43:05.000+01:00</ns3:AimedDepartureTime>
+                <ns3:ExpectedDepartureTime>2016-12-16T11:43:05.000+01:00</ns3:ExpectedDepartureTime>
+                <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
