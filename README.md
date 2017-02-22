@@ -74,14 +74,6 @@ Configuration try the given path if it exists, then the environment variable EDW
 ### Run Tests
 ```
 go test github.com/af83/edwig/...
+cucumber -t ~@wip
 ```
-
-### Install GoSublime
-CMD+Shift+P
-Type "Package Install"
-Search for "GoSublime"
-
-### Install GoImports
-https://michaelwhatcott.com/gosublime-goimports/
-
 
