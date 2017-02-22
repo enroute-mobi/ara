@@ -198,7 +198,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
               <ns3:Monitored>TBD</ns3:Monitored>
               <ns3:ProgressRate>TBD</ns3:ProgressRate>
-              <ns3:Delay>TBD</ns3:Delay>
               <ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
               <ns3:VehicleRef>TBD</ns3:VehicleRef>
               <ns3:MonitoredCall>
