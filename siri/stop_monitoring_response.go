@@ -39,6 +39,28 @@ type XMLMonitoredStopVisit struct {
 	aimedDepartureTime    time.Time
 	expectedDepartureTime time.Time
 	actualDepartureTime   time.Time
+
+	// Attributes
+	delay                       string
+	directionName               string
+	destinationName             string
+	directionRef                string
+	firstOrLastJourney          string
+	headwayService              string
+	journeyNote                 string
+	journeyPatternName          string
+	monitored                   string
+	monitoringError             string
+	occupancy                   string
+	originAimedDepartureTime    string
+	destinationAimedArrivalTime string
+	originName                  string
+	productCategoryRef          string
+	serviceFeatureRef           string
+	trainNumberRef              string
+	vehicleFeature              string
+	vehicleMode                 string
+	viaPlaceName                string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -74,6 +96,9 @@ type SIRIMonitoredStopVisit struct {
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
 	ActualDepartureTime   time.Time
+
+	// Attributes
+	Attributes map[string]map[string]string
 }
 
 const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -99,54 +124,40 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
 				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
+				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if not eq $key "TrainNumberRef" "PlaceName" }}
+					<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
+					<ns3:TrainNumber>
+						<ns3:TrainNumberRef>{{ .Attributes.VehicleJourneyAttributes.TrainNumberRef }}</ns3:TrainNumberRef>
+					</ns3:TrainNumber>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
+					<ns3:Via>
+						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>
+					</ns3:Via>{{ end }}
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
-					<ns3:DirectionRef>TBD</ns3:DirectionRef>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>TBD</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
 					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
-					<ns3:DirectionName>TBD</ns3:DirectionName>
-					<ns3:ExternalLineRef>TBD</ns3:ExternalLineRef>
 					<ns3:OperatorRef>TBD</ns3:OperatorRef>
-					<ns3:ProductCategoryRef>TBD</ns3:ProductCategoryRef>
-					<ns3:VehicleFeatureRef>TBD</ns3:VehicleFeatureRef>
 					<ns3:OriginRef>TBD</ns3:OriginRef>
-					<ns3:OriginName>TBD</ns3:OriginName>
 					<ns3:DestinationRef>TBD</ns3:DestinationRef>
-					<ns3:DestinationName>TBD</ns3:DestinationName>
-					<ns3:OriginAimedDepartureTime>TBD</ns3:OriginAimedDepartureTime>
-					<ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
-					<ns3:Monitored>TBD</ns3:Monitored>
-					<ns3:ProgressRate>TBD</ns3:ProgressRate>
-					<ns3:Delay>TBD</ns3:Delay>
-					<ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
-					<ns3:VehicleRef>TBD</ns3:VehicleRef>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
 						<ns3:Order>{{ .Order }}</ns3:Order>
-						<ns3:StopPointName>TBD</ns3:StopPointName>
 						<ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>{{ if not .AimedArrivalTime.IsZero }}
 						<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
 						<ns3:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedArrivalTime>{{ end }}{{ if not .ActualArrivalTime.IsZero }}
 						<ns3:ActualArrivalTime>{{ .ActualArrivalTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns3:ActualArrivalTime>{{ end }}
-						<ns3:ArrivalStatus>{{ .ArrivalStatus }}</ns3:ArrivalStatus>
-						<ns3:ArrivalBoardingActivity>TBD</ns3:ArrivalBoardingActivity>
-						<ns3:ArrivalStopAssignment>
-							<ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
-							<ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
-						</ns3:ArrivalStopAssignment>{{ if not .AimedDepartureTime.IsZero }}
+						<ns3:ArrivalStatus>{{ .ArrivalStatus }}</ns3:ArrivalStatus>{{ if not .AimedDepartureTime.IsZero }}
 						<ns3:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
 						<ns3:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedDepartureTime>{{ end }}{{ if not .ActualDepartureTime.IsZero }}
 						<ns3:ActualDepartureTime>{{ .ActualDepartureTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns3:ActualDepartureTime>{{ end }}
-						<ns3:DepartureStatus>{{ .DepartureStatus }}</ns3:DepartureStatus>
-						<ns3:DepartureBoardingActivity>TBD</ns3:DepartureBoardingActivity>
-						<ns3:DepartureStopAssignment>
-							<ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
-							<ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
-						</ns3:DepartureStopAssignment>
+						<ns3:DepartureStatus>{{ .DepartureStatus }}</ns3:DepartureStatus>{{ range $key, $value := .Attributes.StopVisitAttributes }}{{ if ne $key "ActualQuayName" }}
+						<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.StopVisitAttributes.ActualQuayName }}
+						<ns3:ArrivalStopAssignment>
+							<ns3:ActualQuayName>{{ .Attributes.StopVisitAttributes.ActualQuayName }}</ns3:ActualQuayName>
+						</ns3:ArrivalStopAssignment>{{ end }}
 					</ns3:MonitoredCall>
 				</ns3:MonitoredVehicleJourney>
 			</ns3:MonitoredStopVisit>{{ end }}
@@ -168,29 +179,6 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 	}
 	response := NewXMLStopMonitoringResponse(doc.Root().XmlNode)
 	return response, nil
-}
-
-func NewSIRIStopMonitoringResponse(
-	address string,
-	producerRef string,
-	requestMessageRef string,
-	responseMessageIdentifier string,
-	status bool,
-	// errorType string,
-	// errorNumber int,
-	// errorText string,
-	responseTimestamp time.Time) *SIRIStopMonitoringResponse {
-	return &SIRIStopMonitoringResponse{
-		Address:                   address,
-		ProducerRef:               producerRef,
-		RequestMessageRef:         requestMessageRef,
-		ResponseMessageIdentifier: responseMessageIdentifier,
-		Status: status,
-		// ErrorType:          errorType,
-		// ErrorNumber:        errorNumber,
-		// ErrorText:          errorText,
-		ResponseTimestamp: responseTimestamp,
-	}
 }
 
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
@@ -322,6 +310,147 @@ func (visit *XMLMonitoredStopVisit) ActualDepartureTime() time.Time {
 		visit.actualDepartureTime = visit.findTimeChildContent("ActualDepartureTime")
 	}
 	return visit.actualDepartureTime
+}
+
+// Attributes
+func (visit *XMLMonitoredStopVisit) Delay() string {
+	if visit.delay == "" {
+		visit.delay = visit.findStringChildContent("Delay")
+	}
+	return visit.delay
+}
+
+func (visit *XMLMonitoredStopVisit) DirectionName() string {
+	if visit.directionName == "" {
+		visit.directionName = visit.findStringChildContent("DirectionName")
+	}
+	return visit.directionName
+}
+
+func (visit *XMLMonitoredStopVisit) DestinationName() string {
+	if visit.destinationName == "" {
+		visit.destinationName = visit.findStringChildContent("DestinationName")
+	}
+	return visit.destinationName
+}
+
+func (visit *XMLMonitoredStopVisit) DirectionRef() string {
+	if visit.directionRef == "" {
+		visit.directionRef = visit.findStringChildContent("DirectionRef")
+	}
+	return visit.directionRef
+}
+
+func (visit *XMLMonitoredStopVisit) FirstOrLastJourney() string {
+	if visit.firstOrLastJourney == "" {
+		visit.firstOrLastJourney = visit.findStringChildContent("FirstOrLastJourney")
+	}
+	return visit.firstOrLastJourney
+}
+
+func (visit *XMLMonitoredStopVisit) HeadwayService() string {
+	if visit.headwayService == "" {
+		visit.headwayService = visit.findStringChildContent("HeadwayService")
+	}
+	return visit.headwayService
+}
+
+func (visit *XMLMonitoredStopVisit) JourneyNote() string {
+	if visit.journeyNote == "" {
+		visit.journeyNote = visit.findStringChildContent("JourneyNote")
+	}
+	return visit.journeyNote
+}
+
+func (visit *XMLMonitoredStopVisit) JourneyPatternName() string {
+	if visit.journeyPatternName == "" {
+		visit.journeyPatternName = visit.findStringChildContent("JourneyPatternName")
+	}
+	return visit.journeyPatternName
+}
+
+func (visit *XMLMonitoredStopVisit) Monitored() string {
+	if visit.monitored == "" {
+		visit.monitored = visit.findStringChildContent("Monitored")
+	}
+	return visit.monitored
+}
+
+func (visit *XMLMonitoredStopVisit) MonitoringError() string {
+	if visit.monitoringError == "" {
+		visit.monitoringError = visit.findStringChildContent("MonitoringError")
+	}
+	return visit.monitoringError
+}
+
+func (visit *XMLMonitoredStopVisit) Occupancy() string {
+	if visit.occupancy == "" {
+		visit.occupancy = visit.findStringChildContent("Occupancy")
+	}
+	return visit.occupancy
+}
+
+func (visit *XMLMonitoredStopVisit) OriginAimedDepartureTime() string {
+	if visit.originAimedDepartureTime == "" {
+		visit.originAimedDepartureTime = visit.findStringChildContent("OriginAimedDepartureTime")
+	}
+	return visit.originAimedDepartureTime
+}
+
+func (visit *XMLMonitoredStopVisit) DestinationAimedArrivalTime() string {
+	if visit.destinationAimedArrivalTime == "" {
+		visit.destinationAimedArrivalTime = visit.findStringChildContent("DestinationAimedArrivalTime")
+	}
+	return visit.destinationAimedArrivalTime
+}
+
+func (visit *XMLMonitoredStopVisit) OriginName() string {
+	if visit.originName == "" {
+		visit.originName = visit.findStringChildContent("OriginName")
+	}
+	return visit.originName
+}
+
+func (visit *XMLMonitoredStopVisit) ProductCategoryRef() string {
+	if visit.productCategoryRef == "" {
+		visit.productCategoryRef = visit.findStringChildContent("ProductCategoryRef")
+	}
+	return visit.productCategoryRef
+}
+
+func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
+	if visit.serviceFeatureRef == "" {
+		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
+	}
+	return visit.serviceFeatureRef
+}
+
+func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
+	if visit.trainNumberRef == "" {
+		visit.trainNumberRef = visit.findStringChildContent("TrainNumberRef")
+	}
+	return visit.trainNumberRef
+}
+
+func (visit *XMLMonitoredStopVisit) VehicleFeature() string {
+	if visit.vehicleFeature == "" {
+		visit.vehicleFeature = visit.findStringChildContent("VehicleFeature")
+	}
+	return visit.vehicleFeature
+}
+
+func (visit *XMLMonitoredStopVisit) VehicleMode() string {
+	if visit.vehicleMode == "" {
+		visit.vehicleMode = visit.findStringChildContent("VehicleMode")
+	}
+	return visit.vehicleMode
+}
+
+func (visit *XMLMonitoredStopVisit) ViaPlaceName() string {
+	if visit.viaPlaceName == "" {
+		visit.viaPlaceName = visit.findStringChildContent("PlaceName")
+	}
+	return visit.viaPlaceName
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {

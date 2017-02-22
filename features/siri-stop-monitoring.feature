@@ -178,46 +178,21 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
             <ns3:MonitoringRef>TBD</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef></ns3:LineRef>
-              <ns3:DirectionRef>TBD</ns3:DirectionRef>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>TBD</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef/>
               </ns3:FramedVehicleJourneyRef>
               <ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
-              <ns3:DirectionName>TBD</ns3:DirectionName>
-              <ns3:ExternalLineRef>TBD</ns3:ExternalLineRef>
               <ns3:OperatorRef>TBD</ns3:OperatorRef>
-              <ns3:ProductCategoryRef>TBD</ns3:ProductCategoryRef>
-              <ns3:VehicleFeatureRef>TBD</ns3:VehicleFeatureRef>
               <ns3:OriginRef>TBD</ns3:OriginRef>
-              <ns3:OriginName>TBD</ns3:OriginName>
               <ns3:DestinationRef>TBD</ns3:DestinationRef>
-              <ns3:DestinationName>TBD</ns3:DestinationName>
-              <ns3:OriginAimedDepartureTime>TBD</ns3:OriginAimedDepartureTime>
-              <ns3:DestinationAimedArrivalTime>TBD</ns3:DestinationAimedArrivalTime>
-              <ns3:Monitored>TBD</ns3:Monitored>
-              <ns3:ProgressRate>TBD</ns3:ProgressRate>
-              <ns3:Delay>TBD</ns3:Delay>
-              <ns3:CourseOfJourneyRef>TBD</ns3:CourseOfJourneyRef>
-              <ns3:VehicleRef>TBD</ns3:VehicleRef>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
-                <ns3:StopPointName>TBD</ns3:StopPointName>
                 <ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
                 <ns3:ArrivalStatus></ns3:ArrivalStatus>
-                <ns3:ArrivalBoardingActivity>TBD</ns3:ArrivalBoardingActivity>
-                <ns3:ArrivalStopAssignment>
-                  <ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
-                  <ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
-                </ns3:ArrivalStopAssignment>
                 <ns3:DepartureStatus></ns3:DepartureStatus>
-                <ns3:DepartureBoardingActivity>TBD</ns3:DepartureBoardingActivity>
-                <ns3:DepartureStopAssignment>
-                  <ns3:AimedQuayRef>TBD</ns3:AimedQuayRef>
-                  <ns3:ActualQuayRef>TBD</ns3:ActualQuayRef>
-                </ns3:DepartureStopAssignment>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>

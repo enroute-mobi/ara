@@ -13,8 +13,10 @@ type VehicleJourney struct {
 	ObjectIDConsumer
 	model Model
 
-	id         VehicleJourneyId
-	lineId     LineId
+	id VehicleJourneyId
+
+	LineId     LineId
+	Name       string
 	Attributes map[string]string
 	References map[string]Reference
 }
@@ -34,7 +36,7 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 }
 
 func (vehicleJourney *VehicleJourney) Line() Line {
-	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.lineId)
+	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
 	return line
 }
 
@@ -45,7 +47,8 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	}
 	vehicleJourneyMap := map[string]interface{}{
 		"Id":         vehicleJourney.id,
-		"Line":       vehicleJourney.lineId,
+		"LineId":     vehicleJourney.LineId,
+		"Name":       vehicleJourney.Name,
 		"StopVisits": stopVisitIds,
 		"Attributes": vehicleJourney.Attributes,
 		"References": vehicleJourney.References,
@@ -71,7 +74,6 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		ObjectIDs map[string]string
 		Reference map[string]Reference
-		LineId    string
 		*Alias
 	}{
 		Alias: (*Alias)(vehicleJourney),
@@ -83,9 +85,6 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 
 	if aux.ObjectIDs != nil {
 		vehicleJourney.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
-	}
-	if aux.LineId != "" {
-		vehicleJourney.lineId = LineId(aux.LineId)
 	}
 
 	return nil

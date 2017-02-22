@@ -118,7 +118,7 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	vehicleJourney = updater.tx.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
 	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
-	vehicleJourney.lineId = foundLine.Id()
+	vehicleJourney.LineId = foundLine.Id()
 	updater.tx.Model().VehicleJourneys().Save(&vehicleJourney)
 
 	return &vehicleJourney
