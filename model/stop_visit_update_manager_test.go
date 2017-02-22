@@ -203,7 +203,7 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney(t *testing.T) {
 	if !ok {
 		t.Errorf("VehicleJourney should be created by findOrCreateStopArea")
 	}
-	if vehicleJourney.lineId != line.Id() {
-		t.Errorf("Wrong VehicleJourney LineId:\n expected: %v\n got: %v", line.Id(), vehicleJourney.lineId)
+	if vehicleJourney.LineId != line.Id() {
+		t.Errorf("Wrong VehicleJourney LineId:\n expected: %v\n got: %v", line.Id(), vehicleJourney.LineId)
 	}
 }
