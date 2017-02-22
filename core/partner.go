@@ -208,6 +208,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.slug = apiPartner.Slug
 	partner.Settings = apiPartner.Settings
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
+	partner.operationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 
 	for id, factory := range apiPartner.factories {
 		if _, ok := partner.connectors[id]; !ok {
