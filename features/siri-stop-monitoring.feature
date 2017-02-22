@@ -517,20 +517,19 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </soap:Body>
 </soap:Envelope>
         """
-    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
+      | remote_credential    | ratpdev                    |
       | remote_objectid_kind | internal              |
+    And a Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | STIF     |
+      | remote_objectid_kind | external |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
-      | ObjectIDs | "internal": "boaarle", "external": "boaarle_ext" |
+      | ObjectIDs | "internal": "boaarle", "external": "FR:78073:ZDE:50089971:STIF" |
     And a minute has passed
-    And a Partner "test2" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | remote_credential    | test                  |
-      | remote_objectid_kind | external              |
-    And a minute has passed
-    When I receive this SIRI request
+    When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
@@ -543,7 +542,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                            xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
-        <ns2:RequestorRef>RATPDEV:Concerto</ns2:RequestorRef>
+        <ns2:RequestorRef>STIF</ns2:RequestorRef>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
       </ServiceRequestInfo>
 
@@ -551,7 +550,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
         <ns2:StartTime>2016-12-15T15:48:52.977Z</ns2:StartTime>
-        <ns2:MonitoringRef>boaarle</ns2:MonitoringRef>
+        <ns2:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
       </Request>
       <RequestExtension />
@@ -559,7 +558,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
-    Then I should send this SIRI reponse
+    Then I should receive this SIRI reponse
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -605,12 +604,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>TBD</ns3:StopPointName>
                 <ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
-                <ns3:DestinationDisplay>TBD</ns5:DestinationDisplay>
-                <ns3:AimedArrivalTime>TBD</ns5:AimedArrivalTime>
-                <ns5:ExpectedArrivalTime>TBD</ns5:ExpectedArrivalTime>
+                <ns3:DestinationDisplay>TBD</ns3:DestinationDisplay>
+                <ns3:AimedArrivalTime>TBD</ns3:AimedArrivalTime>
+                <ns3:ExpectedArrivalTime>TBD</ns3:ExpectedArrivalTime>
                 <ns3:ArrivalStatus>TBD</ns3:ArrivalStatus>
-                <ns5:AimedDepartureTime>TBD</ns5:AimedDepartureTime>
-                <ns5:ExpectedDepartureTime>TBD</ns5:ExpectedDepartureTime>
+                <ns3:AimedDepartureTime>TBD</ns3:AimedDepartureTime>
+                <ns3:ExpectedDepartureTime>TBD</ns3:ExpectedDepartureTime>
                 <ns3:DepartureStatus></ns3:DepartureStatus>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
