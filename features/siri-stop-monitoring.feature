@@ -548,29 +548,29 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     xmlns:ns9="http://wsdl.siri.org.uk/siri">
       <ServiceDeliveryInfo>
         <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-        <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-        <ns3:ResponseMessageIdentifier>Edwig:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-        <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+        <ns3:ProducerRef>RATPDev</ns3:ProducerRef>
+        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+        <ns3:RequestMessageRef>RATPDEV:Message::C412:LOC</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
         <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-          <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+          <ns3:RequestMessageRef>RATPDEV:Message::C412:LOC</ns3:RequestMessageRef>
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:59:25.000Z</ns3:RecordedAtTime>
-            <ns3:ItemIdentifier>RATPDEV:Item::%{checksum:objectid}:LOC</ns3:ItemIdentifier>
+            <ns3:ItemIdentifier>RATPDEV:Item::F921:LOC</ns3:ItemIdentifier>
             <ns3:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
-              <ns3:LineRef>STIF:CODIFLIGNE:Line:C00001</ns3:LineRef>
+              <ns3:LineRef>STIF:Line::C00001</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
-                <ns3:DataFrameRef>SQYBUS:Version:1.0:LOC</ns3:DataFrameRef>
+                <ns3:DataFrameRef>SQYBUS:DataFrame::T567:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef>1STD721687165983</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::%{checksum:objectid}:LOC</ns3:JourneyPatternRef>
+              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::Z651:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>Identifiant_STIF_pour_RATPDev</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operateor:edwig</ns3:OperatorRef>
               <ns3:DestinationRef>FR:78073:ZDE:50090348:STIF</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
