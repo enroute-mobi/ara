@@ -519,17 +519,15 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                            xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
-        <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
+        <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>STIF</ns2:RequestorRef>
-        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+        <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
       </ServiceRequestInfo>
 
       <Request version="2.0:FR-IDF-2.4">
-        <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
+        <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:StartTime>2016-12-15T15:48:52.977Z</ns2:StartTime>
         <ns2:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns2:MonitoringRef>
-        <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
