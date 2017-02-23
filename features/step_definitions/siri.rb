@@ -48,7 +48,7 @@ Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
 
   expected_values = {}
   expected.raw.each do |row|
-    expected_values[row[0]] = row[1]
+    expected_values[row[0]] = row[1] unless row[2] && row[2] =~ /^TODO/
   end
 
   actual_values = {}
