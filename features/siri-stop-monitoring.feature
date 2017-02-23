@@ -327,10 +327,10 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[OriginAimedDepartureTime]   | 2016-09-22T07:54:52.977Z                        |
       | Attribute[OriginAimedDestinationTime] | 2016-09-22T09:54:52.977Z                        |
       | Attribute[OriginName]                 | Magicien Noir                                   |
-      | Attribute[ProductCategory]            | 0                                               |
-      | Attribute[ServiceFeature]             | bus scolaire                                    |
+      | Attribute[ProductCategoryRef]            | 0                                               |
+      | Attribute[ServiceFeatureRef]             | bus scolaire                                    |
       | Attribute[TrainNumbers]               | 12345                                           |
-      | Attribute[VehicleFeature]             | longTrain                                       |
+      | Attribute[VehicleFeatureRef]             | longTrain                                       |
       | Attribute[VehicleMode]                | bus                                             |
       | Attribute[ViaPlaceName]               | Saint Bénédicte                                 |
       | Reference[Destination]#ObjectID       | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
@@ -344,11 +344,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                         | 4                                                                    |
       | RecordedAt                           | 2017-01-01T11:00:00.000Z                                             |
-      | Schedule[actual]#Arrival             | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[actual]#Arrival             | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[actual]#Departure           | 2017-01-01T13:02:00.000Z                                             |
       | Schedule[aimed]#Arrival              | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[aimed]#Departure            | 2017-01-01T13:02:00.000Z                                             |
-      | Schedule[expected]#Arrival           | 2017-01-01T13:02:00.000Z                                             |
+      | Schedule[expected]#Arrival           | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[expected]#Departure         | 2017-01-01T13:02:00.000Z                                             |
       | StopAreaId                           | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                     | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -356,9 +356,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[AimedHeadwayInterval]      | 5                                                                    |
       | Attribute[ActualQuayName]            | Quay Name                                                            |
       | Attribute[ArrivalPlatformName]       | Platform Name                                                        |
-      | Attribute[ArrivalProximyTest]        | "à l'approche"                                                       |
+      | Attribute[ArrivalProximyTest]        | A l'approche                                                      |
       | Attribute[DepartureBoardingActivity] | boarding                                                             |
-      | Attribute[DeparturePlatformName]     | Duroc                                                                |
+      | Attribute[DeparturePlatformName]     | Departure Platform Name                                                                |
       | Attribute[DestinationDisplay]        | Balard Terminus                                                      |
       | Attribute[DistanceFromStop]          | 800                                                                  |
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
@@ -383,9 +383,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                    | NINOXE:Route:66:LOC                                    | VehicleJourney#Reference[RouteRef]#ObjectID          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                               | Mago-Cime OMNI                                         | VehicleJourney#Attribute[DirectionName]              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                 | NINOXE:Company:15563880:LOC                            | TODO                                                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                          | 0                                                      | VehicleJourney#Attribute[ProductCategory]            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                           | bus scolaire                                           | VehicleJourney#Attribute[ServiceFeature]             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                           | longTrain                                              | VehicleJourney#Attribute[VehicleFeature]             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                          | 0                                                      | VehicleJourney#Attribute[ProductCategoryRef]            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                           | bus scolaire                                           | VehicleJourney#Attribute[ServiceFeatureRef]             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                           | longTrain                                              | VehicleJourney#Attribute[VehicleFeatureRef]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                   | NINOXE:StopPoint:SP:42:LOC                             | VehicleJourney#Reference[Origin]#ObjectID            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                  | Magicien Noir                                          | VehicleJourney#Attribute[OriginName]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/PlaceName                                               | Saint Bénédicte                                        | VehicleJourney#Attribute[ViaPlaceName]               |
@@ -409,18 +409,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:VehicleAtStop                            | true                                                   | StopVisit#VehicleAtStop                              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:PlatformTraversal                        | false                                                  | StopVisit#Attribute[PlatformTraversal]               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DestinationDisplay                       | Balard Terminus                                        | StopVisit#Attribute[DestinationDisplay]              |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedArrivalTime                         | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[aimed]#Arrival                    |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ActualArrivalTime                        | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[actual]#Arrival                   |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedArrivalTime                      | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[expected]#Arrival                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedArrivalTime                         | 2017-01-01T13:00:00.000Z                              | StopVisit#Schedule[aimed]#Arrival                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ActualArrivalTime                        | 2017-01-01T13:00:00.000Z                              | StopVisit#Schedule[actual]#Arrival                   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedArrivalTime                      | 2017-01-01T13:00:00.000Z                               | StopVisit#Schedule[expected]#Arrival                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ArrivalStatus                            | onTime                                                 | StopVisit#ArrivalStatus                              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ArrivalProximyTest                       | A l'approche                                           | StopVisit#Attribute[ArrivalProximyTest]              |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ArrivalPlatformName                      | Ducroc                                                 | StopVisit#Attribute[ArrivalPlatformName]             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ArrivalPlatformName                      | Platform Name                                                 | StopVisit#Attribute[ArrivalPlatformName]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ArrivalStopAssignment/siri:AimedQuayName | Quay Name                                              | StopVisit#Attribute[ActualQuayName]                  |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedDepartureTime                       | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[aimed]#Departure                  |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ActualDepartureTime                      | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[actual]#Departure                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedDepartureTime                    | 2016-09-22T08:15:52.977Z                               | StopVisit#Schedule[expected]#Departure               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedDepartureTime                       | 2017-01-01T13:02:00.000Z                               | StopVisit#Schedule[aimed]#Departure                  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ActualDepartureTime                      | 2017-01-01T13:02:00.000Z                               | StopVisit#Schedule[actual]#Departure                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedDepartureTime                    | 2017-01-01T13:02:00.000Z                               | StopVisit#Schedule[expected]#Departure               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DepartureStatus                          | onTime                                                 | StopVisit#DepartureStatus                            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DeparturePlatformName                    | Ducroc                                                 | StopVisit#Attribute[DeparturePlatformName]           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DeparturePlatformName                    | Departure Platform Name                                                 | StopVisit#Attribute[DeparturePlatformName]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DepartureBoardingActivity                | boarding                                               | StopVisit#Attribute[DepartureBoardingActivity]       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedHeadwayInterval                     | 5                                                      | StopVisit#Attribute[AimedHeadwayInterval]            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:ExpectedHeadwayInterval                  | 5                                                      | StopVisit#Attribute[ExpectedHeadwayInterval]         |

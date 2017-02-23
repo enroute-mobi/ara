@@ -192,10 +192,16 @@ func Test_StopVisitUpdateManager_findOrCreateVehicleJourney(t *testing.T) {
 	vehicleJourneyAttributes := &VehicleJourneyAttributes{
 		ObjectId:     objectid,
 		LineObjectId: objectid,
+		Attributes:   make(map[string]string),
 	}
+
+	event := &StopVisitUpdateEvent{
+		Attributes: &TestStopVisitUpdateAttributes{},
+	}
+
 	tx := NewTransaction(model)
 	defer tx.Close()
-	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
+	stopVisitUpdater := NewStopVisitUpdater(tx, event)
 	stopVisitUpdater.findOrCreateVehicleJourney(vehicleJourneyAttributes)
 	tx.Commit()
 

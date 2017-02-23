@@ -14,10 +14,12 @@ type StopVisitAttributes struct {
 	VehicleJourneyObjectId ObjectID
 	PassageOrder           int
 
-	RecordedAt      time.Time
-	DepartureStatus StopVisitDepartureStatus
 	ArrivalStatus   StopVisitArrivalStatus
+	DepartureStatus StopVisitDepartureStatus
+	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
+	VehicleAtStop   string
+	Attributes      map[string]string
 }
 
 type StopVisit struct {
@@ -30,11 +32,13 @@ type StopVisit struct {
 	Attributes       map[string]string
 	References       map[string]Reference
 
+	ArrivalStatus   StopVisitArrivalStatus
+	DepartureStatus StopVisitDepartureStatus
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
-	DepartureStatus StopVisitDepartureStatus
-	ArrivalStatus   StopVisitArrivalStatus
-	PassageOrder    int
+	VehicleAtStop   string
+
+	PassageOrder int
 }
 
 func NewStopVisit(model Model) *StopVisit {

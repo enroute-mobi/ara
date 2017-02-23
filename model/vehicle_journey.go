@@ -7,6 +7,7 @@ type VehicleJourneyId string
 type VehicleJourneyAttributes struct {
 	ObjectId     ObjectID
 	LineObjectId ObjectID
+	Attributes   map[string]string
 }
 
 type VehicleJourney struct {

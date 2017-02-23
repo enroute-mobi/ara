@@ -46,6 +46,7 @@ func (updater *StopVisitUpdater) Update() {
 		existingStopVisit.DepartureStatus = updater.event.DepartureStatus
 		existingStopVisit.ArrivalStatus = updater.event.ArrivalStatuts
 		existingStopVisit.RecordedAt = updater.event.RecordedAt
+		existingStopVisit.VehicleAtStop = updater.event.VehicleAtStop
 
 		updater.tx.Model().StopVisits().Save(&existingStopVisit)
 		updater.tx.Model().StopAreas().Save(&stopArea)
@@ -69,7 +70,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.Schedules = stopVisitAttributes.Schedules
 	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
-
+	stopVisit.Attributes = stopVisitAttributes.Attributes
 	updater.tx.Model().StopVisits().Save(&stopVisit)
 }
 
@@ -119,6 +120,7 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
 	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
 	vehicleJourney.LineId = foundLine.Id()
+	vehicleJourney.Attributes = updater.event.Attributes.VehicleJourneyAttributes().Attributes
 	updater.tx.Model().VehicleJourneys().Save(&vehicleJourney)
 
 	return &vehicleJourney

@@ -43,7 +43,54 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 	if !attributes.response.ActualDepartureTime().IsZero() || !attributes.response.ActualArrivalTime().IsZero() {
 		stopVisitAttributes.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, attributes.response.ActualDepartureTime(), attributes.response.ActualArrivalTime())
 	}
+	stopVisitAttributes.Attributes = attributes.FillStopVisitAttributes()
 	return stopVisitAttributes
+}
+
+func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() map[string]string {
+	attrMap := make(map[string]string)
+
+	attrMap["Delay"] = attributes.response.Delay()
+	attrMap["DirectionName"] = attributes.response.DirectionName()
+	attrMap["DestinationName"] = attributes.response.DestinationName()
+	attrMap["DirectionRef"] = attributes.response.DirectionRef()
+	attrMap["FirstOrLastJourney"] = attributes.response.FirstOrLastJourney()
+	attrMap["HeadwayService"] = attributes.response.HeadwayService()
+	attrMap["JourneyNote"] = attributes.response.JourneyNote()
+	attrMap["JourneyPatternName"] = attributes.response.JourneyPatternName()
+	attrMap["Monitored"] = attributes.response.Monitored()
+	attrMap["MonitoringError"] = attributes.response.MonitoringError()
+	attrMap["Occupancy"] = attributes.response.Occupancy()
+	attrMap["OriginAimedDepartureTime"] = attributes.response.OriginAimedDepartureTime()
+	attrMap["OriginAimedDestinationTime"] = attributes.response.OriginAimedDestinationTime()
+	attrMap["OriginName"] = attributes.response.OriginName()
+	attrMap["ProductCategory"] = attributes.response.ProductCategory()
+	attrMap["ServiceFeature"] = attributes.response.ServiceFeature()
+	attrMap["TrainNumbers"] = attributes.response.TrainNumbers()
+	attrMap["VehicleFeature"] = attributes.response.VehicleFeature()
+	attrMap["VehicleMode"] = attributes.response.VehicleMode()
+	attrMap["ViaPlaceName"] = attributes.response.Delay()
+
+	return attrMap
+}
+
+func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() map[string]string {
+	attrMap := make(map[string]string)
+
+	attrMap["Delay"] = attributes.response.Delay()
+	attrMap["ActualQuayName"] = attributes.response.ActualQuayName()
+	attrMap["AimedHeadwayInterval"] = attributes.response.AimedHeadwayInterval()
+	attrMap["ArrivalPlatformName"] = attributes.response.ArrivalPlatformName()
+	attrMap["ArrivalProximyTest"] = attributes.response.ArrivalProximyTest()
+	attrMap["DepartureBoardingActivity"] = attributes.response.DepartureBoardingActivity()
+	attrMap["DeparturePlatformName"] = attributes.response.DeparturePlatformName()
+	attrMap["DestinationDisplay"] = attributes.response.DestinationDisplay()
+	attrMap["DistanceFromStop"] = attributes.response.DistanceFromStop()
+	attrMap["ExpectedHeadwayInterval"] = attributes.response.ExpectedHeadwayInterval()
+	attrMap["NumberOfStopsAway"] = attributes.response.NumberOfStopsAway()
+	attrMap["PlatformTraversal"] = attributes.response.PlatformTraversal()
+
+	return attrMap
 }
 
 func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *model.VehicleJourneyAttributes {
@@ -53,8 +100,10 @@ func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *mod
 	vehicleJourneyAttributes := &model.VehicleJourneyAttributes{
 		ObjectId:     objectid,
 		LineObjectId: lineObjectId,
+		Attributes:   make(map[string]string),
 	}
 
+	vehicleJourneyAttributes.Attributes = attributes.FillVehicleJourneyAttributes()
 	return vehicleJourneyAttributes
 }
 

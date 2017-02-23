@@ -105,6 +105,7 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 			Id:                connector.NewUUID(),
 			Created_at:        connector.Clock().Now(),
 			RecordedAt:        xmlStopVisitEvent.RecordedAt(),
+			VehicleAtStop:     xmlStopVisitEvent.VehicleAtStop(),
 			StopVisitObjectid: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
 			StopAreaObjectId:  model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
 			Schedules:         make(model.StopVisitSchedules),

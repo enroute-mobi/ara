@@ -2,6 +2,12 @@ def model_attributes(table)
   attributes = table.rows_hash.dup
 
   attributes.dup.each do |key, value|
+    case value
+    when /\A\d+\Z/
+      # Convert integer
+      attributes[key] = value.to_i
+    end
+
     # Transform
     #  | Schedule[aimed]#Arrival   | 2017-01-01T13:00:00.000Z          |
     #  | Schedule[aimed]#Departure | 2017-01-01T13:02:00.000Z          |
@@ -26,11 +32,12 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    case value
-    when /\A\d+\Z/
-      # Convert integer
-      attributes[key] = value.to_i
-    end
+    if key =~ /Attribute\[([^\]]+)\]/
+      name = $1
+      attributes["Attributes"] ||= {}
+      attributes["Attributes"][name] = value
+      attributes.delete key
+    end    
   end
 
   if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])

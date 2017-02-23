@@ -29,8 +29,7 @@ type XMLMonitoredStopVisit struct {
 	departureStatus        string
 	arrivalStatus          string
 	recordedAt             time.Time
-
-	order int
+	order                  int
 
 	aimedArrivalTime    time.Time
 	expectedArrivalTime time.Time
@@ -41,26 +40,39 @@ type XMLMonitoredStopVisit struct {
 	actualDepartureTime   time.Time
 
 	// Attributes
-	delay                       string
-	directionName               string
-	destinationName             string
-	directionRef                string
-	firstOrLastJourney          string
-	headwayService              string
-	journeyNote                 string
-	journeyPatternName          string
-	monitored                   string
-	monitoringError             string
-	occupancy                   string
-	originAimedDepartureTime    string
-	destinationAimedArrivalTime string
-	originName                  string
-	productCategoryRef          string
-	serviceFeatureRef           string
-	trainNumberRef              string
-	vehicleFeature              string
-	vehicleMode                 string
-	viaPlaceName                string
+
+	delay                      string
+	vehicleAtStop              string
+	actualQuayName             string
+	aimedHeadwayInterval       string
+	arrivalPlatformName        string
+	arrivalProximyTest         string
+	departureBoardingActivity  string
+	departurePlatformName      string
+	destinationDisplay         string
+	distanceFromStop           string
+	expectedHeadwayInterval    string
+	numberOfStopsAway          string
+	platformTraversal          string
+	directionName              string
+	destinationName            string
+	directionRef               string
+	firstOrLastJourney         string
+	headwayService             string
+	journeyNote                string
+	journeyPatternName         string
+	monitored                  string
+	monitoringError            string
+	occupancy                  string
+	originAimedDepartureTime   string
+	originAimedDestinationTime string
+	originName                 string
+	productCategory            string
+	serviceFeature             string
+	trainNumbers               string
+	vehicleFeature             string
+	vehicleMode                string
+	viaPlaceName               string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -124,7 +136,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
 				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if not eq $key "TrainNumberRef" "PlaceName" }}
+				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if (and (not (eq $key "TrainNumberRef")) (not (eq $key "PlaceName"))) }}
 					<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
 					<ns3:TrainNumber>
 						<ns3:TrainNumberRef>{{ .Attributes.VehicleJourneyAttributes.TrainNumberRef }}</ns3:TrainNumberRef>
@@ -263,6 +275,13 @@ func (visit *XMLMonitoredStopVisit) RecordedAt() time.Time {
 	return visit.recordedAt
 }
 
+func (visit *XMLMonitoredStopVisit) VehicleAtStop() string {
+	if visit.vehicleAtStop == "" {
+		visit.vehicleAtStop = visit.findStringChildContent("VehicleAtStop")
+	}
+	return visit.vehicleAtStop
+}
+
 func (visit *XMLMonitoredStopVisit) Order() int {
 	if visit.order == 0 {
 		visit.order = visit.findIntChildContent("Order")
@@ -320,6 +339,83 @@ func (visit *XMLMonitoredStopVisit) Delay() string {
 	return visit.delay
 }
 
+func (visit *XMLMonitoredStopVisit) ActualQuayName() string {
+	if visit.actualQuayName == "" {
+		visit.actualQuayName = visit.findStringChildContent("ActualQuayName")
+	}
+	return visit.actualQuayName
+}
+
+func (visit *XMLMonitoredStopVisit) AimedHeadwayInterval() string {
+	if visit.aimedHeadwayInterval == "" {
+		visit.aimedHeadwayInterval = visit.findStringChildContent("AimedHeadwayInterval")
+	}
+	return visit.aimedHeadwayInterval
+}
+
+func (visit *XMLMonitoredStopVisit) ArrivalPlatformName() string {
+	if visit.arrivalPlatformName == "" {
+		visit.arrivalPlatformName = visit.findStringChildContent("ArrivalPlatformName")
+	}
+	return visit.arrivalPlatformName
+}
+
+func (visit *XMLMonitoredStopVisit) ArrivalProximyTest() string {
+	if visit.arrivalProximyTest == "" {
+		visit.arrivalProximyTest = visit.findStringChildContent("ArrivalProximyTest")
+	}
+	return visit.arrivalProximyTest
+}
+
+func (visit *XMLMonitoredStopVisit) DepartureBoardingActivity() string {
+	if visit.departureBoardingActivity == "" {
+		visit.departureBoardingActivity = visit.findStringChildContent("DepartureBoardingActivity")
+	}
+	return visit.departureBoardingActivity
+}
+
+func (visit *XMLMonitoredStopVisit) DeparturePlatformName() string {
+	if visit.departurePlatformName == "" {
+		visit.departurePlatformName = visit.findStringChildContent("DeparturePlatformName")
+	}
+	return visit.departurePlatformName
+}
+
+func (visit *XMLMonitoredStopVisit) DestinationDisplay() string {
+	if visit.destinationDisplay == "" {
+		visit.destinationDisplay = visit.findStringChildContent("DestinationDisplay")
+	}
+	return visit.destinationDisplay
+}
+
+func (visit *XMLMonitoredStopVisit) DistanceFromStop() string {
+	if visit.distanceFromStop == "" {
+		visit.distanceFromStop = visit.findStringChildContent("DistanceFromStop")
+	}
+	return visit.distanceFromStop
+}
+
+func (visit *XMLMonitoredStopVisit) ExpectedHeadwayInterval() string {
+	if visit.expectedHeadwayInterval == "" {
+		visit.expectedHeadwayInterval = visit.findStringChildContent("ExpectedHeadwayInterval")
+	}
+	return visit.expectedHeadwayInterval
+}
+
+func (visit *XMLMonitoredStopVisit) NumberOfStopsAway() string {
+	if visit.distanceFromStop == "" {
+		visit.numberOfStopsAway = visit.findStringChildContent("NumberOfStopsAway")
+	}
+	return visit.numberOfStopsAway
+}
+
+func (visit *XMLMonitoredStopVisit) PlatformTraversal() string {
+	if visit.platformTraversal == "" {
+		visit.platformTraversal = visit.findStringChildContent("PlatformTraversal")
+	}
+	return visit.platformTraversal
+}
+
 func (visit *XMLMonitoredStopVisit) DirectionName() string {
 	if visit.directionName == "" {
 		visit.directionName = visit.findStringChildContent("DirectionName")
@@ -341,18 +437,18 @@ func (visit *XMLMonitoredStopVisit) DirectionRef() string {
 	return visit.directionRef
 }
 
+func (visit *XMLMonitoredStopVisit) HeadwayService() string {
+	if visit.headwayService == "" {
+		visit.headwayService = visit.findStringChildContent("HeadwayService")
+	}
+	return visit.directionRef
+}
+
 func (visit *XMLMonitoredStopVisit) FirstOrLastJourney() string {
 	if visit.firstOrLastJourney == "" {
 		visit.firstOrLastJourney = visit.findStringChildContent("FirstOrLastJourney")
 	}
 	return visit.firstOrLastJourney
-}
-
-func (visit *XMLMonitoredStopVisit) HeadwayService() string {
-	if visit.headwayService == "" {
-		visit.headwayService = visit.findStringChildContent("HeadwayService")
-	}
-	return visit.headwayService
 }
 
 func (visit *XMLMonitoredStopVisit) JourneyNote() string {
@@ -397,11 +493,11 @@ func (visit *XMLMonitoredStopVisit) OriginAimedDepartureTime() string {
 	return visit.originAimedDepartureTime
 }
 
-func (visit *XMLMonitoredStopVisit) DestinationAimedArrivalTime() string {
-	if visit.destinationAimedArrivalTime == "" {
-		visit.destinationAimedArrivalTime = visit.findStringChildContent("DestinationAimedArrivalTime")
+func (visit *XMLMonitoredStopVisit) OriginAimedDestinationTime() string {
+	if visit.originAimedDestinationTime == "" {
+		visit.originAimedDestinationTime = visit.findStringChildContent("OriginAimedDestinationTime")
 	}
-	return visit.destinationAimedArrivalTime
+	return visit.originAimedDestinationTime
 }
 
 func (visit *XMLMonitoredStopVisit) OriginName() string {
@@ -411,25 +507,25 @@ func (visit *XMLMonitoredStopVisit) OriginName() string {
 	return visit.originName
 }
 
-func (visit *XMLMonitoredStopVisit) ProductCategoryRef() string {
-	if visit.productCategoryRef == "" {
-		visit.productCategoryRef = visit.findStringChildContent("ProductCategoryRef")
+func (visit *XMLMonitoredStopVisit) ProductCategory() string {
+	if visit.productCategory == "" {
+		visit.productCategory = visit.findStringChildContent("ProductCategory")
 	}
-	return visit.productCategoryRef
+	return visit.productCategory
 }
 
-func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
-	if visit.serviceFeatureRef == "" {
-		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
+func (visit *XMLMonitoredStopVisit) ServiceFeature() string {
+	if visit.serviceFeature == "" {
+		visit.serviceFeature = visit.findStringChildContent("ServiceFeature")
 	}
-	return visit.serviceFeatureRef
+	return visit.monitored
 }
 
-func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
-	if visit.trainNumberRef == "" {
-		visit.trainNumberRef = visit.findStringChildContent("TrainNumberRef")
+func (visit *XMLMonitoredStopVisit) TrainNumbers() string {
+	if visit.trainNumbers == "" {
+		visit.trainNumbers = visit.findStringChildContent("TrainNumbers")
 	}
-	return visit.trainNumberRef
+	return visit.trainNumbers
 }
 
 func (visit *XMLMonitoredStopVisit) VehicleFeature() string {
@@ -448,7 +544,7 @@ func (visit *XMLMonitoredStopVisit) VehicleMode() string {
 
 func (visit *XMLMonitoredStopVisit) ViaPlaceName() string {
 	if visit.viaPlaceName == "" {
-		visit.viaPlaceName = visit.findStringChildContent("PlaceName")
+		visit.viaPlaceName = visit.findStringChildContent("ViaPlaceName")
 	}
 	return visit.viaPlaceName
 }

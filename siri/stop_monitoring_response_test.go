@@ -236,6 +236,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		t.Fatal(err)
 	}
 	if expectedXML != xml {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
+		t.Error("lol")
+		//t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }

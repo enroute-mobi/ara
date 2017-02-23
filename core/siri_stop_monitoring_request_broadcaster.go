@@ -73,7 +73,13 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			AimedDepartureTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime(),
 			ExpectedDepartureTime: schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
 			ActualDepartureTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
+			Attributes:            make(map[string]map[string]string),
 		}
+		fmt.Printf("StopVisit attributes: %#v\n", stopVisit.Attributes)
+		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
+		fmt.Printf("VehicleJourney attributes: %#v\n", stopVisit.VehicleJourney().Attributes)
+		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = stopVisit.VehicleJourney().Attributes
+
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
 	}
 

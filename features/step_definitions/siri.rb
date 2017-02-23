@@ -13,9 +13,13 @@ def send_siri_request(request, attributes = {})
 end
 
 def save_siri_exchange(request, response)
+  return unless ENV['SIRI_DEBUG']
+
   @siri_message_id ||= 0
   @siri_timestamp ||= Time.now.strftime("%Y%m%d%H%M%S")
   @siri_message_id += 1
+
+  puts response
 
   [ [ :request, request ], [ :response, response ] ].each do |type, content|
     file = "log/siri-exchange-#{@siri_timestamp}-#{@siri_message_id}-#{type}"
@@ -42,13 +46,25 @@ end
 Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
   document = REXML::Document.new(@last_siri_response)
 
-  expected.rows_hash.each do |xpath, values|
+  expected_values = {}
+  expected.raw.each do |row|
+    expected_values[row[0]] = row[1]
+  end
+
+  actual_values = {}
+  expected_values.keys.each do |xpath|
     node = REXML::XPath.first(document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
     xml_value = node.text if node
-
-    value = Array(values).first
-    expect(xml_value).to eq(value)
+    actual_values[xpath] = xml_value
   end
+
+  expect(actual_values).to eq(expected_values)
+
+  # expected_values.each do |xpath, value|
+  #   node = REXML::XPath.first(document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
+  #   xml_value = node.text if node
+  #   expect(xml_value).to eq(value)
+  # end
 end
 
 When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
