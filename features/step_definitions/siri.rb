@@ -35,7 +35,7 @@ When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referen
   send_siri_request request, referential: referential
 end
 
-Then(/^I should receive this SIRI reponse$/) do |expected_xml|
+Then(/^I should receive this SIRI response$/) do |expected_xml|
   expect(normalized_xml(@last_siri_response)).to eq(normalized_xml(expected_xml))
 end
 

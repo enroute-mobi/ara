@@ -6,7 +6,7 @@ Feature: Support SIRI request
     When I send this SIRI request
       """
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
@@ -24,7 +24,7 @@ Feature: Support SIRI request
       """
 Invalid Request
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">

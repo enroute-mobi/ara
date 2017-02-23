@@ -147,7 +147,7 @@ Feature: Support SIRI StopMonitoring
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -240,7 +240,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='UTF-8'?>
 <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
@@ -534,7 +534,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
