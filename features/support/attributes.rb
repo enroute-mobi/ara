@@ -37,7 +37,7 @@ def model_attributes(table)
       attributes["Attributes"] ||= {}
       attributes["Attributes"][name] = value
       attributes.delete key
-    end    
+    end
   end
 
   if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])
@@ -49,8 +49,6 @@ end
 
 def api_attributes(json)
   attributes = JSON.parse(json)
-
-  puts attributes.inspect
 
   objectids = attributes["ObjectIDs"]
   if Array === objectids
