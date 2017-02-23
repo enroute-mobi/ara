@@ -147,7 +147,7 @@ Feature: Support SIRI StopMonitoring
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -240,7 +240,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='UTF-8'?>
 <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
@@ -500,6 +500,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | local_credential     | STIF     |
       | remote_objectid_kind | external |
     And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Ligne 415                                     |
+      | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001" |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
       | ObjectIDs | "internal": "boaarle", "external": "FR:78073:ZDE:50089971:STIF" |
@@ -516,24 +519,22 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                            xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
-        <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
+        <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>STIF</ns2:RequestorRef>
-        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+        <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
       </ServiceRequestInfo>
 
       <Request version="2.0:FR-IDF-2.4">
-        <ns2:RequestTimestamp>2016-12-15T15:48:52.977Z</ns2:RequestTimestamp>
-        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:StartTime>2016-12-15T15:48:52.977Z</ns2:StartTime>
+        <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
+        <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
         <ns2:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns2:MonitoringRef>
-        <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI reponse
+    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -559,18 +560,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:59:25.000Z</ns3:RecordedAtTime>
-            <ns3:ItemIdentifier>RATPDEV:Item::F921:LOC</ns3:ItemIdentifier>
+            <ns3:ItemIdentifier>RATPDEV:Item::ef15d7eda39e99999baa0205e1a16cbaf582edddfd8e53a79fc7984fa561903c:LOC</ns3:ItemIdentifier>
             <ns3:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef>STIF:Line::C00001</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
-                <ns3:DataFrameRef>SQYBUS:DataFrame::T567:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef>1STD721687165983</ns3:DatedVehicleJourneyRef>
+                <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
+                <ns3:DatedVehicleJourneyRef>RATPDev:VehiculeJourney::8b21b7c99b30282da085699320c1700d27ef3d8236c86236b251aab3375bca13:LOC</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::Z651:LOC</ns3:JourneyPatternRef>
-              <ns3:PublishedLineName>415</ns3:PublishedLineName>
+              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::7fe7ad11d5099ebd6ae842b9aa41c2399e738bf83f28311e804f4e5b3f10a9d4:LOC</ns3:JourneyPatternRef>
+              <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>RATPDev:Operateor:edwig</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>
               <ns3:DestinationRef>FR:78073:ZDE:50090348:STIF</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
@@ -580,11 +581,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:StopPointName>Arletty</ns3:StopPointName>
                 <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                 <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                <ns3:AimedArrivalTime>2016-12-16T11:43:05.000+01:00</ns3:AimedArrivalTime>
-                <ns3:ExpectedArrivalTime>2016-12-16T11:43:05.000+01:00</ns3:ExpectedArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T12:43:05.000+01:00</ns3:AimedArrivalTime>
+                <ns3:ExpectedArrivalTime>2017-01-01T12:43:05.000+01:00</ns3:ExpectedArrivalTime>
                 <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                <ns3:AimedDepartureTime>2016-12-16T11:43:05.000+01:00</ns3:AimedDepartureTime>
-                <ns3:ExpectedDepartureTime>2016-12-16T11:43:05.000+01:00</ns3:ExpectedDepartureTime>
+                <ns3:AimedDepartureTime>2017-01-01T12:43:05.000+01:00</ns3:AimedDepartureTime>
+                <ns3:ExpectedDepartureTime>2017-01-01T12:43:05.000+01:00</ns3:ExpectedDepartureTime>
                 <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
