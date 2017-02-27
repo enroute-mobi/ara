@@ -178,13 +178,13 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 			<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
 			<ns3:Status>true</ns3:Status>
 			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
+				<ns3:RecordedAtTime>2015-09-21T20:14:46.000Z</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
+				<ns3:MonitoringRef>stopPointRef</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>
 					<ns3:LineRef>lineRef</ns3:LineRef>
 					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>TBD</ns3:DataFrameRef>
+						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
@@ -220,6 +220,8 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		DepartureStatus:        "depStatus",
 		ArrivalStatus:          "arrStatus",
 		Order:                  1,
+		RecordedAt:             time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
+		DataFrameRef:           time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		AimedArrivalTime:       time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ExpectedArrivalTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ActualArrivalTime:     time.Date(2018, time.September, 21, 20, 14, 46, 0, time.UTC),
@@ -236,7 +238,6 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		t.Fatal(err)
 	}
 	if expectedXML != xml {
-		t.Error("lol")
-		//t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }
