@@ -25,6 +25,7 @@ type XMLMonitoredStopVisit struct {
 	stopPointName          string
 	datedVehicleJourneyRef string
 	lineRef                string
+	vehicleJourneyName     string
 	publishedLineName      string
 	departureStatus        string
 	arrivalStatus          string
@@ -99,6 +100,7 @@ type SIRIMonitoredStopVisit struct {
 	DepartureStatus        string
 	ArrivalStatus          string
 	VehicleAtStop          string
+	VehicleJourneyName     string
 	StopAreaObjectId       string
 
 	Order int
@@ -149,6 +151,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>
 					</ns3:Via>{{ end }}
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
+					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>{{ .DataFrameRef.Format "2006-01-02" }}</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
@@ -537,6 +540,13 @@ func (visit *XMLMonitoredStopVisit) VehicleFeature() string {
 		visit.vehicleFeature = visit.findStringChildContent("VehicleFeature")
 	}
 	return visit.vehicleFeature
+}
+
+func (visit *XMLMonitoredStopVisit) VehicleJourneyName() string {
+	if visit.vehicleJourneyName == "" {
+		visit.vehicleJourneyName = visit.findStringChildContent("VehicleJourneyName")
+	}
+	return visit.vehicleJourneyName
 }
 
 func (visit *XMLMonitoredStopVisit) VehicleMode() string {
