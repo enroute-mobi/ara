@@ -66,10 +66,10 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	attrMap["OriginName"] = attributes.response.OriginName()
 	attrMap["ProductCategory"] = attributes.response.ProductCategory()
 	attrMap["ServiceFeature"] = attributes.response.ServiceFeature()
-	attrMap["TrainNumbers"] = attributes.response.TrainNumbers()
+	attrMap["TrainNumberRef"] = attributes.response.TrainNumberRef()
 	attrMap["VehicleFeature"] = attributes.response.VehicleFeature()
 	attrMap["VehicleMode"] = attributes.response.VehicleMode()
-	attrMap["ViaPlaceName"] = attributes.response.Delay()
+	attrMap["ViaPlaceName"] = attributes.response.ViaPlaceName()
 
 	return attrMap
 }

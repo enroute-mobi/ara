@@ -69,7 +69,7 @@ type XMLMonitoredStopVisit struct {
 	originName                  string
 	productCategory             string
 	serviceFeature              string
-	trainNumbers                string
+	trainNumberRef              string
 	vehicleFeature              string
 	vehicleMode                 string
 	viaPlaceName                string
@@ -98,6 +98,8 @@ type SIRIMonitoredStopVisit struct {
 	PublishedLineName      string
 	DepartureStatus        string
 	ArrivalStatus          string
+	VehicleAtStop          string
+	StopAreaObjectId       string
 
 	Order int
 
@@ -105,6 +107,8 @@ type SIRIMonitoredStopVisit struct {
 	ExpectedArrivalTime time.Time
 	ActualArrivalTime   time.Time
 
+	DataFrameRef          time.Time
+	RecordedAt            time.Time
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
 	ActualDepartureTime   time.Time
@@ -133,9 +137,9 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 			<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 			<ns3:Status>{{ .Status }}</ns3:Status>{{ range .MonitoredStopVisits }}
 			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
+				<ns3:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
+				<ns3:MonitoringRef>{{ .StopPointRef }}</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if not (eq $key "TrainNumberRef" "PlaceName") }}
 					<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
 					<ns3:TrainNumber>
@@ -146,7 +150,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					</ns3:Via>{{ end }}
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
 					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>TBD</ns3:DataFrameRef>
+						<ns3:DataFrameRef>{{ .DataFrameRef.Format "2006-01-02" }}</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
@@ -521,11 +525,11 @@ func (visit *XMLMonitoredStopVisit) ServiceFeature() string {
 	return visit.monitored
 }
 
-func (visit *XMLMonitoredStopVisit) TrainNumbers() string {
-	if visit.trainNumbers == "" {
-		visit.trainNumbers = visit.findStringChildContent("TrainNumbers")
+func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
+	if visit.trainNumberRef == "" {
+		visit.trainNumberRef = visit.findStringChildContent("TrainNumberRef")
 	}
-	return visit.trainNumbers
+	return visit.trainNumberRef
 }
 
 func (visit *XMLMonitoredStopVisit) VehicleFeature() string {
@@ -544,7 +548,7 @@ func (visit *XMLMonitoredStopVisit) VehicleMode() string {
 
 func (visit *XMLMonitoredStopVisit) ViaPlaceName() string {
 	if visit.viaPlaceName == "" {
-		visit.viaPlaceName = visit.findStringChildContent("ViaPlaceName")
+		visit.viaPlaceName = visit.findStringChildContent("PlaceName")
 	}
 	return visit.viaPlaceName
 }

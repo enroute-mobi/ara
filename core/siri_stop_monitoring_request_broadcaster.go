@@ -33,6 +33,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	objectidKind := connector.Partner().Setting("remote_objectid_kind")
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
 	}
@@ -57,16 +58,22 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			continue
 		}
 		schedules := stopVisit.Schedules
+		vehicleJourney := stopVisit.VehicleJourney()
+		line := vehicleJourney.Line()
+
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 			ItemIdentifier: stopVisitId.Value(),
 			StopPointRef:   objectid.Value(),
 			StopPointName:  stopArea.Name,
-			// DatedVehicleJourneyRef: stopVisit
-			// LineRef                string
-			// PublishedLineName      string
+
+			LineRef:               line.Attributes["ObjectId"],
+			DataFrameRef:          connector.Clock().Now(),
+			RecordedAt:            stopVisit.RecordedAt,
+			PublishedLineName:     string(line.Name),
 			DepartureStatus:       string(stopVisit.DepartureStatus),
 			ArrivalStatus:         string(stopVisit.ArrivalStatus),
 			Order:                 stopVisit.PassageOrder,
+			VehicleAtStop:         stopVisit.VehicleAtStop,
 			AimedArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
 			ExpectedArrivalTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
 			ActualArrivalTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),
@@ -75,10 +82,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			ActualDepartureTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
 			Attributes:            make(map[string]map[string]string),
 		}
-		fmt.Printf("StopVisit attributes: %#v\n", stopVisit.Attributes)
+
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-		fmt.Printf("VehicleJourney attributes: %#v\n", stopVisit.VehicleJourney().Attributes)
-		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = stopVisit.VehicleJourney().Attributes
+		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
 	}

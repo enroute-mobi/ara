@@ -149,6 +149,17 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
 
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid)
+	line.Save()
+
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	vehicleJourney.LineId = line.Id()
+
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
 	// Check the response body is what we expect.
