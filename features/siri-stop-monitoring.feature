@@ -296,10 +296,10 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[MonitoringError]            | false                                           |
       | Attribute[Occupancy]                  | seatsAvailable                                  |
       | Attribute[OriginAimedDepartureTime]   | 2016-09-22T07:54:52.977Z                        |
-      | Attribute[OriginAimedDestinationTime] | 2016-09-22T09:54:52.977Z                        |
+      | Attribute[DestinationAimedArrivalTime] | 2016-09-22T09:54:52.977Z                        |
       | Attribute[OriginName]                 | Magicien Noir                                   |
-      | Attribute[ProductCategoryRef]         | 0                                               |
-      | Attribute[ServiceFeatureRef]          | bus scolaire                                    |
+      | Attribute[ProductCategory]         | 0                                               |
+      | Attribute[ServiceFeature]          | bus scolaire                                    |
       | Attribute[TrainNumbers]               | 12345                                           |
       | Attribute[VehicleFeatureRef]          | longTrain                                       |
       | Attribute[VehicleMode]                | bus                                             |
@@ -367,7 +367,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                 | Note de test                                           | VehicleJourney#Attribute[JourneyNote]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:HeadwayService                                              | false                                                  | VehicleJourney#Attribute[HeadwayService]               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginAimedDepartureTime                                    | 2016-09-22T07:54:52.977Z                               | VehicleJourney#Attribute[OriginAimedDepartureTime]     |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginAimedDestinationTime                                  | 2016-09-22T09:54:52.977Z                               | VehicleJourney#Attribute[OriginAimedDestinationTime]   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationAimedArrivalTime                                  | 2016-09-22T09:54:52.977Z                               | VehicleJourney#Attribute[DestinationAimedArrivalTime]   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney                                          | first                                                  | VehicleJourney#Attribute[FirstOrLastJourney]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored                                                   | true                                                   | VehicleJourney#Attribute[Monitored]                    |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError                                             | false                                                  | VehicleJourney#Attribute[MonitoringError]              |

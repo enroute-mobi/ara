@@ -41,38 +41,38 @@ type XMLMonitoredStopVisit struct {
 
 	// Attributes
 
-	delay                      string
-	vehicleAtStop              string
-	actualQuayName             string
-	aimedHeadwayInterval       string
-	arrivalPlatformName        string
-	arrivalProximyTest         string
-	departureBoardingActivity  string
-	departurePlatformName      string
-	destinationDisplay         string
-	distanceFromStop           string
-	expectedHeadwayInterval    string
-	numberOfStopsAway          string
-	platformTraversal          string
-	directionName              string
-	destinationName            string
-	directionRef               string
-	firstOrLastJourney         string
-	headwayService             string
-	journeyNote                string
-	journeyPatternName         string
-	monitored                  string
-	monitoringError            string
-	occupancy                  string
-	originAimedDepartureTime   string
-	originAimedDestinationTime string
-	originName                 string
-	productCategory            string
-	serviceFeature             string
-	trainNumbers               string
-	vehicleFeature             string
-	vehicleMode                string
-	viaPlaceName               string
+	delay                       string
+	vehicleAtStop               string
+	actualQuayName              string
+	aimedHeadwayInterval        string
+	arrivalPlatformName         string
+	arrivalProximyTest          string
+	departureBoardingActivity   string
+	departurePlatformName       string
+	destinationDisplay          string
+	distanceFromStop            string
+	expectedHeadwayInterval     string
+	numberOfStopsAway           string
+	platformTraversal           string
+	directionName               string
+	destinationName             string
+	directionRef                string
+	firstOrLastJourney          string
+	headwayService              string
+	journeyNote                 string
+	journeyPatternName          string
+	monitored                   string
+	monitoringError             string
+	occupancy                   string
+	originAimedDepartureTime    string
+	destinationAimedArrivalTime string
+	originName                  string
+	productCategory             string
+	serviceFeature              string
+	trainNumbers                string
+	vehicleFeature              string
+	vehicleMode                 string
+	viaPlaceName                string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -136,7 +136,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 				<ns3:RecordedAtTime>TBD</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
 				<ns3:MonitoringRef>TBD</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if (and (not (eq $key "TrainNumberRef")) (not (eq $key "PlaceName"))) }}
+				<ns3:MonitoredVehicleJourney>{{ range $key, $value := .Attributes.VehicleJourneyAttributes }}{{ if not (eq $key "TrainNumberRef" "PlaceName") }}
 					<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
 					<ns3:TrainNumber>
 						<ns3:TrainNumberRef>{{ .Attributes.VehicleJourneyAttributes.TrainNumberRef }}</ns3:TrainNumberRef>
@@ -493,11 +493,11 @@ func (visit *XMLMonitoredStopVisit) OriginAimedDepartureTime() string {
 	return visit.originAimedDepartureTime
 }
 
-func (visit *XMLMonitoredStopVisit) OriginAimedDestinationTime() string {
-	if visit.originAimedDestinationTime == "" {
-		visit.originAimedDestinationTime = visit.findStringChildContent("OriginAimedDestinationTime")
+func (visit *XMLMonitoredStopVisit) DestinationAimedArrivalTime() string {
+	if visit.destinationAimedArrivalTime == "" {
+		visit.destinationAimedArrivalTime = visit.findStringChildContent("DestinationAimedArrivalTime")
 	}
-	return visit.originAimedDestinationTime
+	return visit.destinationAimedArrivalTime
 }
 
 func (visit *XMLMonitoredStopVisit) OriginName() string {
@@ -509,14 +509,14 @@ func (visit *XMLMonitoredStopVisit) OriginName() string {
 
 func (visit *XMLMonitoredStopVisit) ProductCategory() string {
 	if visit.productCategory == "" {
-		visit.productCategory = visit.findStringChildContent("ProductCategory")
+		visit.productCategory = visit.findStringChildContent("ProductCategoryRef")
 	}
 	return visit.productCategory
 }
 
 func (visit *XMLMonitoredStopVisit) ServiceFeature() string {
 	if visit.serviceFeature == "" {
-		visit.serviceFeature = visit.findStringChildContent("ServiceFeature")
+		visit.serviceFeature = visit.findStringChildContent("ServiceFeatureRef")
 	}
 	return visit.monitored
 }
