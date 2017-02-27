@@ -41,7 +41,7 @@ type Referentials interface {
 var referentials = NewMemoryReferentials()
 
 type APIReferential struct {
-	id       ReferentialId     `json:"Id,omitempty"`
+	id       ReferentialId
 	Slug     ReferentialSlug   `json:"Slug,omitempty"`
 	Errors   Errors            `json:"Errors,omitempty"`
 	Settings map[string]string `json:"Settings,omitempty"`
