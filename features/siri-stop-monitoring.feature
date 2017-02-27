@@ -109,7 +109,7 @@ Feature: Support SIRI StopMonitoring
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-
+      | Name      |       Passage 32                        |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
 
@@ -178,6 +178,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
             <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef></ns3:LineRef>
+              <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>2017-01-01</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef/>
