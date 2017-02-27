@@ -183,6 +183,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 				<ns3:MonitoringRef>stopPointRef</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>
 					<ns3:LineRef>lineRef</ns3:LineRef>
+					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
@@ -219,6 +220,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		PublishedLineName:      "lineName",
 		DepartureStatus:        "depStatus",
 		ArrivalStatus:          "arrStatus",
+		VehicleJourneyName:     "NameOfVj",
 		Order:                  1,
 		RecordedAt:             time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
 		DataFrameRef:           time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
