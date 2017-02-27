@@ -67,8 +67,8 @@ type XMLMonitoredStopVisit struct {
 	originAimedDepartureTime    string
 	destinationAimedArrivalTime string
 	originName                  string
-	productCategory             string
-	serviceFeature              string
+	productCategoryRef          string
+	serviceFeatureRef           string
 	trainNumberRef              string
 	vehicleFeature              string
 	vehicleMode                 string
@@ -511,16 +511,16 @@ func (visit *XMLMonitoredStopVisit) OriginName() string {
 	return visit.originName
 }
 
-func (visit *XMLMonitoredStopVisit) ProductCategory() string {
-	if visit.productCategory == "" {
-		visit.productCategory = visit.findStringChildContent("ProductCategoryRef")
+func (visit *XMLMonitoredStopVisit) ProductCategoryRef() string {
+	if visit.productCategoryRef == "" {
+		visit.productCategoryRef = visit.findStringChildContent("ProductCategoryRef")
 	}
-	return visit.productCategory
+	return visit.productCategoryRef
 }
 
-func (visit *XMLMonitoredStopVisit) ServiceFeature() string {
-	if visit.serviceFeature == "" {
-		visit.serviceFeature = visit.findStringChildContent("ServiceFeatureRef")
+func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
+	if visit.serviceFeatureRef == "" {
+		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
 	}
 	return visit.monitored
 }
