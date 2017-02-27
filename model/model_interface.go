@@ -52,7 +52,7 @@ func (model *MemoryModel) SetDate(reloadHour string) time.Time {
 		minute, _ = strconv.Atoi(reloadHour[3:5])
 	}
 	loc_cet, _ := time.LoadLocation("CET")
-	now := time.Now().In(loc_cet)
+	now := DefaultClock().Now().In(loc_cet)
 	model.date = time.Date(now.Year(), now.Month(), now.Day()+1, hour, minute, 0, 0, loc_cet)
 	return model.date
 }
