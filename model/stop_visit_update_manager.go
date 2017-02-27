@@ -62,9 +62,11 @@ func (updater *StopVisitUpdater) Update() {
 	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
 	stopVisit := updater.tx.Model().StopVisits().New()
+
 	stopVisit.StopAreaId = foundStopArea.Id()
 	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()
 	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
+	stopVisit.VehicleAtStop = stopVisitAttributes.VehicleAtStop
 	stopVisit.RecordedAt = stopVisitAttributes.RecordedAt
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.Schedules = stopVisitAttributes.Schedules

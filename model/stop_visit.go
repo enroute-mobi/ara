@@ -96,6 +96,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"Id":               stopVisit.id,
 		"StopAreaId":       stopVisit.StopAreaId,
 		"VehicleJourneyId": stopVisit.VehicleJourneyId,
+		"VehicleAtStop":    stopVisit.VehicleAtStop,
 		"PassageOrder":     stopVisit.PassageOrder,
 		"RecordedAt":       stopVisit.RecordedAt,
 		"Schedules":        scheduleSlice,
