@@ -118,6 +118,7 @@ Feature: Support SIRI StopMonitoring
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop    | TRUE  |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -191,7 +192,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
-                <ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
+                <ns3:VehicleAtStop>TRUE</ns3:VehicleAtStop>
                 <ns3:ArrivalStatus></ns3:ArrivalStatus>
                 <ns3:DepartureStatus></ns3:DepartureStatus>
               </ns3:MonitoredCall>
@@ -344,7 +345,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:RecordedAtTime                                                                            | 2017-01-01T11:00:00.000Z                               | StopVisit#RecordedAt                                   |
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 | StopVisit#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                             | StopArea#ObjectID                                      |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                      | TODO Line#ObjectID                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                      | Line#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                  | VehicleJourney#Attribute[DirectionRef]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | 2017-01-01                                             | Model#Date                                             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                              | TODO VehicleJourney#ObjectID                           |
@@ -378,7 +379,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:SituationRef                                                 | 1234556                                                | TODO                                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef                              | NINOXE:StopPoint:SP:24:LOC                             | StopArea#ObjectID                                      |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:Order                                     | 4                                                      | StopVisit#PassageOrder                                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:VehicleAtStop                             | true                                                   | TODO StopVisit#VehicleAtStop                           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:VehicleAtStop                             | true                                                   | StopVisit#VehicleAtStop                                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:PlatformTraversal                         | false                                                  | StopVisit#Attribute[PlatformTraversal]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DestinationDisplay                        | Balard Terminus                                        | StopVisit#Attribute[DestinationDisplay]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:AimedArrivalTime                          | 2017-01-01T13:00:00.000Z                               | StopVisit#Schedule[aimed]#Arrival                      |

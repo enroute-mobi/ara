@@ -196,7 +196,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
-						<ns3:VehicleAtStop>TBD</ns3:VehicleAtStop>
+						<ns3:VehicleAtStop></ns3:VehicleAtStop>
 						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
 						<ns3:ArrivalStatus>arrStatus</ns3:ArrivalStatus>
@@ -221,10 +221,11 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		DepartureStatus:        "depStatus",
 		ArrivalStatus:          "arrStatus",
 		VehicleJourneyName:     "NameOfVj",
-		Order:                  1,
-		RecordedAt:             time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
-		DataFrameRef:           time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
-		AimedArrivalTime:       time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
+		//VehicleAtStop:          "TRUE",
+		Order:            1,
+		RecordedAt:       time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
+		DataFrameRef:     time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		AimedArrivalTime: time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ExpectedArrivalTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ActualArrivalTime:     time.Date(2018, time.September, 21, 20, 14, 46, 0, time.UTC),
 		AimedDepartureTime:    time.Date(2019, time.September, 21, 20, 14, 46, 0, time.UTC),

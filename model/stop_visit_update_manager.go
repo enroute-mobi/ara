@@ -62,9 +62,11 @@ func (updater *StopVisitUpdater) Update() {
 	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
 	stopVisit := updater.tx.Model().StopVisits().New()
+
 	stopVisit.StopAreaId = foundStopArea.Id()
 	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()
 	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
+	stopVisit.VehicleAtStop = stopVisitAttributes.VehicleAtStop
 	stopVisit.RecordedAt = stopVisitAttributes.RecordedAt
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.Schedules = stopVisitAttributes.Schedules
@@ -113,6 +115,7 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	if ok {
 		return &vehicleJourney
 	}
+	vehicleJourney.Name = updater.event.Attributes.VehicleJourneyAttributes().Attributes["VehicleJourneyName"]
 
 	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
 
@@ -120,8 +123,8 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
 	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
 	vehicleJourney.LineId = foundLine.Id()
-	vehicleJourney.Name = updater.event.Attributes.VehicleJourneyAttributes().Attributes["VehicleJourneyName"]
 	vehicleJourney.Attributes = updater.event.Attributes.VehicleJourneyAttributes().Attributes
+	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
 	updater.tx.Model().VehicleJourneys().Save(&vehicleJourney)
 
 	return &vehicleJourney
