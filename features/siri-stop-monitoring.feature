@@ -503,7 +503,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
-        <ns2:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns2:MonitoringRef>
+        <ns2:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:LOC</ns2:MonitoringRef>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
