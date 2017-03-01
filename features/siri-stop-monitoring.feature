@@ -475,10 +475,13 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Ligne 415                                                        |
-      | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001" |
+      | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                                          |
-      | ObjectIDs | "internal": "boaarle", "external": "FR:78073:ZDE:50089971:STIF" |
+      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 2                                                          |
+      | ObjectIDs | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
     And a minute has passed
     When I send this SIRI request
       """
@@ -545,7 +548,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>
-              <ns3:DestinationRef>RATPDev:StopPoint:Q:eeft52df543d:LOC</ns3:DestinationRef>
+              <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:LOC</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
               <ns3:MonitoredCall>
