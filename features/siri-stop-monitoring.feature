@@ -472,10 +472,13 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Ligne 415                                                        |
-      | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001" |
+      | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                                          |
-      | ObjectIDs | "internal": "boaarle", "external": "FR:78073:ZDE:50089971:STIF" |
+      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 2                                                          |
+      | ObjectIDs | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
     And a minute has passed
     When I send this SIRI request
       """
@@ -497,7 +500,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
-        <ns2:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns2:MonitoringRef>
+        <ns2:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:LOC</ns2:MonitoringRef>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
@@ -518,22 +521,22 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     xmlns:ns8="http://wsdl.siri.org.uk"
     xmlns:ns9="http://wsdl.siri.org.uk/siri">
       <ServiceDeliveryInfo>
-        <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
+        <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>RATPDev</ns3:ProducerRef>
         <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>RATPDEV:Message::C412:LOC</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
         <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-          <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-          <ns3:RequestMessageRef>RATPDEV:Message::C412:LOC</ns3:RequestMessageRef>
+          <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
+          <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:59:25.000Z</ns3:RecordedAtTime>
             <ns3:ItemIdentifier>RATPDEV:Item::ef15d7eda39e99999baa0205e1a16cbaf582edddfd8e53a79fc7984fa561903c:LOC</ns3:ItemIdentifier>
-            <ns3:MonitoringRef>FR:78073:ZDE:50089971:STIF</ns3:MonitoringRef>
+            <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:LOC</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
-              <ns3:LineRef>STIF:Line::C00001</ns3:LineRef>
+              <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef>RATPDev:VehiculeJourney::8b21b7c99b30282da085699320c1700d27ef3d8236c86236b251aab3375bca13:LOC</ns3:DatedVehicleJourneyRef>
@@ -542,7 +545,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>
-              <ns3:DestinationRef>FR:78073:ZDE:50090348:STIF</ns3:DestinationRef>
+              <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:LOC</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
               <ns3:MonitoredCall>
