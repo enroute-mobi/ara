@@ -184,11 +184,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DataFrameRef>2017-01-01</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef/>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
               <ns3:OperatorRef>TBD</ns3:OperatorRef>
-              <ns3:OriginRef>TBD</ns3:OriginRef>
-              <ns3:DestinationRef>TBD</ns3:DestinationRef>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
@@ -306,11 +303,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[Destination]#ObjectID        | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | Reference[JourneyPattern]#ObjectID     | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[Origin]#ObjectID             | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Reference[DestinationRef]#ObjectID        | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[JourneyPatternRef]#ObjectID     | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[OriginRef]#ObjectID             | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
       | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[ViaPlace]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
@@ -345,25 +342,25 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:RecordedAtTime                                                                            | 2017-01-01T11:00:00.000Z                               | StopVisit#RecordedAt                                   |
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 | StopVisit#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                             | StopArea#ObjectID                                      |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                      | Line#ObjectID                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                      | Line#ObjectID                                          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                  | VehicleJourney#Attribute[DirectionRef]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | 2017-01-01                                             | Model#Date                                             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                              | TODO VehicleJourney#ObjectID                           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                      | TODO VehicleJourney#Reference[JourneyPattern]#ObjectID |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                      | VehicleJourney#Reference[JourneyPatternRef]#ObjectID      |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                   | VehicleJourney#Attribute[JourneyPatternName]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                    | VehicleJourney#Attribute[VehicleMode]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                          | Line#Name                                              |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | NINOXE:Route:66:LOC                                    | TODO VehicleJourney#Reference[RouteRef]#ObjectID       |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | NINOXE:Route:66:LOC                                    | VehicleJourney#Reference[RouteRef]#ObjectID       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                         | VehicleJourney#Attribute[DirectionName]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                            | TODO                                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                      | VehicleJourney#Attribute[ProductCategoryRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                           | VehicleJourney#Attribute[ServiceFeatureRef]            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                              | VehicleJourney#Attribute[VehicleFeatureRef]            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                             | TODO VehicleJourney#Reference[Origin]#ObjectID         |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                             | VehicleJourney#Reference[OriginRef]#ObjectID         |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                   | Magicien Noir                                          | VehicleJourney#Attribute[OriginName]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceName                                           | Saint Bénédicte                                        | VehicleJourney#Attribute[ViaPlaceName]                 |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                            | TODO VehicleJourney#Reference[ViaPlace]#ObjectID       |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                             | TODO VehicleJourney#Reference[Destination]#ObjectID    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                            | VehicleJourney#Reference[PlaceRef]#ObjectID            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                             | VehicleJourney#Reference[DestinationRef]#ObjectID    |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                 | VehicleJourney#Attribute[DestinationName]              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                       | VehicleJourney#Name                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                           | VehicleJourney#Attribute[JourneyNote]                  |

@@ -108,7 +108,7 @@ func Test_LineController_Show(t *testing.T) {
 func Test_LineController_Create(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ 	"References" : {
-		"JourneyPattern":{"ObjectId":{"Kind":"lol","Value":"lel"}, "Id":"42"}
+		"JourneyPattern":{"ObjectId":{"lol":"lel"}, "Id":"42"}
 	},
 	"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareLineRequest("POST", false, body, t)

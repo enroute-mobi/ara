@@ -38,6 +38,13 @@ def model_attributes(table)
       attributes["Attributes"][name] = value
       attributes.delete key
     end
+
+    if key =~ /Reference\[([^\]]+)\]/
+      name = $1
+      attributes["References"] ||= {}
+      attributes["References"][name] = JSON.parse("{ \"ObjectId\"  : { #{value} }, \"Id\": \"42\" }" )
+      attributes.delete key
+    end
   end
 
   if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])

@@ -5,6 +5,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/af83/edwig/model"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -117,6 +118,9 @@ type SIRIMonitoredStopVisit struct {
 
 	// Attributes
 	Attributes map[string]map[string]string
+
+	// Références
+	References map[string]map[string]model.Reference
 }
 
 const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -146,21 +150,23 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:{{ $key }}>{{ $value }}</ns3:{{ $key }}>{{ end }}{{ end }}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
 					<ns3:TrainNumber>
 						<ns3:TrainNumberRef>{{ .Attributes.VehicleJourneyAttributes.TrainNumberRef }}</ns3:TrainNumberRef>
-					</ns3:TrainNumber>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
-					<ns3:Via>
-						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>
+					</ns3:TrainNumber>{{ end }}{{ if or .Attributes.VehicleJourneyAttributes.ViaPlaceName .References.VehicleJourney.PlaceRef }}
+					<ns3:Via>{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
+						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>{{end}}{{ if .References.VehicleJourney.PlaceRef}}
+					  <ns3:PlaceRef>{{.References.VehicleJourney.PlaceRef.ObjectId.Value}}</ns3:PlaceRef>{{ end }}
 					</ns3:Via>{{ end }}
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
 					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>{{ .DataFrameRef.Format "2006-01-02" }}</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
+					</ns3:FramedVehicleJourneyRef>{{ if .References.VehicleJourney.JourneyPatternRef }}
+					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{end}}
 					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
-					<ns3:OperatorRef>TBD</ns3:OperatorRef>
-					<ns3:OriginRef>TBD</ns3:OriginRef>
-					<ns3:DestinationRef>TBD</ns3:DestinationRef>
+					<ns3:OperatorRef>TBD</ns3:OperatorRef>{{ if .References.VehicleJourney.OriginRef}}
+					<ns3:OriginRef>{{.References.VehicleJourney.OriginRef.ObjectId.Value}}</ns3:OriginRef>{{end}}{{ if .References.VehicleJourney.DestinationRef}}
+					<ns3:DestinationRef>{{.References.VehicleJourney.DestinationRef.ObjectId.Value}}</ns3:DestinationRef>{{end}}{{ if .References.VehicleJourney.RouteRef}}
+					<ns3:RouteRef>{{.References.VehicleJourney.RouteRef.ObjectId.Value }}</ns3:RouteRef>{{end}}
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
 						<ns3:Order>{{ .Order }}</ns3:Order>

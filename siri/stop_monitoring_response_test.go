@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/af83/edwig/model"
 )
 
 func getXMLStopMonitoringResponse(t *testing.T) *XMLStopMonitoringResponse {
@@ -188,11 +190,9 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
-					<ns3:JourneyPatternRef>TBD</ns3:JourneyPatternRef>
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
 					<ns3:OperatorRef>TBD</ns3:OperatorRef>
-					<ns3:OriginRef>TBD</ns3:OriginRef>
-					<ns3:DestinationRef>TBD</ns3:DestinationRef>
+					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
@@ -232,9 +232,14 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		ExpectedDepartureTime: time.Date(2020, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ActualDepartureTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		Attributes: make(map[string]map[string]string),
+		References: make(map[string]map[string]model.Reference),
 	}
+
+	DestinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
+	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &DestinationRefObjId, Id: "42"}
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()
 	if err != nil {

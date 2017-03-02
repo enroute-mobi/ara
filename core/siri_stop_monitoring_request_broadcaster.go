@@ -84,10 +84,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			ExpectedDepartureTime: schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
 			ActualDepartureTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
 			Attributes:            make(map[string]map[string]string),
+			References:            make(map[string]map[string]model.Reference),
 		}
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
+		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
 	}

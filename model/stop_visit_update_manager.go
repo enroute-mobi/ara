@@ -115,7 +115,6 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	if ok {
 		return &vehicleJourney
 	}
-	vehicleJourney.Name = updater.event.Attributes.VehicleJourneyAttributes().Attributes["VehicleJourneyName"]
 
 	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
 
