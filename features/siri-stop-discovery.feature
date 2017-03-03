@@ -34,7 +34,7 @@ Feature: Support SIRI StopMonitoring
       | Attribute[Longitude]  | 5.4488754272460940   |
       | Attribute[Latitude]   | 46.3530890624813000   |
     When I send this SIRI request
-      '''
+      """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
@@ -51,9 +51,9 @@ Feature: Support SIRI StopMonitoring
           </ns7:StopPointsDiscovery>
         </S:Body>
       </S:Envelope>
-        '''
+        """
     Then I should receive this SIRI response
-      '''
+      """
       <?xml version="1.0" encoding="UTF-8"?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
@@ -102,4 +102,4 @@ Feature: Support SIRI StopMonitoring
     </ns8:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
-      '''
+      """
