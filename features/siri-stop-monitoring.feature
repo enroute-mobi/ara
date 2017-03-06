@@ -410,13 +410,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:NumberOfStopsAway                         | 1                                                      | StopVisit#Attribute[NumberOfStopsAway]                |
 
   @wip
-  Scenario: Manage OperatorRef from Line
-  @wip
-  Scenario: Manage OperatorRef from VehicleJourney
-  @wip
-  Scenario: Manage OperatorRef from StopVisit
-
-  @wip
   Scenario: Handle a SIRI StopMonitoring response after SM Request to a SIRI server
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
         """
