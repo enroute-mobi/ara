@@ -73,7 +73,7 @@ func Test_Referential_MarshalJSON(t *testing.T) {
 		Settings: map[string]string{"key": "value"},
 	}
 	referential.partners = NewPartnerManager(referential)
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":[],"Settings":{"key":"value"},"Slug":"referential"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","NextReloadAt":"0001-01-01T00:00:00Z","Partners":[],"Settings":{"key":"value"},"Slug":"referential"}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -100,6 +100,36 @@ func Test_Referential_Save(t *testing.T) {
 	referential = referentials.Find(referential.Id())
 	if referential == nil {
 		t.Errorf("New Referential should be found in Referentials manager")
+	}
+}
+
+func Test_Referential_setNextReloadAt(t *testing.T) {
+	var conditions = []struct {
+		setting        string
+		clockHour      int
+		clockMinute    int
+		expectedDay    int
+		expectedHour   int
+		expectedMinute int
+	}{
+		{"04:00", 15, 0, 2, 4, 0},
+		{"04:00", 3, 0, 1, 4, 0},
+		{"04:00", 4, 0, 2, 4, 0},
+		{"abc", 15, 0, 2, 4, 0},
+	}
+
+	for _, condition := range conditions {
+		referential := Referential{Settings: map[string]string{"model.reloadAt": condition.setting}}
+
+		fakeClock := model.NewFakeClockAt(time.Date(2017, time.January, 1, condition.clockHour, condition.clockMinute, 0, 0, time.UTC))
+		referential.SetClock(fakeClock)
+
+		referential.setNextReloadAt()
+
+		expected := time.Date(2017, time.January, condition.expectedDay, condition.expectedHour, condition.expectedMinute, 0, 0, time.UTC)
+		if !referential.NextReloadAt().Equal(expected) {
+			t.Errorf("Wrong NextReloadAt:\n expected: %v\n got: %v", expected, referential.NextReloadAt())
+		}
 	}
 }
 
@@ -164,6 +194,10 @@ func Test_MemoryReferentials_New(t *testing.T) {
 	}
 	if referential.Id() != "" {
 		t.Errorf("New Referential identifier should be an empty string, got: %s", referential.Id())
+	}
+
+	if referential.NextReloadAt().IsZero() {
+		t.Errorf("New Referential should have a defined NextReloadAt time, got: %s", referential.NextReloadAt())
 	}
 }
 

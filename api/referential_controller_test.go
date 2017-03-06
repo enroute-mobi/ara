@@ -183,14 +183,16 @@ func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
 
 func Test_ReferentialController_Index(t *testing.T) {
 	// Send request
-	_, responseRecorder, _ := referentialPrepareRequest("GET", false, nil, t)
+	referential, responseRecorder, _ := referentialPrepareRequest("GET", false, nil, t)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Partners":[],"Settings":{},"Slug":"First Referential"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
+	referentialJSON, _ := referential.MarshalJSON()
+	expected := fmt.Sprintf("[%s]", referentialJSON)
+
+	if responseRecorder.Body.String() != expected {
+		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), expected)
 	}
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"database/sql"
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/af83/edwig/logger"
@@ -12,7 +13,13 @@ import (
 type ReferentialId string
 type ReferentialSlug string
 
+const (
+	REFERENTIAL_SETTING_MODEL_RELOAD_AT = "model.reload_at"
+)
+
 type Referential struct {
+	model.ClockConsumer
+
 	id   ReferentialId
 	slug ReferentialSlug
 
@@ -24,6 +31,7 @@ type Referential struct {
 	modelGuardian  *ModelGuardian
 	partners       Partners
 	startedAt      time.Time
+	nextReloadAt   time.Time
 }
 
 type Referentials interface {
@@ -106,7 +114,7 @@ func (referential *Referential) Partners() Partners {
 }
 
 func (referential *Referential) Start() {
-	referential.startedAt = model.DefaultClock().Now()
+	referential.startedAt = referential.Clock().Now()
 
 	referential.partners.Start()
 	referential.modelGuardian.Start()
@@ -128,35 +136,67 @@ func (referential *Referential) NewTransaction() *model.Transaction {
 
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Id":       referential.id,
-		"Slug":     referential.slug,
-		"Settings": referential.Settings,
-		"Partners": referential.partners,
+		"Id":           referential.id,
+		"Slug":         referential.slug,
+		"Settings":     referential.Settings,
+		"Partners":     referential.partners,
+		"NextReloadAt": referential.nextReloadAt,
 	})
 }
 
 func (referential *Referential) Definition() *APIReferential {
+	settings := map[string]string{}
+	for k, v := range referential.Settings {
+		settings[k] = v
+	}
+
 	return &APIReferential{
 		id:       referential.id,
 		Slug:     referential.slug,
-		Settings: referential.Settings,
+		Settings: settings,
 		Errors:   NewErrors(),
 		manager:  referential.manager,
 	}
 }
 
 func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
-	//referential.id = apiReferential.Id
+	initialReloadAt := referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT)
+
 	referential.slug = apiReferential.Slug
 	referential.Settings = apiReferential.Settings
+
+	if initialReloadAt != referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT) {
+		referential.setNextReloadAt()
+	}
 }
 
 func (referential *Referential) NextReloadAt() time.Time {
-	return referential.model.GetDate()
+	return referential.nextReloadAt
 }
 
 func (referential *Referential) ReloadModel() {
-	referential.modelGuardian.Reload()
+	logger.Log.Printf("Reset Model")
+	referential.model.Reset()
+	referential.setNextReloadAt()
+}
+
+func (referential *Referential) setNextReloadAt() {
+	reloadHour := referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT)
+	hour, minute := 4, 0
+
+	if len(reloadHour) == 5 {
+		hour, _ = strconv.Atoi(reloadHour[0:2])
+		minute, _ = strconv.Atoi(reloadHour[3:5])
+	}
+	now := referential.Clock().Now()
+
+	day := now.Day()
+	if now.Hour() >= hour && now.Minute() >= minute {
+		day += 1
+	}
+
+	referential.nextReloadAt = time.Date(now.Year(), now.Month(), day, hour, minute, 0, 0, now.Location())
+	logger.Log.Printf("Next reload at: %v", referential.nextReloadAt)
 }
 
 type MemoryReferentials struct {
@@ -194,6 +234,8 @@ func (manager *MemoryReferentials) new() *Referential {
 	referential.collectManager = NewCollectManager(referential.partners)
 
 	referential.modelGuardian = NewModelGuardian(referential)
+	referential.setNextReloadAt()
+
 	return referential
 }
 

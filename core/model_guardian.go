@@ -32,16 +32,8 @@ func (guardian *ModelGuardian) Stop() {
 	}
 }
 
-func (guardian *ModelGuardian) Reload() {
-	guardian.deleteAllVehiculeJourney()
-	guardian.deleteAllStopVisits()
-	guardian.deleteLines()
-}
-
 func (guardian *ModelGuardian) Run() {
-	guardian.referential.model.SetDate(guardian.referential.Setting("reload_at"))
 	c := guardian.Clock().After(10 * time.Second)
-	d := guardian.Clock().After(10 * time.Minute)
 
 	for {
 		select {
@@ -49,13 +41,12 @@ func (guardian *ModelGuardian) Run() {
 			return
 		case <-c:
 			guardian.refreshStopAreas()
-			c = guardian.Clock().After(10 * time.Second)
-		case <-d:
-			if time.Now().After(guardian.referential.NextReloadAt()) == true {
+
+			if guardian.Clock().Now().After(guardian.referential.NextReloadAt()) {
 				guardian.referential.ReloadModel()
-				guardian.referential.model.SetDate(guardian.referential.Setting("reload_at"))
 			}
-			d = guardian.Clock().After(10 * time.Minute)
+
+			c = guardian.Clock().After(10 * time.Second)
 		}
 	}
 }
@@ -87,39 +78,5 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			}
 			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 		}
-	}
-}
-
-func (guardian *ModelGuardian) deleteAllVehiculeJourney() {
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
-	for _, vehicleJourney := range tx.Model().VehicleJourneys().FindAll() {
-
-		transactionnalVehicleJourney, _ := tx.Model().VehicleJourneys().Find(vehicleJourney.Id())
-		tx.Model().VehicleJourneys().Delete(&transactionnalVehicleJourney)
-		tx.Commit()
-	}
-}
-
-func (guardian *ModelGuardian) deleteAllStopVisits() {
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
-	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
-		transactionnalStopVisit, _ := tx.Model().StopVisits().Find(stopVisit.Id())
-		guardian.referential.model.StopVisits().Delete(&transactionnalStopVisit)
-		tx.Commit()
-	}
-}
-
-func (guardian *ModelGuardian) deleteLines() {
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
-	for _, line := range tx.Model().Lines().FindAll() {
-		transactionnalLine, _ := tx.Model().Lines().Find(line.Id())
-		guardian.referential.model.Lines().Delete(&transactionnalLine)
-		tx.Commit()
 	}
 }
