@@ -35,6 +35,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure         | 2017-01-12T11:42:54.000+01:00 |
       | VehicleAtStop                        | false                         |
       | Attribute[DestinationDisplay]        | Méliès - Croix Bonnet         |
+      | Reference["OperatorRef"]             | CdF:Company::410:LOC.         |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                                                                     |
       | ObjectIDs | "internal": "cladebr", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
@@ -61,6 +62,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure         | 2017-01-12T11:41:00.000+01:00 |
       | VehicleAtStop                        | false                         |
       | Attribute[DestinationDisplay]        | PARIS - Porte d'Orléans       |
+      | Reference["OperatorRef"]             | CdF:Company::410:LOC.         |
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
