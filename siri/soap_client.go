@@ -76,6 +76,9 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 
 	// Create SOAPEnvelope and check body type
 	envelope, err := NewSOAPEnvelope(responseReader)
+	if err != nil {
+		return nil, err
+	}
 	if envelope.BodyType() != resource {
 		return nil, newSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 	}

@@ -22,6 +22,7 @@ if [ -x $bundle ]; then
     cd $source_dir
     $bundle install --deployment --path $tmp_dir
     $bundle exec license_finder
+    $bundle exec bundle-audit check --update
 
 		mkdir -p $tmp_dir/cucumber
     $bundle exec cucumber --tags "~@wip" --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
