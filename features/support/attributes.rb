@@ -39,10 +39,16 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /Reference\[([^\]]+)\]/
+    if key =~ /Reference\[([^\]]+)\]#(ObjectID|Id)/
       name = $1
+      attribute = $2
       attributes["References"] ||= {}
-      attributes["References"][name] = JSON.parse("{ \"ObjectId\"  : { #{value} }, \"Id\": \"42\" }" )
+
+      if attribute == "ObjectID"
+        value = JSON.parse("{ #{value} }")
+      end
+
+      attributes["References"][name] = { attribute => value }
       attributes.delete key
     end
   end
