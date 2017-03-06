@@ -46,7 +46,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    rubyzip (1.2.0)
+    rubyzip (1.2.1)
     thor (0.19.1)
     unf (0.1.4)
       unf_ext
