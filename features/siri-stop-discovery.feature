@@ -1,4 +1,4 @@
-Feature: Support SIRI StopMonitoring
+Feature: Support SIRI StopDiscovery
 
   Background:
     Given a Referential "test" is created
