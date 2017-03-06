@@ -41,7 +41,7 @@ func (reference *Reference) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(aux.ObjectId) != 1 {
+	if len(aux.ObjectId) > 1 {
 		return errors.New("ObjectID should look like KIND:VALUE")
 	}
 
