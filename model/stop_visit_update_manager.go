@@ -54,6 +54,7 @@ func (updater *StopVisitUpdater) Update() {
 	}
 
 	foundStopArea := updater.findOrCreateStopArea(updater.event.Attributes.StopAreaAttributes())
+
 	updater.findOrCreateLine(updater.event.Attributes.LineAttributes())
 	foundVehicleJourney := updater.findOrCreateVehicleJourney(updater.event.Attributes.VehicleJourneyAttributes())
 
@@ -94,6 +95,19 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 	return &stopArea
 }
 
+func (updater *StopVisitUpdater) resolveVehiculeJourneyReferences(foundVehicleJourney VehicleJourney) error {
+	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
+
+	for i := range toResolve {
+		foundStopArea, ok := updater.tx.Model().StopAreas().FindByObjectId(*foundVehicleJourney.References[toResolve[i]].ObjectId)
+		if ok {
+			reference := foundVehicleJourney.References[toResolve[i]]
+			reference.Id = string(foundStopArea.Id())
+		}
+	}
+	return nil
+}
+
 func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes) *Line {
 	line, ok := updater.tx.Model().Lines().FindByObjectId(lineAttributes.ObjectId)
 	if ok {
@@ -113,6 +127,7 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) *VehicleJourney {
 	vehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(vehicleJourneyAttributes.ObjectId)
 	if ok {
+		updater.resolveVehiculeJourneyReferences(vehicleJourney)
 		return &vehicleJourney
 	}
 
@@ -123,7 +138,9 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
 	vehicleJourney.LineId = foundLine.Id()
 	vehicleJourney.Attributes = updater.event.Attributes.VehicleJourneyAttributes().Attributes
+	vehicleJourney.References = updater.event.Attributes.VehicleJourneyAttributes().References
 	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
+	updater.resolveVehiculeJourneyReferences(vehicleJourney)
 	updater.tx.Model().VehicleJourneys().Save(&vehicleJourney)
 
 	return &vehicleJourney

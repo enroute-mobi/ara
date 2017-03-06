@@ -86,9 +86,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			Attributes:            make(map[string]map[string]string),
 			References:            make(map[string]map[string]model.Reference),
 		}
+		connector.rewriteVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
+
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
@@ -97,6 +99,26 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
 	return response, nil
+}
+
+func (connector *SIRIStopMonitoringRequestBroadcaster) rewriteVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
+	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
+
+	for _, ref := range toResolve {
+		if references[ref] != (model.Reference{}) {
+			if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
+				obj, ok := foundStopArea.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+				if ok {
+					tmp := references[ref]
+					tmp.ObjectId = &obj
+					references[ref] = tmp
+				}
+			} else {
+				tmp := references[ref]
+				tmp.ChecksumObjId()
+			}
+		}
+	}
 }
 
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

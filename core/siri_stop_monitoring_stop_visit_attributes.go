@@ -75,6 +75,21 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	return attrMap
 }
 
+func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() map[string]model.Reference {
+	refMap := make(map[string]model.Reference)
+
+	objId := model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef())
+	refMap["PlaceRef"] = model.Reference{ObjectId: &objId, Id: ""}
+
+	objId = model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef())
+	refMap["OriginRef"] = model.Reference{ObjectId: &objId, Id: ""}
+
+	objId = model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef())
+	refMap["DestinationRef"] = model.Reference{ObjectId: &objId, Id: ""}
+
+	return refMap
+}
+
 func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() map[string]string {
 	attrMap := make(map[string]string)
 
@@ -102,9 +117,11 @@ func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *mod
 		ObjectId:     objectid,
 		LineObjectId: lineObjectId,
 		Attributes:   make(map[string]string),
+		References:   make(map[string]model.Reference),
 	}
 
 	vehicleJourneyAttributes.Attributes = attributes.FillVehicleJourneyAttributes()
+	vehicleJourneyAttributes.References = attributes.FillVehicleJourneyReferences()
 	return vehicleJourneyAttributes
 }
 

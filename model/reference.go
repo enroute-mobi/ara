@@ -1,13 +1,22 @@
 package model
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 type Reference struct {
 	ObjectId *ObjectID
 	Id       string
+}
+
+func (reference *Reference) ChecksumObjId() {
+	hasher := sha1.New() // oui, on sait
+	hasher.Write([]byte(reference.ObjectId.Value()))
+	sha := fmt.Sprintf("%x", hasher.Sum(nil))
+	reference.ObjectId.SetValue(sha)
 }
 
 func (reference *Reference) UnmarshalJSON(data []byte) error {
@@ -30,6 +39,7 @@ func (reference *Reference) UnmarshalJSON(data []byte) error {
 		ObjectIdCPY := NewObjectID(kind, aux.ObjectId[kind])
 		reference.ObjectId = &ObjectIdCPY
 	}
+
 	reference.Id = aux.Id
 	return nil
 }

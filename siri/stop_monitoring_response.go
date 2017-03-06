@@ -75,6 +75,9 @@ type XMLMonitoredStopVisit struct {
 	vehicleFeature              string
 	vehicleMode                 string
 	viaPlaceName                string
+	originRef                   string
+	placeRef                    string
+	destinationRef              string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -567,6 +570,29 @@ func (visit *XMLMonitoredStopVisit) ViaPlaceName() string {
 		visit.viaPlaceName = visit.findStringChildContent("PlaceName")
 	}
 	return visit.viaPlaceName
+}
+
+// References
+
+func (visit *XMLMonitoredStopVisit) OriginRef() string {
+	if visit.originRef == "" {
+		visit.originRef = visit.findStringChildContent("OriginRef")
+	}
+	return visit.originRef
+}
+
+func (visit *XMLMonitoredStopVisit) PlaceRef() string {
+	if visit.placeRef == "" {
+		visit.placeRef = visit.findStringChildContent("PlaceRef")
+	}
+	return visit.placeRef
+}
+
+func (visit *XMLMonitoredStopVisit) DestinationRef() string {
+	if visit.destinationRef == "" {
+		visit.destinationRef = visit.findStringChildContent("DestinationRef")
+	}
+	return visit.destinationRef
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {

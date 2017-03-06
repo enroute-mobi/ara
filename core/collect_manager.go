@@ -43,6 +43,8 @@ func (manager *TestCollectManager) TestStopVisitUpdateSubscriber(event *model.St
 
 func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopVisitUpdateSubscriber) {}
 
+// TEST END
+
 func NewCollectManager(partners Partners) CollectManagerInterface {
 	return &CollectManager{
 		partners:                   partners,

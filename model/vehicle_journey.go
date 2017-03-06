@@ -8,6 +8,7 @@ type VehicleJourneyAttributes struct {
 	ObjectId     ObjectID
 	LineObjectId ObjectID
 	Attributes   map[string]string
+	References   map[string]Reference
 }
 
 type VehicleJourney struct {

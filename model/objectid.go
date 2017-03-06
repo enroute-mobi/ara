@@ -43,6 +43,10 @@ func (objectid ObjectID) Value() string {
 	return objectid.value
 }
 
+func (objectid *ObjectID) SetValue(toset string) {
+	objectid.value = toset
+}
+
 func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		objectid.kind: objectid.value,

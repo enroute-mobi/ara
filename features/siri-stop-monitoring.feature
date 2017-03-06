@@ -96,7 +96,7 @@ Feature: Support SIRI StopMonitoring
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
@@ -118,7 +118,7 @@ Feature: Support SIRI StopMonitoring
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
-      | VehicleAtStop    | TRUE  |
+      | VehicleAtStop    | TRUE                                                                 |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -264,7 +264,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
-
+@wip
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
@@ -272,6 +272,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a StopArea exists with the following attributes:
+        | Name      | Destination                                     |
+        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
       | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
@@ -303,11 +306,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#ObjectID        | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[DestinationRef]#Id        |         |
       | Reference[JourneyPatternRef]#ObjectID     | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
       | Reference[OriginRef]#ObjectID             | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"                  |
+      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"          |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
