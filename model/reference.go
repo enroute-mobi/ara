@@ -12,11 +12,21 @@ type Reference struct {
 	Id       string
 }
 
-func (reference *Reference) ChecksumObjId() {
+func (reference *Reference) GetSha1() string {
 	hasher := sha1.New() // oui, on sait
 	hasher.Write([]byte(reference.ObjectId.Value()))
-	sha := fmt.Sprintf("%x", hasher.Sum(nil))
-	reference.ObjectId.SetValue(sha)
+	return fmt.Sprintf("%x", hasher.Sum(nil))
+}
+
+func (reference *Reference) Getformat(ref, value string) string {
+	allRef := make(map[string]string)
+
+	allRef["PlaceRef"] = "StopPoint"
+	allRef["OriginRef"] = "StopPoint"
+	allRef["DestinationRef"] = "StopPoint"
+
+	formated := "RATPDev:" + allRef[ref] + ":Q:" + value + ":LOC"
+	return formated
 }
 
 func (reference *Reference) UnmarshalJSON(data []byte) error {

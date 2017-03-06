@@ -98,11 +98,13 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 func (updater *StopVisitUpdater) resolveVehiculeJourneyReferences(foundVehicleJourney VehicleJourney) error {
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
-	for i := range toResolve {
-		foundStopArea, ok := updater.tx.Model().StopAreas().FindByObjectId(*foundVehicleJourney.References[toResolve[i]].ObjectId)
-		if ok {
-			reference := foundVehicleJourney.References[toResolve[i]]
-			reference.Id = string(foundStopArea.Id())
+	for _, ref := range toResolve {
+		if foundVehicleJourney.References[ref] != (Reference{}) {
+			foundStopArea, ok := updater.tx.Model().StopAreas().FindByObjectId(*(foundVehicleJourney.References[ref].ObjectId))
+			if ok {
+				reference := foundVehicleJourney.References[ref]
+				reference.Id = string(foundStopArea.Id())
+			}
 		}
 	}
 	return nil

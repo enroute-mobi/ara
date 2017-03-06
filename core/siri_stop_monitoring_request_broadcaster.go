@@ -115,7 +115,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) rewriteVehiculeJourneyRef
 				}
 			} else {
 				tmp := references[ref]
-				tmp.ChecksumObjId()
+				tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
 			}
 		}
 	}
