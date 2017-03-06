@@ -474,13 +474,13 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | remote_objectid_kind | external |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Ligne 415                                                        |
+      | Name      | Ligne 415                                                         |
       | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
-      | Name      | Test 1                                                          |
+      | Name      | Test 1                                                                    |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | Test 2                                                          |
+      | Name      | Test 2                                                                     |
       | ObjectIDs | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
     And a minute has passed
     When I send this SIRI request
@@ -573,3 +573,21 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   </S:Body>
 </S:Envelope>
       """
+
+  Scenario: Handles invalid GetStopMonitoring response
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+        <html><title>Error</title></body>Error 500</body></html>
+      """
+    And a Partner "invalid" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | remote_objectid_kind | internal              |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | ObjectIDs | "internal": "dummy" |
+    When a minute has passed
+    And the SIRI server has received a GetStopMonitoring request
+    Then a StopArea exists with the following attributes:
+      | ObjectIDs | "internal": "dummy" |
+      | UpdatedAt | -                   |
