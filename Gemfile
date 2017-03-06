@@ -10,5 +10,7 @@ group :test do
 end
 
 group :development do
+  gem 'rake'
   gem 'license_finder'
+  gem 'bundler-audit'
 end

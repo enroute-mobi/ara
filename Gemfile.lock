@@ -2,6 +2,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     builder (3.2.2)
+    bundler-audit (0.5.0)
+      bundler (~> 1.2)
+      thor (~> 0.18)
     cucumber (2.4.0)
       builder (>= 2.1.2)
       cucumber-core (~> 1.5.0)
@@ -34,6 +37,7 @@ GEM
     multi_test (0.1.2)
     multi_xml (0.5.5)
     netrc (0.11.0)
+    rake (12.0.0)
     rest-client (2.0.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -42,7 +46,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    rubyzip (1.2.0)
+    rubyzip (1.2.1)
     thor (0.19.1)
     unf (0.1.4)
       unf_ext
@@ -53,13 +57,15 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bundler-audit
   cucumber
   http-cookie
   license_finder
   mime-types
   netrc
+  rake
   rest-client
   rspec-expectations
 
 BUNDLED WITH
-   1.13.6
+   1.14.3
