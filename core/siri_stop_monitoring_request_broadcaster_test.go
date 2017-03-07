@@ -15,7 +15,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["address"] = "edwig.edwig"
+	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
@@ -47,8 +47,8 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if response.Address != "edwig.edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: edwig.edwig", response.Address)
+	if response.Address != "http://edwig" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
 	}
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
