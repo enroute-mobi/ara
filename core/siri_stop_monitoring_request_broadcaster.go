@@ -83,7 +83,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 			VehicleJourneyName:    vehicleJourney.Name,
 			LineRef:               LineObjectId.Value(),
-			DataFrameRef:          modelDate.String(),
+			DataFrameRef:          fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
 			RecordedAt:            stopVisit.RecordedAt,
 			PublishedLineName:     line.Name,
 			DepartureStatus:       string(stopVisit.DepartureStatus),
