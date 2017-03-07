@@ -17,7 +17,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referential.Start()
 	referential.Stop()
 	partner := referential.Partners().New("partner")
-	partner.Settings["address"] = "edwig.edwig"
+	partner.Settings["local_url"] = "http://edwig"
 	connector := NewSIRICheckStatusServer(partner)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -41,26 +41,26 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	response, err := connector.CheckStatus(request)
 
 	time := model.DefaultClock().Now()
-	if response.Address != "edwig.edwig" {
-		t.Errorf("Wring Address in response:\n got: %v\n want: edwig.edwig", response.Address)
+	if response.Address != "http://edwig" {
+		t.Errorf("Wrong Address in response:\n got: %v\n want: http://edwig", response.Address)
 	}
 	if response.ProducerRef != "Edwig" {
-		t.Errorf("Wring ProducerRef in response:\n got: %v\n want: Edwig", response.ProducerRef)
+		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: Edwig", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "CheckStatus:Test:0" {
-		t.Errorf("Wring RequestMessageRef in response:\n got: %v\n want: CheckStatus:Test:0", response.RequestMessageRef)
+		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: CheckStatus:Test:0", response.RequestMessageRef)
 	}
 	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Wring ResponseMessageIdentifier in response:\n got: %v\n want: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	if !response.Status {
-		t.Errorf("Wring Status in response:\n got: %v\n want: true", response.Status)
+		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status)
 	}
 	if response.ResponseTimestamp != time {
-		t.Errorf("Wring Address in response:\n got: %v\n want: %v", response.ResponseTimestamp, time)
+		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.ResponseTimestamp, time)
 	}
 	if response.ServiceStartedTime != time {
-		t.Errorf("Wring ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime, time)
+		t.Errorf("Wrong ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime, time)
 	}
 }
 

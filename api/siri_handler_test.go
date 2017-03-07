@@ -29,7 +29,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"remote_credential":    "",
 		"remote_objectid_kind": "objectidKind",
 		"local_credential":     "Edwig",
-		"address":              "edwig.edwig",
+		"local_url":            "http://edwig",
 	}
 	partner.ConnectorTypes = []string{"siri-check-status-server", "siri-stop-monitoring-request-broadcaster"}
 	partner.RefreshConnectors()
@@ -96,7 +96,7 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "edwig.edwig"; response.Address() != expected {
+	if expected := "http://edwig"; response.Address() != expected {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
 	}
 
@@ -168,7 +168,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "edwig.edwig"; response.Address() != expected {
+	if expected := "http://edwig"; response.Address() != expected {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
 	}
 
