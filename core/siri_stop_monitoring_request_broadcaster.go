@@ -56,10 +56,18 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
+		var itemIdentifier string
 		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
-		if !ok {
-			continue
+		if ok {
+			itemIdentifier = stopVisitId.Value()
+		} else {
+			defaultObjectID, ok := stopVisit.ObjectID("_default")
+			if !ok {
+				continue
+			}
+			itemIdentifier = fmt.Sprintf("RATPDEV:Item::%s:LOC", defaultObjectID.HashValue())
 		}
+
 		schedules := stopVisit.Schedules
 		vehicleJourney := stopVisit.VehicleJourney()
 		line := vehicleJourney.Line()
@@ -69,7 +77,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		LineObjectId, _ := line.ObjectID(objectidKind)
 
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
-			ItemIdentifier: stopVisitId.Value(),
+			ItemIdentifier: itemIdentifier,
 			StopPointRef:   objectid.Value(),
 			StopPointName:  stopArea.Name,
 
