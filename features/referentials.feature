@@ -9,6 +9,7 @@ Feature: Manager Referentials
     When the Referential "test" is destroyed
     Then a Referential "test" should not exist
 
+  @wip
   Scenario: Referential reloads Model at configured time
     Given a Referential "test" exists with the following settings:
       | model.reload_at | 01:00 |
