@@ -18,7 +18,7 @@ type StopVisitAttributes struct {
 	DepartureStatus StopVisitDepartureStatus
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
-	VehicleAtStop   string
+	VehicleAtStop   bool
 	Attributes      map[string]string
 }
 
@@ -36,7 +36,7 @@ type StopVisit struct {
 	DepartureStatus StopVisitDepartureStatus
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
-	VehicleAtStop   string
+	VehicleAtStop   bool
 
 	PassageOrder int
 }

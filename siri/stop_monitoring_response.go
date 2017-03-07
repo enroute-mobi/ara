@@ -44,7 +44,7 @@ type XMLMonitoredStopVisit struct {
 	// Attributes
 
 	delay                       string
-	vehicleAtStop               string
+	vehicleAtStop               Bool
 	actualQuayName              string
 	aimedHeadwayInterval        string
 	arrivalPlatformName         string
@@ -103,7 +103,7 @@ type SIRIMonitoredStopVisit struct {
 	PublishedLineName      string
 	DepartureStatus        string
 	ArrivalStatus          string
-	VehicleAtStop          string
+	VehicleAtStop          bool
 	VehicleJourneyName     string
 	StopAreaObjectId       string
 
@@ -291,11 +291,11 @@ func (visit *XMLMonitoredStopVisit) RecordedAt() time.Time {
 	return visit.recordedAt
 }
 
-func (visit *XMLMonitoredStopVisit) VehicleAtStop() string {
-	if visit.vehicleAtStop == "" {
-		visit.vehicleAtStop = visit.findStringChildContent("VehicleAtStop")
+func (visit *XMLMonitoredStopVisit) VehicleAtStop() bool {
+	if !visit.vehicleAtStop.Defined {
+		visit.vehicleAtStop.Parse(visit.findStringChildContent("VehicleAtStop"))
 	}
-	return visit.vehicleAtStop
+	return visit.vehicleAtStop.Value
 }
 
 func (visit *XMLMonitoredStopVisit) Order() int {
