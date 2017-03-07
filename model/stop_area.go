@@ -8,17 +8,19 @@ import (
 type StopAreaId string
 
 type StopAreaAttributes struct {
-	ObjectId ObjectID
-	Name     string
+	ObjectId        ObjectID
+	Name            string
+	MonitoredAlways bool
 }
 
 type StopArea struct {
 	ObjectIDConsumer
 	model Model
 
-	id          StopAreaId
-	requestedAt time.Time
-	updatedAt   time.Time
+	id              StopAreaId
+	requestedAt     time.Time
+	updatedAt       time.Time
+	MonitoredAlways bool
 
 	Name       string
 	Attributes map[string]string
@@ -28,9 +30,10 @@ type StopArea struct {
 
 func NewStopArea(model Model) *StopArea {
 	stopArea := &StopArea{
-		model:      model,
-		Attributes: make(map[string]string),
-		References: make(map[string]Reference),
+		model:           model,
+		Attributes:      make(map[string]string),
+		References:      make(map[string]Reference),
+		MonitoredAlways: true,
 	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
@@ -58,10 +61,11 @@ func (stopArea *StopArea) Updated(updateTime time.Time) {
 
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	stopAreaMap := map[string]interface{}{
-		"Id":         stopArea.id,
-		"Name":       stopArea.Name,
-		"Attributes": stopArea.Attributes,
-		"References": stopArea.References,
+		"Id":              stopArea.id,
+		"Name":            stopArea.Name,
+		"Attributes":      stopArea.Attributes,
+		"References":      stopArea.References,
+		"MonitoredAlways": stopArea.MonitoredAlways,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt

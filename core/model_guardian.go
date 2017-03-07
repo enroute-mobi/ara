@@ -59,6 +59,10 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	logger.Log.Debugf("Check StopAreas status")
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
+		if !stopArea.MonitoredAlways {
+			continue
+		}
+
 		stopAreaTx := guardian.referential.NewTransaction()
 		defer stopAreaTx.Close()
 		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
