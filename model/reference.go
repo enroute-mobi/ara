@@ -24,6 +24,8 @@ func (reference *Reference) Getformat(ref, value string) string {
 	allRef["PlaceRef"] = "StopPoint"
 	allRef["OriginRef"] = "StopPoint"
 	allRef["DestinationRef"] = "StopPoint"
+	allRef["JourneyPatternRef"] = "JourneyPattern"
+	allRef["RouteRef"] = "Route"
 
 	formated := "RATPDev:" + allRef[ref] + ":Q:" + value + ":LOC"
 	return formated
