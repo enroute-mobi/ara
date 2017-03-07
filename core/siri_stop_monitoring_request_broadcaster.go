@@ -69,10 +69,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			StopPointName:  stopArea.Name,
 
 			VehicleJourneyName:    vehicleJourney.Name,
-			LineRef:               string(LineObjectId.Value()),
+			LineRef:               LineObjectId.Value(),
 			DataFrameRef:          connector.Clock().Now(),
 			RecordedAt:            stopVisit.RecordedAt,
-			PublishedLineName:     string(line.Name),
+			PublishedLineName:     line.Name,
 			DepartureStatus:       string(stopVisit.DepartureStatus),
 			ArrivalStatus:         string(stopVisit.ArrivalStatus),
 			Order:                 stopVisit.PassageOrder,
