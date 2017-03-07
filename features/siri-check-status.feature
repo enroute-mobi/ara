@@ -20,7 +20,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request>
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>test</ns2:RequestorRef>
-        <ns2:MessageIdentifier>Edwig:Message::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:MessageIdentifier>
+        <ns2:MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:MessageIdentifier>
       </Request>
       <RequestExtension />
     </ns7:CheckStatus>
@@ -44,8 +44,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <ns2:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns2:ResponseTimestamp>
         <ns2:ProducerRef>Edwig</ns2:ProducerRef>
         <ns2:Address></ns2:Address>
-        <ns2:ResponseMessageIdentifier>Edwig:Message::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns2:ResponseMessageIdentifier>
-        <ns2:RequestMessageRef>Edwig:Message::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:RequestMessageRef>
+        <ns2:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns2:ResponseMessageIdentifier>
+        <ns2:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:RequestMessageRef>
       </CheckStatusAnswerInfo>
       <Answer>
         <ns2:Status>true</ns2:Status>
@@ -73,7 +73,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request>
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>invalid</ns2:RequestorRef>
-        <ns2:MessageIdentifier>Edwig:Message::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:MessageIdentifier>
+        <ns2:MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:MessageIdentifier>
       </Request>
       <RequestExtension />
     </ns7:CheckStatus>

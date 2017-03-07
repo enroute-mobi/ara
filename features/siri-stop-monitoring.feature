@@ -165,7 +165,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>Edwig</ns3:ProducerRef>
         <ns3:Address></ns3:Address>
-        <ns3:ResponseMessageIdentifier>Edwig:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
@@ -181,7 +181,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:LineRef></ns3:LineRef>
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:FramedVehicleJourneyRef>
-                <ns3:DataFrameRef>2017-01-01</ns3:DataFrameRef>
+                <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef/>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
@@ -249,7 +249,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>Edwig</ns3:ProducerRef>
         <ns3:Address/>
-        <ns3:ResponseMessageIdentifier>Edwig:Message::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
@@ -352,8 +352,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                            | StopArea#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                                     | Line#ObjectID                                         |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                 | VehicleJourney#Attribute[DirectionRef]                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | 2017-01-01                                                            | Model#Date                                            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                             | VehicleJourney#ObjectID                               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                     | Model#Date                                            |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                             | TODO VehicleJourney#ObjectID                          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern:Q:775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                                  | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                                   | VehicleJourney#Attribute[VehicleMode]                 |
