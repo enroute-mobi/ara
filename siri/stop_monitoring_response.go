@@ -113,7 +113,7 @@ type SIRIMonitoredStopVisit struct {
 	ExpectedArrivalTime time.Time
 	ActualArrivalTime   time.Time
 
-	DataFrameRef          time.Time
+	DataFrameRef          string
 	RecordedAt            time.Time
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
@@ -161,7 +161,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
 					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>{{ .DataFrameRef.Format "2006-01-02" }}</ns3:DataFrameRef>
+						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>{{ if .References.VehicleJourney.JourneyPatternRef }}
 					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{end}}

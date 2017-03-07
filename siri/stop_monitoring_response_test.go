@@ -224,7 +224,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		VehicleAtStop:          true,
 		Order:                  1,
 		RecordedAt:             time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
-		DataFrameRef:           time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		DataFrameRef:           "2016-09-21",
 		AimedArrivalTime:       time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ExpectedArrivalTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ActualArrivalTime:     time.Date(2018, time.September, 21, 20, 14, 46, 0, time.UTC),

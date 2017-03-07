@@ -61,6 +61,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		vehicleJourney := stopVisit.VehicleJourney()
 		line := vehicleJourney.Line()
 
+		modelDate := tx.Model().Date()
+
 		LineObjectId, _ := line.ObjectID(objectidKind)
 
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
@@ -70,7 +72,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 			VehicleJourneyName:    vehicleJourney.Name,
 			LineRef:               LineObjectId.Value(),
-			DataFrameRef:          connector.Clock().Now(),
+			DataFrameRef:          modelDate.String(),
 			RecordedAt:            stopVisit.RecordedAt,
 			PublishedLineName:     line.Name,
 			DepartureStatus:       string(stopVisit.DepartureStatus),
