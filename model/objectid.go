@@ -1,6 +1,10 @@
 package model
 
-import "encoding/json"
+import (
+	"crypto/sha1"
+	"encoding/json"
+	"fmt"
+)
 
 type ObjectIDs map[string]ObjectID
 
@@ -55,6 +59,12 @@ func (objectid ObjectID) Kind() string {
 
 func (objectid ObjectID) Value() string {
 	return objectid.value
+}
+
+func (objectid ObjectID) HashValue() string {
+	hasher := sha1.New() // oui, on sait
+	hasher.Write([]byte(objectid.Value()))
+	return fmt.Sprintf("%x", hasher.Sum(nil))
 }
 
 func (objectid *ObjectID) SetValue(toset string) {
