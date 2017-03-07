@@ -37,9 +37,9 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
 }
 
-func (vehicleJourney *VehicleJourney) Line() Line {
+func (vehicleJourney *VehicleJourney) Line() *Line {
 	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
-	return line
+	return &line
 }
 
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {

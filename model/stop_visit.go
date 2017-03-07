@@ -61,9 +61,9 @@ func (stopVisit *StopVisit) StopArea() StopArea {
 	return stopArea
 }
 
-func (stopVisit *StopVisit) VehicleJourney() VehicleJourney {
+func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
-	return vehicleJourney
+	return &vehicleJourney
 }
 
 /* type ResponseInterface map[string]interface{}
