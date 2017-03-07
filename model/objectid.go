@@ -12,7 +12,11 @@ func NewObjectIDsFromMap(objectIdMap map[string]string) (objectids ObjectIDs) {
 	return objectids
 }
 
-/*func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
+func (identifiers ObjectIDs) Empty() bool {
+	return len(identifiers) == 0
+}
+
+func (identifiers ObjectIDs) UnmarshalJSON(text []byte) error {
 	var definitions map[string]string
 	if err := json.Unmarshal(text, &definitions); err != nil {
 		return err
@@ -21,7 +25,17 @@ func NewObjectIDsFromMap(objectIdMap map[string]string) (objectids ObjectIDs) {
 		identifiers[key] = NewObjectID(key, value)
 	}
 	return nil
-} */
+}
+
+func (identifiers ObjectIDs) MarshalJSON() ([]byte, error) {
+	aux := map[string]string{}
+
+	for kind, objectid := range identifiers {
+		aux[kind] = objectid.Value()
+	}
+
+	return json.Marshal(aux)
+}
 
 type ObjectID struct {
 	kind  string
@@ -48,7 +62,7 @@ func (objectid *ObjectID) SetValue(toset string) {
 }
 
 func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	return json.Marshal(map[string]string{
 		objectid.kind: objectid.value,
 	})
 }
@@ -87,11 +101,8 @@ func (consumer *ObjectIDConsumer) SetObjectID(objectid ObjectID) {
 	consumer.objectids[objectid.Kind()] = objectid
 }
 
-func (consumer *ObjectIDConsumer) ObjectIDs() (objectidArray []ObjectID) {
-	for _, objectid := range consumer.objectids {
-		objectidArray = append(objectidArray, objectid)
-	}
-	return
+func (consumer *ObjectIDConsumer) ObjectIDs() ObjectIDs {
+	return consumer.objectids
 }
 
 func (consumer *ObjectIDConsumer) ObjectIDsResponse() map[string]string {

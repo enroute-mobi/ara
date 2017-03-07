@@ -16,7 +16,7 @@ Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
 	objectidkind = attributes["ObjectIDs"].keys.first
   objectid_value = attributes["ObjectIDs"][objectidkind]
 
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"].find{|o| o[objectidkind] == objectid_value }}
+  expectedAttr = responseArray.find{|a| a["ObjectIDs"][objectidkind] == objectid_value }
 
   expect(expectedAttr).not_to be_nil
 end

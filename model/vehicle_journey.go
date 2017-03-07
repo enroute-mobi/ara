@@ -56,7 +56,7 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		"References": vehicleJourney.References,
 	}
 
-	if vehicleJourney.ObjectIDs() != nil {
+	if !vehicleJourney.ObjectIDs().Empty() {
 		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
 	}
 	return json.Marshal(vehicleJourneyMap)

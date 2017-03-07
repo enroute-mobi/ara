@@ -42,7 +42,7 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 		"Attributes": line.Attributes,
 		"References": line.References,
 	}
-	if line.ObjectIDs() != nil {
+	if !line.ObjectIDs().Empty() {
 		lineMap["ObjectIDs"] = line.ObjectIDs()
 	}
 	return json.Marshal(lineMap)

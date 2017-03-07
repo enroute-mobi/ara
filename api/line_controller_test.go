@@ -124,7 +124,7 @@ func Test_LineController_Create(t *testing.T) {
 		t.Errorf("Line should be found after POST request")
 	}
 	lineMarshal, _ := line.MarshalJSON()
-	expected := `{"Attributes":{},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"","ObjectIDs":[{"reflex":"FR:77491:ZDE:34004:STIF"}],"References":{"JourneyPattern":{"ObjectId":{"lol":"lel"},"Id":"42"}}}`
+	expected := `{"Attributes":{},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"","ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"ObjectId":{"lol":"lel"},"Id":"42"}}}`
 	if responseRecorder.Body.String() != string(expected) && string(lineMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

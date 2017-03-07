@@ -105,8 +105,8 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"Attributes":       stopVisit.Attributes,
 		"References":       stopVisit.References,
 	}
-	if stopVisit.ObjectIDs() != nil {
-		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDsResponse()
+	if !stopVisit.ObjectIDs().Empty() {
+		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
 	}
 	return json.Marshal(stopVisitMap)
 }

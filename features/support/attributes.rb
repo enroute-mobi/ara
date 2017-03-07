@@ -61,12 +61,19 @@ def model_attributes(table)
 end
 
 def api_attributes(json)
-  attributes = JSON.parse(json)
+  JSON.parse(json)
+  # puts json.inspect
+  # attributes = (String === json ? JSON.parse(json) : json)
+  # puts attributes.inspect
 
-  objectids = attributes["ObjectIDs"]
-  if Array === objectids
-    attributes["ObjectIDs"] = Hash[objectids.map { |objectid| [objectid["Kind"], objectid["Value"]] }]
-  end
+  # if Array === attributes
+  #   return attributes.map { |item_attributes| api_attributes(item_attributes) }
+  # end
 
-  attributes
+  # objectids = attributes["ObjectIDs"]
+  # if Array === objectids
+  #   attributes["ObjectIDs"] = Hash[objectids.map { |objectid| [objectid["Kind"], objectid["Value"]] }]
+  # end
+
+  # attributes
 end

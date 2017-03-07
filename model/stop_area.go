@@ -69,7 +69,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	if !stopArea.updatedAt.IsZero() {
 		stopAreaMap["UpdatedAt"] = stopArea.updatedAt
 	}
-	if stopArea.ObjectIDs() != nil {
+	if !stopArea.ObjectIDs().Empty() {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
 	}
 	return json.Marshal(stopAreaMap)
