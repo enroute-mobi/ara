@@ -78,14 +78,20 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() map[string]model.Reference {
 	refMap := make(map[string]model.Reference)
 
-	objId := model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef())
-	refMap["PlaceRef"] = model.Reference{ObjectId: &objId, Id: ""}
+	if attributes.response.PlaceRef() != "" {
+		placeRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef())
+		refMap["PlaceRef"] = model.Reference{ObjectId: &placeRefObjId, Id: ""}
+	}
 
-	objId = model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef())
-	refMap["OriginRef"] = model.Reference{ObjectId: &objId, Id: ""}
+	if attributes.response.OriginRef() != "" {
+		originRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef())
+		refMap["OriginRef"] = model.Reference{ObjectId: &originRefObjId, Id: ""}
+	}
 
-	objId = model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef())
-	refMap["DestinationRef"] = model.Reference{ObjectId: &objId, Id: ""}
+	if attributes.response.DestinationRef() != "" {
+		destinationRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef())
+		refMap["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: ""}
+	}
 
 	return refMap
 }
