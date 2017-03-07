@@ -10,7 +10,7 @@ type MessageIdentifierGenerator interface {
 	NewMessageIdentifier() string
 }
 
-var defaultMessageIdentifierGenerator MessageIdentifierGenerator = NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+var defaultMessageIdentifierGenerator MessageIdentifierGenerator = NewFormatMessageIdentifierGenerator("RATPDev:ResponseMessage::%s:LOC")
 
 func DefaultMessageIdentifierGenerator() MessageIdentifierGenerator {
 	return defaultMessageIdentifierGenerator
