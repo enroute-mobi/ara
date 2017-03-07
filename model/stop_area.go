@@ -20,6 +20,7 @@ type StopArea struct {
 	id              StopAreaId
 	requestedAt     time.Time
 	updatedAt       time.Time
+	MonitoredUntil  time.Time
 	MonitoredAlways bool
 
 	Name       string
@@ -66,6 +67,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		"Attributes":      stopArea.Attributes,
 		"References":      stopArea.References,
 		"MonitoredAlways": stopArea.MonitoredAlways,
+		"MonitoredUntil":  stopArea.MonitoredUntil,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
