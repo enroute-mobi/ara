@@ -70,7 +70,13 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 		schedules := stopVisit.Schedules
 		vehicleJourney := stopVisit.VehicleJourney()
+		if vehicleJourney == nil {
+			continue
+		}
 		line := vehicleJourney.Line()
+		if line == nil {
+			continue
+		}
 
 		modelDate := tx.Model().Date()
 
