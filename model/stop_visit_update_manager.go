@@ -105,6 +105,7 @@ func (updater *StopVisitUpdater) resolveVehiculeJourneyReferences(foundVehicleJo
 			if ok {
 				reference := foundVehicleJourney.References[ref]
 				reference.Id = string(foundStopArea.Id())
+				foundVehicleJourney.References[ref] = reference
 			}
 		}
 	}
