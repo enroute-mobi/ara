@@ -19,8 +19,6 @@ def save_siri_exchange(request, response)
   @siri_timestamp ||= Time.now.strftime("%Y%m%d%H%M%S")
   @siri_message_id += 1
 
-  puts response
-
   [ [ :request, request ], [ :response, response ] ].each do |type, content|
     file = "log/siri-exchange-#{@siri_timestamp}-#{@siri_message_id}-#{type}"
     File.write file, content
