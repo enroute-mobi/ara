@@ -6,6 +6,9 @@ def model_attributes(table)
     when /\A\d+\Z/
       # Convert integer
       attributes[key] = value.to_i
+    when /\A(true|false)\Z/
+      # Convert boolean
+      attributes[key] = (value == "true")
     end
 
     # Transform

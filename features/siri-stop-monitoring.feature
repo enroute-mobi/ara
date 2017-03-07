@@ -118,7 +118,7 @@ Feature: Support SIRI StopMonitoring
       | PassageOrder     | 4                                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
-      | VehicleAtStop    | TRUE                                                                 |
+      | VehicleAtStop    | true                                                                 |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -189,7 +189,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
-                <ns3:VehicleAtStop>TRUE</ns3:VehicleAtStop>
+                <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
                 <ns3:ArrivalStatus></ns3:ArrivalStatus>
                 <ns3:DepartureStatus></ns3:DepartureStatus>
               </ns3:MonitoredCall>
@@ -343,7 +343,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
       | Attribute[NumberOfStopsAway]         | 1                                                                    |
       | Attribute[PlatformTraversal]         | false                                                                |
-      | Attribute[VehicleAtStop]             | true                                                                 |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |

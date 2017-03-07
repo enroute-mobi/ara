@@ -36,6 +36,6 @@ type StopVisitUpdateEvent struct {
 	Schedules         StopVisitSchedules
 	DepartureStatus   StopVisitDepartureStatus
 	ArrivalStatuts    StopVisitArrivalStatus
-	VehicleAtStop     string
+	VehicleAtStop     bool
 	Attributes        StopVisitUpdateAttributes
 }
