@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -38,6 +39,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		return nil, fmt.Errorf("StopArea not found")
 	}
 
+	if stopArea.MonitoredAlways == false {
+		stopArea.MonitoredUntil = connector.Clock().Now().Add(time.Duration(15) * time.Minute)
+	}
+
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -53,7 +58,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
-
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
 		var itemIdentifier string

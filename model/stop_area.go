@@ -67,7 +67,6 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		"Attributes":      stopArea.Attributes,
 		"References":      stopArea.References,
 		"MonitoredAlways": stopArea.MonitoredAlways,
-		"MonitoredUntil":  stopArea.MonitoredUntil,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
@@ -77,6 +76,9 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	}
 	if !stopArea.ObjectIDs().Empty() {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
+	}
+	if stopAreaMap["MonitoredAlways"] == false {
+		stopAreaMap["MonitoredUntil"] = stopArea.MonitoredUntil
 	}
 	return json.Marshal(stopAreaMap)
 }
