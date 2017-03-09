@@ -601,14 +601,14 @@ func (visit *XMLMonitoredStopVisit) JourneyPatternRef() string {
 	if visit.journeyPatternRef == "" {
 		visit.journeyPatternRef = visit.findStringChildContent("JourneyPatternRef")
 	}
-	return visit.destinationRef
+	return visit.journeyPatternRef
 }
 
 func (visit *XMLMonitoredStopVisit) RouteRef() string {
 	if visit.routeRef == "" {
 		visit.routeRef = visit.findStringChildContent("RouteRef")
 	}
-	return visit.destinationRef
+	return visit.routeRef
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
