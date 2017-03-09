@@ -146,7 +146,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) reformatVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
-	toReformat := []string{"RouteRef", "JourneyPatternRef"}
+	toReformat := []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"}
 
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {

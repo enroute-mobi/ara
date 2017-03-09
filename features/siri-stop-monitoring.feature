@@ -182,7 +182,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef/>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
               <ns3:OperatorRef>TBD</ns3:OperatorRef>

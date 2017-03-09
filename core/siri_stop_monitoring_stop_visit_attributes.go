@@ -73,6 +73,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	tmpattrMap["VehicleMode"] = attributes.response.VehicleMode()
 	tmpattrMap["ViaPlaceName"] = attributes.response.ViaPlaceName()
 	tmpattrMap["VehicleJourneyName"] = attributes.response.VehicleJourneyName()
+	tmpattrMap["VehicleJourneyName"] = attributes.response.VehicleJourneyName()
 
 	for key, value := range tmpattrMap {
 		if value != "" {
@@ -109,6 +110,11 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() 
 	if attributes.response.RouteRef() != "" {
 		routeRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef())
 		refMap["RouteRef"] = model.Reference{ObjectId: &routeRefObjId, Id: ""}
+	}
+
+	if attributes.response.DatedVehicleJourneyRef() != "" {
+		datedVehicleJourneyRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
+		refMap["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: ""}
 	}
 
 	return refMap

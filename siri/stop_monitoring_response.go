@@ -163,8 +163,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{ if .VehicleJourneyName }}
 					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>{{ end }}
 					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
+						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>{{ if .References.VehicleJourney.DatedVehicleJourneyRef }}
+						<ns3:DatedVehicleJourneyRef>{{ .References.VehicleJourney.DatedVehicleJourneyRef.ObjectId.Value	 }}</ns3:DatedVehicleJourneyRef>{{ end }}
 					</ns3:FramedVehicleJourneyRef>{{ if .References.VehicleJourney.JourneyPatternRef }}
 					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{end}}
 					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
