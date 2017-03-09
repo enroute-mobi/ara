@@ -459,7 +459,7 @@ func (visit *XMLMonitoredStopVisit) HeadwayService() string {
 	if visit.headwayService == "" {
 		visit.headwayService = visit.findStringChildContent("HeadwayService")
 	}
-	return visit.directionRef
+	return visit.headwayService
 }
 
 func (visit *XMLMonitoredStopVisit) FirstOrLastJourney() string {
@@ -536,7 +536,7 @@ func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
 	if visit.serviceFeatureRef == "" {
 		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
 	}
-	return visit.monitored
+	return visit.serviceFeatureRef
 }
 
 func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
