@@ -69,6 +69,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
 	stopVisit.VehicleAtStop = stopVisitAttributes.VehicleAtStop
 	stopVisit.RecordedAt = stopVisitAttributes.RecordedAt
+
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.SetObjectID(NewObjectID("_default", stopVisitAttributes.ObjectId.HashValue()))
 	stopVisit.Schedules = stopVisitAttributes.Schedules

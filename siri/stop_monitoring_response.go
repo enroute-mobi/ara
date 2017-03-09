@@ -78,6 +78,8 @@ type XMLMonitoredStopVisit struct {
 	originRef                   string
 	placeRef                    string
 	destinationRef              string
+	journeyPatternRef           string
+	routeRef                    string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -591,6 +593,20 @@ func (visit *XMLMonitoredStopVisit) PlaceRef() string {
 func (visit *XMLMonitoredStopVisit) DestinationRef() string {
 	if visit.destinationRef == "" {
 		visit.destinationRef = visit.findStringChildContent("DestinationRef")
+	}
+	return visit.destinationRef
+}
+
+func (visit *XMLMonitoredStopVisit) JourneyPatternRef() string {
+	if visit.journeyPatternRef == "" {
+		visit.journeyPatternRef = visit.findStringChildContent("JourneyPatternRef")
+	}
+	return visit.destinationRef
+}
+
+func (visit *XMLMonitoredStopVisit) RouteRef() string {
+	if visit.routeRef == "" {
+		visit.routeRef = visit.findStringChildContent("RouteRef")
 	}
 	return visit.destinationRef
 }

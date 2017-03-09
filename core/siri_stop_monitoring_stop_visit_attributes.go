@@ -29,6 +29,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 
 		VehicleJourneyObjectId: vehicleJourneyObjectId,
 		PassageOrder:           attributes.response.Order(),
+		RecordedAt:             attributes.response.RecordedAt(),
 
 		DepartureStatus: model.StopVisitDepartureStatus(attributes.response.DepartureStatus()),
 		ArrivalStatus:   model.StopVisitArrivalStatus(attributes.response.ArrivalStatus()),
@@ -49,28 +50,35 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 
 func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() map[string]string {
 	attrMap := make(map[string]string)
+	tmpattrMap := make(map[string]string)
 
-	attrMap["Delay"] = attributes.response.Delay()
-	attrMap["DirectionName"] = attributes.response.DirectionName()
-	attrMap["DestinationName"] = attributes.response.DestinationName()
-	attrMap["DirectionRef"] = attributes.response.DirectionRef()
-	attrMap["FirstOrLastJourney"] = attributes.response.FirstOrLastJourney()
-	attrMap["HeadwayService"] = attributes.response.HeadwayService()
-	attrMap["JourneyNote"] = attributes.response.JourneyNote()
-	attrMap["JourneyPatternName"] = attributes.response.JourneyPatternName()
-	attrMap["Monitored"] = attributes.response.Monitored()
-	attrMap["MonitoringError"] = attributes.response.MonitoringError()
-	attrMap["Occupancy"] = attributes.response.Occupancy()
-	attrMap["OriginAimedDepartureTime"] = attributes.response.OriginAimedDepartureTime()
-	attrMap["DestinationAimedArrivalTime"] = attributes.response.DestinationAimedArrivalTime()
-	attrMap["OriginName"] = attributes.response.OriginName()
-	attrMap["ProductCategoryRef"] = attributes.response.ProductCategoryRef()
-	attrMap["ServiceFeatureRef"] = attributes.response.ServiceFeatureRef()
-	attrMap["TrainNumberRef"] = attributes.response.TrainNumberRef()
-	attrMap["VehicleFeature"] = attributes.response.VehicleFeature()
-	attrMap["VehicleMode"] = attributes.response.VehicleMode()
-	attrMap["ViaPlaceName"] = attributes.response.ViaPlaceName()
-	attrMap["VehicleJourneyName"] = attributes.response.VehicleJourneyName()
+	tmpattrMap["Delay"] = attributes.response.Delay()
+	tmpattrMap["DirectionName"] = attributes.response.DirectionName()
+	tmpattrMap["DestinationName"] = attributes.response.DestinationName()
+	tmpattrMap["DirectionRef"] = attributes.response.DirectionRef()
+	tmpattrMap["FirstOrLastJourney"] = attributes.response.FirstOrLastJourney()
+	tmpattrMap["HeadwayService"] = attributes.response.HeadwayService()
+	tmpattrMap["JourneyNote"] = attributes.response.JourneyNote()
+	tmpattrMap["JourneyPatternName"] = attributes.response.JourneyPatternName()
+	tmpattrMap["Monitored"] = attributes.response.Monitored()
+	tmpattrMap["MonitoringError"] = attributes.response.MonitoringError()
+	tmpattrMap["Occupancy"] = attributes.response.Occupancy()
+	tmpattrMap["OriginAimedDepartureTime"] = attributes.response.OriginAimedDepartureTime()
+	tmpattrMap["DestinationAimedArrivalTime"] = attributes.response.DestinationAimedArrivalTime()
+	tmpattrMap["OriginName"] = attributes.response.OriginName()
+	tmpattrMap["ProductCategoryRef"] = attributes.response.ProductCategoryRef()
+	tmpattrMap["ServiceFeatureRef"] = attributes.response.ServiceFeatureRef()
+	tmpattrMap["TrainNumberRef"] = attributes.response.TrainNumberRef()
+	tmpattrMap["VehicleFeature"] = attributes.response.VehicleFeature()
+	tmpattrMap["VehicleMode"] = attributes.response.VehicleMode()
+	tmpattrMap["ViaPlaceName"] = attributes.response.ViaPlaceName()
+	tmpattrMap["VehicleJourneyName"] = attributes.response.VehicleJourneyName()
+
+	for key, value := range tmpattrMap {
+		if value != "" {
+			attrMap[key] = value
+		}
+	}
 
 	return attrMap
 }
@@ -93,24 +101,41 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() 
 		refMap["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: ""}
 	}
 
+	if attributes.response.JourneyPatternRef() != "" {
+		journeyPatternRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.JourneyPatternRef())
+		refMap["JourneyPatternRef"] = model.Reference{ObjectId: &journeyPatternRefObjId, Id: ""}
+	}
+
+	if attributes.response.RouteRef() != "" {
+		routeRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef())
+		refMap["RouteRef"] = model.Reference{ObjectId: &routeRefObjId, Id: ""}
+	}
+
 	return refMap
 }
 
 func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() map[string]string {
 	attrMap := make(map[string]string)
+	tmpattrMap := make(map[string]string)
 
-	attrMap["Delay"] = attributes.response.Delay()
-	attrMap["ActualQuayName"] = attributes.response.ActualQuayName()
-	attrMap["AimedHeadwayInterval"] = attributes.response.AimedHeadwayInterval()
-	attrMap["ArrivalPlatformName"] = attributes.response.ArrivalPlatformName()
-	attrMap["ArrivalProximyTest"] = attributes.response.ArrivalProximyTest()
-	attrMap["DepartureBoardingActivity"] = attributes.response.DepartureBoardingActivity()
-	attrMap["DeparturePlatformName"] = attributes.response.DeparturePlatformName()
-	attrMap["DestinationDisplay"] = attributes.response.DestinationDisplay()
-	attrMap["DistanceFromStop"] = attributes.response.DistanceFromStop()
-	attrMap["ExpectedHeadwayInterval"] = attributes.response.ExpectedHeadwayInterval()
-	attrMap["NumberOfStopsAway"] = attributes.response.NumberOfStopsAway()
-	attrMap["PlatformTraversal"] = attributes.response.PlatformTraversal()
+	tmpattrMap["Delay"] = attributes.response.Delay()
+	tmpattrMap["ActualQuayName"] = attributes.response.ActualQuayName()
+	tmpattrMap["AimedHeadwayInterval"] = attributes.response.AimedHeadwayInterval()
+	tmpattrMap["ArrivalPlatformName"] = attributes.response.ArrivalPlatformName()
+	tmpattrMap["ArrivalProximyTest"] = attributes.response.ArrivalProximyTest()
+	tmpattrMap["DepartureBoardingActivity"] = attributes.response.DepartureBoardingActivity()
+	tmpattrMap["DeparturePlatformName"] = attributes.response.DeparturePlatformName()
+	tmpattrMap["DestinationDisplay"] = attributes.response.DestinationDisplay()
+	tmpattrMap["DistanceFromStop"] = attributes.response.DistanceFromStop()
+	tmpattrMap["ExpectedHeadwayInterval"] = attributes.response.ExpectedHeadwayInterval()
+	tmpattrMap["NumberOfStopsAway"] = attributes.response.NumberOfStopsAway()
+	tmpattrMap["PlatformTraversal"] = attributes.response.PlatformTraversal()
+
+	for key, value := range tmpattrMap {
+		if value != "" {
+			attrMap[key] = value
+		}
+	}
 
 	return attrMap
 }
