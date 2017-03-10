@@ -112,9 +112,17 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 		connector.reformatVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 
+		if obj, ok := vehicleJourney.ObjectID(connector.Partner().Setting("remote_objectid_kind")); !ok {
+			tmpVehicleRef := vehicleJourney.References["DatedVehicleJourneyRef"]
+			tmpobj, _ := vehicleJourney.ObjectID("_default")
+			tmpVehicleRef.ObjectId = &tmpobj
+		} else {
+			tmp := vehicleJourney.References["DatedVehicleJourneyRef"]
+			tmp.ObjectId = &obj
+		}
+
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
