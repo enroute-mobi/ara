@@ -2,7 +2,6 @@ package core
 
 import (
 	"time"
-	"os"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"

@@ -1,5 +1,7 @@
 Feature: Manage Reload Model
 
+
+@wip
 Scenario: Referential reloads Model at configured time
     Given a Referential "test" exists with the following settings:
         | model.reload_at | 01:00 |
