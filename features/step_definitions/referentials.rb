@@ -7,7 +7,18 @@ def referential_path(id)
 end
 
 Given(/^a Referential "([^"]+)" exists$/) do |referential|
-  RestClient.post referentials_path, "{\"slug\":\"#{referential}\"}", {content_type: :json}
+  attributes = {
+    slug: referential
+  }
+  RestClient.post referentials_path, attributes.to_json, {content_type: :json}
+end
+
+Given(/^a Referential "([^"]*)" exists with the following settings:$/) do |referential, settings|
+  attributes = {
+    slug: referential
+  }
+  attributes[:settings] = settings.rows_hash if settings
+  RestClient.post referentials_path, attributes.to_json, {content_type: :json}
 end
 
 When(/^a Referential "([^"]+)" is created$/) do |referential|

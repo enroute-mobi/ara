@@ -42,10 +42,12 @@ Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) d
 end
 
 
-Then(/^a Line "([^"]+)":"([^"]+)" should (not )?exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
+Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get lines_path(referential: referential)
   responseArray = JSON.parse(response.body)
   expectedLine = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+
+  puts expectedLine
 
   if condition.nil?
     expect(expectedLine).not_to be_nil

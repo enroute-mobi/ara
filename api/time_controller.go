@@ -48,7 +48,7 @@ func (controller *TimeController) serve(response http.ResponseWriter, request *h
 }
 
 func (controller *TimeController) get(response http.ResponseWriter) {
-	responseTime := controller.server.Clock().Now().Format(`{ "time": 2006-01-02T15:04:05.000Z07:00 }`)
+	responseTime := controller.server.Clock().Now().Format(`{ "time": "2006-01-02T15:04:05.000Z07:00" }`)
 	response.Write([]byte(responseTime))
 }
 
