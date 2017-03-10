@@ -188,6 +188,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
+                <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
                 <ns3:ArrivalStatus></ns3:ArrivalStatus>
                 <ns3:DepartureStatus></ns3:DepartureStatus>

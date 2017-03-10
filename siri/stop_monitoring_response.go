@@ -174,7 +174,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:RouteRef>{{.References.VehicleJourney.RouteRef.ObjectId.Value }}</ns3:RouteRef>{{end}}
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
-						<ns3:Order>{{ .Order }}</ns3:Order>
+						<ns3:Order>{{ .Order }}</ns3:Order>{{ if .StopPointName }}
+						<ns3:StopPointName>{{ .StopPointName }}</ns3:StopPointName>{{ end }}
 						<ns3:VehicleAtStop>{{ .VehicleAtStop }}</ns3:VehicleAtStop>{{ if not .AimedArrivalTime.IsZero }}
 						<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
 						<ns3:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedArrivalTime>{{ end }}{{ if not .ActualArrivalTime.IsZero }}

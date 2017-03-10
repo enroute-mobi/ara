@@ -196,6 +196,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
+						<ns3:StopPointName>stopPointName</ns3:StopPointName>
 						<ns3:VehicleAtStop>true</ns3:VehicleAtStop>
 						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
