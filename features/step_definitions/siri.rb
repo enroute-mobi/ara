@@ -12,15 +12,12 @@ def send_siri_request(request, attributes = {})
   @last_siri_response = response.body
 end
 
-Before do
-  @siri_message_id ||= 0
-  @siri_message_id += 1
-end
-
 def save_siri_messages(messages = {})
   return unless ENV['SIRI_DEBUG']
 
   @siri_timestamp ||= Time.now.strftime("%Y%m%d%H%M%S")
+  @siri_message_id ||= 0
+  @siri_message_id += 1
 
   messages.each do |type, content|
     file = "log/siri-message-#{@siri_timestamp}-#{@siri_message_id}-#{type}"

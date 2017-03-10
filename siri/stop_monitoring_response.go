@@ -617,7 +617,7 @@ func (visit *XMLMonitoredStopVisit) OperatorRef() string {
 	if visit.operatorRef == "" {
 		visit.operatorRef = visit.findStringChildContent("OperatorRef")
 	}
-	return visit.routeRef
+	return visit.operatorRef
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
