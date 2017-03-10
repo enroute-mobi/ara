@@ -99,6 +99,9 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := 4; monitoredStopVisit.Order() != expected {
 		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.Order())
 	}
+	if expected := "NINOXE:Company:15563880:LOC"; monitoredStopVisit.OperatorRef() != expected {
+		t.Errorf("Incorrect OperatorRef for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.OperatorRef())
+	}
 	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.AimedArrivalTime().Equal(expected) {
 		t.Errorf("Incorrect AimedArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.AimedArrivalTime())
 	}
@@ -191,11 +194,12 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
-					<ns3:OperatorRef>TBD</ns3:OperatorRef>
+					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
 					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
+						<ns3:StopPointName>stopPointName</ns3:StopPointName>
 						<ns3:VehicleAtStop>true</ns3:VehicleAtStop>
 						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
@@ -234,13 +238,18 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		References: make(map[string]map[string]model.Reference),
 	}
 
-	DestinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
-	DatedVehicleJourneyRefObjId := model.NewObjectID("intenal", "vehicleJourneyRef")
+	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
+	datedVehicleJourneyRefObjId := model.NewObjectID("intenal", "vehicleJourneyRef")
+	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
+
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
-	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &DestinationRefObjId, Id: "42"}
-	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &DatedVehicleJourneyRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
+
+	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
 
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()

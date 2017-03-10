@@ -76,6 +76,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 	stopVisit.Attributes = stopVisitAttributes.Attributes
+	stopVisit.References = stopVisitAttributes.References
 	updater.tx.Model().StopVisits().Save(&stopVisit)
 }
 

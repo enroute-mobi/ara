@@ -112,13 +112,13 @@ Feature: Support SIRI StopMonitoring
       | Name      |       Passage 32                        |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
-
     And a StopVisit exists with the following attributes:
-      | ObjectIDs        | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder     | 4                                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
-      | VehicleAtStop    | true                                                                 |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -184,10 +184,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
-              <ns3:OperatorRef>TBD</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>
+                <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
                 <ns3:ArrivalStatus></ns3:ArrivalStatus>
                 <ns3:DepartureStatus></ns3:DepartureStatus>
@@ -479,12 +480,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Name      | Ligne 415                                                         |
       | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
-      | Name      | Test 1                                                                    |
+      | Name      | Arletty                                                                |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
     And a StopArea exists with the following attributes:
-      | Name            | Test 2                                                                     |
+      | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
-      | MonitoredAlways | false                                                                      |
+      | MonitoredAlways | false                                                                   |
     And a minute has passed
     And I see edwig stop_visits
     And I see edwig stop_areas
@@ -555,7 +556,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
               <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>

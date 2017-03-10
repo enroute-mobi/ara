@@ -20,6 +20,7 @@ type StopVisitAttributes struct {
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
 	Attributes      map[string]string
+	References      map[string]Reference
 }
 
 type StopVisit struct {
