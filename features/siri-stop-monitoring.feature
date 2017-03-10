@@ -552,7 +552,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef>RATPDev:VehiculeJourney::8b21b7c99b30282da085699320c1700d27ef3d8236c86236b251aab3375bca13:LOC</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::dc591bb3c5ee659216d2ae3114ee655e226a64e1:LOC</ns3:JourneyPatternRef>
+              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>
