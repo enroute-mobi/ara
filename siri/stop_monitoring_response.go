@@ -74,6 +74,7 @@ type XMLMonitoredStopVisit struct {
 	trainNumberRef              string
 	vehicleFeature              string
 	vehicleMode                 string
+	operatorRef                 string
 	viaPlaceName                string
 	originRef                   string
 	placeRef                    string
@@ -167,8 +168,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 						<ns3:DatedVehicleJourneyRef>{{ .References.VehicleJourney.DatedVehicleJourneyRef.ObjectId.Value	 }}</ns3:DatedVehicleJourneyRef>{{ end }}
 					</ns3:FramedVehicleJourneyRef>{{ if .References.VehicleJourney.JourneyPatternRef }}
 					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{end}}
-					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
-					<ns3:OperatorRef>TBD</ns3:OperatorRef>{{ if .References.VehicleJourney.OriginRef}}
+					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>{{if .References.StopVisitReferences.OperatorRef}}
+					<ns3:OperatorRef>{{.References.StopVisitReferences.OperatorRef.ObjectId.Value}}</ns3:OperatorRef>{{end}}{{ if .References.VehicleJourney.OriginRef}}
 					<ns3:OriginRef>{{.References.VehicleJourney.OriginRef.ObjectId.Value}}</ns3:OriginRef>{{end}}{{ if .References.VehicleJourney.DestinationRef}}
 					<ns3:DestinationRef>{{.References.VehicleJourney.DestinationRef.ObjectId.Value}}</ns3:DestinationRef>{{end}}{{ if .References.VehicleJourney.RouteRef}}
 					<ns3:RouteRef>{{.References.VehicleJourney.RouteRef.ObjectId.Value }}</ns3:RouteRef>{{end}}
@@ -608,6 +609,13 @@ func (visit *XMLMonitoredStopVisit) JourneyPatternRef() string {
 func (visit *XMLMonitoredStopVisit) RouteRef() string {
 	if visit.routeRef == "" {
 		visit.routeRef = visit.findStringChildContent("RouteRef")
+	}
+	return visit.routeRef
+}
+
+func (visit *XMLMonitoredStopVisit) OperatorRef() string {
+	if visit.operatorRef == "" {
+		visit.operatorRef = visit.findStringChildContent("OperatorRef")
 	}
 	return visit.routeRef
 }

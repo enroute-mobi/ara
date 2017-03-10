@@ -119,6 +119,8 @@ Feature: Support SIRI StopMonitoring
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop    | true                                                                 |
+      | Reference[OperatorRef]#ObjectID  | "internal": "CdF:Company::410:LOC" |
+
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -184,7 +186,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
-              <ns3:OperatorRef>TBD</ns3:OperatorRef>
+              <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                 <ns3:Order>4</ns3:Order>

@@ -191,7 +191,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
-					<ns3:OperatorRef>TBD</ns3:OperatorRef>
+					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
 					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
@@ -235,13 +235,18 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		References: make(map[string]map[string]model.Reference),
 	}
 
-	DestinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
-	DatedVehicleJourneyRefObjId := model.NewObjectID("intenal", "vehicleJourneyRef")
+	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
+	datedVehicleJourneyRefObjId := model.NewObjectID("intenal", "vehicleJourneyRef")
+	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
+
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
-	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &DestinationRefObjId, Id: "42"}
-	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &DatedVehicleJourneyRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
+
+	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
 
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()
