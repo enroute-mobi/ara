@@ -69,6 +69,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
 	stopVisit.VehicleAtStop = stopVisitAttributes.VehicleAtStop
 	stopVisit.RecordedAt = stopVisitAttributes.RecordedAt
+
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.SetObjectID(NewObjectID("_default", stopVisitAttributes.ObjectId.HashValue()))
 	stopVisit.Schedules = stopVisitAttributes.Schedules
@@ -139,6 +140,7 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 
 	vehicleJourney = updater.tx.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
+	vehicleJourney.SetObjectID(NewObjectID("_default", vehicleJourneyAttributes.ObjectId.HashValue()))
 	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
 	vehicleJourney.LineId = foundLine.Id()
 	vehicleJourney.Attributes = updater.event.Attributes.VehicleJourneyAttributes().Attributes

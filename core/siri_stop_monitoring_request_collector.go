@@ -100,6 +100,7 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 	if len(xmlStopVisitEvents) == 0 {
 		return
 	}
+
 	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
 		stopVisitEvent := &model.StopVisitUpdateEvent{
 			Id:                connector.NewUUID(),

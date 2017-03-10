@@ -21,13 +21,15 @@ func (reference *Reference) GetSha1() string {
 func (reference *Reference) Getformat(ref, value string) string {
 	allRef := make(map[string]string)
 
-	allRef["PlaceRef"] = "StopPoint"
-	allRef["OriginRef"] = "StopPoint"
-	allRef["DestinationRef"] = "StopPoint"
-	allRef["JourneyPatternRef"] = "JourneyPattern"
-	allRef["RouteRef"] = "Route"
+	allRef["PlaceRef"] = "StopPoint:Q:"
+	allRef["OriginRef"] = "StopPoint:Q:"
+	allRef["DestinationRef"] = "StopPoint:Q:"
+	allRef["JourneyPatternRef"] = "JourneyPattern::"
+	allRef["RouteRef"] = "Route::"
+	allRef["DatedVehicleJourneyRef"] = "VehiculeJourney::"
 
-	formated := "RATPDev:" + allRef[ref] + ":Q:" + value + ":LOC"
+	formated := fmt.Sprintf("RATPDev:%s%s:LOC", allRef[ref], value)
+
 	return formated
 }
 

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -38,6 +39,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		return nil, fmt.Errorf("StopArea not found")
 	}
 
+	if stopArea.MonitoredAlways == false {
+		stopArea.MonitoredUntil = connector.Clock().Now().Add(time.Duration(15) * time.Minute)
+	}
+
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -53,7 +58,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
-
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
 		var itemIdentifier string
@@ -108,9 +112,17 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 		connector.reformatVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 
+		if obj, ok := vehicleJourney.ObjectID(connector.Partner().Setting("remote_objectid_kind")); !ok {
+			tmpVehicleRef := vehicleJourney.References["DatedVehicleJourneyRef"]
+			tmpobj, _ := vehicleJourney.ObjectID("_default")
+			tmpVehicleRef.ObjectId = &tmpobj
+		} else {
+			tmp := vehicleJourney.References["DatedVehicleJourneyRef"]
+			tmp.ObjectId = &obj
+		}
+
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
@@ -142,7 +154,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) reformatVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
-	toReformat := []string{"RouteRef", "JourneyPatternRef"}
+	toReformat := []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"}
 
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {

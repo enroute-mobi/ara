@@ -182,7 +182,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef/>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName></ns3:PublishedLineName>
               <ns3:OperatorRef>TBD</ns3:OperatorRef>
@@ -354,11 +353,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                 | VehicleJourney#Attribute[DirectionRef]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                     | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                             | TODO VehicleJourney#ObjectID                          |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern:Q:775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC  | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                                  | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                                   | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                         | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route:Q:720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC           | VehicleJourney#Reference[RouteRef]#ObjectID           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                        | VehicleJourney#Attribute[DirectionName]               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                           | TODO                                                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                     | VehicleJourney#Attribute[ProductCategoryRef]          |
@@ -535,7 +534,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>RATPDev</ns3:ProducerRef>
         <ns3:Address>https://api.concerto.ratpdev.com/concerto/siri</ns3:Address>
-        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-10-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-e-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
@@ -544,16 +543,16 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
           <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
-            <ns3:RecordedAtTime>2017-01-01T11:59:25.000Z</ns3:RecordedAtTime>
+            <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
             <ns3:ItemIdentifier>RATPDEV:Item::4d25c8186b19a5b1993e4a401aebec7fc5e8bd15:LOC</ns3:ItemIdentifier>
             <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef>RATPDev:VehiculeJourney::8b21b7c99b30282da085699320c1700d27ef3d8236c86236b251aab3375bca13:LOC</ns3:DatedVehicleJourneyRef>
+                <ns3:DatedVehicleJourneyRef>RATPDev:VehiculeJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDEV:JourneyPattern::7fe7ad11d5099ebd6ae842b9aa41c2399e738bf83f28311e804f4e5b3f10a9d4:LOC</ns3:JourneyPatternRef>
+              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator:edwig</ns3:OperatorRef>

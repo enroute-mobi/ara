@@ -78,6 +78,8 @@ type XMLMonitoredStopVisit struct {
 	originRef                   string
 	placeRef                    string
 	destinationRef              string
+	journeyPatternRef           string
+	routeRef                    string
 }
 
 type SIRIStopMonitoringResponse struct {
@@ -158,11 +160,11 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>{{end}}{{ if .References.VehicleJourney.PlaceRef}}
 					  <ns3:PlaceRef>{{.References.VehicleJourney.PlaceRef.ObjectId.Value}}</ns3:PlaceRef>{{ end }}
 					</ns3:Via>{{ end }}
-					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
-					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>
+					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{ if .VehicleJourneyName }}
+					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>{{ end }}
 					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
+						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>{{ if .References.VehicleJourney.DatedVehicleJourneyRef }}
+						<ns3:DatedVehicleJourneyRef>{{ .References.VehicleJourney.DatedVehicleJourneyRef.ObjectId.Value	 }}</ns3:DatedVehicleJourneyRef>{{ end }}
 					</ns3:FramedVehicleJourneyRef>{{ if .References.VehicleJourney.JourneyPatternRef }}
 					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{end}}
 					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
@@ -457,7 +459,7 @@ func (visit *XMLMonitoredStopVisit) HeadwayService() string {
 	if visit.headwayService == "" {
 		visit.headwayService = visit.findStringChildContent("HeadwayService")
 	}
-	return visit.directionRef
+	return visit.headwayService
 }
 
 func (visit *XMLMonitoredStopVisit) FirstOrLastJourney() string {
@@ -534,7 +536,7 @@ func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
 	if visit.serviceFeatureRef == "" {
 		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
 	}
-	return visit.monitored
+	return visit.serviceFeatureRef
 }
 
 func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
@@ -593,6 +595,20 @@ func (visit *XMLMonitoredStopVisit) DestinationRef() string {
 		visit.destinationRef = visit.findStringChildContent("DestinationRef")
 	}
 	return visit.destinationRef
+}
+
+func (visit *XMLMonitoredStopVisit) JourneyPatternRef() string {
+	if visit.journeyPatternRef == "" {
+		visit.journeyPatternRef = visit.findStringChildContent("JourneyPatternRef")
+	}
+	return visit.journeyPatternRef
+}
+
+func (visit *XMLMonitoredStopVisit) RouteRef() string {
+	if visit.routeRef == "" {
+		visit.routeRef = visit.findStringChildContent("RouteRef")
+	}
+	return visit.routeRef
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
