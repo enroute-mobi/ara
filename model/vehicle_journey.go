@@ -62,6 +62,10 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	return json.Marshal(vehicleJourneyMap)
 }
 
+func (vehicleJourney *VehicleJourney) ToFormat() []string {
+	return []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"}
+}
+
 func (vehicleJourney *VehicleJourney) Attribute(key string) (string, bool) {
 	value, present := vehicleJourney.Attributes[key]
 	return value, present
