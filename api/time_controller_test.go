@@ -56,7 +56,7 @@ func Test_TimeController_Get(t *testing.T) {
 	timeCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected := `{ "time": 1984-04-04T00:00:00.000Z }`; responseRecorder.Body.String() != expected {
+	if expected := `{ "time": "1984-04-04T00:00:00.000Z" }`; responseRecorder.Body.String() != expected {
 		t.Errorf("Wrong body for GET response request:\n got: %v\n want: %v", responseRecorder.Body.String(), expected)
 	}
 }
@@ -70,7 +70,7 @@ func Test_TimeController_Advance(t *testing.T) {
 	timeCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected := `{ "time": 1984-04-04T00:00:01.000Z }`; responseRecorder.Body.String() != expected {
+	if expected := `{ "time": "1984-04-04T00:00:01.000Z" }`; responseRecorder.Body.String() != expected {
 		t.Errorf("Wrong body for GET response request:\n got: %v\n want: %v", responseRecorder.Body.String(), expected)
 	}
 	if expected := time.Date(1984, time.April, 4, 0, 0, 1, 0, time.UTC); !server.Clock().Now().Equal(expected) {
