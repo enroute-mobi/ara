@@ -144,7 +144,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 			<ns3:Status>true</ns3:Status>
 		</ns3:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	request := &SIRIStopMonitoringResponse{
@@ -188,7 +188,6 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 				<ns3:MonitoringRef>stopPointRef</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>
 					<ns3:LineRef>lineRef</ns3:LineRef>
-					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
 						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
@@ -196,6 +195,8 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
 					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
 					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
+					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
+					<ns3:Delay>30</ns3:Delay>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
@@ -207,13 +208,12 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 						<ns3:AimedDepartureTime>2019-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 						<ns3:ExpectedDepartureTime>2020-09-21T20:14:46.000Z</ns3:ExpectedDepartureTime>
 						<ns3:DepartureStatus>depStatus</ns3:DepartureStatus>
-						<ns3:Delay>30</ns3:Delay>
 					</ns3:MonitoredCall>
 				</ns3:MonitoredVehicleJourney>
 			</ns3:MonitoredStopVisit>
 		</ns3:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
 	siriMonitoredStopVisit := &SIRIMonitoredStopVisit{
 		ItemIdentifier:     "itemId",
@@ -245,8 +245,9 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
 	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
+	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
 
-	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
+	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
 	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: "42"}
 	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
