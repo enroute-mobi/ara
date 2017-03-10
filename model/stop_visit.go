@@ -53,6 +53,10 @@ func NewStopVisit(model Model) *StopVisit {
 	return stopVisit
 }
 
+func (stopVisit *StopVisit) ToFormat() []string {
+	return []string{"OperatorRef"}
+}
+
 func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
 }

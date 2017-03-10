@@ -110,8 +110,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			References:            make(map[string]map[string]model.Reference),
 		}
 		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
-		connector.reformatVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
-		connector.reformatStopVisitReferences(stopVisit.References)
+
+		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourney.References, tx.Model().StopAreas())
+		connector.reformatReferences(stopVisit.ToFormat(), stopVisit.References, tx.Model().StopAreas())
 
 		if obj, ok := vehicleJourney.ObjectID(connector.Partner().Setting("remote_objectid_kind")); !ok {
 			tmpVehicleRef := vehicleJourney.References["DatedVehicleJourneyRef"]
@@ -156,9 +157,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
-	toReformat := []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"}
-
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references map[string]model.Reference, manager model.StopAreas) {
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {
 			tmp := references[ref]
