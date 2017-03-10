@@ -99,6 +99,9 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := 4; monitoredStopVisit.Order() != expected {
 		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.Order())
 	}
+	if expected := "NINOXE:Company:15563880:LOC"; monitoredStopVisit.OperatorRef() != expected {
+		t.Errorf("Incorrect OperatorRef for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.OperatorRef())
+	}
 	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.AimedArrivalTime().Equal(expected) {
 		t.Errorf("Incorrect AimedArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.AimedArrivalTime())
 	}
