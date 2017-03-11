@@ -12,6 +12,11 @@ class SIRIServer
     @@servers[url] ||= SIRIServer.new(url)
   end
 
+  def self.stop
+    each(&:stop)
+    @@servers.clear
+  end
+
   attr_accessor :url, :port, :path, :requests, :responses, :started
 
   def initialize(url)
@@ -91,5 +96,5 @@ class SIRIServer
 end
 
 After do
-  SIRIServer.each(&:stop)
+  SIRIServer.stop
 end
