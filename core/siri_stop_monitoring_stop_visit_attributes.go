@@ -116,11 +116,6 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() 
 		refMap["RouteRef"] = model.Reference{ObjectId: &routeRefObjId, Id: ""}
 	}
 
-	if attributes.response.DatedVehicleJourneyRef() != "" {
-		datedVehicleJourneyRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
-		refMap["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: ""}
-	}
-
 	return refMap
 }
 
