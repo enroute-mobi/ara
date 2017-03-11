@@ -164,7 +164,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <ServiceDeliveryInfo>
         <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-        <ns3:Address></ns3:Address>
         <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>
@@ -245,7 +244,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <ServiceDeliveryInfo>
         <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
         <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-        <ns3:Address/>
         <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
         <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
       </ServiceDeliveryInfo>

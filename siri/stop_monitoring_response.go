@@ -142,8 +142,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>
-		<ns3:Address>{{ .Address }}</ns3:Address>
+		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
+		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
 		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
 		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 	</ServiceDeliveryInfo>

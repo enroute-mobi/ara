@@ -43,8 +43,8 @@ const checkStatusResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://
 												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ResponseTimestamp>
-		<ns2:ProducerRef>{{.ProducerRef}}</ns2:ProducerRef>
-		<ns2:Address>{{.Address}}</ns2:Address>
+		<ns2:ProducerRef>{{.ProducerRef}}</ns2:ProducerRef>{{ if .Address }}
+		<ns2:Address>{{ .Address }}</ns2:Address>{{ end }}
 		<ns2:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ns2:ResponseMessageIdentifier>
 		<ns2:RequestMessageRef>{{.RequestMessageRef}}</ns2:RequestMessageRef>
 	</CheckStatusAnswerInfo>
