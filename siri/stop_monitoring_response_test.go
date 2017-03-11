@@ -190,7 +190,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<ns3:LineRef>lineRef</ns3:LineRef>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
+						<ns3:DatedVehicleJourneyRef>vehicleJourney#ObjectID</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
 					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
@@ -239,7 +239,6 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	}
 
 	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
-	datedVehicleJourneyRefObjId := model.NewObjectID("intenal", "vehicleJourneyRef")
 	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
 
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
@@ -249,7 +248,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
-	siriMonitoredStopVisit.References["VehicleJourney"]["DatedVehicleJourneyRef"] = model.Reference{ObjectId: &datedVehicleJourneyRefObjId, Id: "42"}
+	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
 	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
 
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}

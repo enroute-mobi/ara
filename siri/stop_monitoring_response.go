@@ -158,10 +158,10 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 				<ns3:MonitoringRef>{{ .StopPointRef }}</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>{{ if .LineRef }}
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DirectionRef }}
-					<ns3:DirectionRef>{{ .Attributes.VehicleJourneyAttributes.DirectionRef }}</ns3:DirectionRef>{{ end }}{{ if or .References.VehicleJourney.DatedVehicleJourneyRef .DataFrameRef }}
+					<ns3:DirectionRef>{{ .Attributes.VehicleJourneyAttributes.DirectionRef }}</ns3:DirectionRef>{{ end }}{{ if or .DatedVehicleJourneyRef .DataFrameRef }}
 					<ns3:FramedVehicleJourneyRef>{{ if .DataFrameRef }}
-						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>{{ end }}{{ if .References.VehicleJourney.DatedVehicleJourneyRef }}
-						<ns3:DatedVehicleJourneyRef>{{ .References.VehicleJourney.DatedVehicleJourneyRef.ObjectId.Value	 }}</ns3:DatedVehicleJourneyRef>{{ end }}
+						<ns3:DataFrameRef>{{ .DataFrameRef }}</ns3:DataFrameRef>{{ end }}{{ if .DatedVehicleJourneyRef }}
+						<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>{{ end }}
 					</ns3:FramedVehicleJourneyRef>{{ end }}{{ if .References.VehicleJourney.JourneyPatternRef }}
 					<ns3:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</ns3:JourneyPatternRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.JourneyPatternName }}
 					<ns3:JourneyPatternName>{{ .Attributes.VehicleJourneyAttributes.JourneyPatternName }}</ns3:JourneyPatternName>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.VehicleMode }}
