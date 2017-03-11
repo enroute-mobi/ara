@@ -29,8 +29,16 @@ Given(/^a SIRI server waits (GetStopMonitoring) request on "([^"]*)" to respond 
   (@the_siri_server = SIRIServer.create(url)).expect_request(message_type, response).start
 end
 
+Given(/^the SIRI server waits (GetStopMonitoring) request to respond with$/) do |message_type, response|
+  @the_siri_server.expect_request(message_type, response)
+end
+
 When(/^the SIRI server has received a (GetStopMonitoring) request$/) do |message_type|
   @the_siri_server.wait_request message_type
+end
+
+When(/^the SIRI server has received (\d+) (GetStopMonitoring) requests$/) do |count, message_type|
+  @the_siri_server.wait_request message_type, count.to_i
 end
 
 When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
