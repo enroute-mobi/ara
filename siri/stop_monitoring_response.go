@@ -201,8 +201,8 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:MonitoredCall>{{if .StopPointRef}}
 						<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>{{end}}{{if .Order}}
 						<ns3:Order>{{ .Order }}</ns3:Order>{{end}}{{if .StopPointName}}
-						<ns3:StopPointName>{{ .StopPointName }}</ns3:StopPointName>{{end}}{{if .VehicleAtStop}}
-						<ns3:VehicleAtStop>{{ .VehicleAtStop }}</ns3:VehicleAtStop>{{end}}{{if .Attributes.StopVisitAttributes.PlatformTraversal }}
+						<ns3:StopPointName>{{ .StopPointName }}</ns3:StopPointName>{{end}}
+						<ns3:VehicleAtStop>{{ .VehicleAtStop }}</ns3:VehicleAtStop>{{if .Attributes.StopVisitAttributes.PlatformTraversal }}
 						<ns3:PlatformTraversal>{{ .Attributes.StopVisitAttributes.PlatformTraversal }}</ns3:PlatformTraversal>{{end}}{{if .Attributes.StopVisitAttributes.DestinationDisplay }}
 						<ns3:DestinationDisplay>{{ .Attributes.StopVisitAttributes.DestinationDisplay }}</ns3:DestinationDisplay>{{end}}{{ if not .AimedArrivalTime.IsZero }}
 						<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ActualArrivalTime.IsZero }}
