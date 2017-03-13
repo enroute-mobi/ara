@@ -121,7 +121,7 @@ Feature: Support SIRI GetSIRI
                       <ns5:DatedVehicleJourneyRef>1STD721689197098</ns5:DatedVehicleJourneyRef>
                     </ns5:FramedVehicleJourneyRef>
                     <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
-                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:PublishedLineName>Ligne 415</ns5:PublishedLineName>
                     <ns5:DirectionName>Aller</ns5:DirectionName>
                     <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
                     <ns5:DestinationRef>boabonn</ns5:DestinationRef>
@@ -158,7 +158,7 @@ Feature: Support SIRI GetSIRI
                       <ns5:DatedVehicleJourneyRef>5CAR621689196575</ns5:DatedVehicleJourneyRef>
                     </ns5:FramedVehicleJourneyRef>
                     <ns5:JourneyPatternRef>CdF:JourneyPattern::L475P53:LOC</ns5:JourneyPatternRef>
-                    <ns5:PublishedLineName>475</ns5:PublishedLineName>
+                    <ns5:PublishedLineName>Ligne 475</ns5:PublishedLineName>
                     <ns5:DirectionName>Aller</ns5:DirectionName>
                     <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
                     <ns5:DestinationRef>parorle</ns5:DestinationRef>
