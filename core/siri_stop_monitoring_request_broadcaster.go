@@ -82,6 +82,18 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			continue
 		}
 
+		vehicleJourneyId, ok := vehicleJourney.ObjectID(objectidKind)
+		var dataVehicleJourneyRef string
+		if ok {
+			dataVehicleJourneyRef = vehicleJourneyId.Value()
+		} else {
+			defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+			if !ok {
+				continue
+			}
+			dataVehicleJourneyRef = fmt.Sprintf("RATPDEV:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
+		}
+
 		modelDate := tx.Model().Date()
 
 		LineObjectId, _ := line.ObjectID(objectidKind)
@@ -91,30 +103,34 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			StopPointRef:   objectid.Value(),
 			StopPointName:  stopArea.Name,
 
-			VehicleJourneyName:    vehicleJourney.Name,
-			LineRef:               LineObjectId.Value(),
-			DataFrameRef:          fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
-			RecordedAt:            stopVisit.RecordedAt,
-			PublishedLineName:     line.Name,
-			DepartureStatus:       string(stopVisit.DepartureStatus),
-			ArrivalStatus:         string(stopVisit.ArrivalStatus),
-			Order:                 stopVisit.PassageOrder,
-			VehicleAtStop:         stopVisit.VehicleAtStop,
-			AimedArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
-			ExpectedArrivalTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
-			ActualArrivalTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),
-			AimedDepartureTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime(),
-			ExpectedDepartureTime: schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
-			ActualDepartureTime:   schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
-			Attributes:            make(map[string]map[string]string),
-			References:            make(map[string]map[string]model.Reference),
+			VehicleJourneyName:     vehicleJourney.Name,
+			LineRef:                LineObjectId.Value(),
+			DatedVehicleJourneyRef: dataVehicleJourneyRef,
+			DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
+			RecordedAt:             stopVisit.RecordedAt,
+			PublishedLineName:      line.Name,
+			DepartureStatus:        string(stopVisit.DepartureStatus),
+			ArrivalStatus:          string(stopVisit.ArrivalStatus),
+			Order:                  stopVisit.PassageOrder,
+			VehicleAtStop:          stopVisit.VehicleAtStop,
+			AimedArrivalTime:       schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
+			ExpectedArrivalTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
+			ActualArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),
+			AimedDepartureTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime(),
+			ExpectedDepartureTime:  schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
+			ActualDepartureTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
+			Attributes:             make(map[string]map[string]string),
+			References:             make(map[string]map[string]model.Reference),
 		}
 		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
-		connector.reformatVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
+
+		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourney.References, tx.Model().StopAreas())
+		connector.reformatReferences(stopVisit.ToFormat(), stopVisit.References, tx.Model().StopAreas())
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
+		monitoredStopVisit.References["StopVisitReferences"] = stopVisit.References
 
+		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
@@ -145,8 +161,17 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
-	toReformat := []string{"RouteRef", "JourneyPatternRef"}
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references map[string]model.Reference, manager model.StopAreas) {
+	for _, ref := range toReformat {
+		if references[ref] != (model.Reference{}) {
+			tmp := references[ref]
+			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
+		}
+	}
+}
+
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatStopVisitReferences(references map[string]model.Reference) {
+	toReformat := []string{"OperatorRef"}
 
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {

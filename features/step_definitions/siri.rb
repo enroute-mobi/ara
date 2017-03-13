@@ -8,20 +8,20 @@ end
 
 def send_siri_request(request, attributes = {})
   response = RestClient.post siri_path(attributes), request, {content_type: :xml}
-  save_siri_exchange request, response.body
+  save_siri_messages request: request, response: response.body
   @last_siri_response = response.body
 end
 
-def save_siri_exchange(request, response)
+def save_siri_messages(messages = {})
   return unless ENV['SIRI_DEBUG']
 
-  @siri_message_id ||= 0
   @siri_timestamp ||= Time.now.strftime("%Y%m%d%H%M%S")
+  @siri_message_id ||= 0
   @siri_message_id += 1
 
-  [ [ :request, request ], [ :response, response ] ].each do |type, content|
-    file = "log/siri-exchange-#{@siri_timestamp}-#{@siri_message_id}-#{type}"
-    File.write file, content
+  messages.each do |type, content|
+    file = "log/siri-message-#{@siri_timestamp}-#{@siri_message_id}-#{type}"
+    File.write file, content, mode: "wb"
   end
 end
 
@@ -29,8 +29,16 @@ Given(/^a SIRI server waits (GetStopMonitoring) request on "([^"]*)" to respond 
   (@the_siri_server = SIRIServer.create(url)).expect_request(message_type, response).start
 end
 
+Given(/^the SIRI server waits (GetStopMonitoring) request to respond with$/) do |message_type, response|
+  @the_siri_server.expect_request(message_type, response)
+end
+
 When(/^the SIRI server has received a (GetStopMonitoring) request$/) do |message_type|
   @the_siri_server.wait_request message_type
+end
+
+When(/^the SIRI server has received (\d+) (GetStopMonitoring) requests$/) do |count, message_type|
+  @the_siri_server.wait_request message_type, count.to_i
 end
 
 When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
@@ -38,6 +46,7 @@ When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referen
 end
 
 Then(/^I should receive this SIRI response$/) do |expected_xml|
+  save_siri_messages expected: normalized_xml(expected_xml), received: normalized_xml(@last_siri_response), received_raw: @last_siri_response
   expect(normalized_xml(@last_siri_response)).to eq(normalized_xml(expected_xml))
 end
 

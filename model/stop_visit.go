@@ -20,6 +20,7 @@ type StopVisitAttributes struct {
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
 	Attributes      map[string]string
+	References      map[string]Reference
 }
 
 type StopVisit struct {
@@ -50,6 +51,10 @@ func NewStopVisit(model Model) *StopVisit {
 	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
+}
+
+func (stopVisit *StopVisit) ToFormat() []string {
+	return []string{"OperatorRef"}
 }
 
 func (stopVisit *StopVisit) Id() StopVisitId {

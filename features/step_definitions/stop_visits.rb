@@ -41,3 +41,16 @@ Then(/^one StopVisit has the following attributes:$/) do |attributes|
   expect(expectedName).not_to be_nil
   expect(expectedAttr).not_to be_nil
 end
+
+
+Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
+  response = RestClient.get stop_visits_path(referential: referential)
+  responseArray = JSON.parse(response.body)
+  expectedStopVisit = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+
+  if condition.nil?
+    expect(expectedLine).not_to be_nil
+  else
+    expect(expectedLine).to be_nil
+  end
+end

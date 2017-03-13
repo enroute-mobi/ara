@@ -45,6 +45,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 		stopVisitAttributes.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, attributes.response.ActualDepartureTime(), attributes.response.ActualArrivalTime())
 	}
 	stopVisitAttributes.Attributes = attributes.FillStopVisitAttributes()
+	stopVisitAttributes.References = attributes.FillStopVisitReferences()
 	return stopVisitAttributes
 }
 
@@ -53,6 +54,10 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	tmpattrMap := make(map[string]string)
 
 	tmpattrMap["Delay"] = attributes.response.Delay()
+	tmpattrMap["Bearing"] = attributes.response.Bearing()
+	tmpattrMap["InPanic"] = attributes.response.InPanic()
+	tmpattrMap["InCongestion"] = attributes.response.InCongestion()
+	tmpattrMap["SituationRef"] = attributes.response.SituationRef()
 	tmpattrMap["DirectionName"] = attributes.response.DirectionName()
 	tmpattrMap["DestinationName"] = attributes.response.DestinationName()
 	tmpattrMap["DirectionRef"] = attributes.response.DirectionRef()
@@ -140,6 +145,16 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() map[s
 	return attrMap
 }
 
+func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitReferences() map[string]model.Reference {
+	refMap := make(map[string]model.Reference)
+
+	if attributes.response.OperatorRef() != "" {
+		OperatorRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.OperatorRef())
+		refMap["OperatorRef"] = model.Reference{ObjectId: &OperatorRefObjId, Id: ""}
+	}
+	return refMap
+}
+
 func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *model.VehicleJourneyAttributes {
 	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.DatedVehicleJourneyRef())
 	lineObjectId := model.NewObjectID(attributes.objectid_kind, attributes.response.LineRef())
@@ -147,8 +162,6 @@ func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *mod
 	vehicleJourneyAttributes := &model.VehicleJourneyAttributes{
 		ObjectId:     objectid,
 		LineObjectId: lineObjectId,
-		Attributes:   make(map[string]string),
-		References:   make(map[string]model.Reference),
 	}
 
 	vehicleJourneyAttributes.Attributes = attributes.FillVehicleJourneyAttributes()

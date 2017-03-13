@@ -43,7 +43,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <CheckStatusAnswerInfo>
         <ns2:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns2:ResponseTimestamp>
         <ns2:ProducerRef>Edwig</ns2:ProducerRef>
-        <ns2:Address></ns2:Address>
         <ns2:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns2:ResponseMessageIdentifier>
         <ns2:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</ns2:RequestMessageRef>
       </CheckStatusAnswerInfo>

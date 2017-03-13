@@ -41,8 +41,7 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
   expect(expectedAttr).not_to be_nil
 end
 
-
-Then(/^a StopArea "([^"]+)":"([^"]+)" should (not )?exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
+Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get stop_areas_path(referential: referential)
   stopAreas = api_attributes(response.body)
   expectedStopArea = stopAreas.find{|a| a["ObjectIDs"][kind] == objectid }

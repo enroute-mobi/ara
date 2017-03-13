@@ -99,6 +99,9 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := 4; monitoredStopVisit.Order() != expected {
 		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.Order())
 	}
+	if expected := "NINOXE:Company:15563880:LOC"; monitoredStopVisit.OperatorRef() != expected {
+		t.Errorf("Incorrect OperatorRef for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.OperatorRef())
+	}
 	if expected := time.Date(2016, time.September, 22, 5, 54, 0, 000000000, time.UTC); !monitoredStopVisit.AimedArrivalTime().Equal(expected) {
 		t.Errorf("Incorrect AimedArrivalTime for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.AimedArrivalTime())
 	}
@@ -141,7 +144,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 			<ns3:Status>true</ns3:Status>
 		</ns3:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	request := &SIRIStopMonitoringResponse{
@@ -185,17 +188,19 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 				<ns3:MonitoringRef>stopPointRef</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>
 					<ns3:LineRef>lineRef</ns3:LineRef>
-					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
 					<ns3:FramedVehicleJourneyRef>
 						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>vehicleJourneyRef</ns3:DatedVehicleJourneyRef>
+						<ns3:DatedVehicleJourneyRef>vehicleJourney#ObjectID</ns3:DatedVehicleJourneyRef>
 					</ns3:FramedVehicleJourneyRef>
 					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
-					<ns3:OperatorRef>TBD</ns3:OperatorRef>
+					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
 					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
+					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
+					<ns3:Delay>30</ns3:Delay>
 					<ns3:MonitoredCall>
 						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
 						<ns3:Order>1</ns3:Order>
+						<ns3:StopPointName>stopPointName</ns3:StopPointName>
 						<ns3:VehicleAtStop>true</ns3:VehicleAtStop>
 						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
@@ -203,29 +208,27 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 						<ns3:AimedDepartureTime>2019-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 						<ns3:ExpectedDepartureTime>2020-09-21T20:14:46.000Z</ns3:ExpectedDepartureTime>
 						<ns3:DepartureStatus>depStatus</ns3:DepartureStatus>
-						<ns3:Delay>30</ns3:Delay>
 					</ns3:MonitoredCall>
 				</ns3:MonitoredVehicleJourney>
 			</ns3:MonitoredStopVisit>
 		</ns3:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
 	siriMonitoredStopVisit := &SIRIMonitoredStopVisit{
-		ItemIdentifier:         "itemId",
-		StopPointRef:           "stopPointRef",
-		StopPointName:          "stopPointName",
-		DatedVehicleJourneyRef: "vehicleJourneyRef",
-		LineRef:                "lineRef",
-		PublishedLineName:      "lineName",
-		DepartureStatus:        "depStatus",
-		ArrivalStatus:          "arrStatus",
-		VehicleJourneyName:     "NameOfVj",
-		VehicleAtStop:          true,
-		Order:                  1,
-		RecordedAt:             time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
-		DataFrameRef:           "2016-09-21",
-		AimedArrivalTime:       time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ItemIdentifier:     "itemId",
+		StopPointRef:       "stopPointRef",
+		StopPointName:      "stopPointName",
+		LineRef:            "lineRef",
+		PublishedLineName:  "lineName",
+		DepartureStatus:    "depStatus",
+		ArrivalStatus:      "arrStatus",
+		VehicleJourneyName: "NameOfVj",
+		VehicleAtStop:      true,
+		Order:              1,
+		RecordedAt:         time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
+		DataFrameRef:       "2016-09-21",
+		AimedArrivalTime:   time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ExpectedArrivalTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ActualArrivalTime:     time.Date(2018, time.September, 21, 20, 14, 46, 0, time.UTC),
 		AimedDepartureTime:    time.Date(2019, time.September, 21, 20, 14, 46, 0, time.UTC),
@@ -235,11 +238,19 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		References: make(map[string]map[string]model.Reference),
 	}
 
-	DestinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
+	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
+	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
+
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
-	siriMonitoredStopVisit.Attributes["StopVisitAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &DestinationRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
+	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
+
+	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
+	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
+	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
+
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()
 	if err != nil {

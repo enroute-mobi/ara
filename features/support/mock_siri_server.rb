@@ -12,6 +12,11 @@ class SIRIServer
     @@servers[url] ||= SIRIServer.new(url)
   end
 
+  def self.stop
+    each(&:stop)
+    @@servers.clear
+  end
+
   attr_accessor :url, :port, :path, :requests, :responses, :started
 
   def initialize(url)
@@ -50,6 +55,7 @@ class SIRIServer
   </S:Body>
 </S:Envelope>}
 		  else
+        puts "Receive SIRI request" if ENV["SIRI_DEBUG"]
 			  self.requests << req
 		    res.body = self.responses.shift
 		  end
@@ -78,11 +84,11 @@ class SIRIServer
     self
   end
 
-  def wait_request(type)
+  def wait_request(type, count = 1)
 	  try_count = 0
-	  while requests.empty?
+	  while requests.count < count
 		  try_count += 1
-		  raise "No received request" if try_count > 10
+		  raise "Received #{requests.count} request" if try_count > 10
 
 		  sleep 0.5
 	  end
@@ -91,5 +97,5 @@ class SIRIServer
 end
 
 After do
-  SIRIServer.each(&:stop)
+  SIRIServer.stop
 end
