@@ -2,7 +2,7 @@ Feature: Support SIRI CheckStatus
   Background:
     Given a Referential "test" is created
 
-  Scenario: Handle a SIRI Checkstatus request
+  Scenario: 2460 - Handle a SIRI Checkstatus request
     Given a Partner "test" exists with connectors [siri-check-status-server] and the following settings:
       | local_credential | test |
     When I send this SIRI request to the Referential "test"

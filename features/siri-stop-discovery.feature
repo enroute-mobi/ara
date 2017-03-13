@@ -4,7 +4,7 @@ Feature: Support SIRI StopDiscovery
     Given a Referential "test" is created
 
   @wip
-  Scenario: Handle a SIRI StopDiscovery request
+  Scenario: 2464 - Handle a SIRI StopDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-discovery-request-broadcaster] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |

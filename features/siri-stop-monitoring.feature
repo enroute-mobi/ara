@@ -3,7 +3,7 @@ Feature: Support SIRI StopMonitoring
   Background:
       Given a Referential "test" is created
 
-  Scenario: Performs a SIRI StopMonitoring request to a Partner
+  Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
 <?xml version='1.0' encoding='utf-8'?>

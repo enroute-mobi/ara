@@ -4,7 +4,7 @@ Feature: Support SIRI GetSIRI
     Given a Referential "test" is created
 
   @wip
-  Scenario: Handle a SIRI GetSIRIService request with several StopMonitorings
+  Scenario: 2462 - Handle a SIRI GetSIRIService request with several StopMonitorings
     Given a Partner "test" exists with connectors [siri-request-broadcaster siri-stop-monitoring-request-broadcaster] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | Sqybus                |
