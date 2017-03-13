@@ -13,7 +13,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Test 1                                                                    |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:LOC" |
     And a Line exists with the following attributes:
-      | Name      | 415                             |
+      | Name      | Ligne 415                       |
       | ObjectIDs | "internal": "CdF:Line::415:LOC" |
     And a VehicleJourney exists with the following attributes:
       | ObjectIDs                                 | "internal": "1STD721689197098"                 |
@@ -40,7 +40,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Test 2                                                                     |
       | ObjectIDs | "internal": "cladebr", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
     And a Line exists with the following attributes:
-      | Name      | 475                            |
+      | Name      | Ligne 475                      |
       | ObjectIDs | "internal": "CdF:Line::475:LOC"|
     And a VehicleJourney exists with the following attributes:
       | ObjectIDs                                 | "internal": "5CAR621689196575"                |
