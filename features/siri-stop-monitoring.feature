@@ -940,17 +940,16 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       # include a MonitoredStopVisit/ItemIdentifier B at 14:00
       # include a MonitoredStopVisit/ItemIdentifier C at 15:00
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | Test                  |
+      | remote_objectid_kind | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Arletty                                                                |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
-    And a StopArea exists with the following attributes:
-      | Name            | Test 2                                                                  |
-      | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
-    And a minute has passed # la première est fait normalement à cette étape
-    And the SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+    And a minute has passed
+    # la première est fait normalement à cette étape
+    And the SIRI server waits GetStopMonitoring request to respond with
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
@@ -1041,8 +1040,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       # include a MonitoredStopVisit/ItemIdentifier A at 14:00
       # no MonitoredStopVisit/ItemIdentifier B
       # include a MonitoredStopVisit/ItemIdentifier C at 15:00
-    When a minute has passed
-    And the SIRI server has received two GetStopMonitoring requests
+    And 2 minutes have passed
+    When the SIRI server has received 2 GetStopMonitoring requests
     Then a StopVisit exists with the following attributes:
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
