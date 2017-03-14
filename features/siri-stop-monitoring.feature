@@ -476,16 +476,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
       | Name      | Arletty                                                                |
-      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+      | ObjectIDs | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
-      | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
+      | ObjectIDs       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
       | MonitoredAlways | false                                                                   |
     And a minute has passed
-    And I see edwig stop_visits
-    And I see edwig stop_areas
-    And I see edwig vehicle_journeys
-    And I see edwig lines
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -506,7 +502,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
-        <ns2:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns2:MonitoringRef>
+        <ns2:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns2:MonitoringRef>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
@@ -541,7 +537,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
             <ns3:ItemIdentifier>RATPDEV:Item::4d25c8186b19a5b1993e4a401aebec7fc5e8bd15:LOC</ns3:ItemIdentifier>
-            <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
+            <ns3:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
@@ -552,11 +548,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
-              <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
+              <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
               <ns3:MonitoredCall>
-                <ns3:StopPointRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
+                <ns3:StopPointRef>STIF:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
                 <ns3:Order>44</ns3:Order>
                 <ns3:StopPointName>Arletty</ns3:StopPointName>
                 <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
