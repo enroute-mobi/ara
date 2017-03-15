@@ -3,7 +3,7 @@ Feature: Support SIRI StopMonitoring
   Background:
       Given a Referential "test" is created
 
-  Scenario: Performs a SIRI StopMonitoring request to a Partner
+  Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -478,16 +478,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
     And a StopArea exists with the following attributes:
       | Name      | Arletty                                                                |
-      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+      | ObjectIDs | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
-      | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
+      | ObjectIDs       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
       | MonitoredAlways | false                                                                   |
     And a minute has passed
-    And I see edwig stop_visits
-    And I see edwig stop_areas
-    And I see edwig vehicle_journeys
-    And I see edwig lines
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -508,7 +504,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
-        <ns2:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns2:MonitoringRef>
+        <ns2:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns2:MonitoringRef>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
@@ -543,7 +539,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
             <ns3:ItemIdentifier>RATPDEV:Item::4d25c8186b19a5b1993e4a401aebec7fc5e8bd15:LOC</ns3:ItemIdentifier>
-            <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
+            <ns3:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
@@ -554,11 +550,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
               <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
-              <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
+              <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
               <ns3:MonitoredCall>
-                <ns3:StopPointRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
+                <ns3:StopPointRef>STIF:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
                 <ns3:Order>44</ns3:Order>
                 <ns3:StopPointName>Arletty</ns3:StopPointName>
                 <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
@@ -671,7 +667,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name      | Arletty                                                                |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
-      And a StopArea exists with the following attributes:
+    And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
       | MonitoredAlways | false                                                                   |
@@ -816,3 +812,434 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         </S:Body>
       </S:Envelope>
       """
+  @wip
+  Scenario: Detect StopVisit deletion between two StopMonitoring requests
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
+        <soap:Body>
+          <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
+              <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
+              <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
+              <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:StopMonitoringDelivery version="1.3">
+                <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
+                <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <ns5:Status>true</ns5:Status>
+                <ns5:MonitoredStopVisit>
+                  <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
+                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
+                  <ns5:MonitoredVehicleJourney>
+                    <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
+                    <ns5:FramedVehicleJourneyRef>
+                      <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+                      <ns5:DatedVehicleJourneyRef>1STD721687165983</ns5:DatedVehicleJourneyRef>
+                    </ns5:FramedVehicleJourneyRef>
+                    <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
+                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:DirectionName>Aller</ns5:DirectionName>
+                    <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+                    <ns5:DestinationRef>boabonn</ns5:DestinationRef>
+                    <ns5:DestinationName>Méliès - Croix Bonnet</ns5:DestinationName>
+                    <ns5:Monitored>true</ns5:Monitored>
+                    <ns5:MonitoredCall>
+                      <ns5:StopPointRef>boaarle</ns5:StopPointRef>
+                      <ns5:Order>44</ns5:Order>
+                      <ns5:StopPointName>Arletty</ns5:StopPointName>
+                      <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+                      <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
+                      <ns5:AimedArrivalTime>2017-01-01T13:00:00.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T13:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+                      <ns5:AimedDepartureTime>2017-01-01T13:01:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T13:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+                    </ns5:MonitoredCall>
+                  </ns5:MonitoredVehicleJourney>
+                </ns5:MonitoredStopVisit>
+                <ns5:MonitoredStopVisit>
+                  <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
+                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
+                  <ns5:MonitoredVehicleJourney>
+                    <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
+                    <ns5:FramedVehicleJourneyRef>
+                      <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+                      <ns5:DatedVehicleJourneyRef>1STD721687165983</ns5:DatedVehicleJourneyRef>
+                    </ns5:FramedVehicleJourneyRef>
+                    <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
+                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:DirectionName>Aller</ns5:DirectionName>
+                    <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+                    <ns5:DestinationRef>boabonn</ns5:DestinationRef>
+                    <ns5:DestinationName>Méliès - Croix Bonnet</ns5:DestinationName>
+                    <ns5:Monitored>true</ns5:Monitored>
+                    <ns5:MonitoredCall>
+                      <ns5:StopPointRef>boaarle</ns5:StopPointRef>
+                      <ns5:Order>44</ns5:Order>
+                      <ns5:StopPointName>Arletty</ns5:StopPointName>
+                      <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+                      <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
+                      <ns5:AimedArrivalTime>2017-01-01T14:00:00.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T14:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+                      <ns5:AimedDepartureTime>2017-01-01T14:01:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T14:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+                    </ns5:MonitoredCall>
+                  </ns5:MonitoredVehicleJourney>
+                </ns5:MonitoredStopVisit>
+                <ns5:MonitoredStopVisit>
+                  <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
+                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
+                  <ns5:MonitoredVehicleJourney>
+                    <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
+                    <ns5:FramedVehicleJourneyRef>
+                      <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+                      <ns5:DatedVehicleJourneyRef>1STD721687165983</ns5:DatedVehicleJourneyRef>
+                    </ns5:FramedVehicleJourneyRef>
+                    <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
+                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:DirectionName>Aller</ns5:DirectionName>
+                    <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+                    <ns5:DestinationRef>boabonn</ns5:DestinationRef>
+                    <ns5:DestinationName>Méliès - Croix Bonnet</ns5:DestinationName>
+                    <ns5:Monitored>true</ns5:Monitored>
+                    <ns5:MonitoredCall>
+                      <ns5:StopPointRef>boaarle</ns5:StopPointRef>
+                      <ns5:Order>44</ns5:Order>
+                      <ns5:StopPointName>Arletty</ns5:StopPointName>
+                      <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+                      <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
+                      <ns5:AimedArrivalTime>2017-01-01T15:00:00.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T15:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+                      <ns5:AimedDepartureTime>2017-01-01T15:01:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T15:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+                    </ns5:MonitoredCall>
+                  </ns5:MonitoredVehicleJourney>
+                </ns5:MonitoredStopVisit>
+              </ns5:StopMonitoringDelivery>
+            </Answer>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+          </ns1:GetStopMonitoringResponse>
+        </soap:Body>
+      </soap:Envelope>
+        """
+      # include a MonitoredStopVisit/ItemIdentifier A at 13:00
+      # include a MonitoredStopVisit/ItemIdentifier B at 14:00
+      # include a MonitoredStopVisit/ItemIdentifier C at 15:00
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | Test                  |
+      | remote_objectid_kind | internal              |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name      | Arletty                                                                |
+      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+    And a minute has passed
+    # la première est fait normalement à cette étape
+    And the SIRI server waits GetStopMonitoring request to respond with
+      """
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
+        <soap:Body>
+          <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
+              <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
+              <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
+              <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:StopMonitoringDelivery version="1.3">
+                <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
+                <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <ns5:Status>true</ns5:Status>
+                <ns5:MonitoredStopVisit>
+                  <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
+                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
+                  <ns5:MonitoredVehicleJourney>
+                    <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
+                    <ns5:FramedVehicleJourneyRef>
+                      <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+                      <ns5:DatedVehicleJourneyRef>1STD721687165983</ns5:DatedVehicleJourneyRef>
+                    </ns5:FramedVehicleJourneyRef>
+                    <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
+                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:DirectionName>Aller</ns5:DirectionName>
+                    <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+                    <ns5:DestinationRef>boabonn</ns5:DestinationRef>
+                    <ns5:DestinationName>Méliès - Croix Bonnet</ns5:DestinationName>
+                    <ns5:Monitored>true</ns5:Monitored>
+                    <ns5:MonitoredCall>
+                      <ns5:StopPointRef>boaarle</ns5:StopPointRef>
+                      <ns5:Order>44</ns5:Order>
+                      <ns5:StopPointName>Arletty</ns5:StopPointName>
+                      <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+                      <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
+                      <ns5:AimedArrivalTime>2017-01-01T13:00:00.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T13:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+                      <ns5:AimedDepartureTime>2017-01-01T13:01:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T13:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+                    </ns5:MonitoredCall>
+                  </ns5:MonitoredVehicleJourney>
+                </ns5:MonitoredStopVisit>
+                <ns5:MonitoredStopVisit>
+                  <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
+                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
+                  <ns5:MonitoredVehicleJourney>
+                    <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
+                    <ns5:FramedVehicleJourneyRef>
+                      <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+                      <ns5:DatedVehicleJourneyRef>1STD721687165983</ns5:DatedVehicleJourneyRef>
+                    </ns5:FramedVehicleJourneyRef>
+                    <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
+                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:DirectionName>Aller</ns5:DirectionName>
+                    <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+                    <ns5:DestinationRef>boabonn</ns5:DestinationRef>
+                    <ns5:DestinationName>Méliès - Croix Bonnet</ns5:DestinationName>
+                    <ns5:Monitored>true</ns5:Monitored>
+                    <ns5:MonitoredCall>
+                      <ns5:StopPointRef>boaarle</ns5:StopPointRef>
+                      <ns5:Order>44</ns5:Order>
+                      <ns5:StopPointName>Arletty</ns5:StopPointName>
+                      <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+                      <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
+                      <ns5:AimedArrivalTime>2017-01-01T15:00:00.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T15:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+                      <ns5:AimedDepartureTime>2017-01-01T15:01:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T15:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+                    </ns5:MonitoredCall>
+                  </ns5:MonitoredVehicleJourney>
+                </ns5:MonitoredStopVisit>
+              </ns5:StopMonitoringDelivery>
+            </Answer>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+          </ns1:GetStopMonitoringResponse>
+        </soap:Body>
+      </soap:Envelope>
+        """
+      # include a MonitoredStopVisit/ItemIdentifier A at 14:00
+      # no MonitoredStopVisit/ItemIdentifier B
+      # include a MonitoredStopVisit/ItemIdentifier C at 15:00
+    And 2 minutes have passed
+    When the SIRI server has received 2 GetStopMonitoring requests
+    Then a StopVisit exists with the following attributes:
+      | DepartureStatus   | onTime          |
+      | ArrivalStatus     | onTime          |
+      | ObjectIDs         | "internal": "A" |
+    And a StopVisit exists with the following attributes:
+      | DepartureStatus   | cancelled       |
+      | ArrivalStatus     | cancelled       |
+      | ObjectIDs         | "internal": "B" |
+    And a StopVisit exists with the following attributes:
+      | DepartureStatus   | onTime          |
+      | ArrivalStatus     | onTime          |
+      | ObjectIDs         | "internal": "C" |
+
+  @wip
+  Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+                                   xmlns:ns4="http://www.ifopt.org.uk/acsb"
+                                   xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+                                   xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+                                   xmlns:ns7="http://scma/siri"
+                                   xmlns:ns8="http://wsdl.siri.org.uk"
+                                   xmlns:ns9="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+        <ns3:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns3:ResponseTimestamp>
+        <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
+        <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
+        <ns3:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</ns3:ResponseMessageIdentifier>
+        <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+          <ns3:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</ns3:ResponseTimestamp>
+          <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+          <ns3:Status>true</ns3:Status>
+          <ns3:MonitoredStopVisit>
+            <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
+            <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
+            <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
+            <ns3:MonitoredVehicleJourney>
+              <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+              <ns3:DirectionRef>Left</ns3:DirectionRef>
+              <ns3:FramedVehicleJourneyRef>
+                <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
+                <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+              </ns3:FramedVehicleJourneyRef>
+              <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
+              <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
+              <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
+              <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
+              <ns3:OperatorRef>NINOXE:Company:15563880:LOC</ns3:OperatorRef>
+              <ns3:ProductCategoryRef>0</ns3:ProductCategoryRef>
+              <ns3:VehicleFeatureRef>TRFC_M4_1</ns3:VehicleFeatureRef>
+              <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
+              <ns3:OriginName>Magicien Noir</ns3:OriginName>
+              <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
+              <ns3:DestinationName>Cimetière des Sauvages</ns3:DestinationName>
+              <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
+              <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
+              <ns3:Monitored>true</ns3:Monitored>
+              <ns3:ProgressRate>normalProgress</ns3:ProgressRate>
+              <ns3:Delay>P0Y0M0DT0H0M0.000S</ns3:Delay>
+              <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
+              <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
+              <ns3:MonitoredCall>
+                <ns3:StopPointRef>NINOXE:StopPoint:Q:50:LOC</ns3:StopPointRef>
+                <ns3:Order>4</ns3:Order>
+                <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
+                <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+                <ns3:AimedArrivalTime>2016-09-22T07:54:00.000+02:00</ns3:AimedArrivalTime>
+                <ns3:ActualArrivalTime>2016-09-22T07:54:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:ArrivalStatus>arrived</ns3:ArrivalStatus>
+                <ns3:ArrivalBoardingActivity>alighting</ns3:ArrivalBoardingActivity>
+                <ns3:ArrivalStopAssignment>
+                  <ns3:AimedQuayRef>NINOXE:StopPoint:Q:50:LOC</ns3:AimedQuayRef>
+                  <ns3:ActualQuayRef>NINOXE:StopPoint:Q:50:LOC</ns3:ActualQuayRef>
+                </ns3:ArrivalStopAssignment>
+              </ns3:MonitoredCall>
+            </ns3:MonitoredVehicleJourney>
+          </ns3:MonitoredStopVisit>
+        </ns3:StopMonitoringDelivery>
+      </Answer>
+    </ns8:GetStopMonitoringResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a Partner "source" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | source                |
+      | remote_objectid_kind | internal              |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name            | arrêt 1               |
+      | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | MonitoredAlways | false |
+    When a minute has passed
+    Then the SIRI server should not have received a GetStopMonitoring request
+
+  @wip
+  Scenario: Perform StopMonitoring request for an unmonitored StopArea
+     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+                                   xmlns:ns4="http://www.ifopt.org.uk/acsb"
+                                   xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+                                   xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+                                   xmlns:ns7="http://scma/siri"
+                                   xmlns:ns8="http://wsdl.siri.org.uk"
+                                   xmlns:ns9="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+        <ns3:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns3:ResponseTimestamp>
+        <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
+        <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
+        <ns3:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</ns3:ResponseMessageIdentifier>
+        <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+          <ns3:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</ns3:ResponseTimestamp>
+          <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+          <ns3:Status>true</ns3:Status>
+          <ns3:MonitoredStopVisit>
+            <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
+            <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
+            <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
+            <ns3:MonitoredVehicleJourney>
+              <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+              <ns3:DirectionRef>Left</ns3:DirectionRef>
+              <ns3:FramedVehicleJourneyRef>
+                <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
+                <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+              </ns3:FramedVehicleJourneyRef>
+              <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
+              <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
+              <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
+              <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
+              <ns3:OperatorRef>NINOXE:Company:15563880:LOC</ns3:OperatorRef>
+              <ns3:ProductCategoryRef>0</ns3:ProductCategoryRef>
+              <ns3:VehicleFeatureRef>TRFC_M4_1</ns3:VehicleFeatureRef>
+              <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
+              <ns3:OriginName>Magicien Noir</ns3:OriginName>
+              <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
+              <ns3:DestinationName>Cimetière des Sauvages</ns3:DestinationName>
+              <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
+              <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
+              <ns3:Monitored>true</ns3:Monitored>
+              <ns3:ProgressRate>normalProgress</ns3:ProgressRate>
+              <ns3:Delay>P0Y0M0DT0H0M0.000S</ns3:Delay>
+              <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
+              <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
+              <ns3:MonitoredCall>
+                <ns3:StopPointRef>NINOXE:StopPoint:Q:50:LOC</ns3:StopPointRef>
+                <ns3:Order>4</ns3:Order>
+                <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
+                <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+                <ns3:AimedArrivalTime>2016-09-22T07:54:00.000+02:00</ns3:AimedArrivalTime>
+                <ns3:ActualArrivalTime>2016-09-22T07:54:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:ArrivalStatus>arrived</ns3:ArrivalStatus>
+                <ns3:ArrivalBoardingActivity>alighting</ns3:ArrivalBoardingActivity>
+                <ns3:ArrivalStopAssignment>
+                  <ns3:AimedQuayRef>NINOXE:StopPoint:Q:50:LOC</ns3:AimedQuayRef>
+                  <ns3:ActualQuayRef>NINOXE:StopPoint:Q:50:LOC</ns3:ActualQuayRef>
+                </ns3:ArrivalStopAssignment>
+              </ns3:MonitoredCall>
+            </ns3:MonitoredVehicleJourney>
+          </ns3:MonitoredStopVisit>
+        </ns3:StopMonitoringDelivery>
+      </Answer>
+    </ns8:GetStopMonitoringResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a Partner "source" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | source                |
+      | remote_objectid_kind | internal              |
+    And a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name            | arrêt 1               |
+      | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | MonitoredAlways | false |
+    When I send this SIRI GetStopMonitoring request with :
+      | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
+      | RequestorRef      | test                       |
+      | MessageIdentifier | StopMonitoring:Test:0      |
+      | StartTime         | 2017-01-01T07:54:00.977Z   |
+      | MonitoringRef     | NINOXE:StopPoint:SP:24:LOC |
+      | StopVisitTypes    | all                        |
+    And a minute has passed
+    Then the SIRI server should have received a GetStopMonitoring request with:
+      | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
+    And the StopArea "arrêt 1" should have the following attributes:
+      | MonitoredUntil | ~ 07h54 |

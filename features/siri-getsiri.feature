@@ -4,7 +4,7 @@ Feature: Support SIRI GetSIRI
     Given a Referential "test" is created
 
   @wip
-  Scenario: Handle a SIRI GetSIRIService request with several StopMonitorings
+  Scenario: 2462 - Handle a SIRI GetSIRIService request with several StopMonitorings
     Given a Partner "test" exists with connectors [siri-request-broadcaster siri-stop-monitoring-request-broadcaster] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | Sqybus                |
@@ -13,7 +13,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Test 1                                                                    |
       | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:LOC" |
     And a Line exists with the following attributes:
-      | Name      | 415                             |
+      | Name      | Ligne 415                       |
       | ObjectIDs | "internal": "CdF:Line::415:LOC" |
     And a VehicleJourney exists with the following attributes:
       | ObjectIDs                                 | "internal": "1STD721689197098"                 |
@@ -40,7 +40,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Test 2                                                                     |
       | ObjectIDs | "internal": "cladebr", "external": "RATPDev:StopPoint:Q:875fdetgyh765:LOC" |
     And a Line exists with the following attributes:
-      | Name      | 475                            |
+      | Name      | Ligne 475                      |
       | ObjectIDs | "internal": "CdF:Line::475:LOC"|
     And a VehicleJourney exists with the following attributes:
       | ObjectIDs                                 | "internal": "5CAR621689196575"                |
@@ -121,7 +121,7 @@ Feature: Support SIRI GetSIRI
                       <ns5:DatedVehicleJourneyRef>1STD721689197098</ns5:DatedVehicleJourneyRef>
                     </ns5:FramedVehicleJourneyRef>
                     <ns5:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</ns5:JourneyPatternRef>
-                    <ns5:PublishedLineName>415</ns5:PublishedLineName>
+                    <ns5:PublishedLineName>Ligne 415</ns5:PublishedLineName>
                     <ns5:DirectionName>Aller</ns5:DirectionName>
                     <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
                     <ns5:DestinationRef>boabonn</ns5:DestinationRef>
@@ -158,7 +158,7 @@ Feature: Support SIRI GetSIRI
                       <ns5:DatedVehicleJourneyRef>5CAR621689196575</ns5:DatedVehicleJourneyRef>
                     </ns5:FramedVehicleJourneyRef>
                     <ns5:JourneyPatternRef>CdF:JourneyPattern::L475P53:LOC</ns5:JourneyPatternRef>
-                    <ns5:PublishedLineName>475</ns5:PublishedLineName>
+                    <ns5:PublishedLineName>Ligne 475</ns5:PublishedLineName>
                     <ns5:DirectionName>Aller</ns5:DirectionName>
                     <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
                     <ns5:DestinationRef>parorle</ns5:DestinationRef>

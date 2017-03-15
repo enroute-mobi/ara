@@ -24,7 +24,7 @@ test -x $DAEMON || exit 0
 
 start_daemon() {
 		if [ -n "$START" -a -n "$DAEMON_USER" -a -n "$DAEMON_OPTS" ] ; then
-        if [ -f $OUTPUT_FILE ]; then
+        if [ ! -f $OUTPUT_FILE ]; then
             touch $OUTPUT_FILE && chown $DAEMON_USER $OUTPUT_FILE
 	      fi
 	      start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid --chuid $DAEMON_USER \
