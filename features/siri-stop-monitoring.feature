@@ -1050,3 +1050,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
       | ObjectIDs         | "internal": "C" |
+
+  @wip
+  Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090"
+    And a Partner "source" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | source                |
+      | remote_objectid_kind | internal              |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name      | Arletty                                                                |
+      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+      | MonitoredAlways | false |
+    When a minute has passed
+    Then the SIRI server should not have received a GetStopMonitoring request
