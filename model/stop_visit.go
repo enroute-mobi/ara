@@ -29,8 +29,9 @@ type StopVisit struct {
 	ObjectIDConsumer
 	model Model
 
-	id        StopVisitId
-	monitored bool
+	id          StopVisitId
+	collected   bool
+	collectedAt time.Time
 
 	StopAreaId       StopAreaId
 	VehicleJourneyId VehicleJourneyId
@@ -61,8 +62,22 @@ func (stopVisit *StopVisit) ToFormat() []string {
 	return []string{"OperatorRef"}
 }
 
-func (stopVisit *StopVisit) IsMonitored() bool {
-	return stopVisit.monitored
+func (stopVisit *StopVisit) IsCollected() bool {
+	return stopVisit.collected
+}
+
+func (stopVisit *StopVisit) StopCollecting() {
+	stopVisit.collected = false
+}
+
+func (stopVisit *StopVisit) CollectedAt() time.Time {
+	return stopVisit.collectedAt
+}
+
+func (stopVisit *StopVisit) Collected(t time.Time) {
+	stopVisit.collected = true
+	stopVisit.collectedAt = t
+
 }
 
 func (stopVisit *StopVisit) Id() StopVisitId {
