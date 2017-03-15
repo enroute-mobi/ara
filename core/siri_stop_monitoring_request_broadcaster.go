@@ -58,6 +58,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
+
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
 		var itemIdentifier string
@@ -73,6 +74,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		}
 
 		schedules := stopVisit.Schedules
+
 		vehicleJourney := stopVisit.VehicleJourney()
 		if vehicleJourney == nil {
 			continue
@@ -113,15 +115,22 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 			ArrivalStatus:          string(stopVisit.ArrivalStatus),
 			Order:                  stopVisit.PassageOrder,
 			VehicleAtStop:          stopVisit.VehicleAtStop,
-			AimedArrivalTime:       schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime(),
-			ExpectedArrivalTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime(),
-			ActualArrivalTime:      schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime(),
-			AimedDepartureTime:     schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime(),
-			ExpectedDepartureTime:  schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime(),
-			ActualDepartureTime:    schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime(),
 			Attributes:             make(map[string]map[string]string),
 			References:             make(map[string]map[string]model.Reference),
 		}
+
+		if stopVisit.ArrivalStatus != "cancelled" {
+			monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
+			monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
+			monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
+		}
+
+		if stopVisit.DepartureStatus != "cancelled" {
+			monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
+			monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
+			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
+		}
+
 		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
 
 		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourney.References, tx.Model().StopAreas())

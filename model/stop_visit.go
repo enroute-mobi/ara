@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"sort"
 	"time"
 )
 
@@ -19,15 +20,18 @@ type StopVisitAttributes struct {
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
-	Attributes      map[string]string
-	References      map[string]Reference
+
+	Attributes map[string]string
+	References map[string]Reference
 }
 
 type StopVisit struct {
 	ObjectIDConsumer
 	model Model
 
-	id               StopVisitId
+	id        StopVisitId
+	monitored bool
+
 	StopAreaId       StopAreaId
 	VehicleJourneyId VehicleJourneyId
 	Attributes       map[string]string
@@ -55,6 +59,10 @@ func NewStopVisit(model Model) *StopVisit {
 
 func (stopVisit *StopVisit) ToFormat() []string {
 	return []string{"OperatorRef"}
+}
+
+func (stopVisit *StopVisit) IsMonitored() bool {
+	return stopVisit.monitored
 }
 
 func (stopVisit *StopVisit) Id() StopVisitId {
@@ -174,8 +182,37 @@ func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
 	return value, present
 }
 
+func (stopVisit *StopVisit) ReferenceTime() time.Time {
+	orderMap := []StopVisitScheduleType{"actual", "expected", "aimed"}
+
+	for _, value := range orderMap {
+		if stopVisit.Schedules[value] != nil {
+			if !stopVisit.Schedules[value].ArrivalTime().IsZero() {
+				return stopVisit.Schedules[value].ArrivalTime()
+			}
+		}
+	}
+
+	for _, value := range orderMap {
+		if stopVisit.Schedules[value] != nil {
+			if !stopVisit.Schedules[value].DepartureTime().IsZero() {
+				return stopVisit.Schedules[value].DepartureTime()
+			}
+		}
+	}
+
+	return time.Time{}
+}
+
+type ByTime []StopVisit
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Less(i, j int) bool { return !a[i].ReferenceTime().After(a[j].ReferenceTime()) }
+
 type MemoryStopVisits struct {
 	UUIDConsumer
+	ClockConsumer
 
 	model Model
 
@@ -192,6 +229,7 @@ type StopVisits interface {
 	FindByObjectId(objectid ObjectID) (StopVisit, bool)
 	FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit
 	FindByStopAreaId(id StopAreaId) []StopVisit
+	FindFollowingByStopAreaId(id StopAreaId) []StopVisit
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
@@ -246,6 +284,18 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.StopAreaId == id {
+			stopVisits = append(stopVisits, *stopVisit)
+		}
+	}
+
+	sort.Sort(ByTime(stopVisits))
+	return
+}
+
+func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+
+	for _, stopVisit := range manager.byIdentifier {
+		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}

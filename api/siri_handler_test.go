@@ -146,8 +146,19 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.Schedules = make(model.StopVisitSchedules)
+	stopVisit.Schedules["actual"] = &model.StopVisitSchedule{}
+	stopVisit.Schedules["actual"].SetArrivalTime(model.DefaultClock().Now().Add(2 * time.Hour))
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea.Id()
+	stopVisit2.Schedules = make(model.StopVisitSchedules)
+	stopVisit2.Schedules["actual"] = &model.StopVisitSchedule{}
+	stopVisit2.Schedules["actual"].SetArrivalTime(model.DefaultClock().Now().Add(1 * time.Hour))
+	stopVisit2.SetObjectID(objectid)
+	stopVisit2.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(objectid)
@@ -158,6 +169,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	line.Save()
 
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	vehicleJourney.LineId = line.Id()
 
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
@@ -166,6 +178,10 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	response, err := siri.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if !response.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(response.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {
+		t.Errorf("Stop visits are not chronollogicaly ordered ")
 	}
 
 	if expected := "http://edwig"; response.Address() != expected {

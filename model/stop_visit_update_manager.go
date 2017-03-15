@@ -42,7 +42,7 @@ func (updater *StopVisitUpdater) Update() {
 		logger.Log.Debugf("Update StopVisit %v", existingStopVisit.Id())
 		stopArea, _ := updater.tx.Model().StopAreas().FindByObjectId(updater.event.StopAreaObjectId)
 		stopArea.Updated(updater.Clock().Now())
-		existingStopVisit.Schedules = updater.event.Schedules
+		existingStopVisit.Schedules.Merge(updater.event.Schedules)
 		existingStopVisit.DepartureStatus = updater.event.DepartureStatus
 		existingStopVisit.ArrivalStatus = updater.event.ArrivalStatuts
 		existingStopVisit.RecordedAt = updater.event.RecordedAt
@@ -73,6 +73,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.SetObjectID(stopVisitAttributes.ObjectId)
 	stopVisit.SetObjectID(NewObjectID("_default", stopVisitAttributes.ObjectId.HashValue()))
 	stopVisit.Schedules = stopVisitAttributes.Schedules
+
 	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 	stopVisit.Attributes = stopVisitAttributes.Attributes

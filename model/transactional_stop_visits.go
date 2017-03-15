@@ -2,6 +2,7 @@ package model
 
 type TransactionalStopVisits struct {
 	UUIDConsumer
+	ClockConsumer
 
 	model                   Model
 	saved                   map[StopVisitId]*StopVisit
@@ -74,10 +75,27 @@ func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVis
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
+
 	// Check model StopVisits
 	for _, modelStopVisit := range manager.model.StopVisits().FindByStopAreaId(id) {
 		_, ok := manager.saved[modelStopVisit.Id()]
 		if !ok {
+			stopVisits = append(stopVisits, modelStopVisit)
+		}
+	}
+	return
+}
+
+func (manager *TransactionalStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+
+	for _, stopVisit := range manager.saved {
+		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
+			stopVisits = append(stopVisits, *stopVisit)
+		}
+	}
+	for _, modelStopVisit := range manager.model.StopVisits().FindByStopAreaId(id) {
+		_, ok := manager.saved[modelStopVisit.Id()]
+		if !ok && modelStopVisit.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, modelStopVisit)
 		}
 	}
