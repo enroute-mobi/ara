@@ -39,8 +39,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		return nil, fmt.Errorf("StopArea not found")
 	}
 
-	if stopArea.MonitoredAlways == false {
-		stopArea.MonitoredUntil = connector.Clock().Now().Add(time.Duration(15) * time.Minute)
+	if stopArea.CollectedAlways == false {
+		stopArea.CollectedUntil = connector.Clock().Now().Add(time.Duration(15) * time.Minute)
 	}
 
 	logStashEvent := make(audit.LogStashEvent)

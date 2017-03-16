@@ -10,7 +10,7 @@ type StopAreaId string
 type StopAreaAttributes struct {
 	ObjectId        ObjectID
 	Name            string
-	MonitoredAlways bool
+	CollectedAlways bool
 }
 
 type StopArea struct {
@@ -20,8 +20,8 @@ type StopArea struct {
 	id              StopAreaId
 	requestedAt     time.Time
 	updatedAt       time.Time
-	MonitoredUntil  time.Time
-	MonitoredAlways bool
+	CollectedUntil  time.Time
+	CollectedAlways bool
 
 	Name       string
 	Attributes map[string]string
@@ -34,7 +34,7 @@ func NewStopArea(model Model) *StopArea {
 		model:           model,
 		Attributes:      make(map[string]string),
 		References:      make(map[string]Reference),
-		MonitoredAlways: true,
+		CollectedAlways: true,
 	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
@@ -66,7 +66,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		"Name":            stopArea.Name,
 		"Attributes":      stopArea.Attributes,
 		"References":      stopArea.References,
-		"MonitoredAlways": stopArea.MonitoredAlways,
+		"CollectedAlways": stopArea.CollectedAlways,
 	}
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
@@ -77,8 +77,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	if !stopArea.ObjectIDs().Empty() {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
 	}
-	if stopAreaMap["MonitoredAlways"] == false {
-		stopAreaMap["MonitoredUntil"] = stopArea.MonitoredUntil
+	if stopAreaMap["CollectedAlways"] == false {
+		stopAreaMap["CollectedUntil"] = stopArea.CollectedUntil
 	}
 	return json.Marshal(stopAreaMap)
 }

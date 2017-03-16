@@ -54,8 +54,8 @@ func Test_ModelGuardian_Run_On_MonitoredUntil(t *testing.T) {
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.MonitoredAlways = false
-	stopArea.MonitoredUntil = fakeClock.Now().Add(15 * time.Minute)
+	stopArea.CollectedAlways = false
+	stopArea.CollectedUntil = fakeClock.Now().Add(15 * time.Minute)
 	referential.Model().StopAreas().Save(&stopArea)
 	stopAreaId := stopArea.Id()
 

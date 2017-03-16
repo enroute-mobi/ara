@@ -482,7 +482,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
-      | MonitoredAlways | false                                                                   |
+      | CollectedAlways | false                                                                   |
     And a minute has passed
     When I send this SIRI request
       """
@@ -670,7 +670,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
-      | MonitoredAlways | false                                                                   |
+      | CollectedAlways | false                                                                   |
     And a minute has passed
     And the SIRI server waits GetStopMonitoring request to respond with
       """
@@ -1138,7 +1138,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1               |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false |
+      | CollectedAlways | false |
     When a minute has passed
     Then the SIRI server should not have received a GetStopMonitoring request
 
@@ -1230,7 +1230,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1               |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false |
+      | CollectedAlways | false |
     When I send this SIRI GetStopMonitoring request with :
       | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
       | RequestorRef      | test                       |

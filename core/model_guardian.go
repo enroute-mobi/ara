@@ -59,7 +59,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	logger.Log.Debugf("Check StopAreas status")
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if !stopArea.MonitoredAlways && stopArea.MonitoredUntil.After(guardian.Clock().Now()) == false {
+		if !stopArea.CollectedAlways && stopArea.CollectedUntil.After(guardian.Clock().Now()) == false {
 			continue
 		}
 
