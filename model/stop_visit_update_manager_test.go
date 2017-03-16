@@ -11,7 +11,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
 	model.StopVisits().Save(&stopVisit)
-	manager := newStopVisitUpdateManager(model)
+	manager := newStopAreaUpdateManager(model)
 
 	event := &StopVisitUpdateEvent{
 		StopVisitObjectid: objectid,
@@ -19,7 +19,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 		ArrivalStatuts:    STOP_VISIT_ARRIVAL_ONTIME,
 	}
 
-	manager.UpdateStopVisit(event)
+	manager.UpdateStopArea(event)
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
 		t.Errorf("StopVisit DepartureStatus should be updated")
@@ -31,7 +31,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 
 func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
-	manager := newStopVisitUpdateManager(model)
+	manager := newStopAreaUpdateManager(model)
 	objectid := NewObjectID("kind", "value")
 
 	event := &StopVisitUpdateEvent{
@@ -39,7 +39,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 		StopVisitObjectid: objectid,
 	}
 
-	manager.UpdateStopVisit(event)
+	manager.UpdateStopArea(event)
 	stopVisit, ok := model.StopVisits().FindByObjectId(objectid)
 	if !ok {
 		t.Errorf("StopVisit should be created by findOrCreateStopArea")

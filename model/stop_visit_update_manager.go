@@ -2,7 +2,7 @@ package model
 
 import "github.com/af83/edwig/logger"
 
-type StopVisitUpdateManager struct {
+type StopAreaUpdateManager struct {
 	model Model
 }
 
@@ -13,16 +13,16 @@ type StopVisitUpdater struct {
 	event *StopVisitUpdateEvent
 }
 
-func NewStopVisitUpdateManager(model Model) func(*StopVisitUpdateEvent) {
-	manager := newStopVisitUpdateManager(model)
-	return manager.UpdateStopVisit
+func NewStopAreaUpdateManager(model Model) func(*StopVisitUpdateEvent) {
+	manager := newStopAreaUpdateManager(model)
+	return manager.UpdateStopArea
 }
 
-func newStopVisitUpdateManager(model Model) *StopVisitUpdateManager {
-	return &StopVisitUpdateManager{model: model}
+func newStopAreaUpdateManager(model Model) *StopAreaUpdateManager {
+	return &StopAreaUpdateManager{model: model}
 }
 
-func (manager *StopVisitUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopVisitUpdateEvent) {
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 
@@ -74,6 +74,9 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.SetObjectID(NewObjectID("_default", stopVisitAttributes.ObjectId.HashValue()))
 	stopVisit.Schedules = stopVisitAttributes.Schedules
 
+	// f, _ := os.OpenFile("/tmp/data", os.O_RDWR|os.O_APPEND|os.O_APPEND, 0660)
+	// f.WriteString(fmt.Sprintf("== %v", stopVisitAttributes.Schedules))
+	//
 	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 	stopVisit.Attributes = stopVisitAttributes.Attributes
