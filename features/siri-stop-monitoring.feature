@@ -1232,7 +1232,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | MonitoredAlways | false |
       | CollectedAlways | false |
-    When I send this SIRI GetStopMonitoring request with :
+    When I send a SIRI GetStopMonitoring request with
       | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
       | RequestorRef      | test                       |
       | MessageIdentifier | StopMonitoring:Test:0      |
