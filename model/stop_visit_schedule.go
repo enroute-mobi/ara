@@ -36,6 +36,11 @@ func (schedule *StopVisitSchedule) SetArrivalTime(t time.Time) time.Time {
 	return t
 }
 
+func (schedule *StopVisitSchedule) SetDepartureTime(t time.Time) time.Time {
+	schedule.departureTime = t
+	return t
+}
+
 func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
 	jsonSchedule := map[string]interface{}{
 		"Kind": schedule.kind,
@@ -82,6 +87,22 @@ func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
 	}
 }
 
+func (schedules StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
+	_, ok := schedules[kind]
+	if !ok {
+		schedules[kind] = &StopVisitSchedule{}
+	}
+	schedules[kind].SetDepartureTime(departureTime)
+}
+
+func (schedules StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, arrivalTime time.Time) {
+	_, ok := schedules[kind]
+	if !ok {
+		schedules[kind] = &StopVisitSchedule{}
+	}
+	schedules[kind].SetArrivalTime(arrivalTime)
+}
+
 func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
 	_, ok := schedules[kind]
 	if !ok {
@@ -100,4 +121,28 @@ func (schedules StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVi
 		return &StopVisitSchedule{}
 	}
 	return schedule
+}
+
+func (schedules StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitScheduleType) time.Time {
+	if kinds == nil {
+		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
+	}
+	for _, kind := range kinds {
+		if value, ok := schedules[kind]; ok {
+			return value.ArrivalTime()
+		}
+	}
+	return time.Time{}
+}
+
+func (schedules StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitScheduleType) time.Time {
+	if kinds == nil {
+		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
+	}
+	for _, kind := range kinds {
+		if value, ok := schedules[kind]; ok {
+			return value.DepartureTime()
+		}
+	}
+	return time.Time{}
 }

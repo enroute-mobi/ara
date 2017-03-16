@@ -74,9 +74,6 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.SetObjectID(NewObjectID("_default", stopVisitAttributes.ObjectId.HashValue()))
 	stopVisit.Schedules = stopVisitAttributes.Schedules
 
-	// f, _ := os.OpenFile("/tmp/data", os.O_RDWR|os.O_APPEND|os.O_APPEND, 0660)
-	// f.WriteString(fmt.Sprintf("== %v", stopVisitAttributes.Schedules))
-	//
 	stopVisit.DepartureStatus = stopVisitAttributes.DepartureStatus
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 	stopVisit.Attributes = stopVisitAttributes.Attributes

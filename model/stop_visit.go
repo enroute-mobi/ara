@@ -77,7 +77,6 @@ func (stopVisit *StopVisit) CollectedAt() time.Time {
 func (stopVisit *StopVisit) Collected(t time.Time) {
 	stopVisit.collected = true
 	stopVisit.collectedAt = t
-
 }
 
 func (stopVisit *StopVisit) Id() StopVisitId {
