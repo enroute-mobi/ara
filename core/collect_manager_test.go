@@ -25,8 +25,8 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	partners := createTestPartnerManager()
 	collectManager := &CollectManager{
-		partners:                   partners,
-		stopVisitUpdateSubscribers: make([]StopVisitUpdateSubscriber, 0),
+		partners:                  partners,
+		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
@@ -34,9 +34,9 @@ func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	partners.Save(partner)
 
 	testManager := &TestCollectManager{}
-	collectManager.HandleStopVisitUpdateEvent(testManager.TestStopVisitUpdateSubscriber)
+	collectManager.HandleStopVisitUpdateEvent(testManager.TestStopAreaUpdateSubscriber)
 
-	if len(collectManager.stopVisitUpdateSubscribers) != 1 {
+	if len(collectManager.StopAreaUpdateSubscribers) != 1 {
 		t.Error("CollectManager should have a subscriber after HandleStopVisitUpdateEvent call")
 	}
 

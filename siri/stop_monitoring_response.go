@@ -110,9 +110,11 @@ type SIRIMonitoredStopVisit struct {
 	PublishedLineName      string
 	DepartureStatus        string
 	ArrivalStatus          string
-	VehicleAtStop          bool
 	VehicleJourneyName     string
 	StopAreaObjectId       string
+
+	VehicleAtStop bool
+	Monitored     bool
 
 	Order int
 
@@ -186,7 +188,7 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					<ns3:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</ns3:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}
 					<ns3:OriginAimedDepartureTime>{{.Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}</ns3:OriginAimedDepartureTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}
 					<ns3:DestinationAimedArrivalTime>{{.Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}</ns3:DestinationAimedArrivalTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}
-					<ns3:FirstOrLastJourney>{{.Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}</ns3:FirstOrLastJourney>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Monitored}}
+					<ns3:FirstOrLastJourney>{{.Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}</ns3:FirstOrLastJourney>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Monitored }}
 					<ns3:Monitored>{{.Attributes.VehicleJourneyAttributes.Monitored}}</ns3:Monitored>{{end}}{{ if .Attributes.VehicleJourneyAttributes.MonitoringError}}
 					<ns3:MonitoringError>{{.Attributes.VehicleJourneyAttributes.MonitoringError}}</ns3:MonitoringError>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Occupancy }}
 					<ns3:Occupancy>{{.Attributes.VehicleJourneyAttributes.Occupancy}}</ns3:Occupancy>{{end}}{{if .Attributes.VehicleJourneyAttributes.Delay}}
@@ -327,13 +329,6 @@ func (visit *XMLMonitoredStopVisit) RecordedAt() time.Time {
 		visit.recordedAt = visit.findTimeChildContent("RecordedAtTime")
 	}
 	return visit.recordedAt
-}
-
-func (visit *XMLMonitoredStopVisit) VehicleAtStop() bool {
-	if !visit.vehicleAtStop.Defined {
-		visit.vehicleAtStop.Parse(visit.findStringChildContent("VehicleAtStop"))
-	}
-	return visit.vehicleAtStop.Value
 }
 
 func (visit *XMLMonitoredStopVisit) Order() int {
@@ -545,6 +540,13 @@ func (visit *XMLMonitoredStopVisit) JourneyPatternName() string {
 		visit.journeyPatternName = visit.findStringChildContent("JourneyPatternName")
 	}
 	return visit.journeyPatternName
+}
+
+func (visit *XMLMonitoredStopVisit) VehicleAtStop() bool {
+	if !visit.vehicleAtStop.Defined {
+		visit.vehicleAtStop.Parse(visit.findStringChildContent("VehicleAtStop"))
+	}
+	return visit.vehicleAtStop.Value
 }
 
 func (visit *XMLMonitoredStopVisit) Monitored() string {

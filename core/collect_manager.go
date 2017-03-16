@@ -5,19 +5,19 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type StopVisitUpdateSubscriber func(*model.StopVisitUpdateEvent)
+type StopAreaUpdateSubscriber func(*model.StopVisitUpdateEvent)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
-	HandleStopVisitUpdateEvent(StopVisitUpdateSubscriber)
+	HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber)
 }
 
 type CollectManager struct {
-	partners                   Partners
-	stopVisitUpdateSubscribers []StopVisitUpdateSubscriber
+	partners                  Partners
+	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
 }
 
-// TestCollectManager has a test StopVisitUpdateSubscriber method
+// TestCollectManager has a test StopAreaUpdateSubscriber method
 type TestCollectManager struct {
 	Done            chan bool
 	Events          []*model.StopAreaUpdateEvent
@@ -37,28 +37,28 @@ func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest
 	manager.Done <- true
 }
 
-func (manager *TestCollectManager) TestStopVisitUpdateSubscriber(event *model.StopVisitUpdateEvent) {
+func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.StopVisitUpdateEvent) {
 	manager.StopVisitEvents = append(manager.StopVisitEvents, event)
 }
 
-func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopVisitUpdateSubscriber) {}
+func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber) {}
 
 // TEST END
 
 func NewCollectManager(partners Partners) CollectManagerInterface {
 	return &CollectManager{
-		partners:                   partners,
-		stopVisitUpdateSubscribers: make([]StopVisitUpdateSubscriber, 0),
+		partners:                  partners,
+		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
 }
 
-func (manager *CollectManager) HandleStopVisitUpdateEvent(stopVisitUpdateSubscriber StopVisitUpdateSubscriber) {
-	manager.stopVisitUpdateSubscribers = append(manager.stopVisitUpdateSubscribers, stopVisitUpdateSubscriber)
+func (manager *CollectManager) HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
+	manager.StopAreaUpdateSubscribers = append(manager.StopAreaUpdateSubscribers, StopAreaUpdateSubscriber)
 }
 
 func (manager *CollectManager) broadcastStopVisitUpdateEvent(event *model.StopVisitUpdateEvent) {
-	for _, stopVisitUpdateSubscriber := range manager.stopVisitUpdateSubscribers {
-		stopVisitUpdateSubscriber(event)
+	for _, StopAreaUpdateSubscriber := range manager.StopAreaUpdateSubscribers {
+		StopAreaUpdateSubscriber(event)
 	}
 }
 

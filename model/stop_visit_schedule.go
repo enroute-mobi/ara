@@ -31,6 +31,11 @@ func (schedule *StopVisitSchedule) ArrivalTime() time.Time {
 	return schedule.arrivalTime
 }
 
+func (schedule *StopVisitSchedule) SetArrivalTime(t time.Time) time.Time {
+	schedule.arrivalTime = t
+	return t
+}
+
 func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
 	jsonSchedule := map[string]interface{}{
 		"Kind": schedule.kind,
@@ -69,6 +74,12 @@ type StopVisitSchedules map[StopVisitScheduleType]*StopVisitSchedule
 func NewStopVisitSchedules() StopVisitSchedules {
 	schedules := make(StopVisitSchedules)
 	return schedules
+}
+
+func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
+	for key, value := range newSchedules {
+		(*schedules)[key] = value
+	}
 }
 
 func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {

@@ -119,6 +119,7 @@ Feature: Support SIRI StopMonitoring
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[actual]#Arrival             | 2017-01-01T13:00:00.000Z                                        |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -188,6 +189,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
+                <ns3:ActualArrivalTime>2017-01-01T13:00:00.000Z</ns3:ActualArrivalTime>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
@@ -445,11 +447,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns5:StopPointName>Arletty</ns5:StopPointName>
                 <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
                 <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
-                <ns5:AimedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:AimedArrivalTime>
-                <ns5:ExpectedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedArrivalTime>
+                <ns5:AimedArrivalTime>2017-01-01T13:43:05.000+01:00</ns5:AimedArrivalTime>
+                <ns5:ExpectedArrivalTime>2017-01-01T13:43:05.000+01:00</ns5:ExpectedArrivalTime>
                 <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
-                <ns5:AimedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:AimedDepartureTime>
-                <ns5:ExpectedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedDepartureTime>
+                <ns5:AimedDepartureTime>2017-01-01T13:43:05.000+01:00</ns5:AimedDepartureTime>
+                <ns5:ExpectedDepartureTime>2017-01-01T13:43:05.000+01:00</ns5:ExpectedDepartureTime>
                 <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney>
@@ -480,7 +482,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
-      | MonitoredAlways | false                                                                   |
+      | CollectedAlways | false                                                                   |
     And a minute has passed
     When I send this SIRI request
       """
@@ -557,11 +559,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:StopPointName>Arletty</ns3:StopPointName>
                 <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                 <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                <ns3:AimedArrivalTime>2017-01-01T12:43:05.000+01:00</ns3:AimedArrivalTime>
-                <ns3:ExpectedArrivalTime>2017-01-01T12:43:05.000+01:00</ns3:ExpectedArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T13:43:05.000+01:00</ns3:AimedArrivalTime>
+                <ns3:ExpectedArrivalTime>2017-01-01T13:43:05.000+01:00</ns3:ExpectedArrivalTime>
                 <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                <ns3:AimedDepartureTime>2017-01-01T12:43:05.000+01:00</ns3:AimedDepartureTime>
-                <ns3:ExpectedDepartureTime>2017-01-01T12:43:05.000+01:00</ns3:ExpectedDepartureTime>
+                <ns3:AimedDepartureTime>2017-01-01T13:43:05.000+01:00</ns3:AimedDepartureTime>
+                <ns3:ExpectedDepartureTime>2017-01-01T13:43:05.000+01:00</ns3:ExpectedDepartureTime>
                 <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
@@ -634,11 +636,11 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns5:StopPointName>Arletty</ns5:StopPointName>
                 <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
                 <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
-                <ns5:AimedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:AimedArrivalTime>
-                <ns5:ExpectedArrivalTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedArrivalTime>
+                <ns5:AimedArrivalTime>2017-01-01T12:43:05.000+00:00</ns5:AimedArrivalTime>
+                <ns5:ExpectedArrivalTime>2017-01-01T12:43:05.000+00:00</ns5:ExpectedArrivalTime>
                 <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
-                <ns5:AimedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:AimedDepartureTime>
-                <ns5:ExpectedDepartureTime>2017-01-01T12:43:05.000+01:00</ns5:ExpectedDepartureTime>
+                <ns5:AimedDepartureTime>2017-01-01T12:43:05.000</ns5:AimedDepartureTime>
+                <ns5:ExpectedDepartureTime>2017-01-01T12:43:05.000</ns5:ExpectedDepartureTime>
                 <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney>
@@ -668,7 +670,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | Test 2                                                                  |
       | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
-      | MonitoredAlways | false                                                                   |
+      | CollectedAlways | false                                                                   |
     And a minute has passed
     And the SIRI server waits GetStopMonitoring request to respond with
       """
@@ -1136,7 +1138,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1               |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false |
+      | CollectedAlways | false |
     When a minute has passed
     Then the SIRI server should not have received a GetStopMonitoring request
 
@@ -1229,7 +1231,8 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Name            | arrêt 1               |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | MonitoredAlways | false |
-    When I send a SIRI GetStopMonitoring request with
+      | CollectedAlways | false |
+    When I send this SIRI GetStopMonitoring request with :
       | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
       | RequestorRef      | test                       |
       | MessageIdentifier | StopMonitoring:Test:0      |
