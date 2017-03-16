@@ -1230,8 +1230,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1               |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | MonitoredAlways | false |
       | CollectedAlways | false |
-    When I send this SIRI GetStopMonitoring request with :
+    When I send a SIRI GetStopMonitoring request with
       | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
       | RequestorRef      | test                       |
       | MessageIdentifier | StopMonitoring:Test:0      |
@@ -1239,7 +1240,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | MonitoringRef     | NINOXE:StopPoint:SP:24:LOC |
       | StopVisitTypes    | all                        |
     And a minute has passed
-    Then the SIRI server should have received a GetStopMonitoring request with:
+    Then the SIRI server should have received a GetStopMonitoring request with
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     And the StopArea "arrêt 1" should have the following attributes:
       | MonitoredUntil | ~ 07h54 |
