@@ -7,15 +7,23 @@ import (
 )
 
 func Test_CollectManager_BestPartner(t *testing.T) {
+	testModel := model.NewMemoryModel()
+
+	stopArea := testModel.StopAreas().New()
+	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
+	stopArea.Save()
+
 	partners := createTestPartnerManager()
-	collectManager := NewCollectManager(partners)
+	collectManager := NewCollectManager(partners, testModel)
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
 	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+	partner.Settings["collect.include_stop_areas"] = "boarle"
+	partner.Settings["remote_objectid_kind"] = "internal"
 	partners.Save(partner)
 
-	foundPartner := collectManager.(*CollectManager).bestPartner(NewStopAreaUpdateRequest(model.StopAreaId("id")))
+	foundPartner := collectManager.(*CollectManager).bestPartner(NewStopAreaUpdateRequest(stopArea.Id()))
 
 	if foundPartner != partner {
 		t.Errorf("collectManager.bestPartner should return correct partner:\n got: %v\n want: %v", foundPartner, partner)
@@ -24,13 +32,24 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 
 func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	partners := createTestPartnerManager()
+	testModel := model.NewMemoryModel()
 	collectManager := &CollectManager{
+		model:                     testModel,
 		partners:                  partners,
 		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
+
+	stopArea := testModel.StopAreas().New()
+	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
+	stopArea.Save()
+
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
+	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+	partner.Settings["collect.include_stop_areas"] = "boarle"
+	partner.Settings["remote_objectid_kind"] = "internal"
+
 	partners.Save(partner)
 
 	testManager := &TestCollectManager{}
@@ -40,7 +59,7 @@ func Test_CollectManager_UpdateStopArea(t *testing.T) {
 		t.Error("CollectManager should have a subscriber after HandleStopVisitUpdateEvent call")
 	}
 
-	request := &StopAreaUpdateRequest{}
+	request := NewStopAreaUpdateRequest(stopArea.Id())
 	collectManager.UpdateStopArea(request)
 
 	if len(testManager.StopVisitEvents) != 1 {

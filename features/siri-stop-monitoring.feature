@@ -80,9 +80,10 @@ Feature: Support SIRI StopMonitoring
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
+      | remote_url                                   | http://localhost:8090 |
+      | remote_credential                            | test                  |
+      | remote_objectid_kind                         | internal              |
+      | collect.include_stop_areas                   | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |

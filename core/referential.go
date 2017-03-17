@@ -231,7 +231,7 @@ func (manager *MemoryReferentials) new() *Referential {
 	}
 
 	referential.partners = NewPartnerManager(referential)
-	referential.collectManager = NewCollectManager(referential.partners)
+	referential.collectManager = NewCollectManager(referential.partners, referential.model)
 
 	referential.modelGuardian = NewModelGuardian(referential)
 	referential.setNextReloadAt()

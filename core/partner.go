@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -28,6 +30,7 @@ type Partners interface {
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
 	FindByLocalCredential(credential string) (*Partner, bool)
+	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
@@ -47,6 +50,22 @@ type Partner struct {
 	connectors map[string]Connector
 	context    Context
 	manager    Partners
+}
+
+type ByPriority []*Partner
+
+func (a ByPriority) Len() int      { return len(a) }
+func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByPriority) Less(i, j int) bool {
+	first, _ := strconv.Atoi(a[i].Settings["collect.include_stop_areas"])
+	second, _ := strconv.Atoi(a[j].Settings["collect.include_stop_areas"])
+	return first < second
+}
+
+func (manager *PartnerManager) FindAllByCollectPriority() []*Partner {
+	partners := manager.FindAll()
+	sort.Sort(ByPriority(partners))
+	return partners
 }
 
 type APIPartner struct {
@@ -200,6 +219,21 @@ func (partner *Partner) Definition() *APIPartner {
 		Errors:         NewErrors(),
 		manager:        partner.manager,
 	}
+}
+
+func (partner *Partner) CollectPriority() int {
+	value, _ := strconv.Atoi(partner.Settings["collect.priority"])
+	return value
+}
+
+func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID) bool {
+	stopAreas := strings.Split(partner.Settings["collect.include_stop_areas"], ",")
+	for _, stopArea := range stopAreas {
+		if stopArea == stopAreaObjectId.Value() {
+			return true
+		}
+	}
+	return true
 }
 
 // APIPartner.Validate should be called for APIPartner factories to be set

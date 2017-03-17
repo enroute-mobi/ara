@@ -88,11 +88,35 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	// WIP
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
+
 	connector.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
 
+	stopVisitsIds := []model.StopVisitId{}
+	for _, stopVisit := range connector.Partner().Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
+		if stopVisit.IsCollected() == true {
+			stopVisitsIds = append(stopVisitsIds, stopVisit.Id())
+		}
+	}
+
+	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, stopVisitsIds)
 	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
 
 	return stopAreaUpdateEvent, nil
+}
+
+func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotCollectedEvent(event *model.StopAreaUpdateEvent, stopVisitsIds []model.StopVisitId) {
+	objId := make(map[string]bool)
+
+	for _, stopVisitEvent := range event.StopVisitUpdateEvents {
+		objId[stopVisitEvent.StopVisitObjectid.Value()] = true
+	}
+
+	for _, stopVisitid := range stopVisitsIds {
+		if _, ok := objId[string(stopVisitid)]; !ok {
+			stopVisitObjectId := model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), string(stopVisitid))
+			event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, &model.StopVisitNotCollectedEvent{StopVisitObjectId: stopVisitObjectId})
+		}
+	}
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(event *model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {

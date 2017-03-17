@@ -1,8 +1,13 @@
 package model
 
 type StopAreaUpdateEvent struct {
-	id                    string
-	StopVisitUpdateEvents []*StopVisitUpdateEvent
+	id                          string
+	StopVisitUpdateEvents       []*StopVisitUpdateEvent
+	StopVisitNotCollectedEvents []*StopVisitNotCollectedEvent
+}
+
+type StopVisitNotCollectedEvent struct {
+	StopVisitObjectId ObjectID
 }
 
 func NewStopAreaUpdateEvent(id string) *StopAreaUpdateEvent {

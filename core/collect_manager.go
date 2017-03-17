@@ -15,6 +15,7 @@ type CollectManagerInterface interface {
 type CollectManager struct {
 	partners                  Partners
 	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
+	model                     model.Model
 }
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
@@ -45,9 +46,10 @@ func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopAreaUpdateSubs
 
 // TEST END
 
-func NewCollectManager(partners Partners) CollectManagerInterface {
+func NewCollectManager(partners Partners, model model.Model) CollectManagerInterface {
 	return &CollectManager{
-		partners:                  partners,
+		partners: partners,
+		model:    model,
 		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
 }
@@ -81,18 +83,34 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
-	var testPartner *Partner
-	for _, partner := range manager.partners.FindAll() {
-		_, ok := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
-		if ok && partner.OperationnalStatus() == OPERATIONNAL_STATUS_UP {
+	for _, partner := range manager.partners.FindAllByCollectPriority() {
+		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+		_, connectorPresent := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
+		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
+
+		if !(connectorPresent || testConnectorPresent) {
+			continue
+		}
+
+		stopArea, ok := manager.model.StopAreas().Find(request.StopAreaId())
+		if !ok {
+			continue
+		}
+
+		partnerKind := partner.Setting("remote_objectid_kind")
+
+		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
+		if !ok {
+			continue
+		}
+
+		if partner.CanCollect(stopAreaObjectID) {
 			return partner
 		}
-		_, ok = partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
-		if ok {
-			testPartner = partner
-		}
 	}
-	return testPartner
+	return nil
 }
 
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
