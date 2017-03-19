@@ -59,7 +59,8 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	logger.Log.Debugf("Check StopAreas status")
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if !stopArea.CollectedAlways && stopArea.CollectedUntil.After(guardian.Clock().Now()) == false {
+		now := guardian.Clock().Now()
+		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
 			continue
 		}
 
@@ -67,7 +68,6 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 		defer stopAreaTx.Close()
 		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
 
-		now := guardian.Clock().Now()
 		outdated := now.Add(-1 * time.Minute)
 
 		if transactionnalStopArea.RequestedAt().Before(outdated) && transactionnalStopArea.UpdatedAt().Before(outdated) {
