@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/af83/edwig/logger"
@@ -100,7 +99,7 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 			stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ARRIVED
 			stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, now)
 		}
-		fmt.Println(arrivalTime, departureTime)
+
 		if guardian.Clock().Now().After(arrivalTime) && departureTime.After(guardian.Clock().Now()) {
 			stopVisit.VehicleAtStop = true
 		}
