@@ -145,7 +145,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
-		stopVisit.Collected(connector.Clock().Now())
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
 	}
 

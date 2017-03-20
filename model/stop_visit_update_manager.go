@@ -47,6 +47,7 @@ func (updater *StopVisitUpdater) Update() {
 		existingStopVisit.ArrivalStatus = updater.event.ArrivalStatuts
 		existingStopVisit.RecordedAt = updater.event.RecordedAt
 		existingStopVisit.VehicleAtStop = updater.event.VehicleAtStop
+		existingStopVisit.Collected(updater.Clock().Now())
 
 		updater.tx.Model().StopVisits().Save(&existingStopVisit)
 		updater.tx.Model().StopAreas().Save(&stopArea)
