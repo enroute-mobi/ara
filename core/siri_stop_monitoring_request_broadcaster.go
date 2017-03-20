@@ -60,7 +60,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response.ResponseTimestamp = connector.Clock().Now()
 
 	// Fill StopVisits
-	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
+	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
 		var itemIdentifier string
 		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
 		if ok {
