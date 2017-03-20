@@ -305,17 +305,16 @@ func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []S
 		}
 	}
 
-	sort.Sort(ByTime(stopVisits))
 	return
 }
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
-
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
+	sort.Sort(ByTime(stopVisits))
 	return
 }
 
