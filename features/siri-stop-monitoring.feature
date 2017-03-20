@@ -120,7 +120,7 @@ Feature: Support SIRI StopMonitoring
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                              |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     And I see edwig vehicle_journeys
     And I see edwig stop_visits
     And I see edwig lines

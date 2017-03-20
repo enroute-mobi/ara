@@ -22,7 +22,7 @@ type StopVisitAttributes struct {
 	VehicleAtStop   bool
 
 	Attributes Attributes
-	References map[string]Reference
+	References References
 }
 
 type StopVisit struct {
@@ -35,8 +35,8 @@ type StopVisit struct {
 
 	StopAreaId       StopAreaId
 	VehicleJourneyId VehicleJourneyId
-	Attributes       map[string]string
-	References       map[string]Reference
+	Attributes       Attributes
+	References       References
 
 	ArrivalStatus   StopVisitArrivalStatus
 	DepartureStatus StopVisitDepartureStatus
@@ -51,8 +51,8 @@ func NewStopVisit(model Model) *StopVisit {
 	stopVisit := &StopVisit{
 		model:      model,
 		Schedules:  NewStopVisitSchedules(),
-		Attributes: make(map[string]string),
-		References: make(map[string]Reference),
+		Attributes: NewAttributes(),
+		References: NewReferences(),
 	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
