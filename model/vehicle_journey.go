@@ -19,7 +19,7 @@ type VehicleJourney struct {
 
 	LineId     LineId
 	Name       string
-	Attributes map[string]string
+	Attributes Attributes
 	References map[string]Reference
 }
 
@@ -38,7 +38,10 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 }
 
 func (vehicleJourney *VehicleJourney) Line() *Line {
-	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
+	line, ok := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
+	if !ok {
+		return nil
+	}
 	return &line
 }
 

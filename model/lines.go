@@ -16,7 +16,7 @@ type Line struct {
 	id LineId
 
 	Name       string
-	Attributes map[string]string
+	Attributes Attributes
 	References map[string]Reference
 }
 

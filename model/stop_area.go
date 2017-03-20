@@ -24,7 +24,7 @@ type StopArea struct {
 	CollectedAlways bool
 
 	Name       string
-	Attributes map[string]string
+	Attributes Attributes
 	References map[string]Reference
 	// ...
 }

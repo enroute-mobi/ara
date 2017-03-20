@@ -21,7 +21,7 @@ type StopVisitAttributes struct {
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
 
-	Attributes map[string]string
+	Attributes Attributes
 	References map[string]Reference
 }
 
@@ -89,7 +89,10 @@ func (stopVisit *StopVisit) StopArea() StopArea {
 }
 
 func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
-	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	vehicleJourney, ok := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	if !ok {
+		return nil
+	}
 	return &vehicleJourney
 }
 
@@ -307,17 +310,16 @@ func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []S
 		}
 	}
 
-	sort.Sort(ByTime(stopVisits))
 	return
 }
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
-
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
+	sort.Sort(ByTime(stopVisits))
 	return
 }
 
