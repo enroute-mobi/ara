@@ -27,6 +27,9 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
 		t.Errorf("StopVisit ArrivalStatus should be updated")
 	}
+	if !updatedStopVisit.IsCollected() {
+		t.Errorf("StopVisit ArrivalStatus should be collected")
+	}
 }
 
 func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
