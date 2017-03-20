@@ -63,6 +63,8 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	if !ok {
 		return nil, fmt.Errorf("StopArea not found")
 	}
+
+	objectidKind := connector.partner.Setting("remote_objectid_kind")
 	objectid, ok := stopArea.ObjectID(connector.partner.Setting("remote_objectid_kind"))
 	if !ok {
 		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), connector.partner.Setting("remote_objectid_kind"))
@@ -91,30 +93,32 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	connector.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
 
-	stopVisitsIds := []model.StopVisitId{}
+	collectedStopVisitObjectIDs := []model.ObjectID{}
 	for _, stopVisit := range connector.Partner().Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
 		if stopVisit.IsCollected() == true {
-			stopVisitsIds = append(stopVisitsIds, stopVisit.Id())
+			objectId, ok := stopVisit.ObjectID(objectidKind)
+			if ok {
+				collectedStopVisitObjectIDs = append(collectedStopVisitObjectIDs, objectId)
+			}
 		}
 	}
 
-	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, stopVisitsIds)
+	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, collectedStopVisitObjectIDs)
 	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
 
 	return stopAreaUpdateEvent, nil
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotCollectedEvent(event *model.StopAreaUpdateEvent, stopVisitsIds []model.StopVisitId) {
-	objId := make(map[string]bool)
+func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotCollectedEvent(event *model.StopAreaUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID) {
+	objId := make(map[model.ObjectID]bool)
 
 	for _, stopVisitEvent := range event.StopVisitUpdateEvents {
-		objId[stopVisitEvent.StopVisitObjectid.Value()] = true
+		objId[stopVisitEvent.StopVisitObjectid] = true
 	}
 
-	for _, stopVisitid := range stopVisitsIds {
-		if _, ok := objId[string(stopVisitid)]; !ok {
-			stopVisitObjectId := model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), string(stopVisitid))
-			event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, &model.StopVisitNotCollectedEvent{StopVisitObjectId: stopVisitObjectId})
+	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
+		if _, ok := objId[stopVisitObjectID]; !ok {
+			event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, &model.StopVisitNotCollectedEvent{StopVisitObjectId: stopVisitObjectID})
 		}
 	}
 }

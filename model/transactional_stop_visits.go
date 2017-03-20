@@ -1,5 +1,7 @@
 package model
 
+import "sort"
+
 type TransactionalStopVisits struct {
 	UUIDConsumer
 	ClockConsumer
@@ -87,18 +89,18 @@ func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVis
 }
 
 func (manager *TransactionalStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
-
 	for _, stopVisit := range manager.saved {
 		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
-	for _, modelStopVisit := range manager.model.StopVisits().FindByStopAreaId(id) {
-		_, ok := manager.saved[modelStopVisit.Id()]
-		if !ok && modelStopVisit.ReferenceTime().After(manager.Clock().Now()) {
+	for _, modelStopVisit := range manager.model.StopVisits().FindFollowingByStopAreaId(id) {
+		_, saved := manager.saved[modelStopVisit.Id()]
+		if !saved {
 			stopVisits = append(stopVisits, modelStopVisit)
 		}
 	}
+	sort.Sort(ByTime(stopVisits))
 	return
 }
 

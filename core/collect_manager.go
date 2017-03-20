@@ -5,11 +5,11 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type StopAreaUpdateSubscriber func(*model.StopVisitUpdateEvent)
+type StopAreaUpdateSubscriber func(*model.StopAreaUpdateEvent)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
-	HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber)
+	HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)
 }
 
 type CollectManager struct {
@@ -38,11 +38,13 @@ func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest
 	manager.Done <- true
 }
 
-func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.StopVisitUpdateEvent) {
-	manager.StopVisitEvents = append(manager.StopVisitEvents, event)
+func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.StopAreaUpdateEvent) {
+	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
+		manager.StopVisitEvents = append(manager.StopVisitEvents, stopVisitUpdateEvent)
+	}
 }
 
-func (manager *TestCollectManager) HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber) {}
+func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
 
 // TEST END
 
@@ -54,11 +56,11 @@ func NewCollectManager(partners Partners, model model.Model) CollectManagerInter
 	}
 }
 
-func (manager *CollectManager) HandleStopVisitUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
+func (manager *CollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
 	manager.StopAreaUpdateSubscribers = append(manager.StopAreaUpdateSubscribers, StopAreaUpdateSubscriber)
 }
 
-func (manager *CollectManager) broadcastStopVisitUpdateEvent(event *model.StopVisitUpdateEvent) {
+func (manager *CollectManager) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
 	for _, StopAreaUpdateSubscriber := range manager.StopAreaUpdateSubscribers {
 		StopAreaUpdateSubscriber(event)
 	}
@@ -77,9 +79,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		return
 	}
 
-	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
-		manager.broadcastStopVisitUpdateEvent(stopVisitUpdateEvent)
-	}
+	manager.broadcastStopAreaUpdateEvent(event)
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {

@@ -144,33 +144,35 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
-	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Schedules = make(model.StopVisitSchedules)
-	stopVisit.Schedules["actual"] = &model.StopVisitSchedule{}
-	stopVisit.Schedules["actual"].SetArrivalTime(model.DefaultClock().Now().Add(2 * time.Hour))
-	stopVisit.SetObjectID(objectid)
-	stopVisit.Save()
-
-	stopVisit2 := referential.Model().StopVisits().New()
-	stopVisit2.StopAreaId = stopArea.Id()
-	stopVisit2.Schedules = make(model.StopVisitSchedules)
-	stopVisit2.Schedules["actual"] = &model.StopVisitSchedule{}
-	stopVisit2.Schedules["actual"].SetArrivalTime(model.DefaultClock().Now().Add(1 * time.Hour))
-	stopVisit2.SetObjectID(objectid)
-	stopVisit2.Save()
-
-	vehicleJourney := referential.Model().VehicleJourneys().New()
-	vehicleJourney.SetObjectID(objectid)
-	vehicleJourney.Save()
-
 	line := referential.Model().Lines().New()
 	line.SetObjectID(objectid)
 	line.Save()
 
-	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.SetObjectID(objectid)
 	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "second"))
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.Save()
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea.Id()
+	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "first"))
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.Save()
+
+	pastStopVisit := referential.Model().StopVisits().New()
+	pastStopVisit.StopAreaId = stopArea.Id()
+	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
+	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "past"))
+	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
+	pastStopVisit.Save()
 
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
@@ -178,6 +180,10 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	response, err := siri.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if len(response.XMLMonitoredStopVisits()) != 2 {
+		t.Errorf("Past StopVisit should be ignored")
 	}
 
 	if !response.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(response.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {

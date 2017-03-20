@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -60,7 +61,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response.ResponseTimestamp = connector.Clock().Now()
 
 	// Fill StopVisits
-	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
+	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
 		var itemIdentifier string
 		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
 		if ok {
@@ -77,10 +78,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 		vehicleJourney := stopVisit.VehicleJourney()
 		if vehicleJourney == nil {
+			logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
 			continue
 		}
 		line := vehicleJourney.Line()
 		if line == nil {
+			logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
 			continue
 		}
 
@@ -142,7 +145,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
-		stopVisit.Collected(connector.Clock().Now())
 		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
 	}
 
