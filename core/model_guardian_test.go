@@ -42,14 +42,13 @@ func Test_ModelGuardian_Run(t *testing.T) {
 	}
 }
 
-func Test_ModelGuardian_Run_On_MonitoredUntil(t *testing.T) {
+func Test_ModelGuardian_RefreshStopAreas_MonitoredUntil(t *testing.T) {
 	referential := &Referential{
 		model:          model.NewMemoryModel(),
 		collectManager: NewTestCollectManager(),
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
 
-	requested := time.Time{}
 	fakeClock := model.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
 
@@ -57,36 +56,29 @@ func Test_ModelGuardian_Run_On_MonitoredUntil(t *testing.T) {
 	stopArea.CollectedAlways = false
 	stopArea.CollectedUntil = fakeClock.Now().Add(15 * time.Minute)
 	referential.Model().StopAreas().Save(&stopArea)
-	stopAreaId := stopArea.Id()
 
-	referential.ModelGuardian().Start()
-	defer referential.ModelGuardian().Stop()
+	referential.modelGuardian.refreshStopAreas()
 
-	// Wait for the guardian to launch Run
-	fakeClock.BlockUntil(1)
-	// Advance time
-	fakeClock.Advance(11 * time.Second)
-
-	select {
-	case <-referential.CollectManager().(*TestCollectManager).Done:
-		updatedStopArea, ok := referential.Model().StopAreas().Find(stopAreaId)
-		if !ok {
-			t.Error("StopArea should still be found after guardian work")
-		} else if requested = updatedStopArea.RequestedAt(); requested != fakeClock.Now() {
-			t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
-		}
-	case <-time.After(5 * time.Second):
-		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")
+	updatedStopArea, ok := referential.Model().StopAreas().Find(stopArea.Id())
+	if !ok {
+		t.Fatal("StopArea not found after guardian work")
 	}
 
-	fakeClock.Advance(16 * time.Minute)
+	if updatedStopArea.RequestedAt() != fakeClock.Now() {
+		t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
+	}
 
-	time.Sleep(100 * time.Millisecond)
-	updatedStopArea, ok := referential.Model().StopAreas().Find(stopAreaId)
+	requestedAt := updatedStopArea.RequestedAt()
+
+	fakeClock.Advance(15*time.Minute + time.Second)
+
+	referential.modelGuardian.refreshStopAreas()
+
+	updatedStopArea, ok = referential.Model().StopAreas().Find(stopArea.Id())
 	if !ok {
 		t.Error("StopArea should still be found after guardian work")
 	}
-	if updatedStopArea.RequestedAt() != requested {
+	if updatedStopArea.RequestedAt() != requestedAt {
 		t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
 	}
 }

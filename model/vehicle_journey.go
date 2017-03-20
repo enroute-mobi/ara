@@ -38,7 +38,10 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 }
 
 func (vehicleJourney *VehicleJourney) Line() *Line {
-	line, _ := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
+	line, ok := vehicleJourney.model.Lines().Find(vehicleJourney.LineId)
+	if !ok {
+		return nil
+	}
 	return &line
 }
 
