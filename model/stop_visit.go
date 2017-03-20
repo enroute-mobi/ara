@@ -89,7 +89,10 @@ func (stopVisit *StopVisit) StopArea() StopArea {
 }
 
 func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
-	vehicleJourney, _ := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	vehicleJourney, ok := stopVisit.model.VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	if !ok {
+		return nil
+	}
 	return &vehicleJourney
 }
 
