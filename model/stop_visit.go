@@ -131,6 +131,8 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		"ArrivalStatus":    stopVisit.ArrivalStatus,
 		"Attributes":       stopVisit.Attributes,
 		"References":       stopVisit.References,
+		"collected":        stopVisit.collected,
+		"collectedAt":      stopVisit.collectedAt,
 	}
 	if !stopVisit.ObjectIDs().Empty() {
 		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
@@ -146,6 +148,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		StopAreaId       string
 		VehicleJourneyId string
 		PassageOrder     int
+		CollectedAt      time.Time
 		Schedules        []StopVisitSchedule
 		*Alias
 	}{
@@ -177,7 +180,9 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	if aux.PassageOrder > 0 {
 		stopVisit.PassageOrder = aux.PassageOrder
 	}
-
+	if !aux.CollectedAt.IsZero() {
+		stopVisit.Collected(aux.CollectedAt)
+	}
 	return nil
 }
 

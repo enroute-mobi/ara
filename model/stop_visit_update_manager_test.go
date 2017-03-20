@@ -27,6 +27,15 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
 		t.Errorf("StopVisit ArrivalStatus should be updated")
 	}
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
+		t.Errorf("StopVisit ArrivalStatus should be updated")
+	}
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
+		t.Errorf("StopVisit ArrivalStatus should be updated")
+	}
+	if updatedStopVisit.IsCollected() != true {
+		t.Errorf("StopVisit Collected should be true")
+	}
 }
 
 func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
@@ -94,6 +103,7 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 		Name:     "stopArea",
 		ObjectId: objectid,
 	}
+
 	tx := NewTransaction(model)
 	defer tx.Close()
 	stopVisitUpdater := NewStopVisitUpdater(tx, nil)
