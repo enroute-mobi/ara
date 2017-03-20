@@ -13,7 +13,7 @@ type StopVisitUpdater struct {
 	event *StopVisitUpdateEvent
 }
 
-func NewStopAreaUpdateManager(model Model) func(*StopVisitUpdateEvent) {
+func NewStopAreaUpdateManager(model Model) func(*StopAreaUpdateEvent) {
 	manager := newStopAreaUpdateManager(model)
 	return manager.UpdateStopArea
 }
@@ -22,7 +22,13 @@ func newStopAreaUpdateManager(model Model) *StopAreaUpdateManager {
 	return &StopAreaUpdateManager{model: model}
 }
 
-func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopVisitUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
+	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
+		manager.UpdateStopVisit(stopVisitUpdateEvent)
+	}
+}
+
+func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
 	tx := NewTransaction(manager.model)
 	defer tx.Close()
 

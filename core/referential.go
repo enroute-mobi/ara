@@ -268,7 +268,7 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 		referential.id = ReferentialId(manager.NewUUID())
 	}
 	referential.manager = manager
-	referential.collectManager.HandleStopVisitUpdateEvent(model.NewStopAreaUpdateManager(referential.model))
+	referential.collectManager.HandleStopAreaUpdateEvent(model.NewStopAreaUpdateManager(referential.model))
 	manager.byId[referential.id] = referential
 	return true
 }
