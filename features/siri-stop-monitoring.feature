@@ -112,7 +112,7 @@ Feature: Support SIRI StopMonitoring
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8:LOC   |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
@@ -120,7 +120,10 @@ Feature: Support SIRI StopMonitoring
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival             | 2017-01-01T13:00:00.000Z                                        |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                              |
+    And I see edwig vehicle_journeys
+    And I see edwig stop_visits
+    And I see edwig lines
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -179,10 +182,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
             <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
             <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
+              <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
+              <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
               <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:MonitoredCall>
