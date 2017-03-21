@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -139,9 +138,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourney.References, tx.Model().StopAreas())
 		connector.reformatReferences(stopVisit.ToFormat(), stopVisit.References, tx.Model().StopAreas())
-
-		f, _ := os.Create("/tmp/data")
-		f.WriteString(fmt.Sprintf("salut %v\n", stopVisit.References))
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.References["StopVisitReferences"] = stopVisit.References
