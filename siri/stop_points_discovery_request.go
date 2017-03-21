@@ -9,7 +9,7 @@ type XMLStopDiscoveryRequest struct {
 	RequestXMLStructure
 }
 
-const stopDiscoveryResponseTemplate = `<ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
+const stopDiscoveryRequestTemplate = `<ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
                            xmlns:ns3="http://www.ifopt.org.uk/acsb"
                            xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -19,7 +19,7 @@ const stopDiscoveryResponseTemplate = `<ns7:StopPointsDiscovery xmlns:ns2="http:
               <ns2:RequestorRef>STIF</ns2:RequestorRef>
             </Request>
             <RequestExtension />
-          </ns7:StopPointsDiscovery>`
+						</ns7:StopPointsDiscovery>`
 
 func NewXMLStopDiscoveryRequest(node xml.Node) *XMLStopDiscoveryRequest {
 	xmlStopDiscoveryRequest := &XMLStopDiscoveryRequest{}
