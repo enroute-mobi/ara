@@ -1059,7 +1059,6 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ArrivalStatus     | onTime          |
       | ObjectIDs         | "internal": "C" |
 
-  @wip
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -1250,4 +1249,3 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     And the StopArea "arrêt 1" should have the following attributes:
       | MonitoredUntil | ~ 07h54 |
-    

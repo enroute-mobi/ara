@@ -47,7 +47,6 @@ func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
 	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
-	partner.Settings["collect.include_stop_areas"] = "boarle"
 	partner.Settings["remote_objectid_kind"] = "internal"
 
 	partners.Save(partner)
