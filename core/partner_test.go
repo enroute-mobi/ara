@@ -101,6 +101,61 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 	}
 }
 
+func Test_Partner_CanCollectTrue(t *testing.T) {
+	partner := &Partner{}
+	partner.Settings = make(map[string]string)
+	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
+
+	partner.Settings["collect.include_stop_areas"] = "NINOXE:StopPoint:SP:24:LOC"
+	if partner.CanCollect(stopAreaObjectId) != true {
+		t.Errorf("Partner can collect should return true")
+	}
+}
+
+func Test_Partner_CanCollectTrue2(t *testing.T) {
+	partner := &Partner{}
+	partner.Settings = make(map[string]string)
+	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
+
+	if partner.CanCollect(stopAreaObjectId) != true {
+		t.Errorf("Partner can collect should return true")
+	}
+}
+
+func Test_Partner_CanCollectFalse(t *testing.T) {
+	partner := &Partner{}
+	partner.Settings = make(map[string]string)
+	stopAreaObjectId := model.NewObjectID("internal", "BAD_VALUE")
+
+	partner.Settings["collect.include_stop_areas"] = "NINOXE:StopPoint:SP:24:LOC"
+	if partner.CanCollect(stopAreaObjectId) != false {
+		t.Errorf("Partner can collect should return flase")
+	}
+}
+
+func Test_Partners_FindAllByCollectPriority(t *testing.T) {
+	partners := createTestPartnerManager()
+	partner1 := Partner{}
+	partner2 := Partner{}
+
+	partner1.Settings = make(map[string]string)
+	partner2.Settings = make(map[string]string)
+
+	partner1.Settings["collect.priority"] = "2"
+	partner1.SetSlug("First")
+
+	partner2.Settings["collect.priority"] = "1"
+	partner2.SetSlug("Second")
+
+	partners.Save(&partner1)
+	partners.Save(&partner2)
+
+	orderedPartners := partners.FindAllByCollectPriority()
+	if orderedPartners[0].Slug() != "First" {
+		t.Errorf("Partners should be ordered")
+	}
+}
+
 func Test_APIPartner_SetFactories(t *testing.T) {
 	partner := &APIPartner{
 		ConnectorTypes: []string{"unexistant-factory", "test-check-status-client"},

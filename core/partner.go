@@ -57,9 +57,9 @@ type ByPriority []*Partner
 func (a ByPriority) Len() int      { return len(a) }
 func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByPriority) Less(i, j int) bool {
-	first, _ := strconv.Atoi(a[i].Settings["collect.include_stop_areas"])
-	second, _ := strconv.Atoi(a[j].Settings["collect.include_stop_areas"])
-	return first < second
+	first, _ := strconv.Atoi(a[i].Settings["collect.priority"])
+	second, _ := strconv.Atoi(a[j].Settings["collect.priority"])
+	return first > second
 }
 
 func (manager *PartnerManager) FindAllByCollectPriority() []*Partner {
@@ -181,6 +181,10 @@ func (partner *Partner) Slug() PartnerSlug {
 	return partner.slug
 }
 
+func (partner *Partner) SetSlug(s PartnerSlug) {
+	partner.slug = s
+}
+
 func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
 }
@@ -227,13 +231,16 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID) bool {
+	if partner.Settings["collect.include_stop_areas"] == "" {
+		return true
+	}
 	stopAreas := strings.Split(partner.Settings["collect.include_stop_areas"], ",")
 	for _, stopArea := range stopAreas {
 		if stopArea == stopAreaObjectId.Value() {
 			return true
 		}
 	}
-	return true
+	return false
 }
 
 // APIPartner.Validate should be called for APIPartner factories to be set
