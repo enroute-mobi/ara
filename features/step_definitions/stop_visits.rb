@@ -6,9 +6,9 @@ def stop_visit_path(id, attributes = {})
   url_for_model(attributes.merge(resource: 'stop_visit', id: id))
 end
 
-# Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
-#   RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json}
-# end
+Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
+  RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json}
+end
 
 When(/^a StopVisit is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
   if referential.nil?
@@ -42,22 +42,21 @@ Then(/^one StopVisit has the following attributes:$/) do |attributes|
   expect(expectedAttr).not_to be_nil
 end
 
-Then(/^a StopVisit exists with the following attributes:$/) do |attributes|
-  response = RestClient.get stop_visits_path
-  responseArray = JSON.parse(response.body)
+# Then(/^a StopVisit exists with the following attributes:$/) do |attributes|
+#   response = RestClient.get stop_visits_path
+#   puts response_array = JSON.parse(response.body)
 
-  attributes = model_attributes(attributes)
+#   attributes = model_attributes(attributes)
 
-  objectidkind = attributes["ObjectIDs"].keys.first
-  objectid_value = attributes["ObjectIDs"][objectidkind]
+#   objectid_kind = attributes["ObjectIDs"].keys.first
+#   objectid_value = attributes["ObjectIDs"][objectidkind]
 
-  expectedDepartureStatus = responseArray.find{|a| puts a["DepartureStatus"] == attributes["DepartureStatus"]}
-  expectedArrivalStatus = responseArray.find{|a| puts a["ArrivalStatus"] == attributes["ArrivalStatus"]}
-  expectedAttr = responseArray.find{|a| puts a["ObjectIDs"][objectidkind] == objectid_value }
+#   expected_departure_status = response_array.find{|a| puts a["DepartureStatus"] == attributes["DepartureStatus"]}
+#   expected_arrival_status = response_array.find{|a| puts a["ArrivalStatus"] == attributes["ArrivalStatus"]}
+#   expected_attributes = response_array.find{|a| puts a["ObjectIDs"][objectidkind] == object}
 
-  expect(expectedDepartureStatus).not_to be_nil
-  expect(expectedArrivalStatus).not_to be_nil
-  expect(expectedAttr).not_to be_nil
+#   expect(expected_departure_status).not_to be_nil
+#   expect(expecte_arrival_status).not_to be_nil
 end
 
 Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
