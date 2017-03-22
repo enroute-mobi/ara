@@ -40,8 +40,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		return nil, fmt.Errorf("StopArea not found")
 	}
 
-	if stopArea.CollectedAlways == false {
-		stopArea.CollectedUntil = connector.Clock().Now().Add(time.Duration(15) * time.Minute)
+	if !stopArea.CollectedAlways {
+		stopArea.CollectedUntil = connector.Clock().Now().Add(15 * time.Minute)
+		logger.Log.Printf("StopArea %s will be collected until %v", stopArea.Id(), stopArea.CollectedUntil)
+		stopArea.Save()
 	}
 
 	logStashEvent := make(audit.LogStashEvent)
