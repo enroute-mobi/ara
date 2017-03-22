@@ -7,8 +7,8 @@ type VehicleJourneyId string
 type VehicleJourneyAttributes struct {
 	ObjectId     ObjectID
 	LineObjectId ObjectID
-	Attributes   map[string]string
-	References   map[string]Reference
+	Attributes   Attributes
+	References   References
 }
 
 type VehicleJourney struct {
@@ -19,15 +19,15 @@ type VehicleJourney struct {
 
 	LineId     LineId
 	Name       string
-	Attributes map[string]string
-	References map[string]Reference
+	Attributes Attributes
+	References References
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
 	vehicleJourney := &VehicleJourney{
 		model:      model,
-		Attributes: make(map[string]string),
-		References: make(map[string]Reference),
+		Attributes: NewAttributes(),
+		References: NewReferences(),
 	}
 	vehicleJourney.objectids = make(ObjectIDs)
 	return vehicleJourney

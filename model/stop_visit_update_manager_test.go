@@ -97,6 +97,7 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 		Name:     "stopArea",
 		ObjectId: objectid,
 	}
+
 	tx := NewTransaction(model)
 	defer tx.Close()
 	stopVisitUpdater := NewStopVisitUpdater(tx, nil)

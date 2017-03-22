@@ -153,7 +153,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	return response, nil
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyReferences(references map[string]model.Reference, manager model.StopAreas) {
+func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
@@ -173,7 +173,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references map[string]model.Reference, manager model.StopAreas) {
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references model.References, manager model.StopAreas) {
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {
 			tmp := references[ref]
@@ -182,7 +182,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toRefo
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatStopVisitReferences(references map[string]model.Reference) {
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatStopVisitReferences(references model.References) {
 	toReformat := []string{"OperatorRef"}
 
 	for _, ref := range toReformat {

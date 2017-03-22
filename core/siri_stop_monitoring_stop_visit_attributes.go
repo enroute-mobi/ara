@@ -83,34 +83,14 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	return vehiculeJourneyAttributes
 }
 
-func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() map[string]model.Reference {
-	refMap := make(map[string]model.Reference)
+func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() model.References {
+	refMap := model.NewReferences()
 
-	if attributes.response.PlaceRef() != "" {
-		placeRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef())
-		refMap["PlaceRef"] = model.Reference{ObjectId: &placeRefObjId, Id: ""}
-	}
-
-	if attributes.response.OriginRef() != "" {
-		originRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef())
-		refMap["OriginRef"] = model.Reference{ObjectId: &originRefObjId, Id: ""}
-	}
-
-	if attributes.response.DestinationRef() != "" {
-		destinationRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef())
-		refMap["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: ""}
-	}
-
-	if attributes.response.JourneyPatternRef() != "" {
-		journeyPatternRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.JourneyPatternRef())
-		refMap["JourneyPatternRef"] = model.Reference{ObjectId: &journeyPatternRefObjId, Id: ""}
-	}
-
-	if attributes.response.RouteRef() != "" {
-		routeRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef())
-		refMap["RouteRef"] = model.Reference{ObjectId: &routeRefObjId, Id: ""}
-	}
-
+	refMap.SetObjectId("PlaceRef", model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef()), "")
+	refMap.SetObjectId("OriginRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef()), "")
+	refMap.SetObjectId("DestinationRef", model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef()), "")
+	refMap.SetObjectId("JourneyPatternRef", model.NewObjectID(attributes.objectid_kind, attributes.response.JourneyPatternRef()), "")
+	refMap.SetObjectId("RouteRef", model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef()), "")
 	return refMap
 }
 
@@ -133,13 +113,9 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() model
 	return stopVisitAttributes
 }
 
-func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitReferences() map[string]model.Reference {
-	refMap := make(map[string]model.Reference)
-
-	if attributes.response.OperatorRef() != "" {
-		OperatorRefObjId := model.NewObjectID(attributes.objectid_kind, attributes.response.OperatorRef())
-		refMap["OperatorRef"] = model.Reference{ObjectId: &OperatorRefObjId, Id: ""}
-	}
+func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitReferences() model.References {
+	refMap := model.NewReferences()
+	refMap.SetObjectId("OperatorRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OperatorRef()), "")
 	return refMap
 }
 

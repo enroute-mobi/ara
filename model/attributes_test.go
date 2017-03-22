@@ -29,9 +29,6 @@ func Test_Attributes_Set_IgnoreEmptyValues(t *testing.T) {
 
 	attributes.Set("key", "")
 
-	if len(attributes) != 0 {
-		t.Errorf("Attributes should be empty")
-	}
 	if _, ok := attributes["key"]; ok {
 		t.Errorf("'key' should not be associated")
 	}

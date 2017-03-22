@@ -24,16 +24,16 @@ type StopArea struct {
 	CollectedAlways bool
 
 	Name       string
-	Attributes map[string]string
-	References map[string]Reference
+	Attributes Attributes
+	References References
 	// ...
 }
 
 func NewStopArea(model Model) *StopArea {
 	stopArea := &StopArea{
 		model:           model,
-		Attributes:      make(map[string]string),
-		References:      make(map[string]Reference),
+		Attributes:      NewAttributes(),
+		References:      NewReferences(),
 		CollectedAlways: true,
 	}
 	stopArea.objectids = make(ObjectIDs)
@@ -96,8 +96,8 @@ func (stopArea *StopArea) Reference(key string) (Reference, bool) {
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
-		ObjectIDs map[string]string
-		Reference map[string]Reference
+		ObjectIDs  map[string]string
+		References map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),
