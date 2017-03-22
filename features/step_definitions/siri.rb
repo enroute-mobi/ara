@@ -119,25 +119,21 @@ Then(/^the SIRI server should have received a (GetStopMonitoring) request$/) do 
   expect(received_request).not_to be_truthy
 end
 
-# Then(/^the SIRI server should have received a GetStopMonitoring request with$/) do |request|
-#   document = REXML::Document.new(@last_siri_request)
+Then(/^the SIRI server should have received a GetStopMonitoring request with$/) do |request|
+  document = REXML::Document.new(@last_siri_request)
 
-#   puts document
+  expected_values = {}
+  request.raw.each do |row|
+    expected_values[row[0]] = row[1]
+  end
 
-#   expected_values = {}
-#   request.raw.each do |row|
-#     expected_values[row[0]] = row[1] unless row[2] && row[2] =~ /^TODO/
-#   end
+  actual_values = {}
+  expected_values.keys.each do |xpath|
+    node = REXML::XPath.first(document, xpath, {"siri"=>"http://www.siri.org.uk/siri"})
+    xml_value = node.text if node
+    actual_values[xpath] = xml_value
+  end
 
-#   actual_values = {}
-#   expected_values.keys.each do |xpath|
-#     node = REXML::XPath.first(document, xpath, {"siri"=>"http://www.sirir.org.uk/siri"})
-#     xml_value = node.text if node
-#     actual_values[xpath] = xml_value
-#   end
+  expect(actual_values).to eq(expected_values)
 
-#   puts expected_values
-#   puts actual_values
-
-#   expect(actual_values).to eq(expected_values)
-# end
+end
