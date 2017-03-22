@@ -9,6 +9,7 @@ end
 def send_siri_request(request, attributes = {})
   response = RestClient.post siri_path(attributes), request, {content_type: :xml}
   save_siri_messages request: request, response: response.body
+  @last_siri_request = request
   @last_siri_response = response.body
 end
 
@@ -111,4 +112,32 @@ When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
 }
 
   send_siri_request request
+end
+
+Then(/^the SIRI server should have received a (GetStopMonitoring) request$/) do |request|
+  received_request = @the_siri_server.received_request?
+  expect(received_request).not_to be_truthy
+end
+
+Then(/^the SIRI server should have received a GetStopMonitoring request with$/) do |request|
+  document = REXML::Document.new(@last_siri_request)
+
+  puts document
+
+  expected_values = {}
+  request.raw.each do |row|
+    expected_values[row[0]] = row[1] unless row[2] && row[2] =~ /^TODO/
+  end
+
+  actual_values = {}
+  expected_values.keys.each do |xpath|
+    node = REXML::XPath.first(document, xpath, {"siri"=>"http://www.sirir.org.uk/siri"})
+    xml_value = node.text if node
+    actual_values[xpath] = xml_value
+  end
+
+  puts expected_values
+  puts actual_values
+
+  expect(actual_values).to eq(expected_values)
 end
