@@ -53,11 +53,12 @@ end
 
 #   expected_departure_status = response_array.find{|a| puts a["DepartureStatus"] == attributes["DepartureStatus"]}
 #   expected_arrival_status = response_array.find{|a| puts a["ArrivalStatus"] == attributes["ArrivalStatus"]}
-#   expected_attributes = response_array.find{|a| puts a["ObjectIDs"][objectidkind] == object}
+#   expected_attributes = response_array.find{|a| puts a["ObjectIDs"][objectid_kind] == objectid_value}
 
 #   expect(expected_departure_status).not_to be_nil
 #   expect(expecte_arrival_status).not_to be_nil
-end
+#   expect(expected_attributes).not_to be_nil
+# end
 
 Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get stop_visits_path(referential: referential)
