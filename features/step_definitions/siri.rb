@@ -114,9 +114,9 @@ When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
   send_siri_request request
 end
 
-Then(/^the SIRI server should have received a (GetStopMonitoring) request$/) do |request|
+Then(/^the SIRI server should not have received a (GetStopMonitoring) request$/) do |request|
   received_request = @the_siri_server.received_request?
-  expect(received_request).not_to be_truthy
+  expect(received_request).to be_truthy
 end
 
 Then(/^the SIRI server should have received a GetStopMonitoring request with$/) do |request|
