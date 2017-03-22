@@ -19,7 +19,7 @@ const stopDiscoveryRequestTemplate = `<ns7:StopPointsDiscovery xmlns:ns2="http:/
               <ns2:RequestorRef>STIF</ns2:RequestorRef>
             </Request>
             <RequestExtension />
-						</ns7:StopPointsDiscovery>`
+            </ns7:StopPointsDiscovery>`
 
 func NewXMLStopDiscoveryRequest(node xml.Node) *XMLStopDiscoveryRequest {
 	xmlStopDiscoveryRequest := &XMLStopDiscoveryRequest{}
