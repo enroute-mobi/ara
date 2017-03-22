@@ -94,6 +94,9 @@ class SIRIServer
 	  end
   end
 
+  def received_request?
+    requests.count == 0
+  end
 end
 
 After do
