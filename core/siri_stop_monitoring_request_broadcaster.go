@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -28,7 +29,7 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 	return siriStopMonitoringRequestBroadcaster
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, stopArea model.StopArea, messageIdentifier string) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, stopArea model.StopArea, messageIdentifier string) siri.SIRIStopMonitoringDelivery {
 	objectidKind := connector.Partner().Setting("remote_objectid_kind")
 	objectid, _ := stopArea.ObjectID(objectidKind)
 
@@ -44,8 +45,13 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		ResponseTimestamp: connector.Clock().Now(),
 	}
 
+	// Prepare Id Array for logstash
+	var idArray []string
+
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
+		idArray = append(idArray, string(stopVisit.Id()))
+
 		var itemIdentifier string
 		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
 		if ok {
@@ -132,6 +138,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 	}
 
+	logStashEvent["StopVisitIds"] = strings.Join(idArray, ", ")
+
 	return delivery
 }
 
@@ -160,7 +168,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	}
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 
-	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, stopArea, request.MessageIdentifier())
+	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, request.MessageIdentifier())
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
@@ -218,6 +226,7 @@ func (factory *SIRIStopMonitoringRequestBroadcasterFactory) CreateConnector(part
 }
 
 func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) {
+	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
 	logStashEvent["requestorRef"] = request.RequestorRef()

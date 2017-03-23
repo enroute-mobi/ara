@@ -52,7 +52,7 @@ func testCheckStatusLogStash(t *testing.T) {
 	if len(events) != 1 {
 		t.Errorf("Logstash should have recieved an event, got: %v", events)
 	}
-	if len(events[0]) != 13 {
+	if len(events[0]) != 14 {
 		t.Errorf("LogstashEvent should have 13 values, got: %v", events[0])
 	}
 }
@@ -106,6 +106,9 @@ func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 		MessageIdentifier: "0000-0000-0000-0000",
 	}
 	logSIRICheckStatusRequest(logStashEvent, request)
+	if logStashEvent["Connector"] != "CheckStatusClient" {
+		t.Errorf("Wrong Connector logged:\n got: %v\n expected: CheckStatusClient", logStashEvent["messageIdentifier"])
+	}
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
