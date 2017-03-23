@@ -21,7 +21,6 @@ end
 Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, attributes|
 	response = RestClient.get stop_visit_path(identifier)
 	stopVisitAttributes = api_attributes(response.body)
-
   expect(stopVisitAttributes).to include(model_attributes(attributes))
 end
 

@@ -60,14 +60,23 @@ func (stopArea *StopArea) Updated(updateTime time.Time) {
 	stopArea.updatedAt = updateTime
 }
 
-func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
-	stopAreaMap := map[string]interface{}{
-		"Id":              stopArea.id,
-		"Name":            stopArea.Name,
-		"Attributes":      stopArea.Attributes,
-		"References":      stopArea.References,
-		"CollectedAlways": stopArea.CollectedAlways,
+func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
+	if stopArea.id != "" {
+		stopAreaMap["Id"] = stopArea.id
 	}
+
+	if stopArea.Name != "" {
+		stopAreaMap["Name"] = stopArea.Name
+	}
+
+	if !stopArea.Attributes.IsEmpty() {
+		stopAreaMap["Attributes"] = stopArea.Attributes
+	}
+
+	if !stopArea.References.IsEmpty() {
+		stopAreaMap["References"] = stopArea.References
+	}
+
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
 	}
@@ -80,6 +89,14 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	if stopAreaMap["CollectedAlways"] == false {
 		stopAreaMap["CollectedUntil"] = stopArea.CollectedUntil
 	}
+	stopAreaMap["CollectedAlways"] = stopArea.CollectedAlways
+}
+
+func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
+	stopAreaMap := make(map[string]interface{})
+
+	stopArea.FillStopArea(stopAreaMap)
+
 	return json.Marshal(stopAreaMap)
 }
 

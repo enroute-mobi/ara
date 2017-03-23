@@ -35,16 +35,31 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
-func (line *Line) MarshalJSON() ([]byte, error) {
-	lineMap := map[string]interface{}{
-		"Id":         line.id,
-		"Name":       line.Name,
-		"Attributes": line.Attributes,
-		"References": line.References,
+func (line *Line) FillLine(lineMap map[string]interface{}) {
+	if line.id != "" {
+		lineMap["Id"] = line.id
 	}
+
+	if line.Name != "" {
+		lineMap["Name"] = line.Name
+	}
+
+	if !line.Attributes.IsEmpty() {
+		lineMap["Attributes"] = line.Attributes
+	}
+
+	if !line.References.IsEmpty() {
+		lineMap["References"] = line.References
+	}
+}
+
+func (line *Line) MarshalJSON() ([]byte, error) {
+	lineMap := make(map[string]interface{})
+
 	if !line.ObjectIDs().Empty() {
 		lineMap["ObjectIDs"] = line.ObjectIDs()
 	}
+	line.FillLine(lineMap)
 	return json.Marshal(lineMap)
 }
 

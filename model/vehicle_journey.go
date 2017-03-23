@@ -45,23 +45,51 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 	return &line
 }
 
-func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
+func (vehicleJourney *VehicleJourney) FillVehicleJourney(vehicleJourneyMap map[string]interface{}) {
+
 	stopVisitIds := []StopVisitId{}
 	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
 		stopVisitIds = append(stopVisitIds, stopVisit.Id())
 	}
-	vehicleJourneyMap := map[string]interface{}{
-		"Id":         vehicleJourney.id,
-		"LineId":     vehicleJourney.LineId,
-		"Name":       vehicleJourney.Name,
-		"StopVisits": stopVisitIds,
-		"Attributes": vehicleJourney.Attributes,
-		"References": vehicleJourney.References,
+
+	if len(stopVisitIds) > 0 {
+		vehicleJourneyMap["StopVisits"] = stopVisitIds
+	}
+
+	if vehicleJourney.id != "" {
+		vehicleJourneyMap["Id"] = vehicleJourney.id
+	}
+
+	if vehicleJourney.LineId != "" {
+		vehicleJourneyMap["LineId"] = vehicleJourney.LineId
+	}
+
+	if vehicleJourney.Name != "" {
+		vehicleJourneyMap["Name"] = vehicleJourney.Name
+	}
+
+	if !vehicleJourney.Attributes.IsEmpty() {
+		vehicleJourneyMap["Attributes"] = vehicleJourney.Attributes
+	}
+
+	if !vehicleJourney.References.IsEmpty() {
+		vehicleJourneyMap["References"] = vehicleJourney.References
 	}
 
 	if !vehicleJourney.ObjectIDs().Empty() {
 		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
 	}
+}
+
+func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
+	stopVisitIds := []StopVisitId{}
+	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
+		stopVisitIds = append(stopVisitIds, stopVisit.Id())
+	}
+
+	vehicleJourneyMap := make(map[string]interface{})
+	vehicleJourney.FillVehicleJourney(vehicleJourneyMap)
+
 	return json.Marshal(vehicleJourneyMap)
 }
 

@@ -21,7 +21,7 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		Name: "Test",
 	}
-	expected := `{"Attributes":null,"CollectedAlways":false,"CollectedUntil":"0001-01-01T00:00:00Z","Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"Test","References":null}`
+	expected := `{"CollectedAlways":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"Test"}`
 	jsonBytes, err := stopArea.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

@@ -12,3 +12,7 @@ func (attributes Attributes) Set(key string, value string) {
 	}
 	attributes[key] = value
 }
+
+func (attributes Attributes) IsEmpty() bool {
+	return len(attributes) == 0
+}

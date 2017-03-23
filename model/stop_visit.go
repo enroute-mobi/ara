@@ -116,30 +116,73 @@ func (orderMap *ResponseInterface) ToJson(order []string) string {
 	return orderedJson.String()
 } */
 
+func (stopVisit *StopVisit) FillStopVisit(stopVisitMap map[string]interface{}) {
+	scheduleSlice := []StopVisitSchedule{}
+	for _, schedule := range stopVisit.Schedules {
+		scheduleSlice = append(scheduleSlice, *schedule)
+	}
+
+	if len(scheduleSlice) != 0 {
+		stopVisitMap["Schedules"] = scheduleSlice
+	}
+
+	if stopVisit.id != "" {
+		stopVisitMap["Id"] = stopVisit.id
+	}
+
+	if stopVisit.StopAreaId != "" {
+		stopVisitMap["StopAreaId"] = stopVisit.StopAreaId
+	}
+
+	if stopVisit.VehicleJourneyId != "" {
+		stopVisitMap["VehicleJourneyId"] = stopVisit.VehicleJourneyId
+	}
+
+	if stopVisit.PassageOrder > 0 {
+		stopVisitMap["PassageOrder"] = stopVisit.PassageOrder
+	}
+
+	if !stopVisit.RecordedAt.IsZero() {
+		stopVisitMap["RecordedAt"] = stopVisit.RecordedAt
+	}
+
+	if !stopVisit.collectedAt.IsZero() {
+		stopVisitMap["CollectedAt"] = stopVisit.collectedAt
+	}
+
+	if stopVisit.DepartureStatus != "" {
+		stopVisitMap["DepartureStatus"] = stopVisit.DepartureStatus
+	}
+
+	if stopVisit.ArrivalStatus != "" {
+		stopVisitMap["ArrivalStatus"] = stopVisit.ArrivalStatus
+	}
+
+	if !stopVisit.Attributes.IsEmpty() {
+		stopVisitMap["Attributes"] = stopVisit.Attributes
+	}
+
+	if !stopVisit.References.IsEmpty() {
+		stopVisitMap["References"] = stopVisit.References
+	}
+
+	stopVisitMap["VehicleAtStop"] = stopVisit.VehicleAtStop
+	stopVisitMap["Collected"] = stopVisit.collected
+
+	if !stopVisit.ObjectIDs().Empty() {
+		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
+	}
+}
+
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	scheduleSlice := []StopVisitSchedule{}
 	for _, schedule := range stopVisit.Schedules {
 		scheduleSlice = append(scheduleSlice, *schedule)
 	}
 
-	stopVisitMap := map[string]interface{}{
-		"Id":               stopVisit.id,
-		"StopAreaId":       stopVisit.StopAreaId,
-		"VehicleJourneyId": stopVisit.VehicleJourneyId,
-		"VehicleAtStop":    stopVisit.VehicleAtStop,
-		"PassageOrder":     stopVisit.PassageOrder,
-		"RecordedAt":       stopVisit.RecordedAt,
-		"Schedules":        scheduleSlice,
-		"DepartureStatus":  stopVisit.DepartureStatus,
-		"ArrivalStatus":    stopVisit.ArrivalStatus,
-		"Attributes":       stopVisit.Attributes,
-		"References":       stopVisit.References,
-		"collected":        stopVisit.collected,
-		"collectedAt":      stopVisit.collectedAt,
-	}
-	if !stopVisit.ObjectIDs().Empty() {
-		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
-	}
+	stopVisitMap := make(map[string]interface{})
+	stopVisit.FillStopVisit(stopVisitMap)
+
 	return json.Marshal(stopVisitMap)
 }
 

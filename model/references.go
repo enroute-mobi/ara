@@ -23,3 +23,7 @@ func (references References) SetObjectId(key string, obj ObjectID, id string) {
 	}
 	references[key] = Reference{ObjectId: &obj, Id: id}
 }
+
+func (references References) IsEmpty() bool {
+	return len(references) == 0
+}
