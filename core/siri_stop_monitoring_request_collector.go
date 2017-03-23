@@ -168,6 +168,7 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 }
 
 func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
+	logStashEvent["Connector"] = "StopMonitoringRequestCollector"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef

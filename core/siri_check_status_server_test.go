@@ -106,6 +106,9 @@ func Test_SIRICheckStatusServer_LogCheckStatusRequest(t *testing.T) {
 
 	logXMLCheckStatusRequest(logStashEvent, request)
 
+	if logStashEvent["Connector"] != "CheckStatusServer" {
+		t.Errorf("Wrong Connector logged:\n got: %v\n expected: CheckStatusServer", logStashEvent["requestorRef"])
+	}
 	if logStashEvent["requestorRef"] != "NINOXE:default" {
 		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["requestorRef"])
 	}

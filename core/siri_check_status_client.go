@@ -99,6 +99,7 @@ func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) C
 }
 
 func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRICheckStatusRequest) {
+	logStashEvent["Connector"] = "CheckStatusClient"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

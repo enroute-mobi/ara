@@ -107,6 +107,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLStopMonitoringRequest(t *te
 	}
 
 	logXMLStopMonitoringRequest(logStashEvent, request)
+	if logStashEvent["Connector"] != "StopMonitoringRequestBroadcaster" {
+		t.Errorf("Wrong Connector logged:\n got: %v\n expected: StopMonitoringRequestBroadcaster", logStashEvent["messageIdentifier"])
+	}
 	if logStashEvent["messageIdentifier"] != "StopMonitoring:Test:0" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: StopMonitoring:Test:0", logStashEvent["messageIdentifier"])
 	}

@@ -15,7 +15,6 @@ type ServiceRequestBroadcaster interface {
 
 type SIRIServiceRequestBroadcaster struct {
 	model.ClockConsumer
-	model.UUIDConsumer
 
 	siriConnector
 }
@@ -50,6 +49,8 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	stopMonitoringConnector := NewSIRIStopMonitoringRequestBroadcaster(connector.partner)
 
 	for _, stopMonitoringRequest := range request.StopMonitoringRequests() {
+		SMLogStashEvent := make(audit.LogStashEvent)
+
 		logXMLSiriServiceStopMonitoringRequest(logStashEvent, stopMonitoringRequest)
 
 		objectidKind := connector.Partner().Setting("remote_objectid_kind")
@@ -60,9 +61,10 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 			return nil, fmt.Errorf("StopArea not found")
 		}
 
-		delivery := stopMonitoringConnector.getStopMonitoringDelivery(tx, stopArea, stopMonitoringRequest.MessageIdentifier())
+		delivery := stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest.MessageIdentifier())
 
-		// logSIRIStopMonitoringDelivery(logStashEvent, delivery)
+		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
+		audit.CurrentLogStash().WriteEvent(SMLogStashEvent)
 
 		response.Deliveries = append(response.Deliveries, delivery)
 	}
@@ -83,6 +85,7 @@ func (factory *SIRIServiceRequestBroadcasterFactory) CreateConnector(partner *Pa
 }
 
 func logXMLSiriServiceRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceRequest) {
+	logStashEvent["Connector"] = "SIRIServiceRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -104,6 +107,7 @@ func logSIRIServiceResponse(logStashEvent audit.LogStashEvent, response *siri.SI
 }
 
 func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceStopMonitoringRequest) {
+	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster for SIRIServiceRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
 	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
@@ -111,6 +115,8 @@ func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, r
 	logStashEvent["requestXML"] = request.RawXML()
 }
 
-// Empty for now
-// func logSIRIStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIStopMonitoringDelivery) {
-// }
+func logSIRIStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIStopMonitoringDelivery) {
+	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
+	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+}
