@@ -197,6 +197,13 @@ func (partner *Partner) Context() *Context {
 	return &partner.context
 }
 
+func (partner *Partner) RemoteObjectIDKind() string {
+	if partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind") != "" {
+		return partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind")
+	}
+	return partner.Setting("remote_objectid_kind")
+}
+
 func (partner *Partner) Save() (ok bool) {
 	return partner.manager.Save(partner)
 }

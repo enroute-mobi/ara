@@ -30,7 +30,7 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, stopArea model.StopArea, messageIdentifier string) siri.SIRIStopMonitoringDelivery {
-	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	objectidKind := connector.Partner().RemoteObjectIDKind()
 	objectid, _ := stopArea.ObjectID(objectidKind)
 
 	if !stopArea.CollectedAlways {
@@ -147,7 +147,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	objectidKind := connector.Partner().RemoteObjectIDKind()
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 
@@ -181,7 +181,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	for _, ref := range toResolve {
 		if references[ref] != (model.Reference{}) {
 			if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
-				obj, ok := foundStopArea.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+				obj, ok := foundStopArea.ObjectID(connector.Partner().RemoteObjectIDKind())
 				if ok {
 					tmp := references[ref]
 					tmp.ObjectId = &obj
