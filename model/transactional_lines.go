@@ -3,10 +3,9 @@ package model
 type TransactionalLines struct {
 	UUIDConsumer
 
-	model           Model
-	saved           map[LineId]*Line
-	savedByObjectId map[string]map[string]LineId
-	deleted         map[LineId]*Line
+	model   Model
+	saved   map[LineId]*Line
+	deleted map[LineId]*Line
 }
 
 func NewTransactionalLines(model Model) *TransactionalLines {
@@ -17,7 +16,6 @@ func NewTransactionalLines(model Model) *TransactionalLines {
 
 func (manager *TransactionalLines) resetCaches() {
 	manager.saved = make(map[LineId]*Line)
-	manager.savedByObjectId = make(map[string]map[string]LineId)
 	manager.deleted = make(map[LineId]*Line)
 }
 
@@ -35,15 +33,13 @@ func (manager *TransactionalLines) Find(id LineId) (Line, bool) {
 }
 
 func (manager *TransactionalLines) FindByObjectId(objectid ObjectID) (Line, bool) {
-	valueMap, ok := manager.savedByObjectId[objectid.Kind()]
-	if !ok {
-		return manager.model.Lines().FindByObjectId(objectid)
+	for _, line := range manager.saved {
+		lineObjectId, _ := line.ObjectID(objectid.Kind())
+		if lineObjectId.Value() == objectid.Value() {
+			return *line, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return manager.model.Lines().FindByObjectId(objectid)
-	}
-	return *manager.saved[id], true
+	return manager.model.Lines().FindByObjectId(objectid)
 }
 
 func (manager *TransactionalLines) FindAll() (lines []Line) {
@@ -65,13 +61,6 @@ func (manager *TransactionalLines) Save(line *Line) bool {
 		line.id = LineId(manager.NewUUID())
 	}
 	manager.saved[line.Id()] = line
-	for _, objectid := range line.ObjectIDs() {
-		_, ok := manager.savedByObjectId[objectid.Kind()]
-		if !ok {
-			manager.savedByObjectId[objectid.Kind()] = make(map[string]LineId)
-		}
-		manager.savedByObjectId[objectid.Kind()][objectid.Value()] = line.Id()
-	}
 	return true
 }
 

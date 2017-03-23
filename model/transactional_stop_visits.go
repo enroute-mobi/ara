@@ -6,11 +6,9 @@ type TransactionalStopVisits struct {
 	UUIDConsumer
 	ClockConsumer
 
-	model                   Model
-	saved                   map[StopVisitId]*StopVisit
-	savedByObjectId         map[string]map[string]StopVisitId
-	savedByVehicleJourneyId map[VehicleJourneyId][]StopVisitId
-	deleted                 map[StopVisitId]*StopVisit
+	model   Model
+	saved   map[StopVisitId]*StopVisit
+	deleted map[StopVisitId]*StopVisit
 }
 
 func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
@@ -21,8 +19,6 @@ func NewTransactionalStopVisits(model Model) *TransactionalStopVisits {
 
 func (manager *TransactionalStopVisits) resetCaches() {
 	manager.saved = make(map[StopVisitId]*StopVisit)
-	manager.savedByObjectId = make(map[string]map[string]StopVisitId)
-	manager.savedByVehicleJourneyId = make(map[VehicleJourneyId][]StopVisitId)
 	manager.deleted = make(map[StopVisitId]*StopVisit)
 }
 
@@ -40,25 +36,23 @@ func (manager *TransactionalStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 }
 
 func (manager *TransactionalStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
-	valueMap, ok := manager.savedByObjectId[objectid.Kind()]
-	if !ok {
-		return manager.model.StopVisits().FindByObjectId(objectid)
+	for _, stopVisit := range manager.saved {
+		stopVisitObjectId, _ := stopVisit.ObjectID(objectid.Kind())
+		if stopVisitObjectId.Value() == objectid.Value() {
+			return *stopVisit, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return manager.model.StopVisits().FindByObjectId(objectid)
-	}
-	return *manager.saved[id], true
+	return manager.model.StopVisits().FindByObjectId(objectid)
 }
 
 func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
 	// Check saved StopVisits
-	stopVisitIds, ok := manager.savedByVehicleJourneyId[id]
-	if ok {
-		for _, stopVisitId := range stopVisitIds {
-			stopVisits = append(stopVisits, *manager.saved[stopVisitId])
+	for _, stopVisit := range manager.saved {
+		if stopVisit.VehicleJourneyId == id {
+			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
+
 	// Check model StopVisits
 	for _, modelStopVisit := range manager.model.StopVisits().FindByVehicleJourneyId(id) {
 		_, ok := manager.saved[modelStopVisit.Id()]
@@ -123,14 +117,6 @@ func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 	manager.saved[stopVisit.Id()] = stopVisit
-	manager.savedByVehicleJourneyId[stopVisit.VehicleJourneyId] = append(manager.savedByVehicleJourneyId[stopVisit.VehicleJourneyId], stopVisit.id)
-	for _, objectid := range stopVisit.ObjectIDs() {
-		_, ok := manager.savedByObjectId[objectid.Kind()]
-		if !ok {
-			manager.savedByObjectId[objectid.Kind()] = make(map[string]StopVisitId)
-		}
-		manager.savedByObjectId[objectid.Kind()][objectid.Value()] = stopVisit.Id()
-	}
 	return true
 }
 

@@ -3,10 +3,9 @@ package model
 type TransactionalVehicleJourneys struct {
 	UUIDConsumer
 
-	model           Model
-	saved           map[VehicleJourneyId]*VehicleJourney
-	savedByObjectId map[string]map[string]VehicleJourneyId
-	deleted         map[VehicleJourneyId]*VehicleJourney
+	model   Model
+	saved   map[VehicleJourneyId]*VehicleJourney
+	deleted map[VehicleJourneyId]*VehicleJourney
 }
 
 func NewTransactionalVehicleJourneys(model Model) *TransactionalVehicleJourneys {
@@ -17,7 +16,6 @@ func NewTransactionalVehicleJourneys(model Model) *TransactionalVehicleJourneys 
 
 func (manager *TransactionalVehicleJourneys) resetCaches() {
 	manager.saved = make(map[VehicleJourneyId]*VehicleJourney)
-	manager.savedByObjectId = make(map[string]map[string]VehicleJourneyId)
 	manager.deleted = make(map[VehicleJourneyId]*VehicleJourney)
 }
 
@@ -35,15 +33,13 @@ func (manager *TransactionalVehicleJourneys) Find(id VehicleJourneyId) (VehicleJ
 }
 
 func (manager *TransactionalVehicleJourneys) FindByObjectId(objectid ObjectID) (VehicleJourney, bool) {
-	valueMap, ok := manager.savedByObjectId[objectid.Kind()]
-	if !ok {
-		return manager.model.VehicleJourneys().FindByObjectId(objectid)
+	for _, vehicleJourney := range manager.saved {
+		vehicleJourneyObjectId, _ := vehicleJourney.ObjectID(objectid.Kind())
+		if vehicleJourneyObjectId.Value() == objectid.Value() {
+			return *vehicleJourney, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return manager.model.VehicleJourneys().FindByObjectId(objectid)
-	}
-	return *manager.saved[id], true
+	return manager.model.VehicleJourneys().FindByObjectId(objectid)
 }
 
 func (manager *TransactionalVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
@@ -65,13 +61,6 @@ func (manager *TransactionalVehicleJourneys) Save(vehicleJourney *VehicleJourney
 		vehicleJourney.id = VehicleJourneyId(manager.NewUUID())
 	}
 	manager.saved[vehicleJourney.Id()] = vehicleJourney
-	for _, objectid := range vehicleJourney.ObjectIDs() {
-		_, ok := manager.savedByObjectId[objectid.Kind()]
-		if !ok {
-			manager.savedByObjectId[objectid.Kind()] = make(map[string]VehicleJourneyId)
-		}
-		manager.savedByObjectId[objectid.Kind()][objectid.Value()] = vehicleJourney.Id()
-	}
 	return true
 }
 
