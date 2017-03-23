@@ -112,6 +112,30 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 	}
 }
 
+func Test_Partner_RemoteObjectIDKindPresent(t *testing.T) {
+	partner := &Partner{}
+	partner.Settings = make(map[string]string)
+
+	partner.Settings["siri-stop-monitoring-request-broadcaster.remote_objectid_kind"] = "Kind1"
+	partner.Settings["remote_objectid_kind"] = "Kind2"
+
+	if partner.RemoteObjectIDKind() != "Kind1" {
+		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
+	}
+}
+
+func Test_Partner_RemoteObjectIDKindAbsent(t *testing.T) {
+	partner := &Partner{}
+	partner.Settings = make(map[string]string)
+
+	partner.Settings["siri-stop-monitoring-request-broadcaster.remote_objectid_kind"] = ""
+	partner.Settings["remote_objectid_kind"] = "Kind2"
+
+	if partner.RemoteObjectIDKind() != "Kind2" {
+		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
+	}
+}
+
 func Test_Partner_CanCollectTrue2(t *testing.T) {
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
