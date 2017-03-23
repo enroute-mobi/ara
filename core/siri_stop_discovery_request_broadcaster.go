@@ -1,6 +1,10 @@
 package core
 
 import (
+	"fmt"
+	"strconv"
+
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -31,13 +35,11 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	response := &siri.SIRIStopPointsDiscoveryResponse{}
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+	logXMLStopPointDiscoveryRequest(logStashEvent, request)
 
-	// response.Address = connector.Partner().Setting("local_url")
-	// response.ProducerRef = connector.Partner().Setting("remote_credential")
-	// if response.ProducerRef == "" {
-	// 	response.ProducerRef = "Edwig"
-	// }
+	response := &siri.SIRIStopPointsDiscoveryResponse{}
 
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
@@ -52,6 +54,8 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
+
+	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 	return response, nil
 }
 
@@ -63,4 +67,21 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPar
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
+}
+
+func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopDiscoveryRequest) {
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+	logStashEvent["requestXML"] = request.RawXML()
+}
+
+func logSIRIStopPointDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIStopPointsDiscoveryResponse) {
+	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	xml, err := response.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["responseXML"] = xml
 }
