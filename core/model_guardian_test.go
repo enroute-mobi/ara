@@ -42,7 +42,7 @@ func Test_ModelGuardian_Run(t *testing.T) {
 	}
 }
 
-func Test_ModelGuardian_RefreshStopAreas_MonitoredUntil(t *testing.T) {
+func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	referential := &Referential{
 		model:          model.NewMemoryModel(),
 		collectManager: NewTestCollectManager(),

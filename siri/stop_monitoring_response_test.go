@@ -150,11 +150,11 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	request := &SIRIStopMonitoringResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
-		RequestMessageRef:         "ref",
 		ResponseMessageIdentifier: "identifier",
-		Status:            true,
-		ResponseTimestamp: responseTimestamp,
 	}
+	request.RequestMessageRef = "ref"
+	request.Status = true
+	request.ResponseTimestamp = responseTimestamp
 	xml, err := request.BuildXML()
 	if err != nil {
 		t.Fatal(err)

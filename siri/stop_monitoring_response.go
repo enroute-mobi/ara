@@ -88,11 +88,16 @@ type XMLMonitoredStopVisit struct {
 }
 
 type SIRIStopMonitoringResponse struct {
+	SIRIStopMonitoringDelivery
+
 	Address                   string
 	ProducerRef               string
-	RequestMessageRef         string
 	ResponseMessageIdentifier string
-	Status                    bool
+}
+
+type SIRIStopMonitoringDelivery struct {
+	RequestMessageRef string
+	Status            bool
 	// ErrorType                 string
 	// ErrorNumber               int
 	// ErrorText                 string
@@ -135,22 +140,7 @@ type SIRIMonitoredStopVisit struct {
 	References map[string]map[string]model.Reference
 }
 
-const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
-	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
-		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
-		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
-	</ServiceDeliveryInfo>
-	<Answer>
-		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
 			<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 			<ns3:Status>{{ .Status }}</ns3:Status>{{ range .MonitoredStopVisits }}
@@ -229,7 +219,24 @@ const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3
 					</ns3:MonitoredCall>
 				</ns3:MonitoredVehicleJourney>
 			</ns3:MonitoredStopVisit>{{ end }}
-		</ns3:StopMonitoringDelivery>
+		</ns3:StopMonitoringDelivery>`
+
+const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
+															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
+															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+															 xmlns:ns7="http://scma/siri"
+															 xmlns:ns8="http://wsdl.siri.org.uk"
+															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
+		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
+		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		{{ .BuildStopMonitoringDeliveryXML }}
 	</Answer>
 	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
@@ -688,6 +695,15 @@ func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(stopMonitoringResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (delivery *SIRIStopMonitoringDelivery) BuildStopMonitoringDeliveryXML() (string, error) {
+	var buffer bytes.Buffer
+	var stopMonitoringDelivery = template.Must(template.New("stopMonitoringDelivery").Parse(stopMonitoringDeliveryTemplate))
+	if err := stopMonitoringDelivery.Execute(&buffer, delivery); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil

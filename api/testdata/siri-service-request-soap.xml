@@ -1,0 +1,22 @@
+<m:GetSiriService xmlns:m="http://wsdl.siri.org.uk" xmlns:m0="http://www.siri.org.uk/siri">
+  <Request>
+    <m0:ServiceRequestContext>
+    </m0:ServiceRequestContext>
+    <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
+    <m0:RequestorRef>Edwig</m0:RequestorRef>
+    <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
+    <m0:DelegatorRef/>
+    <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
+      <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
+      <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
+      <m0:MonitoringRef>stopArea1</m0:MonitoringRef>
+      <m0:StopVisitTypes>all</m0:StopVisitTypes>
+    </m0:StopMonitoringRequest>
+    <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
+      <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
+      <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
+      <m0:MonitoringRef>stopArea2</m0:MonitoringRef>
+      <m0:StopVisitTypes>all</m0:StopVisitTypes>
+    </m0:StopMonitoringRequest>
+  </Request>
+</m:GetSiriService>

@@ -1,8 +1,10 @@
 package api
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -31,7 +33,11 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"local_credential":     "Edwig",
 		"local_url":            "http://edwig",
 	}
-	partner.ConnectorTypes = []string{"siri-check-status-server", "siri-stop-monitoring-request-broadcaster"}
+	partner.ConnectorTypes = []string{
+		"siri-check-status-server",
+		"siri-stop-monitoring-request-broadcaster",
+		"siri-service-request-broadcaster",
+	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
 	generator := core.NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%v:LOC")
@@ -209,5 +215,188 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	expectedDate := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
 	if !response.ResponseTimestamp().Equal(expectedDate) {
 		t.Errorf("Wrong ResponseTimestamp in response:\n got: %v\n want: %v", response.ResponseTimestamp(), expectedDate)
+	}
+}
+
+func Test_SIRIHandler_SiriService(t *testing.T) {
+	// Generate the request Body
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+
+	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(string(content))
+
+	server, referential := siriHandler_PrepareServer()
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("objectidKind", "stopArea1")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid)
+	line.Save()
+
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "second"))
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.Save()
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea.Id()
+	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "first"))
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.Save()
+
+	pastStopVisit := referential.Model().StopVisits().New()
+	pastStopVisit.StopAreaId = stopArea.Id()
+	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
+	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "past"))
+	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
+	pastStopVisit.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	objectid2 := model.NewObjectID("objectidKind", "stopArea2")
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
+
+	line2 := referential.Model().Lines().New()
+	line2.SetObjectID(objectid2)
+	line2.Save()
+
+	vehicleJourney2 := referential.Model().VehicleJourneys().New()
+	vehicleJourney2.SetObjectID(objectid2)
+	vehicleJourney2.LineId = line2.Id()
+	vehicleJourney2.Save()
+
+	stopVisit3 := referential.Model().StopVisits().New()
+	stopVisit3.StopAreaId = stopArea2.Id()
+	stopVisit3.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "third"))
+	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
+	stopVisit3.Save()
+
+	stopVisit4 := referential.Model().StopVisits().New()
+	stopVisit4.StopAreaId = stopArea2.Id()
+	stopVisit4.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit4.SetObjectID(model.NewObjectID("objectidKind", "fourth"))
+	stopVisit4.VehicleJourneyId = vehicleJourney2.Id()
+	stopVisit4.Save()
+
+	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+
+	// responseRecorder.Body.String()
+	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	responseBody := envelope.Body().String()
+
+	// TEMP: Find a better way to test?
+	expectedResponseBody := `<ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
+	<Answer xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns9="http://wsdl.siri.org.uk/siri">
+		<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>Edwig</ns3:ProducerRef>
+		<ns3:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
+		<ns3:Status>true</ns3:Status>
+		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
+			<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
+			<ns3:Status>true</ns3:Status>
+			<ns3:MonitoredStopVisit>
+				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>first</ns3:ItemIdentifier>
+				<ns3:MonitoringRef>stopArea1</ns3:MonitoringRef>
+				<ns3:MonitoredVehicleJourney>
+					<ns3:LineRef>stopArea1</ns3:LineRef>
+					<ns3:FramedVehicleJourneyRef>
+						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
+						<ns3:DatedVehicleJourneyRef>stopArea1</ns3:DatedVehicleJourneyRef>
+					</ns3:FramedVehicleJourneyRef>
+					<ns3:MonitoredCall>
+						<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
+						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+						<ns3:ActualArrivalTime>1984-04-04T01:00:00.000Z</ns3:ActualArrivalTime>
+					</ns3:MonitoredCall>
+				</ns3:MonitoredVehicleJourney>
+			</ns3:MonitoredStopVisit>
+			<ns3:MonitoredStopVisit>
+				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>second</ns3:ItemIdentifier>
+				<ns3:MonitoringRef>stopArea1</ns3:MonitoringRef>
+				<ns3:MonitoredVehicleJourney>
+					<ns3:LineRef>stopArea1</ns3:LineRef>
+					<ns3:FramedVehicleJourneyRef>
+						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
+						<ns3:DatedVehicleJourneyRef>stopArea1</ns3:DatedVehicleJourneyRef>
+					</ns3:FramedVehicleJourneyRef>
+					<ns3:MonitoredCall>
+						<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
+						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+						<ns3:ActualArrivalTime>1984-04-04T02:00:00.000Z</ns3:ActualArrivalTime>
+					</ns3:MonitoredCall>
+				</ns3:MonitoredVehicleJourney>
+			</ns3:MonitoredStopVisit>
+		</ns3:StopMonitoringDelivery>
+		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
+			<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
+			<ns3:Status>true</ns3:Status>
+			<ns3:MonitoredStopVisit>
+				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>fourth</ns3:ItemIdentifier>
+				<ns3:MonitoringRef>stopArea2</ns3:MonitoringRef>
+				<ns3:MonitoredVehicleJourney>
+					<ns3:LineRef>stopArea2</ns3:LineRef>
+					<ns3:FramedVehicleJourneyRef>
+						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
+						<ns3:DatedVehicleJourneyRef>stopArea2</ns3:DatedVehicleJourneyRef>
+					</ns3:FramedVehicleJourneyRef>
+					<ns3:MonitoredCall>
+						<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
+						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+						<ns3:ActualArrivalTime>1984-04-04T01:00:00.000Z</ns3:ActualArrivalTime>
+					</ns3:MonitoredCall>
+				</ns3:MonitoredVehicleJourney>
+			</ns3:MonitoredStopVisit>
+			<ns3:MonitoredStopVisit>
+				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>third</ns3:ItemIdentifier>
+				<ns3:MonitoringRef>stopArea2</ns3:MonitoringRef>
+				<ns3:MonitoredVehicleJourney>
+					<ns3:LineRef>stopArea2</ns3:LineRef>
+					<ns3:FramedVehicleJourneyRef>
+						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
+						<ns3:DatedVehicleJourneyRef>stopArea2</ns3:DatedVehicleJourneyRef>
+					</ns3:FramedVehicleJourneyRef>
+					<ns3:MonitoredCall>
+						<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
+						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+						<ns3:ActualArrivalTime>1984-04-04T02:00:00.000Z</ns3:ActualArrivalTime>
+					</ns3:MonitoredCall>
+				</ns3:MonitoredVehicleJourney>
+			</ns3:MonitoredStopVisit>
+		</ns3:StopMonitoringDelivery>
+	</Answer>
+</ns1:GetSiriServiceResponse>`
+
+	// Check the response body is what we expect.
+	if responseBody != expectedResponseBody {
+		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
 	}
 }
