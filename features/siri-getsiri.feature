@@ -3,7 +3,6 @@ Feature: Support SIRI GetSIRI
   Background:
     Given a Referential "test" is created
 
-  @wip
   Scenario: 2462 - Handle a SIRI GetSIRIService request with several StopMonitorings
     Given a Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
