@@ -3,10 +3,9 @@ package model
 type TransactionalStopAreas struct {
 	UUIDConsumer
 
-	model           Model
-	saved           map[StopAreaId]*StopArea
-	savedByObjectId map[string]map[string]StopAreaId
-	deleted         map[StopAreaId]*StopArea
+	model   Model
+	saved   map[StopAreaId]*StopArea
+	deleted map[StopAreaId]*StopArea
 }
 
 func NewTransactionalStopAreas(model Model) *TransactionalStopAreas {
@@ -17,7 +16,6 @@ func NewTransactionalStopAreas(model Model) *TransactionalStopAreas {
 
 func (manager *TransactionalStopAreas) resetCaches() {
 	manager.saved = make(map[StopAreaId]*StopArea)
-	manager.savedByObjectId = make(map[string]map[string]StopAreaId)
 	manager.deleted = make(map[StopAreaId]*StopArea)
 }
 
@@ -35,15 +33,13 @@ func (manager *TransactionalStopAreas) Find(id StopAreaId) (StopArea, bool) {
 }
 
 func (manager *TransactionalStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
-	valueMap, ok := manager.savedByObjectId[objectid.Kind()]
-	if !ok {
-		return manager.model.StopAreas().FindByObjectId(objectid)
+	for _, stopArea := range manager.saved {
+		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
+		if stopAreaObjectId.Value() == objectid.Value() {
+			return *stopArea, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return manager.model.StopAreas().FindByObjectId(objectid)
-	}
-	return *manager.saved[id], true
+	return manager.model.StopAreas().FindByObjectId(objectid)
 }
 
 func (manager *TransactionalStopAreas) FindAll() (stopAreas []StopArea) {
@@ -65,13 +61,6 @@ func (manager *TransactionalStopAreas) Save(stopArea *StopArea) bool {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
 	manager.saved[stopArea.Id()] = stopArea
-	for _, objectid := range stopArea.ObjectIDs() {
-		_, ok := manager.savedByObjectId[objectid.Kind()]
-		if !ok {
-			manager.savedByObjectId[objectid.Kind()] = make(map[string]StopAreaId)
-		}
-		manager.savedByObjectId[objectid.Kind()][objectid.Value()] = stopArea.Id()
-	}
 	return true
 }
 
