@@ -871,7 +871,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>SIRI:33193765</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -903,7 +903,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>SIRI:33199874</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -1004,7 +1004,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>SIRI:33199874</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
