@@ -11,24 +11,29 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
+func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
+	connector := NewSIRIServiceRequestBroadcaster(partner)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
-	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	objectid := model.NewObjectID("objectidKind", "boaarle")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
-	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
+	objectid = model.NewObjectID("objectidKind", "cladebr")
+	stopArea = referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	file, err := os.Open("testdata/siri-service-request-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,23 +42,20 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	response, err := connector.RequestStopArea(request)
+	response, err := connector.HandleRequests(request)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
-	}
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
 	}
-	if response.RequestMessageRef != "StopMonitoring:Test:0" {
+	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
 	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
@@ -63,13 +65,19 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	if !response.ResponseTimestamp.Equal(time) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
+	if !response.Status {
+		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
+	}
+	if len(response.Deliveries) != 2 {
+		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.Deliveries))
+	}
 }
 
-func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
+func Test_SIRIServiceRequestBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
 		slug:           "partner",
 		Settings:       make(map[string]string),
-		ConnectorTypes: []string{"siri-stop-monitoring-request-broadcaster"},
+		ConnectorTypes: []string{"siri-service-request-broadcaster"},
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
@@ -89,10 +97,10 @@ func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 	}
 }
 
-func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLStopMonitoringRequest(t *testing.T) {
+func Test_SIRIServiceRequestBroadcaster_LogXMLSiriServiceRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
-	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
+	file, err := os.Open("testdata/siri-service-request-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,35 +109,31 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLStopMonitoringRequest(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	logXMLStopMonitoringRequest(logStashEvent, request)
-	if logStashEvent["messageIdentifier"] != "StopMonitoring:Test:0" {
-		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: StopMonitoring:Test:0", logStashEvent["messageIdentifier"])
+	logXMLSiriServiceRequest(logStashEvent, request)
+	if logStashEvent["messageIdentifier"] != "GetSIRIStopMonitoring:Test:0" {
+		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: GetSIRIStopMonitoring:Test:0", logStashEvent["messageIdentifier"])
 	}
-	if logStashEvent["requestorRef"] != "NINOXE:default" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["requestorRef"])
+	if logStashEvent["requestorRef"] != "RATPDEV:Concerto" {
+		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: RATPDEV:Concerto", logStashEvent["requestorRef"])
 	}
-	if logStashEvent["monitoringRef"] != "NINOXE:StopPoint:SP:24:LOC" {
-		t.Errorf("Wrong monitoringRef logged:\n got: %v\n expected: NINOXE:StopPoint:SP:24:LOC", logStashEvent["monitoringRef"])
-	}
-	if logStashEvent["requestTimestamp"] != "2016-09-22 07:54:52.977 +0000 UTC" {
-		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: 2016-09-22 07:54:52.977 +0000 UTC", logStashEvent["requestTimestamp"])
+	if logStashEvent["requestTimestamp"] != "2001-12-17 09:30:47 +0000 UTC" {
+		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: 2001-12-17 09:30:47 +0000 UTC", logStashEvent["requestTimestamp"])
 	}
 	if logStashEvent["requestXML"] != request.RawXML() {
 		t.Errorf("Wrong requestXML logged:\n got: %v\n expected: %v", logStashEvent["requestXML"], request.RawXML())
 	}
 }
 
-func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *testing.T) {
+func Test_SIRIServiceRequestBroadcaster_LogSIRIServiceResponse(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-	response := &siri.SIRIStopMonitoringResponse{
-		Address:                   "edwig.edwig",
+	response := &siri.SIRIServiceResponse{
 		ProducerRef:               "NINOXE:default",
 		ResponseMessageIdentifier: "fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26",
 	}
@@ -137,11 +141,8 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 	response.Status = true
 	response.ResponseTimestamp = time
 
-	logSIRIStopMonitoringResponse(logStashEvent, response)
+	logSIRIServiceResponse(logStashEvent, response)
 
-	if logStashEvent["address"] != "edwig.edwig" {
-		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])
-	}
 	if logStashEvent["producerRef"] != "NINOXE:default" {
 		t.Errorf("Wrong producerRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["producerRef"])
 	}
@@ -152,7 +153,10 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 		t.Errorf("Wrong responseMessageIdentifier logged:\n got: %v\n expected: fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26", logStashEvent["responseMessageIdentifier"])
 	}
 	if logStashEvent["responseTimestamp"] != "2009-11-10 23:00:00 +0000 UTC" {
-		t.Errorf("Wrong responseTimestamp logged:\n got: %v\n expected: 2009-11-10 23:00:00 +0000 UTC", logStashEvent["responseTimestamp"])
+		t.Errorf("Wrong responseTimestamp logged:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", logStashEvent["responseTimestamp"])
+	}
+	if logStashEvent["status"] != "true" {
+		t.Errorf("Wrong status logged:\n got: %v\n expected: true", logStashEvent["true"])
 	}
 	xml, err := response.BuildXML()
 	if err != nil {

@@ -1,6 +1,7 @@
 package core
 
 const (
+	SIRI_SERVICE_REQUEST_BROADCASTER         = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR   = "siri-stop-monitoring-request-collector"
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR   = "test-stop-monitoring-request-collector"
 	SIRI_STOP_MONITORING_REQUEST_BROADCASTER = "siri-stop-monitoring-request-broadcaster"
@@ -42,6 +43,8 @@ type ConnectorFactory interface {
 
 func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
+	case SIRI_SERVICE_REQUEST_BROADCASTER:
+		return &SIRIServiceRequestBroadcasterFactory{}
 	case SIRI_STOP_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIStopMonitoringRequestCollectorFactory{}
 	case TEST_STOP_MONITORING_REQUEST_COLLECTOR:

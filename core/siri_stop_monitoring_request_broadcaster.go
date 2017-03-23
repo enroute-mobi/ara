@@ -28,17 +28,9 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 	return siriStopMonitoringRequestBroadcaster
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLStopMonitoringRequest) (*siri.SIRIStopMonitoringResponse, error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, stopArea model.StopArea, messageIdentifier string) siri.SIRIStopMonitoringDelivery {
 	objectidKind := connector.Partner().Setting("remote_objectid_kind")
-	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
-
-	if !ok {
-		return nil, fmt.Errorf("StopArea not found")
-	}
+	objectid, _ := stopArea.ObjectID(objectidKind)
 
 	if !stopArea.CollectedAlways {
 		stopArea.CollectedUntil = connector.Clock().Now().Add(15 * time.Minute)
@@ -46,21 +38,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		stopArea.Save()
 	}
 
-	logStashEvent := make(audit.LogStashEvent)
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logXMLStopMonitoringRequest(logStashEvent, request)
-
-	response := new(siri.SIRIStopMonitoringResponse)
-	response.Address = connector.Partner().Setting("local_url")
-	response.ProducerRef = connector.Partner().Setting("remote_credential")
-	if response.ProducerRef == "" {
-		response.ProducerRef = "Edwig"
+	delivery := siri.SIRIStopMonitoringDelivery{
+		RequestMessageRef: messageIdentifier,
+		Status:            true,
+		ResponseTimestamp: connector.Clock().Now(),
 	}
-	response.RequestMessageRef = request.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
-	response.Status = true
-	response.ResponseTimestamp = connector.Clock().Now()
 
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
@@ -147,8 +129,38 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
 
-		response.MonitoredStopVisits = append(response.MonitoredStopVisits, monitoredStopVisit)
+		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 	}
+
+	return delivery
+}
+
+func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLStopMonitoringRequest) (*siri.SIRIStopMonitoringResponse, error) {
+	tx := connector.Partner().Referential().NewTransaction()
+	defer tx.Close()
+
+	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
+	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+
+	if !ok {
+		return nil, fmt.Errorf("StopArea not found")
+	}
+
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	logXMLStopMonitoringRequest(logStashEvent, request)
+
+	response := new(siri.SIRIStopMonitoringResponse)
+	response.Address = connector.Partner().Setting("local_url")
+	response.ProducerRef = connector.Partner().Setting("remote_credential")
+	if response.ProducerRef == "" {
+		response.ProducerRef = "Edwig"
+	}
+	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
+
+	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, stopArea, request.MessageIdentifier())
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
