@@ -65,8 +65,8 @@ Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([
   expectedStopVisit = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
 
   if condition.nil?
-    expect(expectedLine).not_to be_nil
+    expect(expectedStopVisit).not_to be_nil
   else
-    expect(expectedLine).to be_nil
+    expect(expectedStopVisit).to be_nil
   end
 end

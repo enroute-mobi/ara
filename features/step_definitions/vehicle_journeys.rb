@@ -24,11 +24,11 @@ end
 Then(/^a VehicleJourney "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get vehicle_journeys_path(referential: referential)
   responseArray = JSON.parse(response.body)
-  expectedVihicleJourney = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+  expectedVehicleJourney = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
 
   if condition.nil?
-    expect(expectedLine).not_to be_nil
+    expect(expectedVehicleJourney).not_to be_nil
   else
-    expect(expectedLine).to be_nil
+    expect(expectedVehicleJourney).to be_nil
   end
 end
