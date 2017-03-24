@@ -32,9 +32,9 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		return &SIRIStopMonitoringRequestHandler{
 			xmlRequest: siri.NewXMLStopMonitoringRequest(envelope.Body()),
 		}
-	case "GetStopDiscovery":
+	case "StopPointsDiscovery":
 		return &SIRIStopDiscoveryRequestHandler{
-			xmlRequest: siri.NewXMLStopDiscoveryRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
 		}
 	case "GetSiriService":
 		return &SIRIServiceRequestHandler{
@@ -69,10 +69,6 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		siriError("Client", "Invalid Request", response)
 		return
 	}
-
-	// if envelope.BodyType() == "GetSiriService" {
-	// 	// TODO
-	// }
 
 	requestHandler := handler.requestHandler(envelope)
 	if requestHandler == nil {

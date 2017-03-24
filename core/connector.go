@@ -52,6 +52,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &TestStopMonitoringRequestCollectorFactory{}
 	case SIRI_STOP_MONITORING_REQUEST_BROADCASTER:
 		return &SIRIStopMonitoringRequestBroadcasterFactory{}
+	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER:
+		return &SIRIStopPointsDiscoveryRequestBroadcasterFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
 		return &SIRICheckStatusClientFactory{}
 	case TEST_CHECK_STATUS_CLIENT_TYPE:

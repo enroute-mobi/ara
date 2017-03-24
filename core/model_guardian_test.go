@@ -84,10 +84,8 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 }
 
 func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
-
 	referential := &Referential{
-		model:          model.NewMemoryModel(),
-		collectManager: NewTestCollectManager(),
+		model: model.NewMemoryModel(),
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
 
@@ -95,41 +93,42 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.CollectedAlways = true
-	referential.Model().StopAreas().Save(&stopArea)
+	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Schedules = make(model.StopVisitSchedules)
 
-	stopVisit.Schedules[model.STOP_VISIT_SCHEDULE_AIMED] = &model.StopVisitSchedule{}
-	stopVisit.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].SetArrivalTime(referential.ModelGuardian().Clock().Now())
-	stopVisit.Schedules[model.STOP_VISIT_SCHEDULE_AIMED].SetDepartureTime(referential.ModelGuardian().Clock().Now().Add(10 * time.Minute))
-	stopVisit.Schedules[model.STOP_VISIT_SCHEDULE_ACTUAL] = &model.StopVisitSchedule{}
+	stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_ONTIME
+	stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ONTIME
 
-	referential.Model().StopVisits().Save(&stopVisit)
+	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_AIMED, fakeClock.Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_AIMED, fakeClock.Now().Add(10*time.Minute))
+
 	stopVisit.Save()
-	referential.ModelGuardian().Start()
-	defer referential.ModelGuardian().Stop()
 
-	// Wait for the guardian to launch Run
-	fakeClock.BlockUntil(1)
-	// Advance time
-	fakeClock.Advance(11 * time.Second)
-	if referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0].VehicleAtStop != false {
-		t.Errorf("VehicleAtStop should be set at false")
+	fakeClock.Advance(1*time.Minute + 1*time.Second)
+	referential.modelGuardian.simulateActualAttributes()
+
+	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
+	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {
+		t.Errorf("Wrong StopVisit ArrivalStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.ArrivalStatus)
 	}
-	fakeClock.Advance(5 * time.Minute)
-	time.Sleep(100 * time.Millisecond)
-
-	if referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0].VehicleAtStop != true {
-		t.Errorf("VehicleAtStop should be set at true")
+	if !stopVisit.VehicleAtStop {
+		t.Errorf("Wrong StopVisit VehicleAtStop at %s\n want: %#v\n got: %#v", fakeClock.Now(), true, stopVisit.VehicleAtStop)
 	}
 
 	fakeClock.Advance(10 * time.Minute)
-	time.Sleep(100 * time.Millisecond)
+	referential.modelGuardian.simulateActualAttributes()
 
-	if referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0].VehicleAtStop != false {
-		t.Errorf("VehicleAtStop should be set at false")
+	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
+	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {
+		t.Errorf("Wrong StopVisit ArrivalStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.ArrivalStatus)
+	}
+	if expected := model.STOP_VISIT_DEPARTURE_DEPARTED; stopVisit.DepartureStatus != expected {
+		t.Errorf("Wrong StopVisit DepartureStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.DepartureStatus)
+	}
+	if stopVisit.VehicleAtStop {
+		t.Errorf("Wrong StopVisit VehicleAtStop at %s\n want: %#v\n got: %#v", fakeClock.Now(), false, stopVisit.VehicleAtStop)
 	}
 }

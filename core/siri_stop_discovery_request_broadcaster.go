@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/af83/edwig/audit"
@@ -10,7 +11,7 @@ import (
 )
 
 type StopPointsDiscoveryRequestBroadcaster interface {
-	stopAreas(request *siri.XMLStopDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error)
+	stopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error)
 }
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
@@ -27,7 +28,7 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 	return siriStopDiscoveryRequestBroadcaster
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error) {
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -40,19 +41,33 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
 
+	objectIDKind := connector.RemoteObjectIDKind()
+
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" || stopArea.References["StopPointRef"] == (model.Reference{}) || stopArea.References["StopPointRef"].ObjectId.Value() == "" {
+		if stopArea.Name == "" {
 			continue
 		}
+
+		objectID, ok := stopArea.ObjectID(objectIDKind)
+		if !ok {
+			continue
+		}
+
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
-			StopPointName: stopArea.Name,
-			StopPointRef:  stopArea.References["StopPointRef"].ObjectId.Value(),
+			StopName:     stopArea.Name,
+			StopPointRef: objectID.Value(),
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
 
+	sort.Sort(siri.SIRIAnnotatedStopPointByStopPointRef(response.AnnotatedStopPoints))
+
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 	return response, nil
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) RemoteObjectIDKind() string {
+	return connector.Partner().Setting("remote_objectid_kind")
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
@@ -65,7 +80,7 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
 }
 
-func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopDiscoveryRequest) {
+func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestXML"] = request.RawXML()

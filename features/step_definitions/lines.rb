@@ -47,8 +47,6 @@ Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)
   responseArray = JSON.parse(response.body)
   expectedLine = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
 
-  puts expectedLine
-
   if condition.nil?
     expect(expectedLine).not_to be_nil
   else

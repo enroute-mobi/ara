@@ -56,6 +56,8 @@ func (model *MemoryModel) Reset() error {
 		tx.Model().Lines().Delete(&line)
 	}
 
+	tx.Commit()
+
 	model.date = NewDate(DefaultClock().Now())
 	return nil
 }

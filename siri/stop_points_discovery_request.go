@@ -5,7 +5,7 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
-type XMLStopDiscoveryRequest struct {
+type XMLStopPointsDiscoveryRequest struct {
 	RequestXMLStructure
 }
 
@@ -21,17 +21,17 @@ const stopDiscoveryRequestTemplate = `<ns7:StopPointsDiscovery xmlns:ns2="http:/
             <RequestExtension />
             </ns7:StopPointsDiscovery>`
 
-func NewXMLStopDiscoveryRequest(node xml.Node) *XMLStopDiscoveryRequest {
-	xmlStopDiscoveryRequest := &XMLStopDiscoveryRequest{}
+func NewXMLStopPointsDiscoveryRequest(node xml.Node) *XMLStopPointsDiscoveryRequest {
+	xmlStopDiscoveryRequest := &XMLStopPointsDiscoveryRequest{}
 	xmlStopDiscoveryRequest.node = NewXMLNode(node)
 	return xmlStopDiscoveryRequest
 }
 
-func NewXMLStopDiscoveryRequestFromContent(content []byte) (*XMLStopDiscoveryRequest, error) {
+func NewXMLStopPointsDiscoveryRequestFromContent(content []byte) (*XMLStopPointsDiscoveryRequest, error) {
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
 	}
-	request := NewXMLStopDiscoveryRequest(doc.Root().XmlNode)
+	request := NewXMLStopPointsDiscoveryRequest(doc.Root().XmlNode)
 	return request, nil
 }
