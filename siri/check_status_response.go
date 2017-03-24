@@ -2,8 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
 	"text/template"
 	"time"
 
@@ -14,10 +12,6 @@ import (
 type XMLCheckStatusResponse struct {
 	ResponseXMLStructure
 
-	status             bool
-	errorType          string
-	errorNumber        int
-	errorText          string
 	serviceStartedTime time.Time
 }
 
@@ -98,55 +92,6 @@ func NewSIRICheckStatusResponse(
 		ErrorText:          errorText,
 		ResponseTimestamp:  responseTimestamp,
 		ServiceStartedTime: serviceStartedTime}
-}
-
-func (response *XMLCheckStatusResponse) Status() bool {
-	if !response.status {
-		response.status = response.findBoolChildContent("Status")
-	}
-	return response.status
-}
-
-// TODO: See what to do if status is true
-// we can't access directly the node, we search for errorText and get parent
-// Gokogiri FirstChild() or LastChild()  doesn't work
-func (response *XMLCheckStatusResponse) ErrorType() string {
-	if !response.Status() && response.errorType == "" {
-		node := response.findNode("ErrorText")
-		response.errorType = node.Parent().Name()
-
-		// Find errorText and errorNumber to avoir too much parsing
-		response.errorText = strings.TrimSpace(node.Content())
-		if response.errorType == "OtherError" {
-			n, err := strconv.Atoi(node.Parent().Attr("number"))
-			if err != nil {
-				return ""
-			}
-			response.errorNumber = n
-		}
-	}
-	return response.errorType
-}
-
-// TODO: See what to do if status is true
-func (response *XMLCheckStatusResponse) ErrorNumber() int {
-	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
-		node := response.findNode("ErrorText")
-		n, err := strconv.Atoi(node.Parent().Attr("number"))
-		if err != nil {
-			return -1
-		}
-		response.errorNumber = n
-	}
-	return response.errorNumber
-}
-
-// TODO: See what to do if status is true
-func (response *XMLCheckStatusResponse) ErrorText() string {
-	if !response.Status() && response.errorText == "" {
-		response.errorText = response.findStringChildContent("ErrorText")
-	}
-	return response.errorText
 }
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {

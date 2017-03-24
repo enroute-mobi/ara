@@ -74,6 +74,12 @@ type ResponseXMLStructure struct {
 	requestMessageRef         string
 	responseMessageIdentifier string
 	responseTimestamp         time.Time
+
+	status           bool
+	errorType        string
+	errorNumber      int
+	errorText        string
+	errorDescription string
 }
 
 type RequestXMLStructure struct {
@@ -220,4 +226,55 @@ func (response *ResponseXMLStructure) ResponseTimestamp() time.Time {
 		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
 	}
 	return response.responseTimestamp
+}
+
+func (response *ResponseXMLStructure) Status() bool {
+	if !response.status {
+		response.status = response.findBoolChildContent("Status")
+	}
+	return response.status
+}
+
+func (response *ResponseXMLStructure) ErrorType() string {
+	if !response.Status() && response.errorType == "" {
+		node := response.findNode("ErrorText")
+		response.errorType = node.Parent().Name()
+
+		// Find errorText and errorNumber to avoir too much parsing
+		response.errorText = strings.TrimSpace(node.Content())
+		if response.errorType == "OtherError" {
+			n, err := strconv.Atoi(node.Parent().Attr("number"))
+			if err != nil {
+				return ""
+			}
+			response.errorNumber = n
+		}
+	}
+	return response.errorType
+}
+
+func (response *ResponseXMLStructure) ErrorNumber() int {
+	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
+		node := response.findNode("ErrorText")
+		n, err := strconv.Atoi(node.Parent().Attr("number"))
+		if err != nil {
+			return -1
+		}
+		response.errorNumber = n
+	}
+	return response.errorNumber
+}
+
+func (response *ResponseXMLStructure) ErrorText() string {
+	if !response.Status() && response.errorText == "" {
+		response.errorText = response.findStringChildContent("ErrorText")
+	}
+	return response.errorText
+}
+
+func (response *ResponseXMLStructure) ErrorDescription() string {
+	if !response.Status() && response.errorDescription == "" {
+		response.errorDescription = response.findStringChildContent("Description")
+	}
+	return response.errorDescription
 }

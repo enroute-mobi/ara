@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/af83/edwig/audit"
@@ -87,6 +88,15 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
+
+	if !xmlStopMonitoringResponse.Status() {
+		return nil, fmt.Errorf("StopMonitoringResponse Status false: %v %v %v %v",
+			xmlStopMonitoringResponse.ErrorType(),
+			xmlStopMonitoringResponse.ErrorNumber(),
+			xmlStopMonitoringResponse.ErrorText(),
+			xmlStopMonitoringResponse.ErrorDescription(),
+		)
+	}
 
 	// WIP
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID())
@@ -188,6 +198,13 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = response.RawXML()
+	logStashEvent["status"] = strconv.FormatBool(response.Status())
+	if !response.Status() {
+		logStashEvent["errorType"] = response.ErrorType()
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		logStashEvent["errorText"] = response.ErrorText()
+		logStashEvent["errorDescription"] = response.ErrorDescription()
+	}
 }
 
 func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateEvent *model.StopAreaUpdateEvent) {
