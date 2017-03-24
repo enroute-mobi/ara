@@ -47,10 +47,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, err := connector.HandleRequests(request)
-	if err != nil {
-		t.Fatal(err)
-	}
+	response := connector.HandleRequests(request)
 
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
@@ -67,6 +64,55 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	}
 	if !response.Status {
 		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
+	}
+	if len(response.Deliveries) != 2 {
+		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.Deliveries))
+	}
+}
+
+func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	connector := NewSIRIServiceRequestBroadcaster(partner)
+	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
+	connector.SetClock(model.NewFakeClock())
+
+	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := connector.HandleRequests(request)
+
+	if response.ProducerRef != "Edwig" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	}
+	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
+		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
+	}
+	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	}
+	time := connector.Clock().Now()
+	if !response.ResponseTimestamp.Equal(time) {
+		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
+	}
+	if response.Deliveries[0].Status || response.Deliveries[1].Status {
+		t.Errorf("Response deliveries have wrong status:\n got: %v %v\n expected: false", response.Deliveries[0].Status, response.Deliveries[1].Status)
 	}
 	if len(response.Deliveries) != 2 {
 		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.Deliveries))

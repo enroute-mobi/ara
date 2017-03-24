@@ -24,11 +24,7 @@ func (handler *SIRIStopMonitoringRequestHandler) ConnectorType() string {
 func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("StopMonitoring %s\n", handler.xmlRequest.MessageIdentifier())
 
-	response, err := connector.(core.StopMonitoringRequestBroadcaster).RequestStopArea(handler.xmlRequest)
-	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
-		return
-	}
+	response := connector.(core.StopMonitoringRequestBroadcaster).RequestStopArea(handler.xmlRequest)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
