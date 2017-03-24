@@ -34,7 +34,7 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		}
 	case "StopPointsDiscovery":
 		return &SIRIStopDiscoveryRequestHandler{
-			xmlRequest: siri.NewXMLStopDiscoveryRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
 		}
 	case "GetSiriService":
 		return &SIRIServiceRequestHandler{

@@ -35,7 +35,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopDiscoveryRequestFromContent(content)
+	request, err := siri.NewXMLStopPointsDiscoveryRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

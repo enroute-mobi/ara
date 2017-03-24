@@ -10,7 +10,7 @@ import (
 )
 
 type StopPointsDiscoveryRequestBroadcaster interface {
-	stopAreas(request *siri.XMLStopDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error)
+	stopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error)
 }
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
@@ -31,7 +31,7 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 	return siriStopDiscoveryRequestBroadcaster
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error) {
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -81,7 +81,7 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
 }
 
-func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopDiscoveryRequest) {
+func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestXML"] = request.RawXML()

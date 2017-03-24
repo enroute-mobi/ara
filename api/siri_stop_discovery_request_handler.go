@@ -10,7 +10,7 @@ import (
 )
 
 type SIRIStopDiscoveryRequestHandler struct {
-	xmlRequest *siri.XMLStopDiscoveryRequest
+	xmlRequest *siri.XMLStopPointsDiscoveryRequest
 }
 
 func (handler *SIRIStopDiscoveryRequestHandler) RequestorRef() string {
