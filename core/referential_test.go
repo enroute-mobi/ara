@@ -73,7 +73,7 @@ func Test_Referential_MarshalJSON(t *testing.T) {
 		Settings: map[string]string{"key": "value"},
 	}
 	referential.partners = NewPartnerManager(referential)
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","NextReloadAt":"0001-01-01T00:00:00Z","Partners":[],"Settings":{"key":"value"},"Slug":"referential"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Settings":{"key":"value"},"Slug":"referential"}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

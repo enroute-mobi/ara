@@ -120,7 +120,7 @@ func Test_Partner_RemoteObjectIDKindPresent(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "Kind2"
 
 	if partner.RemoteObjectIDKind() != "Kind1" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
+		t.Errorf("RemoteObjectIDKind should be egal to Kind1")
 	}
 }
 
@@ -132,7 +132,7 @@ func Test_Partner_RemoteObjectIDKindAbsent(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "Kind2"
 
 	if partner.RemoteObjectIDKind() != "Kind2" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
+		t.Errorf("RemoteObjectIDKind should be egal to Kind2")
 	}
 }
 

@@ -21,10 +21,6 @@ type SIRIStopPointsDiscoveryRequestBroadcaster struct {
 
 type SIRIStopPointsDiscoveryRequestBroadcasterFactory struct{}
 
-const (
-	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER = "siri-stop-points-discovery-request-broadcaster"
-)
-
 func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDiscoveryRequestBroadcaster {
 	siriStopDiscoveryRequestBroadcaster := &SIRIStopPointsDiscoveryRequestBroadcaster{}
 	siriStopDiscoveryRequestBroadcaster.partner = partner

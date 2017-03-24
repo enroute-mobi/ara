@@ -134,14 +134,35 @@ func (referential *Referential) NewTransaction() *model.Transaction {
 	return model.NewTransaction(referential.model)
 }
 
+func (referential *Referential) FillReferential(referentialMap map[string]interface{}) {
+	if referential.id != "" {
+		referentialMap["Id"] = referential.id
+	}
+
+	if referential.slug != "" {
+		referentialMap["Slug"] = referential.slug
+	}
+
+	if len(referential.Settings) > 0 {
+		referentialMap["Settings"] = referential.Settings
+	}
+
+	if !referential.nextReloadAt.IsZero() {
+		referentialMap["NextReloadAt"] = referential.nextReloadAt
+	}
+
+	if !referential.partners.IsEmpty() {
+		referentialMap["Partners"] = referential.partners
+	}
+}
+
 func (referential *Referential) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
-		"Id":           referential.id,
-		"Slug":         referential.slug,
-		"Settings":     referential.Settings,
-		"Partners":     referential.partners,
-		"NextReloadAt": referential.nextReloadAt,
-	})
+
+	referentialMap := make(map[string]interface{})
+
+	referential.FillReferential(referentialMap)
+
+	return json.Marshal(referentialMap)
 }
 
 func (referential *Referential) Definition() *APIReferential {

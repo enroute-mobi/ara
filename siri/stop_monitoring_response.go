@@ -98,9 +98,10 @@ type SIRIStopMonitoringResponse struct {
 type SIRIStopMonitoringDelivery struct {
 	RequestMessageRef string
 	Status            bool
-	// ErrorType                 string
-	// ErrorNumber               int
-	// ErrorText                 string
+	ErrorType         string
+	ErrorNumber       int
+	ErrorText         string
+	Description       string
 	ResponseTimestamp time.Time
 
 	MonitoredStopVisits []*SIRIMonitoredStopVisit
@@ -143,7 +144,14 @@ type SIRIMonitoredStopVisit struct {
 const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
 			<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
-			<ns3:Status>{{ .Status }}</ns3:Status>{{ range .MonitoredStopVisits }}
+			<ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
+			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<ns3:{{.ErrorType}}>
+					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
+					<ns3:Description>{{.Description}}</ns3:Description>{{ end }}
+				</ns3:ServiceNotAvailableError>
+			</ns3:ErrorCondition>{{ end }}{{ range .MonitoredStopVisits }}
 			<ns3:MonitoredStopVisit>
 				<ns3:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
