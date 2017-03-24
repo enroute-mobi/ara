@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -20,6 +21,14 @@ type SIRIStopPointsDiscoveryResponse struct {
 type SIRIAnnotatedStopPoint struct {
 	StopPointRef string
 	StopName     string
+}
+
+type SIRIAnnotatedStopPointByStopPointRef []*SIRIAnnotatedStopPoint
+
+func (a SIRIAnnotatedStopPointByStopPointRef) Len() int      { return len(a) }
+func (a SIRIAnnotatedStopPointByStopPointRef) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a SIRIAnnotatedStopPointByStopPointRef) Less(i, j int) bool {
+	return strings.Compare(a[i].StopPointRef, a[j].StopPointRef) < 0
 }
 
 const stopDiscoveryResponseTemplate = `

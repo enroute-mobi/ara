@@ -49,12 +49,12 @@ Feature: Support SIRI StopDiscovery
                 <ns3:StopName>Test</ns3:StopName>
               </ns3:AnnotatedStopPointRef>
               <ns3:AnnotatedStopPointRef>
-                <ns3:StopPointRef>NINOXE:StopPoint:SP:16:LOC</ns3:StopPointRef>
-                <ns3:StopName>Test 2</ns3:StopName>
-              </ns3:AnnotatedStopPointRef>
-              <ns3:AnnotatedStopPointRef>
                 <ns3:StopPointRef>NINOXE:StopPoint:BP:7:LOC</ns3:StopPointRef>
                 <ns3:StopName>Test 3</ns3:StopName>
+              </ns3:AnnotatedStopPointRef>
+              <ns3:AnnotatedStopPointRef>
+                <ns3:StopPointRef>NINOXE:StopPoint:SP:16:LOC</ns3:StopPointRef>
+                <ns3:StopName>Test 2</ns3:StopName>
               </ns3:AnnotatedStopPointRef>
             </Answer>
             <AnswerExtension />

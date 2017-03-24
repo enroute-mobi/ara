@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/af83/edwig/audit"
@@ -62,6 +63,8 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
+
+	sort.Sort(siri.SIRIAnnotatedStopPointByStopPointRef(response.AnnotatedStopPoints))
 
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 	return response, nil
