@@ -24,7 +24,7 @@ func (handler *SIRIStopDiscoveryRequestHandler) ConnectorType() string {
 func (handler *SIRIStopDiscoveryRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("StopDiscovery %s\n", handler.xmlRequest.MessageIdentifier())
 
-	tmp := connector.(core.SIRIStopPointsDiscoveryRequestBroadcaster)
+	tmp := connector.(*core.SIRIStopPointsDiscoveryRequestBroadcaster)
 	response, _ := tmp.StopAreas(handler.xmlRequest)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
