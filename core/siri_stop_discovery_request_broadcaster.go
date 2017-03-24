@@ -44,19 +44,31 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
 
+	objectIDKind := connector.RemoteObjectIDKind()
+
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" || stopArea.References["StopPointRef"] == (model.Reference{}) || stopArea.References["StopPointRef"].ObjectId.Value() == "" {
+		if stopArea.Name == "" {
 			continue
 		}
+
+		objectID, ok := stopArea.ObjectID(objectIDKind)
+		if !ok {
+			continue
+		}
+
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
-			StopPointName: stopArea.Name,
-			StopPointRef:  stopArea.References["StopPointRef"].ObjectId.Value(),
+			StopName:     stopArea.Name,
+			StopPointRef: objectID.Value(),
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
 
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 	return response, nil
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) RemoteObjectIDKind() string {
+	return connector.Partner().Setting("remote_objectid_kind")
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
