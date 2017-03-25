@@ -1244,13 +1244,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | MonitoringRef     | NINOXE:StopPoint:SP:24:LOC |
       | StopVisitTypes    | all                        |
     And a minute has passed
-    Then the SIRI server should have received a GetStopMonitoring request with
+    Then the SIRI server should have received a GetStopMonitoring request with:
       | //siri:MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     # And the StopArea "arrêt 1" should have the following attributes:
     #   | CollectedUntil | ~ 07h54 |
 
-  @wip
-  Scenario: 2939 - Test the collect.include_stop_areas
+  Scenario: 2939 - Partner Setting collect.include_stop_areas is used to select the best Partner
     Given a SIRI server "first" waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -1364,13 +1363,15 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       </soap:Envelope>
         """
     And a Partner "first" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                    | http://localhost:8090 |
-      | collect.include_stop_areas    | first                 |
-      | remote_objectid_kind          | external              |
+      | remote_url                 | http://localhost:8090 |
+      | collect.include_stop_areas | first                 |
+      | remote_objectid_kind       | external              |
+      | remote_credential          | dummy                 |
     And a Partner "second" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                    | http://localhost:8091 |
-      | collect.include_stop_areas    | second                |
-      | remote_objectid_kind          | external              |
+      | remote_url                 | http://localhost:8091 |
+      | collect.include_stop_areas | second                |
+      | remote_objectid_kind       | external              |
+      | remote_credential          | dummy                 |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | ObjectIDs       | "external": "first" |
@@ -1378,59 +1379,9 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs       | "external": "second" |
     When a minute has passed
     Then the "first" SIRI server should have received a GetStopMonitoring request with:
-      """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-        <SOAP-ENV:Header />
-        <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
-            <ServiceRequestInfo>
-              <ns2:RequestTimestamp>2017-01-01T12:02:00.000Z</ns2:RequestTimestamp>
-              <ns2:RequestorRef>RATPDev</ns2:RequestorRef>
-              <ns2:MessageIdentifier>RATPDev:Message::123:LOC</ns2:MessageIdentifier>
-            </ServiceRequestInfo>
-
-            <Request version="2.0:FR-IDF-2.4">
-              <ns2:RequestTimestamp>2017-01-01T12:02:00.000Z</ns2:RequestTimestamp>
-              <ns2:MessageIdentifier>RATPDev:Message::123:LOC</ns2:MessageIdentifier>
-              <ns2:MonitoringRef>first</ns2:MonitoringRef>
-            </Request>
-            <RequestExtension />
-          </ns7:GetStopMonitoring>
-        </S:Body>
-      </S:Envelope>
-      """
+      | //siri:MonitoringRef | first |
     And the "second" SIRI server should have received a GetStopMonitoring request with:
-      """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-        <SOAP-ENV:Header />
-        <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
-            <ServiceRequestInfo>
-              <ns2:RequestTimestamp>2017-01-01T12:02:00.000Z</ns2:RequestTimestamp>
-              <ns2:RequestorRef>RATPDev</ns2:RequestorRef>
-              <ns2:MessageIdentifier>RATPDev:Message::234:LOC</ns2:MessageIdentifier>
-            </ServiceRequestInfo>
-
-            <Request version="2.0:FR-IDF-2.4">
-              <ns2:RequestTimestamp>2017-01-01T12:02:00.000Z</ns2:RequestTimestamp>
-              <ns2:MessageIdentifier>RATPDev:Message::234:LOC</ns2:MessageIdentifier>
-              <ns2:MonitoringRef>first</ns2:MonitoringRef>
-            </Request>
-            <RequestExtension />
-          </ns7:GetStopMonitoring>
-        </S:Body>
-      </S:Envelope>
-      """
+      | //siri:MonitoringRef | second |
 
   @wip
   Scenario: 2939 -

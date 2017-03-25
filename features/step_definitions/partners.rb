@@ -4,5 +4,11 @@ end
 
 Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors \[([^"\]]*)\] and the following settings:$/) do |slug, referential, connectors, settings|
 	attributes = {"slug" => slug, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => settings.rows_hash}
-	RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json}
+
+  begin
+	  RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json}
+  rescue RestClient::ExceptionWithResponse => err
+    puts err.response.body
+    raise err
+  end
 end
