@@ -26,6 +26,9 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
 		manager.UpdateStopVisit(stopVisitUpdateEvent)
 	}
+	for _, stopVisitNotCollectedEvent := range event.StopVisitNotCollectedEvents {
+		manager.UpdateNotCollectedStopVisit(stopVisitNotCollectedEvent)
+	}
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
@@ -33,6 +36,24 @@ func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEven
 	defer tx.Close()
 
 	NewStopVisitUpdater(tx, event).Update()
+
+	tx.Commit()
+}
+
+func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVisitNotCollectedEvent) {
+	tx := NewTransaction(manager.model)
+	defer tx.Close()
+
+	stopVisit, found := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectId)
+	if !found {
+		logger.Log.Debugf("StopVisitNotCollectedEvent on unknown StopVisit: %#v", event)
+		return
+	}
+
+	stopVisit.NotCollected()
+	stopVisit.Save()
+
+	logger.Log.Printf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.StopVisitObjectId)
 
 	tx.Commit()
 }

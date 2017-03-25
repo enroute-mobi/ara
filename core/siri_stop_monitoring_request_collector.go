@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -128,6 +129,7 @@ func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotColle
 
 	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
 		if _, ok := objId[stopVisitObjectID]; !ok {
+			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
 			event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, &model.StopVisitNotCollectedEvent{StopVisitObjectId: stopVisitObjectID})
 		}
 	}
