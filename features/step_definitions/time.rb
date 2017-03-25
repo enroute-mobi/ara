@@ -14,6 +14,11 @@ When(/^(\d+) minutes have passed$/) do |count|
 	sleep 1 # don't blame me
 end
 
+When(/^(\d+) seconds have passed$/) do |count|
+	RestClient.post(time_path("advance"), { "duration" => "#{count.to_i}s" }.to_json)
+	sleep 1 # don't blame me
+end
+
 When(/^the time is "([^"]*)"$/) do |expected_time|
 	getTime = RestClient.get(time_path).body
 	splitTime = getTime.split(' ')

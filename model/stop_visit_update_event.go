@@ -5,7 +5,7 @@ import "time"
 type StopVisitDepartureStatus string
 
 const (
-	STOP_VISIT_DEPARTURE_ONTIME    StopVisitDepartureStatus = "ontime"
+	STOP_VISIT_DEPARTURE_ONTIME    StopVisitDepartureStatus = "onTime"
 	STOP_VISIT_DEPARTURE_EARLY     StopVisitDepartureStatus = "early"
 	STOP_VISIT_DEPARTURE_DELAYED   StopVisitDepartureStatus = "delayed"
 	STOP_VISIT_DEPARTURE_CANCELLED StopVisitDepartureStatus = "cancelled"
@@ -18,7 +18,7 @@ type StopVisitArrivalStatus string
 
 const (
 	STOP_VISIT_ARRIVAL_ARRIVED      StopVisitArrivalStatus = "arrived"
-	STOP_VISIT_ARRIVAL_ONTIME       StopVisitArrivalStatus = "ontime"
+	STOP_VISIT_ARRIVAL_ONTIME       StopVisitArrivalStatus = "onTime"
 	STOP_VISIT_ARRIVAL_EARLY        StopVisitArrivalStatus = "early"
 	STOP_VISIT_ARRIVAL_DELAYED      StopVisitArrivalStatus = "delayed"
 	STOP_VISIT_ARRIVAL_CANCELLED    StopVisitArrivalStatus = "cancelled"

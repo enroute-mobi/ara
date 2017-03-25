@@ -818,9 +818,12 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         </S:Body>
       </S:Envelope>
       """
-  @wip
-  Scenario: Detect StopVisit deletion between two StopMonitoring requests
+
+  Scenario: Manage a passed StopVisit
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+    # include a MonitoredStopVisit/ItemIdentifier A at 13:00
+    # include a MonitoredStopVisit/ItemIdentifier B arrival 12:02:30 / departure 12:03
+    # include a MonitoredStopVisit/ItemIdentifier C at 15:00
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
@@ -839,7 +842,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>StopVisit:A</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -871,7 +874,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193765</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>StopVisit:B</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -892,18 +895,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                       <ns5:StopPointName>Arletty</ns5:StopPointName>
                       <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
                       <ns5:DestinationDisplay>Méliès - Croix Bonnet</ns5:DestinationDisplay>
-                      <ns5:AimedArrivalTime>2017-01-01T14:00:00.000+01:00</ns5:AimedArrivalTime>
-                      <ns5:ExpectedArrivalTime>2017-01-01T14:00:00.000+01:00</ns5:ExpectedArrivalTime>
+                      <ns5:AimedArrivalTime>2017-01-01T12:02:30.000+01:00</ns5:AimedArrivalTime>
+                      <ns5:ExpectedArrivalTime>2017-01-01T12:02:30.000+01:00</ns5:ExpectedArrivalTime>
                       <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
-                      <ns5:AimedDepartureTime>2017-01-01T14:01:00.000+01:00</ns5:AimedDepartureTime>
-                      <ns5:ExpectedDepartureTime>2017-01-01T14:01:00.000+01:00</ns5:ExpectedDepartureTime>
+                      <ns5:AimedDepartureTime>2017-01-01T12:03:00.000+01:00</ns5:AimedDepartureTime>
+                      <ns5:ExpectedDepartureTime>2017-01-01T12:03:00.000+01:00</ns5:ExpectedDepartureTime>
                       <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
                     </ns5:MonitoredCall>
                   </ns5:MonitoredVehicleJourney>
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33199874</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>StopVisit:C</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -940,20 +943,19 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         </soap:Body>
       </soap:Envelope>
         """
-      # include a MonitoredStopVisit/ItemIdentifier A at 13:00
-      # include a MonitoredStopVisit/ItemIdentifier B at 14:00
-      # include a MonitoredStopVisit/ItemIdentifier C at 15:00
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | Test                  |
       | remote_objectid_kind | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                                |
-      | ObjectIDs | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+      | Name      | Arletty               |
+      | ObjectIDs | "internal": "boaarle" |
     And a minute has passed
-    # la première est fait normalement à cette étape
     And the SIRI server waits GetStopMonitoring request to respond with
+      # include a MonitoredStopVisit/ItemIdentifier A at 14:00
+      # no MonitoredStopVisit/ItemIdentifier B
+      # include a MonitoredStopVisit/ItemIdentifier C at 15:00
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
@@ -972,7 +974,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33193249</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>StopVisit:A</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -1004,7 +1006,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 </ns5:MonitoredStopVisit>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
-                  <ns5:ItemIdentifier>SIRI:33199874</ns5:ItemIdentifier>
+                  <ns5:ItemIdentifier>StopVisit:C</ns5:ItemIdentifier>
                   <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
                   <ns5:MonitoredVehicleJourney>
                     <ns5:LineRef>CdF:Line::415:LOC</ns5:LineRef>
@@ -1041,23 +1043,27 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         </soap:Body>
       </soap:Envelope>
         """
-      # include a MonitoredStopVisit/ItemIdentifier A at 14:00
-      # no MonitoredStopVisit/ItemIdentifier B
-      # include a MonitoredStopVisit/ItemIdentifier C at 15:00
-    And 2 minutes have passed
+    And 90 seconds have passed
     When the SIRI server has received 2 GetStopMonitoring requests
-    Then a StopVisit exists with the following attributes:
+    And the StopVisit "6ba7b814-9dad-11d1-d-00c04fd430c8" has the following attributes:
+      # "internal": "A"
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
-      | ObjectIDs         | "internal": "A" |
-    And a StopVisit exists with the following attributes:
-      | DepartureStatus   | cancelled       |
-      | ArrivalStatus     | cancelled       |
-      | ObjectIDs         | "internal": "B" |
-    And a StopVisit exists with the following attributes:
+    And the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
+      # "internal": "B"
+      | Collected   | false                |
+      | CollectedAt | 2017-01-01T12:02:00Z |
+    And the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+      # "internal": "C"
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
-      | ObjectIDs         | "internal": "C" |
+    And 10 seconds have passed
+    And the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
+      # "internal": "B"
+      | Collected       | false                |
+      | CollectedAt     | 2017-01-01T12:02:00Z |
+      | DepartureStatus | departed             |
+      | ArrivalStatus   | arrived              |
 
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
