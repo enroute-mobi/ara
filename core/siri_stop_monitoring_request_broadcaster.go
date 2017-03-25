@@ -176,8 +176,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		response.ResponseTimestamp = connector.Clock().Now()
 		response.Status = false
 		response.ErrorType = "InvalidDataReferencesError"
-		response.ErrorText = "StopArea not found"
-		response.Description = "Error [MonitoringRef] : StopArea not found"
+		response.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
 	} else {
 		response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, request.MessageIdentifier())
 	}
@@ -257,7 +256,6 @@ func logSIRIStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *
 		logStashEvent["errorType"] = response.ErrorType
 		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
 		logStashEvent["errorText"] = response.ErrorText
-		logStashEvent["errorDescription"] = response.Description
 	}
 	xml, err := response.BuildXML()
 	if err != nil {
