@@ -1519,3 +1519,40 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then the "first" SIRI server should not have received a GetStopMonitoring request
     Then the "second" SIRI server should have received a GetStopMonitoring request with:
       | //siri:MonitoringRef | single |
+
+  Scenario: 2481 - Handle a SIRI StopMonitoring request on a unknown StopArea
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
+    When I send a SIRI GetStopMonitoring request with
+      | RequestorRef  | test    |
+      | MonitoringRef | unknown |
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
+  <S:Body>
+    <ns8:GetStopMonitoringResponse xmlns:ns3='http://www.siri.org.uk/siri' xmlns:ns4='http://www.ifopt.org.uk/acsb' xmlns:ns5='http://www.ifopt.org.uk/ifopt' xmlns:ns6='http://datex2.eu/schema/2_0RC1/2_0' xmlns:ns7='http://scma/siri' xmlns:ns8='http://wsdl.siri.org.uk' xmlns:ns9='http://wsdl.siri.org.uk/siri'>
+      <ServiceDeliveryInfo>
+        <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
+        <ns3:ProducerRef>Edwig</ns3:ProducerRef>
+        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+        <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <ns3:StopMonitoringDelivery version='2.0:FR-IDF-2.4'>
+          <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
+          <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+          <ns3:Status>false</ns3:Status>
+          <ns3:ErrorCondition>
+            <ns3:InvalidDataReferencesError>
+              <ns3:ErrorText>StopArea not found: 'unknown'</ns3:ErrorText>
+            </ns3:InvalidDataReferencesError>
+          </ns3:ErrorCondition>
+        </ns3:StopMonitoringDelivery>
+      </Answer>
+      <AnswerExtension/>
+    </ns8:GetStopMonitoringResponse>
+  </S:Body>
+</S:Envelope>
+      """
