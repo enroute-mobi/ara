@@ -238,16 +238,18 @@ func (response *ResponseXMLStructure) Status() bool {
 func (response *ResponseXMLStructure) ErrorType() string {
 	if !response.Status() && response.errorType == "" {
 		node := response.findNode("ErrorText")
-		response.errorType = node.Parent().Name()
+		if node != nil {
+			response.errorType = node.Parent().Name()
 
-		// Find errorText and errorNumber to avoir too much parsing
-		response.errorText = strings.TrimSpace(node.Content())
-		if response.errorType == "OtherError" {
-			n, err := strconv.Atoi(node.Parent().Attr("number"))
-			if err != nil {
-				return ""
+			// Find errorText and errorNumber to avoir too much parsing
+			response.errorText = strings.TrimSpace(node.Content())
+			if response.errorType == "OtherError" {
+				n, err := strconv.Atoi(node.Parent().Attr("number"))
+				if err != nil {
+					return ""
+				}
+				response.errorNumber = n
 			}
-			response.errorNumber = n
 		}
 	}
 	return response.errorType
