@@ -134,7 +134,7 @@ func (simulator *ActualAttributesSimulator) Now() time.Time {
 }
 
 func (simulator *ActualAttributesSimulator) ArrivalTime() time.Time {
-	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{"aimed", "expected"})
+	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
 }
 
 func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
@@ -142,7 +142,7 @@ func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
 }
 
 func (simulator *ActualAttributesSimulator) DepartureTime() time.Time {
-	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{"aimed", "expected"})
+	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
 }
 
 func (simulator *ActualAttributesSimulator) AfterDepartureTime() bool {
