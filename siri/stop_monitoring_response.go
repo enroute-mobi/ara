@@ -101,7 +101,6 @@ type SIRIStopMonitoringDelivery struct {
 	ErrorType         string
 	ErrorNumber       int
 	ErrorText         string
-	Description       string
 	ResponseTimestamp time.Time
 
 	MonitoredStopVisits []*SIRIMonitoredStopVisit
@@ -149,8 +148,7 @@ const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0
 				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
 				<ns3:{{.ErrorType}}>
 					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
-					<ns3:Description>{{.Description}}</ns3:Description>{{ end }}
-				</ns3:ServiceNotAvailableError>
+				</ns3:{{.ErrorType}}>{{ end }}
 			</ns3:ErrorCondition>{{ end }}{{ range .MonitoredStopVisits }}
 			<ns3:MonitoredStopVisit>
 				<ns3:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
