@@ -62,21 +62,21 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
+	now := guardian.Clock().Now()
+	outdated := now.Add(-1 * time.Minute)
+
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		now := guardian.Clock().Now()
 		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
 			continue
 		}
 
-		stopAreaTx := guardian.referential.NewTransaction()
-		defer stopAreaTx.Close()
-		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
+		if stopArea.RequestedAt().Before(outdated) && stopArea.UpdatedAt().Before(outdated) {
+			stopAreaTx := guardian.referential.NewTransaction()
+			defer stopAreaTx.Close()
 
-		outdated := now.Add(-1 * time.Minute)
-
-		if transactionnalStopArea.RequestedAt().Before(outdated) && transactionnalStopArea.UpdatedAt().Before(outdated) {
+			transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
 			transactionnalStopArea.Requested(now)
-			stopAreaTx.Model().StopAreas().Save(&transactionnalStopArea)
+			transactionnalStopArea.Save()
 			stopAreaTx.Commit()
 
 			stopAreaUpdateRequest := &StopAreaUpdateRequest{
