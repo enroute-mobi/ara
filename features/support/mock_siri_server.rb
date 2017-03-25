@@ -99,7 +99,7 @@ class SIRIServer
   end
 
   def received_request?
-    requests.count == 0
+    !requests.empty?
   end
 
 end
