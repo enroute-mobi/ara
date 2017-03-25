@@ -48,7 +48,7 @@ const checkStatusResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://
 			<ns2:OtherError number="{{.ErrorNumber}}">{{ else }}
 			<ns2:{{.ErrorType}}>{{ end }}
 				<ns2:ErrorText>{{.ErrorText}}</ns2:ErrorText>
-			</ns2:ServiceNotAvailableError>
+			</ns2:{{.ErrorType}}>
 		</ns2:ErrorCondition>{{ end }}
 		<ns2:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ServiceStartedTime>
 	</Answer>
