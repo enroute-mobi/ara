@@ -40,6 +40,8 @@ func (guardian *ModelGuardian) Run() {
 		case <-guardian.stop:
 			return
 		case <-c:
+			logger.Log.Debugf("Model guardian visit")
+
 			guardian.refreshStopAreas()
 			guardian.checkReloadModel()
 			guardian.simulateActualAttributes()
@@ -59,8 +61,6 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	// Open a new transaction
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
-
-	logger.Log.Debugf("Check StopAreas status")
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
 		now := guardian.Clock().Now()
@@ -95,8 +95,10 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 
 	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
 		if stopVisit.IsCollected() == true {
-			return
+			continue
 		}
+
+		logger.Log.Debugf("Simulate actual attributes on StopVisit %v", stopVisit.Id())
 
 		stopVisitTx := guardian.referential.NewTransaction()
 		defer stopVisitTx.Close()
