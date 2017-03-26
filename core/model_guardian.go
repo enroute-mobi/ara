@@ -98,7 +98,8 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 			continue
 		}
 
-		logger.Log.Debugf("Simulate actual attributes on StopVisit %v", stopVisit.Id())
+		// too verbse
+		// logger.Log.Debugf("Simulate actual attributes on StopVisit %v", stopVisit.Id())
 
 		stopVisitTx := guardian.referential.NewTransaction()
 		defer stopVisitTx.Close()
