@@ -163,6 +163,19 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 	}
 }
 
+func (manager *MemoryStopAreas) Clone(model Model) *MemoryStopAreas {
+	clone := NewMemoryStopAreas()
+	clone.model = model
+
+	for _, stopArea := range manager.byIdentifier {
+		cloneStopArea := *stopArea
+		cloneStopArea.id = StopAreaId("")
+		clone.Save(&cloneStopArea)
+	}
+
+	return clone
+}
+
 func (manager *MemoryStopAreas) New() StopArea {
 	stopArea := NewStopArea(manager.model)
 	return *stopArea

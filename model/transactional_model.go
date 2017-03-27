@@ -22,10 +22,6 @@ func (model *TransactionalModel) Date() Date {
 	return model.parent.Date()
 }
 
-func (model *TransactionalModel) Reset() error {
-	return model.parent.Reset()
-}
-
 func (model *TransactionalModel) StopAreas() StopAreas {
 	return model.stopAreas
 }

@@ -27,7 +27,7 @@ type Referential struct {
 
 	collectManager CollectManagerInterface
 	manager        Referentials
-	model          model.Model
+	model          *model.MemoryModel
 	modelGuardian  *ModelGuardian
 	partners       Partners
 	startedAt      time.Time
@@ -197,7 +197,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model")
-	referential.model.Reset()
+	referential.model = referential.model.Clone()
 	referential.setNextReloadAt()
 }
 
