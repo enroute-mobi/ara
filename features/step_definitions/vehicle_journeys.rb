@@ -9,16 +9,11 @@ end
 
 Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
 	response = RestClient.get vehicle_journeys_path
-	responseArray = JSON.parse(response.body)
+  response_array = JSON.parse(response.body)
 
-	attributes = model_attributes(attributes)
+  called_method = has_attributes(response_array, attributes)
 
-	objectidkind = attributes["ObjectIDs"].keys.first
-  objectid_value = attributes["ObjectIDs"][objectidkind]
-
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"][objectidkind] == objectid_value }
-
-  expect(expectedAttr).not_to be_nil
+  expect(called_method).to be_truthy
 end
 
 Then(/^a VehicleJourney "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|

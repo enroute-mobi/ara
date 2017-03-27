@@ -26,19 +26,13 @@ When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/
   RestClient.delete line_path expectedLine["Id"]
 end
 
-Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, line|
+Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get lines_path(referential: referential)
-  responseArray = JSON.parse(response.body)
+  response_array = JSON.parse(response.body)
 
-  lineHash = model_attributes(line)
-  objectidkind = lineHash["ObjectIDs"].keys.first
-  objectid_value = lineHash["ObjectIDs"][objectidkind]
+  called_method = has_attributes(response_array, attributes)
 
-  expectedName = responseArray.find{|a| a["Name"] == lineHash["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"][objectidkind] == objectid_value }
-
-  expect(expectedName).not_to be_nil
-  expect(expectedAttr).not_to be_nil
+  expect(called_method).to be_truthy
 end
 
 

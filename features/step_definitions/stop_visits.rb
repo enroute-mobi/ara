@@ -26,38 +26,13 @@ end
 
 Then(/^one StopVisit has the following attributes:$/) do |attributes|
   response = RestClient.get stop_visits_path
-  responseArray = JSON.parse(response.body)
+  response_array = JSON.parse(response.body)
 
-  attributes = model_attributes(attributes)
+  called_method = has_attributes(response_array, attributes)
 
-  objectidkind = attributes["ObjectIDs"].keys.first
-  objectid_value = attributes["ObjectIDs"][objectidkind]
-
-
-  expectedName = responseArray.find{|a| a["Name"] == attributes["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"][objectidkind] == objectid_value }
-
-  expect(expectedName).not_to be_nil
-  expect(expectedAttr).not_to be_nil
+  expect(called_method).to be_truthy
 end
 
-# Then(/^a StopVisit exists with the following attributes:$/) do |attributes|
-#   response = RestClient.get stop_visits_path
-#   puts response_array = JSON.parse(response.body)
-
-#   attributes = model_attributes(attributes)
-
-#   objectid_kind = attributes["ObjectIDs"].keys.first
-#   objectid_value = attributes["ObjectIDs"][objectidkind]
-
-#   expected_departure_status = response_array.find{|a| puts a["DepartureStatus"] == attributes["DepartureStatus"]}
-#   expected_arrival_status = response_array.find{|a| puts a["ArrivalStatus"] == attributes["ArrivalStatus"]}
-#   expected_attributes = response_array.find{|a| puts a["ObjectIDs"][objectid_kind] == objectid_value}
-
-#   expect(expected_departure_status).not_to be_nil
-#   expect(expecte_arrival_status).not_to be_nil
-#   expect(expected_attributes).not_to be_nil
-# end
 
 Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
   response = RestClient.get stop_visits_path(referential: referential)

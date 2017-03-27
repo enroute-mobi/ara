@@ -26,19 +26,13 @@ When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroy
   RestClient.delete stop_area_path expectedStopArea["Id"]
 end
 
-Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, stopArea|
+Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get stop_areas_path(referential: referential)
-  responseArray = api_attributes(response.body)
+  response_array = api_attributes(response.body)
 
-  stopAreaHash = model_attributes(stopArea)
-  objectidkind = stopAreaHash["ObjectIDs"].keys.first
-  objectid_value = stopAreaHash["ObjectIDs"][objectidkind]
+  called_method = has_attributes(response_array, attributes)
 
-  expectedName = responseArray.find{|a| a["Name"] == stopAreaHash["Name"]}
-  expectedAttr = responseArray.find{|a| a["ObjectIDs"][objectidkind] == objectid_value }
-
-  expect(expectedName).not_to be_nil
-  expect(expectedAttr).not_to be_nil
+  expect(called_method).to be_truthy
 end
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|

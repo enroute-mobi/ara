@@ -119,7 +119,7 @@ Feature: Support SIRI StopMonitoring
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                               |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     And I see edwig vehicle_journeys
     And I see edwig stop_visits
@@ -1046,18 +1046,18 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       # include a MonitoredStopVisit/ItemIdentifier C at 15:00
     And 2 minutes have passed
     When the SIRI server has received 2 GetStopMonitoring requests
-    Then a StopVisit exists with the following attributes:
-      | DepartureStatus   | onTime          |
-      | ArrivalStatus     | onTime          |
-      | ObjectIDs         | "internal": "A" |
-    And a StopVisit exists with the following attributes:
-      | DepartureStatus   | cancelled       |
-      | ArrivalStatus     | cancelled       |
-      | ObjectIDs         | "internal": "B" |
-    And a StopVisit exists with the following attributes:
-      | DepartureStatus   | onTime          |
-      | ArrivalStatus     | onTime          |
-      | ObjectIDs         | "internal": "C" |
+    Then one StopVisit has the following attributes:
+      | DepartureStatus   | onTime                     |
+      | ArrivalStatus     | onTime                     |
+      | ObjectIDs         | "internal":"SIRI:33193249" |
+    And one StopVisit has the following attributes:
+      | DepartureStatus   | cancelled                  |
+      | ArrivalStatus     | cancelled                  |
+      | ObjectIDs         | "internal":"SIRI:33193765" |
+    And one StopVisit has the following attributes:
+      | DepartureStatus   | onTime                     |
+      | ArrivalStatus     | onTime                     |
+      | ObjectIDs         | "internal":"SIRI:33199874" |
 
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with

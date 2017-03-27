@@ -80,3 +80,17 @@ def api_attributes(json)
 
   # attributes
 end
+
+def has_attributes(response_array, attributes)
+  parsed_attributes = model_attributes(attributes)
+
+  objectid_kind = parsed_attributes["ObjectIDs"].keys.first
+  objectid_value = parsed_attributes["ObjectIDs"][objectid_kind]
+
+  found_value = response_array.find{|a| a["ObjectIDs"][objectid_kind] == objectid_value}
+
+  expect(found_value).not_to be_nil
+
+  parsed_attributes.delete("ObjectIDs")
+  expect(found_value).to include(parsed_attributes) 
+end
