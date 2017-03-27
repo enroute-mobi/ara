@@ -10,7 +10,7 @@ import (
 )
 
 type ServiceRequestBroadcaster interface {
-	HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error)
+	HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse
 }
 
 type SIRIServiceRequestBroadcaster struct {
@@ -27,7 +27,7 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	return siriServiceRequestBroadcaster
 }
 
-func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error) {
+func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -57,11 +57,19 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 		objectid := model.NewObjectID(objectidKind, stopMonitoringRequest.MonitoringRef())
 		stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 
+		var delivery siri.SIRIStopMonitoringDelivery
 		if !ok {
-			return nil, fmt.Errorf("StopArea not found")
+			delivery = siri.SIRIStopMonitoringDelivery{
+				RequestMessageRef: stopMonitoringRequest.MessageIdentifier(),
+				Status:            false,
+				ResponseTimestamp: connector.Clock().Now(),
+				ErrorType:         "InvalidDataReferencesError",
+				ErrorText:         fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
+			}
+			response.Status = false
+		} else {
+			delivery = stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest.MessageIdentifier())
 		}
-
-		delivery := stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest.MessageIdentifier())
 
 		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
 		audit.CurrentLogStash().WriteEvent(SMLogStashEvent)
@@ -71,7 +79,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 	logSIRIServiceResponse(logStashEvent, response)
 
-	return response, nil
+	return response
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
@@ -119,4 +127,9 @@ func logSIRIStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery s
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+	if !delivery.Status {
+		logStashEvent["errorType"] = delivery.ErrorType
+		logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+		logStashEvent["errorText"] = delivery.ErrorText
+	}
 }

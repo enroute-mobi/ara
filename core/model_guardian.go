@@ -40,6 +40,8 @@ func (guardian *ModelGuardian) Run() {
 		case <-guardian.stop:
 			return
 		case <-c:
+			logger.Log.Debugf("Model guardian visit")
+
 			guardian.refreshStopAreas()
 			guardian.checkReloadModel()
 			guardian.simulateActualAttributes()
@@ -60,23 +62,21 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
-	logger.Log.Debugf("Check StopAreas status")
+	now := guardian.Clock().Now()
+	outdated := now.Add(-1 * time.Minute)
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		now := guardian.Clock().Now()
 		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
 			continue
 		}
 
-		stopAreaTx := guardian.referential.NewTransaction()
-		defer stopAreaTx.Close()
-		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
+		if stopArea.RequestedAt().Before(outdated) && stopArea.UpdatedAt().Before(outdated) {
+			stopAreaTx := guardian.referential.NewTransaction()
+			defer stopAreaTx.Close()
 
-		outdated := now.Add(-1 * time.Minute)
-
-		if transactionnalStopArea.RequestedAt().Before(outdated) && transactionnalStopArea.UpdatedAt().Before(outdated) {
+			transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
 			transactionnalStopArea.Requested(now)
-			stopAreaTx.Model().StopAreas().Save(&transactionnalStopArea)
+			transactionnalStopArea.Save()
 			stopAreaTx.Commit()
 
 			stopAreaUpdateRequest := &StopAreaUpdateRequest{
@@ -95,8 +95,11 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 
 	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
 		if stopVisit.IsCollected() == true {
-			return
+			continue
 		}
+
+		// too verbse
+		// logger.Log.Debugf("Simulate actual attributes on StopVisit %v", stopVisit.Id())
 
 		stopVisitTx := guardian.referential.NewTransaction()
 		defer stopVisitTx.Close()
@@ -132,7 +135,7 @@ func (simulator *ActualAttributesSimulator) Now() time.Time {
 }
 
 func (simulator *ActualAttributesSimulator) ArrivalTime() time.Time {
-	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{"aimed", "expected"})
+	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
 }
 
 func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
@@ -140,7 +143,7 @@ func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
 }
 
 func (simulator *ActualAttributesSimulator) DepartureTime() time.Time {
-	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{"aimed", "expected"})
+	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
 }
 
 func (simulator *ActualAttributesSimulator) AfterDepartureTime() bool {
@@ -158,7 +161,7 @@ func (simulator *ActualAttributesSimulator) Simulate() bool {
 func (simulator *ActualAttributesSimulator) simulateArrival() bool {
 	if simulator.AfterArrivalTime() && simulator.CanArrive() {
 		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ARRIVED
-		simulator.stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.Now())
+		simulator.stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.ArrivalTime())
 
 		logger.Log.Printf("Set StopVisit %s ArrivalStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_ARRIVAL_ARRIVED)
 
@@ -195,7 +198,7 @@ func (simulator *ActualAttributesSimulator) simulateDeparture() bool {
 	if simulator.AfterDepartureTime() && simulator.CanDepart() {
 		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
 
-		simulator.stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.Now())
+		simulator.stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.DepartureTime())
 		simulator.stopVisit.VehicleAtStop = false
 
 		logger.Log.Printf("Set StopVisit %s DepartureStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_DEPARTURE_DEPARTED)

@@ -66,7 +66,7 @@ func (stopVisit *StopVisit) IsCollected() bool {
 	return stopVisit.collected
 }
 
-func (stopVisit *StopVisit) StopCollecting() {
+func (stopVisit *StopVisit) NotCollected() {
 	stopVisit.collected = false
 }
 

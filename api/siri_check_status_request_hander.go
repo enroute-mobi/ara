@@ -22,7 +22,7 @@ func (handler *SIRICheckStatusRequestHandler) ConnectorType() string {
 }
 
 func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
-	logger.Log.Debugf("CheckStatus %s\n", handler.xmlRequest.MessageIdentifier())
+	logger.Log.Debugf("CheckStatus %s", handler.xmlRequest.MessageIdentifier())
 
 	response, err := connector.(core.CheckStatusServer).CheckStatus(handler.xmlRequest)
 	if err != nil {

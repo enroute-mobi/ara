@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/jbowtie/gokogiri/xml"
+	"golang.org/x/text/encoding/charmap"
 )
 
 type Request interface {
@@ -63,15 +64,20 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 	}
 
 	// Check if response is gzip
-	var responseReader io.ReadCloser
+	var responseReader io.Reader
 	if acceptGzip && response.Header.Get("Content-Encoding") == "gzip" {
-		responseReader, err = gzip.NewReader(response.Body)
+		gzipReader, err := gzip.NewReader(response.Body)
 		if err != nil {
 			return nil, err
 		}
-		defer responseReader.Close()
+		defer gzipReader.Close()
+		responseReader = gzipReader
 	} else {
 		responseReader = response.Body
+	}
+
+	if response.Header.Get("Content-Type") == "text/xml;charset=ISO-8859-1" {
+		responseReader = charmap.ISO8859_1.NewDecoder().Reader(responseReader)
 	}
 
 	// Create SOAPEnvelope and check body type

@@ -36,6 +36,7 @@ type Partners interface {
 	Delete(partner *Partner) bool
 	Model() model.Model
 	Referential() *Referential
+	IsEmpty() bool
 	Load() error
 }
 
@@ -417,6 +418,10 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 
 func (manager *PartnerManager) Model() model.Model {
 	return manager.referential.Model()
+}
+
+func (manager *PartnerManager) IsEmpty() bool {
+	return len(manager.byId) == 0
 }
 
 func (manager *PartnerManager) Referential() *Referential {

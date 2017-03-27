@@ -26,20 +26,21 @@ def save_siri_messages(messages = {})
   end
 end
 
-Given(/^a SIRI server waits (GetStopMonitoring) request on "([^"]*)" to respond with$/) do |message_type, url, response|
-  (@the_siri_server = SIRIServer.create(url)).expect_request(message_type, response).start
+Given(/^a SIRI server (?:"([^"]*)" )?waits (GetStopMonitoring) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
+  name ||= "default"
+  SIRIServer.create(name, url).expect_request(message_type, response).start
 end
 
 Given(/^the SIRI server waits (GetStopMonitoring) request to respond with$/) do |message_type, response|
-  @the_siri_server.expect_request(message_type, response)
+  SIRIServer.find("default").expect_request(message_type, response)
 end
 
 When(/^the SIRI server has received a (GetStopMonitoring) request$/) do |message_type|
-  @the_siri_server.wait_request message_type
+  SIRIServer.find("default").wait_request message_type
 end
 
 When(/^the SIRI server has received (\d+) (GetStopMonitoring) requests$/) do |count, message_type|
-  @the_siri_server.wait_request message_type, count.to_i
+  SIRIServer.find("default").wait_request message_type, count.to_i
 end
 
 When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
@@ -67,12 +68,6 @@ Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
   end
 
   expect(actual_values).to eq(expected_values)
-
-  # expected_values.each do |xpath, value|
-  #   node = REXML::XPath.first(document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
-  #   xml_value = node.text if node
-  #   expect(xml_value).to eq(value)
-  # end
 end
 
 When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
@@ -114,26 +109,19 @@ When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
   send_siri_request request
 end
 
-Then(/^the SIRI server should not have received a (GetStopMonitoring) request$/) do |request|
-  received_request = @the_siri_server.received_request?
-  expect(received_request).to be_truthy
+Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (GetStopMonitoring) request$/) do |name, request_type|
+  name ||= "default"
+  expect(SIRIServer.find(name).received_request?).to be_falsy
 end
 
-Then(/^the SIRI server should have received a GetStopMonitoring request with$/) do |request|
-  document = REXML::Document.new(@last_siri_request)
+Then(/^the (?:"([^"]*)" )?SIRI server should have received a GetStopMonitoring request with:$/) do |name, attributes|
+  name ||= "default"
+  last_siri_request = SIRIServer.find(name).requests.last.body
 
-  expected_values = {}
-  request.raw.each do |row|
-    expected_values[row[0]] = row[1]
-  end
+  document = XML::Document.new(last_siri_request)
 
-  actual_values = {}
-  expected_values.keys.each do |xpath|
-    node = REXML::XPath.first(document, xpath, {"siri"=>"http://www.siri.org.uk/siri"})
-    xml_value = node.text if node
-    actual_values[xpath] = xml_value
-  end
+  expected_values = attributes.rows_hash
+  actual_values = document.values(expected_values.keys)
 
   expect(actual_values).to eq(expected_values)
-
 end

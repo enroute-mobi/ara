@@ -3,6 +3,8 @@ package model
 import "github.com/af83/edwig/logger"
 
 type StopAreaUpdateManager struct {
+	ClockConsumer
+
 	model Model
 }
 
@@ -23,8 +25,26 @@ func newStopAreaUpdateManager(model Model) *StopAreaUpdateManager {
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
+	tx := NewTransaction(manager.model)
+	defer tx.Close()
+
+	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
+	if !found {
+		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea", event.StopAreaId)
+		return
+	}
+
+	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
+	stopArea.Updated(manager.Clock().Now())
+	stopArea.Save()
+
+	tx.Commit()
+
 	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
 		manager.UpdateStopVisit(stopVisitUpdateEvent)
+	}
+	for _, stopVisitNotCollectedEvent := range event.StopVisitNotCollectedEvents {
+		manager.UpdateNotCollectedStopVisit(stopVisitNotCollectedEvent)
 	}
 }
 
@@ -37,6 +57,24 @@ func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEven
 	tx.Commit()
 }
 
+func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVisitNotCollectedEvent) {
+	tx := NewTransaction(manager.model)
+	defer tx.Close()
+
+	stopVisit, found := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectId)
+	if !found {
+		logger.Log.Debugf("StopVisitNotCollectedEvent on unknown StopVisit: %#v", event)
+		return
+	}
+
+	stopVisit.NotCollected()
+	stopVisit.Save()
+
+	logger.Log.Printf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.StopVisitObjectId)
+
+	tx.Commit()
+}
+
 func NewStopVisitUpdater(tx *Transaction, event *StopVisitUpdateEvent) *StopVisitUpdater {
 	return &StopVisitUpdater{tx: tx, event: event}
 }
@@ -45,9 +83,8 @@ func (updater *StopVisitUpdater) Update() {
 	existingStopVisit, ok := updater.tx.Model().StopVisits().FindByObjectId(updater.event.StopVisitObjectid)
 
 	if ok {
-		logger.Log.Debugf("Update StopVisit %v", existingStopVisit.Id())
-		stopArea, _ := updater.tx.Model().StopAreas().FindByObjectId(updater.event.StopAreaObjectId)
-		stopArea.Updated(updater.Clock().Now())
+		// too verbose
+		// logger.Log.Debugf("Update StopVisit %v", existingStopVisit.Id())
 		existingStopVisit.Schedules.Merge(updater.event.Schedules)
 		existingStopVisit.DepartureStatus = updater.event.DepartureStatus
 		existingStopVisit.ArrivalStatus = updater.event.ArrivalStatuts
@@ -55,8 +92,16 @@ func (updater *StopVisitUpdater) Update() {
 		existingStopVisit.VehicleAtStop = updater.event.VehicleAtStop
 		existingStopVisit.Collected(updater.Clock().Now())
 
-		updater.tx.Model().StopVisits().Save(&existingStopVisit)
-		updater.tx.Model().StopAreas().Save(&stopArea)
+		existingStopVisit.Save()
+
+		stopArea, found := updater.tx.Model().StopAreas().FindByObjectId(updater.event.StopAreaObjectId)
+		if found {
+			stopArea.Updated(updater.Clock().Now())
+			stopArea.Save()
+		} else {
+			logger.Log.Debugf("StopVisitUpdateEvent associated to unknown StopArea: %v", updater.event.StopAreaObjectId)
+		}
+
 		return
 	}
 
@@ -67,7 +112,8 @@ func (updater *StopVisitUpdater) Update() {
 
 	stopVisitAttributes := updater.event.Attributes.StopVisitAttributes()
 
-	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
+	// too verbose
+	// logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
 
 	stopVisit := updater.tx.Model().StopVisits().New()
 
@@ -86,7 +132,8 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.ArrivalStatus = stopVisitAttributes.ArrivalStatus
 	stopVisit.Attributes = stopVisitAttributes.Attributes
 	stopVisit.References = stopVisitAttributes.References
-	updater.tx.Model().StopVisits().Save(&stopVisit)
+
+	stopVisit.Save()
 }
 
 func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAreaAttributes) *StopArea {
@@ -102,7 +149,8 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 	stopArea.Name = stopAreaAttributes.Name
 	stopArea.Requested(updater.Clock().Now())
 	stopArea.Updated(updater.Clock().Now())
-	updater.tx.Model().StopAreas().Save(&stopArea)
+
+	stopArea.Save()
 
 	return &stopArea
 }
@@ -134,7 +182,8 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 	line = updater.tx.Model().Lines().New()
 	line.SetObjectID(lineAttributes.ObjectId)
 	line.Name = lineAttributes.Name
-	updater.tx.Model().Lines().Save(&line)
+
+	line.Save()
 
 	return &line
 }
@@ -157,7 +206,8 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 	vehicleJourney.References = updater.event.Attributes.VehicleJourneyAttributes().References
 	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
 	updater.resolveVehiculeJourneyReferences(vehicleJourney)
-	updater.tx.Model().VehicleJourneys().Save(&vehicleJourney)
+
+	vehicleJourney.Save()
 
 	return &vehicleJourney
 }

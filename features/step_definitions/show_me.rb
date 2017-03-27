@@ -10,3 +10,16 @@ end
 Then(/^show me edwig (vehicle_journeys|stop_areas|stop_visits|lines|partners)$/) do |model_type|
   show_me model_type
 end
+
+def show_me_time
+  time = Time.parse(JSON.parse(RestClient.get(time_path).body)["time"])
+  puts "Edwig time is #{time}"
+end
+
+Given(/^I see edwig time$/) do
+  show_me_time
+end
+
+Then(/^show me edwig time$/) do
+  show_me_time
+end

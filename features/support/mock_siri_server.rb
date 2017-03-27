@@ -8,8 +8,12 @@ class SIRIServer
     @@servers.values.each &block
   end
 
-  def self.create(url)
-    @@servers[url] ||= SIRIServer.new(url)
+  def self.create(name, url)
+    @@servers[name] ||= SIRIServer.new(url)
+  end
+
+  def self.find(name)
+    @@servers[name]
   end
 
   def self.stop
@@ -95,8 +99,9 @@ class SIRIServer
   end
 
   def received_request?
-    requests.count == 0
+    !requests.empty?
   end
+
 end
 
 After do

@@ -90,7 +90,7 @@ func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
 func (schedules StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
 	_, ok := schedules[kind]
 	if !ok {
-		schedules[kind] = &StopVisitSchedule{}
+		schedules[kind] = &StopVisitSchedule{kind: kind}
 	}
 	schedules[kind].SetDepartureTime(departureTime)
 }
@@ -98,7 +98,7 @@ func (schedules StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType,
 func (schedules StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, arrivalTime time.Time) {
 	_, ok := schedules[kind]
 	if !ok {
-		schedules[kind] = &StopVisitSchedule{}
+		schedules[kind] = &StopVisitSchedule{kind: kind}
 	}
 	schedules[kind].SetArrivalTime(arrivalTime)
 }
@@ -106,7 +106,7 @@ func (schedules StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, a
 func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
 	_, ok := schedules[kind]
 	if !ok {
-		schedules[kind] = &StopVisitSchedule{}
+		schedules[kind] = &StopVisitSchedule{kind: kind}
 	}
 	schedules[kind] = &StopVisitSchedule{
 		kind:          kind,

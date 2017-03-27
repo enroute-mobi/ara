@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
 
@@ -68,7 +69,9 @@ func (controller *TimeController) advance(response http.ResponseWriter, body []b
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse duration: %v", err), 400)
 		return
 	}
+	logger.Log.Printf("Advance time by %v", parsedDuration)
 	controller.server.Clock().(model.FakeClock).Advance(parsedDuration)
+	logger.Log.Printf("Time is now %v", controller.server.Clock().Now())
 
 	controller.get(response)
 }

@@ -120,7 +120,7 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 		<ns2:ErrorCondition>
 			<ns2:OtherError number="103">
 				<ns2:ErrorText>text</ns2:ErrorText>
-			</ns2:ServiceNotAvailableError>
+			</ns2:OtherError>
 		</ns2:ErrorCondition>
 		<ns2:ServiceStartedTime>2016-09-21T03:30:22.000Z</ns2:ServiceStartedTime>
 	</Answer>

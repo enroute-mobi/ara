@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 type StopMonitoringRequestBroadcaster interface {
-	RequestStopArea(request *siri.XMLStopMonitoringRequest) (*siri.SIRIStopMonitoringResponse, error)
+	RequestStopArea(request *siri.XMLStopMonitoringRequest) *siri.SIRIStopMonitoringResponse
 }
 
 type SIRIStopMonitoringRequestBroadcaster struct {
@@ -150,17 +151,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	return delivery
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLStopMonitoringRequest) (*siri.SIRIStopMonitoringResponse, error) {
+func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLStopMonitoringRequest) *siri.SIRIStopMonitoringResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
-
-	objectidKind := connector.RemoteObjectIDKind()
-	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
-
-	if !ok {
-		return nil, fmt.Errorf("StopArea not found")
-	}
 
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -175,11 +168,22 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	}
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 
-	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, request.MessageIdentifier())
+	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
+	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+	if !ok {
+		response.RequestMessageRef = request.MessageIdentifier()
+		response.ResponseTimestamp = connector.Clock().Now()
+		response.Status = false
+		response.ErrorType = "InvalidDataReferencesError"
+		response.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
+	} else {
+		response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, request.MessageIdentifier())
+	}
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
-	return response, nil
+	return response
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {
@@ -247,6 +251,12 @@ func logSIRIStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	if !response.Status {
+		logStashEvent["errorType"] = response.ErrorType
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		logStashEvent["errorText"] = response.ErrorText
+	}
 	xml, err := response.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
