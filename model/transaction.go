@@ -53,3 +53,7 @@ func (transaction *Transaction) Close() error {
 	}
 	return nil
 }
+
+type TransactionProvider interface {
+	NewTransaction() *Transaction
+}
