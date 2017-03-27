@@ -68,6 +68,9 @@ func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVis
 	}
 
 	stopVisit.NotCollected()
+	stopVisit.ArrivalStatus = "cancelled"
+	stopVisit.DepartureStatus = "cancelled"
+
 	stopVisit.Save()
 
 	logger.Log.Printf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.StopVisitObjectId)
