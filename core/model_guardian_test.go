@@ -111,7 +111,7 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	referential.modelGuardian.simulateActualAttributes()
 
 	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
-	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {
+	if expected := model.STOP_VISIT_ARRIVAL_CANCELLED; stopVisit.ArrivalStatus != expected {
 		t.Errorf("Wrong StopVisit ArrivalStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.ArrivalStatus)
 	}
 	if !stopVisit.VehicleAtStop {
@@ -122,10 +122,10 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	referential.modelGuardian.simulateActualAttributes()
 
 	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
-	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {
+	if expected := model.STOP_VISIT_ARRIVAL_CANCELLED; stopVisit.ArrivalStatus != expected {
 		t.Errorf("Wrong StopVisit ArrivalStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.ArrivalStatus)
 	}
-	if expected := model.STOP_VISIT_DEPARTURE_DEPARTED; stopVisit.DepartureStatus != expected {
+	if expected := model.STOP_VISIT_DEPARTURE_CANCELLED; stopVisit.DepartureStatus != expected {
 		t.Errorf("Wrong StopVisit DepartureStatus at %s\n want: %#v\n got: %#v", fakeClock.Now(), expected, stopVisit.DepartureStatus)
 	}
 	if stopVisit.VehicleAtStop {

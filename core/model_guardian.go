@@ -160,10 +160,10 @@ func (simulator *ActualAttributesSimulator) Simulate() bool {
 
 func (simulator *ActualAttributesSimulator) simulateArrival() bool {
 	if simulator.AfterArrivalTime() && simulator.CanArrive() {
-		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ARRIVED
+		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
 		simulator.stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.ArrivalTime())
 
-		logger.Log.Printf("Set StopVisit %s ArrivalStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_ARRIVAL_ARRIVED)
+		logger.Log.Printf("Set StopVisit %s ArrivalStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_ARRIVAL_CANCELLED)
 
 		if !simulator.AfterDepartureTime() {
 			simulator.stopVisit.VehicleAtStop = true
@@ -196,12 +196,12 @@ func (simulator *ActualAttributesSimulator) CanDepart() bool {
 
 func (simulator *ActualAttributesSimulator) simulateDeparture() bool {
 	if simulator.AfterDepartureTime() && simulator.CanDepart() {
-		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
+		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_CANCELLED
 
 		simulator.stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.DepartureTime())
 		simulator.stopVisit.VehicleAtStop = false
 
-		logger.Log.Printf("Set StopVisit %s DepartureStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_DEPARTURE_DEPARTED)
+		logger.Log.Printf("Set StopVisit %s DepartureStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_DEPARTURE_CANCELLED)
 
 		return true
 	}
