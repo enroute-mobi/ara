@@ -220,6 +220,11 @@ func (referential *Referential) setNextReloadAt() {
 	logger.Log.Printf("Next reload at: %v", referential.nextReloadAt)
 }
 
+func (referential *Referential) Load() {
+	referential.Partners().Load()
+	referential.model.Load(string(referential.id))
+}
+
 type MemoryReferentials struct {
 	model.UUIDConsumer
 
@@ -316,9 +321,6 @@ func (manager *MemoryReferentials) Load() error {
 		referential.id = ReferentialId(r.Referential_id)
 		referential.slug = ReferentialSlug(r.Slug)
 
-		referential.Partners().Load()
-		referential.model.Load(r.Referential_id)
-
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
 				return err
@@ -326,6 +328,7 @@ func (manager *MemoryReferentials) Load() error {
 		}
 
 		manager.Save(referential)
+		referential.Load()
 	}
 
 	logger.Log.Debugf("Loaded Referentials from database")
