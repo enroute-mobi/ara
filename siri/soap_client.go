@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -25,6 +26,18 @@ func NewSOAPClient(url string) *SOAPClient {
 }
 func (client *SOAPClient) URL() string {
 	return client.url
+}
+
+func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
+	r, _ := regexp.Compile("^text/xml;charset=([ -~]+)")
+	s := r.FindStringSubmatch(contentType)
+	if len(s) == 0 {
+		return body
+	}
+	if s[1] == "ISO-8859-1" {
+		return charmap.ISO8859_1.NewDecoder().Reader(body)
+	}
+	return body
 }
 
 func (client *SOAPClient) prepareAndSendRequest(request Request, resource string, acceptGzip bool) (xml.Node, error) {
@@ -73,11 +86,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 		defer gzipReader.Close()
 		responseReader = gzipReader
 	} else {
-		responseReader = response.Body
-	}
-
-	if response.Header.Get("Content-Type") == "text/xml;charset=ISO-8859-1" {
-		responseReader = charmap.ISO8859_1.NewDecoder().Reader(responseReader)
+		responseReader = client.responseFromFormat(response.Body, response.Header.Get("Content-Type"))
 	}
 
 	// Create SOAPEnvelope and check body type
