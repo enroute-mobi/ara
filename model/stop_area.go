@@ -19,7 +19,7 @@ type StopArea struct {
 
 	id              StopAreaId
 	requestedAt     time.Time
-	updatedAt       time.Time
+	collectedat     time.Time
 	CollectedUntil  time.Time
 	CollectedAlways bool
 
@@ -52,12 +52,12 @@ func (stopArea *StopArea) Requested(requestTime time.Time) {
 	stopArea.requestedAt = requestTime
 }
 
-func (stopArea *StopArea) UpdatedAt() time.Time {
-	return stopArea.updatedAt
+func (stopArea *StopArea) Collectedat() time.Time {
+	return stopArea.collectedat
 }
 
 func (stopArea *StopArea) Updated(updateTime time.Time) {
-	stopArea.updatedAt = updateTime
+	stopArea.collectedat = updateTime
 }
 
 func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
@@ -80,8 +80,8 @@ func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
 	}
-	if !stopArea.updatedAt.IsZero() {
-		stopAreaMap["UpdatedAt"] = stopArea.updatedAt
+	if !stopArea.collectedat.IsZero() {
+		stopAreaMap["Collectedat"] = stopArea.collectedat
 	}
 	if !stopArea.ObjectIDs().Empty() {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()

@@ -70,7 +70,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			continue
 		}
 
-		if stopArea.RequestedAt().Before(outdated) && stopArea.UpdatedAt().Before(outdated) {
+		if stopArea.RequestedAt().Before(outdated) && stopArea.Collectedat().Before(outdated) {
 			stopAreaTx := guardian.referential.NewTransaction()
 			defer stopAreaTx.Close()
 
