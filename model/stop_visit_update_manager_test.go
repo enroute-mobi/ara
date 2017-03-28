@@ -113,8 +113,8 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 		t.Errorf("Wrong StopArea Name:\n expected: %v\n got: %v", "stopArea", stopArea.Name)
 	}
 	expected := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
-	if stopArea.Collectedat() != expected {
-		t.Errorf("Wrong Collectedat:\n expected: %v\n got: %v", expected, stopArea.Collectedat())
+	if stopArea.CollectedAt() != expected {
+		t.Errorf("Wrong CollectedAt:\n expected: %v\n got: %v", expected, stopArea.CollectedAt())
 	}
 	if stopArea.RequestedAt() != expected {
 		t.Errorf("Wrong RequestedAt:\n expected: %v\n got: %v", expected, stopArea.RequestedAt())

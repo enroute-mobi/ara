@@ -598,7 +598,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     And the SIRI server has received a GetStopMonitoring request
     Then a StopArea exists with the following attributes:
       | ObjectIDs | "internal": "dummy" |
-      | Collectedat | -                   |
+      | CollectedAt | -                   |
 
 
   Scenario: Handle a SIRI StopMonitoring response after SM cancellation from a SIRI server

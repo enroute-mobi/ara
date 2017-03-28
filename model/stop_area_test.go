@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_StopArea_Id(t *testing.T) {
@@ -195,5 +196,77 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	_, ok = stopAreas.FindByObjectId(objectid)
 	if ok {
 		t.Errorf("Deleted StopArea should not be findable by objectid")
+	}
+}
+
+func Test_MemoryStopAreas_Load(t *testing.T) {
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	testTime := time.Now()
+	// Insert Data in the test db
+	var databaseStopArea = struct {
+		Id              string    `db:"id"`
+		ReferentialId   string    `db:"referential_id"`
+		Name            string    `db:"name"`
+		ObjectIDs       string    `db:"object_ids"`
+		Attributes      string    `db:"attributes"`
+		References      string    `db:"siri_references"`
+		RequestedAt     time.Time `db:"requested_at"`
+		CollectedAt     time.Time `db:"collected_at"`
+		CollectedUntil  time.Time `db:"collected_until"`
+		CollectedAlways bool      `db:"collected_always"`
+	}{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId:   "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Name:            "stopArea",
+		ObjectIDs:       `{"internal":"value"}`,
+		Attributes:      "{}",
+		References:      "{}",
+		RequestedAt:     testTime,
+		CollectedAt:     testTime,
+		CollectedUntil:  testTime,
+		CollectedAlways: true,
+	}
+
+	Database.AddTableWithName(databaseStopArea, "stop_areas")
+	err := Database.Insert(&databaseStopArea)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	stopAreas := NewMemoryStopAreas()
+	err = stopAreas.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stopAreaId := StopAreaId(databaseStopArea.Id)
+	stopArea, ok := stopAreas.Find(stopAreaId)
+	if !ok {
+		t.Fatal("Loaded StopAreas should be found")
+	}
+
+	if stopArea.id != stopAreaId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", stopArea.id, stopAreaId)
+	}
+	if stopArea.Name != "stopArea" {
+		t.Errorf("Wrong Name:\n got: %v\n expected: stopArea", stopArea.Name)
+	}
+	if objectid, ok := stopArea.ObjectID("internal"); !ok || objectid.Value() != "value" {
+		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: %v", objectid.Kind(), objectid.Value(), stopAreaId)
+	}
+	if !stopArea.CollectedAlways {
+		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
+	}
+	if stopArea.requestedAt.Equal(testTime) {
+		t.Errorf("Wrong requestedAt:\n got: %v\n expected: %v", stopArea.requestedAt, testTime)
+	}
+	if stopArea.collectedAt.Equal(testTime) {
+		t.Errorf("Wrong collectedAt:\n got: %v\n expected: %v", stopArea.collectedAt, testTime)
+	}
+	if stopArea.CollectedUntil.Equal(testTime) {
+		t.Errorf("Wrong CollectedUntil:\n got: %v\n expected: %v", stopArea.CollectedUntil, testTime)
 	}
 }

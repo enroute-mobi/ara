@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type StopArea struct {
 
 	id              StopAreaId
 	requestedAt     time.Time
-	collectedat     time.Time
+	collectedAt     time.Time
 	CollectedUntil  time.Time
 	CollectedAlways bool
 
@@ -52,12 +53,12 @@ func (stopArea *StopArea) Requested(requestTime time.Time) {
 	stopArea.requestedAt = requestTime
 }
 
-func (stopArea *StopArea) Collectedat() time.Time {
-	return stopArea.collectedat
+func (stopArea *StopArea) CollectedAt() time.Time {
+	return stopArea.collectedAt
 }
 
 func (stopArea *StopArea) Updated(updateTime time.Time) {
-	stopArea.collectedat = updateTime
+	stopArea.collectedAt = updateTime
 }
 
 func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
@@ -80,8 +81,8 @@ func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
 	if !stopArea.requestedAt.IsZero() {
 		stopAreaMap["RequestedAt"] = stopArea.requestedAt
 	}
-	if !stopArea.collectedat.IsZero() {
-		stopAreaMap["Collectedat"] = stopArea.collectedat
+	if !stopArea.collectedAt.IsZero() {
+		stopAreaMap["CollectedAt"] = stopArea.collectedAt
 	}
 	if !stopArea.ObjectIDs().Empty() {
 		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
@@ -139,7 +140,7 @@ func (stopArea *StopArea) Save() (ok bool) {
 type MemoryStopAreas struct {
 	UUIDConsumer
 
-	model Model
+	model *MemoryModel
 
 	byIdentifier map[StopAreaId]*StopArea
 	byObjectId   map[string]map[string]StopAreaId
@@ -163,7 +164,7 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 	}
 }
 
-func (manager *MemoryStopAreas) Clone(model Model) *MemoryStopAreas {
+func (manager *MemoryStopAreas) Clone(model *MemoryModel) *MemoryStopAreas {
 	clone := NewMemoryStopAreas()
 	clone.model = model
 
@@ -235,4 +236,50 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 		delete(valueMap, objectid.Value())
 	}
 	return true
+}
+
+func (manager *MemoryStopAreas) Load(referentialId string) error {
+	var selectStopAreas []struct {
+		Id              string
+		ReferentialId   string `db:"referential_id"`
+		Name            string
+		ObjectIDs       string `db:"object_ids"`
+		Attributes      string
+		References      string    `db:"siri_references"`
+		RequestedAt     time.Time `db:"requested_at"`
+		CollectedAt     time.Time `db:"collected_at"`
+		CollectedUntil  time.Time `db:"collected_until"`
+		CollectedAlways bool      `db:"collected_always"`
+	}
+	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_id = '%s'", referentialId)
+	_, err := Database.Select(&selectStopAreas, sqlQuery)
+	if err != nil {
+		return err
+	}
+	for _, sa := range selectStopAreas {
+		stopArea := manager.New()
+		stopArea.id = StopAreaId(sa.Id)
+		stopArea.Name = sa.Name
+		stopArea.requestedAt = sa.RequestedAt
+		stopArea.collectedAt = sa.CollectedAt
+		stopArea.CollectedAlways = sa.CollectedAlways
+		stopArea.CollectedUntil = sa.CollectedUntil
+
+		if err = json.Unmarshal([]byte(sa.Attributes), &stopArea.Attributes); err != nil {
+			return err
+		}
+
+		if err = json.Unmarshal([]byte(sa.References), &stopArea.References); err != nil {
+			return err
+		}
+
+		objectIdMap := make(map[string]string)
+		if err = json.Unmarshal([]byte(sa.ObjectIDs), &objectIdMap); err != nil {
+			return err
+		}
+		stopArea.objectids = NewObjectIDsFromMap(objectIdMap)
+
+		manager.Save(&stopArea)
+	}
+	return nil
 }
