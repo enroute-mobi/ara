@@ -7,14 +7,15 @@ import (
 )
 
 func Test_CollectManager_BestPartner(t *testing.T) {
-	testModel := model.NewMemoryModel()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
 
-	stopArea := testModel.StopAreas().New()
+	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
 	stopArea.Save()
 
-	partners := createTestPartnerManager()
-	collectManager := NewCollectManager(partners, testModel)
+	partners := referential.Partners()
+	collectManager := NewCollectManager(referential)
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
@@ -31,15 +32,16 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 }
 
 func Test_CollectManager_UpdateStopArea(t *testing.T) {
-	partners := createTestPartnerManager()
-	testModel := model.NewMemoryModel()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+
+	partners := referential.Partners()
 	collectManager := &CollectManager{
-		model:                     testModel,
-		partners:                  partners,
+		referential:               referential,
 		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
 
-	stopArea := testModel.StopAreas().New()
+	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
 	stopArea.Save()
 

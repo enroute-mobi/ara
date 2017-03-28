@@ -13,9 +13,8 @@ type CollectManagerInterface interface {
 }
 
 type CollectManager struct {
-	partners                  Partners
 	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
-	model                     model.Model
+	referential               *Referential
 }
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
@@ -48,10 +47,9 @@ func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubsc
 
 // TEST END
 
-func NewCollectManager(partners Partners, model model.Model) CollectManagerInterface {
+func NewCollectManager(referential *Referential) CollectManagerInterface {
 	return &CollectManager{
-		partners: partners,
-		model:    model,
+		referential:               referential,
 		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
 	}
 }
@@ -83,7 +81,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
-	for _, partner := range manager.partners.FindAllByCollectPriority() {
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
 			continue
 		}
@@ -94,7 +92,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 			continue
 		}
 
-		stopArea, ok := manager.model.StopAreas().Find(request.StopAreaId())
+		stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
 		if !ok {
 			continue
 		}

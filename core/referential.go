@@ -27,7 +27,7 @@ type Referential struct {
 
 	collectManager CollectManagerInterface
 	manager        Referentials
-	model          model.Model
+	model          *model.MemoryModel
 	modelGuardian  *ModelGuardian
 	partners       Partners
 	startedAt      time.Time
@@ -197,7 +197,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model")
-	referential.model.Reset()
+	referential.model = referential.model.Clone()
 	referential.setNextReloadAt()
 }
 
@@ -252,7 +252,7 @@ func (manager *MemoryReferentials) new() *Referential {
 	}
 
 	referential.partners = NewPartnerManager(referential)
-	referential.collectManager = NewCollectManager(referential.partners, referential.model)
+	referential.collectManager = NewCollectManager(referential)
 
 	referential.modelGuardian = NewModelGuardian(referential)
 	referential.setNextReloadAt()
@@ -289,7 +289,7 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 		referential.id = ReferentialId(manager.NewUUID())
 	}
 	referential.manager = manager
-	referential.collectManager.HandleStopAreaUpdateEvent(model.NewStopAreaUpdateManager(referential.model))
+	referential.collectManager.HandleStopAreaUpdateEvent(model.NewStopAreaUpdateManager(referential))
 	manager.byId[referential.id] = referential
 	return true
 }

@@ -6,12 +6,11 @@ type Model interface {
 	VehicleJourneys() VehicleJourneys
 	Lines() Lines
 	Date() Date
-	Reset() error
 	// ...
 }
 
 type MemoryModel struct {
-	stopAreas       StopAreas
+	stopAreas       *MemoryStopAreas
 	stopVisits      StopVisits
 	vehicleJourneys VehicleJourneys
 	lines           Lines
@@ -42,24 +41,11 @@ func NewMemoryModel() *MemoryModel {
 	return model
 }
 
-func (model *MemoryModel) Reset() error {
-	tx := NewTransaction(model)
-	defer tx.Close()
-
-	for _, vehicleJourney := range tx.Model().VehicleJourneys().FindAll() {
-		tx.Model().VehicleJourneys().Delete(&vehicleJourney)
-	}
-	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
-		tx.Model().StopVisits().Delete(&stopVisit)
-	}
-	for _, line := range tx.Model().Lines().FindAll() {
-		tx.Model().Lines().Delete(&line)
-	}
-
-	tx.Commit()
-
-	model.date = NewDate(DefaultClock().Now())
-	return nil
+func (model *MemoryModel) Clone() *MemoryModel {
+	clone := NewMemoryModel()
+	clone.stopAreas = model.stopAreas.Clone(clone)
+	clone.date = NewDate(DefaultClock().Now())
+	return clone
 }
 
 func (model *MemoryModel) Date() Date {

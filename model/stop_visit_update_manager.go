@@ -5,7 +5,7 @@ import "github.com/af83/edwig/logger"
 type StopAreaUpdateManager struct {
 	ClockConsumer
 
-	model Model
+	transactionProvider TransactionProvider
 }
 
 type StopVisitUpdater struct {
@@ -15,22 +15,22 @@ type StopVisitUpdater struct {
 	event *StopVisitUpdateEvent
 }
 
-func NewStopAreaUpdateManager(model Model) func(*StopAreaUpdateEvent) {
-	manager := newStopAreaUpdateManager(model)
+func NewStopAreaUpdateManager(transactionProvider TransactionProvider) func(*StopAreaUpdateEvent) {
+	manager := newStopAreaUpdateManager(transactionProvider)
 	return manager.UpdateStopArea
 }
 
-func newStopAreaUpdateManager(model Model) *StopAreaUpdateManager {
-	return &StopAreaUpdateManager{model: model}
+func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopAreaUpdateManager {
+	return &StopAreaUpdateManager{transactionProvider: transactionProvider}
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
-	tx := NewTransaction(manager.model)
+	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
-		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea", event.StopAreaId)
+		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea %v", event.StopAreaId)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
-	tx := NewTransaction(manager.model)
+	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
 	NewStopVisitUpdater(tx, event).Update()
@@ -58,7 +58,7 @@ func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEven
 }
 
 func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVisitNotCollectedEvent) {
-	tx := NewTransaction(manager.model)
+	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
 	stopVisit, found := tx.Model().StopVisits().FindByObjectId(event.StopVisitObjectId)

@@ -818,7 +818,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         </S:Body>
       </S:Envelope>
       """
-  @wip
+      
   Scenario: Detect StopVisit deletion between two StopMonitoring requests
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
