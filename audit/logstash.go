@@ -3,8 +3,6 @@ package audit
 import (
 	"encoding/json"
 	"net"
-
-	"github.com/af83/edwig/logger"
 )
 
 type LogStashEvent map[string]string
@@ -71,7 +69,8 @@ func (logStash *TCPLogStash) WriteEvent(datas LogStashEvent) error {
 	}
 	jsonBytes = append(jsonBytes, '\n')
 
-	logger.Log.Debugf("Sending data to logstash: %s", string(jsonBytes))
+	// too verbose
+	// logger.Log.Debugf("Sending data to logstash: %s", string(jsonBytes))
 
 	_, err = conn.Write(jsonBytes)
 	if err != nil {
