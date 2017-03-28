@@ -71,3 +71,7 @@ func (model *MemoryModel) Lines() Lines {
 func (model *MemoryModel) NewTransaction() *Transaction {
 	return NewTransaction(model)
 }
+
+func (model *MemoryModel) Load(referentialId string) error {
+	return model.stopAreas.Load(referentialId)
+}

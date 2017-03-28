@@ -317,6 +317,7 @@ func (manager *MemoryReferentials) Load() error {
 		referential.slug = ReferentialSlug(r.Slug)
 
 		referential.Partners().Load()
+		referential.model.Load(r.Referential_id)
 
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
