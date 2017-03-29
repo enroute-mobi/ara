@@ -107,7 +107,6 @@ type MemoryLines struct {
 	model Model
 
 	byIdentifier map[LineId]*Line
-	byObjectId   map[string]map[string]LineId
 }
 
 type Lines interface {
@@ -124,7 +123,6 @@ type Lines interface {
 func NewMemoryLines() *MemoryLines {
 	return &MemoryLines{
 		byIdentifier: make(map[LineId]*Line),
-		byObjectId:   make(map[string]map[string]LineId),
 	}
 }
 
@@ -143,15 +141,13 @@ func (manager *MemoryLines) Find(id LineId) (Line, bool) {
 }
 
 func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
-	valueMap, ok := manager.byObjectId[objectid.Kind()]
-	if !ok {
-		return Line{}, false
+	for _, line := range manager.byIdentifier {
+		lineObjectId, _ := line.ObjectID(objectid.Kind())
+		if lineObjectId.Value() == objectid.Value() {
+			return *line, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return Line{}, false
-	}
-	return *manager.byIdentifier[id], true
+	return Line{}, false
 }
 
 func (manager *MemoryLines) FindAll() (lines []Line) {
@@ -170,21 +166,10 @@ func (manager *MemoryLines) Save(line *Line) bool {
 	}
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
-	for _, objectid := range line.ObjectIDs() {
-		_, ok := manager.byObjectId[objectid.Kind()]
-		if !ok {
-			manager.byObjectId[objectid.Kind()] = make(map[string]LineId)
-		}
-		manager.byObjectId[objectid.Kind()][objectid.Value()] = line.Id()
-	}
 	return true
 }
 
 func (manager *MemoryLines) Delete(line *Line) bool {
 	delete(manager.byIdentifier, line.Id())
-	for _, objectid := range line.ObjectIDs() {
-		valueMap := manager.byObjectId[objectid.Kind()]
-		delete(valueMap, objectid.Value())
-	}
 	return true
 }

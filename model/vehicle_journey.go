@@ -136,7 +136,6 @@ type MemoryVehicleJourneys struct {
 	model Model
 
 	byIdentifier map[VehicleJourneyId]*VehicleJourney
-	byObjectId   map[string]map[string]VehicleJourneyId
 }
 
 type VehicleJourneys interface {
@@ -153,7 +152,6 @@ type VehicleJourneys interface {
 func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	return &MemoryVehicleJourneys{
 		byIdentifier: make(map[VehicleJourneyId]*VehicleJourney),
-		byObjectId:   make(map[string]map[string]VehicleJourneyId),
 	}
 }
 
@@ -172,15 +170,13 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney,
 }
 
 func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (VehicleJourney, bool) {
-	valueMap, ok := manager.byObjectId[objectid.Kind()]
-	if !ok {
-		return VehicleJourney{}, false
+	for _, vehicleJourney := range manager.byIdentifier {
+		vehicleJourneyObjectId, _ := vehicleJourney.ObjectID(objectid.Kind())
+		if vehicleJourneyObjectId.Value() == objectid.Value() {
+			return *vehicleJourney, true
+		}
 	}
-	id, ok := valueMap[objectid.Value()]
-	if !ok {
-		return VehicleJourney{}, false
-	}
-	return *manager.byIdentifier[id], true
+	return VehicleJourney{}, false
 }
 
 func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
@@ -199,21 +195,10 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 	}
 	vehicleJourney.model = manager.model
 	manager.byIdentifier[vehicleJourney.Id()] = vehicleJourney
-	for _, objectid := range vehicleJourney.ObjectIDs() {
-		_, ok := manager.byObjectId[objectid.Kind()]
-		if !ok {
-			manager.byObjectId[objectid.Kind()] = make(map[string]VehicleJourneyId)
-		}
-		manager.byObjectId[objectid.Kind()][objectid.Value()] = vehicleJourney.Id()
-	}
 	return true
 }
 
 func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) bool {
 	delete(manager.byIdentifier, vehicleJourney.Id())
-	for _, objectid := range vehicleJourney.ObjectIDs() {
-		valueMap := manager.byObjectId[objectid.Kind()]
-		delete(valueMap, objectid.Value())
-	}
 	return true
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -15,7 +16,6 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIServiceRequestBroadcaster(partner)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
@@ -28,10 +28,10 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
-	objectid = model.NewObjectID("objectidKind", "cladebr")
-	stopArea = referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
-	stopArea.Save()
+	objectid2 := model.NewObjectID("objectidKind", "cladebr")
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")
 	if err != nil {
@@ -63,6 +63,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
 	if !response.Status {
+		fmt.Println(referential.Model().StopAreas().FindAll())
 		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
 	}
 	if len(response.Deliveries) != 2 {
@@ -74,7 +75,6 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIServiceRequestBroadcaster(partner)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
