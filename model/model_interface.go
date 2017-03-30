@@ -1,6 +1,7 @@
 package model
 
 type Model interface {
+	Situations() Situations
 	StopAreas() StopAreas
 	StopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
@@ -15,6 +16,7 @@ type MemoryModel struct {
 	vehicleJourneys VehicleJourneys
 	lines           Lines
 	date            Date
+	situations      Situations
 }
 
 func NewMemoryModel() *MemoryModel {
@@ -36,6 +38,10 @@ func NewMemoryModel() *MemoryModel {
 	lines.model = model
 	model.lines = lines
 
+	situations := NewMemorySituations()
+	situations.model = model
+	model.situations = situations
+
 	model.date = NewDate(DefaultClock().Now())
 
 	return model
@@ -50,6 +56,10 @@ func (model *MemoryModel) Clone() *MemoryModel {
 
 func (model *MemoryModel) Date() Date {
 	return model.date
+}
+
+func (model *MemoryModel) Situations() Situations {
+	return model.situations
 }
 
 func (model *MemoryModel) StopAreas() StopAreas {

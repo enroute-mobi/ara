@@ -8,8 +8,9 @@ import (
 )
 
 type Reference struct {
-	ObjectId *ObjectID
-	Id       string
+	ObjectId *ObjectID `json:",omitempty"`
+	Id       string    `json:",omitempty"`
+	Type     string    `json:",omitempty"`
 }
 
 func (reference *Reference) GetSha1() string {

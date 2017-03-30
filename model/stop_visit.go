@@ -96,26 +96,6 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 	return &vehicleJourney
 }
 
-/* type ResponseInterface map[string]interface{}
-
-func (orderMap *ResponseInterface) ToJson(order []string) string {
-	orderedJson := &bytes.Buffer{}
-	orderedJson.Write([]byte{'{', '\n'})
-	l := len(order)
-	for i, key := range order {
-		if (*orderMap)[key] == nil {
-			(*orderMap)[key] = ""
-		}
-		fmt.Fprintf(orderedJson, "\t\"%s\": \"%v\"", key, (*orderMap)[key])
-		if i < l { // putting the ',' only if not last
-			orderedJson.WriteByte(',')
-		}
-		orderedJson.WriteByte('\n')
-	}
-	orderedJson.Write([]byte{'}', '\n'})
-	return orderedJson.String()
-} */
-
 func (stopVisit *StopVisit) FillStopVisit(stopVisitMap map[string]interface{}) {
 	scheduleSlice := []StopVisitSchedule{}
 	for _, schedule := range stopVisit.Schedules {
