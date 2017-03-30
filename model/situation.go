@@ -130,6 +130,16 @@ func (manager *MemorySituations) FindAll() (situations []Situation) {
 	return
 }
 
+func (manager *MemorySituations) FindByObjectId(objectid ObjectID) (StopArea, bool) {
+	for _, situation := range manager.byIdentifier {
+		situationObjectId, _ := situation.ObjectID(objectid.Kind())
+		if situationObjectId.Value() == objectid.Value() {
+			return *situation, true
+		}
+	}
+	return situation{}, false
+}
+
 func (manager *MemorySituations) Save(situation *Situation) bool {
 	if situation.Id() == "" {
 		situation.id = SituationId(manager.NewUUID())
