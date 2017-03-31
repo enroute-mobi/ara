@@ -6,7 +6,9 @@ type ModelId string
 //type LineId ModelId
 // ...
 
-type ModelInstance interface{}
+type ModelInstance interface {
+	ObjectIDConsumerInterface
+}
 type IndexableExtractor func(ModelInstance) ModelId
 
 type Index struct {
@@ -51,8 +53,8 @@ func (index *Index) Index(modelId ModelId, model ModelInstance) {
 }
 
 func (index *Index) Find(indexable ModelId) ([]ModelId, bool) {
-	modelId, ok := index.byIndexable[indexable]
-	return modelId, ok
+	modelIds, ok := index.byIndexable[indexable]
+	return modelIds, ok
 }
 
 func (index *Index) Delete(modelId ModelId) {

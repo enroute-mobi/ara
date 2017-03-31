@@ -4,7 +4,7 @@ import "testing"
 
 func createTestIndex() *Index {
 	extractor := func(instance ModelInstance) ModelId {
-		stopVisit := (instance.(StopVisit))
+		stopVisit := (instance.(*StopVisit))
 		return ModelId(stopVisit.VehicleJourneyId)
 	}
 
@@ -14,7 +14,7 @@ func createTestIndex() *Index {
 func Test_Index_simple(t *testing.T) {
 	index := createTestIndex()
 
-	stopVisit := StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
+	stopVisit := &StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 
 	foundStopVisits, ok := index.Find(ModelId("dummy"))
@@ -29,10 +29,10 @@ func Test_Index_simple(t *testing.T) {
 func Test_Index_Multiple(t *testing.T) {
 	index := createTestIndex()
 
-	stopVisit := StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
+	stopVisit := &StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 
-	stopVisit2 := StopVisit{id: "stopVisitId2", VehicleJourneyId: "dummy"}
+	stopVisit2 := &StopVisit{id: "stopVisitId2", VehicleJourneyId: "dummy"}
 	index.Index(ModelId(stopVisit2.Id()), stopVisit2)
 
 	foundStopVisits, ok := index.Find(ModelId("dummy"))
@@ -47,7 +47,7 @@ func Test_Index_Multiple(t *testing.T) {
 func Test_Index_Change(t *testing.T) {
 	index := createTestIndex()
 
-	stopVisit := StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
+	stopVisit := &StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 
 	stopVisit.VehicleJourneyId = "dummy2"
@@ -69,7 +69,7 @@ func Test_Index_Change(t *testing.T) {
 func Test_Index_Delete(t *testing.T) {
 	index := createTestIndex()
 
-	stopVisit := StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
+	stopVisit := &StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 	index.Delete("stopVisitId")
 
@@ -112,12 +112,12 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = VehicleJourneyId(DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
-		index.Index(ModelId(stopVisit.Id()), stopVisit)
+		index.Index(ModelId(stopVisit.Id()), &stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisit.Save()
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(ModelId(stopVisit.Id()), &stopVisit)
 
 	var foundStopVisits []ModelId
 	for n := 0; n < b.N; n++ {
@@ -134,15 +134,15 @@ func benchmarkIndexing(sv int, b *testing.B) {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 		stopVisit.Save()
-		index.Index(ModelId(stopVisit.Id()), stopVisit)
+		index.Index(ModelId(stopVisit.Id()), &stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisit.Save()
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(ModelId(stopVisit.Id()), &stopVisit)
 
 	for n := 0; n < b.N; n++ {
-		index.Index(ModelId(stopVisit.Id()), stopVisit)
+		index.Index(ModelId(stopVisit.Id()), &stopVisit)
 		index.Delete(ModelId(stopVisit.Id()))
 	}
 }

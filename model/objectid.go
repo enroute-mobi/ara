@@ -95,6 +95,13 @@ func (objectid *ObjectID) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type ObjectIDConsumerInterface interface {
+	ObjectID(string) (ObjectID, bool)
+	ObjectIDs() ObjectIDs
+	ObjectIDsResponse() map[string]string
+	SetObjectID(ObjectID)
+}
+
 type ObjectIDConsumer struct {
 	objectids ObjectIDs
 }
