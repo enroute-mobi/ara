@@ -208,7 +208,7 @@ Feature: Support SIRI GeneralMessage
       </S:Body>
     </S:Envelope>
       """
-    When I send this SIRI ServiceDelivery
+    Then I send this SIRI ServiceDelivery
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
