@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -181,10 +182,10 @@ func (manager *MemoryLines) Load(referentialId string) error {
 	var selectLines []struct {
 		Id            string
 		ReferentialId string `db:"referential_id"`
-		Name          string
-		ObjectIDs     string `db:"object_ids"`
-		Attributes    string
-		References    string `db:"siri_references"`
+		Name          sql.NullString
+		ObjectIDs     sql.NullString `db:"object_ids"`
+		Attributes    sql.NullString
+		References    sql.NullString `db:"siri_references"`
 	}
 	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s'", referentialId)
 	_, err := Database.Select(&selectLines, sqlQuery)
@@ -194,21 +195,29 @@ func (manager *MemoryLines) Load(referentialId string) error {
 	for _, sl := range selectLines {
 		line := manager.New()
 		line.id = LineId(sl.Id)
-		line.Name = sl.Name
-
-		if err = json.Unmarshal([]byte(sl.Attributes), &line.Attributes); err != nil {
-			return err
+		if sl.Name.Valid {
+			line.Name = sl.Name.String
 		}
 
-		if err = json.Unmarshal([]byte(sl.References), &line.References); err != nil {
-			return err
+		if sl.Attributes.Valid && len(sl.Attributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sl.Attributes.String), &line.Attributes); err != nil {
+				return err
+			}
 		}
 
-		objectIdMap := make(map[string]string)
-		if err = json.Unmarshal([]byte(sl.ObjectIDs), &objectIdMap); err != nil {
-			return err
+		if sl.References.Valid && len(sl.References.String) > 0 {
+			if err = json.Unmarshal([]byte(sl.References.String), &line.References); err != nil {
+				return err
+			}
 		}
-		line.objectids = NewObjectIDsFromMap(objectIdMap)
+
+		if sl.ObjectIDs.Valid && len(sl.ObjectIDs.String) > 0 {
+			objectIdMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sl.ObjectIDs.String), &objectIdMap); err != nil {
+				return err
+			}
+			line.objectids = NewObjectIDsFromMap(objectIdMap)
+		}
 
 		manager.Save(&line)
 	}

@@ -1,9 +1,12 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type StopAreaId string
@@ -227,14 +230,14 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 	var selectStopAreas []struct {
 		Id              string
 		ReferentialId   string `db:"referential_id"`
-		Name            string
-		ObjectIDs       string `db:"object_ids"`
-		Attributes      string
-		References      string    `db:"siri_references"`
-		RequestedAt     time.Time `db:"requested_at"`
-		CollectedAt     time.Time `db:"collected_at"`
-		CollectedUntil  time.Time `db:"collected_until"`
-		CollectedAlways bool      `db:"collected_always"`
+		Name            sql.NullString
+		ObjectIDs       sql.NullString `db:"object_ids"`
+		Attributes      sql.NullString
+		References      sql.NullString `db:"siri_references"`
+		RequestedAt     pq.NullTime    `db:"requested_at"`
+		CollectedAt     pq.NullTime    `db:"collected_at"`
+		CollectedUntil  pq.NullTime    `db:"collected_until"`
+		CollectedAlways sql.NullBool   `db:"collected_always"`
 	}
 	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_id = '%s'", referentialId)
 	_, err := Database.Select(&selectStopAreas, sqlQuery)
@@ -244,25 +247,41 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 	for _, sa := range selectStopAreas {
 		stopArea := manager.New()
 		stopArea.id = StopAreaId(sa.Id)
-		stopArea.Name = sa.Name
-		stopArea.requestedAt = sa.RequestedAt
-		stopArea.collectedAt = sa.CollectedAt
-		stopArea.CollectedAlways = sa.CollectedAlways
-		stopArea.CollectedUntil = sa.CollectedUntil
-
-		if err = json.Unmarshal([]byte(sa.Attributes), &stopArea.Attributes); err != nil {
-			return err
+		if sa.Name.Valid {
+			stopArea.Name = sa.Name.String
+		}
+		if sa.RequestedAt.Valid {
+			stopArea.requestedAt = sa.RequestedAt.Time
+		}
+		if sa.CollectedAt.Valid {
+			stopArea.collectedAt = sa.CollectedAt.Time
+		}
+		if sa.CollectedAlways.Valid {
+			stopArea.CollectedAlways = sa.CollectedAlways.Bool
+		}
+		if sa.CollectedUntil.Valid {
+			stopArea.CollectedUntil = sa.CollectedUntil.Time
 		}
 
-		if err = json.Unmarshal([]byte(sa.References), &stopArea.References); err != nil {
-			return err
+		if sa.Attributes.Valid && len(sa.Attributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sa.Attributes.String), &stopArea.Attributes); err != nil {
+				return err
+			}
 		}
 
-		objectIdMap := make(map[string]string)
-		if err = json.Unmarshal([]byte(sa.ObjectIDs), &objectIdMap); err != nil {
-			return err
+		if sa.References.Valid && len(sa.References.String) > 0 {
+			if err = json.Unmarshal([]byte(sa.References.String), &stopArea.References); err != nil {
+				return err
+			}
 		}
-		stopArea.objectids = NewObjectIDsFromMap(objectIdMap)
+
+		if sa.ObjectIDs.Valid && len(sa.ObjectIDs.String) > 0 {
+			objectIdMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sa.ObjectIDs.String), &objectIdMap); err != nil {
+				return err
+			}
+			stopArea.objectids = NewObjectIDsFromMap(objectIdMap)
+		}
 
 		manager.Save(&stopArea)
 	}

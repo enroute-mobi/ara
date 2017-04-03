@@ -1,6 +1,7 @@
 package core
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -433,8 +434,8 @@ func (manager *PartnerManager) Load() error {
 		Id             string
 		ReferentialId  string `db:"referential_id"`
 		Slug           string
-		Settings       string
-		ConnectorTypes string `db:"connector_types"`
+		Settings       sql.NullString
+		ConnectorTypes sql.NullString `db:"connector_types"`
 	}
 	sqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", manager.referential.Id())
 	_, err := model.Database.Select(&selectPartners, sqlQuery)
@@ -445,12 +446,16 @@ func (manager *PartnerManager) Load() error {
 		partner := manager.New(PartnerSlug(p.Slug))
 		partner.id = PartnerId(p.Id)
 
-		if err = json.Unmarshal([]byte(p.Settings), &partner.Settings); err != nil {
-			return err
+		if p.Settings.Valid && len(p.Settings.String) > 0 {
+			if err = json.Unmarshal([]byte(p.Settings.String), &partner.Settings); err != nil {
+				return err
+			}
 		}
 
-		if err = json.Unmarshal([]byte(p.ConnectorTypes), &partner.ConnectorTypes); err != nil {
-			return err
+		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
+			if err = json.Unmarshal([]byte(p.ConnectorTypes.String), &partner.ConnectorTypes); err != nil {
+				return err
+			}
 		}
 
 		partner.RefreshConnectors()
