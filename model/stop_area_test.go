@@ -255,7 +255,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		t.Errorf("Wrong Name:\n got: %v\n expected: stopArea", stopArea.Name)
 	}
 	if objectid, ok := stopArea.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: %v", objectid.Kind(), objectid.Value(), stopAreaId)
+		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
 	}
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)

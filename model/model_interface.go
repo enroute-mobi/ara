@@ -14,7 +14,7 @@ type MemoryModel struct {
 	stopAreas       *MemoryStopAreas
 	stopVisits      StopVisits
 	vehicleJourneys VehicleJourneys
-	lines           Lines
+	lines           *MemoryLines
 	date            Date
 	situations      Situations
 }
@@ -82,6 +82,9 @@ func (model *MemoryModel) NewTransaction() *Transaction {
 	return NewTransaction(model)
 }
 
+// TEMP: See what to do with errors
 func (model *MemoryModel) Load(referentialId string) error {
-	return model.stopAreas.Load(referentialId)
+	model.stopAreas.Load(referentialId)
+	model.lines.Load(referentialId)
+	return nil
 }

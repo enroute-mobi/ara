@@ -1,6 +1,9 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type LineId string
 
@@ -172,4 +175,42 @@ func (manager *MemoryLines) Save(line *Line) bool {
 func (manager *MemoryLines) Delete(line *Line) bool {
 	delete(manager.byIdentifier, line.Id())
 	return true
+}
+
+func (manager *MemoryLines) Load(referentialId string) error {
+	var selectLines []struct {
+		Id            string
+		ReferentialId string `db:"referential_id"`
+		Name          string
+		ObjectIDs     string `db:"object_ids"`
+		Attributes    string
+		References    string `db:"siri_references"`
+	}
+	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s'", referentialId)
+	_, err := Database.Select(&selectLines, sqlQuery)
+	if err != nil {
+		return err
+	}
+	for _, sl := range selectLines {
+		line := manager.New()
+		line.id = LineId(sl.Id)
+		line.Name = sl.Name
+
+		if err = json.Unmarshal([]byte(sl.Attributes), &line.Attributes); err != nil {
+			return err
+		}
+
+		if err = json.Unmarshal([]byte(sl.References), &line.References); err != nil {
+			return err
+		}
+
+		objectIdMap := make(map[string]string)
+		if err = json.Unmarshal([]byte(sl.ObjectIDs), &objectIdMap); err != nil {
+			return err
+		}
+		line.objectids = NewObjectIDsFromMap(objectIdMap)
+
+		manager.Save(&line)
+	}
+	return nil
 }

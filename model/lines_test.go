@@ -192,3 +192,54 @@ func Test_MemoryLines_Delete(t *testing.T) {
 		t.Errorf("Deleted Line should not be findable by objectid")
 	}
 }
+
+func Test_MemoryLines_Load(t *testing.T) {
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	// Insert Data in the test db
+	var databaseLine = struct {
+		Id            string `db:"id"`
+		ReferentialId string `db:"referential_id"`
+		Name          string `db:"name"`
+		ObjectIDs     string `db:"object_ids"`
+		Attributes    string `db:"attributes"`
+		References    string `db:"siri_references"`
+	}{
+		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Name:          "line",
+		ObjectIDs:     `{"internal":"value"}`,
+		Attributes:    "{}",
+		References:    "{}",
+	}
+
+	Database.AddTableWithName(databaseLine, "lines")
+	err := Database.Insert(&databaseLine)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	lines := NewMemoryLines()
+	err = lines.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	lineId := LineId(databaseLine.Id)
+	line, ok := lines.Find(lineId)
+	if !ok {
+		t.Fatal("Loaded Liness should be found")
+	}
+
+	if line.id != lineId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", line.id, lineId)
+	}
+	if line.Name != "line" {
+		t.Errorf("Wrong Name:\n got: %v\n expected: line", line.Name)
+	}
+	if objectid, ok := line.ObjectID("internal"); !ok || objectid.Value() != "value" {
+		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	}
+}
