@@ -72,7 +72,6 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 
 	aux := &struct {
 		ObjectIDs map[string]string
-		Reference References
 		*Alias
 	}{
 		Alias: (*Alias)(line),
