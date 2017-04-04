@@ -19,6 +19,7 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Contro
 	"lines":            NewLineController,
 	"stop_visits":      NewStopVisitController,
 	"vehicle_journeys": NewVehicleJourneyController,
+	"situations":       NewSituationController,
 }
 
 type RestfulRessource interface {

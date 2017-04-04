@@ -2,7 +2,6 @@ package model
 
 type TransactionalSituations struct {
 	UUIDConsumer
-	ClockConsumer
 
 	model   Model
 	saved   map[SituationId]*Situation
@@ -31,6 +30,16 @@ func (manager *TransactionalSituations) Find(id SituationId) (Situation, bool) {
 	}
 
 	return manager.model.Situations().Find(id)
+}
+
+func (manager *TransactionalSituations) FindByObjectId(objectid ObjectID) (Situation, bool) {
+	for _, situation := range manager.saved {
+		situationObjectId, _ := situation.ObjectID(objectid.Kind())
+		if situationObjectId.Value() == objectid.Value() {
+			return *situation, true
+		}
+	}
+	return manager.model.Situations().FindByObjectId(objectid)
 }
 
 func (manager *TransactionalSituations) FindAll() []Situation {
