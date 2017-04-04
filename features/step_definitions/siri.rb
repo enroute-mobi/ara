@@ -26,7 +26,7 @@ def save_siri_messages(messages = {})
   end
 end
 
-Given(/^a SIRI server (?:"([^"]*)" )?waits (GetStopMonitoring) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
+Given(/^a SIRI server (?:"([^"]*)" )?waits (([^"]*)) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
   name ||= "default"
   SIRIServer.create(name, url).expect_request(message_type, response).start
 end
@@ -50,6 +50,10 @@ end
 Then(/^I should receive this SIRI response$/) do |expected_xml|
   save_siri_messages expected: normalized_xml(expected_xml), received: normalized_xml(@last_siri_response), received_raw: @last_siri_response
   expect(normalized_xml(@last_siri_response)).to eq(normalized_xml(expected_xml))
+end
+
+When(/^I receive this GeneralMessageRequesst$/) do |message_type|
+  SIRIServer.find("default").wait_request message_type
 end
 
 Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
