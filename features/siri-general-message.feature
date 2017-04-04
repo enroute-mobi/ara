@@ -2,7 +2,7 @@ Feature: Support SIRI GeneralMessage
 
   Background:
       Given a Referential "test" is created
-  @wip
+  
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | test     |
