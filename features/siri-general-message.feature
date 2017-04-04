@@ -2,13 +2,12 @@ Feature: Support SIRI GeneralMessage
 
   Background:
       Given a Referential "test" is created
-
   @wip
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
-    When I send this GeneralMessageRequest
+    When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>

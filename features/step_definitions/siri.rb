@@ -125,3 +125,8 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a GetStopMonitoring r
 
   expect(actual_values).to eq(expected_values)
 end
+
+
+Then (/^I send this SIRI ServiceDelivery$/) do |request|
+  send_siri_request request
+end
