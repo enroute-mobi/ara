@@ -138,3 +138,26 @@ func Test_VehicleJourneyController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
+
+func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
+	memoryModel := model.NewMemoryModel()
+	tx := model.NewTransaction(memoryModel)
+	defer tx.Close()
+
+	vehicleJourney := memoryModel.VehicleJourneys().New()
+	objectid := model.NewObjectID("kind", "value")
+	vehicleJourney.SetObjectID(objectid)
+	memoryModel.VehicleJourneys().Save(&vehicleJourney)
+
+	controller := &VehicleJourneyController{}
+
+	_, ok := controller.findVehicleJourney(tx, "kind:value")
+	if !ok {
+		t.Error("Can't find VehicleJourney by ObjectId")
+	}
+
+	_, ok = controller.findVehicleJourney(tx, string(vehicleJourney.Id()))
+	if !ok {
+		t.Error("Can't find VehicleJourney by Id")
+	}
+}

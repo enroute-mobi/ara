@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -22,15 +23,32 @@ func NewVehicleJourneyController(referential *core.Referential) ControllerInterf
 	}
 }
 
+func (controller *VehicleJourneyController) findVehicleJourney(tx *model.Transaction, identifier string) (model.VehicleJourney, bool) {
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
+	pattern := regexp.MustCompile(idRegexp)
+	foundStrings := pattern.FindStringSubmatch(identifier)
+	if foundStrings != nil {
+		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
+		return tx.Model().VehicleJourneys().FindByObjectId(objectid)
+	}
+	return tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
+}
+
 func (controller *VehicleJourneyController) Index(response http.ResponseWriter) {
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
 	logger.Log.Debugf("VehicleJourneys Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().VehicleJourneys().FindAll())
+	jsonBytes, _ := json.Marshal(tx.Model().VehicleJourneys().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *VehicleJourneyController) Show(response http.ResponseWriter, identifier string) {
-	vehicleJourney, ok := controller.referential.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
+	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return
@@ -46,7 +64,7 @@ func (controller *VehicleJourneyController) Delete(response http.ResponseWriter,
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	vehicleJourney, ok := tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
+	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return
@@ -69,7 +87,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	vehicleJourney, ok := tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
+	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
 		return

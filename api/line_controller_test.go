@@ -143,3 +143,26 @@ func Test_LineController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
+
+func Test_LineController_FindLine(t *testing.T) {
+	memoryModel := model.NewMemoryModel()
+	tx := model.NewTransaction(memoryModel)
+	defer tx.Close()
+
+	line := memoryModel.Lines().New()
+	objectid := model.NewObjectID("kind", "value")
+	line.SetObjectID(objectid)
+	memoryModel.Lines().Save(&line)
+
+	controller := &LineController{}
+
+	_, ok := controller.findLine(tx, "kind:value")
+	if !ok {
+		t.Error("Can't find Line by ObjectId")
+	}
+
+	_, ok = controller.findLine(tx, string(line.Id()))
+	if !ok {
+		t.Error("Can't find Line by Id")
+	}
+}
