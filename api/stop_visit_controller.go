@@ -24,7 +24,7 @@ func NewStopVisitController(referential *core.Referential) ControllerInterface {
 }
 
 func (controller *StopVisitController) findStopVisit(tx *model.Transaction, identifier string) (model.StopVisit, bool) {
-	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
+	idRegexp := "([0-9a-zA-Z-]+)&([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {

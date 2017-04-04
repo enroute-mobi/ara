@@ -33,7 +33,8 @@ func (manager *TransactionalSituations) Find(id SituationId) (Situation, bool) {
 	return manager.model.Situations().Find(id)
 }
 
-func (manager *TransactionalSituations) FindAll() (situations []Situation) {
+func (manager *TransactionalSituations) FindAll() []Situation {
+	situations := []Situation{}
 	for _, situation := range manager.saved {
 		situations = append(situations, *situation)
 	}
@@ -44,7 +45,7 @@ func (manager *TransactionalSituations) FindAll() (situations []Situation) {
 			situations = append(situations, situation)
 		}
 	}
-	return
+	return situations
 }
 
 func (manager *TransactionalSituations) Save(situation *Situation) bool {

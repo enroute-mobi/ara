@@ -158,7 +158,7 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 
 	controller := &StopAreaController{}
 
-	_, ok := controller.findStopArea(tx, "kind:value")
+	_, ok := controller.findStopArea(tx, "kind&value")
 	if !ok {
 		t.Error("Can't find StopArea by ObjectId")
 	}

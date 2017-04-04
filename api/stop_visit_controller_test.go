@@ -152,7 +152,7 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 
 	controller := &StopVisitController{}
 
-	_, ok := controller.findStopVisit(tx, "kind:value")
+	_, ok := controller.findStopVisit(tx, "kind&value")
 	if !ok {
 		t.Error("Can't find StopVisit by ObjectId")
 	}

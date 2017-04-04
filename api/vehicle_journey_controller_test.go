@@ -151,7 +151,7 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 
 	controller := &VehicleJourneyController{}
 
-	_, ok := controller.findVehicleJourney(tx, "kind:value")
+	_, ok := controller.findVehicleJourney(tx, "kind&value")
 	if !ok {
 		t.Error("Can't find VehicleJourney by ObjectId")
 	}

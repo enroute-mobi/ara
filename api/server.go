@@ -36,7 +36,7 @@ func (server *Server) ListenAndServe() error {
 
 func (server *Server) APIHandler(response http.ResponseWriter, request *http.Request) {
 	path := request.URL.Path
-	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-]+)?))?"
+	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?:&[0-9a-zA-Z-]+)?))?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(path)
 	if foundStrings == nil || foundStrings[1] == "" {

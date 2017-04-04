@@ -156,7 +156,7 @@ func Test_LineController_FindLine(t *testing.T) {
 
 	controller := &LineController{}
 
-	_, ok := controller.findLine(tx, "kind:value")
+	_, ok := controller.findLine(tx, "kind&value")
 	if !ok {
 		t.Error("Can't find Line by ObjectId")
 	}

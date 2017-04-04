@@ -24,7 +24,7 @@ func NewVehicleJourneyController(referential *core.Referential) ControllerInterf
 }
 
 func (controller *VehicleJourneyController) findVehicleJourney(tx *model.Transaction, identifier string) (model.VehicleJourney, bool) {
-	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
+	idRegexp := "([0-9a-zA-Z-]+)&([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {

@@ -42,7 +42,8 @@ func (manager *TransactionalLines) FindByObjectId(objectid ObjectID) (Line, bool
 	return manager.model.Lines().FindByObjectId(objectid)
 }
 
-func (manager *TransactionalLines) FindAll() (lines []Line) {
+func (manager *TransactionalLines) FindAll() []Line {
+	lines := []Line{}
 	for _, line := range manager.saved {
 		lines = append(lines, *line)
 	}
@@ -53,7 +54,7 @@ func (manager *TransactionalLines) FindAll() (lines []Line) {
 			lines = append(lines, line)
 		}
 	}
-	return
+	return lines
 }
 
 func (manager *TransactionalLines) Save(line *Line) bool {
