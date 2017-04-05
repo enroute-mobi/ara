@@ -17,7 +17,7 @@ type Situation struct {
 	Reference          Reference
 	Text               string `json:",omitempty"`
 	TextType           string
-	RecordedAt         time.Time
+	RecordedAtTime     time.Time
 	InfoMessageVersion string
 	InfoChannelRef     string
 	ItemIdentifier     string
