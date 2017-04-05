@@ -42,7 +42,8 @@ func (manager *TransactionalVehicleJourneys) FindByObjectId(objectid ObjectID) (
 	return manager.model.VehicleJourneys().FindByObjectId(objectid)
 }
 
-func (manager *TransactionalVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
+func (manager *TransactionalVehicleJourneys) FindAll() []VehicleJourney {
+	vehicleJourneys := []VehicleJourney{}
 	for _, vehicleJourney := range manager.saved {
 		vehicleJourneys = append(vehicleJourneys, *vehicleJourney)
 	}
@@ -53,7 +54,7 @@ func (manager *TransactionalVehicleJourneys) FindAll() (vehicleJourneys []Vehicl
 			vehicleJourneys = append(vehicleJourneys, vehicleJourney)
 		}
 	}
-	return
+	return vehicleJourneys
 }
 
 func (manager *TransactionalVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool {

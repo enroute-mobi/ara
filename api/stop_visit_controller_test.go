@@ -139,3 +139,26 @@ func Test_StopVisitController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
+
+func Test_StopVisitController_FindStopVisit(t *testing.T) {
+	memoryModel := model.NewMemoryModel()
+	tx := model.NewTransaction(memoryModel)
+	defer tx.Close()
+
+	stopVisit := memoryModel.StopVisits().New()
+	objectid := model.NewObjectID("kind", "stif:value")
+	stopVisit.SetObjectID(objectid)
+	memoryModel.StopVisits().Save(&stopVisit)
+
+	controller := &StopVisitController{}
+
+	_, ok := controller.findStopVisit(tx, "kind:stif:value")
+	if !ok {
+		t.Error("Can't find StopVisit by ObjectId")
+	}
+
+	_, ok = controller.findStopVisit(tx, string(stopVisit.Id()))
+	if !ok {
+		t.Error("Can't find StopVisit by Id")
+	}
+}

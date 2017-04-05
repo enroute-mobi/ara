@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -22,15 +23,32 @@ func NewLineController(referential *core.Referential) ControllerInterface {
 	}
 }
 
+func (controller *LineController) findLine(tx *model.Transaction, identifier string) (model.Line, bool) {
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
+	pattern := regexp.MustCompile(idRegexp)
+	foundStrings := pattern.FindStringSubmatch(identifier)
+	if foundStrings != nil {
+		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
+		return tx.Model().Lines().FindByObjectId(objectid)
+	}
+	return tx.Model().Lines().Find(model.LineId(identifier))
+}
+
 func (controller *LineController) Index(response http.ResponseWriter) {
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
 	logger.Log.Debugf("Lines Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Lines().FindAll())
+	jsonBytes, _ := json.Marshal(tx.Model().Lines().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *LineController) Show(response http.ResponseWriter, identifier string) {
-	line, ok := controller.referential.Model().Lines().Find(model.LineId(identifier))
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
+	line, ok := controller.findLine(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return
@@ -46,7 +64,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	line, ok := tx.Model().Lines().Find(model.LineId(identifier))
+	line, ok := controller.findLine(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return
@@ -69,7 +87,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	line, ok := tx.Model().Lines().Find(model.LineId(identifier))
+	line, ok := controller.findLine(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
 		return

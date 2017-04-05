@@ -117,8 +117,7 @@ func (stopArea *StopArea) Reference(key string) (Reference, bool) {
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
-		ObjectIDs  map[string]string
-		References map[string]Reference
+		ObjectIDs map[string]string
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),

@@ -31,6 +31,7 @@ type Partners interface {
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
 	FindByLocalCredential(credential string) (*Partner, bool)
+	FindBySlug(slug PartnerSlug) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
@@ -387,6 +388,15 @@ func (manager *PartnerManager) Find(id PartnerId) *Partner {
 func (manager *PartnerManager) FindByLocalCredential(credential string) (*Partner, bool) {
 	for _, partner := range manager.byId {
 		if partner.Setting("local_credential") == credential {
+			return partner, true
+		}
+	}
+	return nil, false
+}
+
+func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
+	for _, partner := range manager.byId {
+		if partner.slug == slug {
 			return partner, true
 		}
 	}

@@ -98,7 +98,8 @@ func (manager *TransactionalStopVisits) FindFollowingByStopAreaId(id StopAreaId)
 	return
 }
 
-func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {
+func (manager *TransactionalStopVisits) FindAll() []StopVisit {
+	stopVisits := []StopVisit{}
 	for _, stopVisit := range manager.saved {
 		stopVisits = append(stopVisits, *stopVisit)
 	}
@@ -109,7 +110,7 @@ func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {
 			stopVisits = append(stopVisits, stopVisit)
 		}
 	}
-	return
+	return stopVisits
 }
 
 func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {

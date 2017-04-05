@@ -42,7 +42,8 @@ func (manager *TransactionalStopAreas) FindByObjectId(objectid ObjectID) (StopAr
 	return manager.model.StopAreas().FindByObjectId(objectid)
 }
 
-func (manager *TransactionalStopAreas) FindAll() (stopAreas []StopArea) {
+func (manager *TransactionalStopAreas) FindAll() []StopArea {
+	stopAreas := []StopArea{}
 	for _, savedStopArea := range manager.saved {
 		stopAreas = append(stopAreas, *savedStopArea)
 	}
@@ -53,7 +54,7 @@ func (manager *TransactionalStopAreas) FindAll() (stopAreas []StopArea) {
 			stopAreas = append(stopAreas, stopArea)
 		}
 	}
-	return
+	return stopAreas
 }
 
 func (manager *TransactionalStopAreas) Save(stopArea *StopArea) bool {

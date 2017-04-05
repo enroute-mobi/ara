@@ -48,7 +48,6 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 
 	aux := &struct {
 		ObjectIDs map[string]string
-		Reference References
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
@@ -64,7 +63,7 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (situation *Situation) FillSituation(situationMap map[string]interface{}) {
+func (situation *Situation) fillSituation(situationMap map[string]interface{}) {
 	if situation.id != "" {
 		situationMap["Id"] = situation.id
 	}
@@ -75,7 +74,7 @@ func (situation *Situation) FillSituation(situationMap map[string]interface{}) {
 
 	ref := Reference{}
 	if situation.Reference != ref {
-		situationMap["References"] = situation.Reference
+		situationMap["Reference"] = situation.Reference
 	}
 
 }
@@ -87,7 +86,7 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		situationMap["ObjectIDs"] = situation.ObjectIDs()
 	}
 
-	situation.FillSituation(situationMap)
+	situation.fillSituation(situationMap)
 	return json.Marshal(situationMap)
 }
 
@@ -104,6 +103,7 @@ type Situations interface {
 
 	New() Situation
 	Find(id SituationId) (Situation, bool)
+	FindByObjectId(objectid ObjectID) (Situation, bool)
 	FindAll() []Situation
 	Save(situation *Situation) bool
 	Delete(situation *Situation) bool

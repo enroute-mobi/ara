@@ -169,13 +169,9 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	type Alias StopVisit
 	aux := &struct {
-		ObjectIDs        map[string]string
-		Reference        map[string]Reference
-		StopAreaId       string
-		VehicleJourneyId string
-		PassageOrder     int
-		CollectedAt      time.Time
-		Schedules        []StopVisitSchedule
+		ObjectIDs   map[string]string
+		CollectedAt time.Time
+		Schedules   []StopVisitSchedule
 		*Alias
 	}{
 		Alias: (*Alias)(stopVisit),
@@ -197,15 +193,6 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if aux.StopAreaId != "" {
-		stopVisit.StopAreaId = StopAreaId(aux.StopAreaId)
-	}
-	if aux.VehicleJourneyId != "" {
-		stopVisit.VehicleJourneyId = VehicleJourneyId(aux.VehicleJourneyId)
-	}
-	if aux.PassageOrder > 0 {
-		stopVisit.PassageOrder = aux.PassageOrder
-	}
 	if !aux.CollectedAt.IsZero() {
 		stopVisit.Collected(aux.CollectedAt)
 	}

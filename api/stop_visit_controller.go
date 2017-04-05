@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -22,15 +23,32 @@ func NewStopVisitController(referential *core.Referential) ControllerInterface {
 	}
 }
 
+func (controller *StopVisitController) findStopVisit(tx *model.Transaction, identifier string) (model.StopVisit, bool) {
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
+	pattern := regexp.MustCompile(idRegexp)
+	foundStrings := pattern.FindStringSubmatch(identifier)
+	if foundStrings != nil {
+		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
+		return tx.Model().StopVisits().FindByObjectId(objectid)
+	}
+	return tx.Model().StopVisits().Find(model.StopVisitId(identifier))
+}
+
 func (controller *StopVisitController) Index(response http.ResponseWriter) {
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
 	logger.Log.Debugf("StopVisits Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().StopVisits().FindAll())
+	jsonBytes, _ := json.Marshal(tx.Model().StopVisits().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *StopVisitController) Show(response http.ResponseWriter, identifier string) {
-	stopVisit, ok := controller.referential.Model().StopVisits().Find(model.StopVisitId(identifier))
+	tx := controller.referential.NewTransaction()
+	defer tx.Close()
+
+	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return
@@ -46,7 +64,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(identifier))
+	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return
@@ -69,7 +87,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(identifier))
+	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
 		return

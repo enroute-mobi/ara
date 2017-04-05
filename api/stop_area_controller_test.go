@@ -145,3 +145,26 @@ func Test_StopAreaController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
+
+func Test_StopAreaController_FindStopArea(t *testing.T) {
+	memoryModel := model.NewMemoryModel()
+	tx := model.NewTransaction(memoryModel)
+	defer tx.Close()
+
+	stopArea := memoryModel.StopAreas().New()
+	objectid := model.NewObjectID("kind", "value")
+	stopArea.SetObjectID(objectid)
+	memoryModel.StopAreas().Save(&stopArea)
+
+	controller := &StopAreaController{}
+
+	_, ok := controller.findStopArea(tx, "kind:value")
+	if !ok {
+		t.Error("Can't find StopArea by ObjectId")
+	}
+
+	_, ok = controller.findStopArea(tx, string(stopArea.Id()))
+	if !ok {
+		t.Error("Can't find StopArea by Id")
+	}
+}
