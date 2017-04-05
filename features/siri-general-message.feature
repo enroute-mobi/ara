@@ -351,4 +351,3 @@ Feature: Support SIRI GeneralMessage
       | Attribute[ValidUntilTime]       | 2017-03-29T20:30:06.000+02:00                                              |
       | Attribute[MessageType]          | longMessage                                                                |
       | Attribute[MessageText]          | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
->>>>>>> fea222b17ac3f4ec2005711f425f90a11c299e3f
