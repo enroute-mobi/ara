@@ -189,3 +189,26 @@ func Test_PartnerController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
 }
+
+func Test_PartnerController_FindPartner(t *testing.T) {
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	referential := referentials.New("default")
+	referential.Save()
+
+	// Save a new partner
+	partner := referential.Partners().New("First Partner")
+	referential.Partners().Save(partner)
+
+	controller := &PartnerController{referential: referential}
+
+	foundPartner := controller.findPartner("First Partner")
+	if foundPartner == nil {
+		t.Error("Can't find Partner by Slug")
+	}
+
+	foundPartner = controller.findPartner(string(partner.Id()))
+	if foundPartner == nil {
+		t.Error("Can't find Partner by Id")
+	}
+}

@@ -296,6 +296,21 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	}
 }
 
+func Test_PartnerManager_FindBySlug(t *testing.T) {
+	partners := createTestPartnerManager()
+
+	existingPartner := partners.New("partner")
+	partners.Save(existingPartner)
+
+	partner, ok := partners.FindBySlug("partner")
+	if !ok {
+		t.Fatal("FindBySlug should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySlug should return a Partner with the given slug")
+	}
+}
+
 func Test_PartnerManager_FindAll(t *testing.T) {
 	partners := createTestPartnerManager()
 
