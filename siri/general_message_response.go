@@ -1,7 +1,9 @@
 package siri
 
 import (
+	"bytes"
 	"fmt"
+	"text/template"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
@@ -11,13 +13,19 @@ import (
 type XMLGeneralMessageResponse struct {
 	ResponseXMLStructure
 
+	xmlGeneralMessages []*XMLGeneralMessage
+}
+
+type XMLGeneralMessage struct {
+	XMLStructure
+
 	recordedAtTime        time.Time
 	validUntilTime        time.Time
 	itemIdentifier        string
 	infoMessageIdentifier string
 	infoMessageVersion    string
 	infoChannelRef        string
-	contents              interface{}
+	content               interface{}
 }
 
 type IDFGeneralMessageStructure struct {
@@ -44,68 +52,182 @@ type IDFLineSectionStructure struct {
 	lineRef   string
 }
 
-func (visit *XMLGeneralMessageResponse) Contents() interface{} {
-	if visit.contents != nil {
-		return visit.contents
-	}
-	nodes := visit.findNodes("Content")
-	if nodes == nil {
-		return nil
-	}
-	contents := []*IDFGeneralMessageStructure{}
-	for _, content := range nodes {
-		contents = append(contents, NewIDFGeneralMessageStructure(content))
-	}
-	visit.contents = contents
-	return visit.contents
+type SIRIGeneralMessageResponse struct {
+	SIRIGeneralMessageDelivery
+
+	Address                   string
+	ProducerRef               string
+	ResponseMessageIdentifier string
 }
 
-func NewIDFGeneralMessageStructure(node XMLNode) *IDFGeneralMessageStructure {
-	content := &IDFGeneralMessageStructure{}
-	content.node = node
-	return content
+type SIRIGeneralMessageDelivery struct {
+	RequestMessageRef string
+	Status            bool
+	ErrorType         string
+	ErrorNumber       int
+	ErrorText         string
+	ResponseTimestamp time.Time
+
+	GeneralMessages []*SIRIGeneralMessage
 }
 
-func (visit *XMLGeneralMessageResponse) RecordedAtTime() time.Time {
+type SIRIGeneralMessage struct {
+	RecordedAtTime        time.Time
+	ValidUntilTime        time.Time
+	ItemIdentifier        string
+	InfoMessageIdentifier string
+	InfoMessageVersion    string
+	InfoChannelRef        string
+
+	NumberOfLines       int
+	NumberOfCharPerLine int
+	MessageType         string
+	MessageText         string
+	LineRefContent      string
+	StopPointRef        string
+	JourneyPatternRef   string
+	DestinationRef      string
+	RouteRef            string
+	GroupOfLinesRef     string
+
+	FirstStop string
+	LastStop  string
+	LineRef   string
+}
+
+const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+					<ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
+					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
+					<ns3:GeneralMessage formatRef="FRANCE">
+						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
+						<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
+						<ns3:InfoMessageIdentifier>{{.InfoMessageIdentifier}}</ns3:InfoMessageIdentifier>
+						<ns3:InfoMessageVersion>{{.InfoMessageVersion}}</ns3:InfoMessageVersion>
+						<ns3:InfoChannelRef>{{.InfoChannelRef}}</ns3:InfoChannelRef>
+						<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
+						<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+						xsi:type="ns9:IDFLineSectionStructure">
+							<Message>
+								<MessageType>{{ .MessageType }}</MessageType>
+								<MessageText xml:lang="NL">{{ .MessageText }}</MessageText>
+							</Message>
+							<LineSection>
+								<FirstStop>{{.FirstStop}}</FirstStop>
+							  <LastStop>{{.LastStop}}</LastStop>
+							  <LineRef>{{.LineRef}}</LineRef>
+							</LineSection>
+						</ns3:Content>
+					</ns3:GeneralMessage>{{end}}
+				</ns3:GeneralMessageDelivery>`
+
+const generalMessageDeliveryTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
+															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
+															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+															 xmlns:ns7="http://scma/siri"
+															 xmlns:ns8="http://wsdl.siri.org.uk"
+															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
+		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
+		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		{{ .BuildGeneralMessageXML }}
+	</Answer>
+	<AnswerExtension/>
+</ns8:GetGeneralMessageResponse>`
+
+func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMessage {
+	if len(response.xmlGeneralMessages) == 0 {
+		nodes := response.findNodes("GeneralMessage")
+		if nodes == nil {
+			return response.xmlGeneralMessages
+		}
+		for _, generalMessage := range nodes {
+			response.xmlGeneralMessages = append(response.xmlGeneralMessages, NewIDFGeneralMessageStructure(generalMessage))
+		}
+	}
+	return response.xmlGeneralMessages
+}
+
+func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	response := NewXMLGeneralMessageResponse(doc.Root().XmlNode)
+	return response, nil
+}
+
+func NewXMLGeneralMessageResponse(node xml.Node) *XMLGeneralMessageResponse {
+	xmlGeneralMessageResponse := &XMLGeneralMessageResponse{}
+	xmlGeneralMessageResponse.node = NewXMLNode(node)
+	return xmlGeneralMessageResponse
+}
+
+func NewIDFGeneralMessageStructure(node XMLNode) *XMLGeneralMessage {
+	generalMessage := &XMLGeneralMessage{}
+	generalMessage.node = node
+	return generalMessage
+}
+
+func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {
 	if visit.recordedAtTime.IsZero() {
 		visit.recordedAtTime = visit.findTimeChildContent("RecordedAtTime")
 	}
 	return visit.recordedAtTime
 }
 
-func (visit *XMLGeneralMessageResponse) ValidUntilTime() time.Time {
+func (visit *XMLGeneralMessage) ValidUntilTime() time.Time {
 	if visit.validUntilTime.IsZero() {
 		visit.validUntilTime = visit.findTimeChildContent("ValidUntilTime")
 	}
 	return visit.validUntilTime
 }
 
-func (visit *XMLGeneralMessageResponse) ItemIdentifier() string {
+func (visit *XMLGeneralMessage) ItemIdentifier() string {
 	if visit.itemIdentifier == "" {
 		visit.itemIdentifier = visit.findStringChildContent("ItemIdentifier")
 	}
 	return visit.itemIdentifier
 }
 
-func (visit *XMLGeneralMessageResponse) InfoMessageIdentifier() string {
+func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
 	if visit.infoMessageIdentifier == "" {
 		visit.infoMessageIdentifier = visit.findStringChildContent("InfoMessageIdentifier")
 	}
 	return visit.infoMessageIdentifier
 }
 
-func (visit *XMLGeneralMessageResponse) InfoChannelRef() string {
+func (visit *XMLGeneralMessage) InfoMessageVersion() string {
+	if visit.infoMessageVersion == "" {
+		visit.infoMessageVersion = visit.findStringChildContent("InfoMessageVersion")
+	}
+	return visit.infoMessageVersion
+}
+
+func (visit *XMLGeneralMessage) InfoChannelRef() string {
 	if visit.infoChannelRef == "" {
 		visit.infoChannelRef = visit.findStringChildContent("InfoChannelRef")
 	}
 	return visit.infoChannelRef
 }
 
-func (visit *XMLGeneralMessageResponse) InfoMessageVersion() string {
-	if visit.infoMessageVersion == "" {
-		visit.infoMessageVersion = visit.findStringChildContent("InfoMessageVersion")
+func (visit *XMLGeneralMessage) createNewContent() IDFGeneralMessageStructure {
+	content := IDFGeneralMessageStructure{}
+	content.node = NewXMLNode(visit.findNode("Content"))
+	return content
+}
+
+func (visit *XMLGeneralMessage) Content() interface{} {
+	if visit.content != nil {
+		return visit.content
 	}
-	return visit.infoMessageVersion
+	visit.content = visit.createNewContent()
+	return visit.content
 }
 
 func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() string {
@@ -180,8 +302,8 @@ func (visit *IDFGeneralMessageStructure) NumberOfCharPerLine() int {
 
 func (visit *IDFGeneralMessageStructure) createNewLineSection() IDFLineSectionStructure {
 	visit.lineSection = IDFLineSectionStructure{}
+	fmt.Println(visit.findNode("LineSection"))
 	visit.lineSection.node = NewXMLNode(visit.findNode("LineSection"))
-	fmt.Println(visit.lineSection.node)
 	return visit.lineSection
 }
 
@@ -214,17 +336,20 @@ func (visit *IDFLineSectionStructure) LineRef() string {
 	return visit.lineRef
 }
 
-func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
-	doc, err := gokogiri.ParseXml(content)
-	if err != nil {
-		return nil, err
+func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
+	var buffer bytes.Buffer
+	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageDeliveryTemplate))
+	if err := generalMessage.Execute(&buffer, response); err != nil {
+		return "", err
 	}
-	response := NewXMLGeneralMessageResponse(doc.Root().XmlNode)
-	return response, nil
+	return buffer.String(), nil
 }
 
-func NewXMLGeneralMessageResponse(node xml.Node) *XMLGeneralMessageResponse {
-	xmlGeneralMessageResponse := &XMLGeneralMessageResponse{}
-	xmlGeneralMessageResponse.node = NewXMLNode(node)
-	return xmlGeneralMessageResponse
+func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageXML() (string, error) {
+	var buffer bytes.Buffer
+	var generalMessageDelivery = template.Must(template.New("generalMessageDelivery").Parse(generalMessageTemplate))
+	if err := generalMessageDelivery.Execute(&buffer, delivery); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
 }

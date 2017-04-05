@@ -24,32 +24,32 @@ func getXMLGeneralMessageResponse(t *testing.T) *XMLGeneralMessageResponse {
 
 func Test_XMLGeneralMessage(t *testing.T) {
 	response := getXMLGeneralMessageResponse(t)
-	contents := response.Contents().([]*IDFGeneralMessageStructure)
-	content := contents[0]
+	generalMessage := response.XMLGeneralMessage()[0]
+	content := generalMessage.Content().(IDFGeneralMessageStructure)
 	lineSection := content.LineSection()
 
-	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, response.RecordedAtTime().Location()); response.RecordedAtTime() != expected {
-		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", response.RecordedAtTime(), expected)
+	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, generalMessage.RecordedAtTime().Location()); generalMessage.RecordedAtTime() != expected {
+		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", generalMessage.RecordedAtTime(), expected)
 	}
 
-	if expected := "3477"; response.ItemIdentifier() != expected {
-		t.Errorf("Wrong ItemIdentifier: \n got: %v\nwant: %v", response.ItemIdentifier(), expected)
+	if expected := "3477"; generalMessage.ItemIdentifier() != expected {
+		t.Errorf("Wrong ItemIdentifier: \n got: %v\nwant: %v", generalMessage.ItemIdentifier(), expected)
 	}
 
-	if expected := "NINOXE:GeneralMessage:27_1"; response.InfoMessageIdentifier() != expected {
-		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", response.InfoMessageIdentifier(), expected)
+	if expected := "NINOXE:GeneralMessage:27_1"; generalMessage.InfoMessageIdentifier() != expected {
+		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", generalMessage.InfoMessageIdentifier(), expected)
 	}
 
-	if expected := "1"; response.InfoMessageVersion() != expected {
-		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", response.InfoMessageVersion(), expected)
+	if expected := "1"; generalMessage.InfoMessageVersion() != expected {
+		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", generalMessage.InfoMessageVersion(), expected)
 	}
 
-	if expected := "Commercial"; response.InfoChannelRef() != expected {
-		t.Errorf("Wrong InfoChannelRef: \n got: %v\nwant: %v", response.InfoChannelRef(), expected)
+	if expected := "Commercial"; generalMessage.InfoChannelRef() != expected {
+		t.Errorf("Wrong InfoChannelRef: \n got: %v\nwant: %v", generalMessage.InfoChannelRef(), expected)
 	}
 
-	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, response.ValidUntilTime().Location()); response.ValidUntilTime() != expected {
-		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", response.ValidUntilTime(), expected)
+	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, generalMessage.ValidUntilTime().Location()); generalMessage.ValidUntilTime() != expected {
+		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", generalMessage.ValidUntilTime(), expected)
 	}
 
 	if expected := "longMessage"; content.MessageType() != expected {
@@ -76,4 +76,171 @@ func Test_XMLGeneralMessage(t *testing.T) {
 		t.Errorf("Wrong lineRef: \n got: %v\nwant: %v", lineSection.LineRef(), expected)
 	}
 
+}
+
+func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGeneralMessageResponse, t *testing.T) {
+
+	if s1.Address() != s2.Address() {
+		t.Errorf("Wrong Address: \n got: %v\nwant: %v", s2.Address(), s1.Address())
+	}
+
+	if s1.ProducerRef() != s2.ProducerRef() {
+		t.Errorf("Wrong ProducerRef: \n got: %v\nwant: %v", s2.ProducerRef(), s1.ProducerRef())
+	}
+
+	if s1.ResponseMessageIdentifier() != s2.ResponseMessageIdentifier() {
+		t.Errorf("Wrong ResponseMessageIdentifier: \n got: %v\nwant: %v", s2.ResponseMessageIdentifier(), s1.ResponseMessageIdentifier())
+	}
+
+	if s1.Status() != s2.Status() {
+		t.Errorf("Wrong Status: \n got: %v\nwant: %v", s2.Status(), s1.Status())
+	}
+
+	if s1.ResponseTimestamp() != s2.ResponseTimestamp() {
+		t.Errorf("Wrong ResponseTimestamp: \n got: %v\nwant: %v", s2.ResponseTimestamp(), s1.ResponseTimestamp())
+	}
+
+	if len(s1.XMLGeneralMessage()) != len(s2.XMLGeneralMessage()) {
+		t.Errorf("Wrong XMLGeneralMessage: \n got: %v\nwant: %v", len(s2.XMLGeneralMessage()), len(s1.XMLGeneralMessage()))
+	}
+
+	expectedGM := s1.XMLGeneralMessage()[0]
+	gotGM := s2.XMLGeneralMessage()[0]
+
+	if expectedGM.RecordedAtTime() != gotGM.RecordedAtTime() {
+		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", gotGM.RecordedAtTime(), expectedGM.RecordedAtTime())
+	}
+
+	if expectedGM.ValidUntilTime() != gotGM.ValidUntilTime() {
+		t.Errorf("Wrong ValidUntilTime: \n got: %v\nwant: %v", gotGM.ValidUntilTime(), expectedGM.ValidUntilTime())
+	}
+
+	if expectedGM.ItemIdentifier() != gotGM.ItemIdentifier() {
+		t.Errorf("Wrong ItemIdentifier: \n got: %v\nwant: %v", gotGM.ItemIdentifier(), expectedGM.ItemIdentifier())
+	}
+
+	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
+		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
+	}
+
+	if expectedGM.InfoMessageVersion() != gotGM.InfoMessageVersion() {
+		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", gotGM.InfoMessageVersion(), expectedGM.InfoMessageVersion())
+	}
+
+	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
+		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
+	}
+
+	if expectedGM.InfoChannelRef() != gotGM.InfoChannelRef() {
+		t.Errorf("Wrong InfoChannelRef: \n got: %v\nwant: %v", gotGM.InfoChannelRef(), expectedGM.RecordedAtTime())
+	}
+
+	expectedContent := expectedGM.Content().(IDFGeneralMessageStructure)
+	gotContent := gotGM.Content().(IDFGeneralMessageStructure)
+
+	if expectedContent.MessageText() != gotContent.MessageText() {
+		t.Errorf("Wrong MessageText: \n got: %v\nwant: %v", gotContent.MessageText(), expectedContent.MessageText())
+	}
+
+	if expectedContent.MessageType() != gotContent.MessageType() {
+		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", expectedContent.MessageType(), expectedContent.MessageType())
+	}
+
+	expectedLineSection := expectedContent.LineSection()
+	gotLineSection := gotContent.LineSection()
+
+	if expectedLineSection.LineRef() != gotLineSection.LineRef() {
+		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.LineRef(), expectedLineSection.LineRef())
+	}
+
+	if expectedLineSection.FirstStop() != gotLineSection.FirstStop() {
+		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.FirstStop(), expectedLineSection.FirstStop())
+	}
+
+	if expectedLineSection.LastStop() != gotLineSection.LastStop() {
+		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.LastStop(), expectedLineSection.LastStop())
+	}
+
+}
+
+func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
+	expectedXML := `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
+															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
+															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+															 xmlns:ns7="http://scma/siri"
+															 xmlns:ns8="http://wsdl.siri.org.uk"
+															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>producer</ns3:ProducerRef>
+		<ns3:Address>address</ns3:Address>
+		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+			<ns3:Status>true</ns3:Status>
+			<ns3:GeneralMessage formatRef="FRANCE">
+				<ns3:RecordedAtTime>2016-09-21T20:14:46.000Z</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
+				<ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:21_1</ns3:InfoMessageIdentifier>
+				<ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
+				<ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
+				<ns3:ValidUntilTime>2016-09-21T20:14:46.000Z</ns3:ValidUntilTime>
+				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xsi:type="ns9:IDFGeneralMessageStructure">
+					<Message>
+						<MessageType>Je suis de type texte</MessageType>
+						<MessageText xml:lang="NL">Je suis un texte</MessageText>
+					</Message>
+					<LineSection>
+					  <FirstStop>NINOXE:StopPoint:SP:24:LOC</FirstStop>
+					  <LastStop>NINOXE:StopPoint:SP:12:LOC</LastStop>
+					  <LineRef>NINOXE:Line::3:LOC</LineRef>
+					</LineSection>
+				</ns3:Content>
+			</ns3:GeneralMessage>{{end}}
+		</ns3:GeneralMessageDelivery>
+	</Answer>
+	<AnswerExtension/>
+</ns8:GetGeneralMessageResponse>`
+
+	response, _ := NewXMLGeneralMessageResponseFromContent([]byte(expectedXML))
+	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
+
+	request := &SIRIGeneralMessageResponse{
+		Address:                   "address",
+		ProducerRef:               "producer",
+		ResponseMessageIdentifier: "identifier",
+	}
+
+	gM := &SIRIGeneralMessage{
+		RecordedAtTime:        time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ValidUntilTime:        time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ItemIdentifier:        "itemId",
+		InfoMessageIdentifier: "NINOXE:GeneralMessage:21_1",
+		InfoMessageVersion:    "1",
+		InfoChannelRef:        "Commercial",
+		MessageType:           "Je suis de type texte",
+		MessageText:           "Je suis un texte",
+		FirstStop:             "NINOXE:StopPoint:SP:24:LOC",
+		LastStop:              "NINOXE:StopPoint:SP:12:LOC",
+		LineRef:               "NINOXE:Line::3:LOC",
+	}
+
+	request.RequestMessageRef = "ref"
+	request.Status = true
+	request.ResponseTimestamp = responseTimestamp
+	request.GeneralMessages = []*SIRIGeneralMessage{gM}
+
+	xml, err := request.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	xmlResponse, _ := NewXMLGeneralMessageResponseFromContent([]byte(xml))
+
+	checkGeneralMessagesEquivalence(response, xmlResponse, t)
 }

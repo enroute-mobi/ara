@@ -280,5 +280,3 @@ Feature: Support SIRI GeneralMessage
         </S:Body>
       </S:Envelope>
       """
-
-

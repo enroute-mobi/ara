@@ -1,6 +1,9 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type SituationId string
 
@@ -11,8 +14,14 @@ type Situation struct {
 
 	id SituationId
 
-	Reference Reference
-	Text      string `json:",omitempty"`
+	Reference          Reference
+	Text               string `json:",omitempty"`
+	TextType           string
+	RecordedAt         time.Time
+	InfoMessageVersion string
+	InfoChannelRef     string
+	ItemIdentifier     string
+	ValidUntilTime     time.Time
 }
 
 func NewSituation(model Model) *Situation {

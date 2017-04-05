@@ -90,14 +90,28 @@ type RequestXMLStructure struct {
 	requestTimestamp  time.Time
 }
 
-func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
+func (xmlStruct *XMLStructure) findNodeWithNamespace(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
+
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
 		return nil
 	}
 	if len(nodes) == 0 {
 		return nil
+	}
+	return nodes[0]
+}
+
+func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
+	xpath := fmt.Sprintf(".//%s", localName)
+
+	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
+	if err != nil {
+		return xmlStruct.findNodeWithNamespace(localName)
+	}
+	if len(nodes) == 0 {
+		return xmlStruct.findNodeWithNamespace(localName)
 	}
 	return nodes[0]
 }

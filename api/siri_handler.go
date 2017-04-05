@@ -40,6 +40,10 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		return &SIRIServiceRequestHandler{
 			xmlRequest: siri.NewXMLSiriServiceRequest(envelope.Body()),
 		}
+	case "GetGeneralMessage":
+		return &SIRIGeneralMessageRequestHandler{
+			xmlRequest: siri.NewXMLGeneralMessageRequest(envelope.Body()),
+		}
 	}
 	return nil
 }

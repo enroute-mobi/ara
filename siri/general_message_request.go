@@ -4,7 +4,13 @@ import (
 	"bytes"
 	"html/template"
 	"time"
+
+	"github.com/jbowtie/gokogiri/xml"
 )
+
+type XMLGeneralMessageRequest struct {
+	RequestXMLStructure
+}
 
 type SIRIGeneralMessageRequest struct {
 	MessageIdentifier string
@@ -12,10 +18,7 @@ type SIRIGeneralMessageRequest struct {
 	RequestTimestamp  time.Time
 }
 
-const generalMessageRequestTemplate = `<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-<SOAP-ENV:Header/>
-  <S:Body>
-    <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+const generalMessageRequestTemplate = `<ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z"}}</ns2:RequestTimestamp>
         <ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
@@ -26,9 +29,13 @@ const generalMessageRequestTemplate = `<S:Envelope xmlns:S="http://schemas.xmlso
         <ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
       </Request>
       <RequestExtension/>
-      </ns7:GetGeneralMessage>
-    </S:Body>
-</S:Envelope>`
+      </ns7:GetGeneralMessage>`
+
+func NewXMLGeneralMessageRequest(node xml.Node) *XMLGeneralMessageRequest {
+	xmlGeneralMessageRequest := &XMLGeneralMessageRequest{}
+	xmlGeneralMessageRequest.node = NewXMLNode(node)
+	return xmlGeneralMessageRequest
+}
 
 func NewSIRIGeneralMessageRequest(
 	messageIdentifier,
