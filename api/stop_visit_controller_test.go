@@ -146,13 +146,13 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	defer tx.Close()
 
 	stopVisit := memoryModel.StopVisits().New()
-	objectid := model.NewObjectID("kind", "value")
+	objectid := model.NewObjectID("kind", "stif:value")
 	stopVisit.SetObjectID(objectid)
 	memoryModel.StopVisits().Save(&stopVisit)
 
 	controller := &StopVisitController{}
 
-	_, ok := controller.findStopVisit(tx, "kind&value")
+	_, ok := controller.findStopVisit(tx, "kind:stif:value")
 	if !ok {
 		t.Error("Can't find StopVisit by ObjectId")
 	}

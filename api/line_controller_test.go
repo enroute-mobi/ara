@@ -150,13 +150,13 @@ func Test_LineController_FindLine(t *testing.T) {
 	defer tx.Close()
 
 	line := memoryModel.Lines().New()
-	objectid := model.NewObjectID("kind", "value")
+	objectid := model.NewObjectID("kind", "stif:value")
 	line.SetObjectID(objectid)
 	memoryModel.Lines().Save(&line)
 
 	controller := &LineController{}
 
-	_, ok := controller.findLine(tx, "kind&value")
+	_, ok := controller.findLine(tx, "kind:stif:value")
 	if !ok {
 		t.Error("Can't find Line by ObjectId")
 	}

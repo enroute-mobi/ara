@@ -24,7 +24,7 @@ func NewStopAreaController(referential *core.Referential) ControllerInterface {
 }
 
 func (controller *StopAreaController) findStopArea(tx *model.Transaction, identifier string) (model.StopArea, bool) {
-	idRegexp := "([0-9a-zA-Z-]+)&([0-9a-zA-Z-]+)"
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
