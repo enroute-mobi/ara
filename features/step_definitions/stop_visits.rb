@@ -6,6 +6,7 @@ def stop_visit_path(id, attributes = {})
   url_for_model(attributes.merge(resource: 'stop_visit', id: id))
 end
 
+
 Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
   RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json}
 end
@@ -34,14 +35,13 @@ Then(/^one StopVisit has the following attributes:$/) do |attributes|
 end
 
 
-Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
-  response = RestClient.get stop_visits_path(referential: referential)
-  responseArray = JSON.parse(response.body)
-  expectedStopVisit = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
-
+Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
+  response = RestClient.get(stop_visit_path("#{kind}:#{value}", referential: referential)){|response, request, result| response }
+  
   if condition.nil?
-    expect(expectedStopVisit).not_to be_nil
+    expect(response.code).to eq(200)
   else
-    expect(expectedStopVisit).to be_nil
+    expect(response.code).to eq(500)
+    expect(response.body).to include("Stop visit not found: #{kind}:#{value}")
   end
 end

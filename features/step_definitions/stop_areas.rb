@@ -18,10 +18,9 @@ When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following at
   end
 end
 
-When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
-  response = RestClient.get stop_areas_path(referential: referential)
-  responseArray = JSON.parse(response.body)
-  expectedStopArea = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, value, referential|
+  response = RestClient.get stop_area_path("#{kind}:#{value}", referential: referential)
+  expectedStopArea = JSON.parse(response.body)
 
   RestClient.delete stop_area_path expectedStopArea["Id"]
 end
@@ -35,14 +34,13 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
   expect(called_method).to be_truthy
 end
 
-Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
-  response = RestClient.get stop_areas_path(referential: referential)
-  stopAreas = api_attributes(response.body)
-  expectedStopArea = stopAreas.find{|a| a["ObjectIDs"][kind] == objectid }
-
+Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
+ response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential)){|response, request, result| response }
+  
   if condition.nil?
-    expect(expectedStopArea).not_to be_nil
+    expect(response.code).to eq(200)
   else
-    expect(expectedStopArea).to be_nil
+    expect(response.code).to eq(500)
+    expect(response.body).to include("Stop area not found: #{kind}:#{value}")
   end
 end

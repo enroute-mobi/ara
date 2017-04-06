@@ -52,6 +52,10 @@ Then(/^I should receive this SIRI response$/) do |expected_xml|
   expect(normalized_xml(@last_siri_response)).to eq(normalized_xml(expected_xml))
 end
 
+When(/^I receive this GeneralMessageRequesst$/) do |message_type|
+  SIRIServer.find("default").wait_request message_type
+end
+
 Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
   document = REXML::Document.new(@last_siri_response)
 
@@ -124,4 +128,9 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a GetStopMonitoring r
   actual_values = document.values(expected_values.keys)
 
   expect(actual_values).to eq(expected_values)
+end
+
+
+Then (/^I send this SIRI ServiceDelivery$/) do |request|
+  send_siri_request request
 end
