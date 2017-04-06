@@ -166,7 +166,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	if response.ProducerRef == "" {
 		response.ProducerRef = "Edwig"
 	}
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().NewResponseMessageIdentifier()
 
 	objectidKind := connector.Partner().Setting("remote_objectid_kind")
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())

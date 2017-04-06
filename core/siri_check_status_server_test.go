@@ -19,9 +19,9 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	connector := NewSIRICheckStatusServer(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")
@@ -50,7 +50,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	if response.RequestMessageRef != "CheckStatus:Test:0" {
 		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: CheckStatus:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
 		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	if !response.Status {

@@ -40,9 +40,14 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
-	generator := core.NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%v:LOC")
+
+	generator := core.NewFormatMessageIdentifierGenerator("Edwig:Message::%v:LOC")
 	generator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	siriPartner.SetMessageIdentifierGenerator(generator)
+	responseGenerator := core.NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%v:LOC")
+	responseGenerator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	siriPartner.SetResponseMessageIdentifierGenerator(responseGenerator)
+
 	partner.Context().SetValue(core.SIRI_PARTNER, siriPartner)
 
 	partner.Save()

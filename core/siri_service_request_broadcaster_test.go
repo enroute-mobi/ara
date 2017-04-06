@@ -18,9 +18,9 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIServiceRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
@@ -55,7 +55,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
 		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
@@ -77,9 +77,9 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIServiceRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")
@@ -104,7 +104,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
 		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
