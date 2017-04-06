@@ -10,6 +10,10 @@ func Test_SIRIStopDiscoveryResponse_BuildXML(t *testing.T) {
 <ns8:StopPointsDiscoveryResponse xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns9="http://wsdl.siri.org.uk/siri">
    <Answer version="2.0">
       <ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
+      <ns3:Address>address</ns3:Address>
+      <ns3:ProducerRef>producer</ns3:ProducerRef>
+      <ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+      <ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
       <ns3:Status>true</ns3:Status>
       <ns3:AnnotatedStopPointRef>
          <ns3:StopPointRef>NINOXE:StopPoint:BP:1:LOC</ns3:StopPointRef>

@@ -38,9 +38,16 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	response := &siri.SIRIStopPointsDiscoveryResponse{}
 
+	response.Address = connector.Partner().Setting("local_url")
+	response.ProducerRef = connector.Partner().Setting("remote_credential")
+	response.RequestMessageRef = request.MessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
 
+	if response.ProducerRef == "" {
+		response.ProducerRef = "Edwig"
+	}
 	objectIDKind := connector.RemoteObjectIDKind()
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
