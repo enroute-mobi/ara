@@ -164,8 +164,8 @@ func Test_SIRIServiceRequestBroadcaster_LogXMLSiriServiceRequest(t *testing.T) {
 	if logStashEvent["messageIdentifier"] != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: GetSIRIStopMonitoring:Test:0", logStashEvent["messageIdentifier"])
 	}
-	if logStashEvent["requestorRef"] != "RATPDEV:Concerto" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: RATPDEV:Concerto", logStashEvent["requestorRef"])
+	if logStashEvent["requestorRef"] != "RATPDev:Concerto" {
+		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: RATPDev:Concerto", logStashEvent["requestorRef"])
 	}
 	if logStashEvent["requestTimestamp"] != "2001-12-17 09:30:47 +0000 UTC" {
 		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: 2001-12-17 09:30:47 +0000 UTC", logStashEvent["requestTimestamp"])
