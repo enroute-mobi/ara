@@ -26,7 +26,7 @@ def save_siri_messages(messages = {})
   end
 end
 
-Given(/^a SIRI server (?:"([^"]*)" )?waits (([^"]*)) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
+Given(/^a SIRI server (?:"([^"]*)" )?waits (GetStopMonitoring) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
   name ||= "default"
   SIRIServer.create(name, url).expect_request(message_type, response).start
 end

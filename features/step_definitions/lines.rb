@@ -3,7 +3,7 @@ def lines_path(attributes = {})
 end
 
 def line_path(id, attributes = {})
-  url_for_model(attributes.merge(resource: 'line', id: id))
+  path = url_for_model(attributes.merge(resource: 'line', id: id))
 end
 
 Given(/^a Line exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, line|
@@ -36,14 +36,13 @@ Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) d
 end
 
 
-Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, objectid, condition, referential|
-  response = RestClient.get lines_path(referential: referential)
-  responseArray = JSON.parse(response.body)
-  expectedLine = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
-
+Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
+  response = RestClient.get(line_path("#{kind}:#{value}", referential: referential)){|response, request, result| response }
+  
   if condition.nil?
-    expect(expectedLine).not_to be_nil
+    expect(response.code).to eq(200)
   else
-    expect(expectedLine).to be_nil
+    expect(response.code).to eq(500)
+    expect(response.body).to include("Line not found: #{kind}:#{value}")
   end
 end
