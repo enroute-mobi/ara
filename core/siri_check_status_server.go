@@ -40,7 +40,7 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 		response.ProducerRef = "Edwig"
 	}
 	response.RequestMessageRef = request.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().NewResponseMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
 	response.ServiceStartedTime = connector.Partner().Referential().StartedAt()

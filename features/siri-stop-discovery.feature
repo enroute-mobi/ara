@@ -48,7 +48,7 @@ Feature: Support SIRI StopDiscovery
             <ns3:Address>address</ns3:Address>
             <ns3:ProducerRef>Edwig</ns3:ProducerRef>
             <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
-            <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+            <ns3:ResponseMessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
             <ns3:Status>true</ns3:Status>
               <ns3:AnnotatedStopPointRef>
                 <ns3:StopPointRef>NINOXE:StopPoint:BP:6:LOC</ns3:StopPointRef>

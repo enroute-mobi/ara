@@ -5,7 +5,7 @@ Feature: Support SIRI GeneralMessage
   @wip
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
-      | local_credential     | test     |
+      | local_credential     | NINOXE:default     |
       | remote_objectid_kind | internal |
     When I send this SIRI request
       """

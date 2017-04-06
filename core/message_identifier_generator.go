@@ -10,7 +10,7 @@ type MessageIdentifierGenerator interface {
 	NewMessageIdentifier() string
 }
 
-var defaultMessageIdentifierGenerator MessageIdentifierGenerator = NewFormatMessageIdentifierGenerator("RATPDev:ResponseMessage::%s:LOC")
+var defaultMessageIdentifierGenerator MessageIdentifierGenerator = NewFormatMessageIdentifierGenerator("RATPDev:Message::%s:LOC")
 
 func DefaultMessageIdentifierGenerator() MessageIdentifierGenerator {
 	return defaultMessageIdentifierGenerator
@@ -47,4 +47,23 @@ func (consumer *MessageIdentifierConsumer) MessageIdentifierGenerator() MessageI
 
 func (consumer *MessageIdentifierConsumer) NewMessageIdentifier() string {
 	return consumer.MessageIdentifierGenerator().NewMessageIdentifier()
+}
+
+type ResponseMessageIdentifierConsumer struct {
+	messageIdentifierGenerator MessageIdentifierGenerator
+}
+
+func (consumer *ResponseMessageIdentifierConsumer) SetResponseMessageIdentifierGenerator(generator MessageIdentifierGenerator) {
+	consumer.messageIdentifierGenerator = generator
+}
+
+func (consumer *ResponseMessageIdentifierConsumer) ResponseMessageIdentifierGenerator() MessageIdentifierGenerator {
+	if consumer.messageIdentifierGenerator == nil {
+		consumer.messageIdentifierGenerator = NewFormatMessageIdentifierGenerator("RATPDev:ResponseMessage::%s:LOC")
+	}
+	return consumer.messageIdentifierGenerator
+}
+
+func (consumer *ResponseMessageIdentifierConsumer) NewResponseMessageIdentifier() string {
+	return consumer.ResponseMessageIdentifierGenerator().NewMessageIdentifier()
 }

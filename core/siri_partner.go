@@ -7,6 +7,7 @@ import (
 
 type SIRIPartner struct {
 	MessageIdentifierConsumer
+	ResponseMessageIdentifierConsumer
 
 	partner *Partner
 

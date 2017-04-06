@@ -69,7 +69,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			if !ok {
 				continue
 			}
-			itemIdentifier = fmt.Sprintf("RATPDEV:Item::%s:LOC", defaultObjectID.HashValue())
+			itemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", defaultObjectID.HashValue())
 		}
 
 		schedules := stopVisit.Schedules
@@ -94,7 +94,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			if !ok {
 				continue
 			}
-			dataVehicleJourneyRef = fmt.Sprintf("RATPDEV:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
+			dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
 		}
 
 		modelDate := tx.Model().Date()
@@ -166,7 +166,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	if response.ProducerRef == "" {
 		response.ProducerRef = "Edwig"
 	}
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().NewResponseMessageIdentifier()
 
 	objectidKind := connector.Partner().Setting("remote_objectid_kind")
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
