@@ -81,6 +81,12 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
+
+	stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
+	if !ok {
+		return nil
+	}
+
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
 			continue
@@ -89,11 +95,6 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
 
 		if !(connectorPresent || testConnectorPresent) {
-			continue
-		}
-
-		stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
-		if !ok {
 			continue
 		}
 
