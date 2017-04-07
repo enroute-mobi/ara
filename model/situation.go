@@ -7,6 +7,13 @@ import (
 
 type SituationId string
 
+type Message struct {
+	Content             string `xml:"MessageText,chardata"`
+	Type                string `xml:"MessageType,chardata"`
+	NumberOfLines       int    `xml:"NumberOfLines,attr"`
+	NumberOfCharPerLine int    `xml:"NumberOfCharPerLine,attr"`
+}
+
 type Situation struct {
 	ObjectIDConsumer
 
@@ -14,20 +21,20 @@ type Situation struct {
 
 	id SituationId
 
-	Reference          Reference
-	Text               string `json:",omitempty"`
-	TextType           string
-	RecordedAtTime     time.Time
-	InfoMessageVersion string
-	InfoChannelRef     string
-	ItemIdentifier     string
-	ValidUntilTime     time.Time
+	References References
+	Messages   []*Message
+
+	RecordedAt time.Time
+	ValidUntil time.Time
+	Format     string
+	Channel    string
+	Version    int64
 }
 
 func NewSituation(model Model) *Situation {
 	situation := &Situation{
-		model:     model,
-		Reference: Reference{},
+		model:      model,
+		References: NewReferences(),
 	}
 
 	situation.objectids = make(ObjectIDs)
@@ -68,13 +75,12 @@ func (situation *Situation) fillSituation(situationMap map[string]interface{}) {
 		situationMap["Id"] = situation.id
 	}
 
-	if situation.Text != "" {
-		situationMap["Text"] = situation.Text
+	if len(situation.Messages) != 0 {
+		situationMap["Message"] = situation.Messages
 	}
 
-	ref := Reference{}
-	if situation.Reference != ref {
-		situationMap["Reference"] = situation.Reference
+	if !situation.References.IsEmpty() {
+		situationMap["References"] = situation.References
 	}
 
 }

@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/af83/edwig/model"
 )
 
 func getXMLGeneralMessageResponse(t *testing.T) *XMLGeneralMessageResponse {
@@ -50,18 +52,6 @@ func Test_XMLGeneralMessage(t *testing.T) {
 
 	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, generalMessage.ValidUntilTime().Location()); generalMessage.ValidUntilTime() != expected {
 		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", generalMessage.ValidUntilTime(), expected)
-	}
-
-	if expected := "longMessage"; content.MessageType() != expected {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", content.MessageType(), expected)
-	}
-
-	if expected := `La nouvelle carte d'abonnement est disponible au points de vente du réseau`; content.MessageText() != expected {
-		t.Errorf("Wrong MessageText: \n got: %v\nwant: %v", content.MessageText(), expected)
-	}
-
-	if expected := "longMessage"; content.MessageType() != expected {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", content.MessageType(), expected)
 	}
 
 	if expected := "NINOXE:StopPoint:SP:24:LOC"; lineSection.FirstStop() != expected {
@@ -115,10 +105,6 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 		t.Errorf("Wrong ValidUntilTime: \n got: %v\nwant: %v", gotGM.ValidUntilTime(), expectedGM.ValidUntilTime())
 	}
 
-	if expectedGM.ItemIdentifier() != gotGM.ItemIdentifier() {
-		t.Errorf("Wrong ItemIdentifier: \n got: %v\nwant: %v", gotGM.ItemIdentifier(), expectedGM.ItemIdentifier())
-	}
-
 	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
 		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
 	}
@@ -138,12 +124,15 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 	expectedContent := expectedGM.Content().(IDFGeneralMessageStructure)
 	gotContent := gotGM.Content().(IDFGeneralMessageStructure)
 
-	if expectedContent.MessageText() != gotContent.MessageText() {
-		t.Errorf("Wrong MessageText: \n got: %v\nwant: %v", gotContent.MessageText(), expectedContent.MessageText())
+	expedtedMessages := expectedContent.Messages()[0]
+	gotMessages := gotContent.Messages()[0]
+
+	if expedtedMessages.Content != gotMessages.Content {
+		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.Content, gotMessages.Content)
 	}
 
-	if expectedContent.MessageType() != gotContent.MessageType() {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", expectedContent.MessageType(), expectedContent.MessageType())
+	if expedtedMessages.NumberOfLines != gotMessages.NumberOfLines {
+		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.NumberOfLines, gotMessages.NumberOfLines)
 	}
 
 	expectedLineSection := expectedContent.LineSection()
@@ -184,11 +173,9 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 			<ns3:Status>true</ns3:Status>
 			<ns3:GeneralMessage formatRef="FRANCE">
 				<ns3:RecordedAtTime>2016-09-21T20:14:46.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
-				<ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:21_1</ns3:InfoMessageIdentifier>
-				<ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-				<ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
 				<ns3:ValidUntilTime>2016-09-21T20:14:46.000Z</ns3:ValidUntilTime>
+				<ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
+				<ns3:InfoChannelRef>Chan</ns3:InfoChannelRef>
 				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFGeneralMessageStructure">
 					<Message>
@@ -217,23 +204,21 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 	}
 
 	gM := &SIRIGeneralMessage{
-		RecordedAtTime:        time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
-		ValidUntilTime:        time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
-		ItemIdentifier:        "itemId",
-		InfoMessageIdentifier: "NINOXE:GeneralMessage:21_1",
-		InfoMessageVersion:    "1",
-		InfoChannelRef:        "Commercial",
-		MessageType:           "Je suis de type texte",
-		MessageText:           "Je suis un texte",
-		FirstStop:             "NINOXE:StopPoint:SP:24:LOC",
-		LastStop:              "NINOXE:StopPoint:SP:12:LOC",
-		LineRef:               "NINOXE:Line::3:LOC",
+		RecordedAtTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		ValidUntilTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
+		FirstStop:      "NINOXE:StopPoint:SP:24:LOC",
+		LastStop:       "NINOXE:StopPoint:SP:12:LOC",
+		LineRef:        "NINOXE:Line::3:LOC",
 	}
 
-	request.RequestMessageRef = "ref"
 	request.Status = true
 	request.ResponseTimestamp = responseTimestamp
+	request.RequestMessageRef = "ref"
+
 	request.GeneralMessages = []*SIRIGeneralMessage{gM}
+	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &model.Message{Content: "Joyeux Noel", Type: "Un Type", NumberOfLines: 1, NumberOfCharPerLine: 3})
+	request.GeneralMessages[0].InfoMessageVersion = 1
+	request.GeneralMessages[0].InfoChannelRef = "Chan"
 
 	xml, err := request.BuildXML()
 	if err != nil {

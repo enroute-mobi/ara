@@ -40,6 +40,7 @@ func (reference *Reference) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		ObjectId map[string]string
 		Id       string
+		Type     string
 	}{}
 
 	err := json.Unmarshal(data, aux)
@@ -55,7 +56,7 @@ func (reference *Reference) UnmarshalJSON(data []byte) error {
 		ObjectIdCPY := NewObjectID(kind, aux.ObjectId[kind])
 		reference.ObjectId = &ObjectIdCPY
 	}
-
+	reference.Type = aux.Type
 	reference.Id = aux.Id
 	return nil
 }

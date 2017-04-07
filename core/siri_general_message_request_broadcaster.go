@@ -52,14 +52,13 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	for _, situation := range tx.Model().Situations().FindAll() {
 		xmlGeneralMessage := &siri.SIRIGeneralMessage{}
 		objectid, _ := situation.ObjectID(objectidKind)
-		xmlGeneralMessage.MessageText = situation.Text
-		xmlGeneralMessage.MessageType = situation.TextType
-		xmlGeneralMessage.ItemIdentifier = situation.ItemIdentifier
+		xmlGeneralMessage.Messages = situation.Messages
+		//xmlGeneralMessage.ItemIdentifier = situation.ItemIdentifier
 		xmlGeneralMessage.InfoMessageIdentifier = objectid.Value()
-		xmlGeneralMessage.ValidUntilTime = situation.ValidUntilTime
-		xmlGeneralMessage.InfoChannelRef = situation.InfoChannelRef
-		xmlGeneralMessage.InfoMessageVersion = situation.InfoMessageVersion
-		xmlGeneralMessage.RecordedAtTime = situation.RecordedAtTime
+		xmlGeneralMessage.InfoChannelRef = situation.Channel
+		xmlGeneralMessage.InfoMessageVersion = situation.Version
+		xmlGeneralMessage.ValidUntilTime = situation.ValidUntil
+		xmlGeneralMessage.RecordedAtTime = situation.RecordedAt
 		response.GeneralMessages = append(response.GeneralMessages, xmlGeneralMessage)
 	}
 	return response, nil

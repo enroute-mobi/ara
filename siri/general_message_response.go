@@ -2,10 +2,12 @@ package siri
 
 import (
 	"bytes"
+	rxml "encoding/xml"
 	"fmt"
 	"text/template"
 	"time"
 
+	"github.com/af83/edwig/model"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -31,17 +33,14 @@ type XMLGeneralMessage struct {
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	numberOfLines       int
-	numberOfCharPerLine int
-	messageType         string
-	messageText         string
-	lineRef             string
-	stopPointRef        string
-	journeyPatternRef   string
-	destinationRef      string
-	routeRef            string
-	groupOfLinesRef     string
-	lineSection         IDFLineSectionStructure
+	messages          []model.Message
+	lineRef           string
+	stopPointRef      string
+	journeyPatternRef string
+	destinationRef    string
+	routeRef          string
+	groupOfLinesRef   string
+	lineSection       IDFLineSectionStructure
 }
 
 type IDFLineSectionStructure struct {
@@ -76,19 +75,17 @@ type SIRIGeneralMessage struct {
 	ValidUntilTime        time.Time
 	ItemIdentifier        string
 	InfoMessageIdentifier string
-	InfoMessageVersion    string
+	InfoMessageVersion    int64
 	InfoChannelRef        string
 
-	NumberOfLines       int
-	NumberOfCharPerLine int
-	MessageType         string
-	MessageText         string
-	LineRefContent      string
-	StopPointRef        string
-	JourneyPatternRef   string
-	DestinationRef      string
-	RouteRef            string
-	GroupOfLinesRef     string
+	LineRefContent    string
+	StopPointRef      string
+	JourneyPatternRef string
+	DestinationRef    string
+	RouteRef          string
+	GroupOfLinesRef   string
+
+	Messages []*model.Message
 
 	FirstStop string
 	LastStop  string
@@ -96,21 +93,22 @@ type SIRIGeneralMessage struct {
 }
 
 const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-					<ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
+				  <ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
 					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
 					<ns3:GeneralMessage formatRef="FRANCE">
 						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
-						<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
 						<ns3:InfoMessageIdentifier>{{.InfoMessageIdentifier}}</ns3:InfoMessageIdentifier>
 						<ns3:InfoMessageVersion>{{.InfoMessageVersion}}</ns3:InfoMessageVersion>
 						<ns3:InfoChannelRef>{{.InfoChannelRef}}</ns3:InfoChannelRef>
 						<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
 						<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-						xsi:type="ns9:IDFLineSectionStructure">
+						xsi:type="ns9:IDFLineSectionStructure">{{range .Messages}}
 							<Message>
-								<MessageType>{{ .MessageType }}</MessageType>
-								<MessageText xml:lang="NL">{{ .MessageText }}</MessageText>
-							</Message>
+								<MessageType>{{ .Type }}</MessageType>
+								<MessageText>{{ .Content }}</MessageText>
+								<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>
+								<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>
+							</Message>{{end}}
 							<LineSection>
 								<FirstStop>{{.FirstStop}}</FirstStop>
 							  <LastStop>{{.LastStop}}</LastStop>
@@ -151,6 +149,21 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMess
 		}
 	}
 	return response.xmlGeneralMessages
+}
+
+func (visit *IDFGeneralMessageStructure) Messages() []model.Message {
+	if len(visit.messages) == 0 {
+		nodes := visit.findNodes("Message")
+		if nodes == nil {
+			return visit.messages
+		}
+		unmashallMessage := model.Message{}
+		for _, message := range nodes {
+			rxml.Unmarshal([]byte(message.NativeNode().String()), unmashallMessage)
+			visit.messages = append(visit.messages, unmashallMessage)
+		}
+	}
+	return visit.messages
 }
 
 func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
@@ -270,34 +283,6 @@ func (visit *IDFGeneralMessageStructure) LineRef() string {
 		visit.lineRef = visit.findStringChildContent("LineRef")
 	}
 	return visit.lineRef
-}
-
-func (visit *IDFGeneralMessageStructure) MessageText() string {
-	if visit.messageText == "" {
-		visit.messageText = visit.findStringChildContent("MessageText")
-	}
-	return visit.messageText
-}
-
-func (visit *IDFGeneralMessageStructure) MessageType() string {
-	if visit.messageType == "" {
-		visit.messageType = visit.findStringChildContent("MessageType")
-	}
-	return visit.messageType
-}
-
-func (visit *IDFGeneralMessageStructure) NumberOfLines() int {
-	if visit.numberOfLines == 0 {
-		visit.numberOfLines = visit.findIntChildContent("NumberOfLines")
-	}
-	return visit.numberOfLines
-}
-
-func (visit *IDFGeneralMessageStructure) NumberOfCharPerLine() int {
-	if visit.numberOfCharPerLine == 0 {
-		visit.numberOfCharPerLine = visit.findIntChildContent("NumberOfCharPerLine")
-	}
-	return visit.numberOfCharPerLine
 }
 
 func (visit *IDFGeneralMessageStructure) createNewLineSection() IDFLineSectionStructure {
