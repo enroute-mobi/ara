@@ -6,15 +6,20 @@ import (
 )
 
 type StopAreaUpdateSubscriber func(*model.StopAreaUpdateEvent)
+type SituationUpdateSubscriber func(*model.SituationUpdateEvent)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
 	HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)
+
+	UpdateSituation(request *SituationUpdateRequest)
+	HandleSituationUpdateEvent(SituationUpdateSubscriber)
 }
 
 type CollectManager struct {
-	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
-	referential               *Referential
+	StopAreaUpdateSubscribers  []StopAreaUpdateSubscriber
+	SituationUpdateSubscribers []SituationUpdateSubscriber
+	referential                *Referential
 }
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
@@ -45,12 +50,16 @@ func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.Sto
 
 func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
 
+func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
+func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
+
 // TEST END
 
 func NewCollectManager(referential *Referential) CollectManagerInterface {
 	return &CollectManager{
-		referential:               referential,
-		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
+		referential:                referential,
+		StopAreaUpdateSubscribers:  make([]StopAreaUpdateSubscriber, 0),
+		SituationUpdateSubscribers: make([]SituationUpdateSubscriber, 0),
 	}
 }
 
@@ -112,6 +121,19 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 	return nil
 }
 
+func (manager *CollectManager) PartnerWithConnector(connector string) *Partner {
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+		_, connectorPresent := partner.Connector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+		if connectorPresent {
+			return partner
+		}
+	}
+	return nil
+}
+
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
 	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
@@ -120,4 +142,39 @@ func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *
 		return nil, err
 	}
 	return event, nil
+}
+
+func (manager *CollectManager) broadcastSituationUpdateEvent(event *model.SituationUpdateEvent) {
+	for _, SituationUpdateSubscriber := range manager.SituationUpdateSubscribers {
+		SituationUpdateSubscriber(event)
+	}
+}
+
+func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) (*model.SituationUpdateEvent, error) {
+	logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
+
+	event, err := partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
+	if err != nil {
+		return nil, err
+	}
+	return event, nil
+}
+
+func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
+	manager.SituationUpdateSubscribers = append(manager.SituationUpdateSubscribers, SituationUpdateSubscriber)
+}
+
+func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
+	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+	if partner == nil {
+		logger.Log.Debugf("Can't find a partner for Situation %v", request.Id())
+		return
+	}
+
+	event, err := manager.requestSituationUpdate(partner, request)
+	if err != nil {
+		logger.Log.Printf("Can't request Situation update : %v", err)
+		return
+	}
+	manager.broadcastSituationUpdateEvent(event)
 }

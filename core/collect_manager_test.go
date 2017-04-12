@@ -6,6 +6,28 @@ import (
 	"github.com/af83/edwig/model"
 )
 
+func Test_PartnerWithConnector(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+
+	partners := referential.Partners()
+	collectManager := NewCollectManager(referential)
+	partner := partners.New("partner")
+
+	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR}
+	partner.RefreshConnectors()
+	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+	partner.Settings["collect.include_stop_areas"] = "boarle"
+	partner.Settings["remote_objectid_kind"] = "internal"
+	partners.Save(partner)
+
+	foundPartner := collectManager.(*CollectManager).PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+
+	if foundPartner != partner {
+		t.Errorf("collectManager.PartnerWithConnector should return correct partner:\n got: %v\n want: %v", foundPartner, partner)
+	}
+}
+
 func Test_CollectManager_BestPartner(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")

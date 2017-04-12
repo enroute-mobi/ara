@@ -305,6 +305,15 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	return nil
 }
 
+func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCollector {
+	// WIP
+	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR]
+	if ok {
+		return client.(GeneralMessageRequestCollector)
+	}
+	return nil
+}
+
 func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
 	// WIP
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
