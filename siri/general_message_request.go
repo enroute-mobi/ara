@@ -29,7 +29,7 @@ const generalMessageRequestTemplate = `<ns7:GetGeneralMessage xmlns:ns2="http://
         <ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
       </Request>
       <RequestExtension/>
-      </ns7:GetGeneralMessage>`
+</ns7:GetGeneralMessage>`
 
 func NewXMLGeneralMessageRequest(node xml.Node) *XMLGeneralMessageRequest {
 	xmlGeneralMessageRequest := &XMLGeneralMessageRequest{}

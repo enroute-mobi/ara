@@ -3,6 +3,8 @@ package core
 const (
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER = "siri-stop-points-discovery-request-broadcaster"
 	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER       = "siri-general-message-request-broadcaster"
+	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "siri-general-message-request-collector"
+	TEST_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "test-general-message-request-collector"
 	SIRI_SERVICE_REQUEST_BROADCASTER               = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR         = "siri-stop-monitoring-request-collector"
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR         = "test-stop-monitoring-request-collector"
@@ -57,6 +59,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIStopPointsDiscoveryRequestBroadcasterFactory{}
 	case SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER:
 		return &SIRIGeneralMessageRequestBroadcasterFactory{}
+	case SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR:
+		return &SIRIGeneralMessageRequestCollectorFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
 		return &SIRICheckStatusClientFactory{}
 	case TEST_CHECK_STATUS_CLIENT_TYPE:

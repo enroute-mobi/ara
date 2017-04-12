@@ -67,9 +67,9 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	objectidKind := connector.partner.Setting("remote_objectid_kind")
-	objectid, ok := stopArea.ObjectID(connector.partner.Setting("remote_objectid_kind"))
+	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
-		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), connector.partner.Setting("remote_objectid_kind"))
+		return nil, fmt.Errorf("StopArea %s doesn't have an ojbectID of type %s", stopArea.Id(), objectidKind)
 	}
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{

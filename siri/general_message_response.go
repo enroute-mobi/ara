@@ -25,20 +25,22 @@ type XMLGeneralMessage struct {
 	validUntilTime        time.Time
 	itemIdentifier        string
 	infoMessageIdentifier string
-	infoMessageVersion    string
+	infoMessageVersion    int
 	infoChannelRef        string
+	format                string
 	content               interface{}
 }
 
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	messages          []model.Message
+	messages          []*model.Message
 	lineRef           string
 	stopPointRef      string
 	journeyPatternRef string
 	destinationRef    string
 	routeRef          string
+	format            string
 	groupOfLinesRef   string
 	lineSection       IDFLineSectionStructure
 }
@@ -151,7 +153,7 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMess
 	return response.xmlGeneralMessages
 }
 
-func (visit *IDFGeneralMessageStructure) Messages() []model.Message {
+func (visit *IDFGeneralMessageStructure) Messages() []*model.Message {
 	if len(visit.messages) == 0 {
 		nodes := visit.findNodes("Message")
 		if nodes == nil {
@@ -159,8 +161,9 @@ func (visit *IDFGeneralMessageStructure) Messages() []model.Message {
 		}
 		unmashallMessage := model.Message{}
 		for _, message := range nodes {
-			rxml.Unmarshal([]byte(message.NativeNode().String()), unmashallMessage)
-			visit.messages = append(visit.messages, unmashallMessage)
+			rxml.Unmarshal([]byte(message.NativeNode().String()), &unmashallMessage)
+			tmp := unmashallMessage
+			visit.messages = append(visit.messages, &tmp)
 		}
 	}
 	return visit.messages
@@ -215,9 +218,9 @@ func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
 	return visit.infoMessageIdentifier
 }
 
-func (visit *XMLGeneralMessage) InfoMessageVersion() string {
-	if visit.infoMessageVersion == "" {
-		visit.infoMessageVersion = visit.findStringChildContent("InfoMessageVersion")
+func (visit *XMLGeneralMessage) InfoMessageVersion() int {
+	if visit.infoMessageVersion == 0 {
+		visit.infoMessageVersion = visit.findIntChildContent("InfoMessageVersion")
 	}
 	return visit.infoMessageVersion
 }
@@ -227,6 +230,16 @@ func (visit *XMLGeneralMessage) InfoChannelRef() string {
 		visit.infoChannelRef = visit.findStringChildContent("InfoChannelRef")
 	}
 	return visit.infoChannelRef
+}
+
+func (visit *XMLGeneralMessage) Format() string {
+	if visit.format == "" {
+		node := visit.node.NativeNode()
+		if node != nil {
+			visit.format = node.Attr("formatRef")
+		}
+	}
+	return visit.format
 }
 
 func (visit *XMLGeneralMessage) createNewContent() IDFGeneralMessageStructure {

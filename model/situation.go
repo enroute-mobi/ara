@@ -8,10 +8,10 @@ import (
 type SituationId string
 
 type Message struct {
-	Content             string `xml:"MessageText,chardata"`
-	Type                string `xml:"MessageType,chardata"`
-	NumberOfLines       int    `xml:"NumberOfLines,attr"`
-	NumberOfCharPerLine int    `xml:"NumberOfCharPerLine,attr"`
+	Content             string `xml:"MessageText,"`
+	Type                string `xml:"MessageType"`
+	NumberOfLines       int    `xml:"NumberOfLines"`
+	NumberOfCharPerLine int    `xml:"NumberOfCharPerLine"`
 }
 
 type Situation struct {

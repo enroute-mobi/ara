@@ -13,10 +13,10 @@ type SituationUpdateRequest struct {
 	createdAt time.Time
 }
 
-func NewSituationUpdateEvent(id SituationUpdateRequestId) *SituationUpdateRequest {
+func NewSituationUpdateRequest(id SituationUpdateRequestId) *SituationUpdateRequest {
 	return &SituationUpdateRequest{
 		id:        id,
-		CreatedAt: model.DefaultClock().Now(),
+		createdAt: model.DefaultClock().Now(),
 	}
 }
 

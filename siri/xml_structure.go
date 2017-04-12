@@ -254,7 +254,6 @@ func (response *ResponseXMLStructure) ErrorType() string {
 		node := response.findNode("ErrorText")
 		if node != nil {
 			response.errorType = node.Parent().Name()
-
 			// Find errorText and errorNumber to avoir too much parsing
 			response.errorText = strings.TrimSpace(node.Content())
 			if response.errorType == "OtherError" {

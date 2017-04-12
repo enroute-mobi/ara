@@ -17,7 +17,7 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
         <ns2:MessageIdentifier>MessageId</ns2:MessageIdentifier>
       </Request>
       <RequestExtension/>
-      </ns7:GetGeneralMessage>`
+</ns7:GetGeneralMessage>`
 
 	requestTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 

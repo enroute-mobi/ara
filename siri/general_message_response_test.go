@@ -42,7 +42,7 @@ func Test_XMLGeneralMessage(t *testing.T) {
 		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", generalMessage.InfoMessageIdentifier(), expected)
 	}
 
-	if expected := "1"; generalMessage.InfoMessageVersion() != expected {
+	if expected := 1; generalMessage.InfoMessageVersion() != expected {
 		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", generalMessage.InfoMessageVersion(), expected)
 	}
 
@@ -118,7 +118,7 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 	}
 
 	if expectedGM.InfoChannelRef() != gotGM.InfoChannelRef() {
-		t.Errorf("Wrong InfoChannelRef: \n got: %v\nwant: %v", gotGM.InfoChannelRef(), expectedGM.RecordedAtTime())
+		t.Errorf("Wrong InfoChannelRef: \n got: %v\n want: %v", gotGM.InfoChannelRef(), expectedGM.RecordedAtTime())
 	}
 
 	expectedContent := expectedGM.Content().(IDFGeneralMessageStructure)
@@ -132,7 +132,7 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 	}
 
 	if expedtedMessages.NumberOfLines != gotMessages.NumberOfLines {
-		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.NumberOfLines, gotMessages.NumberOfLines)
+		t.Errorf("Wrong Message NumberOfLines: \n got: %v\nwant: %v", expedtedMessages.NumberOfLines, gotMessages.NumberOfLines)
 	}
 
 	expectedLineSection := expectedContent.LineSection()
@@ -216,7 +216,7 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 	request.RequestMessageRef = "ref"
 
 	request.GeneralMessages = []*SIRIGeneralMessage{gM}
-	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &model.Message{Content: "Joyeux Noel", Type: "Un Type", NumberOfLines: 1, NumberOfCharPerLine: 3})
+	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &model.Message{Content: "Je suis un texte", Type: "Un Type"})
 	request.GeneralMessages[0].InfoMessageVersion = 1
 	request.GeneralMessages[0].InfoChannelRef = "Chan"
 
