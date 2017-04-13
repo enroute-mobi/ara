@@ -6,7 +6,7 @@ import (
 )
 
 type StopAreaUpdateSubscriber func(*model.StopAreaUpdateEvent)
-type SituationUpdateSubscriber func(*model.SituationUpdateEvent)
+type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
 
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
@@ -144,13 +144,13 @@ func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *
 	return event, nil
 }
 
-func (manager *CollectManager) broadcastSituationUpdateEvent(event *model.SituationUpdateEvent) {
+func (manager *CollectManager) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 	for _, SituationUpdateSubscriber := range manager.SituationUpdateSubscribers {
 		SituationUpdateSubscriber(event)
 	}
 }
 
-func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) (*model.SituationUpdateEvent, error) {
+func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) ([]*model.SituationUpdateEvent, error) {
 	logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
 
 	event, err := partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
