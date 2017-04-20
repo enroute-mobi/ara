@@ -63,6 +63,8 @@ func main() {
 	// Configure logstash
 	if config.Config.LogStash != "" {
 		audit.SetCurrentLogstash(audit.NewTCPLogStash(config.Config.LogStash))
+		audit.CurrentLogStash().Start()
+		defer audit.CurrentLogStash().Stop()
 	}
 
 	if *uuidPtr {
