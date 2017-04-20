@@ -65,8 +65,8 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 }
 
 func (connector *SIRIGeneralMessageRequestBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind")
+	if connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind")
 	}
 	return connector.partner.Setting("remote_objectid_kind")
 }

@@ -1,8 +1,6 @@
 package core
 
 import (
-	"fmt"
-
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
@@ -75,15 +73,15 @@ func (manager *CollectManager) broadcastStopAreaUpdateEvent(event *model.StopAre
 	}
 }
 
-func (manager *CollectManager) requestAndBroadcast(partner *Partner, request *StopAreaUpdateRequest) {
-	event, err := manager.requestStopAreaUpdate(partner, request)
-	if err != nil {
-		logger.Log.Printf("Can't request stop area update : %v", err)
-		return
-	}
-	manager.broadcastStopAreaUpdateEvent(event)
-	fmt.Println("salut les gens\n")
-}
+//TEST
+// func (manager *CollectManager) requestAndBroadcast(partner *Partner, request *StopAreaUpdateRequest) {
+// 	event, err := manager.requestStopAreaUpdate(partner, request)
+// 	if err != nil {
+// 		logger.Log.Printf("Can't request stop area update : %v", err)
+// 		return
+// 	}
+// 	manager.broadcastStopAreaUpdateEvent(event)
+// }
 
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	partner := manager.bestPartner(request)
@@ -91,7 +89,13 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
 		return
 	}
-	go manager.requestAndBroadcast(partner, request)
+	//go manager.requestAndBroadcast(partner, request)
+	event, err := manager.requestStopAreaUpdate(partner, request)
+	if err != nil {
+		logger.Log.Printf("Can't request stop area update : %v", err)
+		return
+	}
+	manager.broadcastStopAreaUpdateEvent(event)
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
