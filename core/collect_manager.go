@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
@@ -73,20 +75,23 @@ func (manager *CollectManager) broadcastStopAreaUpdateEvent(event *model.StopAre
 	}
 }
 
+func (manager *CollectManager) requestAndBroadcast(partner *Partner, request *StopAreaUpdateRequest) {
+	event, err := manager.requestStopAreaUpdate(partner, request)
+	if err != nil {
+		logger.Log.Printf("Can't request stop area update : %v", err)
+		return
+	}
+	manager.broadcastStopAreaUpdateEvent(event)
+	fmt.Println("salut les gens\n")
+}
+
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	partner := manager.bestPartner(request)
 	if partner == nil {
 		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
 		return
 	}
-
-	event, err := manager.requestStopAreaUpdate(partner, request)
-	if err != nil {
-		logger.Log.Printf("Can't request stop area update : %v", err)
-		return
-	}
-
-	manager.broadcastStopAreaUpdateEvent(event)
+	go manager.requestAndBroadcast(partner, request)
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {

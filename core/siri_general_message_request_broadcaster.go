@@ -37,7 +37,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Setting("local_url"),
 		ProducerRef:               connector.Partner().Setting("remote_credential"),
-		ResponseMessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.SIRIPartner().NewResponseMessageIdentifier(),
 	}
 
 	if response.ProducerRef == "" {
@@ -65,7 +65,10 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 }
 
 func (connector *SIRIGeneralMessageRequestBroadcaster) RemoteObjectIDKind() string {
-	return connector.Partner().Setting("remote_objectid_kind")
+	if connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind")
+	}
+	return connector.partner.Setting("remote_objectid_kind")
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

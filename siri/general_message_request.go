@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"time"
 
+	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -35,6 +36,15 @@ func NewXMLGeneralMessageRequest(node xml.Node) *XMLGeneralMessageRequest {
 	xmlGeneralMessageRequest := &XMLGeneralMessageRequest{}
 	xmlGeneralMessageRequest.node = NewXMLNode(node)
 	return xmlGeneralMessageRequest
+}
+
+func NewXMLGeneralMessageRequestFromContent(content []byte) (*XMLGeneralMessageRequest, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	request := NewXMLGeneralMessageRequest(doc.Root().XmlNode)
+	return request, nil
 }
 
 func NewSIRIGeneralMessageRequest(

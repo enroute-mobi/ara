@@ -2,6 +2,7 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/model"
 )
@@ -85,6 +86,7 @@ func Test_CollectManager_UpdateStopArea(t *testing.T) {
 	request := NewStopAreaUpdateRequest(stopArea.Id())
 	collectManager.UpdateStopArea(request)
 
+	time.Sleep(50 * time.Millisecond)
 	if len(testManager.StopVisitEvents) != 1 {
 		t.Errorf("Subscriber should be called by CollectManager UpdateStopArea %v", len(testManager.Events))
 	}
