@@ -212,7 +212,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		ObjectIDs       string    `db:"object_ids"`
 		Attributes      string    `db:"attributes"`
 		References      string    `db:"siri_references"`
-		RequestedAt     time.Time `db:"requested_at"`
+		NextCollectAt   time.Time `db:"next_collect_at"`
 		CollectedAt     time.Time `db:"collected_at"`
 		CollectedUntil  time.Time `db:"collected_until"`
 		CollectedAlways bool      `db:"collected_always"`
@@ -223,7 +223,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		ObjectIDs:       `{"internal":"value"}`,
 		Attributes:      "{}",
 		References:      "{}",
-		RequestedAt:     testTime,
+		NextCollectAt:   testTime,
 		CollectedAt:     testTime,
 		CollectedUntil:  testTime,
 		CollectedAlways: true,
@@ -260,8 +260,8 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
 	}
-	if stopArea.requestedAt.Equal(testTime) {
-		t.Errorf("Wrong requestedAt:\n got: %v\n expected: %v", stopArea.requestedAt, testTime)
+	if stopArea.NextCollectAt.Equal(testTime) {
+		t.Errorf("Wrong NextCollectAt:\n got: %v\n expected: %v", stopArea.NextCollectAt, testTime)
 	}
 	if stopArea.collectedAt.Equal(testTime) {
 		t.Errorf("Wrong collectedAt:\n got: %v\n expected: %v", stopArea.collectedAt, testTime)

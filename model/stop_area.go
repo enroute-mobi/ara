@@ -22,7 +22,7 @@ type StopArea struct {
 	model Model
 
 	id              StopAreaId
-	requestedAt     time.Time
+	NextCollectAt   time.Time
 	collectedAt     time.Time
 	CollectedUntil  time.Time
 	CollectedAlways bool
@@ -48,12 +48,8 @@ func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
 }
 
-func (stopArea *StopArea) RequestedAt() time.Time {
-	return stopArea.requestedAt
-}
-
-func (stopArea *StopArea) Requested(requestTime time.Time) {
-	stopArea.requestedAt = requestTime
+func (stopArea *StopArea) NextCollect(collectTime time.Time) {
+	stopArea.NextCollectAt = collectTime
 }
 
 func (stopArea *StopArea) CollectedAt() time.Time {
@@ -81,8 +77,8 @@ func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
 		stopAreaMap["References"] = stopArea.References
 	}
 
-	if !stopArea.requestedAt.IsZero() {
-		stopAreaMap["RequestedAt"] = stopArea.requestedAt
+	if !stopArea.NextCollectAt.IsZero() {
+		stopAreaMap["NextCollectAt"] = stopArea.NextCollectAt
 	}
 	if !stopArea.collectedAt.IsZero() {
 		stopAreaMap["CollectedAt"] = stopArea.collectedAt
@@ -233,7 +229,7 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 		ObjectIDs       sql.NullString `db:"object_ids"`
 		Attributes      sql.NullString
 		References      sql.NullString `db:"siri_references"`
-		RequestedAt     pq.NullTime    `db:"requested_at"`
+		NextCollectAt   pq.NullTime    `db:"next_collect_at"`
 		CollectedAt     pq.NullTime    `db:"collected_at"`
 		CollectedUntil  pq.NullTime    `db:"collected_until"`
 		CollectedAlways sql.NullBool   `db:"collected_always"`
@@ -249,8 +245,8 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 		if sa.Name.Valid {
 			stopArea.Name = sa.Name.String
 		}
-		if sa.RequestedAt.Valid {
-			stopArea.requestedAt = sa.RequestedAt.Time
+		if sa.NextCollectAt.Valid {
+			stopArea.NextCollectAt = sa.NextCollectAt.Time
 		}
 		if sa.CollectedAt.Valid {
 			stopArea.collectedAt = sa.CollectedAt.Time

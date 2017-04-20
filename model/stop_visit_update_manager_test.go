@@ -116,8 +116,8 @@ func Test_StopVisitUpdateManager_findOrCreateStopArea(t *testing.T) {
 	if stopArea.CollectedAt() != expected {
 		t.Errorf("Wrong CollectedAt:\n expected: %v\n got: %v", expected, stopArea.CollectedAt())
 	}
-	if stopArea.RequestedAt() != expected {
-		t.Errorf("Wrong RequestedAt:\n expected: %v\n got: %v", expected, stopArea.RequestedAt())
+	if stopArea.NextCollectAt != expected.Add(1*time.Minute) {
+		t.Errorf("Wrong NextCollectAt:\n expected: %v\n got: %v", expected, stopArea.NextCollectAt)
 	}
 }
 

@@ -1,6 +1,10 @@
 package model
 
-import "github.com/af83/edwig/logger"
+import (
+	"time"
+
+	"github.com/af83/edwig/logger"
+)
 
 type StopAreaUpdateManager struct {
 	ClockConsumer
@@ -146,15 +150,13 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 	}
 
 	logger.Log.Debugf("Create new StopArea %v, objectid: %v", stopAreaAttributes.Name, stopAreaAttributes.ObjectId)
-
 	stopArea = updater.tx.Model().StopAreas().New()
 	stopArea.SetObjectID(stopAreaAttributes.ObjectId)
 	stopArea.Name = stopAreaAttributes.Name
-	stopArea.Requested(updater.Clock().Now())
 	stopArea.Updated(updater.Clock().Now())
-
+	stopArea.CollectedAlways = false
+	stopArea.NextCollectAt = updater.Clock().Now().Add(1 * time.Minute)
 	stopArea.Save()
-
 	return &stopArea
 }
 

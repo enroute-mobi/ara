@@ -1,6 +1,7 @@
 package core
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/af83/edwig/logger"
@@ -22,6 +23,7 @@ func NewModelGuardian(referential *Referential) *ModelGuardian {
 func (guardian *ModelGuardian) Start() {
 	logger.Log.Debugf("Start models guardian")
 
+	rand.Seed(time.Now().UTC().UnixNano())
 	guardian.stop = make(chan struct{})
 	go guardian.Run()
 }
@@ -63,26 +65,28 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	defer tx.Close()
 
 	now := guardian.Clock().Now()
-	outdated := now.Add(-1 * time.Minute)
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
 		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
 			continue
 		}
 
-		if stopArea.RequestedAt().Before(outdated) && stopArea.CollectedAt().Before(outdated) {
+		if stopArea.NextCollectAt.Before(now) {
 			stopAreaTx := guardian.referential.NewTransaction()
 			defer stopAreaTx.Close()
 
 			transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
-			transactionnalStopArea.Requested(now)
+
+			randNb := time.Duration(rand.Intn(20)+40) * time.Second
+
+			transactionnalStopArea.NextCollectAt = now.Add(randNb)
 			transactionnalStopArea.Save()
 			stopAreaTx.Commit()
 
 			stopAreaUpdateRequest := &StopAreaUpdateRequest{
 				id:         StopAreaUpdateRequestId(guardian.NewUUID()),
 				stopAreaId: transactionnalStopArea.Id(),
-				createdAt:  guardian.Clock().Now(),
+				createdAt:  now,
 			}
 			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 		}

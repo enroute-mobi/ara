@@ -30,8 +30,8 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 		t.Fatal("StopArea should still be found after guardian work")
 	}
 
-	if updatedStopArea.RequestedAt() != fakeClock.Now() {
-		t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
+	if updatedStopArea.NextCollectAt.Before(fakeClock.Now()) {
+		t.Errorf("StopArea should have NextCollectAt before fakeClock %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
 	}
 }
 
@@ -48,6 +48,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.CollectedAlways = false
 	stopArea.CollectedUntil = fakeClock.Now().Add(15 * time.Minute)
+	stopArea.NextCollectAt = fakeClock.Now()
 	referential.Model().StopAreas().Save(&stopArea)
 
 	referential.modelGuardian.refreshStopAreas()
@@ -57,11 +58,11 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 		t.Fatal("StopArea not found after guardian work")
 	}
 
-	if updatedStopArea.RequestedAt() != fakeClock.Now() {
-		t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
+	if updatedStopArea.NextCollectAt.Before(fakeClock.Now()) {
+		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
 	}
 
-	requestedAt := updatedStopArea.RequestedAt()
+	nextCollectAt := updatedStopArea.NextCollectAt
 
 	fakeClock.Advance(15*time.Minute + time.Second)
 
@@ -71,8 +72,8 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	if !ok {
 		t.Error("StopArea should still be found after guardian work")
 	}
-	if updatedStopArea.RequestedAt() != requestedAt {
-		t.Errorf("StopArea should have RequestedAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.RequestedAt())
+	if updatedStopArea.NextCollectAt.After(nextCollectAt) {
+		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
 	}
 }
 
