@@ -14,6 +14,14 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
+type fakeBroadcaster struct {
+	Events []*model.StopAreaUpdateEvent
+}
+
+func (fb *fakeBroadcaster) FakeBroadcaster(event *model.StopAreaUpdateEvent) {
+	fb.Events = append(fb.Events, event)
+}
+
 func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) *model.StopAreaUpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 	// Create a test http server
@@ -49,14 +57,15 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	partners.Model().StopAreas().Save(&stopArea)
 
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
+
+	fs := fakeBroadcaster{}
+	siriStopMonitoringRequestCollector.SetStopAreaUpdateSubscriber(fs.FakeBroadcaster)
 	siriStopMonitoringRequestCollector.SetClock(model.NewFakeClock())
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
-	stopAreaUpdateEvent, err := siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
-	if err != nil {
-		t.Fatal(err)
-	}
+	siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 
-	return stopAreaUpdateEvent
+	time.Sleep(42 * time.Millisecond)
+	return fs.Events[0]
 }
 
 func testStopMonitoringLogStash(t *testing.T) {

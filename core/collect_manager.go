@@ -11,6 +11,7 @@ type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
 	HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)
+	GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber
 
 	UpdateSituation(request *SituationUpdateRequest)
 	HandleSituationUpdateEvent(SituationUpdateSubscriber)
@@ -52,6 +53,9 @@ func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubsc
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
 func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
+func (manager *TestCollectManager) GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber {
+	return nil
+}
 
 // TEST END
 
@@ -73,29 +77,18 @@ func (manager *CollectManager) broadcastStopAreaUpdateEvent(event *model.StopAre
 	}
 }
 
-//TEST
-// func (manager *CollectManager) requestAndBroadcast(partner *Partner, request *StopAreaUpdateRequest) {
-// 	event, err := manager.requestStopAreaUpdate(partner, request)
-// 	if err != nil {
-// 		logger.Log.Printf("Can't request stop area update : %v", err)
-// 		return
-// 	}
-// 	manager.broadcastStopAreaUpdateEvent(event)
-// }
-
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	partner := manager.bestPartner(request)
 	if partner == nil {
 		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
 		return
 	}
-	//go manager.requestAndBroadcast(partner, request)
-	event, err := manager.requestStopAreaUpdate(partner, request)
-	if err != nil {
-		logger.Log.Printf("Can't request stop area update : %v", err)
-		return
-	}
-	manager.broadcastStopAreaUpdateEvent(event)
+
+	manager.requestStopAreaUpdate(partner, request)
+}
+
+func (manager *CollectManager) GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber {
+	return manager.StopAreaUpdateSubscribers
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
@@ -143,14 +136,10 @@ func (manager *CollectManager) PartnerWithConnector(connector string) *Partner {
 	return nil
 }
 
-func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) (*model.StopAreaUpdateEvent, error) {
+func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) {
 	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
-	event, err := partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
-	if err != nil {
-		return nil, err
-	}
-	return event, nil
+	partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 }
 
 func (manager *CollectManager) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {

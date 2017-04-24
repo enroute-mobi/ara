@@ -3,6 +3,8 @@ package core
 import "testing"
 
 func Test_Factories_CreateConnector(t *testing.T) {
+	partners := createTestPartnerManager()
+
 	partner := &Partner{
 		Settings: make(map[string]string),
 		ConnectorTypes: []string{
@@ -15,7 +17,7 @@ func Test_Factories_CreateConnector(t *testing.T) {
 			"siri-general-message-request-broadcaster",
 		},
 		connectors: make(map[string]Connector),
-		manager:    NewPartnerManager(nil),
+		manager:    partners,
 	}
 	partner.RefreshConnectors()
 
