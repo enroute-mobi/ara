@@ -3,7 +3,6 @@ package model
 import (
 	"crypto/sha1"
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -36,27 +35,17 @@ func (reference *Reference) Getformat(ref, value string) string {
 }
 
 func (reference *Reference) UnmarshalJSON(data []byte) error {
-
+	type Alias Reference
 	aux := &struct {
-		ObjectId map[string]string
-		Id       string
-		Type     string
-	}{}
+		*Alias
+	}{
+		Alias: (*Alias)(reference),
+	}
 
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
 	}
 
-	if len(aux.ObjectId) > 1 {
-		return errors.New("ObjectID should look like KIND:VALUE")
-	}
-
-	for kind, _ := range aux.ObjectId {
-		ObjectIdCPY := NewObjectID(kind, aux.ObjectId[kind])
-		reference.ObjectId = &ObjectIdCPY
-	}
-	reference.Type = aux.Type
-	reference.Id = aux.Id
 	return nil
 }

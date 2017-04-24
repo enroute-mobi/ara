@@ -134,7 +134,7 @@ func Test_StopVisitController_Index(t *testing.T) {
 
 	//Test Results
 
-	expected := `[{"Collected":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","VehicleAtStop":false}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"VehicleAtStop":false}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

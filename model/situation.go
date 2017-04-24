@@ -26,9 +26,9 @@ type Situation struct {
 
 	RecordedAt time.Time
 	ValidUntil time.Time
-	Format     string
-	Channel    string
-	Version    int64
+	Format     string `json:",omitempty"`
+	Channel    string `json:",omitempty"`
+	Version    int64  `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {
@@ -70,30 +70,38 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (situation *Situation) fillSituation(situationMap map[string]interface{}) {
-	if situation.id != "" {
-		situationMap["Id"] = situation.id
-	}
-
-	if len(situation.Messages) != 0 {
-		situationMap["Message"] = situation.Messages
-	}
-
-	if !situation.References.IsEmpty() {
-		situationMap["References"] = situation.References
-	}
-
-}
-
 func (situation *Situation) MarshalJSON() ([]byte, error) {
-	situationMap := make(map[string]interface{})
+	type Alias Situation
+	aux := struct {
+		Id         SituationId
+		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		RecordedAt *time.Time `json:",omitempty"`
+		ValidUntil *time.Time `json:",omitempty"`
+		Messages   []*Message `json:",omitempty"`
+		References References `json:",omitempty"`
+		*Alias
+	}{
+		Id:    situation.id,
+		Alias: (*Alias)(situation),
+	}
 
 	if !situation.ObjectIDs().Empty() {
-		situationMap["ObjectIDs"] = situation.ObjectIDs()
+		aux.ObjectIDs = situation.ObjectIDs()
+	}
+	if len(situation.Messages) != 0 {
+		aux.Messages = situation.Messages
+	}
+	if !situation.References.IsEmpty() {
+		aux.References = situation.References
+	}
+	if !situation.RecordedAt.IsZero() {
+		aux.RecordedAt = &situation.RecordedAt
+	}
+	if !situation.ValidUntil.IsZero() {
+		aux.ValidUntil = &situation.ValidUntil
 	}
 
-	situation.fillSituation(situationMap)
-	return json.Marshal(situationMap)
+	return json.Marshal(&aux)
 }
 
 type MemorySituations struct {

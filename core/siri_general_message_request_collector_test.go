@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -111,7 +110,6 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 	}
 
 	messages := situationEvent.SituationAttributes.Messages
-	fmt.Println(messages[0], "\n\n", messages[1])
 
 	if len(messages) != 2 {
 		t.Error("messages length should be 2")

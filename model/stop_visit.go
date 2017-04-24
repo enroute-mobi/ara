@@ -33,18 +33,18 @@ type StopVisit struct {
 	collected   bool
 	collectedAt time.Time
 
-	StopAreaId       StopAreaId
-	VehicleJourneyId VehicleJourneyId
+	StopAreaId       StopAreaId       `json:",omitempty"`
+	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 	Attributes       Attributes
 	References       References
 
-	ArrivalStatus   StopVisitArrivalStatus
-	DepartureStatus StopVisitDepartureStatus
+	ArrivalStatus   StopVisitArrivalStatus   `json:",omitempty"`
+	DepartureStatus StopVisitDepartureStatus `json:",omitempty"`
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
 
-	PassageOrder int
+	PassageOrder int `json:",omitempty"`
 }
 
 func NewStopVisit(model Model) *StopVisit {
@@ -96,74 +96,49 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 	return &vehicleJourney
 }
 
-func (stopVisit *StopVisit) FillStopVisit(stopVisitMap map[string]interface{}) {
-	scheduleSlice := []StopVisitSchedule{}
-	for _, schedule := range stopVisit.Schedules {
-		scheduleSlice = append(scheduleSlice, *schedule)
+func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
+	type Alias StopVisit
+	aux := struct {
+		Id          StopVisitId
+		ObjectIDs   ObjectIDs `json:",omitempty"`
+		Collected   bool
+		CollectedAt *time.Time          `json:",omitempty"`
+		RecordedAt  *time.Time          `json:",omitempty"`
+		Attributes  Attributes          `json:",omitempty"`
+		References  References          `json:",omitempty"`
+		Schedules   []StopVisitSchedule `json:",omitempty"`
+		*Alias
+	}{
+		Id:        stopVisit.id,
+		Collected: stopVisit.collected,
+		Alias:     (*Alias)(stopVisit),
 	}
-
-	if len(scheduleSlice) != 0 {
-		stopVisitMap["Schedules"] = scheduleSlice
-	}
-
-	if stopVisit.id != "" {
-		stopVisitMap["Id"] = stopVisit.id
-	}
-
-	if stopVisit.StopAreaId != "" {
-		stopVisitMap["StopAreaId"] = stopVisit.StopAreaId
-	}
-
-	if stopVisit.VehicleJourneyId != "" {
-		stopVisitMap["VehicleJourneyId"] = stopVisit.VehicleJourneyId
-	}
-
-	if stopVisit.PassageOrder > 0 {
-		stopVisitMap["PassageOrder"] = stopVisit.PassageOrder
-	}
-
-	if !stopVisit.RecordedAt.IsZero() {
-		stopVisitMap["RecordedAt"] = stopVisit.RecordedAt
-	}
-
-	if !stopVisit.collectedAt.IsZero() {
-		stopVisitMap["CollectedAt"] = stopVisit.collectedAt
-	}
-
-	if stopVisit.DepartureStatus != "" {
-		stopVisitMap["DepartureStatus"] = stopVisit.DepartureStatus
-	}
-
-	if stopVisit.ArrivalStatus != "" {
-		stopVisitMap["ArrivalStatus"] = stopVisit.ArrivalStatus
-	}
-
-	if !stopVisit.Attributes.IsEmpty() {
-		stopVisitMap["Attributes"] = stopVisit.Attributes
-	}
-
-	if !stopVisit.References.IsEmpty() {
-		stopVisitMap["References"] = stopVisit.References
-	}
-
-	stopVisitMap["VehicleAtStop"] = stopVisit.VehicleAtStop
-	stopVisitMap["Collected"] = stopVisit.collected
 
 	if !stopVisit.ObjectIDs().Empty() {
-		stopVisitMap["ObjectIDs"] = stopVisit.ObjectIDs()
+		aux.ObjectIDs = stopVisit.ObjectIDs()
 	}
-}
+	if !stopVisit.Attributes.IsEmpty() {
+		aux.Attributes = stopVisit.Attributes
+	}
+	if !stopVisit.References.IsEmpty() {
+		aux.References = stopVisit.References
+	}
+	if !stopVisit.RecordedAt.IsZero() {
+		aux.RecordedAt = &stopVisit.RecordedAt
+	}
+	if !stopVisit.collectedAt.IsZero() {
+		aux.CollectedAt = &stopVisit.collectedAt
+	}
 
-func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	scheduleSlice := []StopVisitSchedule{}
 	for _, schedule := range stopVisit.Schedules {
 		scheduleSlice = append(scheduleSlice, *schedule)
 	}
+	if len(scheduleSlice) != 0 {
+		aux.Schedules = scheduleSlice
+	}
 
-	stopVisitMap := make(map[string]interface{})
-	stopVisit.FillStopVisit(stopVisitMap)
-
-	return json.Marshal(stopVisitMap)
+	return json.Marshal(&aux)
 }
 
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
