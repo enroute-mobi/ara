@@ -95,7 +95,7 @@ type SIRIGeneralMessage struct {
 }
 
 const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-				  <ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
+				  <ns3:ResponseTimestamp>{{ .ResponseTimestamp }}</ns3:ResponseTimestamp>
 					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
 					<ns3:GeneralMessage formatRef="FRANCE">
 						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
