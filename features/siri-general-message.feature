@@ -14,7 +14,7 @@ Feature: Support SIRI GeneralMessage
       <S:Body>
         <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
-            <ns2:RequestTimestamp>2017-03-29T16:47:58.311Z</ns2:RequestTimestamp>
+            <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
             <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
           </ServiceRequestInfo>
@@ -31,6 +31,7 @@ Feature: Support SIRI GeneralMessage
       </S:Body>
     </S:Envelope>
       """
+    And a minute has passed
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
@@ -45,7 +46,7 @@ Feature: Support SIRI GeneralMessage
           xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>
-              2017-03-29T16:47:59.311Z</ns3:ResponseTimestamp>
+              2017-01-01T12:01:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
               <ns3:Address>
               http://appli.chouette.mobi/siri_france/siri</ns3:Address>
