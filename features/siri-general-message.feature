@@ -97,7 +97,7 @@ Feature: Support SIRI GeneralMessage
 
   @wip
   Scenario: Handle a SIRI ServiceDelivery after GM Request to a SIRI server
-    Given a SIRI server waits GeneralMessageRequest on "http://localhost:8090" to respond with
+    Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -174,7 +174,7 @@ Feature: Support SIRI GeneralMessage
     | remote_credential | ratpdev |
     | remote_objectid_kind | internal |
     And a minute has passed
-    When I receive this GeneralMessageRequest
+    When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>
@@ -270,6 +270,7 @@ Feature: Support SIRI GeneralMessage
         </S:Body>
       </S:Envelope>
       """
+
   @wip
   Scenario: Handle a GeneralMessage response (ServiceDelivery)
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
