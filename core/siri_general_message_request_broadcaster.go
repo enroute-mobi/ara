@@ -46,6 +46,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
+	response.RequestMessageRef = request.MessageIdentifier()
 
 	objectidKind := connector.RemoteObjectIDKind()
 
