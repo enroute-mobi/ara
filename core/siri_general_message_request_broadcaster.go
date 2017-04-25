@@ -62,6 +62,8 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		xmlGeneralMessage.RecordedAtTime = situation.RecordedAt
 		response.GeneralMessages = append(response.GeneralMessages, xmlGeneralMessage)
 	}
+
+	logSIRIGeneralMessageResponse(logStashEvent, response)
 	return response, nil
 }
 
