@@ -47,7 +47,7 @@ Feature: Support SIRI GeneralMessage
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
               <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
-              <ns3:ResponseMessageIdentifier>b28e8207-f030-4932-966c-3e6099fad4ef</ns3:ResponseMessageIdentifier>
+              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Answer>
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
