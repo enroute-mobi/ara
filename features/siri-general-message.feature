@@ -44,29 +44,22 @@ Feature: Support SIRI GeneralMessage
           xmlns:ns8="http://wsdl.siri.org.uk"
           xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>
-              2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
+              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
-              <ns3:Address>
-              http://appli.chouette.mobi/siri_france/siri</ns3:Address>
-              <ns3:ResponseMessageIdentifier>
-              b28e8207-f030-4932-966c-3e6099fad4ef</ns3:ResponseMessageIdentifier>
+              <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
+              <ns3:ResponseMessageIdentifier>b28e8207-f030-4932-966c-3e6099fad4ef</ns3:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Answer>
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>
-                2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
+                <ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
                 <ns3:GeneralMessage formatRef="FRANCE">
-                  <ns3:RecordedAtTime>
-                  2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
+                  <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>
-                  NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
+                  <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>
-                  2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
+                  <ns3:ValidUntilTime>2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:type="ns9:IDFGeneralMessageStructure">
                     <Message>
@@ -78,15 +71,12 @@ Feature: Support SIRI GeneralMessage
                   </ns3:Content>
                 </ns3:GeneralMessage>
                 <ns3:GeneralMessage formatRef="FRANCE">
-                  <ns3:RecordedAtTime>
-                  2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
+                  <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>3471</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>
-                  NINOXE:GeneralMessage:21_1</ns3:InfoMessageIdentifier>
+                  <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:21_1</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>
-                  2017-03-29T22:30:06.000+02:00</ns3:ValidUntilTime>
+                  <ns3:ValidUntilTime>2017-03-29T22:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:type="ns9:IDFGeneralMessageStructure">
                     <Message>
