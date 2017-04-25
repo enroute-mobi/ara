@@ -45,7 +45,7 @@ Feature: Support SIRI GeneralMessage
           xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>
-              2017-01-01T12:01:00.000Z</ns3:ResponseTimestamp>
+              2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
               <ns3:Address>
               http://appli.chouette.mobi/siri_france/siri</ns3:Address>
