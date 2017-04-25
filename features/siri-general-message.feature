@@ -31,7 +31,6 @@ Feature: Support SIRI GeneralMessage
       </S:Body>
     </S:Envelope>
       """
-    And a minute has passed
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
