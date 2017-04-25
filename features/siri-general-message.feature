@@ -19,7 +19,7 @@ Feature: Support SIRI GeneralMessage
             <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
           </ServiceRequestInfo>
           <Request version="2.0:FR-IDF-2.4">
-            <ns2:RequestTimestamp>2017-03-29T16:47:58.311Z</ns2:RequestTimestamp>
+            <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
             <ns2:Extensions>
               <ns6:IDFGeneralMessageRequestFilter>
@@ -34,7 +34,7 @@ Feature: Support SIRI GeneralMessage
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
           xmlns:ns4="http://www.ifopt.org.uk/acsb"
@@ -48,10 +48,11 @@ Feature: Support SIRI GeneralMessage
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
               <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
               <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+              <ns3:RequestMessageRef>RATPDev:Message::9dad:LOC</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
+                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
                 <ns3:GeneralMessage formatRef="FRANCE">
                   <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
