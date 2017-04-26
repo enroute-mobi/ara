@@ -273,7 +273,7 @@ Feature: Support SIRI GeneralMessage
 
   @wip
   Scenario: Handle a GeneralMessage response (ServiceDelivery)
-    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+    Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -326,14 +326,14 @@ Feature: Support SIRI GeneralMessage
         </S:Body>
       </S:Envelope>
       """
-    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
       | remote_objectid_kind | internal              |
     And a minute has passed
     When a minute has passed
-    And the SIRI server has received a GeneralMessage Request
-    Then a Situation exists with the following attributes
+    And the SIRI server has received a GeneralMessage request
+    Then a Situation has the following attributes:
       | ObjectIDs                       | "internal" : "3477"                                                        |
       | RecordedAt                      | 2017-03-29T03:30:06.000+02:00                                              |
       | Attribute[ProducerRef]          | NINOXE:default                                                             |
