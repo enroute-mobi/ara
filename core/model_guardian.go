@@ -12,8 +12,9 @@ type ModelGuardian struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
-	stop        chan struct{}
-	referential *Referential
+	stop            chan struct{}
+	referential     *Referential
+	situationsTimer time.Time
 }
 
 func NewModelGuardian(referential *Referential) *ModelGuardian {
@@ -35,6 +36,7 @@ func (guardian *ModelGuardian) Stop() {
 }
 
 func (guardian *ModelGuardian) Run() {
+	guardian.situationsTimer = guardian.Clock().Now()
 	c := guardian.Clock().After(10 * time.Second)
 
 	for {
@@ -47,6 +49,7 @@ func (guardian *ModelGuardian) Run() {
 			guardian.refreshStopAreas()
 			guardian.checkReloadModel()
 			guardian.simulateActualAttributes()
+			guardian.requestSituations()
 
 			c = guardian.Clock().After(10 * time.Second)
 		}
@@ -91,6 +94,16 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 		}
 	}
+}
+
+func (guardian *ModelGuardian) requestSituations() {
+	if !guardian.Clock().Now().After(guardian.situationsTimer.Add(1 * time.Minute)) {
+		return
+	}
+	guardian.situationsTimer = guardian.Clock().Now().Add(1 * time.Minute)
+
+	situationUpdateRequest := NewSituationUpdateRequest(SituationUpdateRequestId(guardian.NewUUID()))
+	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 }
 
 func (guardian *ModelGuardian) simulateActualAttributes() {

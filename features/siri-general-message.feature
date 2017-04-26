@@ -333,7 +333,7 @@ Feature: Support SIRI GeneralMessage
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
-    Then a Situation has the following attributes:
+    Then one Situation has the following attributes:
       | ObjectIDs                       | "internal" : "3477"                                                        |
       | RecordedAt                      | 2017-03-29T03:30:06.000+02:00                                              |
       | Attribute[ProducerRef]          | NINOXE:default                                                             |
