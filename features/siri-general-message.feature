@@ -336,9 +336,9 @@ Feature: Support SIRI GeneralMessage
     Then one Situation has the following attributes:
       | ObjectIDs                       | "internal" : "3477"                                                        |
       | RecordedAt                      | 2017-03-29T03:30:06.000+02:00                                              |
-      | Attribute[ProducerRef]          | NINOXE:default                                                             |
-      | Attribute[InfoMessageVersion]   | 1                                                                          |
-      | Attribute[InfoChannelRef]       | Commercial                                                                 |
-      | Attribute[ValidUntilTime]       | 2017-03-29T20:30:06.000+02:00                                              |
-      | Attribute[MessageType]          | longMessage                                                                |
-      | Attribute[MessageText]          | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | References[ProducerRef]         | NINOXE:default                                                             |
+      | Version                         | 1                                                                          |
+      | Channel                         | Commercial                                                                 |
+      | ValidUntil                      | 2017-03-29T20:30:06.000+02:00                                              |
+      | References[MessageType]         | longMessage                                                                |
+      | Message                         | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
