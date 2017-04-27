@@ -288,6 +288,7 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 	}
 	referential.manager = manager
 	referential.collectManager.HandleStopAreaUpdateEvent(model.NewStopAreaUpdateManager(referential))
+	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential))
 	manager.byId[referential.id] = referential
 	return true
 }
