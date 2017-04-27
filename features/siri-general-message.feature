@@ -5,8 +5,8 @@ Feature: Support SIRI GeneralMessage
   @wip
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
-      | local_credential     | NINOXE:default     |
-      | remote_objectid_kind | internal |
+      | local_credential     | NINOXE:default |
+      | remote_objectid_kind | internal       |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
@@ -170,9 +170,9 @@ Feature: Support SIRI GeneralMessage
       </S:Envelope>
       """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
-    | remote_url | http://localhost:8090 |
-    | remote_credential | ratpdev |
-    | remote_objectid_kind | internal |
+    | remote_url           | http://localhost:8090 |
+    | remote_credential    | ratpdev               |
+    | remote_objectid_kind | internal              |
     And a minute has passed
     When I send this SIRI request
       """
@@ -313,9 +313,7 @@ Feature: Support SIRI GeneralMessage
                   xsi:type="ns9:IDFGeneralMessageStructure">
                     <Message>
                       <MessageType>longMessage</MessageType>
-                      <MessageText xml:lang="NL">La nouvelle carte
-                      d'abonnement est disponible au points de vente du
-                      réseau</MessageText>
+                      <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                     </Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
@@ -334,11 +332,10 @@ Feature: Support SIRI GeneralMessage
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs                       | "internal" : "3477"                                                        |
-      | RecordedAt                      | 2017-03-29T03:30:06.000+02:00                                              |
-      | References[ProducerRef]         | NINOXE:default                                                             |
-      | Version                         | 1                                                                          |
-      | Channel                         | Commercial                                                                 |
-      | ValidUntil                      | 2017-03-29T20:30:06.000+02:00                                              |
-      | References[MessageType]         | longMessage                                                                |
-      | Message                         | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | ObjectIDs               | "internal" : "3477"                                                        |
+      | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
+      | Version                 | 1                                                                          |
+      | Channel                 | Commercial                                                                 |
+      | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
+      | Messages[0]#MessageType | longMessage                                                                |
+      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
