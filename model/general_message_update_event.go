@@ -18,6 +18,7 @@ type SituationUpdateEvent struct {
 	RecordedAt          time.Time
 	SituationObjectID   ObjectID
 	Version             int64
+	ProducerRef         string
 	SituationAttributes SituationAttributes
 }
 

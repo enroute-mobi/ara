@@ -271,7 +271,6 @@ Feature: Support SIRI GeneralMessage
       </S:Envelope>
       """
 
-
   Scenario: 3032 - Handle a GeneralMessage response (ServiceDelivery)
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
@@ -336,6 +335,7 @@ Feature: Support SIRI GeneralMessage
       | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
       | Channel                 | Commercial                                                                 |
+      | ProducerRef             | NINOXE:default                                                             |
       | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
