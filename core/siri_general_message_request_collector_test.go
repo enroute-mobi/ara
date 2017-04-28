@@ -98,15 +98,19 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 	}
 
 	if expected := 1; situationEvent.Version != int64(expected) {
-		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Format)
+		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.Version)
 	}
 
 	if expected := "Commercial"; situationEvent.SituationAttributes.Channel != expected {
-		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Format)
+		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Channel)
 	}
 
 	if expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00"); !situationEvent.SituationAttributes.ValidUntil.Equal(expected) {
 		t.Errorf("Wrong ValidUntil for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.ValidUntil)
+	}
+
+	if expected := "NINOXE:default"; situationEvent.ProducerRef != "NINOXE:default" {
+		t.Errorf("Wrong ProducerRef for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.ProducerRef)
 	}
 
 	messages := situationEvent.SituationAttributes.Messages

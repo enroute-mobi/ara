@@ -24,11 +24,12 @@ type Situation struct {
 	References References
 	Messages   []*Message
 
-	RecordedAt time.Time
-	ValidUntil time.Time
-	Format     string `json:",omitempty"`
-	Channel    string `json:",omitempty"`
-	Version    int64  `json:",omitempty"`
+	RecordedAt  time.Time
+	ValidUntil  time.Time
+	Format      string `json:",omitempty"`
+	Channel     string `json:",omitempty"`
+	ProducerRef string `json:",omitempty"`
+	Version     int64  `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {

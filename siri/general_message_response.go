@@ -25,9 +25,11 @@ type XMLGeneralMessage struct {
 	validUntilTime        time.Time
 	itemIdentifier        string
 	infoMessageIdentifier string
-	infoMessageVersion    int
 	infoChannelRef        string
 	format                string
+	infoMessageVersion    int
+	numberOfLines         int
+	numberOfCharPerLine   int
 	content               interface{}
 }
 
@@ -147,7 +149,7 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMess
 			return response.xmlGeneralMessages
 		}
 		for _, generalMessage := range nodes {
-			response.xmlGeneralMessages = append(response.xmlGeneralMessages, NewIDFGeneralMessageStructure(generalMessage))
+			response.xmlGeneralMessages = append(response.xmlGeneralMessages, NewXMLGeneralMessage(generalMessage))
 		}
 	}
 	return response.xmlGeneralMessages
@@ -184,7 +186,7 @@ func NewXMLGeneralMessageResponse(node xml.Node) *XMLGeneralMessageResponse {
 	return xmlGeneralMessageResponse
 }
 
-func NewIDFGeneralMessageStructure(node XMLNode) *XMLGeneralMessage {
+func NewXMLGeneralMessage(node XMLNode) *XMLGeneralMessage {
 	generalMessage := &XMLGeneralMessage{}
 	generalMessage.node = node
 	return generalMessage

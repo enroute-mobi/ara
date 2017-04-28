@@ -47,6 +47,7 @@ func (updater *SituationUpdater) Update() {
 		}
 		situation.RecordedAt = event.RecordedAt
 		situation.Version = event.Version
+		situation.ProducerRef = event.ProducerRef
 
 		situation.References = event.SituationAttributes.References
 		situation.Messages = event.SituationAttributes.Messages

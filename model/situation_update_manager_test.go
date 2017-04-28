@@ -11,6 +11,7 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 		RecordedAt:        testTime,
 		SituationObjectID: objectid,
 		Version:           1,
+		ProducerRef:       "Edwig",
 	}
 
 	message := &Message{
@@ -41,14 +42,15 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 	}
 
 	testSituation := Situation{
-		id:         situation.id,
-		References: NewReferences(),
-		Messages:   []*Message{message},
-		RecordedAt: testTime,
-		ValidUntil: testTime,
-		Format:     "format",
-		Channel:    "channel",
-		Version:    1,
+		id:          situation.id,
+		References:  NewReferences(),
+		Messages:    []*Message{message},
+		RecordedAt:  testTime,
+		ValidUntil:  testTime,
+		Format:      "format",
+		Channel:     "channel",
+		ProducerRef: "Edwig",
+		Version:     1,
 	}
 	testSituation.model = situation.model
 	testSituation.objectids = make(ObjectIDs)
