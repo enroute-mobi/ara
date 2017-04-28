@@ -5,8 +5,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/af83/edwig/model"
 )
 
 func getXMLGeneralMessageResponse(t *testing.T) *XMLGeneralMessageResponse {
@@ -216,7 +214,7 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 	request.RequestMessageRef = "ref"
 
 	request.GeneralMessages = []*SIRIGeneralMessage{gM}
-	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &model.Message{Content: "Je suis un texte", Type: "Un Type"})
+	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &SIRIMessage{Content: "Je suis un texte", Type: "Un Type"})
 	request.GeneralMessages[0].InfoMessageVersion = 1
 	request.GeneralMessages[0].InfoChannelRef = "Chan"
 

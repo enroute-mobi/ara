@@ -6,7 +6,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/af83/edwig/model"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -97,11 +96,18 @@ type SIRIGeneralMessage struct {
 	RouteRef          string
 	GroupOfLinesRef   string
 
-	Messages []*model.Message
+	Messages []*SIRIMessage
 
 	FirstStop string
 	LastStop  string
 	LineRef   string
+}
+
+type SIRIMessage struct {
+	Content             string
+	Type                string
+	NumberOfLines       int
+	NumberOfCharPerLine int
 }
 
 const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
