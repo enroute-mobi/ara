@@ -51,16 +51,24 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	objectidKind := connector.RemoteObjectIDKind()
 
 	for _, situation := range tx.Model().Situations().FindAll() {
-		xmlGeneralMessage := &siri.SIRIGeneralMessage{}
+		siriGeneralMessage := &siri.SIRIGeneralMessage{}
 		objectid, _ := situation.ObjectID(objectidKind)
-		xmlGeneralMessage.Messages = situation.Messages
-		//xmlGeneralMessage.ItemIdentifier = situation.ItemIdentifier
-		xmlGeneralMessage.InfoMessageIdentifier = objectid.Value()
-		xmlGeneralMessage.InfoChannelRef = situation.Channel
-		xmlGeneralMessage.InfoMessageVersion = situation.Version
-		xmlGeneralMessage.ValidUntilTime = situation.ValidUntil
-		xmlGeneralMessage.RecordedAtTime = situation.RecordedAt
-		response.GeneralMessages = append(response.GeneralMessages, xmlGeneralMessage)
+		for _, message := range situation.Messages {
+			siriMessage := &siri.SIRIMessage{
+				Content:             message.Content,
+				Type:                message.Type,
+				NumberOfLines:       message.NumberOfLines,
+				NumberOfCharPerLine: message.NumberOfCharPerLine,
+			}
+			siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
+		}
+		//siriGeneralMessage.ItemIdentifier = situation.ItemIdentifier
+		siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
+		siriGeneralMessage.InfoChannelRef = situation.Channel
+		siriGeneralMessage.InfoMessageVersion = situation.Version
+		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
+		siriGeneralMessage.RecordedAtTime = situation.RecordedAt
+		response.GeneralMessages = append(response.GeneralMessages, siriGeneralMessage)
 	}
 
 	logSIRIGeneralMessageResponse(logStashEvent, response)
