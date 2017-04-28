@@ -24,6 +24,7 @@ var Config = struct {
 	LogStash string
 	Syslog   bool
 	Debug    bool
+	ApiKey   string
 }{}
 
 func LoadConfig(path string) error {
@@ -47,7 +48,6 @@ func LoadConfig(path string) error {
 		}
 		yaml.Unmarshal(data, &Config)
 	}
-
 	// database config
 	LoadDatabaseConfig(configPath)
 

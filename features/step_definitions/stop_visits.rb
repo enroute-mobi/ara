@@ -8,7 +8,7 @@ end
 
 
 Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
-  RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json}
+  RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
 
 When(/^a StopVisit is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
@@ -20,13 +20,13 @@ When(/^a StopVisit is created (?:in Referential "([^"]+)" )?with the following a
 end
 
 Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, attributes|
-	response = RestClient.get stop_visit_path(identifier)
+	response = RestClient.get stop_visit_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
 	stopVisitAttributes = api_attributes(response.body)
   expect(stopVisitAttributes).to include(model_attributes(attributes))
 end
 
 Then(/^one StopVisit has the following attributes:$/) do |attributes|
-  response = RestClient.get stop_visits_path
+  response = RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = JSON.parse(response.body)
 
   called_method = has_attributes(response_array, attributes)
@@ -36,8 +36,8 @@ end
 
 
 Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(stop_visit_path("#{kind}:#{value}", referential: referential)){|response, request, result| response }
-  
+  response = RestClient.get(stop_visit_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+
   if condition.nil?
     expect(response.code).to eq(200)
   else

@@ -1,5 +1,5 @@
 def show_me(model_type, referential = "test")
-  response = RestClient.get send("#{model_type}_path", referential: referential)
+  response = RestClient.get send("#{model_type}_path", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   puts JSON.pretty_generate(JSON.parse(response))
 end
 

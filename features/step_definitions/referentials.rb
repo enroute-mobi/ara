@@ -8,17 +8,19 @@ end
 
 Given(/^a Referential "([^"]+)" exists$/) do |referential|
   attributes = {
-    slug: referential
+    slug: referential,
+    tokens: [$token]
   }
-  RestClient.post referentials_path, attributes.to_json, {content_type: :json}
+  RestClient.post referentials_path, attributes.to_json, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
 end
 
 Given(/^a Referential "([^"]*)" exists with the following settings:$/) do |referential, settings|
   attributes = {
-    slug: referential
+    slug: referential,
+    tokens: [$token]
   }
   attributes[:settings] = settings.rows_hash if settings
-  RestClient.post referentials_path, attributes.to_json, {content_type: :json}
+  RestClient.post referentials_path, attributes.to_json, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
 end
 
 When(/^a Referential "([^"]+)" is created$/) do |referential|
@@ -26,15 +28,15 @@ When(/^a Referential "([^"]+)" is created$/) do |referential|
 end
 
 When(/^the Referential "([^"]+)" is destroyed$/) do |referential|
-  response = RestClient.get referentials_path
+  response = RestClient.get referentials_path, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
   responseHash = JSON.parse(response.body)
 
   id = responseHash.find{|a| a["Slug"] == referential}["Id"]
-  RestClient.delete referential_path(id)
+  RestClient.delete referential_path(id), {:Authorization => "Token token=#{$adminToken}"}
 end
 
 Then(/^a Referential "([^"]+)" should (not )?exist$/) do |referential, condition|
-  response = RestClient.get referentials_path
+  response = RestClient.get referentials_path, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
   responseHash = JSON.parse(response.body)
 
   if condition.nil?

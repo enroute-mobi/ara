@@ -1,3 +1,4 @@
 #logstash: localhost:10000
 #syslog:   true
 debug:    true
+apikey:   "6ceab96a-8d97-4f2a-8d69-32569a38fc64"

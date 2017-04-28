@@ -68,7 +68,7 @@ func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, 
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.APIHandler)
+	handler := http.HandlerFunc(server.HandleFlow)
 
 	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(responseRecorder, request)

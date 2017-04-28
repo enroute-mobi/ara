@@ -23,7 +23,7 @@ func statusPrepareRequest(method string, t *testing.T) (responseRecorder *httpte
 
 	responseRecorder = httptest.NewRecorder()
 
-	server.APIHandler(responseRecorder, request)
+	server.HandleFlow(responseRecorder, request)
 
 	return
 }

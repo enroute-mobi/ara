@@ -32,6 +32,7 @@ type Referential struct {
 	partners       Partners
 	startedAt      time.Time
 	nextReloadAt   time.Time
+	Tokens         []string
 }
 
 type Referentials interface {
@@ -53,6 +54,7 @@ type APIReferential struct {
 	Slug     ReferentialSlug   `json:"Slug,omitempty"`
 	Errors   Errors            `json:"Errors,omitempty"`
 	Settings map[string]string `json:"Settings,omitempty"`
+	Tokens   []string          `json:"Tokens,omitempty"`
 
 	manager Referentials
 }
@@ -154,6 +156,10 @@ func (referential *Referential) FillReferential(referentialMap map[string]interf
 	if !referential.partners.IsEmpty() {
 		referentialMap["Partners"] = referential.partners
 	}
+
+	if len(referential.Tokens) > 0 {
+		referentialMap["Tokens"] = referential.Tokens
+	}
 }
 
 func (referential *Referential) MarshalJSON() ([]byte, error) {
@@ -177,6 +183,7 @@ func (referential *Referential) Definition() *APIReferential {
 		Settings: settings,
 		Errors:   NewErrors(),
 		manager:  referential.manager,
+		Tokens:   referential.Tokens,
 	}
 }
 
@@ -185,6 +192,7 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 
 	referential.slug = apiReferential.Slug
 	referential.Settings = apiReferential.Settings
+	referential.Tokens = apiReferential.Tokens
 
 	if initialReloadAt != referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT) {
 		referential.setNextReloadAt()

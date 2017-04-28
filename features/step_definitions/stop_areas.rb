@@ -7,7 +7,7 @@ def stop_area_path(id, attributes = {})
 end
 
 Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
-  RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json}
+  RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
 
 When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
@@ -19,14 +19,14 @@ When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following at
 end
 
 When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, value, referential|
-  response = RestClient.get stop_area_path("#{kind}:#{value}", referential: referential)
+  response = RestClient.get stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   expectedStopArea = JSON.parse(response.body)
 
-  RestClient.delete stop_area_path expectedStopArea["Id"]
+  RestClient.delete stop_area_path(expectedStopArea["Id"]), {:Authorization => "Token token=#{$token}"}
 end
 
 Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
-  response = RestClient.get stop_areas_path(referential: referential)
+  response = RestClient.get stop_areas_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = api_attributes(response.body)
 
   called_method = has_attributes(response_array, attributes)
@@ -35,8 +35,8 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
 end
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
- response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential)){|response, request, result| response }
-  
+ response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+
   if condition.nil?
     expect(response.code).to eq(200)
   else

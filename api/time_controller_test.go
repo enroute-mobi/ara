@@ -42,8 +42,8 @@ func timePrepareRequest(method string, advance bool, body []byte, t *testing.T) 
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call APIHandler method and pass in our Request and ResponseRecorder.
-	server.APIHandler(responseRecorder, request)
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
 
 	return
 }

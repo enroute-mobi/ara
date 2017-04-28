@@ -6,7 +6,7 @@ Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors
 	attributes = {"slug" => slug, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => settings.rows_hash}
 
   begin
-	  RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json}
+	  RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
   rescue RestClient::ExceptionWithResponse => err
     puts err.response.body
     raise err

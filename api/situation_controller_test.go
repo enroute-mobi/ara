@@ -29,6 +29,7 @@ func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t 
 	server := &Server{}
 	server.SetReferentials(referentials)
 	referential = referentials.New("default")
+	referential.Tokens = []string{"testToken"}
 	referential.Save()
 
 	// Set the fake UUID generator
@@ -47,11 +48,12 @@ func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t 
 		t.Fatal(err)
 	}
 
+	request.Header.Set("Authorization", "Token token=testToken")
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call APIHandler method and pass in our Request and ResponseRecorder.
-	server.APIHandler(responseRecorder, request)
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
 
 	return
 }
