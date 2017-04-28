@@ -4,7 +4,15 @@ Feature: Support SIRI GeneralMessage
       Given a Referential "test" is created
 
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
-    Given a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
+    Given a Situation exists with the following attributes:
+      | ObjectIDs               | "internal" : "3477"                                                        |
+      | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
+      | Version                 | 1                                                                          |
+      | Channel                 | Commercial                                                                 |
+      | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
+      | Messages[0]#MessageType | longMessage                                                                |
+      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+    And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | internal       |
     When I send this SIRI request
@@ -68,22 +76,6 @@ Feature: Support SIRI GeneralMessage
                       <MessageText xml:lang="NL">La nouvelle carte
                       d'abonnement est disponible au points de vente du
                       réseau</MessageText>
-                    </Message>
-                  </ns3:Content>
-                </ns3:GeneralMessage>
-                <ns3:GeneralMessage formatRef="FRANCE">
-                  <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>3471</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:21_1</ns3:InfoMessageIdentifier>
-                  <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>2017-03-29T22:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:type="ns9:IDFGeneralMessageStructure">
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText xml:lang="NL">Les nouveaux tarifs sont
-                      consultable sur le site internet</MessageText>
                     </Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
