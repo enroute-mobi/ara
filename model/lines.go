@@ -19,7 +19,7 @@ type Line struct {
 
 	id LineId
 
-	Name       string
+	Name       string `json:",omitempty"`
 	Attributes Attributes
 	References References
 }
@@ -39,32 +39,30 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
-func (line *Line) FillLine(lineMap map[string]interface{}) {
-	if line.id != "" {
-		lineMap["Id"] = line.id
-	}
-
-	if line.Name != "" {
-		lineMap["Name"] = line.Name
-	}
-
-	if !line.Attributes.IsEmpty() {
-		lineMap["Attributes"] = line.Attributes
-	}
-
-	if !line.References.IsEmpty() {
-		lineMap["References"] = line.References
-	}
-}
-
 func (line *Line) MarshalJSON() ([]byte, error) {
-	lineMap := make(map[string]interface{})
+	type Alias Line
+	aux := struct {
+		Id         LineId
+		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		Attributes Attributes `json:",omitempty"`
+		References References `json:",omitempty"`
+		*Alias
+	}{
+		Id:    line.id,
+		Alias: (*Alias)(line),
+	}
 
 	if !line.ObjectIDs().Empty() {
-		lineMap["ObjectIDs"] = line.ObjectIDs()
+		aux.ObjectIDs = line.ObjectIDs()
 	}
-	line.FillLine(lineMap)
-	return json.Marshal(lineMap)
+	if !line.Attributes.IsEmpty() {
+		aux.Attributes = line.Attributes
+	}
+	if !line.References.IsEmpty() {
+		aux.References = line.References
+	}
+
+	return json.Marshal(&aux)
 }
 
 func (line *Line) UnmarshalJSON(data []byte) error {

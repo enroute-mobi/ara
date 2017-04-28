@@ -35,6 +35,21 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Messages\[(\d+)\]#(\S+)/
+      message_number = $1.to_i
+      attribute = $2
+
+      attributes["Messages"] ||= []
+
+      until attributes["Messages"].length >= message_number+1
+        attributes["Messages"] << {}
+      end
+      message = attributes["Messages"][message_number]
+
+      message[attribute] = value
+      attributes.delete key
+    end
+
     if key =~ /Attribute\[([^\]]+)\]/
       name = $1
       attributes["Attributes"] ||= {}

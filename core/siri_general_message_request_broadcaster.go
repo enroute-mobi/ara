@@ -46,6 +46,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
+	response.RequestMessageRef = request.MessageIdentifier()
 
 	objectidKind := connector.RemoteObjectIDKind()
 
@@ -61,6 +62,8 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		xmlGeneralMessage.RecordedAtTime = situation.RecordedAt
 		response.GeneralMessages = append(response.GeneralMessages, xmlGeneralMessage)
 	}
+
+	logSIRIGeneralMessageResponse(logStashEvent, response)
 	return response, nil
 }
 

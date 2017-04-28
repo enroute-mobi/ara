@@ -205,15 +205,18 @@ func (partner *Partner) Save() (ok bool) {
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
-	partnerMap := map[string]interface{}{
-		"Id":                 partner.id,
-		"Slug":               partner.slug,
-		"Settings":           partner.Settings,
-		"ConnectorTypes":     partner.ConnectorTypes,
-		"OperationnalStatus": partner.operationnalStatus,
-	}
-	return json.Marshal(partnerMap)
-
+	type Alias Partner
+	return json.Marshal(&struct {
+		Id                 PartnerId
+		Slug               PartnerSlug
+		OperationnalStatus OperationnalStatus
+		*Alias
+	}{
+		Id:                 partner.id,
+		Slug:               partner.slug,
+		OperationnalStatus: partner.operationnalStatus,
+		Alias:              (*Alias)(partner),
+	})
 }
 
 func (partner *Partner) Definition() *APIPartner {

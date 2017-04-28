@@ -51,7 +51,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 		Settings:           make(map[string]string),
 		ConnectorTypes:     []string{},
 	}
-	expected := `{"ConnectorTypes":[],"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","OperationnalStatus":"unknown","Settings":{},"Slug":"partner"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","OperationnalStatus":"unknown","ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

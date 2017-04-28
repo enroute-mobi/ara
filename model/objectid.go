@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -78,19 +79,25 @@ func (objectid *ObjectID) MarshalJSON() ([]byte, error) {
 }
 
 func (objectid *ObjectID) UnmarshalJSON(data []byte) error {
+	var aux map[string]string
 
-	aux := &struct {
-		Kind  string
-		Value string
-	}{}
-
-	err := json.Unmarshal(data, aux)
+	err := json.Unmarshal(data, &aux)
 	if err != nil {
 		return err
 	}
 
-	objectid.kind = aux.Kind
-	objectid.value = aux.Value
+	if aux == nil {
+		return nil
+	}
+
+	if len(aux) > 1 {
+		return errors.New("ObjectID should look like KIND:VALUE")
+	}
+
+	for kind, value := range aux {
+		objectid.kind = kind
+		objectid.value = value
+	}
 
 	return nil
 }

@@ -1,43 +1,125 @@
 package model
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+	"time"
+)
+
+func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdateEvent) {
+	event = &SituationUpdateEvent{
+		RecordedAt:        testTime,
+		SituationObjectID: objectid,
+		Version:           1,
+		ProducerRef:       "Edwig",
+	}
+
+	message := &Message{
+		Content:             "Message Text",
+		Type:                "MessageType",
+		NumberOfLines:       2,
+		NumberOfCharPerLine: 20,
+	}
+
+	event.SituationAttributes = SituationAttributes{
+		Format:     "format",
+		Channel:    "channel",
+		References: NewReferences(),
+		Messages:   []*Message{message},
+		ValidUntil: testTime,
+	}
+	event.SituationAttributes.References.Set("type", Reference{ObjectId: &objectid, Id: "id", Type: "type"})
+
+	return
+}
+
+func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) bool {
+	message := &Message{
+		Content:             "Message Text",
+		Type:                "MessageType",
+		NumberOfLines:       2,
+		NumberOfCharPerLine: 20,
+	}
+
+	testSituation := Situation{
+		id:          situation.id,
+		References:  NewReferences(),
+		Messages:    []*Message{message},
+		RecordedAt:  testTime,
+		ValidUntil:  testTime,
+		Format:      "format",
+		Channel:     "channel",
+		ProducerRef: "Edwig",
+		Version:     1,
+	}
+	testSituation.model = situation.model
+	testSituation.objectids = make(ObjectIDs)
+	testSituation.SetObjectID(objectid)
+	testSituation.References.Set("type", Reference{ObjectId: &objectid, Id: "id", Type: "type"})
+
+	return reflect.DeepEqual(situation, testSituation)
+}
 
 func Test_SituationUpdateManager_Update(t *testing.T) {
+	objectid := NewObjectID("kind", "value")
+	testTime := time.Now()
+
 	model := NewMemoryModel()
 	situation := model.Situations().New()
-	objectid := NewObjectID("kind", "value")
 	situation.SetObjectID(objectid)
 	model.Situations().Save(&situation)
+
 	manager := newSituationUpdateManager(model)
+	event := completeEvent(objectid, testTime)
+	manager.UpdateSituation([]*SituationUpdateEvent{event})
 
-	event := &SituationUpdateEvent{}
-	event.Version = 1
-	event.SituationObjectID = objectid
-
-	events := append([]*SituationUpdateEvent{}, event)
-
-	manager.UpdateSituation(events)
 	updatedSituation, _ := model.Situations().Find(situation.Id())
-	if updatedSituation.Version != 1 {
-		t.Errorf("Situation Version should be 1")
+	if !checkSituation(updatedSituation, objectid, testTime) {
+		t.Errorf("Situation is not properly updated:\n got: %v\n event: %v", updatedSituation, event)
+	}
+}
+
+func Test_SituationUpdateManager_SameVersion(t *testing.T) {
+	objectid := NewObjectID("kind", "value")
+	testTime := time.Now()
+
+	model := NewMemoryModel()
+	situation := model.Situations().New()
+	situation.SetObjectID(objectid)
+	situation.Version = 1
+	situation.Channel = "SituationChannel"
+	model.Situations().Save(&situation)
+
+	manager := newSituationUpdateManager(model)
+	event := completeEvent(objectid, testTime)
+	manager.UpdateSituation([]*SituationUpdateEvent{event})
+
+	updatedSituation, _ := model.Situations().Find(situation.Id())
+	if checkSituation(updatedSituation, objectid, testTime) {
+		t.Errorf("Situation should not be updated:\n got: %v\n event: %v", updatedSituation, event)
+	}
+	if updatedSituation.Channel != "SituationChannel" {
+		t.Errorf("Situation Channel should not have been updated:\n got: %v\n want: SituationChannel", updatedSituation.Channel)
 	}
 }
 
 func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
+	objectid := NewObjectID("kind", "value")
+	testTime := time.Now()
+
 	model := NewMemoryModel()
-	tx := NewTransaction(model)
 
-	defer tx.Close()
+	manager := newSituationUpdateManager(model)
+	event := completeEvent(objectid, testTime)
+	manager.UpdateSituation([]*SituationUpdateEvent{event})
 
-	event := &SituationUpdateEvent{}
+	situations := model.Situations().FindAll()
+	if len(situations) != 1 {
+		t.Fatalf("Should find 1 situation, got %v", len(situations))
+	}
 
-	situationUpdater := NewSituationUpdater(tx, nil)
-	situationUpdater.SetClock(NewFakeClock())
-	situationUpdater.CreateSituationFromEvent(event)
-	tx.Commit()
-
-	nb := model.Situations().FindAll()
-	if len(nb) != 1 {
-		t.Errorf("Should find 1 situation %v", len(nb))
+	situation := situations[0]
+	if !checkSituation(situation, objectid, testTime) {
+		t.Errorf("Situation is not properly created:\n got: %v\n event: %v", situation, event)
 	}
 }

@@ -23,7 +23,7 @@ type Referential struct {
 	id   ReferentialId
 	slug ReferentialSlug
 
-	Settings map[string]string
+	Settings map[string]string `json:"Settings,omitempty"`
 
 	collectManager CollectManagerInterface
 	manager        Referentials
@@ -32,7 +32,7 @@ type Referential struct {
 	partners       Partners
 	startedAt      time.Time
 	nextReloadAt   time.Time
-	Tokens         []string
+	Tokens         []string `json:",omitempty"`
 }
 
 type Referentials interface {
@@ -136,39 +136,32 @@ func (referential *Referential) NewTransaction() *model.Transaction {
 	return model.NewTransaction(referential.model)
 }
 
-func (referential *Referential) FillReferential(referentialMap map[string]interface{}) {
-	if referential.id != "" {
-		referentialMap["Id"] = referential.id
-	}
-
-	if referential.slug != "" {
-		referentialMap["Slug"] = referential.slug
-	}
-
-	if len(referential.Settings) > 0 {
-		referentialMap["Settings"] = referential.Settings
+func (referential *Referential) MarshalJSON() ([]byte, error) {
+	type Alias Referential
+	aux := struct {
+		Id           ReferentialId
+		Slug         ReferentialSlug
+		NextReloadAt *time.Time `json:",omitempty"`
+		Partners     Partners   `json:",omitempty"`
+		*Alias
+	}{
+		Id:    referential.id,
+		Slug:  referential.slug,
+		Alias: (*Alias)(referential),
 	}
 
 	if !referential.nextReloadAt.IsZero() {
-		referentialMap["NextReloadAt"] = referential.nextReloadAt
+		aux.NextReloadAt = &referential.nextReloadAt
 	}
-
 	if !referential.partners.IsEmpty() {
-		referentialMap["Partners"] = referential.partners
+		aux.Partners = referential.partners
 	}
 
-	if len(referential.Tokens) > 0 {
-		referentialMap["Tokens"] = referential.Tokens
-	}
-}
+	// if len(referential.Tokens) > 0 {
+	// 	referentialMap["Tokens"] = referential.Tokens
+	// }
 
-func (referential *Referential) MarshalJSON() ([]byte, error) {
-
-	referentialMap := make(map[string]interface{})
-
-	referential.FillReferential(referentialMap)
-
-	return json.Marshal(referentialMap)
+	return json.Marshal(&aux)
 }
 
 func (referential *Referential) Definition() *APIReferential {
@@ -303,6 +296,7 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 	}
 	referential.manager = manager
 	referential.collectManager.HandleStopAreaUpdateEvent(model.NewStopAreaUpdateManager(referential))
+	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential))
 	manager.byId[referential.id] = referential
 	return true
 }

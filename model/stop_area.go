@@ -60,44 +60,42 @@ func (stopArea *StopArea) Updated(updateTime time.Time) {
 	stopArea.collectedAt = updateTime
 }
 
-func (stopArea *StopArea) FillStopArea(stopAreaMap map[string]interface{}) {
-	if stopArea.id != "" {
-		stopAreaMap["Id"] = stopArea.id
+func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
+	type Alias StopArea
+	aux := struct {
+		Id             StopAreaId
+		ObjectIDs      ObjectIDs  `json:",omitempty"`
+		NextCollectAt  *time.Time `json:",omitempty"`
+		CollectedAt    *time.Time `json:",omitempty"`
+		CollectedUntil *time.Time `json:",omitempty"`
+		Attributes     Attributes `json:",omitempty"`
+		References     References `json:",omitempty"`
+		*Alias
+	}{
+		Id:    stopArea.id,
+		Alias: (*Alias)(stopArea),
 	}
 
-	if stopArea.Name != "" {
-		stopAreaMap["Name"] = stopArea.Name
+	if !stopArea.ObjectIDs().Empty() {
+		aux.ObjectIDs = stopArea.ObjectIDs()
 	}
-
 	if !stopArea.Attributes.IsEmpty() {
-		stopAreaMap["Attributes"] = stopArea.Attributes
+		aux.Attributes = stopArea.Attributes
 	}
-
 	if !stopArea.References.IsEmpty() {
-		stopAreaMap["References"] = stopArea.References
+		aux.References = stopArea.References
 	}
-
 	if !stopArea.NextCollectAt.IsZero() {
-		stopAreaMap["NextCollectAt"] = stopArea.NextCollectAt
+		aux.NextCollectAt = &stopArea.NextCollectAt
 	}
 	if !stopArea.collectedAt.IsZero() {
-		stopAreaMap["CollectedAt"] = stopArea.collectedAt
+		aux.CollectedAt = &stopArea.collectedAt
 	}
-	if !stopArea.ObjectIDs().Empty() {
-		stopAreaMap["ObjectIDs"] = stopArea.ObjectIDs()
+	if !stopArea.CollectedAlways && !stopArea.CollectedUntil.IsZero() {
+		aux.CollectedUntil = &stopArea.CollectedUntil
 	}
-	if stopAreaMap["CollectedAlways"] == false {
-		stopAreaMap["CollectedUntil"] = stopArea.CollectedUntil
-	}
-	stopAreaMap["CollectedAlways"] = stopArea.CollectedAlways
-}
 
-func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
-	stopAreaMap := make(map[string]interface{})
-
-	stopArea.FillStopArea(stopAreaMap)
-
-	return json.Marshal(stopAreaMap)
+	return json.Marshal(&aux)
 }
 
 func (stopArea *StopArea) Attribute(key string) (string, bool) {

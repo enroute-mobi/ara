@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -99,19 +98,22 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 	}
 
 	if expected := 1; situationEvent.Version != int64(expected) {
-		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Format)
+		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.Version)
 	}
 
 	if expected := "Commercial"; situationEvent.SituationAttributes.Channel != expected {
-		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Format)
+		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Channel)
 	}
 
 	if expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00"); !situationEvent.SituationAttributes.ValidUntil.Equal(expected) {
 		t.Errorf("Wrong ValidUntil for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.ValidUntil)
 	}
 
+	if expected := "NINOXE:default"; situationEvent.ProducerRef != "NINOXE:default" {
+		t.Errorf("Wrong ProducerRef for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.ProducerRef)
+	}
+
 	messages := situationEvent.SituationAttributes.Messages
-	fmt.Println(messages[0], "\n\n", messages[1])
 
 	if len(messages) != 2 {
 		t.Error("messages length should be 2")

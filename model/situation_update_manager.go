@@ -9,8 +9,8 @@ type SituationUpdateManager struct {
 type SituationUpdater struct {
 	ClockConsumer
 
-	tx    *Transaction
-	event []*SituationUpdateEvent
+	tx     *Transaction
+	events []*SituationUpdateEvent
 }
 
 func NewSituationUpdateManager(transactionProvider TransactionProvider) func([]*SituationUpdateEvent) {
@@ -22,48 +22,39 @@ func newSituationUpdateManager(transactionProvider TransactionProvider) *Situati
 	return &SituationUpdateManager{transactionProvider: transactionProvider}
 }
 
-func (manager *SituationUpdateManager) UpdateSituation(event []*SituationUpdateEvent) {
+func (manager *SituationUpdateManager) UpdateSituation(events []*SituationUpdateEvent) {
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
-	NewSituationUpdater(tx, event).Update()
+	NewSituationUpdater(tx, events).Update()
 
 	tx.Commit()
 }
 
-func NewSituationUpdater(tx *Transaction, event []*SituationUpdateEvent) *SituationUpdater {
-	return &SituationUpdater{tx: tx, event: event}
-}
-
-func (updater *SituationUpdater) CreateSituationFromEvent(event *SituationUpdateEvent) *Situation {
-
-	situation := updater.tx.Model().Situations().New()
-	situation.SetObjectID(event.SituationObjectID)
-	situation.References = event.SituationAttributes.References
-	situation.Messages = event.SituationAttributes.Messages
-	situation.ValidUntil = event.SituationAttributes.ValidUntil
-	situation.Channel = event.SituationAttributes.Channel
-	situation.Format = event.SituationAttributes.Format
-
-	situation.Save()
-	return &situation
+func NewSituationUpdater(tx *Transaction, events []*SituationUpdateEvent) *SituationUpdater {
+	return &SituationUpdater{tx: tx, events: events}
 }
 
 func (updater *SituationUpdater) Update() {
-	for _, event := range updater.event {
-		existingSituation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
-		if ok && existingSituation.Version != event.Version {
-			existingSituation.RecordedAt = event.RecordedAt
-			existingSituation.Version = event.Version
-
-			existingSituation.References = event.SituationAttributes.References
-			existingSituation.Messages = event.SituationAttributes.Messages
-			existingSituation.ValidUntil = event.SituationAttributes.ValidUntil
-			existingSituation.Channel = event.SituationAttributes.Channel
-			existingSituation.Format = event.SituationAttributes.Format
-			existingSituation.Save()
+	for _, event := range updater.events {
+		situation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
+		if ok && situation.Version == event.Version {
 			return
 		}
-		updater.CreateSituationFromEvent(event)
+		if !ok {
+			situation = updater.tx.Model().Situations().New()
+			situation.SetObjectID(event.SituationObjectID)
+		}
+		situation.RecordedAt = event.RecordedAt
+		situation.Version = event.Version
+		situation.ProducerRef = event.ProducerRef
+
+		situation.References = event.SituationAttributes.References
+		situation.Messages = event.SituationAttributes.Messages
+		situation.ValidUntil = event.SituationAttributes.ValidUntil
+		situation.Channel = event.SituationAttributes.Channel
+		situation.Format = event.SituationAttributes.Format
+
+		situation.Save()
 	}
 }

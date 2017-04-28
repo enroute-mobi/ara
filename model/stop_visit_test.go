@@ -16,23 +16,21 @@ func Test_StopVisit_Id(t *testing.T) {
 	}
 }
 
-// WIP: Determine what to return in JSON
-// func Test_StopVisit_MarshalJSON(t *testing.T) {
-// 	stopVisit := StopVisit{
-// 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-// 		Name: "Test",
-// 	}
-// 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"Test"}`
-// 	jsonBytes, err := stopVisit.MarshalJSON()
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+func Test_StopVisit_MarshalJSON(t *testing.T) {
+	stopVisit := StopVisit{
+		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+	}
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"VehicleAtStop":false}`
+	jsonBytes, err := stopVisit.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	jsonString := string(jsonBytes)
-// 	if jsonString != expected {
-// 		t.Errorf("StopVisit.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
-// 	}
-// }
+	jsonString := string(jsonBytes)
+	if jsonString != expected {
+		t.Errorf("StopVisit.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
+}
 
 func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	text := `{

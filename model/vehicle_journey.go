@@ -17,8 +17,8 @@ type VehicleJourney struct {
 
 	id VehicleJourneyId
 
-	LineId     LineId
-	Name       string
+	LineId     LineId `json:",omitempty"`
+	Name       string `json:",omitempty"`
 	Attributes Attributes
 	References References
 }
@@ -45,52 +45,39 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 	return &line
 }
 
-func (vehicleJourney *VehicleJourney) FillVehicleJourney(vehicleJourneyMap map[string]interface{}) {
-
-	stopVisitIds := []StopVisitId{}
-	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
-		stopVisitIds = append(stopVisitIds, stopVisit.Id())
-	}
-
-	if len(stopVisitIds) > 0 {
-		vehicleJourneyMap["StopVisits"] = stopVisitIds
-	}
-
-	if vehicleJourney.id != "" {
-		vehicleJourneyMap["Id"] = vehicleJourney.id
-	}
-
-	if vehicleJourney.LineId != "" {
-		vehicleJourneyMap["LineId"] = vehicleJourney.LineId
-	}
-
-	if vehicleJourney.Name != "" {
-		vehicleJourneyMap["Name"] = vehicleJourney.Name
-	}
-
-	if !vehicleJourney.Attributes.IsEmpty() {
-		vehicleJourneyMap["Attributes"] = vehicleJourney.Attributes
-	}
-
-	if !vehicleJourney.References.IsEmpty() {
-		vehicleJourneyMap["References"] = vehicleJourney.References
+func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
+	type Alias VehicleJourney
+	aux := struct {
+		Id         VehicleJourneyId
+		ObjectIDs  ObjectIDs     `json:",omitempty"`
+		StopVisits []StopVisitId `json:",omitempty"`
+		Attributes Attributes    `json:",omitempty"`
+		References References    `json:",omitempty"`
+		*Alias
+	}{
+		Id:    vehicleJourney.id,
+		Alias: (*Alias)(vehicleJourney),
 	}
 
 	if !vehicleJourney.ObjectIDs().Empty() {
-		vehicleJourneyMap["ObjectIDs"] = vehicleJourney.ObjectIDs()
+		aux.ObjectIDs = vehicleJourney.ObjectIDs()
 	}
-}
+	if !vehicleJourney.Attributes.IsEmpty() {
+		aux.Attributes = vehicleJourney.Attributes
+	}
+	if !vehicleJourney.References.IsEmpty() {
+		aux.References = vehicleJourney.References
+	}
 
-func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	stopVisitIds := []StopVisitId{}
 	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
 		stopVisitIds = append(stopVisitIds, stopVisit.Id())
 	}
+	if len(stopVisitIds) > 0 {
+		aux.StopVisits = stopVisitIds
+	}
 
-	vehicleJourneyMap := make(map[string]interface{})
-	vehicleJourney.FillVehicleJourney(vehicleJourneyMap)
-
-	return json.Marshal(vehicleJourneyMap)
+	return json.Marshal(&aux)
 }
 
 func (vehicleJourney *VehicleJourney) ToFormat() []string {
