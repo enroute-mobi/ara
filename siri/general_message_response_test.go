@@ -127,12 +127,12 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 	expedtedMessages := expectedContent.Messages()[0]
 	gotMessages := gotContent.Messages()[0]
 
-	if expedtedMessages.Content != gotMessages.Content {
-		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.Content, gotMessages.Content)
+	if expedtedMessages.messageText != gotMessages.messageText {
+		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.messageText, gotMessages.messageText)
 	}
 
-	if expedtedMessages.NumberOfLines != gotMessages.NumberOfLines {
-		t.Errorf("Wrong Message NumberOfLines: \n got: %v\nwant: %v", expedtedMessages.NumberOfLines, gotMessages.NumberOfLines)
+	if expedtedMessages.numberOfLines != gotMessages.numberOfLines {
+		t.Errorf("Wrong Message NumberOfLines: \n got: %v\nwant: %v", expedtedMessages.numberOfLines, gotMessages.numberOfLines)
 	}
 
 	expectedLineSection := expectedContent.LineSection()

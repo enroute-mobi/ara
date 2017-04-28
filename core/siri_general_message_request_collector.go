@@ -73,7 +73,15 @@ func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(si
 		situationEvent.SetId(model.SituationUpdateRequestId(connector.NewUUID()))
 		if xmlGeneralMessage.Content() != nil {
 			content := xmlGeneralMessage.Content().(siri.IDFGeneralMessageStructure)
-			situationEvent.SituationAttributes.Messages = content.Messages()
+			for _, xmlMessage := range content.Messages() {
+				message := &model.Message{
+					Content:             xmlMessage.MessageText(),
+					Type:                xmlMessage.MessageType(),
+					NumberOfLines:       xmlMessage.NumberOfLines(),
+					NumberOfCharPerLine: xmlMessage.NumberOfCharPerLine(),
+				}
+				situationEvent.SituationAttributes.Messages = append(situationEvent.SituationAttributes.Messages, message)
+			}
 		}
 		situationEvent.SituationAttributes.Format = xmlGeneralMessage.Format()
 		situationEvent.SituationAttributes.Channel = xmlGeneralMessage.InfoChannelRef()

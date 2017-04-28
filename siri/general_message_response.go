@@ -2,7 +2,6 @@ package siri
 
 import (
 	"bytes"
-	rxml "encoding/xml"
 	"fmt"
 	"text/template"
 	"time"
@@ -36,7 +35,7 @@ type XMLGeneralMessage struct {
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	messages          []*model.Message
+	messages          []*XMLMessage
 	lineRef           string
 	stopPointRef      string
 	journeyPatternRef string
@@ -45,6 +44,15 @@ type IDFGeneralMessageStructure struct {
 	format            string
 	groupOfLinesRef   string
 	lineSection       IDFLineSectionStructure
+}
+
+type XMLMessage struct {
+	XMLStructure
+
+	messageText         string
+	messageType         string
+	numberOfLines       int
+	numberOfCharPerLine int
 }
 
 type IDFLineSectionStructure struct {
@@ -155,17 +163,14 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMess
 	return response.xmlGeneralMessages
 }
 
-func (visit *IDFGeneralMessageStructure) Messages() []*model.Message {
+func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 	if len(visit.messages) == 0 {
 		nodes := visit.findNodes("Message")
 		if nodes == nil {
 			return visit.messages
 		}
-		unmashallMessage := model.Message{}
-		for _, message := range nodes {
-			rxml.Unmarshal([]byte(message.NativeNode().String()), &unmashallMessage)
-			tmp := unmashallMessage
-			visit.messages = append(visit.messages, &tmp)
+		for _, messageNode := range nodes {
+			visit.messages = append(visit.messages, NewXMLMessage(messageNode))
 		}
 	}
 	return visit.messages
@@ -190,6 +195,12 @@ func NewXMLGeneralMessage(node XMLNode) *XMLGeneralMessage {
 	generalMessage := &XMLGeneralMessage{}
 	generalMessage.node = node
 	return generalMessage
+}
+
+func NewXMLMessage(node XMLNode) *XMLMessage {
+	message := &XMLMessage{}
+	message.node = node
+	return message
 }
 
 func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {
@@ -334,6 +345,34 @@ func (visit *IDFLineSectionStructure) LineRef() string {
 		visit.lineRef = visit.findStringChildContent("LineRef")
 	}
 	return visit.lineRef
+}
+
+func (message *XMLMessage) MessageText() string {
+	if message.messageText == "" {
+		message.messageText = message.findStringChildContent("MessageText")
+	}
+	return message.messageText
+}
+
+func (message *XMLMessage) MessageType() string {
+	if message.messageType == "" {
+		message.messageType = message.findStringChildContent("MessageType")
+	}
+	return message.messageType
+}
+
+func (message *XMLMessage) NumberOfLines() int {
+	if message.numberOfLines == 0 {
+		message.numberOfLines = message.findIntChildContent("NumberOfLines")
+	}
+	return message.numberOfLines
+}
+
+func (message *XMLMessage) NumberOfCharPerLine() int {
+	if message.numberOfCharPerLine == 0 {
+		message.numberOfCharPerLine = message.findIntChildContent("NumberOfCharPerLine")
+	}
+	return message.numberOfCharPerLine
 }
 
 func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {

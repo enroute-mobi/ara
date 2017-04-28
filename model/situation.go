@@ -8,10 +8,10 @@ import (
 type SituationId string
 
 type Message struct {
-	Content             string `xml:"MessageText" json:"MessageText,omitempty"`
-	Type                string `xml:"MessageType" json:"MessageType,omitempty"`
-	NumberOfLines       int    `xml:"NumberOfLines" json:",omitempty"`
-	NumberOfCharPerLine int    `xml:"NumberOfCharPerLine" json:",omitempty"`
+	Content             string `json:"MessageText,omitempty"`
+	Type                string `json:"MessageType,omitempty"`
+	NumberOfLines       int    `json:",omitempty"`
+	NumberOfCharPerLine int    `json:",omitempty"`
 }
 
 type Situation struct {
