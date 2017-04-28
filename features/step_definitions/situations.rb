@@ -7,6 +7,28 @@ def situation_path(id, attributes = {})
 end
 
 
+
+Given(/^a Situation exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, situation|
+  RestClient.post situations_path(referential: referential), model_attributes(situation).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+end
+
+When(/^a Situation is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, situation|
+  if referential.nil?
+    step "a Situation exists with the following attributes:", situation
+  else
+    step "a Situation exists in Referential \"#{referential}\" with the following attributes:", situation
+  end
+end
+
+When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
+  response = RestClient.get situations_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
+  responseArray = JSON.parse(response.body)
+  expectedSituation = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+
+  RestClient.delete situation_path(expectedSituation["Id"]), {:Authorization => "Token token=#{$token}"}
+end
+
+
 Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get situations_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}" }
   response_array = JSON.parse(response.body)
@@ -14,4 +36,15 @@ Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:
   called_method = has_attributes(response_array, attributes)
 
   expect(called_method).to be_truthy
+end
+
+Then(/^a Situation "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
+  response = RestClient.get(situation_path("#{kind}:#{value}" ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"} ){|response, request, result| response }
+
+  if condition.nil?
+    expect(response.code).to eq(200)
+  else
+    expect(response.code).to eq(500)
+    expect(response.body).to include("situation not found: #{kind}:#{value}")
+  end
 end
