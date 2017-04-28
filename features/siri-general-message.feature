@@ -271,8 +271,8 @@ Feature: Support SIRI GeneralMessage
       </S:Envelope>
       """
 
-  @wip
-  Scenario: Handle a GeneralMessage response (ServiceDelivery)
+
+  Scenario: 3032 - Handle a GeneralMessage response (ServiceDelivery)
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
