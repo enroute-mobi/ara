@@ -115,17 +115,17 @@ const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-
 						<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
 						<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 						xsi:type="ns9:IDFLineSectionStructure">{{range .Messages}}
-							<Message>
-								<MessageType>{{ .Type }}</MessageType>
-								<MessageText>{{ .Content }}</MessageText>
-								<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>
-								<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>
-							</Message>{{end}}
-							<LineSection>
-								<FirstStop>{{.FirstStop}}</FirstStop>
-							  <LastStop>{{.LastStop}}</LastStop>
-							  <LineRef>{{.LineRef}}</LineRef>
-							</LineSection>
+							<Message>{{if .Type}}
+								<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content}}
+								<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines}}
+								<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine}}
+								<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
+							</Message>{{end}}{{ if or .FirstStop .LastStop .LineRef}}
+							<LineSection>{{ if .FirstStop }}
+								<FirstStop>{{.FirstStop}}</FirstStop>{{end}}{{if .LastStop}}
+							  <LastStop>{{.LastStop}}</LastStop>{{end}}{{if .LineRef}}
+							  <LineRef>{{.LineRef}}</LineRef>{{end}}
+							</LineSection>{{end}}
 						</ns3:Content>
 					</ns3:GeneralMessage>{{end}}
 				</ns3:GeneralMessageDelivery>`
