@@ -13,7 +13,7 @@ Feature: Support SIRI GeneralMessage
       | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-    And a Partner "test" exists with connectors [siri-general-message-request-collector] and the following settings:
+    And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | internal       |
     When I send this SIRI request
