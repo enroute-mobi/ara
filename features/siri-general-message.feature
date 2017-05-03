@@ -56,7 +56,7 @@ Feature: Support SIRI GeneralMessage
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
               <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -71,10 +71,10 @@ Feature: Support SIRI GeneralMessage
                   <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:type="ns9:IDFGeneralMessageStructure">
+                  xsi:type="ns9:IDFLineSectionStructure">
                     <Message>
                       <MessageType>longMessage</MessageType>
-                      <MessageText xml:lang="NL">La nouvelle carte
+                      <MessageText>La nouvelle carte
                       d'abonnement est disponible au points de vente du
                       réseau</MessageText>
                     </Message>
