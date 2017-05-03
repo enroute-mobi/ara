@@ -62,12 +62,15 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 			}
 			siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 		}
-		//siriGeneralMessage.ItemIdentifier = situation.ItemIdentifier
-		siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
+
+		siriGeneralMessage.ItemIdentifier = objectid.Value()
+		//siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
 		siriGeneralMessage.InfoChannelRef = situation.Channel
 		siriGeneralMessage.InfoMessageVersion = situation.Version
 		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
 		siriGeneralMessage.RecordedAtTime = situation.RecordedAt
+		siriGeneralMessage.FormatRef = "STIF-IDF"
+
 		response.GeneralMessages = append(response.GeneralMessages, siriGeneralMessage)
 	}
 

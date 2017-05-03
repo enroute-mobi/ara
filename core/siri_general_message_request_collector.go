@@ -83,7 +83,7 @@ func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(si
 				situationEvent.SituationAttributes.Messages = append(situationEvent.SituationAttributes.Messages, message)
 			}
 		}
-		situationEvent.SituationAttributes.Format = xmlGeneralMessage.Format()
+		situationEvent.SituationAttributes.Format = xmlGeneralMessage.FormatRef()
 		situationEvent.SituationAttributes.Channel = xmlGeneralMessage.InfoChannelRef()
 		situationEvent.SituationAttributes.ValidUntil = xmlGeneralMessage.ValidUntilTime()
 		*situationEvents = append(*situationEvents, situationEvent)

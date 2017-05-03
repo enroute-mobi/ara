@@ -103,16 +103,16 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 		t.Errorf("Wrong ValidUntilTime: \n got: %v\nwant: %v", gotGM.ValidUntilTime(), expectedGM.ValidUntilTime())
 	}
 
-	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
-		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
-	}
-
 	if expectedGM.InfoMessageVersion() != gotGM.InfoMessageVersion() {
 		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", gotGM.InfoMessageVersion(), expectedGM.InfoMessageVersion())
 	}
 
 	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
 		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
+	}
+
+	if expectedGM.FormatRef() != gotGM.FormatRef() {
+		t.Errorf("Wrong FormatRef: \n got: %v\nwant: %v", gotGM.FormatRef(), expectedGM.FormatRef())
 	}
 
 	if expectedGM.InfoChannelRef() != gotGM.InfoChannelRef() {
@@ -169,10 +169,11 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 		<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
 			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
 			<ns3:Status>true</ns3:Status>
-			<ns3:GeneralMessage formatRef="FRANCE">
+			<ns3:GeneralMessage>
 				<ns3:RecordedAtTime>2016-09-21T20:14:46.000Z</ns3:RecordedAtTime>
 				<ns3:ValidUntilTime>2016-09-21T20:14:46.000Z</ns3:ValidUntilTime>
 				<ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
+				<ns3:formatRef>STIF-IDF</ns3:formatRef>
 				<ns3:InfoChannelRef>Chan</ns3:InfoChannelRef>
 				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFGeneralMessageStructure">
@@ -217,6 +218,7 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &SIRIMessage{Content: "Je suis un texte", Type: "Un Type"})
 	request.GeneralMessages[0].InfoMessageVersion = 1
 	request.GeneralMessages[0].InfoChannelRef = "Chan"
+	request.GeneralMessages[0].FormatRef = "STIF-IDF"
 
 	xml, err := request.BuildXML()
 	if err != nil {
