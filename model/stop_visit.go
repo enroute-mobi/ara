@@ -276,7 +276,6 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 			stopVisits = append(stopVisits, *stopVisit)
 		}
 	}
-
 	return
 }
 

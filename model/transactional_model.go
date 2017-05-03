@@ -3,25 +3,39 @@ package model
 type TransactionalModel struct {
 	parent Model
 
+	lines           *TransactionalLines
+	situations      *TransactionalSituations
+	subscriptions   *TransactionalSubscriptions
 	stopAreas       *TransactionalStopAreas
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
-	lines           *TransactionalLines
-	situations      *TransactionalSituations
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
 	model := &TransactionalModel{parent: parent}
+	model.lines = NewTransactionalLines(parent)
+	model.situations = NewTransactionalSituations(parent)
+	model.subscriptions = NewTransactionalSubscriptions(parent)
 	model.stopAreas = NewTransactionalStopAreas(parent)
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
-	model.lines = NewTransactionalLines(parent)
-	model.situations = NewTransactionalSituations(parent)
 	return model
 }
 
 func (model *TransactionalModel) Date() Date {
 	return model.parent.Date()
+}
+
+func (model *TransactionalModel) Lines() Lines {
+	return model.lines
+}
+
+func (model *TransactionalModel) Situations() Situations {
+	return model.situations
+}
+
+func (model *TransactionalModel) Subscriptions() Subscriptions {
+	return model.subscriptions
 }
 
 func (model *TransactionalModel) StopAreas() StopAreas {
@@ -34,14 +48,6 @@ func (model *TransactionalModel) StopVisits() StopVisits {
 
 func (model *TransactionalModel) VehicleJourneys() VehicleJourneys {
 	return model.vehicleJourneys
-}
-
-func (model *TransactionalModel) Lines() Lines {
-	return model.lines
-}
-
-func (model *TransactionalModel) Situations() Situations {
-	return model.situations
 }
 
 func (model *TransactionalModel) NewTransaction() *Transaction {

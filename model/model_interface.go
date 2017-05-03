@@ -1,12 +1,13 @@
 package model
 
 type Model interface {
+	Date() Date
+	Lines() Lines
 	Situations() Situations
+	Subscriptions() Subscriptions
 	StopAreas() StopAreas
 	StopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
-	Lines() Lines
-	Date() Date
 	// ...
 }
 
@@ -17,10 +18,25 @@ type MemoryModel struct {
 	lines           *MemoryLines
 	date            Date
 	situations      Situations
+	subscriptions   Subscriptions
 }
 
 func NewMemoryModel() *MemoryModel {
 	model := &MemoryModel{}
+
+	model.date = NewDate(DefaultClock().Now())
+
+	lines := NewMemoryLines()
+	lines.model = model
+	model.lines = lines
+
+	subscriptions := NewMemorySubscriptions()
+	subscriptions.model = model
+	model.subscriptions = subscriptions
+
+	situations := NewMemorySituations()
+	situations.model = model
+	model.situations = situations
 
 	stopAreas := NewMemoryStopAreas()
 	stopAreas.model = model
@@ -33,16 +49,6 @@ func NewMemoryModel() *MemoryModel {
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	vehicleJourneys.model = model
 	model.vehicleJourneys = vehicleJourneys
-
-	lines := NewMemoryLines()
-	lines.model = model
-	model.lines = lines
-
-	situations := NewMemorySituations()
-	situations.model = model
-	model.situations = situations
-
-	model.date = NewDate(DefaultClock().Now())
 
 	return model
 }
@@ -60,6 +66,10 @@ func (model *MemoryModel) Date() Date {
 
 func (model *MemoryModel) Situations() Situations {
 	return model.situations
+}
+
+func (model *MemoryModel) Subscriptions() Subscriptions {
+	return model.subscriptions
 }
 
 func (model *MemoryModel) StopAreas() StopAreas {
