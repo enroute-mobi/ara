@@ -50,9 +50,10 @@ type Partner struct {
 	ConnectorTypes []string
 	Settings       map[string]string
 
-	connectors map[string]Connector
-	context    Context
-	manager    Partners
+	connectors          map[string]Connector
+	context             Context
+	subscriptionManager Subscriptions
+	manager             Partners
 }
 
 type ByPriority []*Partner
@@ -163,17 +164,24 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 }
 
 func NewPartner() *Partner {
-	return &Partner{
+	partner := &Partner{
 		Settings:           make(map[string]string),
 		ConnectorTypes:     []string{},
 		connectors:         make(map[string]Connector),
 		context:            make(Context),
 		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 	}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+
+	return partner
 }
 
 func (partner *Partner) Referential() *Referential {
 	return partner.manager.Referential()
+}
+
+func (partner *Partner) Subscriptions() Subscriptions {
+	return partner.subscriptionManager
 }
 
 func (partner *Partner) Id() PartnerId {

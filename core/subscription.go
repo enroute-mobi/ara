@@ -1,29 +1,31 @@
-package model
+package core
 
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/af83/edwig/model"
 )
 
 type SubscriptionId string
 
 type Subscription struct {
-	ClockConsumer
+	model.ClockConsumer
 
 	id                  SubscriptionId
 	kind                string
-	model               Model
+	partner             *Partner
 	resourcesByObjectID map[string]*SubscribedResource
 }
 
 type SubscribedResource struct {
-	Reference       Reference
+	Reference       model.Reference
 	SubscribedUntil time.Time
 }
 
-func NewSubscription(model Model) *Subscription {
+func NewSubscription(partner *Partner) *Subscription {
 	return &Subscription{
-		model:               model,
+		partner:             partner,
 		resourcesByObjectID: make(map[string]*SubscribedResource),
 	}
 }
@@ -36,8 +38,12 @@ func (subscription *Subscription) Kind() string {
 	return subscription.kind
 }
 
+func (subscription *Subscription) SetKind(kind string) {
+	subscription.kind = kind
+}
+
 func (subscription *Subscription) Save() (ok bool) {
-	ok = subscription.model.Subscriptions().Save(subscription)
+	ok = subscription.partner.Subscriptions().Save(subscription)
 	return
 }
 
@@ -84,7 +90,7 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (subscription *Subscription) Resource(obj ObjectID) *SubscribedResource {
+func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
 	ObjIdString := obj.Value() + obj.Kind()
 	return subscription.resourcesByObjectID[ObjIdString]
 }
@@ -100,7 +106,7 @@ func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource
 	return ressources
 }
 
-func (subscription *Subscription) NewResource(reference Reference) *SubscribedResource {
+func (subscription *Subscription) NewResource(reference model.Reference) *SubscribedResource {
 	ressource := SubscribedResource{
 		Reference:       reference,
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
@@ -112,15 +118,15 @@ func (subscription *Subscription) NewResource(reference Reference) *SubscribedRe
 }
 
 type MemorySubscriptions struct {
-	UUIDConsumer
+	model.UUIDConsumer
 
-	model *MemoryModel
+	partner *Partner
 
 	byIdentifier map[SubscriptionId]*Subscription
 }
 
 type Subscriptions interface {
-	UUIDInterface
+	model.UUIDInterface
 
 	New() Subscription
 	Find(id SubscriptionId) (Subscription, bool)
@@ -129,15 +135,28 @@ type Subscriptions interface {
 	Delete(Subscription *Subscription) bool
 }
 
-func NewMemorySubscriptions() *MemorySubscriptions {
+func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 	return &MemorySubscriptions{
 		byIdentifier: make(map[SubscriptionId]*Subscription),
+		partner:      partner,
 	}
 }
 
 func (manager *MemorySubscriptions) New() Subscription {
-	subscription := NewSubscription(manager.model)
+	subscription := NewSubscription(manager.partner)
 	return *subscription
+}
+
+func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
+	for _, subscription := range manager.byIdentifier {
+		if subscription.Kind() == kind {
+			return subscription
+		}
+	}
+
+	subscription := NewSubscription(manager.partner)
+	subscription.SetKind(kind)
+	return subscription
 }
 
 func (manager *MemorySubscriptions) Find(id SubscriptionId) (Subscription, bool) {
@@ -163,7 +182,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	if subscription.Id() == "" {
 		subscription.id = SubscriptionId(manager.NewUUID())
 	}
-	subscription.model = manager.model
+	subscription.partner = manager.partner
 	manager.byIdentifier[subscription.Id()] = subscription
 	return true
 }

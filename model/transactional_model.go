@@ -5,7 +5,6 @@ type TransactionalModel struct {
 
 	lines           *TransactionalLines
 	situations      *TransactionalSituations
-	subscriptions   *TransactionalSubscriptions
 	stopAreas       *TransactionalStopAreas
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
@@ -15,7 +14,6 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 	model := &TransactionalModel{parent: parent}
 	model.lines = NewTransactionalLines(parent)
 	model.situations = NewTransactionalSituations(parent)
-	model.subscriptions = NewTransactionalSubscriptions(parent)
 	model.stopAreas = NewTransactionalStopAreas(parent)
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
@@ -32,10 +30,6 @@ func (model *TransactionalModel) Lines() Lines {
 
 func (model *TransactionalModel) Situations() Situations {
 	return model.situations
-}
-
-func (model *TransactionalModel) Subscriptions() Subscriptions {
-	return model.subscriptions
 }
 
 func (model *TransactionalModel) StopAreas() StopAreas {

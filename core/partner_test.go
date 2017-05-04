@@ -156,6 +156,18 @@ func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	}
 }
 
+func Test_Partner_Subcription(t *testing.T) {
+	partner := NewPartner()
+
+	sub := partner.Subscriptions()
+	nsub := sub.New()
+	nsub.Save()
+
+	if len(partner.Subscriptions().FindAll()) != 1 {
+		t.Errorf("Wrong number of subcriptions want : %v got: %v", 1, len(sub.FindAll()))
+	}
+}
+
 func Test_APIPartner_SetFactories(t *testing.T) {
 	partner := &APIPartner{
 		ConnectorTypes: []string{"unexistant-factory", "test-check-status-client"},

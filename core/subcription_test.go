@@ -1,4 +1,4 @@
-package model
+package core
 
 import (
 	"encoding/json"
@@ -64,26 +64,8 @@ func Test_Subscription_UnmarshalJSON(t *testing.T) {
 	}
 }
 
-func Test_Subscription_Save(t *testing.T) {
-	model := NewMemoryModel()
-	subscription := model.Subscriptions().New()
-
-	if subscription.model != model {
-		t.Errorf("New subscription model should be Memorysubscription model")
-	}
-
-	ok := subscription.Save()
-	if !ok {
-		t.Errorf("subscription.Save() should succeed")
-	}
-	_, ok = model.Subscriptions().Find(subscription.Id())
-	if !ok {
-		t.Errorf("New subscription should be found in Memorysubscription")
-	}
-}
-
 func Test_MemorySubscription_New(t *testing.T) {
-	subcriptions := NewMemorySubscriptions()
+	subcriptions := NewMemorySubscriptions(NewPartner())
 
 	subcription := subcriptions.New()
 	if subcription.Id() != "" {
@@ -92,7 +74,7 @@ func Test_MemorySubscription_New(t *testing.T) {
 }
 
 func Test_MemorySubscriptions_Find_NotFound(t *testing.T) {
-	subscriptions := NewMemorySubscriptions()
+	subscriptions := NewMemorySubscriptions(NewPartner())
 	_, ok := subscriptions.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if ok {
 		t.Errorf("Find should return false when Subscription isn't found")
@@ -100,7 +82,7 @@ func Test_MemorySubscriptions_Find_NotFound(t *testing.T) {
 }
 
 func Test_MemorySubscriptions_Find(t *testing.T) {
-	subscriptions := NewMemorySubscriptions()
+	subscriptions := NewMemorySubscriptions(NewPartner())
 
 	existingSubscription := subscriptions.New()
 	subscriptions.Save(&existingSubscription)
@@ -117,7 +99,7 @@ func Test_MemorySubscriptions_Find(t *testing.T) {
 }
 
 func Test_MemorySubscriptions_FindAll(t *testing.T) {
-	subscriptions := NewMemorySubscriptions()
+	subscriptions := NewMemorySubscriptions(NewPartner())
 
 	for i := 0; i < 5; i++ {
 		existingSubscription := subscriptions.New()
@@ -132,7 +114,7 @@ func Test_MemorySubscriptions_FindAll(t *testing.T) {
 }
 
 func Test_MemorySubscriptions_Delete(t *testing.T) {
-	subscriptions := NewMemorySubscriptions()
+	subscriptions := NewMemorySubscriptions(NewPartner())
 	existingSubscription := subscriptions.New()
 	subscriptions.Save(&existingSubscription)
 

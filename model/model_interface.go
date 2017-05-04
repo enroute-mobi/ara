@@ -4,7 +4,6 @@ type Model interface {
 	Date() Date
 	Lines() Lines
 	Situations() Situations
-	Subscriptions() Subscriptions
 	StopAreas() StopAreas
 	StopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
@@ -18,7 +17,6 @@ type MemoryModel struct {
 	lines           *MemoryLines
 	date            Date
 	situations      Situations
-	subscriptions   Subscriptions
 }
 
 func NewMemoryModel() *MemoryModel {
@@ -29,10 +27,6 @@ func NewMemoryModel() *MemoryModel {
 	lines := NewMemoryLines()
 	lines.model = model
 	model.lines = lines
-
-	subscriptions := NewMemorySubscriptions()
-	subscriptions.model = model
-	model.subscriptions = subscriptions
 
 	situations := NewMemorySituations()
 	situations.model = model
@@ -66,10 +60,6 @@ func (model *MemoryModel) Date() Date {
 
 func (model *MemoryModel) Situations() Situations {
 	return model.situations
-}
-
-func (model *MemoryModel) Subscriptions() Subscriptions {
-	return model.subscriptions
 }
 
 func (model *MemoryModel) StopAreas() StopAreas {

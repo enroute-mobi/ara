@@ -2,8 +2,8 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -36,26 +36,6 @@ func (server *Server) ListenAndServe() error {
 	logger.Log.Debugf("Starting server on %s", server.bind)
 	return http.ListenAndServe(server.bind, nil)
 }
-
-// func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-// 	path := request.URL.Path
-// 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?"
-// 	pattern := regexp.MustCompile(pathRegexp)
-// 	foundStrings := pattern.FindStringSubmatch(path)
-// 	if foundStrings == nil || foundStrings[1] == "" {
-// 		http.Error(response, "Invalid request", 400)
-// 		return
-// 	}
-// 	response.Header().Set("Content-Type", "application/json")
-//
-// 	if foundStrings[2] == "siri" {
-// 		server.handleSIRI(response, request, foundStrings[1])
-// 	} else if strings.HasPrefix(foundStrings[1], "_") {
-// 		server.handleControllers(response, request, foundStrings[1], foundStrings[2])
-// 	} else {
-// 		server.handleWithReferentialControllers(response, request, foundStrings[1], foundStrings[2], foundStrings[3])
-// 	}
-// }
 
 func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, ressource, value string) {
 	newController, ok := newControllerMap[ressource]
@@ -119,6 +99,7 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 }
 
 func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, foundStrings []string) {
+	fmt.Println(foundStrings)
 	if foundStrings[2] == "siri" {
 		server.handleSIRI(response, request, foundStrings[1])
 	} else if strings.HasPrefix(foundStrings[1], "_") {
@@ -129,15 +110,12 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 		}
 		server.handleControllers(response, request, foundStrings[1], foundStrings[2])
 	} else {
-		server.handleWithReferentialControllers(response, request, foundStrings[1], foundStrings[2], foundStrings[3])
+		server.handleWithReferentialControllers(response, request, foundStrings)
 	}
 }
 
 func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
 	foundStrings := []string{}
-
-	f, _ := os.OpenFile("/tmp/salut", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0660)
-	f.WriteString(server.getToken(request) + "\n")
 
 	foundStrings, err := server.checkFormat(response, request)
 
@@ -147,7 +125,11 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 	server.handleRoutes(response, request, foundStrings)
 }
 
-func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, referential, ressource, id string) {
+func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, params []string) {
+	referential := params[1]
+	ressource := params[2]
+	id := params[3]
+
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", 500)
