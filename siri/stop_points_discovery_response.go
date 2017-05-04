@@ -21,6 +21,9 @@ type SIRIStopPointsDiscoveryResponse struct {
 type SIRIAnnotatedStopPoint struct {
 	StopPointRef string
 	StopName     string
+	Lines        []string
+	Monitored    bool
+	TimingPoint  bool
 }
 
 type SIRIAnnotatedStopPointByStopPointRef []*SIRIAnnotatedStopPoint
