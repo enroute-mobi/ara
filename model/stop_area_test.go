@@ -17,6 +17,20 @@ func Test_StopArea_Id(t *testing.T) {
 	}
 }
 
+func Test_StopArea_Lines(t *testing.T) {
+	model := NewMemoryModel()
+	line := model.Lines().New()
+	line.Save()
+	stopArea := StopArea{
+		model:   model,
+		LineIds: []LineId{line.Id()},
+	}
+
+	if len(stopArea.Lines()) != 1 || stopArea.Lines()[0].Id() != line.Id() {
+		t.Errorf("StopArea.Lines() returns wrong values, got: %s, required: [%s]", stopArea.Lines(), line.Id())
+	}
+}
+
 func Test_StopArea_MarshalJSON(t *testing.T) {
 	stopArea := StopArea{
 		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
@@ -37,7 +51,8 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 func Test_StopArea_UnmarshalJSON(t *testing.T) {
 	text := `{
     "Name":"Test",
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Lines": ["1234","5678"]
   }`
 
 	stopArea := StopArea{}
@@ -63,6 +78,10 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 		if !reflect.DeepEqual(expectedObjectId, objectId) {
 			t.Errorf("Wrong StopArea ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
 		}
+	}
+
+	if len(stopArea.LineIds) != 2 || stopArea.LineIds[0] != LineId("1234") || stopArea.LineIds[1] != LineId("5678") {
+		t.Errorf("Wrong StopArea Lines:\n got: %v\n want: [1234,5678]", stopArea.LineIds)
 	}
 }
 

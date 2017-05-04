@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/siri"
 )
@@ -57,7 +58,14 @@ func siriError(errCode, errDescription string, response http.ResponseWriter) {
     <faultstring>%s</faultstring>
   </S:Fault>`, errCode, errDescription))
 
+	logSIRIError(soapEnvelope.String())
 	soapEnvelope.WriteTo(response)
+}
+
+func logSIRIError(siriError string) {
+	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent["SIRIError"] = siriError
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
 }
 
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {

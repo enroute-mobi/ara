@@ -4,13 +4,9 @@ import (
 	"io/ioutil"
 	"net"
 	"testing"
-
-	"github.com/af83/edwig/logger"
 )
 
 func Test_Logstash_WriteEvent(t *testing.T) {
-	logger.Log.Debug = true
-
 	logstash := NewFakeLogStash()
 
 	logstashDatas := make(map[string]string)

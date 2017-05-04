@@ -63,7 +63,8 @@ Feature: Support SIRI GeneralMessage
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage formatRef="FRANCE">
+                <ns3:GeneralMessage>
+                  <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>

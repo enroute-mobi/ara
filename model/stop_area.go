@@ -28,6 +28,7 @@ type StopArea struct {
 	CollectedAlways bool
 
 	Name       string
+	LineIds    []LineId `json:"Lines,omitempty"`
 	Attributes Attributes
 	References References
 	// ...
@@ -106,6 +107,16 @@ func (stopArea *StopArea) Attribute(key string) (string, bool) {
 func (stopArea *StopArea) Reference(key string) (Reference, bool) {
 	value, present := stopArea.References[key]
 	return value, present
+}
+
+func (stopArea *StopArea) Lines() (lines []Line) {
+	for _, lineId := range stopArea.LineIds {
+		foundLine, ok := stopArea.model.Lines().Find(lineId)
+		if ok {
+			lines = append(lines, foundLine)
+		}
+	}
+	return
 }
 
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {

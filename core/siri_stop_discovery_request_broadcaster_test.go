@@ -20,10 +20,16 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
+	line := referential.Model().Lines().New()
+	lineObjectId := model.NewObjectID("test", "1234")
+	line.SetObjectID(lineObjectId)
+	line.Save()
+
 	firstStopArea := referential.Model().StopAreas().New()
 	firstObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetObjectID(firstObjectID)
 	firstStopArea.Name = "First"
+	firstStopArea.LineIds = []model.LineId{line.Id()}
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()
@@ -67,6 +73,15 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	}
 	if response.AnnotatedStopPoints[0].StopPointRef != firstObjectID.Value() {
 		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
+	}
+	if !response.AnnotatedStopPoints[0].Monitored {
+		t.Errorf("AnnotatedStopPoints Monitored is false, should be true")
+	}
+	if !response.AnnotatedStopPoints[0].TimingPoint {
+		t.Errorf("AnnotatedStopPoints TimingPoint is false, should be true")
+	}
+	if len(response.AnnotatedStopPoints[0].Lines) != 1 || response.AnnotatedStopPoints[0].Lines[0] != "1234" {
+		t.Errorf("AnnotatedStopPoints Lines is wrong:\n got: %v\n want: [1234]", response.AnnotatedStopPoints[0].Lines)
 	}
 
 	if response.AnnotatedStopPoints[1].StopName != "Second" {
