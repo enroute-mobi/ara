@@ -63,7 +63,21 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
 			StopName:     stopArea.Name,
 			StopPointRef: objectID.Value(),
+			Monitored:    true,
+			TimingPoint:  true,
 		}
+		for _, line := range stopArea.Lines() {
+			objectid, ok := line.ObjectID(objectIDKind)
+			if ok {
+				annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
+			} else {
+				defaultObjectID, ok := line.ObjectID("_default")
+				if ok {
+					annotedStopPoint.Lines = append(annotedStopPoint.Lines, defaultObjectID.Value())
+				}
+			}
+		}
+
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
 
