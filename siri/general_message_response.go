@@ -115,10 +115,10 @@ const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-
 				  <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
 					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
 					<ns3:GeneralMessage>
+						<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
 						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
 						<ns3:InfoMessageIdentifier>{{.InfoMessageIdentifier}}</ns3:InfoMessageIdentifier>
 						<ns3:InfoMessageVersion>{{.InfoMessageVersion}}</ns3:InfoMessageVersion>
-						<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
 						<ns3:InfoChannelRef>{{.InfoChannelRef}}</ns3:InfoChannelRef>
 						<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
 						<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
