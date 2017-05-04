@@ -8,10 +8,23 @@ import (
 	"testing"
 	"time"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
+
+func Test_SIRIHandler_LogSIRIError(t *testing.T) {
+	logstash := audit.NewFakeLogStash()
+	audit.SetCurrentLogstash(logstash)
+	defer audit.SetCurrentLogstash(audit.NewNullLogStash())
+
+	siriError("errCode", "errDescription", httptest.NewRecorder())
+
+	if len(logstash.Events()) != 1 {
+		t.Errorf("Logstash should have one event, got %d", len(logstash.Events()))
+	}
+}
 
 func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	model.SetDefaultClock(model.NewFakeClock())
