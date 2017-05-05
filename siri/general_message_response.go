@@ -2,7 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 	"time"
 
@@ -318,7 +317,6 @@ func (visit *IDFGeneralMessageStructure) LineRef() string {
 
 func (visit *IDFGeneralMessageStructure) createNewLineSection() IDFLineSectionStructure {
 	visit.lineSection = IDFLineSectionStructure{}
-	fmt.Println(visit.findNode("LineSection"))
 	visit.lineSection.node = NewXMLNode(visit.findNode("LineSection"))
 	return visit.lineSection
 }
