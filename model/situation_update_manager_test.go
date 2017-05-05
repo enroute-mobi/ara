@@ -55,6 +55,7 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 	testSituation.model = situation.model
 	testSituation.objectids = make(ObjectIDs)
 	testSituation.SetObjectID(objectid)
+	testSituation.SetObjectID(NewObjectID("_default", objectid.HashValue()))
 	testSituation.References.Set("type", Reference{ObjectId: &objectid, Id: "id", Type: "type"})
 
 	return reflect.DeepEqual(situation, testSituation)
@@ -67,6 +68,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	model := NewMemoryModel()
 	situation := model.Situations().New()
 	situation.SetObjectID(objectid)
+	situation.SetObjectID(NewObjectID("_default", objectid.HashValue()))
 	model.Situations().Save(&situation)
 
 	manager := newSituationUpdateManager(model)

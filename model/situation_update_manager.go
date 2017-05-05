@@ -44,6 +44,7 @@ func (updater *SituationUpdater) Update() {
 		if !ok {
 			situation = updater.tx.Model().Situations().New()
 			situation.SetObjectID(event.SituationObjectID)
+			situation.SetObjectID(NewObjectID("_default", event.SituationObjectID.HashValue()))
 		}
 		situation.RecordedAt = event.RecordedAt
 		situation.Version = event.Version

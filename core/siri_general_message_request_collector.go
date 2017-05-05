@@ -66,7 +66,7 @@ func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(si
 		situationEvent := &model.SituationUpdateEvent{
 			CreatedAt:         connector.Clock().Now(),
 			RecordedAt:        xmlGeneralMessage.RecordedAtTime(),
-			SituationObjectID: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlGeneralMessage.ItemIdentifier()),
+			SituationObjectID: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlGeneralMessage.InfoMessageIdentifier()),
 			Version:           int64(xmlGeneralMessage.InfoMessageVersion()),
 			ProducerRef:       xmlResponse.ProducerRef(),
 		}
