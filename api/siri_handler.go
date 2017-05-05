@@ -1,7 +1,9 @@
 package api
 
 import (
+	"compress/gzip"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/af83/edwig/audit"
@@ -76,9 +78,23 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	envelope, err := siri.NewSOAPEnvelope(request.Body)
+	// Check if request is gzip
+	var requestReader io.Reader
+	if request.Header.Get("Content-Encoding") == "gzip" {
+		gzipReader, err := gzip.NewReader(request.Body)
+		if err != nil {
+			siriError("Client", "Can't unzip request", response)
+			return
+		}
+		defer gzipReader.Close()
+		requestReader = gzipReader
+	} else {
+		requestReader = request.Body
+	}
+
+	envelope, err := siri.NewSOAPEnvelope(requestReader)
 	if err != nil {
-		siriError("Client", "Invalid Request", response)
+		siriError("Client", fmt.Sprintf("Invalid Request: %v", err), response)
 		return
 	}
 
