@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -147,6 +148,49 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 
 	if !response.ServiceStartedTime().Equal(expectedDate) {
 		t.Errorf("Wrong ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime(), expectedDate)
+	}
+}
+
+func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
+	server, _ := siriHandler_PrepareServer()
+
+	// Create a request
+	file, err := os.Open("testdata/checkstatus-soap-request.xml.gz")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+
+	request, err := http.NewRequest("POST", "/default/siri", file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Content-Encoding", "gzip")
+	request.Header.Set("Content-Type", "text/xml")
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+	handler := http.HandlerFunc(server.HandleFlow)
+
+	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
+	handler.ServeHTTP(responseRecorder, request)
+
+	// Check the status code is what we expect.
+	if status := responseRecorder.Code; status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusOK)
+	}
+
+	fmt.Println(responseRecorder.Body)
+
+	// Check the response body is what we expect.
+	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !response.Status() {
+		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status())
 	}
 }
 

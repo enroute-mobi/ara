@@ -9,6 +9,9 @@ def model_attributes(table)
     when /\A(true|false)\Z/
       # Convert boolean
       attributes[key] = (value == "true")
+    when /\A\[.+\]\Z/
+      # Convert Array
+      attributes[key] = JSON.parse(value)
     end
 
     # Transform

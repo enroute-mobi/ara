@@ -3,24 +3,31 @@ Feature: Support SIRI StopDiscovery
   Background:
     Given a Referential "test" is created
 
-  @wip
   Scenario: 2464 3292 - Handle a SIRI StopDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential     | test                  |
-      | remote_objectid_kind | internal              |
-      | local_url            | address |
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
+      | local_url            | address  |
+    And a Line exists with the following attributes:
+      | Name      | Line 1                          |
+      | ObjectIDs | "internal":"STIF:Line::C00272:" |
+    And a Line exists with the following attributes:
+      | Name      | Line 2                          |
+      | ObjectIDs | "internal":"STIF:Line::C00273:" |
+    And a Line exists with the following attributes:
+      | Name      | Line 3                          |
+      | ObjectIDs | "internal":"STIF:Line::C00274:" |
     And a StopArea exists with the following attributes:
-      | Name                  | Test                                     |
-      | ObjectIDs             | "internal": "NINOXE:StopPoint:BP:6:LOC"   |
-      | LineRef               | "internal": "STIF:Line::C00272:"          |
+      | Name      | Test                                                                      |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
+      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name                  | Test 2                                    |
-      | LineRef               | "internal": "NINOXE:StopPoint:SP:16:LOC"   |
-      | LineRef               | "internal": "STIF:Line::C00273:"          |
+      | Name      | Test 2                                   |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:16:LOC" |
     And a StopArea exists with the following attributes:
-      | Name                  | Test 3                                    |
-      | LineRef               | "internal": "NINOXE:StopPoint:BP:7:LOC"   |
-      | LineRef               | "internal": "STIF:Line::C00274:"          |
+      | Name      | Test 3                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:7:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -52,31 +59,29 @@ Feature: Support SIRI StopDiscovery
             <ns3:Address>address</ns3:Address>
             <ns3:ProducerRef>Edwig</ns3:ProducerRef>
             <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
-            <ns3:ResponseMessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+            <ns3:ResponseMessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
             <ns3:Status>true</ns3:Status>
               <ns3:AnnotatedStopPointRef>
-                <ns3:Monitored>true</ns3:Monitored>
                 <ns3:StopPointRef>NINOXE:StopPoint:BP:6:LOC</ns3:StopPointRef>
+                <ns3:Monitored>true</ns3:Monitored>
                 <ns3:StopName>Test</ns3:StopName>
                 <ns3:Lines>
                   <ns3:LineRef>STIF:Line::C00272:</ns3:LineRef>
-                </ns3:Lines>
-              </ns3:AnnotatedStopPointRef>
-              <ns3:AnnotatedStopPointRef>
-                <ns3:Monitored>true</ns3:Monitored>
-                <ns3:StopPointRef>NINOXE:StopPoint:BP:7:LOC</ns3:StopPointRef>
-                <ns3:StopName>Test 3</ns3:StopName>
-                <ns3:Lines>
                   <ns3:LineRef>STIF:Line::C00273:</ns3:LineRef>
                 </ns3:Lines>
               </ns3:AnnotatedStopPointRef>
               <ns3:AnnotatedStopPointRef>
+                <ns3:StopPointRef>NINOXE:StopPoint:BP:7:LOC</ns3:StopPointRef>
                 <ns3:Monitored>true</ns3:Monitored>
-                <ns3:StopPointRef>NINOXE:StopPoint:SP:16:LOC</ns3:StopPointRef>
-                <ns3:StopName>Test 2</ns3:StopName>
+                <ns3:StopName>Test 3</ns3:StopName>
                 <ns3:Lines>
                   <ns3:LineRef>STIF:Line::C00274:</ns3:LineRef>
                 </ns3:Lines>
+              </ns3:AnnotatedStopPointRef>
+              <ns3:AnnotatedStopPointRef>
+                <ns3:StopPointRef>NINOXE:StopPoint:SP:16:LOC</ns3:StopPointRef>
+                <ns3:Monitored>true</ns3:Monitored>
+                <ns3:StopName>Test 2</ns3:StopName>
               </ns3:AnnotatedStopPointRef>
             </Answer>
             <AnswerExtension />
