@@ -23,6 +23,28 @@ type Server struct {
 	startedTime time.Time
 }
 
+type RequestData struct {
+	Referential string
+	Ressource   string
+	Id          string
+	Action      string
+}
+
+func NewRequestDataFromContent(params []string) *RequestData {
+	requestFiller := make([]string, 5)
+
+	for i, param := range params {
+		requestFiller[i] = param
+	}
+
+	return &RequestData{
+		Referential: requestFiller[1],
+		Ressource:   requestFiller[2],
+		Id:          requestFiller[3],
+		Action:      requestFiller[4],
+	}
+}
+
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
@@ -37,22 +59,22 @@ func (server *Server) ListenAndServe() error {
 	return http.ListenAndServe(server.bind, nil)
 }
 
-func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, ressource, value string) {
-	newController, ok := newControllerMap[ressource]
+func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+	newController, ok := newControllerMap[requestData.Referential]
 	if !ok {
 		http.Error(response, "Invalid ressource", 500)
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", ressource[1:], request)
+	logger.Log.Debugf("%s controller request: %s", requestData.Ressource, request)
 
 	controller := newController(server)
-	controller.serve(response, request, value)
+	controller.serve(response, request, requestData)
 }
 
-func (server *Server) checkFormat(response http.ResponseWriter, request *http.Request) ([]string, error) {
+func (server *Server) parse(response http.ResponseWriter, request *http.Request) (*RequestData, error) {
 	path := request.URL.Path
-	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?"
+	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?/?([0-9a-zA-Z-_]+)?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(path)
 	if foundStrings == nil || foundStrings[1] == "" {
@@ -60,8 +82,10 @@ func (server *Server) checkFormat(response http.ResponseWriter, request *http.Re
 		return nil, errors.New("Invalid request")
 	}
 
+	requestData := NewRequestDataFromContent(foundStrings)
+	fmt.Println(requestData.Referential)
 	response.Header().Set("Content-Type", "application/json")
-	return foundStrings, nil
+	return requestData, nil
 }
 
 func (server *Server) getToken(r *http.Request) string {
@@ -98,39 +122,37 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 	return false
 }
 
-func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, foundStrings []string) {
-	fmt.Println(foundStrings)
-	if foundStrings[2] == "siri" {
-		server.handleSIRI(response, request, foundStrings[1])
-	} else if strings.HasPrefix(foundStrings[1], "_") {
+func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+	if requestData.Ressource == "siri" {
+		server.handleSIRI(response, request, requestData)
+	} else if strings.HasPrefix(requestData.Referential, "_") {
 		if !server.isAdmin(request) {
 			http.Error(response, "Unauthorized request", 401)
 			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%s", request)
 			return
 		}
-		server.handleControllers(response, request, foundStrings[1], foundStrings[2])
+		if requestData.Referential == "_referentials" {
+			requestData.Id = requestData.Ressource
+		}
+		server.handleControllers(response, request, requestData)
 	} else {
-		server.handleWithReferentialControllers(response, request, foundStrings)
+		server.handleWithReferentialControllers(response, request, requestData)
 	}
 }
 
 func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-	foundStrings := []string{}
 
-	foundStrings, err := server.checkFormat(response, request)
+	requestData, err := server.parse(response, request)
 
 	if err != nil {
 		return
 	}
-	server.handleRoutes(response, request, foundStrings)
+	server.handleRoutes(response, request, requestData)
 }
 
-func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, params []string) {
-	referential := params[1]
-	ressource := params[2]
-	id := params[3]
+func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", 500)
 		return
@@ -139,20 +161,20 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 		http.Error(response, "Unauthorized request", 401)
 		return
 	}
-	newController, ok := newWithReferentialControllerMap[ressource]
+	newController, ok := newWithReferentialControllerMap[requestData.Ressource]
 	if !ok {
 		http.Error(response, "Invalid ressource", 500)
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", ressource, request)
+	logger.Log.Debugf("%s controller request: %s", requestData.Ressource, request)
 
 	controller := newController(foundReferential)
-	controller.serve(response, request, id)
+	controller.serve(response, request, requestData)
 }
 
-func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, referential string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 
 	logger.Log.Debugf("SIRI request: %s", request)
 

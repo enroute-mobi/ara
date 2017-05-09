@@ -20,10 +20,10 @@ func NewTimeController(server *Server) ControllerInterface {
 	}
 }
 
-func (controller *TimeController) serve(response http.ResponseWriter, request *http.Request, action string) {
+func (controller *TimeController) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	switch {
 	case request.Method == "GET":
-		if action != "" {
+		if requestData.Ressource != "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
@@ -33,7 +33,7 @@ func (controller *TimeController) serve(response http.ResponseWriter, request *h
 			http.Error(response, "Invalid request: server has a real Clock", 400)
 			return
 		}
-		if action != "advance" {
+		if requestData.Ressource != "advance" {
 			http.Error(response, "Invalid request: invalid action", 400)
 			return
 		}

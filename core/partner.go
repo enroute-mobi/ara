@@ -381,7 +381,7 @@ func (manager *PartnerManager) Stop() {
 }
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
-	return &Partner{
+	partner := &Partner{
 		slug:               slug,
 		manager:            manager,
 		Settings:           make(map[string]string),
@@ -390,6 +390,8 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		ConnectorTypes:     []string{},
 	}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	return partner
 }
 
 func (manager *PartnerManager) MarshalJSON() ([]byte, error) {

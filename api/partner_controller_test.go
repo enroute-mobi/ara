@@ -11,6 +11,14 @@ import (
 	"github.com/af83/edwig/model"
 )
 
+type RequestTestData struct {
+	Server *Server
+	Id     string
+	Method string
+	Action string
+	Body   []byte
+}
+
 func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
 	if status := responseRecorder.Code; status != http.StatusOK {
 		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
@@ -58,11 +66,85 @@ func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *t
 	return
 }
 
+func createReferential() (*Server, *core.Referential) {
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	return server, referential
+}
+
+func createPartner(referential *core.Referential) *core.Partner {
+	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner := referential.Partners().New("First Partner")
+	referential.Partners().Save(partner)
+
+	return partner
+}
+
+func sendRequest(rdata *RequestTestData, t *testing.T) (responseRecorder *httptest.ResponseRecorder) {
+
+	address := []byte("/default/partners")
+	if rdata.Id != "" {
+		address = append(address, fmt.Sprintf("/%s", rdata.Id)...)
+		if rdata.Action != "" {
+			address = append(address, fmt.Sprintf("/%s", rdata.Action)...)
+		}
+	}
+
+	request, err := http.NewRequest(rdata.Method, string(address), bytes.NewReader(rdata.Body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request.Header.Set("Authorization", "Token token=testToken")
+	// Create a ResponseRecorder
+	responseRecorder = httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+
+	rdata.Server.HandleFlow(responseRecorder, request)
+	return responseRecorder
+}
+
+func Test_PartnerController_Action_Subscriber(t *testing.T) {
+	rdata := &RequestTestData{}
+	server, referential := createReferential()
+	partner := createPartner(referential)
+
+	rdata.Id = string(partner.Id())
+	rdata.Method = "GET"
+	rdata.Action = "Subscriptions"
+	rdata.Server = server
+
+	sub := partner.Subscriptions()
+	sub.NewSubscription()
+
+	responseRecorder := sendRequest(rdata, t)
+	partnerCheckResponseStatus(responseRecorder, t)
+
+	if len(partner.Subscriptions().FindAll()) != 1 {
+		t.Errorf("Should find one subscription")
+	}
+
+}
+
 func Test_PartnerController_Delete(t *testing.T) {
 	// Send request
-	partner, responseRecorder, referential := partnerPrepareRequest("DELETE", true, nil, t)
+	//	partner, responseRecorder, referential := partnerPrepareRequest("DELETE", true, nil, t)
 
-	// Test response
+	server, referential := createReferential()
+	partner := createPartner(referential)
+
+	rdata := &RequestTestData{}
+	rdata.Id = string(partner.Id())
+	rdata.Method = "DELETE"
+	rdata.Server = server
+
+	responseRecorder := sendRequest(rdata, t)
 	partnerCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
@@ -77,8 +159,16 @@ func Test_PartnerController_Delete(t *testing.T) {
 
 func Test_PartnerController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Slug": "Yet another test" }`)
-	partner, responseRecorder, referential := partnerPrepareRequest("PUT", true, body, t)
+	rdata := &RequestTestData{}
+	server, referential := createReferential()
+	partner := createPartner(referential)
+
+	rdata.Body = []byte(`{ "Slug": "Yet another test" }`)
+	rdata.Method = "PUT"
+	rdata.Server = server
+	rdata.Id = string(partner.Id())
+
+	responseRecorder := sendRequest(rdata, t)
 
 	// Check response
 	partnerCheckResponseStatus(responseRecorder, t)
@@ -99,8 +189,17 @@ func Test_PartnerController_Update(t *testing.T) {
 
 func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ConnectorTypes": ["test"] }`)
-	partner, responseRecorder, referential := partnerPrepareRequest("PUT", true, body, t)
+
+	server, referential := createReferential()
+	partner := createPartner(referential)
+
+	rdata := &RequestTestData{}
+	rdata.Id = string(partner.Id())
+	rdata.Method = "PUT"
+	rdata.Server = server
+	rdata.Body = []byte(`{ "ConnectorTypes": ["test"] }`)
+
+	responseRecorder := sendRequest(rdata, t)
 
 	// Check response
 	partnerCheckResponseStatus(responseRecorder, t)
@@ -122,7 +221,16 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 
 func Test_PartnerController_Show(t *testing.T) {
 	// Send request
-	partner, responseRecorder, _ := partnerPrepareRequest("GET", true, nil, t)
+
+	server, referential := createReferential()
+	partner := createPartner(referential)
+
+	rdata := &RequestTestData{}
+	rdata.Id = string(partner.Id())
+	rdata.Method = "GET"
+	rdata.Server = server
+
+	responseRecorder := sendRequest(rdata, t)
 
 	// Test response
 	partnerCheckResponseStatus(responseRecorder, t)
@@ -135,8 +243,15 @@ func Test_PartnerController_Show(t *testing.T) {
 
 func Test_PartnerController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Slug": "test" }`)
-	_, responseRecorder, referential := partnerPrepareRequest("POST", false, body, t)
+	rdata := RequestTestData{}
+
+	server, referential := createReferential()
+
+	rdata.Method = "POST"
+	rdata.Body = []byte(`{ "Slug": "test" }`)
+	rdata.Server = server
+
+	responseRecorder := sendRequest(&rdata, t)
 
 	// Check response
 	partnerCheckResponseStatus(responseRecorder, t)
@@ -144,9 +259,15 @@ func Test_PartnerController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// partner should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	partner := referential.Partners().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+
+	if len(referential.Partners().FindAll()) != 1 {
+		t.Errorf("Partner should be found after POST %v", referential.Partners().FindAll()[0].Id())
+		return
+	}
+
+	partner := referential.Partners().FindAll()[0]
 	if partner == nil {
-		t.Errorf("Partner should be found after POST request")
+		t.Errorf("Partner should be found after POST request, %v", referential.Partners().FindAll()[0].Id())
 	}
 	if expected := core.PartnerSlug("test"); partner.Slug() != expected {
 		t.Errorf("Invalid partner slug after POST request:\n got: %v\n want: %v", partner.Slug(), expected)
@@ -158,8 +279,15 @@ func Test_PartnerController_Create(t *testing.T) {
 
 func Test_PartnerController_Create_Invalid(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Slug": "InvalidSlug", "ConnectorTypes": ["test-validation-connector"] }`)
-	_, responseRecorder, _ := partnerPrepareRequest("POST", false, body, t)
+	server, _ := createReferential()
+
+	rdata := &RequestTestData{}
+	rdata.Id = ""
+	rdata.Method = "POST"
+	rdata.Server = server
+	rdata.Body = []byte(`{ "Slug": "InvalidSlug", "ConnectorTypes": ["test-validation-connector"] }`)
+
+	responseRecorder := sendRequest(rdata, t)
 
 	// Check response
 	if status := responseRecorder.Code; status != http.StatusBadRequest {
@@ -179,10 +307,15 @@ func Test_PartnerController_Create_Invalid(t *testing.T) {
 }
 
 func Test_PartnerController_Index(t *testing.T) {
-	// Send request
-	_, responseRecorder, _ := partnerPrepareRequest("GET", false, nil, t)
+	server, referential := createReferential()
+	createPartner(referential)
 
-	// Test response
+	rdata := &RequestTestData{}
+	rdata.Id = ""
+	rdata.Method = "GET"
+	rdata.Server = server
+
+	responseRecorder := sendRequest(rdata, t)
 	partnerCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
@@ -194,6 +327,7 @@ func Test_PartnerController_Index(t *testing.T) {
 
 func Test_PartnerController_FindPartner(t *testing.T) {
 	// Create a referential
+
 	referentials := core.NewMemoryReferentials()
 	referential := referentials.New("default")
 	referential.Save()

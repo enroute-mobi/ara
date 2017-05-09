@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -30,8 +31,12 @@ type RestfulRessource interface {
 	Create(response http.ResponseWriter, body []byte)
 }
 
+type ActionResource interface {
+	Action(response http.ResponseWriter, requestData *RequestData)
+}
+
 type ControllerInterface interface {
-	serve(response http.ResponseWriter, request *http.Request, value string)
+	serve(response http.ResponseWriter, request *http.Request, requestData *RequestData)
 }
 
 type Controller struct {
@@ -51,22 +56,31 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 	return body
 }
 
-func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, identifier string) {
+func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+
+	if requestData.Action != "" {
+		if actionResource, ok := controller.restfulRessource.(ActionResource); ok {
+			fmt.Println("The ressource implement action Bra")
+			actionResource.Action(response, requestData)
+			return
+		}
+	}
+
 	switch request.Method {
 	case "GET":
-		if identifier == "" {
+		if requestData.Id == "" {
 			controller.restfulRessource.Index(response)
 		} else {
-			controller.restfulRessource.Show(response, identifier)
+			controller.restfulRessource.Show(response, requestData.Id)
 		}
 	case "DELETE":
-		if identifier == "" {
+		if requestData.Id == "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		controller.restfulRessource.Delete(response, identifier)
+		controller.restfulRessource.Delete(response, requestData.Id)
 	case "PUT":
-		if identifier == "" {
+		if requestData.Id == "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
@@ -74,9 +88,9 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 		if body == nil {
 			return
 		}
-		controller.restfulRessource.Update(response, identifier, body)
+		controller.restfulRessource.Update(response, requestData.Id, body)
 	case "POST":
-		if identifier != "" {
+		if requestData.Id != "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/af83/edwig/model"
@@ -21,13 +22,6 @@ type Subscription struct {
 type SubscribedResource struct {
 	Reference       model.Reference
 	SubscribedUntil time.Time
-}
-
-func NewSubscription(partner *Partner) *Subscription {
-	return &Subscription{
-		partner:             partner,
-		resourcesByObjectID: make(map[string]*SubscribedResource),
-	}
 }
 
 func (subscription *Subscription) Id() SubscriptionId {
@@ -133,6 +127,7 @@ type Subscriptions interface {
 	FindAll() []Subscription
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
+	NewSubscription() *Subscription
 }
 
 func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
@@ -143,7 +138,7 @@ func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 }
 
 func (manager *MemorySubscriptions) New() Subscription {
-	subscription := NewSubscription(manager.partner)
+	subscription := manager.NewSubscription()
 	return *subscription
 }
 
@@ -154,7 +149,7 @@ func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscriptio
 		}
 	}
 
-	subscription := NewSubscription(manager.partner)
+	subscription := manager.NewSubscription()
 	subscription.SetKind(kind)
 	return subscription
 }
@@ -168,7 +163,17 @@ func (manager *MemorySubscriptions) Find(id SubscriptionId) (Subscription, bool)
 	}
 }
 
+func (manager *MemorySubscriptions) NewSubscription() *Subscription {
+	sub := &Subscription{
+		resourcesByObjectID: make(map[string]*SubscribedResource),
+	}
+	manager.Save(sub)
+
+	return sub
+}
+
 func (manager *MemorySubscriptions) FindAll() (subscriptions []Subscription) {
+	fmt.Println("In find all ")
 	if len(manager.byIdentifier) == 0 {
 		return []Subscription{}
 	}

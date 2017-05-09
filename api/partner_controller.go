@@ -21,6 +21,26 @@ func NewPartnerController(referential *core.Referential) ControllerInterface {
 	}
 }
 
+func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {
+	partner := controller.findPartner(requestData.Id)
+	if partner == nil {
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		return
+	}
+	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
+
+	subscriptions := partner.Subscriptions()
+	fmt.Println("subscriptions == ", subscriptions)
+	jsonBytes, _ := json.Marshal(subscriptions.FindAll())
+	response.Write(jsonBytes)
+}
+
+func (controller *PartnerController) Action(response http.ResponseWriter, requestData *RequestData) {
+	if requestData.Action == "Subscriptions" {
+		controller.subscriptions(response, requestData)
+	}
+}
+
 func (controller *PartnerController) findPartner(identifier string) *core.Partner {
 	partner, ok := controller.referential.Partners().FindBySlug(core.PartnerSlug(identifier))
 	if ok {
