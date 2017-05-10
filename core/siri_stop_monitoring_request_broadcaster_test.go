@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -27,6 +28,38 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	stopVisitRef := model.Reference{}
+	obj := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
+	stopVisitRef.ObjectId = &obj
+
+	stopVisit.SetObjectID(obj)
+	stopVisit.References.Set("OperatorRef", stopVisitRef)
+	stopVisit.StopAreaId = stopArea.Id()
+
+	sVSchedule := model.StopVisitSchedule{}
+
+	sVSchedule.SetArrivalTime(connector.Clock().Now().Add(10 * time.Minute))
+	stopVisit.Schedules["actual"] = &sVSchedule
+	stopVisit.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	obj = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:26:LOC")
+	vehicleJourney.SetObjectID(obj)
+	vehicleJourney.Save()
+
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+
+	line := referential.model.Lines().New()
+	obj = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:27:LOC")
+	line.SetObjectID(obj)
+	line.Save()
+
+	vehicleJourney.LineId = line.Id()
+
+	s := len(referential.model.StopVisits().FindFollowingByStopAreaId(stopArea.Id()))
+	fmt.Println("STOPVISITS ==", s)
 
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
 	if err != nil {
@@ -59,6 +92,18 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	time := connector.Clock().Now()
 	if !response.ResponseTimestamp.Equal(time) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
+	}
+
+	if len(response.MonitoredStopVisits) != 1 {
+		t.Errorf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
+	}
+
+	operatorRef := response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value()
+
+	response = connector.RequestStopArea(request)
+
+	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != operatorRef {
+		t.Errorf("OperatorRef should be the same %v, %v", operatorRef, response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
 	}
 }
 

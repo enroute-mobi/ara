@@ -132,16 +132,19 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
 		}
 
-		connector.resolveVehiculeJourneyReferences(vehicleJourney.References, tx.Model().StopAreas())
+		vehicleJourneyRefCopy := vehicleJourney.References.Copy()
+		stopVisitRefCopy := stopVisit.References.Copy()
 
-		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourney.References, tx.Model().StopAreas())
-		connector.reformatReferences(stopVisit.ToFormat(), stopVisit.References, tx.Model().StopAreas())
+		connector.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx.Model().StopAreas())
+
+		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
+		connector.reformatReferences(stopVisit.ToFormat(), stopVisitRefCopy)
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-		monitoredStopVisit.References["StopVisitReferences"] = stopVisit.References
+		monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy
 
 		monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-		monitoredStopVisit.References["VehicleJourney"] = vehicleJourney.References
+		monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy
 
 		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 	}
@@ -206,7 +209,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references model.References, manager model.StopAreas) {
+func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references model.References) {
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {
 			tmp := references[ref]

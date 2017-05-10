@@ -188,7 +188,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:OperatorRef>
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -358,13 +358,13 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                | VehicleJourney#Attribute[DirectionRef]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                    | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                            | VehicleJourney#ObjectID                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                                 | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                                  | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                        | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                       | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | RATPDev:Operator::dbe9523913efc7af28fe2f166da05a9013c8a647:LOC       | StopVisit#Reference[OperatorRef]#ObjectID             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | RATPDev:Operator::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC       | StopVisit#Reference[OperatorRef]#ObjectID             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                    | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                         | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                            | VehicleJourney#Attribute[VehicleFeatureRef]           |
@@ -552,10 +552,10 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                 <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::5d5ddf96f5db438e2f4e24af3c074e2d0733cc4e:LOC</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
+              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:OperatorRef>
               <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
@@ -792,10 +792,10 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                       <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::5d5ddf96f5db438e2f4e24af3c074e2d0733cc4e:LOC</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
+                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:JourneyPatternRef>
                     <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
                     <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+                    <ns3:OperatorRef>RATPDev:Operator::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:OperatorRef>
                     <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
                     <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
                     <ns3:Monitored>true</ns3:Monitored>
