@@ -48,11 +48,9 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response.ResponseTimestamp = connector.Clock().Now()
 	response.RequestMessageRef = request.MessageIdentifier()
 
-	objectidKind := connector.RemoteObjectIDKind()
-
 	for _, situation := range tx.Model().Situations().FindAll() {
 		siriGeneralMessage := &siri.SIRIGeneralMessage{}
-		objectid, _ := situation.ObjectID(objectidKind)
+		objectid, _ := situation.ObjectID("_default")
 		for _, message := range situation.Messages {
 			siriMessage := &siri.SIRIMessage{
 				Content:             message.Content,
@@ -63,8 +61,8 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 			siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 		}
 
-		siriGeneralMessage.ItemIdentifier = objectid.Value()
-		//siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
+		siriGeneralMessage.ItemIdentifier = fmt.Sprintf("Edwig:Item::%s:LOC", objectid.Value())
+		siriGeneralMessage.InfoMessageIdentifier = fmt.Sprintf("Edwig:InfoMessage::%s:LOC", objectid.Value())
 		siriGeneralMessage.InfoChannelRef = situation.Channel
 		siriGeneralMessage.InfoMessageVersion = situation.Version
 		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
