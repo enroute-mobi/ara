@@ -188,7 +188,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                 <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -364,7 +364,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                        | Line#Name                                             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                       | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | RATPDev:Operator::dbe9523913efc7af28fe2f166da05a9013c8a647:LOC       | StopVisit#Reference[OperatorRef]#ObjectID             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | RATPDev:Operator::dbe9523913efc7af28fe2f166da05a9013c8a647:          | StopVisit#Reference[OperatorRef]#ObjectID             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                    | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                         | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                            | VehicleJourney#Attribute[VehicleFeatureRef]           |
@@ -555,7 +555,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
               <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
               <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
@@ -795,7 +795,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
                     <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
                     <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
                     <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:LOC</ns3:OperatorRef>
+                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
                     <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
                     <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
                     <ns3:Monitored>true</ns3:Monitored>

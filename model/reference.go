@@ -17,7 +17,11 @@ func (reference *Reference) GetSha1() string {
 
 func (reference *Reference) Getformat(ref, value string) string {
 	allRef := make(map[string]string)
+	loc := ""
 
+	if ref != "OperatorRef" {
+		loc = "LOC"
+	}
 	allRef["PlaceRef"] = "StopPoint:Q:"
 	allRef["OriginRef"] = "StopPoint:Q:"
 	allRef["DestinationRef"] = "StopPoint:Q:"
@@ -26,7 +30,7 @@ func (reference *Reference) Getformat(ref, value string) string {
 	allRef["DatedVehicleJourneyRef"] = "VehiculeJourney::"
 	allRef["OperatorRef"] = "Operator::"
 
-	formated := fmt.Sprintf("RATPDev:%s%s:LOC", allRef[ref], value)
+	formated := fmt.Sprintf("RATPDev:%s%s:%s", allRef[ref], value, loc)
 
 	return formated
 }
