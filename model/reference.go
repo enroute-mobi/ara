@@ -1,7 +1,6 @@
 package model
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 )
@@ -13,9 +12,7 @@ type Reference struct {
 }
 
 func (reference *Reference) GetSha1() string {
-	hasher := sha1.New() // oui, on sait
-	hasher.Write([]byte(reference.ObjectId.Value()))
-	return fmt.Sprintf("%x", hasher.Sum(nil))
+	return reference.ObjectId.HashValue()
 }
 
 func (reference *Reference) Getformat(ref, value string) string {

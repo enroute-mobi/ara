@@ -193,18 +193,19 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
-		if references[ref] != (model.Reference{}) {
-			if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
-				obj, ok := foundStopArea.ObjectID(connector.RemoteObjectIDKind())
-				if ok {
-					tmp := references[ref]
-					tmp.ObjectId = &obj
-					references[ref] = tmp
-				}
-			} else {
+		if references[ref] == (model.Reference{}) {
+			continue
+		}
+		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
+			obj, ok := foundStopArea.ObjectID(connector.RemoteObjectIDKind())
+			if ok {
 				tmp := references[ref]
-				tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
+				tmp.ObjectId = &obj
+				references[ref] = tmp
 			}
+		} else {
+			tmp := references[ref]
+			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
 		}
 	}
 }

@@ -29,18 +29,19 @@ func (references References) IsEmpty() bool {
 }
 
 func (references References) Copy() References {
-	copy := NewReferences()
+	newReferences := NewReferences()
 
 	for key, value := range references {
-		var obj ObjectID
-		if value.ObjectId != nil {
-			obj = NewObjectID(value.ObjectId.Value(), value.ObjectId.Kind())
+		newReferences[key] = Reference{
+			Id:   value.Id,
+			Type: value.Type,
 		}
-		copy[key] = Reference{
-			Id:       value.Id,
-			Type:     value.Type,
-			ObjectId: &obj,
+		if value.ObjectId != nil {
+			objectid := NewObjectID(value.ObjectId.Kind(), value.ObjectId.Value())
+			tmp := newReferences[key]
+			tmp.ObjectId = &objectid
+			newReferences[key] = tmp
 		}
 	}
-	return copy
+	return newReferences
 }

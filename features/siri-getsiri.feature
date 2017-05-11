@@ -156,10 +156,10 @@ Feature: Support SIRI GetSIRI
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
                       <ns3:DatedVehicleJourneyRef>5CAR621689196575</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:JourneyPatternRef>
+                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::3eb50093508f11b474950daa6b0b8632660a32a6:LOC</ns3:JourneyPatternRef>
                     <ns3:PublishedLineName>Ligne 475</ns3:PublishedLineName>
                     <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:DestinationRef>RATPDev:StopPoint:Q:9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a:LOC</ns3:DestinationRef>
+                    <ns3:DestinationRef>RATPDev:StopPoint:Q:9dd925e2cd515383ad6d975e761cea71ea1a79e7:LOC</ns3:DestinationRef>
                     <ns3:DestinationName>PARIS - Porte d'Orléans</ns3:DestinationName>
                     <ns3:Monitored>true</ns3:Monitored>
                     <ns3:MonitoredCall>
