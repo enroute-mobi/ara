@@ -3,7 +3,6 @@ Feature: Support SIRI GeneralMessage
   Background:
       Given a Referential "test" is created
 
-  @wip
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "3477", "_default" : "45gfdT5EDCfde"                          |
@@ -65,7 +64,7 @@ Feature: Support SIRI GeneralMessage
                 <ns3:GeneralMessage>
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>Edwig:Item::45gfdT5EDCfde:LOC</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>Edwig:InfoMessage::45gfdT5EDCfde:LOC</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
