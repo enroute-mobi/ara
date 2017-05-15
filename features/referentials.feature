@@ -24,6 +24,6 @@ Feature: Manager Referentials
         | ObjectIDs | "internal": "SIRI:34852540"   |
     When the time is "2017-01-02T05:00:00+01:00"
     Then a StopArea "internal":"boaarle" should exist
-    And a Line "internal":"CdF:Line::415:LOC" should not exist
+    And a Line "internal":"CdF:Line::415:LOC" should exist
     And a VehicleJourney "internal":"1STD721689197098" should not exist
     And a StopVisit "internal":"SIRI:34852540" should not exist

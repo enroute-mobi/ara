@@ -50,6 +50,7 @@ func NewMemoryModel() *MemoryModel {
 func (model *MemoryModel) Clone() *MemoryModel {
 	clone := NewMemoryModel()
 	clone.stopAreas = model.stopAreas.Clone(clone)
+	clone.lines = model.lines.Clone(clone)
 	clone.date = NewDate(DefaultClock().Now())
 	return clone
 }

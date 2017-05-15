@@ -127,6 +127,19 @@ func NewMemoryLines() *MemoryLines {
 	}
 }
 
+func (manager *MemoryLines) Clone(model Model) *MemoryLines {
+	clone := NewMemoryLines()
+	clone.model = model
+
+	for _, line := range manager.byIdentifier {
+		cloneLine := *line
+		cloneLine.id = LineId("")
+		clone.Save(&cloneLine)
+	}
+
+	return clone
+}
+
 func (manager *MemoryLines) New() Line {
 	line := NewLine(manager.model)
 	return *line
