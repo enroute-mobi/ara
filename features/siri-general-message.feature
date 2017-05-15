@@ -88,7 +88,7 @@ Feature: Support SIRI GeneralMessage
       </S:Envelope>
       """
 
-
+  @wip
   Scenario: 3009 - Handle a SIRI ServiceDelivery after GM Request to a SIRI server
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
@@ -191,7 +191,7 @@ Feature: Support SIRI GeneralMessage
       </S:Body>
     </S:Envelope>
       """
-    Then I send this SIRI ServiceDelivery
+    Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
