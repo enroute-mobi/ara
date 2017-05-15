@@ -6,7 +6,7 @@ Feature: Support SIRI GeneralMessage
   @wip
   Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "3477"                                                        |
+      | ObjectIDs               | "internal" : "3477", "_default" : "45gfdT5EDCfde"                          |
       | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
       | Channel                 | Commercial                                                                 |
@@ -55,7 +55,6 @@ Feature: Support SIRI GeneralMessage
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
               <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -67,7 +66,7 @@ Feature: Support SIRI GeneralMessage
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
+                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::45gfdT5EDCfde:LOC</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
