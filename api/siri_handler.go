@@ -71,7 +71,7 @@ func logSIRIError(siriError string) {
 }
 
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
-	response.Header().Set("Content-Type", "text/xml")
+	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
 
 	if handler.referential == nil {
 		siriError("NotFound", "Referential not found", response)
