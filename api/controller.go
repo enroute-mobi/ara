@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -60,7 +59,6 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 
 	if requestData.Action != "" {
 		if actionResource, ok := controller.restfulRessource.(ActionResource); ok {
-			fmt.Println("The ressource implement action Bra")
 			actionResource.Action(response, requestData)
 			return
 		}

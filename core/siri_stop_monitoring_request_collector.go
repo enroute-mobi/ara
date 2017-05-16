@@ -120,7 +120,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
-	fmt.Println()
 	for _, StopAreaUpdateSubscriber := range connector.StopAreaUpdateSubscribers {
 		StopAreaUpdateSubscriber(event)
 	}
