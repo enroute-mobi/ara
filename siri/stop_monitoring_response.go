@@ -119,7 +119,6 @@ type SIRIMonitoredStopVisit struct {
 	StopAreaObjectId       string
 
 	VehicleAtStop bool
-	Monitored     bool
 
 	Order int
 
