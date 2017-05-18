@@ -1,18 +1,19 @@
 package core
 
 const (
-	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER = "siri-stop-points-discovery-request-broadcaster"
-	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER       = "siri-general-message-request-broadcaster"
-	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "siri-general-message-request-collector"
-	TEST_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "test-general-message-request-collector"
-	SIRI_SERVICE_REQUEST_BROADCASTER               = "siri-service-request-broadcaster"
-	SIRI_STOP_MONITORING_REQUEST_COLLECTOR         = "siri-stop-monitoring-request-collector"
-	TEST_STOP_MONITORING_REQUEST_COLLECTOR         = "test-stop-monitoring-request-collector"
-	SIRI_STOP_MONITORING_REQUEST_BROADCASTER       = "siri-stop-monitoring-request-broadcaster"
-	SIRI_CHECK_STATUS_CLIENT_TYPE                  = "siri-check-status-client"
-	TEST_CHECK_STATUS_CLIENT_TYPE                  = "test-check-status-client"
-	SIRI_CHECK_STATUS_SERVER_TYPE                  = "siri-check-status-server"
-	TEST_VALIDATION_CONNECTOR                      = "test-validation-connector"
+	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER     = "siri-stop-points-discovery-request-broadcaster"
+	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER           = "siri-general-message-request-broadcaster"
+	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "siri-general-message-request-collector"
+	TEST_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "test-general-message-request-collector"
+	SIRI_SERVICE_REQUEST_BROADCASTER                   = "siri-service-request-broadcaster"
+	SIRI_STOP_MONITORING_REQUEST_COLLECTOR             = "siri-stop-monitoring-request-collector"
+	TEST_STOP_MONITORING_REQUEST_COLLECTOR             = "test-stop-monitoring-request-collector"
+	SIRI_STOP_MONITORING_REQUEST_BROADCASTER           = "siri-stop-monitoring-request-broadcaster"
+	SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR = "siri-stop-monitoring-deliveries-response-collector"
+	SIRI_CHECK_STATUS_CLIENT_TYPE                      = "siri-check-status-client"
+	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
+	SIRI_CHECK_STATUS_SERVER_TYPE                      = "siri-check-status-server"
+	TEST_VALIDATION_CONNECTOR                          = "test-validation-connector"
 )
 
 const (
@@ -69,6 +70,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case TEST_VALIDATION_CONNECTOR:
 		return &TestValidationFactory{}
+	case SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR:
+		return &SIRIStopMonitoringSubscriptionCollectorFactory{}
 	default:
 		return nil
 	}

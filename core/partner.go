@@ -302,7 +302,6 @@ func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	connector, ok := partner.connectors[connectorType]
 	return connector, ok
 }
-
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	// WIP
 	client, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]

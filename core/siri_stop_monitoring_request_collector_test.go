@@ -24,6 +24,7 @@ func (fb *fakeBroadcaster) FakeBroadcaster(event *model.StopAreaUpdateEvent) {
 
 func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) *model.StopAreaUpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
+
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
