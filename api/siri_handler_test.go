@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -93,9 +92,9 @@ func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, 
 			status, http.StatusOK)
 	}
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "text/xml" {
+	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "text/xml; charset=utf-8" {
 		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "text/xml")
+			contentType, "text/xml; charset=utf-8")
 	}
 
 	return responseRecorder
@@ -166,7 +165,7 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 		t.Fatal(err)
 	}
 	request.Header.Set("Content-Encoding", "gzip")
-	request.Header.Set("Content-Type", "text/xml")
+	request.Header.Set("Content-Type", "text/xml; charset=utf-8")
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
@@ -180,8 +179,6 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
 			status, http.StatusOK)
 	}
-
-	fmt.Println(responseRecorder.Body)
 
 	// Check the response body is what we expect.
 	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())

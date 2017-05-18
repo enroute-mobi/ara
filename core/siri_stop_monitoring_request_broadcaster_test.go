@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -57,9 +56,6 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopArea(t *testing.T) {
 	line.Save()
 
 	vehicleJourney.LineId = line.Id()
-
-	s := len(referential.model.StopVisits().FindFollowingByStopAreaId(stopArea.Id()))
-	fmt.Println("STOPVISITS ==", s)
 
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
 	if err != nil {

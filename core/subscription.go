@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/af83/edwig/model"
@@ -178,7 +177,6 @@ func (manager *MemorySubscriptions) NewSubscription() *Subscription {
 }
 
 func (manager *MemorySubscriptions) FindAll() (subscriptions []Subscription) {
-	fmt.Println("In find all ")
 	if len(manager.byIdentifier) == 0 {
 		return []Subscription{}
 	}

@@ -119,7 +119,6 @@ type SIRIMonitoredStopVisit struct {
 	StopAreaObjectId       string
 
 	VehicleAtStop bool
-	Monitored     bool
 
 	Order int
 
@@ -149,7 +148,7 @@ const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0
 				<ns3:{{.ErrorType}}>
 					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
 				</ns3:{{.ErrorType}}>{{ end }}
-			</ns3:ErrorCondition>{{ end }}{{ range .MonitoredStopVisits }}
+			</ns3:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
 			<ns3:MonitoredStopVisit>
 				<ns3:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
@@ -224,7 +223,7 @@ const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0
 						<ns3:NumberOfStopsAway>{{ .Attributes.StopVisitAttributes.NumberOfStopsAway }}</ns3:NumberOfStopsAway>{{end}}
 					</ns3:MonitoredCall>
 				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>{{ end }}
+			</ns3:MonitoredStopVisit>{{ end }}{{ end }}
 		</ns3:StopMonitoringDelivery>`
 
 const stopMonitoringResponseTemplate = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"

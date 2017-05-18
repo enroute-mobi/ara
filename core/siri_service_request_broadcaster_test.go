@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -63,7 +62,6 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
 	if !response.Status {
-		fmt.Println(referential.Model().StopAreas().FindAll())
 		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
 	}
 	if len(response.Deliveries) != 2 {

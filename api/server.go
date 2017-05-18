@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -83,7 +82,6 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 	}
 
 	requestData := NewRequestDataFromContent(foundStrings)
-	fmt.Println(requestData.Referential)
 	response.Header().Set("Content-Type", "application/json")
 	return requestData, nil
 }

@@ -30,7 +30,6 @@ func (controller *PartnerController) subscriptions(response http.ResponseWriter,
 	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
 
 	subscriptions := partner.Subscriptions()
-	fmt.Println("subscriptions == ", subscriptions)
 	jsonBytes, _ := json.Marshal(subscriptions.FindAll())
 	response.Write(jsonBytes)
 }
