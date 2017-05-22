@@ -1,9 +1,9 @@
-require 'webrick'
-require 'uri'
+require 'json'
 require 'optparse'
 require 'securerandom'
 require 'time'
-require 'json'
+require 'uri'
+require 'webrick'
 
 options = {}
 OptionParser.new do |parser|
