@@ -68,7 +68,6 @@ func Test_SIRIStopMonitoringRequest_BuildXML(t *testing.T) {
 	<Request version="2.0:FR-IDF-2.4">
 		<ns2:RequestTimestamp>2009-11-10T23:00:00.000Z</ns2:RequestTimestamp>
 		<ns2:MessageIdentifier>test</ns2:MessageIdentifier>
-		<ns2:StartTime>2009-11-10T23:00:00.000Z</ns2:StartTime>
 		<ns2:MonitoringRef>test</ns2:MonitoringRef>
 		<ns2:StopVisitTypes>all</ns2:StopVisitTypes>
 	</Request>

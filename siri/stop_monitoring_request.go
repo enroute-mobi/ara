@@ -35,7 +35,6 @@ const stopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://
 	<Request version="2.0:FR-IDF-2.4">
 		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
 		<ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
-		<ns2:StartTime>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:StartTime>
 		<ns2:MonitoringRef>{{.MonitoringRef}}</ns2:MonitoringRef>
 		<ns2:StopVisitTypes>all</ns2:StopVisitTypes>
 	</Request>
