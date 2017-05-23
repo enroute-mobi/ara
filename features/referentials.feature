@@ -23,7 +23,11 @@ Feature: Manager Referentials
     And a StopVisit exists with the following attributes:
         | ObjectIDs | "internal": "SIRI:34852540"   |
     When the time is "2017-01-02T05:00:00+01:00"
-    Then a StopArea "internal":"boaarle" should exist
-    And a Line "internal":"CdF:Line::415:LOC" should exist
+    Then one StopArea has the following attributes:
+        | Id        | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+        | ObjectIDs | "internal":"boaarle"              |
+    And one Line has the following attributes:
+        | Id        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+        | ObjectIDs | "internal":"CdF:Line::415:LOC"    |
     And a VehicleJourney "internal":"1STD721689197098" should not exist
     And a StopVisit "internal":"SIRI:34852540" should not exist

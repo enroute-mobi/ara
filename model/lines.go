@@ -133,7 +133,6 @@ func (manager *MemoryLines) Clone(model Model) *MemoryLines {
 
 	for _, line := range manager.byIdentifier {
 		cloneLine := *line
-		cloneLine.id = LineId("")
 		clone.Save(&cloneLine)
 	}
 
