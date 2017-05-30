@@ -19,7 +19,7 @@ Before do
 
     begin
       response = RestClient::Request.execute(method: :get, url: "#{$server}/_status", timeout: 1, :headers => {:Authorization => 'Token token=6ceab96a-8d97-4f2a-8d69-32569a38fc64'})
-      break if response.code == 200 && response.body == '{ "status": "ok" }'
+      break if response.code == 200 && JSON.parse(response.body)["status"] == "ok"
     rescue Exception # => e
       # puts e.inspect
     end
