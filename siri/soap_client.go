@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/af83/edwig/version"
 	"github.com/jbowtie/gokogiri/xml"
 	"golang.org/x/text/encoding/charmap"
 )
@@ -58,6 +59,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 		httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
+	httpRequest.Header.Set("User-Agent", version.Value())
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request

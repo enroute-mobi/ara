@@ -11,6 +11,7 @@ import (
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
+	"github.com/af83/edwig/version"
 )
 
 type Server struct {
@@ -83,6 +84,7 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 
 	requestData := NewRequestDataFromContent(foundStrings)
 	response.Header().Set("Content-Type", "application/json")
+	response.Header().Set("Server", version.Value())
 	return requestData, nil
 }
 

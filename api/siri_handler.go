@@ -9,6 +9,7 @@ import (
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/siri"
+	"github.com/af83/edwig/version"
 )
 
 type SIRIRequestHandler interface {
@@ -76,6 +77,7 @@ func logSIRIError(siriError string) {
 
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
+	response.Header().Set("Server", version.Value())
 
 	if handler.referential == nil {
 		siriError("NotFound", "Referential not found", response)
