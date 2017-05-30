@@ -16,6 +16,7 @@ import (
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
+	"github.com/af83/edwig/version"
 )
 
 func main() {
@@ -66,6 +67,7 @@ func main() {
 		audit.CurrentLogStash().Start()
 		defer audit.CurrentLogStash().Stop()
 	}
+	logger.Log.Debugf("Edwig started with a version : %v", version.Value())
 
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
