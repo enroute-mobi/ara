@@ -1584,7 +1584,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
       | Schedule[aimed]#Departure            | 2017-01-01T13:02:00.000Z                                             |
       | Schedule[expected]#Arrival           | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[expected]#Departure         | 2017-01-01T13:02:00.000Z                                             |
-    When I receive this StopMonitoringDelivery
+    When I send this SIRI request
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
