@@ -169,15 +169,15 @@ const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0
 					<ns3:OperatorRef>{{.References.StopVisitReferences.OperatorRef.ObjectId.Value}}</ns3:OperatorRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ProductCategoryRef}}
 					<ns3:ProductCategoryRef>{{.Attributes.VehicleJourneyAttributes.ProductCategoryRef}}</ns3:ProductCategoryRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}
 					<ns3:ServiceFeatureRef>{{.Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}</ns3:ServiceFeatureRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}
-					<ns3:VehicleFeatureRef>{{.Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}</ns3:VehicleFeatureRef>{{end}}{{ if .References.VehicleJourney.OriginRef}}
-					<ns3:OriginRef>{{.References.VehicleJourney.OriginRef.ObjectId.Value}}</ns3:OriginRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.OriginName }}
+					<ns3:VehicleFeatureRef>{{.Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}</ns3:VehicleFeatureRef>{{end}}{{ if .References.VehicleJourney.OriginRef.ObjectId.Value}}
+					<ns3:OriginRef>{{ .References.VehicleJourney.OriginRef.ObjectId.Value }}</ns3:OriginRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.OriginName }}
 					<ns3:OriginName>{{ .Attributes.VehicleJourneyAttributes.OriginName }}</ns3:OriginName>{{ end }}{{ if or .Attributes.VehicleJourneyAttributes.ViaPlaceName .References.VehicleJourney.PlaceRef }}
 					<ns3:Via>{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
 						<ns3:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</ns3:PlaceName>{{end}}{{ if .References.VehicleJourney.PlaceRef}}
 					  <ns3:PlaceRef>{{.References.VehicleJourney.PlaceRef.ObjectId.Value}}</ns3:PlaceRef>{{ end }}
-					</ns3:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef}}
-					<ns3:DestinationRef>{{.References.VehicleJourney.DestinationRef.ObjectId.Value}}</ns3:DestinationRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationName}}
-					<ns3:DestinationName>{{.Attributes.VehicleJourneyAttributes.DestinationName}}</ns3:DestinationName>{{end}}{{ if .VehicleJourneyName }}
+					</ns3:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef.ObjectId.Value }}
+					<ns3:DestinationRef>{{ .References.VehicleJourney.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationName}}
+					<ns3:DestinationName>{{ .Attributes.VehicleJourneyAttributes.DestinationName }}</ns3:DestinationName>{{end}}{{ if .VehicleJourneyName }}
 					<ns3:VehicleJourneyName>{{ .VehicleJourneyName }}</ns3:VehicleJourneyName>{{end}}{{ if .Attributes.VehicleJourneyAttributes.JourneyNote}}
 					<ns3:JourneyNote>{{.Attributes.VehicleJourneyAttributes.JourneyNote}}</ns3:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}
 					<ns3:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</ns3:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}

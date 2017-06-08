@@ -109,12 +109,26 @@ func (updater *StopVisitUpdater) Update() {
 			logger.Log.Debugf("StopVisitUpdateEvent associated to unknown StopArea: %v", updater.event.StopAreaObjectId)
 		}
 
+		foundVehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DatedVehicleJourneyRef))
+		if ok {
+			foundVehicleJourney.References.SetObjectId("DestinationRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationRef), "")
+			foundVehicleJourney.References.SetObjectId("DestinationName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationName), "")
+			foundVehicleJourney.References.SetObjectId("OriginRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginRef), "")
+			foundVehicleJourney.References.SetObjectId("OriginName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginName), "")
+		} else {
+			foundVehicleJourney = *updater.CreateVehicleJourney(updater.event.Attributes.VehicleJourneyAttributes())
+		}
+		updater.resolveVehiculeJourneyReferences(foundVehicleJourney)
+
+		foundVehicleJourney.Save()
+
 		return
 	}
 
 	foundStopArea := updater.findOrCreateStopArea(updater.event.Attributes.StopAreaAttributes())
 
 	updater.findOrCreateLine(updater.event.Attributes.LineAttributes())
+
 	foundVehicleJourney := updater.findOrCreateVehicleJourney(updater.event.Attributes.VehicleJourneyAttributes())
 
 	stopVisitAttributes := updater.event.Attributes.StopVisitAttributes()
@@ -193,6 +207,26 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 	return &line
 }
 
+func (updater *StopVisitUpdater) CreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) *VehicleJourney {
+	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
+
+	vehicleJourney := updater.tx.Model().VehicleJourneys().New()
+	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
+	vehicleJourney.SetObjectID(NewObjectID("_default", vehicleJourneyAttributes.ObjectId.HashValue()))
+	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
+	vehicleJourney.LineId = foundLine.Id()
+
+	vehicleJourney.Attributes = vehicleJourneyAttributes.Attributes
+	vehicleJourney.References = vehicleJourneyAttributes.References
+	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
+
+	updater.resolveVehiculeJourneyReferences(vehicleJourney)
+
+	vehicleJourney.Save()
+
+	return &vehicleJourney
+}
+
 func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) *VehicleJourney {
 	vehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(vehicleJourneyAttributes.ObjectId)
 	if ok {
@@ -200,19 +234,5 @@ func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttrib
 		return &vehicleJourney
 	}
 
-	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
-
-	vehicleJourney = updater.tx.Model().VehicleJourneys().New()
-	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
-	vehicleJourney.SetObjectID(NewObjectID("_default", vehicleJourneyAttributes.ObjectId.HashValue()))
-	foundLine, _ := updater.tx.Model().Lines().FindByObjectId(vehicleJourneyAttributes.LineObjectId)
-	vehicleJourney.LineId = foundLine.Id()
-	vehicleJourney.Attributes = updater.event.Attributes.VehicleJourneyAttributes().Attributes
-	vehicleJourney.References = updater.event.Attributes.VehicleJourneyAttributes().References
-	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
-	updater.resolveVehiculeJourneyReferences(vehicleJourney)
-
-	vehicleJourney.Save()
-
-	return &vehicleJourney
+	return updater.CreateVehicleJourney(vehicleJourneyAttributes)
 }

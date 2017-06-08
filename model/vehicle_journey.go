@@ -17,8 +17,9 @@ type VehicleJourney struct {
 
 	id VehicleJourneyId
 
-	LineId     LineId `json:",omitempty"`
-	Name       string `json:",omitempty"`
+	LineId LineId `json:",omitempty"`
+	Name   string `json:",omitempty"`
+
 	Attributes Attributes
 	References References
 }

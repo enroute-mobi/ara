@@ -38,5 +38,12 @@ type StopVisitUpdateEvent struct {
 	DepartureStatus   StopVisitDepartureStatus
 	ArrivalStatuts    StopVisitArrivalStatus
 	VehicleAtStop     bool
-	Attributes        StopVisitUpdateAttributes
+
+	// Vehicle Journey
+	DatedVehicleJourneyRef string
+	DestinationRef         string
+	OriginRef              string
+	DestinationName        string
+	OriginName             string
+	Attributes             StopVisitUpdateAttributes
 }

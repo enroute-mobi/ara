@@ -17,6 +17,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 		StopVisitObjectid: objectid,
 		DepartureStatus:   STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatuts:    STOP_VISIT_ARRIVAL_ONTIME,
+		Attributes:        &TestStopVisitUpdateAttributes{},
 	}
 
 	manager.UpdateStopVisit(event)

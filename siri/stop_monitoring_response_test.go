@@ -146,7 +146,9 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	</Answer>
 	<AnswerExtension/>
 </ns8:GetStopMonitoringResponse>`
+
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
+
 	request := &SIRIStopMonitoringResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
@@ -238,18 +240,17 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		References: make(map[string]map[string]model.Reference),
 	}
 
-	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
 	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
+	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
 
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
 	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
-
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "42"}
 	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
 	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "1337"}
 
 	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = request.BuildXML()

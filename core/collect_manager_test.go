@@ -113,6 +113,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 		StopVisitObjectid: objectid,
 		DepartureStatus:   model.STOP_VISIT_DEPARTURE_ONTIME,
 		ArrivalStatuts:    model.STOP_VISIT_ARRIVAL_ARRIVED,
+		Attributes:        &model.TestStopVisitUpdateAttributes{},
 	}
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent("test", stopArea.Id())
 	stopAreaUpdateEvent.StopVisitUpdateEvents = []*model.StopVisitUpdateEvent{stopVisitUpdateEvent}
