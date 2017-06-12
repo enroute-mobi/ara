@@ -10,6 +10,7 @@ import (
 
 type SIRIStopMonitoringDeliveriesResponseHandler struct {
 	xmlRequest *siri.XMLStopMonitoringResponse
+	Partner    core.Partner
 }
 
 func (handler *SIRIStopMonitoringDeliveriesResponseHandler) RequestorRef() string {
@@ -30,4 +31,15 @@ func (handler *SIRIStopMonitoringDeliveriesResponseHandler) Respond(connector co
 		stopAreaUpdateRequest := core.NewStopAreaUpdateRequest(model.StopAreaId(stopvisit.StopPointRef()))
 		connector.(core.StopMonitoringSubscriptionCollector).RequestStopAreaUpdate(stopAreaUpdateRequest)
 	}
+
+	cancelledMap := make(map[string][]string)
+	cancelledstopvisits := handler.xmlRequest.XMLMonitoredStopVisitCancellations()
+	for _, cancelledStopVisit := range cancelledstopvisits {
+		if cancelledStopVisit.ItemRef() == "" || cancelledStopVisit.MonitoringRef() == "" {
+			continue
+		}
+		monitoringRef := cancelledStopVisit.MonitoringRef()
+		cancelledMap[monitoringRef] = append(cancelledMap[monitoringRef], cancelledStopVisit.ItemRef())
+	}
+	connector.(core.StopMonitoringSubscriptionCollector).CancelStopVisitMonitoring(cancelledMap)
 }

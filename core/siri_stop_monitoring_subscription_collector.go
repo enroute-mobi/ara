@@ -8,6 +8,7 @@ import (
 
 type StopMonitoringSubscriptionCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
+	CancelStopVisitMonitoring(cancelledMap map[string][]string)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -15,6 +16,9 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 	model.UUIDConsumer
 
 	siriConnector
+
+	Partner                   Partner
+	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
 }
 
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
@@ -22,6 +26,8 @@ type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
 func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonitoringSubscriptionCollector {
 	siriStopMonitoringSubscriptionCollector := &SIRIStopMonitoringSubscriptionCollector{}
 	siriStopMonitoringSubscriptionCollector.partner = partner
+	manager := partner.Referential().CollectManager()
+	siriStopMonitoringSubscriptionCollector.StopAreaUpdateSubscribers = manager.GetStopAreaUpdateSubscribers()
 
 	return siriStopMonitoringSubscriptionCollector
 }
@@ -46,7 +52,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		}
 	}
 
-	objId := model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), string(request.StopAreaId()))
+	objId := model.NewObjectID("StopMonitoring", string(request.StopAreaId()))
 	ref := model.Reference{
 		ObjectId: &objId,
 		Id:       string(request.StopAreaId()),
@@ -54,4 +60,25 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	subscription.CreateAddNewResource(ref)
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
+	connector.StopAreaUpdateSubscribers = append(connector.StopAreaUpdateSubscribers, stopAreaUpdateSubscriber)
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+	for _, StopAreaUpdateSubscriber := range connector.StopAreaUpdateSubscribers {
+		StopAreaUpdateSubscriber(event)
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) CancelStopVisitMonitoring(cancelledMap map[string][]string) {
+	for key, stopVisitIds := range cancelledMap {
+		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(key))
+		for _, stopVisitId := range stopVisitIds {
+			NotCollectedEvent := model.StopVisitNotCollectedEvent{StopVisitObjectId: model.NewObjectID("StopMonitoring", stopVisitId)}
+			stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, &NotCollectedEvent)
+		}
+		connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	}
 }

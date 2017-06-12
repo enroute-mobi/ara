@@ -94,6 +94,10 @@
               </ns2:MonitoredCall>
             </ns2:MonitoredVehicleJourney>
           </ns2:MonitoredStopVisit>
+          <ns2:MonitoredStopVisitCancellation>
+            <ns2:ItemRef>SNCF-ACCES:Item::411415_125212:LOC</ns2:ItemRef>
+            <ns2:MonitoringRef>STIF:StopPoint:Q:411415:</ns2:MonitoringRef>
+          </ns2:MonitoredStopVisitCancellation>
         </ns2:StopMonitoringDelivery>
       </Notification>
       <SiriExtension />

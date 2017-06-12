@@ -16,6 +16,13 @@ type XMLStopMonitoringResponse struct {
 	monitoredStopVisits []*XMLMonitoredStopVisit
 }
 
+type XMLMonitoredStopVisitCancellation struct {
+	XMLStructure
+
+	itemRef       string
+	monitoringRef string
+}
+
 type XMLMonitoredStopVisit struct {
 	XMLStructure
 
@@ -261,6 +268,32 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 	return response, nil
 }
 
+func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
+	cancelledStopVisits := []*XMLMonitoredStopVisitCancellation{}
+	nodes := response.findNodes("MonitoredStopVisitCancellation")
+	if nodes == nil {
+		return cancelledStopVisits
+		for _, cancelledStopVisitNode := range nodes {
+			cancelledStopVisits = append(cancelledStopVisits, NewXMLCancelledStopVisit(cancelledStopVisitNode))
+		}
+	}
+	return cancelledStopVisits
+}
+
+func (cancel *XMLMonitoredStopVisitCancellation) ItemRef() string {
+	if cancel.itemRef == "" {
+		cancel.itemRef = cancel.findStringChildContent("ItemRef")
+	}
+	return cancel.itemRef
+}
+
+func (cancel *XMLMonitoredStopVisitCancellation) MonitoringRef() string {
+	if cancel.monitoringRef == "" {
+		cancel.monitoringRef = cancel.findStringChildContent("MonitoringRef")
+	}
+	return cancel.monitoringRef
+}
+
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
 	if len(response.monitoredStopVisits) == 0 {
 		nodes := response.findNodes("MonitoredStopVisit")
@@ -272,6 +305,12 @@ func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonito
 		}
 	}
 	return response.monitoredStopVisits
+}
+
+func NewXMLCancelledStopVisit(node XMLNode) *XMLMonitoredStopVisitCancellation {
+	cancelledStopVisit := &XMLMonitoredStopVisitCancellation{}
+	cancelledStopVisit.node = node
+	return cancelledStopVisit
 }
 
 func NewXMLMonitoredStopVisit(node XMLNode) *XMLMonitoredStopVisit {

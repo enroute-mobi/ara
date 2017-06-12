@@ -11,6 +11,7 @@ import (
 
 type SIRIStopMonitoringRequestHandler struct {
 	xmlRequest *siri.XMLStopMonitoringRequest
+	Partner    core.Partner
 }
 
 func (handler *SIRIStopMonitoringRequestHandler) RequestorRef() string {
