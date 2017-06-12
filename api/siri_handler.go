@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/siri"
 	"github.com/af83/edwig/version"
@@ -56,25 +55,6 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 	return nil
 }
 
-func siriError(errCode, errDescription string, response http.ResponseWriter) {
-	// Wrap soap and send response
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(fmt.Sprintf(`
-  <S:Fault xmlns:ns4="http://www.w3.org/2003/05/soap-envelope">
-    <faultcode>S:%s</faultcode>
-    <faultstring>%s</faultstring>
-  </S:Fault>`, errCode, errDescription))
-
-	logSIRIError(soapEnvelope.String())
-	soapEnvelope.WriteTo(response)
-}
-
-func logSIRIError(siriError string) {
-	logStashEvent := make(audit.LogStashEvent)
-	logStashEvent["SIRIError"] = siriError
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
-}
-
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
 	response.Header().Set("Server", version.Value())
@@ -106,18 +86,18 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 
 	requestHandler := handler.requestHandler(envelope)
 	if requestHandler == nil {
-		siriError("NotSupported", fmt.Sprintf("SIRIRequest %v not supported", envelope.BodyType()), response)
+		siriErrorWithRequest("NotSupported", fmt.Sprintf("SIRIRequest %v not supported", envelope.BodyType()), envelope.Body().String(), response)
 		return
 	}
 
 	partner, ok := handler.referential.Partners().FindByLocalCredential(requestHandler.RequestorRef())
 	if !ok {
-		siriError("UnknownCredential", "RequestorRef Unknown", response)
+		siriErrorWithRequest("UnknownCredential", "RequestorRef Unknown", envelope.Body().String(), response)
 		return
 	}
 	connector, ok := partner.Connector(requestHandler.ConnectorType())
 	if !ok {
-		siriError("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), response)
+		siriErrorWithRequest("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), envelope.Body().String(), response)
 		return
 	}
 
