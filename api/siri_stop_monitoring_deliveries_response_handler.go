@@ -14,7 +14,7 @@ type SIRIStopMonitoringDeliveriesResponseHandler struct {
 }
 
 func (handler *SIRIStopMonitoringDeliveriesResponseHandler) RequestorRef() string {
-	return "None"
+	return handler.xmlRequest.ProducerRef()
 }
 
 func (handler *SIRIStopMonitoringDeliveriesResponseHandler) ConnectorType() string {
