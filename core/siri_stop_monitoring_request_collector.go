@@ -27,7 +27,7 @@ type SIRIStopMonitoringRequestCollector struct {
 
 	siriConnector
 
-	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
+	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
 }
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}
@@ -54,7 +54,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{}
 	siriStopMonitoringRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriStopMonitoringRequestCollector.StopAreaUpdateSubscribers = manager.GetStopAreaUpdateSubscribers()
+	siriStopMonitoringRequestCollector.stopAreaUpdateSubscriber = manager.BroadcastStopAreaUpdateEvent
 
 	return siriStopMonitoringRequestCollector
 }
@@ -116,12 +116,12 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, collectedStopVisitObjectIDs)
 	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
 
-	go connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
-	for _, StopAreaUpdateSubscriber := range connector.StopAreaUpdateSubscribers {
-		StopAreaUpdateSubscriber(event)
+	if connector.stopAreaUpdateSubscriber != nil {
+		connector.stopAreaUpdateSubscriber(event)
 	}
 }
 
@@ -179,7 +179,7 @@ func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(ev
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
-	connector.StopAreaUpdateSubscribers = append(connector.StopAreaUpdateSubscribers, stopAreaUpdateSubscriber)
+	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
