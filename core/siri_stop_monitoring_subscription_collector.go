@@ -143,6 +143,20 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 	}
 }
 
+func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
+	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+	logStashEvent["monitoringRef"] = request.MonitoringRef
+	logStashEvent["requestorRef"] = request.RequestorRef
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+	xml, err := request.BuildXML()
+	if err != nil {
+		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["requestXML"] = xml
+}
+
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
 	logStashEvent["address"] = delivery.Address()
 	logStashEvent["producerRef"] = delivery.ProducerRef()
