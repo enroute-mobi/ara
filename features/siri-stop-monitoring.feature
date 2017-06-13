@@ -156,8 +156,7 @@ Feature: Support SIRI StopMonitoring
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
     xmlns:ns4="http://www.ifopt.org.uk/acsb"
@@ -246,7 +245,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='UTF-8'?>
-<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
+<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
   <S:Body>
     <ns8:GetStopMonitoringResponse xmlns:ns3='http://www.siri.org.uk/siri' xmlns:ns4='http://www.ifopt.org.uk/acsb' xmlns:ns5='http://www.ifopt.org.uk/ifopt' xmlns:ns6='http://datex2.eu/schema/2_0RC1/2_0' xmlns:ns7='http://scma/siri' xmlns:ns8='http://wsdl.siri.org.uk' xmlns:ns9='http://wsdl.siri.org.uk/siri'>
       <ServiceDeliveryInfo>
@@ -520,8 +519,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
     xmlns:ns4="http://www.ifopt.org.uk/acsb"
@@ -761,8 +759,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
           xmlns:ns4="http://www.ifopt.org.uk/acsb"
@@ -1529,7 +1526,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='UTF-8'?>
-<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/' xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
+<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
   <S:Body>
     <ns8:GetStopMonitoringResponse xmlns:ns3='http://www.siri.org.uk/siri' xmlns:ns4='http://www.ifopt.org.uk/acsb' xmlns:ns5='http://www.ifopt.org.uk/ifopt' xmlns:ns6='http://datex2.eu/schema/2_0RC1/2_0' xmlns:ns7='http://scma/siri' xmlns:ns8='http://wsdl.siri.org.uk' xmlns:ns9='http://wsdl.siri.org.uk/siri'>
       <ServiceDeliveryInfo>
