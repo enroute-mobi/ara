@@ -94,7 +94,7 @@ Feature: Support SIRI GetSIRI
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
           <Answer xmlns:ns3="http://www.siri.org.uk/siri"
@@ -273,7 +273,7 @@ Feature: Support SIRI GetSIRI
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
           <Answer xmlns:ns3="http://www.siri.org.uk/siri"

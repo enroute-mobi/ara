@@ -8,8 +8,7 @@ Feature: Support SIRI CheckStatus
     When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri"
     xmlns:ns3="http://www.ifopt.org.uk/acsb"
@@ -30,8 +29,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
     xmlns:ns3="http://www.ifopt.org.uk/acsb"
@@ -60,8 +58,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     When I send this SIRI request
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns7:CheckStatus xmlns:ns2="http://www.siri.org.uk/siri"
     xmlns:ns3="http://www.ifopt.org.uk/acsb"
@@ -82,7 +79,7 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <S:Fault xmlns:ns4='http://www.w3.org/2003/05/soap-envelope'>
       <faultcode>S:UnknownCredential</faultcode>

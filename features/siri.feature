@@ -9,7 +9,7 @@ Feature: Support SIRI request
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <S:Fault xmlns:ns4='http://www.w3.org/2003/05/soap-envelope'>
       <faultcode>S:Client</faultcode>
@@ -27,7 +27,7 @@ Invalid Request
     Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <S:Fault xmlns:ns4='http://www.w3.org/2003/05/soap-envelope'>
       <faultcode>S:Client</faultcode>

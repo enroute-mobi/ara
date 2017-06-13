@@ -62,7 +62,7 @@ func NewSOAPEnvelopeBuffer() *SOAPEnvelopeBuffer {
 }
 
 func (writer *SOAPEnvelopeBuffer) WriteXML(xml string) {
-	writer.buffer.WriteString("<?xml version='1.0' encoding='utf-8'?>\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<S:Body>\n")
+	writer.buffer.WriteString("<?xml version='1.0' encoding='utf-8'?>\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<S:Body>\n")
 	writer.buffer.WriteString(xml)
 	writer.buffer.WriteString("\n</S:Body>\n</S:Envelope>")
 }

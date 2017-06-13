@@ -65,7 +65,7 @@ func Test_SOAPEnvelope_BodyType(t *testing.T) {
 func Test_SOAPEnvelopeBuffer_Read(t *testing.T) {
 	var r []byte = make([]byte, 512)
 	expected := `<?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 <S:Body>
 test
 </S:Body>
@@ -86,7 +86,7 @@ test
 func Test_SOAPEnvelopeBuffer_WriteTo(t *testing.T) {
 	var buf bytes.Buffer
 	expected := `<?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 <S:Body>
 test
 </S:Body>

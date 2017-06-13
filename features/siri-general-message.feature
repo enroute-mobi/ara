@@ -17,7 +17,7 @@ Feature: Support SIRI GeneralMessage
       | remote_objectid_kind | internal       |
     When I send this SIRI request
       """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>
       <S:Body>
         <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -42,7 +42,7 @@ Feature: Support SIRI GeneralMessage
     Then I should receive this SIRI response
       """
       <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
           xmlns:ns4="http://www.ifopt.org.uk/acsb"
@@ -168,7 +168,7 @@ Feature: Support SIRI GeneralMessage
     And a minute has passed
     When I send this SIRI request
       """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>
       <S:Body>
         <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
