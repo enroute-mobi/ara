@@ -48,6 +48,9 @@ func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonit
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	for _, sr := range subscription.resourcesByObjectID {
