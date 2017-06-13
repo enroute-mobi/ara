@@ -107,10 +107,7 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//%s", localName)
 
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
-	if err != nil {
-		return xmlStruct.findNodeWithNamespace(localName)
-	}
-	if len(nodes) == 0 {
+	if err != nil || len(nodes) == 0 {
 		return xmlStruct.findNodeWithNamespace(localName)
 	}
 	return nodes[0]
