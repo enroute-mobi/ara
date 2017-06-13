@@ -75,6 +75,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", objId.HashValue()),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
+	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 	connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 }
 
