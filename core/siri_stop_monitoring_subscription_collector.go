@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -64,6 +65,17 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	subscription.CreateAddNewResource(ref)
+
+	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
+		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
+		MonitoringRef:          string(request.StopAreaId()),
+		RequestorRef:           connector.SIRIPartner().RequestorRef(),
+		RequestTimestamp:       connector.Clock().Now(),
+		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
+		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", objId.HashValue()),
+		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
+	}
+	connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {

@@ -31,7 +31,7 @@ type SIRIStopMonitoringSubscriptionRequest struct {
 	ConsumerAddress        string
 }
 
-const StopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:siri="tmp value">
+const StopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:siri="http://www.siri.org.uk/siri">
 	<SubscriptionRequestInfo>
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
