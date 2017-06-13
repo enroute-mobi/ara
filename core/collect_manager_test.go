@@ -117,7 +117,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	}
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent("test", stopArea.Id())
 	stopAreaUpdateEvent.StopVisitUpdateEvents = []*model.StopVisitUpdateEvent{stopVisitUpdateEvent}
-	referential.collectManager.(*CollectManager).broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	referential.collectManager.BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_ARRIVED {

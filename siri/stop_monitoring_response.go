@@ -271,8 +271,7 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
 	cancelledStopVisits := []*XMLMonitoredStopVisitCancellation{}
 	nodes := response.findNodes("MonitoredStopVisitCancellation")
-	if nodes == nil {
-		return cancelledStopVisits
+	if nodes != nil {
 		for _, cancelledStopVisitNode := range nodes {
 			cancelledStopVisits = append(cancelledStopVisits, NewXMLCancelledStopVisit(cancelledStopVisitNode))
 		}

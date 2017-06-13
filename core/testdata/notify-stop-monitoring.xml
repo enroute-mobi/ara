@@ -1,0 +1,114 @@
+<ns1:NotifyStopMonitoring xmlns:ns1="http://wsdl.siri.org.uk">
+  <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+    <ns5:ResponseTimestamp>2017-06-13T10:12:38.935+02:00</ns5:ResponseTimestamp>
+    <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
+    <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:374397</ns5:ResponseMessageIdentifier>
+    <ns5:RequestMessageRef>Edwig:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+    <ns5:StopMonitoringDelivery version="1.3">
+      <ns5:ResponseTimestamp>2017-06-13T10:12:38.935+02:00</ns5:ResponseTimestamp>
+      <ns5:RequestMessageRef>28679112-9dad-11d1-2-00c04fd430c8</ns5:RequestMessageRef>
+      <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
+      <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns5:SubscriptionRef>
+      <ns5:Status>true</ns5:Status>
+      <ns5:MonitoredStopVisit>
+        <ns5:RecordedAtTime>2017-06-13T10:12:38.930+02:00</ns5:RecordedAtTime>
+        <ns5:ItemIdentifier>SIRI:43417614</ns5:ItemIdentifier>
+        <ns5:MonitoringRef>coicogn2</ns5:MonitoringRef>
+        <ns5:MonitoredVehicleJourney>
+          <ns5:LineRef>CdF:Line::411:LOC</ns5:LineRef>
+          <ns5:FramedVehicleJourneyRef>
+            <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+            <ns5:DatedVehicleJourneyRef>1STD4821696072881</ns5:DatedVehicleJourneyRef>
+          </ns5:FramedVehicleJourneyRef>
+          <ns5:JourneyPatternRef>CdF:JourneyPattern::L411P21:LOC</ns5:JourneyPatternRef>
+          <ns5:PublishedLineName>411</ns5:PublishedLineName>
+          <ns5:DirectionName>Aller</ns5:DirectionName>
+          <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+          <ns5:DestinationRef>elacote</ns5:DestinationRef>
+          <ns5:DestinationName>Les Côtes</ns5:DestinationName>
+          <ns5:Monitored>false</ns5:Monitored>
+          <ns5:MonitoredCall>
+            <ns5:StopPointRef>coicogn2</ns5:StopPointRef>
+            <ns5:Order>4</ns5:Order>
+            <ns5:StopPointName>Rue des Cognassiers</ns5:StopPointName>
+            <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+            <ns5:DestinationDisplay>Les Côtes</ns5:DestinationDisplay>
+            <ns5:AimedArrivalTime>2017-06-13T14:54:26.000+02:00</ns5:AimedArrivalTime>
+            <ns5:ExpectedArrivalTime>2017-06-13T14:54:26.000+02:00</ns5:ExpectedArrivalTime>
+            <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+            <ns5:AimedDepartureTime>2017-06-13T14:54:26.000+02:00</ns5:AimedDepartureTime>
+            <ns5:ExpectedDepartureTime>2017-06-13T14:54:26.000+02:00</ns5:ExpectedDepartureTime>
+            <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+          </ns5:MonitoredCall>
+        </ns5:MonitoredVehicleJourney>
+      </ns5:MonitoredStopVisit>
+      <ns5:MonitoredStopVisit>
+        <ns5:RecordedAtTime>2017-06-13T10:12:38.930+02:00</ns5:RecordedAtTime>
+        <ns5:ItemIdentifier>SIRI:43386217</ns5:ItemIdentifier>
+        <ns5:MonitoringRef>coicogn2</ns5:MonitoringRef>
+        <ns5:MonitoredVehicleJourney>
+          <ns5:LineRef>CdF:Line::411:LOC</ns5:LineRef>
+          <ns5:FramedVehicleJourneyRef>
+            <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+            <ns5:DatedVehicleJourneyRef>1STD2821696075548</ns5:DatedVehicleJourneyRef>
+          </ns5:FramedVehicleJourneyRef>
+          <ns5:JourneyPatternRef>CdF:JourneyPattern::L411P21:LOC</ns5:JourneyPatternRef>
+          <ns5:PublishedLineName>411</ns5:PublishedLineName>
+          <ns5:DirectionName>Aller</ns5:DirectionName>
+          <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+          <ns5:DestinationRef>elacote</ns5:DestinationRef>
+          <ns5:DestinationName>Les Côtes</ns5:DestinationName>
+          <ns5:Monitored>true</ns5:Monitored>
+          <ns5:MonitoredCall>
+            <ns5:StopPointRef>coicogn2</ns5:StopPointRef>
+            <ns5:Order>4</ns5:Order>
+            <ns5:StopPointName>Rue des Cognassiers</ns5:StopPointName>
+            <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+            <ns5:DestinationDisplay>Les Côtes</ns5:DestinationDisplay>
+            <ns5:AimedArrivalTime>2017-06-13T11:54:26.000+02:00</ns5:AimedArrivalTime>
+            <ns5:ExpectedArrivalTime>2017-06-13T11:54:26.000+02:00</ns5:ExpectedArrivalTime>
+            <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+            <ns5:AimedDepartureTime>2017-06-13T11:54:26.000+02:00</ns5:AimedDepartureTime>
+            <ns5:ExpectedDepartureTime>2017-06-13T11:54:26.000+02:00</ns5:ExpectedDepartureTime>
+            <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+          </ns5:MonitoredCall>
+        </ns5:MonitoredVehicleJourney>
+      </ns5:MonitoredStopVisit>
+      <ns5:MonitoredStopVisit>
+        <ns5:RecordedAtTime>2017-06-13T10:12:38.930+02:00</ns5:RecordedAtTime>
+        <ns5:ItemIdentifier>SIRI:43386179</ns5:ItemIdentifier>
+        <ns5:MonitoringRef>coicogn3</ns5:MonitoringRef>
+        <ns5:MonitoredVehicleJourney>
+          <ns5:LineRef>CdF:Line::411:LOC</ns5:LineRef>
+          <ns5:FramedVehicleJourneyRef>
+            <ns5:DataFrameRef>SQYBUS:Version:1.0:LOC</ns5:DataFrameRef>
+            <ns5:DatedVehicleJourneyRef>1STD2821696072987</ns5:DatedVehicleJourneyRef>
+          </ns5:FramedVehicleJourneyRef>
+          <ns5:JourneyPatternRef>CdF:JourneyPattern::L411P21:LOC</ns5:JourneyPatternRef>
+          <ns5:PublishedLineName>411</ns5:PublishedLineName>
+          <ns5:DirectionName>Aller</ns5:DirectionName>
+          <ns5:OperatorRef>CdF:Company::410:LOC</ns5:OperatorRef>
+          <ns5:DestinationRef>elacote</ns5:DestinationRef>
+          <ns5:DestinationName>Les Côtes</ns5:DestinationName>
+          <ns5:Monitored>true</ns5:Monitored>
+          <ns5:MonitoredCall>
+            <ns5:StopPointRef>coicogn3</ns5:StopPointRef>
+            <ns5:Order>4</ns5:Order>
+            <ns5:StopPointName>Rue des Cognassiers</ns5:StopPointName>
+            <ns5:VehicleAtStop>false</ns5:VehicleAtStop>
+            <ns5:DestinationDisplay>Les Côtes</ns5:DestinationDisplay>
+            <ns5:AimedArrivalTime>2017-06-13T10:54:26.000+02:00</ns5:AimedArrivalTime>
+            <ns5:ExpectedArrivalTime>2017-06-13T10:54:26.000+02:00</ns5:ExpectedArrivalTime>
+            <ns5:ArrivalStatus>onTime</ns5:ArrivalStatus>
+            <ns5:AimedDepartureTime>2017-06-13T10:54:26.000+02:00</ns5:AimedDepartureTime>
+            <ns5:ExpectedDepartureTime>2017-06-13T10:54:26.000+02:00</ns5:ExpectedDepartureTime>
+            <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
+          </ns5:MonitoredCall>
+        </ns5:MonitoredVehicleJourney>
+      </ns5:MonitoredStopVisit>
+    </ns5:StopMonitoringDelivery>
+  </Notification>
+  <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+</ns1:NotifyStopMonitoring>

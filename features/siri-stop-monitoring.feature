@@ -1044,20 +1044,20 @@ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         """
     And 90 seconds have passed
     When the SIRI server has received 2 GetStopMonitoring requests
-    And the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
+    Then the StopVisit "6ba7b814-9dad-11d1-d-00c04fd430c8" has the following attributes:
       # "internal": "A"
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
-    And the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+    And the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
       # "internal": "B"
       | Collected   | false                |
       | CollectedAt | 2017-01-01T12:02:00Z |
-    And the StopVisit "6ba7b814-9dad-11d1-10-00c04fd430c8" has the following attributes:
+    And the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
       # "internal": "C"
       | DepartureStatus   | onTime          |
       | ArrivalStatus     | onTime          |
     And 10 seconds have passed
-    And the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+    And the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
       # "internal": "B"
       | Collected       | false                |
       | CollectedAt     | 2017-01-01T12:02:00Z |

@@ -27,7 +27,7 @@ type SIRIStopMonitoringRequestCollector struct {
 
 	siriConnector
 
-	StopAreaUpdateSubscribers []StopAreaUpdateSubscriber
+	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
 }
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}
@@ -54,7 +54,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{}
 	siriStopMonitoringRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriStopMonitoringRequestCollector.StopAreaUpdateSubscribers = manager.GetStopAreaUpdateSubscribers()
+	siriStopMonitoringRequestCollector.stopAreaUpdateSubscriber = manager.BroadcastStopAreaUpdateEvent
 
 	return siriStopMonitoringRequestCollector
 }
@@ -101,7 +101,8 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	// WIP
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
 
-	connector.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
+	builder := newStopVisitUpdateEventBuilder(connector.partner)
+	builder.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
 
 	collectedStopVisitObjectIDs := []model.ObjectID{}
 	for _, stopVisit := range connector.Partner().Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
@@ -116,12 +117,12 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, collectedStopVisitObjectIDs)
 	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
 
-	go connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
-	for _, StopAreaUpdateSubscriber := range connector.StopAreaUpdateSubscribers {
-		StopAreaUpdateSubscriber(event)
+	if connector.stopAreaUpdateSubscriber != nil {
+		connector.stopAreaUpdateSubscriber(event)
 	}
 }
 
@@ -140,46 +141,8 @@ func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotColle
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) setStopVisitUpdateEvents(event *model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
-	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
-	if len(xmlStopVisitEvents) == 0 {
-		return
-	}
-
-	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
-		stopVisitEvent := &model.StopVisitUpdateEvent{
-			Id:                     connector.NewUUID(),
-			Created_at:             connector.Clock().Now(),
-			RecordedAt:             xmlStopVisitEvent.RecordedAt(),
-			VehicleAtStop:          xmlStopVisitEvent.VehicleAtStop(),
-			StopVisitObjectid:      model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
-			StopAreaObjectId:       model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
-			Schedules:              make(model.StopVisitSchedules),
-			DepartureStatus:        model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
-			ArrivalStatuts:         model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
-			DatedVehicleJourneyRef: xmlStopVisitEvent.DatedVehicleJourneyRef(),
-			DestinationRef:         xmlStopVisitEvent.DestinationRef(),
-			OriginRef:              xmlStopVisitEvent.OriginRef(),
-			DestinationName:        xmlStopVisitEvent.DestinationName(),
-			OriginName:             xmlStopVisitEvent.OriginName(),
-			Attributes:             NewSIRIStopVisitUpdateAttributes(xmlStopVisitEvent, connector.partner.Setting("remote_objectid_kind")),
-		}
-		stopVisitEvent.Schedules = model.NewStopVisitSchedules()
-		if !xmlStopVisitEvent.AimedDepartureTime().IsZero() || !xmlStopVisitEvent.AimedArrivalTime().IsZero() {
-			stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
-		}
-		if !xmlStopVisitEvent.ExpectedDepartureTime().IsZero() || !xmlStopVisitEvent.ExpectedArrivalTime().IsZero() {
-			stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, xmlStopVisitEvent.ExpectedDepartureTime(), xmlStopVisitEvent.ExpectedArrivalTime())
-		}
-		if !xmlStopVisitEvent.ActualDepartureTime().IsZero() || !xmlStopVisitEvent.ActualArrivalTime().IsZero() {
-			stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
-		}
-		event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
-	}
-}
-
 func (connector *SIRIStopMonitoringRequestCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
-	connector.StopAreaUpdateSubscribers = append(connector.StopAreaUpdateSubscribers, stopAreaUpdateSubscriber)
+	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {

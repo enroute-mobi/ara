@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/model"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
 
@@ -22,24 +22,9 @@ func (handler *SIRIStopMonitoringDeliveriesResponseHandler) ConnectorType() stri
 }
 
 func (handler *SIRIStopMonitoringDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+	logger.Log.Debugf("NotifyStopMonitoring %s\n", handler.xmlRequest.ResponseMessageIdentifier())
 
-	stopvisits := handler.xmlRequest.XMLMonitoredStopVisits()
-	for _, stopvisit := range stopvisits {
-		if stopvisit.StopPointRef() == "" {
-			continue
-		}
-		stopAreaUpdateRequest := core.NewStopAreaUpdateRequest(model.StopAreaId(stopvisit.StopPointRef()))
-		connector.(core.StopMonitoringSubscriptionCollector).RequestStopAreaUpdate(stopAreaUpdateRequest)
-	}
+	connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
 
-	cancelledMap := make(map[string][]string)
-	cancelledstopvisits := handler.xmlRequest.XMLMonitoredStopVisitCancellations()
-	for _, cancelledStopVisit := range cancelledstopvisits {
-		if cancelledStopVisit.ItemRef() == "" || cancelledStopVisit.MonitoringRef() == "" {
-			continue
-		}
-		monitoringRef := cancelledStopVisit.MonitoringRef()
-		cancelledMap[monitoringRef] = append(cancelledMap[monitoringRef], cancelledStopVisit.ItemRef())
-	}
-	connector.(core.StopMonitoringSubscriptionCollector).CancelStopVisitMonitoring(cancelledMap)
+	rw.WriteHeader(http.StatusOK)
 }

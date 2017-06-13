@@ -4,49 +4,53 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
+	"github.com/jbowtie/gokogiri/xml"
 )
 
-func Test_StopMonitoringCancelled(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"remote_url":           "Une Magnifique Url",
-			"remote_objectid_kind": "test kind",
-		},
-		manager: partners,
+func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t *testing.T) {
+	collectManager := NewTestCollectManager()
+	referential := &Referential{
+		collectManager: collectManager,
 	}
 
-	partners.Save(partner)
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+	partner.Settings["remote_objectid_kind"] = "_internal"
 
-	siriStopMonitoringSubscriptionCollector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
-	fs := fakeBroadcaster{}
-	siriStopMonitoringSubscriptionCollector.SetStopAreaUpdateSubscriber(fs.FakeBroadcaster)
-	siriStopMonitoringSubscriptionCollector.SetClock(model.NewFakeClock())
-	cancelStopVisitMonitoring := make(map[string][]string)
-	cancelStopVisitMonitoring["STIF:StopPoint:Q:411415:"] = []string{"SNCF-ACCES:Item::411415_125212:LOC"}
-	siriStopMonitoringSubscriptionCollector.CancelStopVisitMonitoring(cancelStopVisitMonitoring)
-
-	time.Sleep(42 * time.Millisecond)
-	if len(fs.Events) != 1 {
-		t.Error("Events should have a lenght of 1 but got: ", len(fs.Events))
+	file, err := os.Open("testdata/notify-stop-monitoring.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if len(fs.Events[0].StopVisitNotCollectedEvents) != 1 {
-		t.Error(".Events.StopVisitNotCollectedEvents should have a lenght of 1 but got: ", len(fs.Events[0].StopVisitNotCollectedEvents))
+	doc, err := xml.Parse(content, xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if fs.Events[0].StopVisitNotCollectedEvents[0].StopVisitObjectId.Kind() != "StopMonitoring" {
-		t.Error("Kind of the event should be 'StopMonitoring' but got: ", fs.Events[0].StopVisitNotCollectedEvents[0].StopVisitObjectId.Kind())
-	}
+	delivery := siri.NewXMLStopMonitoringResponse(doc.Root())
+	connector.HandleNotifyStopMonitoring(delivery)
 
-	if fs.Events[0].StopVisitNotCollectedEvents[0].StopVisitObjectId.Value() != "SNCF-ACCES:Item::411415_125212:LOC" {
-		t.Error("Id of the event should be 'SNCF-ACCES:Item::411415_125212:LOC' but got:", fs.Events[0].StopVisitNotCollectedEvents[0].StopVisitObjectId.Value())
+	if len(collectManager.(*TestCollectManager).Events) != 2 {
+		t.Errorf("Wrong number of events in collectManager, expected 2 got %v", len(collectManager.(*TestCollectManager).Events))
+	}
+	for _, event := range collectManager.(*TestCollectManager).Events {
+		if event.StopAreaId == model.StopAreaId("coicogn2") && len(event.StopVisitUpdateEvents) != 2 {
+			t.Errorf("StopArea coicogn2 should have 2 StopVisitEvents, got %v", len(event.StopVisitUpdateEvents))
+		} else if event.StopAreaId == model.StopAreaId("coicogn3") && len(event.StopVisitUpdateEvents) != 1 {
+			t.Errorf("StopArea coicogn3 should have 1 StopVisitEvent, got %v", len(event.StopVisitUpdateEvents))
+		} else if event.StopAreaId != model.StopAreaId("coicogn2") && event.StopAreaId != model.StopAreaId("coicogn3") {
+			t.Errorf("Wrong StopAreaId, want coicogn2 or coicogn2, got %v", event.StopAreaId)
+		}
 	}
 }
 

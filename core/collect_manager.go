@@ -11,7 +11,7 @@ type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
 type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
 	HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)
-	GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber
+	BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent)
 
 	UpdateSituation(request *SituationUpdateRequest)
 	HandleSituationUpdateEvent(SituationUpdateSubscriber)
@@ -50,12 +50,12 @@ func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.Sto
 }
 
 func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
+func (manager *TestCollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+	manager.Events = append(manager.Events, event)
+}
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
 func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
-func (manager *TestCollectManager) GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber {
-	return nil
-}
 
 // TEST END
 
@@ -71,7 +71,7 @@ func (manager *CollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscribe
 	manager.StopAreaUpdateSubscribers = append(manager.StopAreaUpdateSubscribers, StopAreaUpdateSubscriber)
 }
 
-func (manager *CollectManager) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+func (manager *CollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
 	for _, StopAreaUpdateSubscriber := range manager.StopAreaUpdateSubscribers {
 		StopAreaUpdateSubscriber(event)
 	}
@@ -85,10 +85,6 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	}
 
 	manager.requestStopAreaUpdate(partner, request)
-}
-
-func (manager *CollectManager) GetStopAreaUpdateSubscribers() []StopAreaUpdateSubscriber {
-	return manager.StopAreaUpdateSubscribers
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
