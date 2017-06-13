@@ -2,6 +2,7 @@ package core
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -69,9 +70,11 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubsc
 	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvents(events map[string]*model.StopAreaUpdateEvent) {
 	if connector.stopAreaUpdateSubscriber != nil {
-		connector.stopAreaUpdateSubscriber(event)
+		for _, event := range events {
+			connector.stopAreaUpdateSubscriber(event)
+		}
 	}
 }
 
@@ -81,30 +84,50 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	logXMLStopMonitoringDelivery(logStashEvent, delivery)
 
-	// TEMP, DON'T WORK
-	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), "")
+	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
-	builder := newStopVisitUpdateEventBuilder(connector.partner)
-	builder.setStopVisitUpdateEvents(stopAreaUpdateEvent, delivery)
+	connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery)
+	connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery)
 
-	connector.setStopVisitCancellationEvents(stopAreaUpdateEvent, delivery)
+	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 
-	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
-
-	connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	connector.broadcastStopAreaUpdateEvents(stopAreaUpdateEvents)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(event *model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
+	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
+	if len(xmlStopVisitEvents) == 0 {
+		return
+	}
+
+	builder := newStopVisitUpdateEventBuilder(connector.partner)
+
+	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
+		stopAreaUpdateEvent, ok := events[xmlStopVisitEvent.StopPointRef()]
+		if !ok {
+			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(xmlStopVisitEvent.StopPointRef()))
+			events[xmlStopVisitEvent.StopPointRef()] = stopAreaUpdateEvent
+		}
+		builder.buildStopVisitUpdateEvent(stopAreaUpdateEvent, xmlStopVisitEvent)
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
 	xmlStopVisitCancellationEvents := xmlResponse.XMLMonitoredStopVisitCancellations()
 	if len(xmlStopVisitCancellationEvents) == 0 {
 		return
 	}
 
 	for _, xmlStopVisitCancellationEvent := range xmlStopVisitCancellationEvents {
+		stopAreaUpdateEvent, ok := events[xmlStopVisitCancellationEvent.MonitoringRef()]
+		if !ok {
+			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(xmlStopVisitCancellationEvent.ItemRef()))
+			events[xmlStopVisitCancellationEvent.MonitoringRef()] = stopAreaUpdateEvent
+		}
 		stopVisitCancellationEvent := &model.StopVisitNotCollectedEvent{
 			StopVisitObjectId: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitCancellationEvent.ItemRef()),
 		}
-		event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, stopVisitCancellationEvent)
+		stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, stopVisitCancellationEvent)
 	}
 }
 
@@ -122,4 +145,19 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *s
 		logStashEvent["errorText"] = delivery.ErrorText()
 		logStashEvent["errorDescription"] = delivery.ErrorDescription()
 	}
+}
+
+func logStopVisitUpdateEventsFromMap(logStashEvent audit.LogStashEvent, stopAreaUpdateEvents map[string]*model.StopAreaUpdateEvent) {
+	var idArray []string
+	var cancelledIdArray []string
+	for _, stopAreaUpdateEvent := range stopAreaUpdateEvents {
+		for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
+			idArray = append(idArray, stopVisitUpdateEvent.Id)
+		}
+		for _, stopVisitCancelledEvent := range stopAreaUpdateEvent.StopVisitNotCollectedEvents {
+			cancelledIdArray = append(cancelledIdArray, stopVisitCancelledEvent.StopVisitObjectId.Value())
+		}
+	}
+	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
+	logStashEvent["StopVisitCancelledEventIds"] = strings.Join(cancelledIdArray, ", ")
 }

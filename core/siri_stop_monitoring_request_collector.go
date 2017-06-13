@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
@@ -183,4 +184,12 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
 	}
+}
+
+func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateEvent *model.StopAreaUpdateEvent) {
+	var idArray []string
+	for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
+		idArray = append(idArray, stopVisitUpdateEvent.Id)
+	}
+	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
 }

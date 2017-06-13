@@ -50,10 +50,12 @@ func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.Sto
 }
 
 func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
+func (manager *TestCollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+	manager.Events = append(manager.Events, event)
+}
 
-func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)                       {}
-func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber)          {}
-func (manager *TestCollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {}
+func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
+func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
 
 // TEST END
 
