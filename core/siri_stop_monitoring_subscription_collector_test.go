@@ -14,7 +14,19 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	collectManager := NewTestCollectManager()
 	referential := &Referential{
 		collectManager: collectManager,
+		model:          model.NewMemoryModel(),
 	}
+	referential.Model().StopAreas().(*model.MemoryStopAreas).SetUUIDGenerator(model.NewFakeUUIDGenerator())
+
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("_internal", "coicogn2")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	objectid2 := model.NewObjectID("_internal", "coicogn3")
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
@@ -44,12 +56,12 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		t.Errorf("Wrong number of events in collectManager, expected 2 got %v", len(collectManager.(*TestCollectManager).Events))
 	}
 	for _, event := range collectManager.(*TestCollectManager).Events {
-		if event.StopAreaId == model.StopAreaId("coicogn2") && len(event.StopVisitUpdateEvents) != 2 {
-			t.Errorf("StopArea coicogn2 should have 2 StopVisitEvents, got %v", len(event.StopVisitUpdateEvents))
-		} else if event.StopAreaId == model.StopAreaId("coicogn3") && len(event.StopVisitUpdateEvents) != 1 {
-			t.Errorf("StopArea coicogn3 should have 1 StopVisitEvent, got %v", len(event.StopVisitUpdateEvents))
-		} else if event.StopAreaId != model.StopAreaId("coicogn2") && event.StopAreaId != model.StopAreaId("coicogn3") {
-			t.Errorf("Wrong StopAreaId, want coicogn2 or coicogn2, got %v", event.StopAreaId)
+		if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && len(event.StopVisitUpdateEvents) != 2 {
+			t.Errorf("StopArea 6ba7b814-9dad-11d1-0-00c04fd430c8 should have 2 StopVisitEvents, got %v", len(event.StopVisitUpdateEvents))
+		} else if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8") && len(event.StopVisitUpdateEvents) != 1 {
+			t.Errorf("StopArea 6ba7b814-9dad-11d1-1-00c04fd430c8 should have 1 StopVisitEvent, got %v", len(event.StopVisitUpdateEvents))
+		} else if event.StopAreaId != model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && event.StopAreaId != model.StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8") {
+			t.Errorf("Wrong StopAreaId, want 6ba7b814-9dad-11d1-0-00c04fd430c8 or 6ba7b814-9dad-11d1-1-00c04fd430c8, got %v", event.StopAreaId)
 		}
 	}
 }
