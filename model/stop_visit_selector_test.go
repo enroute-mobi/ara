@@ -110,7 +110,7 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	// Wrong Schedule
 	stopVisit.Schedules.SetSchedule("aimed", time.Date(2017, time.April, 2, 1, 0, 0, 0, time.UTC), time.Time{})
 
-	if selector(stopVisit2) {
+	if selector(stopVisit) {
 		t.Errorf("Selector should return false, got true")
 	}
 
