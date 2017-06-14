@@ -70,6 +70,9 @@ func (referential *APIReferential) Validate() bool {
 		referential.Errors.Add("Slug", ERROR_BLANK)
 	}
 
+	// if len(referential.Tokens) == 0 {
+	// 	referential.Errors.Add("Tokens", ERROR_BLANK)
+	// }
 	// Check Slug uniqueness
 	for _, existingReferential := range referential.manager.FindAll() {
 		if existingReferential.id != referential.Id() {

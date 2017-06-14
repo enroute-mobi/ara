@@ -2,6 +2,8 @@ package core
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -93,4 +95,52 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) 
 		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
 	}
 
+}
+
+func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
+
+	request := &siri.XMLStopMonitoringSubscriptionRequest{}
+	// Create a test http server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ContentLength <= 0 {
+			t.Errorf("Request ContentLength should be zero")
+		}
+		body, _ := ioutil.ReadAll(r.Body)
+		request, _ = siri.NewXMLStopMonitoringSubscriptionRequestFromContent(body)
+	}))
+	defer ts.Close()
+
+	connectors := make(map[string]Connector)
+
+	// Create a SIRIStopMonitoringRequestCollector
+	partners := createTestPartnerManager()
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"remote_url":           ts.URL,
+			"remote_objectid_kind": "test kind",
+		},
+		ConnectorTypes: []string{"siri-stop-monitoring-deliveries-response-collector"},
+		manager:        partners,
+		connectors:     connectors,
+	}
+
+	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR] = NewSIRIStopMonitoringSubscriptionCollector(partner)
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	stopAreaUpdateEvent := NewStopAreaUpdateRequest(model.StopAreaId("NINOXE:StopPoint:SP:24:LOC"))
+	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR].(StopMonitoringSubscriptionCollector).RequestStopAreaUpdate(stopAreaUpdateEvent)
+
+	if request.MonitoringRef() != "NINOXE:StopPoint:SP:24:LOC" {
+		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), "NINOXE:StopPoint:SP:24:LOC")
+	}
+
+	if request.ConsumerAddress() != "https://edwig-staging.af83.io/test/siri" {
+		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), "https://edwig-staging.af83.io/test/siri")
+	}
+
+	if request.SubscriptionIdentifier() != "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC" {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
+	}
 }

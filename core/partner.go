@@ -324,6 +324,15 @@ func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCo
 	return nil
 }
 
+func (partner *Partner) StopMonitoringSubscriptionRequestCollector() StopMonitoringSubscriptionCollector {
+	// WIP
+	client, ok := partner.connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR]
+	if ok {
+		return client.(StopMonitoringSubscriptionCollector)
+	}
+	return nil
+}
+
 func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
 	// WIP
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
