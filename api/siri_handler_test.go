@@ -50,6 +50,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-check-status-server",
 		"siri-stop-monitoring-request-broadcaster",
 		"siri-service-request-broadcaster",
+		"siri-stop-monitoring-deliveries-response-collector",
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
@@ -457,5 +458,40 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	// Check the response body is what we expect.
 	if responseBody != expectedResponseBody {
 		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
+	}
+}
+
+func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
+	// Generate the request Body
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+
+	file, err := os.Open("testdata/notify-stop-monitoring.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(string(content))
+
+	server, referential := siriHandler_PrepareServer()
+
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("objectidKind", "stopArea1")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	objectid2 := model.NewObjectID("objectidKind", "stopArea2")
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
+
+	siriHandler_Request(server, soapEnvelope, t)
+
+	// Some Tests
+	if count := len(referential.Model().StopVisits().FindAll()); count != 3 {
+		t.Errorf("Notify should have created 3 StopVisits, got: %v", count)
 	}
 }

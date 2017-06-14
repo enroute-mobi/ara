@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -22,7 +23,6 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 
 	siriConnector
 
-	Partner                  Partner
 	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
 }
 
@@ -120,9 +120,16 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	builder := newStopVisitUpdateEventBuilder(connector.partner)
 
 	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
+		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
+		stopArea, ok := connector.Partner().Model().StopAreas().FindByObjectId(stopAreaObjectId)
+		if !ok {
+			logger.Log.Debugf("StopVisitUpdateEvent for unknown StopArea %v", stopAreaObjectId.Value())
+			continue
+		}
+
 		stopAreaUpdateEvent, ok := events[xmlStopVisitEvent.StopPointRef()]
 		if !ok {
-			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(xmlStopVisitEvent.StopPointRef()))
+			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
 			events[xmlStopVisitEvent.StopPointRef()] = stopAreaUpdateEvent
 		}
 		builder.buildStopVisitUpdateEvent(stopAreaUpdateEvent, xmlStopVisitEvent)
@@ -163,6 +170,7 @@ func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent,
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
+	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
 	logStashEvent["address"] = delivery.Address()
 	logStashEvent["producerRef"] = delivery.ProducerRef()
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
