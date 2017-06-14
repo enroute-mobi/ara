@@ -162,6 +162,7 @@ func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent,
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
+	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
 	logStashEvent["address"] = delivery.Address()
 	logStashEvent["producerRef"] = delivery.ProducerRef()
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
