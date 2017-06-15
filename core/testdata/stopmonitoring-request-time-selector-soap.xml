@@ -14,6 +14,8 @@
       </ServiceRequestInfo>
 
       <Request version="2.0:FR-IDF-2.4">
+        <ns2:PreviewInterval>P5M</ns2:PreviewInterval>
+        <ns2:StartTime>2016-09-22T07:54:52.977Z</ns2:StartTime>
         <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>

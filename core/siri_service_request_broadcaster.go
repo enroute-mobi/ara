@@ -68,7 +68,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 			}
 			response.Status = false
 		} else {
-			delivery = stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest.MessageIdentifier())
+			delivery = stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest)
 		}
 
 		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
@@ -114,7 +114,7 @@ func logSIRIServiceResponse(logStashEvent audit.LogStashEvent, response *siri.SI
 	logStashEvent["responseXML"] = xml
 }
 
-func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceStopMonitoringRequest) {
+func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubRequest) {
 	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster for SIRIServiceRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
