@@ -2,6 +2,7 @@ package siri
 
 import (
 	"fmt"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -153,6 +154,39 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 		return time.Time{}
 	}
 	return t
+}
+
+func (xmlStruct *XMLStructure) findDurationChildContent(localName string) time.Duration {
+	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return 0
+	}
+	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
+	matches := durationRegex.FindStringSubmatch(strings.TrimSpace(node.Content()))
+
+	if len(matches) == 0 {
+		return 0
+	}
+
+	years := parseDuration(matches[1]) * 24 * 365 * time.Hour
+	months := parseDuration(matches[2]) * 30 * 24 * time.Hour
+	days := parseDuration(matches[3]) * 24 * time.Hour
+	hours := parseDuration(matches[4]) * time.Hour
+	minutes := parseDuration(matches[5]) * time.Minute
+	seconds := parseDuration(matches[6]) * time.Second
+
+	return time.Duration(years + months + days + hours + minutes + seconds)
+}
+
+func parseDuration(value string) time.Duration {
+	if len(value) == 0 {
+		return 0
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		return 0
+	}
+	return time.Duration(parsed)
 }
 
 func (xmlStruct *XMLStructure) findBoolChildContent(localName string) bool {
