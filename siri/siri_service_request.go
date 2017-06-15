@@ -1,8 +1,6 @@
 package siri
 
 import (
-	"time"
-
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -10,17 +8,7 @@ import (
 type XMLSiriServiceRequest struct {
 	RequestXMLStructure
 
-	stopMonitoringRequests []*XMLSiriServiceStopMonitoringRequest
-}
-
-type XMLSiriServiceStopMonitoringRequest struct {
-	XMLStructure
-
-	messageIdentifier string
-	monitoringRef     string
-	stopVisitTypes    string
-
-	requestTimestamp time.Time
+	stopMonitoringRequests []*XMLStopMonitoringSubRequest
 }
 
 func NewXMLSiriServiceRequest(node xml.Node) *XMLSiriServiceRequest {
@@ -38,45 +26,17 @@ func NewXMLSiriServiceRequestFromContent(content []byte) (*XMLSiriServiceRequest
 	return request, nil
 }
 
-func (request *XMLSiriServiceRequest) StopMonitoringRequests() []*XMLSiriServiceStopMonitoringRequest {
+func (request *XMLSiriServiceRequest) StopMonitoringRequests() []*XMLStopMonitoringSubRequest {
 	if len(request.stopMonitoringRequests) == 0 {
 		nodes := request.findNodes("StopMonitoringRequest")
 		if nodes == nil {
 			return request.stopMonitoringRequests
 		}
 		for _, stopMonitoringNode := range nodes {
-			xmlStopMonitoringRequest := &XMLSiriServiceStopMonitoringRequest{}
+			xmlStopMonitoringRequest := &XMLStopMonitoringSubRequest{}
 			xmlStopMonitoringRequest.node = stopMonitoringNode
 			request.stopMonitoringRequests = append(request.stopMonitoringRequests, xmlStopMonitoringRequest)
 		}
 	}
 	return request.stopMonitoringRequests
-}
-
-func (request *XMLSiriServiceStopMonitoringRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLSiriServiceStopMonitoringRequest) MonitoringRef() string {
-	if request.monitoringRef == "" {
-		request.monitoringRef = request.findStringChildContent("MonitoringRef")
-	}
-	return request.monitoringRef
-}
-
-func (request *XMLSiriServiceStopMonitoringRequest) StopVisitTypes() string {
-	if request.stopVisitTypes == "" {
-		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
-	}
-	return request.stopVisitTypes
-}
-
-func (request *XMLSiriServiceStopMonitoringRequest) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
 }

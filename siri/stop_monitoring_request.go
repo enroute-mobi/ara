@@ -10,9 +10,23 @@ import (
 )
 
 type XMLStopMonitoringRequest struct {
-	RequestXMLStructure
+	XMLStopMonitoringSubRequest
 
-	monitoringRef string
+	requestorRef string
+}
+
+type XMLStopMonitoringSubRequest struct {
+	XMLStructure
+
+	messageIdentifier string
+	monitoringRef     string
+	stopVisitTypes    string
+	lineRef           string
+
+	previewInterval time.Duration
+
+	startTime        time.Time
+	requestTimestamp time.Time
 }
 
 type SIRIStopMonitoringRequest struct {
@@ -69,11 +83,11 @@ func NewSIRIStopMonitoringRequest(
 	}
 }
 
-func (request *XMLStopMonitoringRequest) MonitoringRef() string {
-	if request.monitoringRef == "" {
-		request.monitoringRef = request.findStringChildContent("MonitoringRef")
+func (request *XMLStopMonitoringRequest) RequestorRef() string {
+	if request.requestorRef == "" {
+		request.requestorRef = request.findStringChildContent("RequestorRef")
 	}
-	return request.monitoringRef
+	return request.requestorRef
 }
 
 func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
@@ -83,4 +97,53 @@ func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
 		return "", err
 	}
 	return buffer.String(), nil
+}
+
+func (request *XMLStopMonitoringSubRequest) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
+func (request *XMLStopMonitoringSubRequest) MonitoringRef() string {
+	if request.monitoringRef == "" {
+		request.monitoringRef = request.findStringChildContent("MonitoringRef")
+	}
+	return request.monitoringRef
+}
+
+func (request *XMLStopMonitoringSubRequest) StopVisitTypes() string {
+	if request.stopVisitTypes == "" {
+		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
+	}
+	return request.stopVisitTypes
+}
+
+func (request *XMLStopMonitoringSubRequest) LineRef() string {
+	if request.lineRef == "" {
+		request.lineRef = request.findStringChildContent("LineRef")
+	}
+	return request.lineRef
+}
+
+func (request *XMLStopMonitoringSubRequest) RequestTimestamp() time.Time {
+	if request.requestTimestamp.IsZero() {
+		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
+	}
+	return request.requestTimestamp
+}
+
+func (request *XMLStopMonitoringSubRequest) PreviewInterval() time.Duration {
+	if request.previewInterval == 0 {
+		request.previewInterval = request.findDurationChildContent("PreviewInterval")
+	}
+	return request.previewInterval
+}
+
+func (request *XMLStopMonitoringSubRequest) StartTime() time.Time {
+	if request.startTime.IsZero() {
+		request.startTime = request.findTimeChildContent("StartTime")
+	}
+	return request.startTime
 }

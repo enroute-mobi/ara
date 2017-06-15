@@ -37,7 +37,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RemoteObjectIDKind() stri
 	return connector.partner.Setting("remote_objectid_kind")
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, stopArea model.StopArea, messageIdentifier string) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, stopArea model.StopArea, request *siri.XMLStopMonitoringSubRequest) siri.SIRIStopMonitoringDelivery {
 	objectidKind := connector.RemoteObjectIDKind()
 	objectid, _ := stopArea.ObjectID(objectidKind)
 
@@ -48,16 +48,36 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	}
 
 	delivery := siri.SIRIStopMonitoringDelivery{
-		RequestMessageRef: messageIdentifier,
+		RequestMessageRef: request.MessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
 	}
+
+	// Prepare StopVisit Selectors
+	selectors := []model.StopVisitSelector{}
+	if request.LineRef() != "" {
+		objectid := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), request.LineRef())
+		selectors = append(selectors, model.StopVisitSelectorByLine(objectid))
+	}
+	if request.PreviewInterval() != 0 {
+		duration := request.PreviewInterval()
+		now := connector.Clock().Now()
+		if !request.StartTime().IsZero() {
+			now = request.StartTime()
+		}
+		selectors = append(selectors, model.StopVisitSelectorByTime(now, now.Add(duration)))
+	}
+	selector := model.CompositeStopVisitSelector(selectors)
 
 	// Prepare Id Array for logstash
 	var idArray []string
 
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
+		if !selector(stopVisit) {
+			continue
+		}
+
 		idArray = append(idArray, string(stopVisit.Id()))
 
 		var itemIdentifier string
@@ -181,7 +201,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		response.ErrorType = "InvalidDataReferencesError"
 		response.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
 	} else {
-		response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, request.MessageIdentifier())
+		response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, &request.XMLStopMonitoringSubRequest)
 	}
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
