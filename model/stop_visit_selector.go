@@ -23,7 +23,7 @@ func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
 	}
 }
 
-func CompositeStopVisitSelector(selectors ...StopVisitSelector) StopVisitSelector {
+func CompositeStopVisitSelector(selectors []StopVisitSelector) StopVisitSelector {
 	return func(stopVisit StopVisit) bool {
 		for _, selector := range selectors {
 			if !selector(stopVisit) {

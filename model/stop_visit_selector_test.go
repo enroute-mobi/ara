@@ -8,7 +8,7 @@ import (
 func Test_CompositeStopVisitSelector_Empty(t *testing.T) {
 	stopVisit := StopVisit{}
 
-	selector := CompositeStopVisitSelector()
+	selector := CompositeStopVisitSelector([]StopVisitSelector{})
 
 	if !selector(stopVisit) {
 		t.Errorf("Empty selector should return true, got false")
@@ -19,7 +19,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
 
-	selector := CompositeStopVisitSelector(StopVisitSelectorByTime(startTime, endTime))
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByTime(startTime, endTime)})
 
 	stopVisit := StopVisit{
 		Schedules: NewStopVisitSchedules(),
@@ -42,7 +42,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
-	selector := CompositeStopVisitSelector(StopVisitSelectorByLine(objectid))
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(objectid)})
 
 	model := NewMemoryModel()
 
@@ -85,7 +85,7 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
 	objectid := NewObjectID("kind", "value")
 
-	selector := CompositeStopVisitSelector(StopVisitSelectorByLine(objectid), StopVisitSelectorByTime(startTime, endTime))
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(objectid), StopVisitSelectorByTime(startTime, endTime)})
 
 	model := NewMemoryModel()
 
