@@ -69,8 +69,7 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 }
 
 func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
-	ObjIdString := obj.Value() + obj.Kind()
-	sub, present := subscription.resourcesByObjectID[ObjIdString]
+	sub, present := subscription.resourcesByObjectID[obj.String()]
 	if !present {
 		return nil
 	}
@@ -94,8 +93,7 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
 	}
 
-	ObjIdString := reference.ObjectId.Value() + reference.ObjectId.Kind()
-	subscription.resourcesByObjectID[ObjIdString] = &ressource
+	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
 	return &ressource
 }
 
