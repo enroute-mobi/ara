@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
 
@@ -88,6 +89,7 @@ func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource
 }
 
 func (subscription *Subscription) CreateAddNewResource(reference model.Reference) *SubscribedResource {
+	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
 	ressource := SubscribedResource{
 		Reference:       reference,
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
