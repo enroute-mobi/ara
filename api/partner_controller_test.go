@@ -117,7 +117,7 @@ func Test_PartnerController_Action_Subscriber(t *testing.T) {
 
 	rdata.Id = string(partner.Id())
 	rdata.Method = "GET"
-	rdata.Action = "Subscriptions"
+	rdata.Action = "subscriptions"
 	rdata.Server = server
 
 	sub := partner.Subscriptions()
