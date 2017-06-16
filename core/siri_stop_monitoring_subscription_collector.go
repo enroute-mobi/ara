@@ -80,6 +80,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
+		logger.Log.Debugf("Error in SIRIStopMonitoringSubscriptionRequest: %v", err)
 		return
 	}
 	logStashEvent["response"] = response.RawXML()
