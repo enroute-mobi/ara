@@ -79,7 +79,11 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
-	if err == nil && response.Status() == true {
+	if err != nil {
+		return
+	}
+	logStashEvent["response"] = response.RawXML()
+	if response.Status() == true {
 		subscription.CreateAddNewResource(ref)
 	}
 }
