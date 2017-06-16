@@ -11,6 +11,10 @@ type Reference struct {
 	Type     string    `json:",omitempty"`
 }
 
+func NewReference(objectId ObjectID) *Reference {
+	return &Reference{ObjectId: &objectId}
+}
+
 func (reference *Reference) GetSha1() string {
 	return reference.ObjectId.HashValue()
 }

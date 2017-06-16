@@ -1,8 +1,9 @@
 package core
 
 import (
-	"encoding/json"
 	"testing"
+
+	"github.com/af83/edwig/model"
 )
 
 func Test_Subscription_Id(t *testing.T) {
@@ -16,11 +17,12 @@ func Test_Subscription_Id(t *testing.T) {
 }
 
 func Test_subscription_MarshalJSON(t *testing.T) {
-	subscription := Subscription{
-		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		kind: "salut",
-	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Kind":"salut"}`
+	subscription := NewSubscription()
+	subscription.id = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+	subscription.kind = "salut"
+	subscription.CreateAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
+
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Kind":"salut","Resources":[{"Reference":{"ObjectId":{"test":"value"}},"SubscribedUntil":"1984-04-04T00:01:00Z"}]}`
 	jsonBytes, err := subscription.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -29,38 +31,6 @@ func Test_subscription_MarshalJSON(t *testing.T) {
 	jsonString := string(jsonBytes)
 	if jsonString != expected {
 		t.Errorf("subscription.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
-	}
-}
-
-func Test_Subscription_UnmarshalJSON(t *testing.T) {
-	text := `{
-    "ResourcesByObjectID": {
-		"une ressource" : {
-			"Reference": {
-					"ObjectId": {
-						"kind":"value"
-					},
-					"Id": "une id",
-					"Type": "un type"
-				}
-			}
-		}
-	}`
-
-	subscription := Subscription{}
-	err := json.Unmarshal([]byte(text), &subscription)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ressources := subscription.ResourcesByObjectID()
-
-	if len(ressources) != 1 {
-		t.Errorf("ResourcesByObjectID  should have len == 1 after UnmarshalJSON()")
-	}
-
-	if ressources["une ressource"] == nil {
-		t.Errorf("ResourcesByObjectID  should have a ressource 'une ressource' after UnmarshalJSON()")
 	}
 }
 
