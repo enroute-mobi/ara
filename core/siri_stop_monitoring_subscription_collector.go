@@ -67,8 +67,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		Type:     "StopArea",
 	}
 
-	subscription.CreateAddNewResource(ref)
-
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
 		MonitoringRef:          string(request.StopAreaId()),
@@ -80,7 +78,10 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
-	connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+	if err == nil && response.Status() == true {
+		subscription.CreateAddNewResource(ref)
+	}
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {

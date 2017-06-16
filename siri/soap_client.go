@@ -124,13 +124,14 @@ func (client *SOAPClient) StopMonitoring(request *SIRIStopMonitoringRequest) (*X
 }
 
 // WIP
-func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoringSubscriptionRequest) error {
-	_, err := client.prepareAndSendRequest(request, "Subscribe", false)
+func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoringSubscriptionRequest) (*XMLStopMonitoringSubscriptionResponse, error) {
+
+	node, err := client.prepareAndSendRequest(request, "SubscribeResponse", false)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	//stopMonitoring := NewXMLStopMonitoringResponse(node)
-	return nil
+	response := NewXMLStopMonitoringSubscriptionResponse(node)
+	return response, nil
 }
 
 func (client *SOAPClient) SituationMonitoring(request *SIRIGeneralMessageRequest) (*XMLGeneralMessageResponse, error) {

@@ -8,7 +8,7 @@ import (
 )
 
 func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLStopMonitoringSubscriptionRequest {
-	file, err := os.Open("testdata/stopmonitoringsubscription-request.soap.xml")
+	file, err := os.Open("../core/testdata/stopmonitoringsubscription-request-soap.xml")
 	defer file.Close()
 	if err != nil {
 		t.Fatal(err)

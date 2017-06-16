@@ -1,6 +1,7 @@
 package core
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -69,44 +70,46 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 }
 
 func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) {
-	partners := createTestPartnerManager()
 
+	response, err := os.Open("testdata/stopmonitoringsubscription-response-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Close()
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/xml")
+		io.Copy(w, response)
+	}))
+	defer ts.Close()
+
+	connectors := make(map[string]Connector)
+
+	// Create a SIRIStopMonitoringRequestCollector
+	partners := createTestPartnerManager()
 	partner := &Partner{
 		context: make(Context),
-		manager: partners,
+		Settings: map[string]string{
+			"remote_url":           ts.URL,
+			"remote_objectid_kind": "test kind",
+		},
+		ConnectorTypes: []string{"siri-stop-monitoring-deliveries-response-collector"},
+		manager:        partners,
+		connectors:     connectors,
 	}
 
 	partners.Save(partner)
+
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
-	file, err := os.Open("testdata/stopmonitoringdeliveries-request-soap.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer file.Close()
-	content, err := ioutil.ReadAll(file)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	xmlRequest, _ := siri.NewXMLStopMonitoringResponseFromContent(content)
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
-	stopvisits := xmlRequest.XMLMonitoredStopVisits()
-	stopvisit := stopvisits[0]
-	stopAreaUpdateRequest := NewStopAreaUpdateRequest(model.StopAreaId(stopvisit.StopPointRef()))
+	stopAreaUpdateRequest := NewStopAreaUpdateRequest(model.StopAreaId("UN STOP AREA"))
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+
 	if len(subscription.ResourcesByObjectID()) != 1 {
 		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
 	}
-
-	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
-	subscription = connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
-	if len(subscription.ResourcesByObjectID()) != 1 {
-		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
-	}
-
 }
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
