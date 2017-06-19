@@ -21,7 +21,9 @@ type StopArea struct {
 	ObjectIDConsumer
 	model Model
 
-	id              StopAreaId
+	id       StopAreaId
+	ParentId StopAreaId
+
 	NextCollectAt   time.Time
 	collectedAt     time.Time
 	CollectedUntil  time.Time
