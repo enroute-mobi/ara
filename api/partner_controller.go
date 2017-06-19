@@ -35,9 +35,11 @@ func (controller *PartnerController) subscriptions(response http.ResponseWriter,
 }
 
 func (controller *PartnerController) Action(response http.ResponseWriter, requestData *RequestData) {
-	if requestData.Action == "Subscriptions" {
+	if requestData.Action == "subscriptions" {
 		controller.subscriptions(response, requestData)
+		return
 	}
+	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), 500)
 }
 
 func (controller *PartnerController) findPartner(identifier string) *core.Partner {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
 
@@ -16,6 +17,12 @@ type Subscription struct {
 	kind                string
 	partner             *Partner
 	resourcesByObjectID map[string]*SubscribedResource
+}
+
+func NewSubscription() *Subscription {
+	return &Subscription{
+		resourcesByObjectID: make(map[string]*SubscribedResource),
+	}
 }
 
 type SubscribedResource struct {
@@ -44,48 +51,26 @@ func (subscription *Subscription) ResourcesByObjectID() map[string]*SubscribedRe
 	return subscription.resourcesByObjectID
 }
 
-func (subscription *Subscription) UnmarshalJSON(data []byte) error {
-	type Alias Subscription
-
-	aux := &struct {
-		ResourcesByObjectID map[string]*SubscribedResource
-		*Alias
-	}{
-		Alias: (*Alias)(subscription),
-	}
-	err := json.Unmarshal(data, aux)
-	if err != nil {
-		return err
-	}
-
-	if aux.ResourcesByObjectID != nil {
-		subscription.resourcesByObjectID = aux.ResourcesByObjectID
-	}
-	return nil
-}
-
 func (subscription *Subscription) MarshalJSON() ([]byte, error) {
-	type Alias Subscription
-	aux := struct {
-		Id                  SubscriptionId
-		Kind                string                         `json:",omitempty"`
-		ResourcesByObjectID map[string]*SubscribedResource `json:",omitempty"`
-		*Alias
-	}{
-		Id:    subscription.id,
-		Kind:  subscription.kind,
-		Alias: (*Alias)(subscription),
+	resources := make([]*SubscribedResource, 0)
+	for _, resource := range subscription.resourcesByObjectID {
+		resources = append(resources, resource)
 	}
 
-	if len(subscription.resourcesByObjectID) != 0 {
-		aux.ResourcesByObjectID = subscription.resourcesByObjectID
+	aux := struct {
+		Id        SubscriptionId
+		Kind      string                `json:",omitempty"`
+		Resources []*SubscribedResource `json:",omitempty"`
+	}{
+		Id:        subscription.id,
+		Kind:      subscription.kind,
+		Resources: resources,
 	}
 	return json.Marshal(&aux)
 }
 
 func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
-	ObjIdString := obj.Value() + obj.Kind()
-	sub, present := subscription.resourcesByObjectID[ObjIdString]
+	sub, present := subscription.resourcesByObjectID[obj.String()]
 	if !present {
 		return nil
 	}
@@ -104,13 +89,13 @@ func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource
 }
 
 func (subscription *Subscription) CreateAddNewResource(reference model.Reference) *SubscribedResource {
+	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
 	ressource := SubscribedResource{
 		Reference:       reference,
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
 	}
 
-	ObjIdString := reference.ObjectId.Value() + reference.ObjectId.Kind()
-	subscription.resourcesByObjectID[ObjIdString] = &ressource
+	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
 	return &ressource
 }
 
@@ -120,6 +105,15 @@ type MemorySubscriptions struct {
 	partner *Partner
 
 	byIdentifier map[SubscriptionId]*Subscription
+}
+
+func (manager *MemorySubscriptions) MarshalJSON() ([]byte, error) {
+	subscriptions := make([]*Subscription, 0)
+	for _, subscription := range manager.byIdentifier {
+		subscriptions = append(subscriptions, subscription)
+	}
+
+	return json.Marshal(subscriptions)
 }
 
 type Subscriptions interface {
@@ -168,9 +162,7 @@ func (manager *MemorySubscriptions) Find(id SubscriptionId) (Subscription, bool)
 }
 
 func (manager *MemorySubscriptions) NewSubscription() *Subscription {
-	sub := &Subscription{
-		resourcesByObjectID: make(map[string]*SubscribedResource),
-	}
+	sub := NewSubscription()
 	manager.Save(sub)
 
 	return sub

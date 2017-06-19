@@ -2,7 +2,7 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
@@ -31,12 +31,12 @@ type SIRIStopMonitoringSubscriptionRequest struct {
 	ConsumerAddress        string
 }
 
-const StopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:siri="http://www.siri.org.uk/siri">
+const StopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<SubscriptionRequestInfo>
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:ConsumerAddress>https://edwig-staging.af83.io/test/siri</siri:ConsumerAddress>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
+		<siri:ConsumerAddress>https://edwig-staging.af83.io/test/siri</siri:ConsumerAddress>
   </SubscriptionRequestInfo>
 	<Request>
 		<StopMonitoringSubscriptionRequest>

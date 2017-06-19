@@ -100,8 +100,9 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 		}
 		_, connectorPresent := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
 		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
+		_, subscriptionPresent := partner.Connector(SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR)
 
-		if !(connectorPresent || testConnectorPresent) {
+		if !(connectorPresent || testConnectorPresent || subscriptionPresent) {
 			continue
 		}
 

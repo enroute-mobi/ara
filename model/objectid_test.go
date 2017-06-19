@@ -26,6 +26,16 @@ func Test_ObjectID_Value(t *testing.T) {
 	}
 }
 
+func Test_ObjectID_String(t *testing.T) {
+	objectID := ObjectID{
+		kind:  "kind",
+		value: "value",
+	}
+	if expected := "kind:value"; objectID.String() != expected {
+		t.Errorf("ObjectID.String() returns wrong value, got: %s, required: %s", objectID.String(), expected)
+	}
+}
+
 func Test_NewObjectIDsFromMap(t *testing.T) {
 	idmap := map[string]string{
 		"reflex": "FR:77491:ZDE:34004:STIF",

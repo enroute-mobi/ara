@@ -68,6 +68,10 @@ func (objectid ObjectID) HashValue() string {
 	return fmt.Sprintf("%x", hasher.Sum(nil))
 }
 
+func (objectid ObjectID) String() string {
+	return fmt.Sprintf("%s:%s", objectid.kind, objectid.value)
+}
+
 func (objectid *ObjectID) SetValue(toset string) {
 	objectid.value = toset
 }
