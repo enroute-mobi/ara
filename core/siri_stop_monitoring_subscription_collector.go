@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 type StopMonitoringSubscriptionCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
 	HandleNotifyStopMonitoring(delivery *siri.XMLStopMonitoringResponse)
+	HandleTerminatedNotification(termination *siri.XMLStopMonitoringSubscriptionTerminatedResponse)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -88,11 +90,51 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubsc
 	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvents(events map[string]*model.StopAreaUpdateEvent) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
 	if connector.stopAreaUpdateSubscriber != nil {
-		for _, event := range events {
-			connector.stopAreaUpdateSubscriber(event)
+		connector.stopAreaUpdateSubscriber(event)
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotification(response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	//logSIRISubscriptionTerminatedResponse(logStashEvent, reponse)
+
+	subscriptionTerminated := response.XMLSubscriptionTerminateds()
+	connector.setSubscriptionTerminatedEvents(subscriptionTerminated)
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTerminatedEvents(terminations []*siri.XMLSubscriptionTerminated) {
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	terminationIds := make(map[string]int)
+
+	for index, termination := range terminations {
+		terminationIds[termination.SubscriptionRef()] = index
+	}
+
+	for key, sr := range subscription.resourcesByObjectID {
+		index, ok := terminationIds[sr.Reference.ObjectId.Value()]
+		if !ok {
+			continue
 		}
+		termination := terminations[index]
+		delete(subscription.resourcesByObjectID, key)
+		f, _ := os.Create("/tmp/data")
+		f.WriteString("salut\n")
+		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(termination.SubscriberRef()))
+		stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(termination.SubscriberRef()))
+		for _, stopvisit := range stopvisits {
+			objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+			if present == true {
+				notcollected := &model.StopVisitNotCollectedEvent{
+					StopVisitObjectId: objectid,
+				}
+				stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+			}
+		}
+		connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 	}
 }
 
@@ -109,7 +151,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 
-	connector.broadcastStopAreaUpdateEvents(stopAreaUpdateEvents)
+	for _, event := range stopAreaUpdateEvents {
+		connector.broadcastStopAreaUpdateEvent(event)
+	}
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
@@ -169,6 +213,20 @@ func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent,
 	}
 	logStashEvent["requestXML"] = xml
 }
+
+// func logSIRISubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+// 	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
+// 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+// 	logStashEvent["monitoringRef"] = request.MonitoringRef
+// 	logStashEvent["requestorRef"] = request.RequestorRef
+// 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+// 	xml, err := request.BuildXML()
+// 	if err != nil {
+// 		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+// 		return
+// 	}
+// 	logStashEvent["requestXML"] = xml
+// }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
 	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
