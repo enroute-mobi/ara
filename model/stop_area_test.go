@@ -218,6 +218,49 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	}
 }
 
+func Test_MemoryStopAreas_FindFamily(t *testing.T) {
+	stopAreas := NewMemoryStopAreas()
+	stopArea := stopAreas.New()
+	stopAreas.Save(&stopArea)
+
+	stopArea1 := stopAreas.New()
+	stopArea1.ParentId = stopArea.id
+	stopAreas.Save(&stopArea1)
+
+	stopArea2 := stopAreas.New()
+	stopArea2.ParentId = stopArea1.id
+	stopAreas.Save(&stopArea2)
+
+	stopArea3 := stopAreas.New()
+	stopArea3.ParentId = stopArea2.id
+	stopAreas.Save(&stopArea3)
+
+	stopArea4 := stopAreas.New()
+	stopArea4.ParentId = stopArea1.id
+	stopAreas.Save(&stopArea4)
+
+	stopArea5 := stopAreas.New()
+	stopArea5.ParentId = stopArea.id
+	stopAreas.Save(&stopArea5)
+
+	stopArea6 := stopAreas.New()
+	stopArea6.ParentId = stopArea5.id
+	stopAreas.Save(&stopArea6)
+
+	stopArea7 := stopAreas.New()
+	stopAreas.Save(&stopArea7)
+
+	if len(stopAreas.FindFamily(stopArea.id)) != 7 {
+		t.Errorf("FindFamily should find 6 StopAreas, got: %v", len(stopAreas.FindFamily(stopArea.id)))
+	}
+	if len(stopAreas.FindFamily(stopArea1.id)) != 4 {
+		t.Errorf("FindFamily should find 3 StopAreas, got: %v", len(stopAreas.FindFamily(stopArea1.id)))
+	}
+	if len(stopAreas.FindFamily(stopArea7.id)) != 1 {
+		t.Errorf("FindFamily should find 0 StopAreas, got: %v", len(stopAreas.FindFamily(stopArea7.id)))
+	}
+}
+
 func Test_MemoryStopAreas_Load(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)

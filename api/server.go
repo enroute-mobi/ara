@@ -84,7 +84,7 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 
 	requestData := NewRequestDataFromContent(foundStrings)
 	response.Header().Set("Content-Type", "application/json")
-	response.Header().Set("Server", version.Value())
+	response.Header().Set("Server", version.ApplicationName())
 	return requestData, nil
 }
 

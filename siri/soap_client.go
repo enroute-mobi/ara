@@ -59,7 +59,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 		httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
-	httpRequest.Header.Set("User-Agent", version.Value())
+	httpRequest.Header.Set("User-Agent", version.ApplicationName())
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request

@@ -61,7 +61,7 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
-	response.Header().Set("Server", version.Value())
+	response.Header().Set("Server", version.ApplicationName())
 
 	if handler.referential == nil {
 		siriError("NotFound", "Referential not found", response)
