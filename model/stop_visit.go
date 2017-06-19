@@ -300,6 +300,14 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopV
 	return
 }
 
+func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) (stopVisits []StopVisit) {
+	for _, stopAreaId := range stopAreaIds {
+		stopVisits = append(stopVisits, manager.FindFollowingByStopAreaId(stopAreaId)...)
+	}
+	sort.Sort(ByTime(stopVisits))
+	return
+}
+
 func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 	if len(manager.byIdentifier) == 0 {
 		return []StopVisit{}

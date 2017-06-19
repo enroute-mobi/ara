@@ -70,7 +70,7 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	}
 
 	if expected := 10; stopVisit.PassageOrder != expected {
-		t.Errorf("Wrong StopVisit PassageOrder:\n got: %s\n want: %s", stopVisit.PassageOrder, expected)
+		t.Errorf("Wrong StopVisit PassageOrder:\n got: %v\n want: %v", stopVisit.PassageOrder, expected)
 	}
 }
 
