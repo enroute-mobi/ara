@@ -85,3 +85,65 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs                    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | Schedule[expected]#Arrival   | 2017-01-01T13:01:00.000Z                                             |
       | Schedule[expected]#Departure | 2017-01-01T13:02:00.000Z                                             |
+
+@wip
+  Scenario: 3737 - Manage a MonitoredStopVisitCancellation
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | internal |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                              |
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+    When I send this SIRI request
+      """
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
+          xmlns:ns3="http://www.ifopt.org.uk/acsb"
+          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+          xmlns:ns6="http://wsdl.siri.org.uk"
+          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <ns2:ResponseTimestamp>
+              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
+              <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
+              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <MonitoredStopVisitCancellation>
+                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime><ns2:ItemIdentifier>
+                <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+              </MonitoredStopVisitCancellation>
+            </Notification>
+            <SiriExtension />
+          </ns6:NotifyStopMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+
+
