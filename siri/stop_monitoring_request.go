@@ -23,6 +23,8 @@ type XMLStopMonitoringSubRequest struct {
 	stopVisitTypes    string
 	lineRef           string
 
+	maximumStopVisits int
+
 	previewInterval time.Duration
 
 	startTime        time.Time
@@ -125,6 +127,13 @@ func (request *XMLStopMonitoringSubRequest) LineRef() string {
 		request.lineRef = request.findStringChildContent("LineRef")
 	}
 	return request.lineRef
+}
+
+func (request *XMLStopMonitoringSubRequest) MaximumStopVisits() int {
+	if request.maximumStopVisits == 0 {
+		request.maximumStopVisits = request.findIntChildContent("MaximumStopVisits")
+	}
+	return request.maximumStopVisits
 }
 
 func (request *XMLStopMonitoringSubRequest) RequestTimestamp() time.Time {
