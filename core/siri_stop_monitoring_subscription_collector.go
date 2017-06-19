@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 type StopMonitoringSubscriptionCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
 	HandleNotifyStopMonitoring(delivery *siri.XMLStopMonitoringResponse)
+	HandleTerminatedNotification(termination *siri.XMLStopMonitoringSubscriptionTerminatedResponse)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -51,40 +53,54 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
+	if !ok {
+		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoring SubscriptionCollector for unknown StopArea %v", request.StopAreaId())
+		return
+	}
+
+	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	stopAreaObjectid, ok := stopArea.ObjectID(objectidKind)
+	if !ok {
+		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
+		return
+	}
+
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	for _, sr := range subscription.resourcesByObjectID {
-		if sr.Reference.ObjectId.Value() == string(request.StopAreaId()) {
+		if sr.Reference.ObjectId.String() == stopAreaObjectid.String() {
 			sr.SubscribedUntil = sr.SubscribedUntil.Add(1 * time.Minute)
 			return
 		}
 	}
 
-	objId := model.NewObjectID("StopMonitoring", string(request.StopAreaId()))
-	ref := model.Reference{
-		ObjectId: &objId,
-		Id:       string(request.StopAreaId()),
-		Type:     "StopArea",
-	}
-
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
-		MonitoringRef:          string(request.StopAreaId()),
+		MonitoringRef:          stopAreaObjectid.Value(),
 		RequestorRef:           connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", objId.Value()),
+		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
+
 	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
-		logger.Log.Debugf("Error in SIRIStopMonitoringSubscriptionRequest: %v", err)
+		logger.Log.Debugf("Error while subscribing: %v", err)
 		return
 	}
+
 	logStashEvent["response"] = response.RawXML()
 	if response.Status() == true {
+		ref := model.Reference{
+			ObjectId: &stopAreaObjectid,
+			Id:       string(request.StopAreaId()),
+			Type:     "StopArea",
+		}
+
 		subscription.CreateAddNewResource(ref)
 	}
 }
@@ -93,11 +109,51 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubsc
 	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvents(events map[string]*model.StopAreaUpdateEvent) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
 	if connector.stopAreaUpdateSubscriber != nil {
-		for _, event := range events {
-			connector.stopAreaUpdateSubscriber(event)
+		connector.stopAreaUpdateSubscriber(event)
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotification(response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	//logSIRISubscriptionTerminatedResponse(logStashEvent, reponse)
+
+	subscriptionTerminated := response.XMLSubscriptionTerminateds()
+	connector.setSubscriptionTerminatedEvents(subscriptionTerminated)
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTerminatedEvents(terminations []*siri.XMLSubscriptionTerminated) {
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	terminationIds := make(map[string]int)
+
+	for index, termination := range terminations {
+		terminationIds[termination.SubscriptionRef()] = index
+	}
+
+	for key, sr := range subscription.resourcesByObjectID {
+		index, ok := terminationIds[sr.Reference.ObjectId.Value()]
+		if !ok {
+			continue
 		}
+		termination := terminations[index]
+		delete(subscription.resourcesByObjectID, key)
+		f, _ := os.Create("/tmp/data")
+		f.WriteString("salut\n")
+		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(termination.SubscriberRef()))
+		stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(termination.SubscriberRef()))
+		for _, stopvisit := range stopvisits {
+			objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+			if present == true {
+				notcollected := &model.StopVisitNotCollectedEvent{
+					StopVisitObjectId: objectid,
+				}
+				stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+			}
+		}
+		connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 	}
 }
 
@@ -114,7 +170,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 
-	connector.broadcastStopAreaUpdateEvents(stopAreaUpdateEvents)
+	for _, event := range stopAreaUpdateEvents {
+		connector.broadcastStopAreaUpdateEvent(event)
+	}
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
@@ -174,6 +232,20 @@ func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent,
 	}
 	logStashEvent["requestXML"] = xml
 }
+
+// func logSIRISubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+// 	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
+// 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+// 	logStashEvent["monitoringRef"] = request.MonitoringRef
+// 	logStashEvent["requestorRef"] = request.RequestorRef
+// 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+// 	xml, err := request.BuildXML()
+// 	if err != nil {
+// 		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+// 		return
+// 	}
+// 	logStashEvent["requestXML"] = xml
+// }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
 	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"

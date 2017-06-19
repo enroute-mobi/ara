@@ -3,18 +3,20 @@ Feature: Support SIRI GeneralMessage
   Background:
       Given a Referential "test" is created
 
-  Scenario: 3008 - Performs a SIRI GeneralMessage Request to a Partner
+  # Should be fixed by 3800 and 3801
+  @wip
+  Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "3477", "_default" : "45gfdT5EDCfde"                          |
-      | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
+      | ObjectIDs               | "external" : "Edwig:InfoMessage::test:LOC"                                 |
+      | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
-      | Channel                 | Commercial                                                                 |
-      | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
+      | Channel                 | Perturbation                                                               |
+      | ValidUntil              | 2017-01-01T20:30:06+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
-      | remote_objectid_kind | internal       |
+      | remote_objectid_kind | external       |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -31,7 +33,7 @@ Feature: Support SIRI GeneralMessage
             <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
             <ns2:Extensions>
               <ns6:IDFGeneralMessageRequestFilter>
-                </ns6:IDFGeneralMessageRequestFilter>
+              </ns6:IDFGeneralMessageRequestFilter>
             </ns2:Extensions>
           </Request>
           <RequestExtension/>
@@ -63,19 +65,16 @@ Feature: Support SIRI GeneralMessage
                 <ns3:Status>true</ns3:Status>
                 <ns3:GeneralMessage>
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
-                  <ns3:RecordedAtTime>2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>Edwig:Item::45gfdT5EDCfde:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::45gfdT5EDCfde:LOC</ns3:InfoMessageIdentifier>
+                  <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
+                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ItemIdentifier> <!-- Shoud be fixed by 3800 -->
+                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::test:LOC</ns3:InfoMessageIdentifier> <!-- Should be fixed by 3801 -->
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:type="ns9:IDFLineSectionStructure">
+                  <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
+                  <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
+                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
                     <Message>
                       <MessageType>longMessage</MessageType>
-                      <MessageText>La nouvelle carte
-                      d'abonnement est disponible au points de vente du
-                      réseau</MessageText>
+                      <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                     </Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>

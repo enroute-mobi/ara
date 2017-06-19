@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -82,33 +83,103 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) 
 	}))
 	defer ts.Close()
 
-	connectors := make(map[string]Connector)
-
 	// Create a SIRIStopMonitoringRequestCollector
-	partners := createTestPartnerManager()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+	partners := NewPartnerManager(referential)
+
 	partner := &Partner{
 		context: make(Context),
 		Settings: map[string]string{
 			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test kind",
+			"remote_objectid_kind": "test_kind",
+		},
+		manager: partners,
+		// connectors: make(map[string]Connector),
+	}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("test_kind", "value")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+
+	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
+	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+
+	if len(subscription.ResourcesByObjectID()) != 1 {
+		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
+	}
+}
+
+func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
+	file, err := os.Open("../siri/testdata/subscription_terminated_notification-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := siri.NewXMLStopMonitoringSubscriptionTerminatedResponseFromContent(content)
+	connectors := make(map[string]Connector)
+
+	partners := createTestPartnerManager()
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"remote_url":           "une url",
+			"remote_objectid_kind": "_internal",
 		},
 		ConnectorTypes: []string{"siri-stop-monitoring-deliveries-response-collector"},
 		manager:        partners,
 		connectors:     connectors,
 	}
 
-	partners.Save(partner)
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR] = connector
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
 
-	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+	referential := partner.Referential()
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("_internal", "coicogn2")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
 
-	stopAreaUpdateRequest := NewStopAreaUpdateRequest(model.StopAreaId("UN STOP AREA"))
-	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
+	stopVisit := referential.Model().StopVisits().New()
+	objectid = model.NewObjectID("_internal", "stopvisit1")
+	stopVisit.SetObjectID(objectid)
+	stopVisit.StopAreaId = "coicogn2"
+	stopVisit.Save()
+
+	objId := model.NewObjectID("_internal", "coicogn2")
+	ref := model.Reference{
+		ObjectId: &objId,
+		Id:       "coicogn2",
+		Type:     "StopArea",
+	}
+
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription.CreateAddNewResource(ref)
 
-	if len(subscription.ResourcesByObjectID()) != 1 {
-		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
+	connector.HandleTerminatedNotification(response)
+
+	if len(subscription.ResourcesByObjectID()) != 0 {
+		t.Errorf("Response should have 0 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
+	}
+
+	if stopVisit.IsCollected() != false {
+		t.Errorf("stopVisit should be false  but got %v\n", stopVisit.IsCollected())
 	}
 }
 
@@ -125,37 +196,45 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	connectors := make(map[string]Connector)
-
 	// Create a SIRIStopMonitoringRequestCollector
-	partners := createTestPartnerManager()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+	partners := NewPartnerManager(referential)
+
 	partner := &Partner{
 		context: make(Context),
 		Settings: map[string]string{
 			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test kind",
+			"remote_objectid_kind": "test_kind",
 		},
-		ConnectorTypes: []string{"siri-stop-monitoring-deliveries-response-collector"},
-		manager:        partners,
-		connectors:     connectors,
+		manager: partners,
 	}
-
-	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR] = NewSIRIStopMonitoringSubscriptionCollector(partner)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	stopAreaUpdateEvent := NewStopAreaUpdateRequest(model.StopAreaId("NINOXE:StopPoint:SP:24:LOC"))
-	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR].(StopMonitoringSubscriptionCollector).RequestStopAreaUpdate(stopAreaUpdateEvent)
+	objectid := model.NewObjectID("test_kind", "value")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
 
-	if request.MonitoringRef() != "NINOXE:StopPoint:SP:24:LOC" {
-		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), "NINOXE:StopPoint:SP:24:LOC")
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+
+	stopAreaUpdateEvent := NewStopAreaUpdateRequest(stopArea.Id())
+	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
+
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+
+	if request.MonitoringRef() != "value" {
+		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), "value")
 	}
 
 	if request.ConsumerAddress() != "https://edwig-staging.af83.io/test/siri" {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), "https://edwig-staging.af83.io/test/siri")
 	}
 
-	if request.SubscriptionIdentifier() != "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC" {
+	if request.SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
 		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
 	}
 }
