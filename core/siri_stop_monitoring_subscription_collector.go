@@ -51,40 +51,54 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
+	if !ok {
+		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoring SubscriptionCollector for unknown StopArea %v", request.StopAreaId())
+		return
+	}
+
+	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	stopAreaObjectid, ok := stopArea.ObjectID(objectidKind)
+	if !ok {
+		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
+		return
+	}
+
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	for _, sr := range subscription.resourcesByObjectID {
-		if sr.Reference.ObjectId.Value() == string(request.StopAreaId()) {
+		if sr.Reference.ObjectId.String() == stopAreaObjectid.String() {
 			sr.SubscribedUntil = sr.SubscribedUntil.Add(1 * time.Minute)
 			return
 		}
 	}
 
-	objId := model.NewObjectID("StopMonitoring", string(request.StopAreaId()))
-	ref := model.Reference{
-		ObjectId: &objId,
-		Id:       string(request.StopAreaId()),
-		Type:     "StopArea",
-	}
-
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
-		MonitoringRef:          string(request.StopAreaId()),
+		MonitoringRef:          stopAreaObjectid.Value(),
 		RequestorRef:           connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", objId.Value()),
+		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
+
 	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
-		logger.Log.Debugf("Error in SIRIStopMonitoringSubscriptionRequest: %v", err)
+		logger.Log.Debugf("Error while subscribing: %v", err)
 		return
 	}
+
 	logStashEvent["response"] = response.RawXML()
 	if response.Status() == true {
+		ref := model.Reference{
+			ObjectId: &stopAreaObjectid,
+			Id:       string(request.StopAreaId()),
+			Type:     "StopArea",
+		}
+
 		subscription.CreateAddNewResource(ref)
 	}
 }

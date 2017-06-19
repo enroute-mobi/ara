@@ -67,12 +67,14 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
+		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoringRequestCollector for unknown StopArea %v", request.StopAreaId())
 		return
 	}
 
 	objectidKind := connector.partner.Setting("remote_objectid_kind")
 	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
+		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
 		return
 	}
 
