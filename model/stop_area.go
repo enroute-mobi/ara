@@ -22,7 +22,7 @@ type StopArea struct {
 	model Model
 
 	id       StopAreaId
-	ParentId StopAreaId
+	ParentId StopAreaId `json:",omitempty"`
 
 	NextCollectAt   time.Time
 	collectedAt     time.Time
@@ -230,6 +230,16 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	delete(manager.byIdentifier, stopArea.Id())
 	return true
+}
+
+func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	stopAreaIds = []StopAreaId{stopAreaId}
+	for _, stopArea := range manager.byIdentifier {
+		if stopArea.ParentId == stopAreaId {
+			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
+		}
+	}
+	return stopAreaIds
 }
 
 func (manager *MemoryStopAreas) Load(referentialId string) error {
