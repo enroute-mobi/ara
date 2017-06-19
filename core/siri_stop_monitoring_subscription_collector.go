@@ -129,22 +129,23 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTermina
 	for _, termination := range terminations {
 		sub, present := connector.partner.Subscriptions().Find(SubscriptionId(termination.SubscriptionRef()))
 		if !present {
-			for _, sr := range sub.resourcesByObjectID {
-				stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(sr.Reference.Id)
-				stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
-				for _, stopvisit := range stopvisits {
-					objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
-					if present == true {
-						notcollected := &model.StopVisitNotCollectedEvent{
-							StopVisitObjectId: objectid,
-						}
-						stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
-					}
-				}
-				connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
-			}
-			connector.partner.Subscriptions().Delete(&sub)
+			continue
 		}
+		for _, sr := range sub.resourcesByObjectID {
+			stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(sr.Reference.Id))
+			stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
+			for _, stopvisit := range stopvisits {
+				objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+				if present == true {
+					notcollected := &model.StopVisitNotCollectedEvent{
+						StopVisitObjectId: objectid,
+					}
+					stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+				}
+			}
+			connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+		}
+		connector.partner.Subscriptions().Delete(&sub)
 	}
 }
 

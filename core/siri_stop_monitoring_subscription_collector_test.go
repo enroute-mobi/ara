@@ -178,8 +178,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 
 	connector.HandleTerminatedNotification(response)
 
-	//6ba7b814-9dad-11d1-0-00c04fd430c8
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-a-00c04fd430c8"); ok {
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
 		t.Errorf("Subscriptions should not be found \n")
 	}
 
