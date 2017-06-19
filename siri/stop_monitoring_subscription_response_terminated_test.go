@@ -34,7 +34,7 @@ func Test_XMLStopMonitoringSubscriptionTerminatedResponse(t *testing.T) {
 		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, subscriptionTerminated.SubscriberRef())
 	}
 
-	if expected := "coicogn2"; subscriptionTerminated.SubscriptionRef() != expected {
+	if expected := "6ba7b814-9dad-11d1-a-00c04fd430c8"; subscriptionTerminated.SubscriptionRef() != expected {
 		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, subscriptionTerminated.SubscriptionRef())
 	}
 

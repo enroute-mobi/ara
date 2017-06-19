@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -126,34 +125,26 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotifi
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTerminatedEvents(terminations []*siri.XMLSubscriptionTerminated) {
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
-	terminationIds := make(map[string]int)
 
-	for index, termination := range terminations {
-		terminationIds[termination.SubscriptionRef()] = index
-	}
-
-	for key, sr := range subscription.resourcesByObjectID {
-		index, ok := terminationIds[sr.Reference.ObjectId.Value()]
-		if !ok {
-			continue
-		}
-		termination := terminations[index]
-		delete(subscription.resourcesByObjectID, key)
-		f, _ := os.Create("/tmp/data")
-		f.WriteString("salut\n")
-		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(termination.SubscriberRef()))
-		stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(termination.SubscriberRef()))
-		for _, stopvisit := range stopvisits {
-			objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
-			if present == true {
-				notcollected := &model.StopVisitNotCollectedEvent{
-					StopVisitObjectId: objectid,
+	for _, termination := range terminations {
+		sub, present := connector.partner.Subscriptions().Find(SubscriptionId(termination.SubscriptionRef()))
+		if !present {
+			for _, sr := range sub.resourcesByObjectID {
+				stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(sr.Reference.Id)
+				stopvisits := connector.Partner().Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
+				for _, stopvisit := range stopvisits {
+					objectid, present := stopvisit.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+					if present == true {
+						notcollected := &model.StopVisitNotCollectedEvent{
+							StopVisitObjectId: objectid,
+						}
+						stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+					}
 				}
-				stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+				connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 			}
+			connector.partner.Subscriptions().Delete(&sub)
 		}
-		connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 	}
 }
 

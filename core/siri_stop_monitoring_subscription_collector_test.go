@@ -150,8 +150,11 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
+	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+
 	referential := partner.Referential()
 	stopArea := referential.Model().StopAreas().New()
+	stopArea.CollectedAlways = false
 	objectid := model.NewObjectID("_internal", "coicogn2")
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
@@ -171,15 +174,17 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 	subscription.CreateAddNewResource(ref)
+	subscription.Save()
 
 	connector.HandleTerminatedNotification(response)
 
-	if len(subscription.ResourcesByObjectID()) != 0 {
-		t.Errorf("Response should have 0 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
+	//6ba7b814-9dad-11d1-0-00c04fd430c8
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-a-00c04fd430c8"); ok {
+		t.Errorf("Subscriptions should not be found \n")
 	}
 
 	if stopVisit.IsCollected() != false {
-		t.Errorf("stopVisit should be false  but got %v\n", stopVisit.IsCollected())
+		t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
 	}
 }
 
