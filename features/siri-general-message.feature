@@ -4,7 +4,6 @@ Feature: Support SIRI GeneralMessage
       Given a Referential "test" is created
 
   # Should be fixed by 3800 and 3801
-  @wip
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "external" : "Edwig:InfoMessage::test:LOC"                                 |
@@ -66,8 +65,8 @@ Feature: Support SIRI GeneralMessage
                 <ns3:GeneralMessage>
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ItemIdentifier> <!-- Shoud be fixed by 3800 -->
-                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::test:LOC</ns3:InfoMessageIdentifier> <!-- Should be fixed by 3801 -->
+                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ItemIdentifier>
+                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::test:LOC</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>

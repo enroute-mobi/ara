@@ -14,7 +14,7 @@ type GeneralMessageRequestBroadcaster interface {
 
 type SIRIGeneralMessageRequestBroadcaster struct {
 	model.ClockConsumer
-
+	model.UUIDConsumer
 	siriConnector
 }
 
@@ -50,7 +50,10 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 
 	for _, situation := range tx.Model().Situations().FindAll() {
 		siriGeneralMessage := &siri.SIRIGeneralMessage{}
-		objectid, _ := situation.ObjectID("_default")
+		objectid, present := situation.ObjectID(connector.RemoteObjectIDKind())
+		if !present {
+			objectid, _ = situation.ObjectID("_default")
+		}
 		for _, message := range situation.Messages {
 			siriMessage := &siri.SIRIMessage{
 				Content:             message.Content,
@@ -61,8 +64,8 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 			siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 		}
 
-		siriGeneralMessage.ItemIdentifier = fmt.Sprintf("Edwig:Item::%s:LOC", objectid.Value())
-		siriGeneralMessage.InfoMessageIdentifier = fmt.Sprintf("Edwig:InfoMessage::%s:LOC", objectid.Value())
+		siriGeneralMessage.ItemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", connector.NewUUID())
+		siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
 		siriGeneralMessage.InfoChannelRef = situation.Channel
 		siriGeneralMessage.InfoMessageVersion = situation.Version
 		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
