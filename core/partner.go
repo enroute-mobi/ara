@@ -388,6 +388,7 @@ func (partner *Partner) deleteSubscription(sub Subscription) {
 func (partner *Partner) CancelSubscriptions() {
 	subscriptions := partner.subscriptionManager.FindAll()
 	for _, sub := range subscriptions {
+		logger.Log.Printf("Deleting subscription id %v and kind %v", sub.Id(), sub.Kind())
 		partner.deleteSubscription(sub)
 	}
 }
