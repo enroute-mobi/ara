@@ -161,6 +161,7 @@ type StopAreas interface {
 	Find(id StopAreaId) (StopArea, bool)
 	FindByObjectId(objectid ObjectID) (StopArea, bool)
 	FindAll() []StopArea
+	FindFamily(stopAreaId StopAreaId) []StopAreaId
 	Save(stopArea *StopArea) bool
 	Delete(stopArea *StopArea) bool
 }

@@ -56,8 +56,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Prepare StopVisit Selectors
 	selectors := []model.StopVisitSelector{}
 	if request.LineRef() != "" {
-		objectid := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), request.LineRef())
-		selectors = append(selectors, model.StopVisitSelectorByLine(objectid))
+		lineSelectorObjectid := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), request.LineRef())
+		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorObjectid))
 	}
 	if request.PreviewInterval() != 0 {
 		duration := request.PreviewInterval()
@@ -72,8 +72,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Prepare Id Array for logstash
 	var idArray []string
 
+	// Find Descendants
+	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
+
 	// Fill StopVisits
-	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaId(stopArea.Id()) {
+	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {
 		if request.MaximumStopVisits() > 0 && len(idArray) >= request.MaximumStopVisits() {
 			break
 		}
@@ -122,15 +125,19 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 
 		modelDate := tx.Model().Date()
 
-		LineObjectId, _ := line.ObjectID(objectidKind)
+		lineObjectId, _ := line.ObjectID(objectidKind)
+
+		stopPointRef, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+		stopPointRefObjectId, _ := stopPointRef.ObjectID(objectidKind)
 
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 			ItemIdentifier: itemIdentifier,
-			StopPointRef:   objectid.Value(),
-			StopPointName:  stopArea.Name,
+			MonitoringRef:  objectid.Value(),
+			StopPointRef:   stopPointRefObjectId.Value(),
+			StopPointName:  stopPointRef.Name,
 
 			VehicleJourneyName:     vehicleJourney.Name,
-			LineRef:                LineObjectId.Value(),
+			LineRef:                lineObjectId.Value(),
 			DatedVehicleJourneyRef: dataVehicleJourneyRef,
 			DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
 			RecordedAt:             stopVisit.RecordedAt,

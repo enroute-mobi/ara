@@ -235,6 +235,7 @@ type StopVisits interface {
 	FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit
 	FindByStopAreaId(id StopAreaId) []StopVisit
 	FindFollowingByStopAreaId(id StopAreaId) []StopVisit
+	FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) []StopVisit
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
