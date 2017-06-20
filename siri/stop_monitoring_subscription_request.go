@@ -31,12 +31,12 @@ type SIRIStopMonitoringSubscriptionRequest struct {
 	ConsumerAddress        string
 }
 
-const StopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<SubscriptionRequestInfo>
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-		<siri:ConsumerAddress>https://edwig-staging.af83.io/test/siri</siri:ConsumerAddress>
+		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
+		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
   </SubscriptionRequestInfo>
 	<Request>
 		<StopMonitoringSubscriptionRequest>
@@ -73,7 +73,7 @@ func NewXMLStopMonitoringSubscriptionRequestFromContent(content []byte) (*XMLSto
 
 func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(StopMonitoringSubscriptionRequestTemplate))
+	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringSubscriptionRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {
 		return "", err
 	}
