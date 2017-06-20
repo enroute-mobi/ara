@@ -109,6 +109,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+      | DepartureStatus                 | onTime                                                               |
     When I send this SIRI request
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -129,7 +130,9 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <MonitoredStopVisitCancellation>
                 <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime><ns2:ItemIdentifier>
+                <ns2:ItemRef>SIRI:43745132</ns2:ItemRef>
                 <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
               </MonitoredStopVisitCancellation>
             </Notification>
             <SiriExtension />
@@ -145,5 +148,6 @@ Feature: Support SIRI StopMonitoring by subscription
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+      | DepartureStatus                 | Departed                                                             |
 
 
