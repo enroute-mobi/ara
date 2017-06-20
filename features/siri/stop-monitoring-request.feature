@@ -1,4 +1,3 @@
-
 Feature: Support SIRI StopMonitoring by request
 
   Background:
@@ -638,7 +637,7 @@ Feature: Support SIRI StopMonitoring by request
         </S:Body>
       </S:Envelope>
       """
-=======
+      
   Scenario: Handle a SIRI StopMonitoring request with descendants
       Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
         | local_credential     | test     |

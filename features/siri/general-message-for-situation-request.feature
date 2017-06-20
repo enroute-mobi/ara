@@ -4,7 +4,6 @@ Feature: Support SIRI GeneralMessage for Situation
       Given a Referential "test" is created
 
   # Should be fixed by #3797
-  @wip
   Scenario: Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "1"                                 |
