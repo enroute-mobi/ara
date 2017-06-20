@@ -6,7 +6,7 @@ Feature: Support SIRI GeneralMessage
   # Should be fixed by 3800 and 3801
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "Edwig:InfoMessage::test:LOC"                                 |
+      | ObjectIDs               | "external" : "test"                                                        |
       | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
       | Channel                 | Perturbation                                                               |

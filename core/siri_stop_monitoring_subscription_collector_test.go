@@ -139,7 +139,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 			"remote_url":           "une url",
 			"remote_objectid_kind": "_internal",
 		},
-		ConnectorTypes: []string{"siri-stop-monitoring-deliveries-response-collector"},
+		ConnectorTypes: []string{"siri-stop-monitoring-subscription-collector"},
 		manager:        partners,
 		connectors:     connectors,
 	}

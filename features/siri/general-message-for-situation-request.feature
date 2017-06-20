@@ -75,7 +75,7 @@ Feature: Support SIRI GeneralMessage for Situation
                 <ns3:GeneralMessage>
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>Edwig:Item::2:LOC</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>Edwig:InfoMessage::2:LOC</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>

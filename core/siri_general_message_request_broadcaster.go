@@ -49,6 +49,9 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response.RequestMessageRef = request.MessageIdentifier()
 
 	for _, situation := range tx.Model().Situations().FindAll() {
+		if situation.Channel == "Commercial" {
+			continue
+		}
 		siriGeneralMessage := &siri.SIRIGeneralMessage{}
 		objectid, present := situation.ObjectID(connector.RemoteObjectIDKind())
 		if !present {
@@ -65,7 +68,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		}
 
 		siriGeneralMessage.ItemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", connector.NewUUID())
-		siriGeneralMessage.InfoMessageIdentifier = objectid.Value()
+		siriGeneralMessage.InfoMessageIdentifier = fmt.Sprintf("Edwig:InfoMessage::%s:LOC", objectid.Value())
 		siriGeneralMessage.InfoChannelRef = situation.Channel
 		siriGeneralMessage.InfoMessageVersion = situation.Version
 		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
