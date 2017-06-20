@@ -1,4 +1,3 @@
-
 Feature: Support SIRI StopMonitoring by request
 
   Background:
@@ -638,7 +637,6 @@ Feature: Support SIRI StopMonitoring by request
         </S:Body>
       </S:Envelope>
       """
-=======
   Scenario: Handle a SIRI StopMonitoring request with descendants
       Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
         | local_credential     | test     |
@@ -649,7 +647,7 @@ Feature: Support SIRI StopMonitoring by request
       And a StopArea exists with the following attributes:
         | Name      | TestSon                                  |
         | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
-        | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+        | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
       And a Line exists with the following attributes:
         | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
         | Name      | Ligne 3 Metro                   |
@@ -661,7 +659,7 @@ Feature: Support SIRI StopMonitoring by request
         | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
         | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       And a VehicleJourney exists with the following attributes:
-        | Name      | Passage 202                              |
+        | Name      | Passage 202                             |
         | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
         | LineId    | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
       And a StopVisit exists with the following attributes:
@@ -670,7 +668,7 @@ Feature: Support SIRI StopMonitoring by request
         | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                               |
+        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       And a StopVisit exists with the following attributes:
         | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-3" |
@@ -678,7 +676,7 @@ Feature: Support SIRI StopMonitoring by request
         | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                               |
+        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T14:00:00.000Z                                             |
       And I see edwig vehicle_journeys
       And I see edwig stop_visits
@@ -786,3 +784,20 @@ Feature: Support SIRI StopMonitoring by request
     </S:Body>
   </S:Envelope>
         """
+
+  Scenario: Don't perform a SIRI StopMonitoring request when StopArea has a parent
+      Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+        """
+        """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+        | remote_url                 | http://localhost:8090      |
+        | remote_credential          | test                       |
+        | remote_objectid_kind       | internal                   |
+        | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+      And a minute has passed
+      And a StopArea exists with the following attributes:
+        | Name      | Test 1                                   |
+        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        | ParentId  | parent                                   |
+      When a minute has passed
+      Then the SIRI server should not have received a GetStopMonitoring request

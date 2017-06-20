@@ -4,7 +4,7 @@ Feature: Support SIRI StopMonitoring by subscription
       Given a Referential "test" is created
 
   Scenario: 3258 - Update a StopVisit after a StopMonitoringDelivery in a subscription
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-deliveries-response-collector] and the following settings:
+    Given a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
@@ -149,5 +149,3 @@ Feature: Support SIRI StopMonitoring by subscription
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       | DepartureStatus                 | Departed                                                             |
-
-

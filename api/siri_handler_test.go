@@ -50,7 +50,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-check-status-server",
 		"siri-stop-monitoring-request-broadcaster",
 		"siri-service-request-broadcaster",
-		"siri-stop-monitoring-deliveries-response-collector",
+		"siri-stop-monitoring-subscription-collector",
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
