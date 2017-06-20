@@ -210,6 +210,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	partner := &Partner{
 		context: make(Context),
 		Settings: map[string]string{
+			"local_url":            "http://example.com/test/siri",
 			"remote_url":           ts.URL,
 			"remote_objectid_kind": "test_kind",
 		},
@@ -234,8 +235,8 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), "value")
 	}
 
-	if request.ConsumerAddress() != "https://edwig-staging.af83.io/test/siri" {
-		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), "https://edwig-staging.af83.io/test/siri")
+	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
+		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
 
 	if request.SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {

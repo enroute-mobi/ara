@@ -149,15 +149,15 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 
-	request := &SIRIStopMonitoringResponse{
+	response := &SIRIStopMonitoringResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
 		ResponseMessageIdentifier: "identifier",
 	}
-	request.RequestMessageRef = "ref"
-	request.Status = true
-	request.ResponseTimestamp = responseTimestamp
-	xml, err := request.BuildXML()
+	response.RequestMessageRef = "ref"
+	response.Status = true
+	response.ResponseTimestamp = responseTimestamp
+	xml, err := response.BuildXML()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 			<ns3:MonitoredStopVisit>
 				<ns3:RecordedAtTime>2015-09-21T20:14:46.000Z</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>stopPointRef</ns3:MonitoringRef>
+				<ns3:MonitoringRef>monitoringRef</ns3:MonitoringRef>
 				<ns3:MonitoredVehicleJourney>
 					<ns3:LineRef>lineRef</ns3:LineRef>
 					<ns3:FramedVehicleJourneyRef>
@@ -219,6 +219,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 </ns8:GetStopMonitoringResponse>`
 	siriMonitoredStopVisit := &SIRIMonitoredStopVisit{
 		ItemIdentifier:     "itemId",
+		MonitoringRef:      "monitoringRef",
 		StopPointRef:       "stopPointRef",
 		StopPointName:      "stopPointName",
 		LineRef:            "lineRef",
@@ -252,8 +253,8 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
 	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "1337"}
 
-	request.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
-	xml, err = request.BuildXML()
+	response.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
+	xml, err = response.BuildXML()
 	if err != nil {
 		t.Fatal(err)
 	}

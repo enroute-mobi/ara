@@ -57,6 +57,28 @@ func (manager *TransactionalStopAreas) FindAll() []StopArea {
 	return stopAreas
 }
 
+func (manager *TransactionalStopAreas) FindFamily(stopAreaId StopAreaId) []StopAreaId {
+	stopAreaIds := manager.findSavedFamily(stopAreaId)
+	// Ignore first stopAreaId from the model as it's the original stopAreaId
+	for _, stopAreaId := range manager.model.StopAreas().FindFamily(stopAreaId)[1:] {
+		_, ok := manager.saved[stopAreaId]
+		if !ok {
+			stopAreaIds = append(stopAreaIds, stopAreaId)
+		}
+	}
+	return stopAreaIds
+}
+
+func (manager *TransactionalStopAreas) findSavedFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	stopAreaIds = []StopAreaId{stopAreaId}
+	for _, stopArea := range manager.saved {
+		if stopArea.ParentId == stopAreaId {
+			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
+		}
+	}
+	return stopAreaIds
+}
+
 func (manager *TransactionalStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
