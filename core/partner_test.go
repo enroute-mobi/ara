@@ -43,6 +43,59 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 	}
 }
 
+func Test_Partner_SubcriptionCancel(t *testing.T) {
+	partners := createTestPartnerManager()
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"remote_url":           "une url",
+			"remote_objectid_kind": "_internal",
+		},
+		ConnectorTypes: []string{"siri-stop-monitoring-subscription-collector"},
+		manager:        partners,
+	}
+
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	referential := partner.Referential()
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.CollectedAlways = false
+	objectid := model.NewObjectID("_internal", "coicogn2")
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	objectid = model.NewObjectID("_internal", "stopvisit1")
+	stopVisit.SetObjectID(objectid)
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.SetCollected(true)
+	stopVisit.Save()
+
+	objId := model.NewObjectID("_internal", "coicogn2")
+	ref := model.Reference{
+		ObjectId: &objId,
+		Id:       string(stopArea.Id()),
+		Type:     "StopArea",
+	}
+
+	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription.CreateAddNewResource(ref)
+	subscription.Save()
+
+	partner.CancelSubscriptions()
+	if len(partner.Subscriptions().FindAll()) != 0 {
+		t.Errorf("Subscriptions should not be found \n")
+	}
+
+	stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
+	if stopVisit.IsCollected() != false {
+		t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
+	}
+}
+
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
 		id:                 "6ba7b814-9dad-11d1-0-00c04fd430c8",

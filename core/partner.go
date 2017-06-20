@@ -367,6 +367,31 @@ func (partner *Partner) Model() model.Model {
 	return partner.manager.Model()
 }
 
+func (partner *Partner) deleteSubscription(sub Subscription) {
+	for _, sr := range sub.resourcesByObjectID {
+		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(partner.manager.NewUUID(), model.StopAreaId(sr.Reference.Id))
+		stopvisits := partner.Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
+		for _, stopvisit := range stopvisits {
+			objectid, present := stopvisit.ObjectID(partner.Setting("remote_objectid_kind"))
+			if present == true {
+				notcollected := &model.StopVisitNotCollectedEvent{
+					StopVisitObjectId: objectid,
+				}
+				stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
+			}
+		}
+		partner.Referential().CollectManager().BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+	}
+	partner.Subscriptions().Delete(&sub)
+}
+
+func (partner *Partner) CancelSubscriptions() {
+	subscriptions := partner.subscriptionManager.FindAll()
+	for _, sub := range subscriptions {
+		partner.deleteSubscription(sub)
+	}
+}
+
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
 		byId:        make(map[PartnerId]*Partner),

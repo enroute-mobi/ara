@@ -160,15 +160,16 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.SetCollected(true)
 	objectid = model.NewObjectID("_internal", "stopvisit1")
 	stopVisit.SetObjectID(objectid)
-	stopVisit.StopAreaId = "coicogn2"
+	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Save()
 
 	objId := model.NewObjectID("_internal", "coicogn2")
 	ref := model.Reference{
 		ObjectId: &objId,
-		Id:       "coicogn2",
+		Id:       string(stopArea.Id()),
 		Type:     "StopArea",
 	}
 
@@ -182,6 +183,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 		t.Errorf("Subscriptions should not be found \n")
 	}
 
+	stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
 	if stopVisit.IsCollected() != false {
 		t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
 	}

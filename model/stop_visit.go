@@ -79,6 +79,10 @@ func (stopVisit *StopVisit) Collected(t time.Time) {
 	stopVisit.collectedAt = t
 }
 
+func (stopVisit *StopVisit) SetCollected(collect bool) {
+	stopVisit.collected = collect
+}
+
 func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
 }

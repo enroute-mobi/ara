@@ -54,4 +54,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) {
 	}()
 
 	partner.CheckStatus()
+	if partner.OperationnalStatus() == OPERATIONNAL_STATUS_UNKNOWN {
+
+	}
 }
