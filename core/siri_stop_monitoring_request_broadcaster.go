@@ -150,13 +150,13 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			References:             make(map[string]map[string]model.Reference),
 		}
 
-		if stopVisit.ArrivalStatus != "cancelled" {
+		if stopVisit.ArrivalStatus != "cancelled" && request.StopVisitTypes() != "departures" {
 			monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
 			monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
 			monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
 		}
 
-		if stopVisit.DepartureStatus != "cancelled" {
+		if stopVisit.DepartureStatus != "cancelled" && request.StopVisitTypes() != "arrivals" {
 			monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
 			monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
 			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
