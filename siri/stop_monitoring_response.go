@@ -10,10 +10,25 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
+type XMLStopMonitoringDelivery struct {
+	XMLStructure
+
+	monitoredStopVisits             []*XMLMonitoredStopVisit
+	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
+}
+
+func NewXMLStopMonitoringDelivery(node XMLNode) *XMLStopMonitoringDelivery {
+	delivery := &XMLStopMonitoringDelivery{}
+	delivery.node = node
+	return delivery
+}
+
 type XMLStopMonitoringResponse struct {
 	ResponseXMLStructure
 
-	monitoredStopVisits []*XMLMonitoredStopVisit
+	// Can't include XMLStopMonitoringDelivery :(
+	monitoredStopVisits             []*XMLMonitoredStopVisit
+	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
 }
 
 type XMLMonitoredStopVisitCancellation struct {
@@ -270,14 +285,31 @@ func NewXMLStopMonitoringResponseFromContent(content []byte) (*XMLStopMonitoring
 }
 
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
-	cancelledStopVisits := []*XMLMonitoredStopVisitCancellation{}
-	nodes := response.findNodes("MonitoredStopVisitCancellation")
-	if nodes != nil {
-		for _, cancelledStopVisitNode := range nodes {
-			cancelledStopVisits = append(cancelledStopVisits, NewXMLCancelledStopVisit(cancelledStopVisitNode))
+	if response.monitoredStopVisitCancellations == nil {
+		cancellations := []*XMLMonitoredStopVisitCancellation{}
+		nodes := response.findNodes("MonitoredStopVisitCancellation")
+		if nodes != nil {
+			for _, node := range nodes {
+				cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
+			}
 		}
+		response.monitoredStopVisitCancellations = cancellations
 	}
-	return cancelledStopVisits
+	return response.monitoredStopVisitCancellations
+}
+
+func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
+	if delivery.monitoredStopVisitCancellations == nil {
+		cancellations := []*XMLMonitoredStopVisitCancellation{}
+		nodes := delivery.findNodes("MonitoredStopVisitCancellation")
+		if nodes != nil {
+			for _, node := range nodes {
+				cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
+			}
+		}
+		delivery.monitoredStopVisitCancellations = cancellations
+	}
+	return delivery.monitoredStopVisitCancellations
 }
 
 func (cancel *XMLMonitoredStopVisitCancellation) ItemRef() string {
@@ -295,16 +327,31 @@ func (cancel *XMLMonitoredStopVisitCancellation) MonitoringRef() string {
 }
 
 func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
-	if len(response.monitoredStopVisits) == 0 {
+	if response.monitoredStopVisits == nil {
+		stopVisits := []*XMLMonitoredStopVisit{}
 		nodes := response.findNodes("MonitoredStopVisit")
-		if nodes == nil {
-			return response.monitoredStopVisits
+		if nodes != nil {
+			for _, node := range nodes {
+				stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
+			}
 		}
-		for _, stopVisitNode := range nodes {
-			response.monitoredStopVisits = append(response.monitoredStopVisits, NewXMLMonitoredStopVisit(stopVisitNode))
-		}
+		response.monitoredStopVisits = stopVisits
 	}
 	return response.monitoredStopVisits
+}
+
+func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
+	if delivery.monitoredStopVisits == nil {
+		stopVisits := []*XMLMonitoredStopVisit{}
+		nodes := delivery.findNodes("MonitoredStopVisit")
+		if nodes != nil {
+			for _, node := range nodes {
+				stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
+			}
+		}
+		delivery.monitoredStopVisits = stopVisits
+	}
+	return delivery.monitoredStopVisits
 }
 
 func NewXMLCancelledStopVisit(node XMLNode) *XMLMonitoredStopVisitCancellation {
