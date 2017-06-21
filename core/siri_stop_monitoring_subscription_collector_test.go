@@ -233,10 +233,6 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
-	if request.MonitoringRef() != "value" {
-		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), "value")
-	}
-
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}

@@ -33,10 +33,6 @@ func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
 	}
 
-	if expected := "coicogn2"; request.MonitoringRef() != expected {
-		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", request.MonitoringRef(), expected)
-	}
-
 	if expected := "RATPDEV:Concerto"; request.SubscriberRef() != expected {
 		t.Errorf("Wrong SubscriberRef:\n got: %v\nwant: %v", request.SubscriberRef(), expected)
 	}
@@ -59,7 +55,6 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &SIRIStopMonitoringSubscriptionRequest{
 		MessageIdentifier:      "test",
-		MonitoringRef:          "test",
 		RequestorRef:           "test",
 		RequestTimestamp:       date,
 		ConsumerAddress:        "https://edwig-staging.af83.io/test/siri",
@@ -68,6 +63,13 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 		InitialTerminationTime: date,
 	}
 
+	entry := &SIRIStopMonitoringSubscriptionRequestEntry{
+		MessageIdentifier: "test",
+		MonitoringRef:     "MonitoringRef",
+		RequestTimestamp:  date,
+	}
+
+	request.Entries = append(request.Entries, entry)
 	xml, err := request.BuildXML()
 	if err != nil {
 		t.Fatal(err)
@@ -87,10 +89,6 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", smsr.ConsumerAddress(), request.ConsumerAddress)
 	}
 
-	if smsr.MonitoringRef() != request.MonitoringRef {
-		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", smsr.MonitoringRef(), request.MonitoringRef)
-	}
-
 	if smsr.RequestTimestamp() != request.RequestTimestamp {
 		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", smsr.RequestTimestamp(), request.RequestTimestamp)
 	}
@@ -105,5 +103,24 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 
 	if smsr.InitialTerminationTime() != request.InitialTerminationTime {
 		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", smsr.InitialTerminationTime(), request.InitialTerminationTime)
+	}
+
+	xse := smsr.XMLSubscriptionEntries()
+	if len(xse) != 1 {
+		t.Errorf("Wrong number of subscriptions entries :\n got: %v\nwant: %v", len(xse), 1)
+	}
+
+	xmlEntry := xse[0]
+
+	if xmlEntry.MessageIdentifier() != entry.MessageIdentifier {
+		t.Errorf("Wrong MessageIdentifier:\n got: %v\nwant: %v", xmlEntry.MessageIdentifier(), entry.MessageIdentifier)
+	}
+
+	if xmlEntry.MonitoringRef() != entry.MonitoringRef {
+		t.Errorf("Wrong MonitoringRef:\n got: %v\nwant: %v", xmlEntry.MonitoringRef(), entry.MonitoringRef)
+	}
+
+	if xmlEntry.RequestTimestamp() != entry.RequestTimestamp {
+		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", xmlEntry.RequestTimestamp(), entry.RequestTimestamp)
 	}
 }

@@ -76,7 +76,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
-		MonitoringRef:          stopAreaObjectid.Value(),
 		RequestorRef:           connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
@@ -84,6 +83,14 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 		ConsumerAddress:        connector.Partner().Setting("local_url"),
 	}
+
+	entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
+		MessageIdentifier: siriStopMonitoringSubscriptionRequest.MessageIdentifier,
+		RequestTimestamp:  connector.Clock().Now(),
+		MonitoringRef:     stopAreaObjectid.Value(),
+	}
+
+	siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 
@@ -215,7 +222,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
 	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
 	xml, err := request.BuildXML()
