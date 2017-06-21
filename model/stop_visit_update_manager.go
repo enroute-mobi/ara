@@ -73,7 +73,7 @@ func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVis
 
 	stopVisit.NotCollected()
 	stopVisit.ArrivalStatus = "cancelled"
-	stopVisit.DepartureStatus = "cancelled"
+	stopVisit.DepartureStatus = STOP_VISIT_DEPARTURE_DEPARTED
 
 	stopVisit.Save()
 
