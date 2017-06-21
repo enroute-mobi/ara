@@ -125,13 +125,21 @@ Feature: Support SIRI StopMonitoring by subscription
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
+
             <Notification>
-              <MonitoredStopVisitCancellation>
-                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
-                <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
-                <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
-              </MonitoredStopVisitCancellation>
+              <ns2:StopMonitoringDelivery version="1.3">
+                <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
+                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
+                <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
+                <ns2:SubscriptionRef>Edwig:Subscription::ea7004a9-4eb1-4dbc-9e13-93afe28b41a7:LOC</ns2:SubscriptionRef>
+                <ns2:Status>true</ns2:Status>
+                <ns2:MonitoredStopVisitCancellation>
+                  <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:MonitoredStopVisitCancellation>
+              </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
           </ns6:NotifyStopMonitoring>
