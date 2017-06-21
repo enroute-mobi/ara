@@ -147,7 +147,7 @@ Feature: Support SIRI StopMonitoring by subscription
       </soap:Envelope>
       """
     Then the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" has the following attributes:
-      | DepartureStatus | cancelled |
+      | DepartureStatus | departed  |
       | ArrivalStatus   | cancelled |
 
   Scenario: Manage several StopMonitoringDeliveries in NotifyStopMonitoring

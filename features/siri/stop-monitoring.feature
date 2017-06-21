@@ -651,7 +651,7 @@ Feature: Support SIRI StopMonitoring
       # "internal": "B"
       | Collected       | false                |
       | CollectedAt     | 2017-01-01T12:02:00Z |
-      | DepartureStatus | cancelled            |
+      | DepartureStatus | departed             |
       | ArrivalStatus   | cancelled            |
 
   Scenario: 2939 - Partner Setting collect.include_stop_areas is used to select the best Partner
