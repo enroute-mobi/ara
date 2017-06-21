@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -160,7 +161,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.SetCollected(true)
+	stopVisit.Collected(time.Now())
 	objectid = model.NewObjectID("_internal", "stopvisit1")
 	stopVisit.SetObjectID(objectid)
 	stopVisit.StopAreaId = stopArea.Id()

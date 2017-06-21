@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/model"
 )
@@ -71,7 +72,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	objectid = model.NewObjectID("_internal", "stopvisit1")
 	stopVisit.SetObjectID(objectid)
 	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.SetCollected(true)
+	stopVisit.Collected(time.Now())
 	stopVisit.Save()
 
 	objId := model.NewObjectID("_internal", "coicogn2")
