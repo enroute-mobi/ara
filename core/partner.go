@@ -367,7 +367,7 @@ func (partner *Partner) Model() model.Model {
 	return partner.manager.Model()
 }
 
-func (partner *Partner) deleteSubscription(sub Subscription) {
+func (partner *Partner) DeleteSubscription(sub Subscription) {
 	for _, sr := range sub.resourcesByObjectID {
 		stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(partner.manager.NewUUID(), model.StopAreaId(sr.Reference.Id))
 		stopvisits := partner.Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
@@ -389,7 +389,7 @@ func (partner *Partner) CancelSubscriptions() {
 	subscriptions := partner.subscriptionManager.FindAll()
 	for _, sub := range subscriptions {
 		logger.Log.Printf("Deleting subscription id %v and kind %v", sub.Id(), sub.Kind())
-		partner.deleteSubscription(sub)
+		partner.DeleteSubscription(sub)
 	}
 }
 
