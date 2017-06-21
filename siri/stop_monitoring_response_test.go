@@ -93,7 +93,7 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	if expected := ""; monitoredStopVisit.DepartureStatus() != expected {
 		t.Errorf("Incorrect DepartureStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.DepartureStatus())
 	}
-	if expected := "arrived"; monitoredStopVisit.ArrivalStatus() != expected {
+	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; model.StopVisitArrivalStatus(monitoredStopVisit.ArrivalStatus()) != expected {
 		t.Errorf("Incorrect ArrivalStatus for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.ArrivalStatus())
 	}
 	if expected := 4; monitoredStopVisit.Order() != expected {
