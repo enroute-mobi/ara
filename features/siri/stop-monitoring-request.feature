@@ -637,16 +637,17 @@ Feature: Support SIRI StopMonitoring by request
         </S:Body>
       </S:Envelope>
       """
+
   Scenario: Handle a SIRI StopMonitoring request with descendants
       Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
         | local_credential     | test     |
         | remote_objectid_kind | internal |
       And a StopArea exists with the following attributes:
-        | Name      | Test                                     |
-        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        | Name      | Parent                                   |
+        | ObjectIDs | "internal": "parent" |
       And a StopArea exists with the following attributes:
-        | Name      | TestSon                                  |
-        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+        | Name      | Child                                    |
+        | ObjectIDs | "internal": "child" |
         | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
       And a Line exists with the following attributes:
         | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
@@ -681,35 +682,9 @@ Feature: Support SIRI StopMonitoring by request
       And I see edwig vehicle_journeys
       And I see edwig stop_visits
       And I see edwig lines
-      When I send this SIRI request
-        """
-  <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-              xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-    <SOAP-ENV:Header />
-    <S:Body>
-      <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                             xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                             xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                             xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                             xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
-        <ServiceRequestInfo>
-          <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
-          <ns2:RequestorRef>test</ns2:RequestorRef>
-          <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        </ServiceRequestInfo>
-
-        <Request version="2.0:FR-IDF-2.4">
-          <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
-          <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-          <ns2:StartTime>2016-09-22T07:54:52.977Z</ns2:StartTime>
-          <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
-          <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
-        </Request>
-        <RequestExtension />
-      </ns7:GetStopMonitoring>
-    </S:Body>
-  </S:Envelope>
-        """
+      When I send a SIRI GetStopMonitoring request with
+        | RequestorRef  | test   |
+        | MonitoringRef | parent |
       Then I should receive this SIRI response
         """
   <?xml version='1.0' encoding='utf-8'?>
@@ -736,7 +711,7 @@ Feature: Support SIRI StopMonitoring by request
             <ns3:MonitoredStopVisit>
               <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
               <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-              <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
+              <ns3:MonitoringRef>parent</ns3:MonitoringRef>
               <ns3:MonitoredVehicleJourney>
                 <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
                 <ns3:FramedVehicleJourneyRef>
@@ -747,9 +722,9 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
                 <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                 <ns3:MonitoredCall>
-                  <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
+                  <ns3:StopPointRef>parent</ns3:StopPointRef>
                   <ns3:Order>4</ns3:Order>
-                  <ns3:StopPointName>Test</ns3:StopPointName>
+                  <ns3:StopPointName>Parent</ns3:StopPointName>
                   <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
                   <ns3:ActualArrivalTime>2017-01-01T13:00:00.000Z</ns3:ActualArrivalTime>
                 </ns3:MonitoredCall>
@@ -758,7 +733,7 @@ Feature: Support SIRI StopMonitoring by request
             <ns3:MonitoredStopVisit>
               <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
               <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-3</ns3:ItemIdentifier>
-              <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
+              <ns3:MonitoringRef>parent</ns3:MonitoringRef>
               <ns3:MonitoredVehicleJourney>
                 <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
                 <ns3:FramedVehicleJourneyRef>
@@ -769,9 +744,9 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
                 <ns3:VehicleJourneyName>Passage 202</ns3:VehicleJourneyName>
                 <ns3:MonitoredCall>
-                  <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
+                  <ns3:StopPointRef>child</ns3:StopPointRef>
                   <ns3:Order>4</ns3:Order>
-                  <ns3:StopPointName>TestSon</ns3:StopPointName>
+                  <ns3:StopPointName>Child</ns3:StopPointName>
                   <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
                   <ns3:ActualArrivalTime>2017-01-01T14:00:00.000Z</ns3:ActualArrivalTime>
                 </ns3:MonitoredCall>

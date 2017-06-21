@@ -86,11 +86,10 @@ Feature: Support SIRI StopMonitoring by subscription
       | Schedule[expected]#Arrival   | 2017-01-01T13:01:00.000Z                                             |
       | Schedule[expected]#Departure | 2017-01-01T13:02:00.000Z                                             |
 
-@wip
   Scenario: 3737 - Manage a MonitoredStopVisitCancellation
     Given a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
-      | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | local_credential     | NINOXE:default |
+      | remote_objectid_kind | internal       |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -121,16 +120,15 @@ Feature: Support SIRI StopMonitoring by subscription
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <MonitoredStopVisitCancellation>
-                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime><ns2:ItemIdentifier>
-                <ns2:ItemRef>SIRI:43745132</ns2:ItemRef>
+                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
+                <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                 <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
                 <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
               </MonitoredStopVisitCancellation>
@@ -140,12 +138,6 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-    Then a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder                    | 4                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
-      | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
-      | DepartureStatus                 | Departed                                                             |
+    Then the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" has the following attributes:
+      | DepartureStatus | cancelled |
+      | ArrivalStatus   | cancelled |
