@@ -9,7 +9,7 @@ import (
 )
 
 type SIRIStopMonitoringDeliveriesResponseHandler struct {
-	xmlRequest *siri.XMLStopMonitoringResponse
+	xmlRequest *siri.XMLNotifyStopMonitoring
 	Partner    core.Partner
 }
 

@@ -54,7 +54,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		t.Fatal(err)
 	}
 
-	delivery := siri.NewXMLStopMonitoringResponse(doc.Root())
+	delivery := siri.NewXMLNotifyStopMonitoring(doc.Root())
 	connector.HandleNotifyStopMonitoring(delivery)
 
 	if len(collectManager.(*TestCollectManager).Events) != 2 {

@@ -6,7 +6,7 @@ import (
 )
 
 type XMLNotifyStopMonitoring struct {
-	XMLStructure
+	ResponseXMLStructure
 
 	deliveries []*XMLStopMonitoringDelivery
 }
