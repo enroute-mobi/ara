@@ -159,6 +159,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
 	connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery)
+
 	connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery)
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
@@ -200,9 +201,16 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 	}
 
 	for _, xmlStopVisitCancellationEvent := range xmlStopVisitCancellationEvents {
+		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitCancellationEvent.MonitoringRef())
+		stopArea, ok := connector.Partner().Model().StopAreas().FindByObjectId(stopAreaObjectId)
+		if !ok {
+			logger.Log.Debugf("StopVisitCancellationEvent for unknown StopArea %v", stopAreaObjectId.Value())
+			continue
+		}
+
 		stopAreaUpdateEvent, ok := events[xmlStopVisitCancellationEvent.MonitoringRef()]
 		if !ok {
-			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), model.StopAreaId(xmlStopVisitCancellationEvent.ItemRef()))
+			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
 			events[xmlStopVisitCancellationEvent.MonitoringRef()] = stopAreaUpdateEvent
 		}
 		stopVisitCancellationEvent := &model.StopVisitNotCollectedEvent{
