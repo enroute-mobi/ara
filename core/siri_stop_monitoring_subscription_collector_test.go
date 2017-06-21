@@ -111,6 +111,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
+	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
@@ -230,14 +231,15 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
 	stopAreaUpdateEvent := NewStopAreaUpdateRequest(stopArea.Id())
+	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
+	connector.stopMonitoringSubscriber.Run()
 
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
-
 	if request.SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
 		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
 	}

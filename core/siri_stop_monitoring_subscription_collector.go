@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -19,11 +18,12 @@ type StopMonitoringSubscriptionCollector interface {
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
-	model.ClockConsumer
+	// model.ClockConsumer
 	model.UUIDConsumer
 
 	siriConnector
 
+	stopMonitoringSubscriber SIRIStopMonitoringSubscriber
 	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
 }
 
@@ -49,9 +49,6 @@ func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonit
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	logStashEvent := make(audit.LogStashEvent)
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoring SubscriptionCollector for unknown StopArea %v", request.StopAreaId())
@@ -74,42 +71,22 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		}
 	}
 
-	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
-		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
-		RequestorRef:           connector.SIRIPartner().RequestorRef(),
-		RequestTimestamp:       connector.Clock().Now(),
-		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
-		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
-		ConsumerAddress:        connector.Partner().Setting("local_url"),
+	ref := model.Reference{
+		ObjectId: &stopAreaObjectid,
+		Id:       string(request.StopAreaId()),
+		Type:     "StopArea",
 	}
 
-	entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
-		MessageIdentifier: siriStopMonitoringSubscriptionRequest.MessageIdentifier,
-		RequestTimestamp:  connector.Clock().Now(),
-		MonitoringRef:     stopAreaObjectid.Value(),
+	subscription.CreateAddNewResource(ref)
+
+	if connector.stopMonitoringSubscriber == nil {
+		connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
+		connector.stopMonitoringSubscriber.Run()
 	}
+}
 
-	siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
-
-	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
-
-	response, err := connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
-	if err != nil {
-		logger.Log.Debugf("Error while subscribing: %v", err)
-		return
-	}
-
-	logStashEvent["response"] = response.RawXML()
-	if response.Status() == true {
-		ref := model.Reference{
-			ObjectId: &stopAreaObjectid,
-			Id:       string(request.StopAreaId()),
-			Type:     "StopArea",
-		}
-
-		subscription.CreateAddNewResource(ref)
-	}
+func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubscriber(stopMonitoringSubscriber SIRIStopMonitoringSubscriber) {
+	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
@@ -211,19 +188,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 		}
 		stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, stopVisitCancellationEvent)
 	}
-}
-
-func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
-	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	xml, err := request.BuildXML()
-	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["requestXML"] = xml
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {

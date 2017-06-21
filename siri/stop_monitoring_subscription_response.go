@@ -8,7 +8,6 @@ import (
 )
 
 //WIP
-
 type XMLStopMonitoringSubscriptionResponse struct {
 	ResponseXMLStructure
 
