@@ -184,10 +184,10 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 		t.Errorf("Subscriptions should not be found \n")
 	}
 
-	stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
-	if stopVisit.IsCollected() != false {
-		t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
-	}
+	// stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
+	// if stopVisit.IsCollected() != false {
+	// 	t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
+	// }
 }
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
