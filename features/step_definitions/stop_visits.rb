@@ -41,7 +41,7 @@ Then(/^a StopVisit "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([
   if condition.nil?
     expect(response.code).to eq(200)
   else
-    expect(response.code).to eq(500)
+    expect(response.code).to eq(404)
     expect(response.body).to include("Stop visit not found: #{kind}:#{value}")
   end
 end

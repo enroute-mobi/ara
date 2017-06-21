@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
 
@@ -29,6 +30,8 @@ func siriErrorWithRequest(errCode, errDescription, request string, response http
 }
 
 func (siriError SiriError) sendSiriError() {
+	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
+
 	// Wrap soap and send response
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(fmt.Sprintf(`

@@ -14,7 +14,7 @@ import (
 
 type StopMonitoringSubscriptionCollector interface {
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
-	HandleNotifyStopMonitoring(delivery *siri.XMLStopMonitoringResponse)
+	HandleNotifyStopMonitoring(delivery *siri.XMLNotifyStopMonitoring)
 	HandleTerminatedNotification(termination *siri.XMLStopMonitoringSubscriptionTerminatedResponse)
 }
 
@@ -142,17 +142,18 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTermina
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(delivery *siri.XMLStopMonitoringResponse) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	logXMLStopMonitoringDelivery(logStashEvent, delivery)
+	logXMLStopMonitoringDelivery(logStashEvent, notify)
 
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
-	connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery)
-
-	connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery)
+	for _, delivery := range notify.StopMonitoringDeliveries() {
+		connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery)
+		connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery)
+	}
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 
@@ -161,7 +162,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery) {
 	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
 	if len(xmlStopVisitEvents) == 0 {
 		return
@@ -186,7 +187,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery) {
 	xmlStopVisitCancellationEvents := xmlResponse.XMLMonitoredStopVisitCancellations()
 	if len(xmlStopVisitCancellationEvents) == 0 {
 		return
@@ -225,20 +226,20 @@ func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent,
 	logStashEvent["requestXML"] = xml
 }
 
-func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery *siri.XMLStopMonitoringResponse) {
+func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
 	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
-	logStashEvent["address"] = delivery.Address()
-	logStashEvent["producerRef"] = delivery.ProducerRef()
-	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = delivery.ResponseMessageIdentifier()
-	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = delivery.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(delivery.Status())
-	if !delivery.Status() {
-		logStashEvent["errorType"] = delivery.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber())
-		logStashEvent["errorText"] = delivery.ErrorText()
-		logStashEvent["errorDescription"] = delivery.ErrorDescription()
+	logStashEvent["address"] = notify.Address()
+	logStashEvent["producerRef"] = notify.ProducerRef()
+	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
+	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
+	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
+	logStashEvent["responseXML"] = notify.RawXML()
+	logStashEvent["status"] = strconv.FormatBool(notify.Status())
+	if !notify.Status() {
+		logStashEvent["errorType"] = notify.ErrorType()
+		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+		logStashEvent["errorText"] = notify.ErrorText()
+		logStashEvent["errorDescription"] = notify.ErrorDescription()
 	}
 }
 
