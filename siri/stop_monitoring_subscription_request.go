@@ -58,8 +58,8 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 		<StopMonitoringSubscriptionRequest>
 			<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
 			<SubscriptionIdentifier>{{.SubscriptionIdentifier}}</SubscriptionIdentifier>
-			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>
-			<StopMonitoringRequest>{{ range .Entries }}
+			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>{{ range .Entries }}
+			<StopMonitoringRequest>
 				<MessageIdentifier>{{.MessageIdentifier}}</MessageIdentifier>
 				<RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</RequestTimestamp>
 				<MonitoringRef>{{.MonitoringRef}}</MonitoringRef>
