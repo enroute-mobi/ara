@@ -252,7 +252,7 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                <ns3:ActualArrivalTime>2017-01-01T14:00:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T14:00:00.000+02:00</ns3:AimedArrivalTime>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
@@ -274,7 +274,7 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                <ns3:ActualArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
