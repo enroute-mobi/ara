@@ -15,7 +15,15 @@ func StopVisitSelectorByTime(startTime, endTime time.Time) StopVisitSelector {
 
 func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
 	return func(stopVisit StopVisit) bool {
-		lineObjectid, ok := stopVisit.VehicleJourney().Line().ObjectID(objectid.Kind())
+		vehicleJourney := stopVisit.VehicleJourney()
+		if vehicleJourney == nil {
+			return false
+		}
+		line := vehicleJourney.Line()
+		if line == nil {
+			return false
+		}
+		lineObjectid, ok := line.ObjectID(objectid.Kind())
 		if ok {
 			return lineObjectid.Value() == objectid.Value()
 		}

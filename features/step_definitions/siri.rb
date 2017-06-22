@@ -56,7 +56,7 @@ When(/^I receive this GeneralMessageRequest$/) do |message_type|
   SIRIServer.find("default").wait_request message_type
 end
 
-Then(/^I should receive a SIRI GetStopMonitoringResponse with$/) do |expected|
+Then(/^I should receive a SIRI \S+ with$/) do |expected|
   document = REXML::Document.new(@last_siri_response)
 
   expected_values = {}
@@ -118,7 +118,7 @@ Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (GetStopMonitor
   expect(SIRIServer.find(name).received_request?).to be_falsy
 end
 
-Then(/^the (?:"([^"]*)" )?SIRI server should have received a GetStopMonitoring request with:$/) do |name, attributes|
+Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with:$/) do |name, attributes|
   name ||= "default"
   last_siri_request = SIRIServer.find(name).requests.last.body
 
@@ -130,6 +130,16 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a GetStopMonitoring r
   expect(actual_values).to eq(expected_values)
 end
 
+Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with (\d+) "([^"]*)"$/) do |name, requestNumber, requestType|
+  name ||= "default"
+  last_siri_request = SIRIServer.find(name).requests.last.body
+
+  document = REXML::Document.new(last_siri_request)
+
+  nodes = REXML::XPath.match(document, "//#{requestType}", { "siri" => "http://www.siri.org.uk/siri" })
+
+  expect(nodes.length).to eq(requestNumber.to_i)
+end
 
 Then (/^I send this SIRI ServiceDelivery$/) do |request|
   send_siri_request request
