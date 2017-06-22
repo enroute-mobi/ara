@@ -416,17 +416,17 @@ Feature: Support SIRI StopMonitoring by request
                 </ns3:MonitoredStopVisit>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
                     <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
                     <ns3:FramedVehicleJourneyRef>
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
                     <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
+                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                       <ns3:Order>4</ns3:Order>
