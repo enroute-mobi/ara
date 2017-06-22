@@ -20,7 +20,7 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -28,7 +28,7 @@ Feature: Support SIRI StopMonitoring by request
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000+02:00                                        |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-2" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -44,7 +44,7 @@ Feature: Support SIRI StopMonitoring by request
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T14:00:00.000+02:00                                        |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
