@@ -1,3 +1,8 @@
+Feature: Support SIRI StopMonitoring by request
+
+  Background:
+      Given a Referential "test" is created
+
 @wip
   Scenario: 3754a - Handle a SIRI StopMonitoring request with filter PreviewInterval
     # si StartTime absent, alors ça démarre à l'heure courante (=celle de la request)
