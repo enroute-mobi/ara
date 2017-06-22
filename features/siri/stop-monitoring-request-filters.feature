@@ -71,7 +71,7 @@ Feature: Support SIRI StopMonitoring by request
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:PreviewInterval>P1H</ns2:PreviewInterval>
+        <ns2:PreviewInterval>PT1H</ns2:PreviewInterval>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
       </Request>
@@ -121,7 +121,7 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                <ns3:ActualArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
@@ -201,7 +201,7 @@ Feature: Support SIRI StopMonitoring by request
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:PreviewInterval>P1H</ns2:PreviewInterval>
+        <ns2:PreviewInterval>PT1H</ns2:PreviewInterval>
         <ns2:StartTime>2017-01-01T13:35:00.000+02:00</ns2:StartTime>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
@@ -307,20 +307,20 @@ Feature: Support SIRI StopMonitoring by request
     And a VehicleJourney exists with the following attributes:
       | Name      | Le 15.                                  |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
-      | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | LineId    | 6ba7b814-9dad-11d1-7-00c04fd430c8       |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000+02:00                                        |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-2" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T13:30:00.000+02:00                                        |
@@ -328,15 +328,15 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T14:00:00.000+02:00                                        |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T14:30:00.000+02:00                                        |
@@ -384,7 +384,7 @@ Feature: Support SIRI StopMonitoring by request
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -394,45 +394,45 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:Status>true</ns3:Status>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
                     <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
                     <ns3:FramedVehicleJourneyRef>
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
+                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
                     <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
+                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                       <ns3:Order>4</ns3:Order>
                       <ns3:StopPointName>Test</ns3:StopPointName>
                       <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:00:00.000+02:00</ns3:AimedArrivalTime>
+                      <ns3:ActualArrivalTime>2017-01-01T14:00:00.000+02:00</ns3:ActualArrivalTime>
                     </ns3:MonitoredCall>
                   </ns3:MonitoredVehicleJourney>
                 </ns3:MonitoredStopVisit>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
                     <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
                     <ns3:FramedVehicleJourneyRef>
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
+                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
                     <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
+                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                       <ns3:Order>4</ns3:Order>
                       <ns3:StopPointName>Test</ns3:StopPointName>
                       <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
+                      <ns3:ActualArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:ActualArrivalTime>
                     </ns3:MonitoredCall>
                   </ns3:MonitoredVehicleJourney>
                 </ns3:MonitoredStopVisit>

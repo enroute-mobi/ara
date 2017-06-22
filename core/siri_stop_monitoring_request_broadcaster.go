@@ -59,7 +59,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		lineSelectorObjectid := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), request.LineRef())
 		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorObjectid))
 	}
-
 	if request.PreviewInterval() != 0 {
 		duration := request.PreviewInterval()
 		now := connector.Clock().Now()
