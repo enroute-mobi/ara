@@ -416,7 +416,7 @@ Feature: Support SIRI StopMonitoring by request
                 </ns3:MonitoredStopVisit>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
                     <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
