@@ -167,7 +167,6 @@ func (xmlStruct *XMLStructure) findDurationChildContent(localName string) time.D
 	if len(matches) == 0 {
 		return 0
 	}
-
 	years := parseDuration(matches[1]) * 24 * 365 * time.Hour
 	months := parseDuration(matches[2]) * 30 * 24 * time.Hour
 	days := parseDuration(matches[3]) * 24 * time.Hour

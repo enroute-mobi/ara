@@ -71,7 +71,7 @@ Feature: Support SIRI StopMonitoring by request
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:PreviewInterval>P1H</ns2:PreviewInterval>
+        <ns2:PreviewInterval>PT1H</ns2:PreviewInterval>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
       </Request>
@@ -121,7 +121,7 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:Order>4</ns3:Order>
                 <ns3:StopPointName>Test</ns3:StopPointName>
                 <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                <ns3:ActualArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:ActualArrivalTime>
+                <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
               </ns3:MonitoredCall>
             </ns3:MonitoredVehicleJourney>
           </ns3:MonitoredStopVisit>
@@ -201,7 +201,7 @@ Feature: Support SIRI StopMonitoring by request
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:PreviewInterval>P1H</ns2:PreviewInterval>
+        <ns2:PreviewInterval>PT1H</ns2:PreviewInterval>
         <ns2:StartTime>2017-01-01T13:35:00.000+02:00</ns2:StartTime>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
