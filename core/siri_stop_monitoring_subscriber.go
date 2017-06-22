@@ -49,13 +49,6 @@ func NewSIRIStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCo
 }
 
 func (subscriber *StopMonitoringSubscriber) Run() {
-	logger.Log.Debugf("Start StopMonitoringSubscriber")
-
-	subscriber.stop = make(chan struct{})
-	go subscriber.run()
-}
-
-func (subscriber *StopMonitoringSubscriber) run() {
 	c := subscriber.Clock().After(5 * time.Second)
 
 	for {
