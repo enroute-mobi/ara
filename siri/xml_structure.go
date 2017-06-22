@@ -161,7 +161,7 @@ func (xmlStruct *XMLStructure) findDurationChildContent(localName string) time.D
 	if node == nil {
 		return 0
 	}
-	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
+	durationRegex := regexp.MustCompile(`P([0-9]+Y)?([0-9]+M)?([0-9]+D)?([0-9]+H)?([0-9]+M)?([0-9]+S)?`)
 	matches := durationRegex.FindStringSubmatch(strings.TrimSpace(node.Content()))
 
 	if len(matches) == 0 {
@@ -179,9 +179,12 @@ func (xmlStruct *XMLStructure) findDurationChildContent(localName string) time.D
 }
 
 func parseDuration(value string) time.Duration {
-	if len(value) == 0 {
+	length := len(value)
+	if length == 0 {
 		return 0
 	}
+
+	value = value[:length-1]
 	parsed, err := strconv.Atoi(value)
 	if err != nil {
 		return 0
