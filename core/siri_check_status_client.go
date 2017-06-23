@@ -10,12 +10,12 @@ import (
 )
 
 type CheckStatusClient interface {
-	Status() (OperationnalStatus, error)
+	Status() (PartnerStatus, error)
 }
 
 type TestCheckStatusClient struct {
-	status OperationnalStatus
-	Done   chan bool
+	partnerStatus PartnerStatus
+	Done          chan bool
 }
 
 type TestCheckStatusClientFactory struct{}
@@ -30,18 +30,21 @@ type SIRICheckStatusClientFactory struct{}
 
 func NewTestCheckStatusClient() *TestCheckStatusClient {
 	return &TestCheckStatusClient{
-		status: OPERATIONNAL_STATUS_UP,
-		Done:   make(chan bool, 1),
+		partnerStatus: PartnerStatus{
+			OperationnalStatus: OPERATIONNAL_STATUS_UP,
+		},
+		Done: make(chan bool, 1),
 	}
 }
 
-func (connector *TestCheckStatusClient) Status() (OperationnalStatus, error) {
+func (connector *TestCheckStatusClient) Status() (PartnerStatus, error) {
 	connector.Done <- true
-	return connector.status, nil
+
+	return connector.partnerStatus, nil
 }
 
 func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
-	connector.status = status
+	connector.partnerStatus.OperationnalStatus = status
 }
 
 func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
@@ -58,12 +61,13 @@ func NewSIRICheckStatusClient(partner *Partner) *SIRICheckStatusClient {
 	return siriCheckStatusClient
 }
 
-func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
+func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	logStashEvent := make(audit.LogStashEvent)
 	startTime := connector.Clock().Now()
 
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	partnerStatus := PartnerStatus{}
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  startTime,
@@ -76,15 +80,19 @@ func (connector *SIRICheckStatusClient) Status() (OperationnalStatus, error) {
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
-		return OPERATIONNAL_STATUS_UNKNOWN, err
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+		return partnerStatus, err
 	}
 
 	logXMLCheckStatusResponse(logStashEvent, response)
 
+	partnerStatus.ServiceStartedAt = response.ServiceStartedTime()
 	if response.Status() {
-		return OPERATIONNAL_STATUS_UP, nil
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
+		return partnerStatus, nil
 	} else {
-		return OPERATIONNAL_STATUS_DOWN, nil
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+		return partnerStatus, nil
 	}
 }
 

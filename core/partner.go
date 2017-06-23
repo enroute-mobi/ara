@@ -3,10 +3,12 @@ package core
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -42,10 +44,15 @@ type Partners interface {
 	Load() error
 }
 
+type PartnerStatus struct {
+	OperationnalStatus OperationnalStatus
+	ServiceStartedAt   time.Time
+}
+
 type Partner struct {
-	id                 PartnerId
-	slug               PartnerSlug
-	operationnalStatus OperationnalStatus
+	id            PartnerId
+	slug          PartnerSlug
+	PartnerStatus PartnerStatus
 
 	ConnectorTypes []string
 	Settings       map[string]string
@@ -165,11 +172,13 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 
 func NewPartner() *Partner {
 	partner := &Partner{
-		Settings:           make(map[string]string),
-		ConnectorTypes:     []string{},
-		connectors:         make(map[string]Connector),
-		context:            make(Context),
-		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		Settings:       make(map[string]string),
+		ConnectorTypes: []string{},
+		connectors:     make(map[string]Connector),
+		context:        make(Context),
+		PartnerStatus: PartnerStatus{
+			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		},
 	}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
@@ -201,7 +210,7 @@ func (partner *Partner) Setting(key string) string {
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
-	return partner.operationnalStatus
+	return partner.PartnerStatus.OperationnalStatus
 }
 
 func (partner *Partner) Context() *Context {
@@ -215,15 +224,13 @@ func (partner *Partner) Save() (ok bool) {
 func (partner *Partner) MarshalJSON() ([]byte, error) {
 	type Alias Partner
 	return json.Marshal(&struct {
-		Id                 PartnerId
-		Slug               PartnerSlug
-		OperationnalStatus OperationnalStatus
+		Id   PartnerId
+		Slug PartnerSlug
 		*Alias
 	}{
-		Id:                 partner.id,
-		Slug:               partner.slug,
-		OperationnalStatus: partner.operationnalStatus,
-		Alias:              (*Alias)(partner),
+		Id:    partner.id,
+		Slug:  partner.slug,
+		Alias: (*Alias)(partner),
 	})
 }
 
@@ -263,7 +270,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.slug = apiPartner.Slug
 	partner.Settings = apiPartner.Settings
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
-	partner.operationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 
 	for id, factory := range apiPartner.factories {
 		if _, ok := partner.connectors[id]; !ok {
@@ -302,6 +309,7 @@ func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	connector, ok := partner.connectors[connectorType]
 	return connector, ok
 }
+
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
 	// WIP
 	client, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]
@@ -346,21 +354,23 @@ func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCo
 	return nil
 }
 
-func (partner *Partner) CheckStatus() {
+func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 
+	partnerStatus := PartnerStatus{}
 	if partner.CheckStatusClient() == nil {
 		logger.Log.Debugf("No CheckStatusClient connector")
-		return
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+		return partnerStatus, errors.New("No CheckStatusClient connector")
 	}
 
-	status, err := partner.CheckStatusClient().Status()
+	partnerStatus, err := partner.CheckStatusClient().Status()
 	if err != nil {
 		logger.Log.Printf("Error while checking status: %v", err)
 	}
 
-	partner.operationnalStatus = status
-	logger.Log.Debugf("Partner status is %v", partner.operationnalStatus)
+	logger.Log.Debugf("Partner status is %v", partner.PartnerStatus.OperationnalStatus)
+	return partnerStatus, nil
 }
 
 func (partner *Partner) Model() model.Model {
@@ -416,13 +426,15 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
-		slug:               slug,
-		manager:            manager,
-		Settings:           make(map[string]string),
-		connectors:         make(map[string]Connector),
-		context:            make(Context),
-		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
-		ConnectorTypes:     []string{},
+		slug:       slug,
+		manager:    manager,
+		Settings:   make(map[string]string),
+		connectors: make(map[string]Connector),
+		context:    make(Context),
+		PartnerStatus: PartnerStatus{
+			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		},
+		ConnectorTypes: []string{},
 	}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner

@@ -95,7 +95,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 	}
 
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
 		_, connectorPresent := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
@@ -122,7 +122,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 
 func (manager *CollectManager) PartnerWithConnector(connector string) *Partner {
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
 		_, connectorPresent := partner.Connector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)

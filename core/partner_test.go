@@ -39,8 +39,8 @@ func Test_Partner_Slug(t *testing.T) {
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := NewPartner()
 
-	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.OperationnalStatus() != expected {
-		t.Errorf("Partner.OperationnalStatus() returns wrong status, got: %s, required: %s", partner.OperationnalStatus(), expected)
+	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.PartnerStatus.OperationnalStatus != expected {
+		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
 
@@ -99,13 +99,15 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
-		id:                 "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		operationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
-		slug:               "partner",
-		Settings:           make(map[string]string),
-		ConnectorTypes:     []string{},
+		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		PartnerStatus: PartnerStatus{
+			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		},
+		slug:           "partner",
+		Settings:       make(map[string]string),
+		ConnectorTypes: []string{},
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","OperationnalStatus":"unknown","ConnectorTypes":[],"Settings":{}}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

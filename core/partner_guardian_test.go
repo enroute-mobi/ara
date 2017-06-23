@@ -29,8 +29,8 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	// Wait for the Test CheckStatusClient to finish Status()
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
-		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
-			t.Errorf("Partner OperationnalStatus should be UP when guardian is running, got: %v", partner.OperationnalStatus())
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			t.Errorf("Partner OperationnalStatus should be UP when guardian is running, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
 		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")
@@ -38,11 +38,12 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 
 	// Test a change in status
 	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_DOWN)
+	partner.PartnerStatus, _ = partner.CheckStatusClient().(*TestCheckStatusClient).Status()
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
-		if partner.OperationnalStatus() != OPERATIONNAL_STATUS_DOWN {
-			t.Errorf("Partner OperationnalStatus should be DOWN when guardian is running, got: %v", partner.OperationnalStatus())
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
+			t.Errorf("Partner OperationnalStatus should be DOWN when guardian is running, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
 		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")

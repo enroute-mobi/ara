@@ -16,7 +16,7 @@ func Test_PartnerWithConnector(t *testing.T) {
 
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
-	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
 	partner.Settings["collect.include_stop_areas"] = "boarle"
 	partner.Settings["remote_objectid_kind"] = "internal"
 	partners.Save(partner)
@@ -41,7 +41,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 	partner := partners.New("partner")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
-	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
 	partner.Settings["collect.include_stop_areas"] = "boarle"
 	partner.Settings["remote_objectid_kind"] = "internal"
 	partners.Save(partner)
@@ -71,7 +71,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 // 	partner := partners.New("partner")
 // 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
 // 	partner.RefreshConnectors()
-// 	partner.operationnalStatus = OPERATIONNAL_STATUS_UP
+// 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
 // 	partner.Settings["remote_objectid_kind"] = "internal"
 //
 // 	partners.Save(partner)

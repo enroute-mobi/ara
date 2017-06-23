@@ -13,7 +13,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) OperationnalStatus {
+func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) PartnerStatus {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,13 +38,12 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Operat
 	}
 	checkStatusClient := NewSIRICheckStatusClient(partner)
 
-	status, err := checkStatusClient.Status()
-
+	partnerStatus, err := checkStatusClient.Status()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return status
+	return partnerStatus
 }
 
 func testCheckStatusLogStash(t *testing.T) {
@@ -58,17 +57,17 @@ func testCheckStatusLogStash(t *testing.T) {
 }
 
 func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
-	status := prepare_siriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
-	if status != OPERATIONNAL_STATUS_UP {
-		t.Errorf("Wrong status found:\n got: %v\n expected: up", status)
+	partnerStatus := prepare_siriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
+	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		t.Errorf("Wrong status found:\n got: %v\n expected: up", partnerStatus.OperationnalStatus)
 	}
 	testCheckStatusLogStash(t)
 }
 
 func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
-	status := prepare_siriCheckStatusClient(t, "testdata/checkstatus-negative-response-soap.xml")
-	if status != OPERATIONNAL_STATUS_DOWN {
-		t.Errorf("Wrong status found:\n got: %v\n expected: down", status)
+	partnerStatus := prepare_siriCheckStatusClient(t, "testdata/checkstatus-negative-response-soap.xml")
+	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
+		t.Errorf("Wrong status found:\n got: %v\n expected: down", partnerStatus.OperationnalStatus)
 	}
 	testCheckStatusLogStash(t)
 }
