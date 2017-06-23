@@ -443,7 +443,7 @@ Feature: Support SIRI StopMonitoring by request
       """
 
 @wip
-  Scenario: 3754c - Handle a SIRI StopMonitoring request with filter StopVisitTypes "departure"
+  Scenario: 3754d - Handle a SIRI StopMonitoring request with filter StopVisitTypes "departure"
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
