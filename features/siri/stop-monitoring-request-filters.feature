@@ -154,7 +154,6 @@ Feature: Support SIRI StopMonitoring by request
       </S:Envelope>
       """
 
-@wip
   Scenario: 3754b - Handle a SIRI StopMonitoring request with filter PreviewInterval and StartTime
     # si StartTime absent, alors ça démarre à l'heure courante (=celle de la request)
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
