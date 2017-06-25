@@ -12,10 +12,7 @@ import (
 type XMLStopMonitoringSubscriptionRequest struct {
 	RequestXMLStructure
 
-	subscriberRef          string
-	subscriptionIdentifier string
-	consumerAddress        string
-	initialTerminationTime time.Time
+	consumerAddress string
 
 	entries []*XMLStopMonitoringSubscriptionRequestEntry
 }
@@ -23,28 +20,33 @@ type XMLStopMonitoringSubscriptionRequest struct {
 type XMLStopMonitoringSubscriptionRequestEntry struct {
 	XMLStructure
 
-	messageIdentifier string
-	requestTimestamp  time.Time
-	monitoringRef     string
+	messageIdentifier      string
+	monitoringRef          string
+	stopVisitTypes         string
+	subscriberRef          string
+	subscriptionIdentifier string
+
+	initialTerminationTime time.Time
+	requestTimestamp       time.Time
 }
 
 type SIRIStopMonitoringSubscriptionRequest struct {
+	ConsumerAddress   string
 	MessageIdentifier string
 	RequestorRef      string
 	RequestTimestamp  time.Time
-
-	SubscriberRef          string
-	SubscriptionIdentifier string
-	InitialTerminationTime time.Time
-	ConsumerAddress        string
 
 	Entries []*SIRIStopMonitoringSubscriptionRequestEntry
 }
 
 type SIRIStopMonitoringSubscriptionRequestEntry struct {
-	MessageIdentifier string
-	RequestTimestamp  time.Time
-	MonitoringRef     string
+	MessageIdentifier      string
+	MonitoringRef          string
+	SubscriberRef          string
+	SubscriptionIdentifier string
+
+	InitialTerminationTime time.Time
+	RequestTimestamp       time.Time
 }
 
 const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -54,20 +56,20 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
 		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
   </SubscriptionRequestInfo>
-	<Request>
+	<Request>{{ range .Entries }}
 		<StopMonitoringSubscriptionRequest>
 			<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
 			<SubscriptionIdentifier>{{.SubscriptionIdentifier}}</SubscriptionIdentifier>
-			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>{{ range .Entries }}
+			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>
 			<StopMonitoringRequest>
 				<MessageIdentifier>{{.MessageIdentifier}}</MessageIdentifier>
 				<RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</RequestTimestamp>
 				<MonitoringRef>{{.MonitoringRef}}</MonitoringRef>
 				<StopVisitTypes>all</StopVisitTypes>
-      </StopMonitoringRequest>{{end}}
+      </StopMonitoringRequest>
       <IncrementalUpdates>true</IncrementalUpdates>
     	<ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
-    </StopMonitoringSubscriptionRequest>
+    </StopMonitoringSubscriptionRequest>{{end}}
 	</Request>
   <RequestExtension />
 </ws:Subscribe>`
@@ -97,22 +99,13 @@ func (request *XMLStopMonitoringSubscriptionRequest) XMLSubscriptionEntries() []
 	if len(request.entries) != 0 {
 		return request.entries
 	}
-	nodes := request.findNodes("StopMonitoringRequest")
+	nodes := request.findNodes("StopMonitoringSubscriptionRequest")
 	if nodes != nil {
 		for _, stopMonitoring := range nodes {
 			request.entries = append(request.entries, NewXMLStopMonitoringSubscriptionRequestEntry(stopMonitoring))
 		}
 	}
 	return request.entries
-}
-
-func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {
-	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringSubscriptionRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
-		return "", err
-	}
-	return buffer.String(), nil
 }
 
 func (request *XMLStopMonitoringSubscriptionRequest) ConsumerAddress() string {
@@ -122,21 +115,21 @@ func (request *XMLStopMonitoringSubscriptionRequest) ConsumerAddress() string {
 	return request.consumerAddress
 }
 
-func (request *XMLStopMonitoringSubscriptionRequest) SubscriberRef() string {
+func (request *XMLStopMonitoringSubscriptionRequestEntry) SubscriberRef() string {
 	if request.subscriberRef == "" {
 		request.subscriberRef = request.findStringChildContent("SubscriberRef")
 	}
 	return request.subscriberRef
 }
 
-func (request *XMLStopMonitoringSubscriptionRequest) SubscriptionIdentifier() string {
+func (request *XMLStopMonitoringSubscriptionRequestEntry) SubscriptionIdentifier() string {
 	if request.subscriptionIdentifier == "" {
 		request.subscriptionIdentifier = request.findStringChildContent("SubscriptionIdentifier")
 	}
 	return request.subscriptionIdentifier
 }
 
-func (request *XMLStopMonitoringSubscriptionRequest) InitialTerminationTime() time.Time {
+func (request *XMLStopMonitoringSubscriptionRequestEntry) InitialTerminationTime() time.Time {
 	if request.initialTerminationTime.IsZero() {
 		request.initialTerminationTime = request.findTimeChildContent("InitialTerminationTime")
 	}
@@ -162,4 +155,13 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) RequestTimestamp() tim
 		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
 	}
 	return request.requestTimestamp
+}
+
+func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {
+	var buffer bytes.Buffer
+	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringSubscriptionRequestTemplate))
+	if err := siriRequest.Execute(&buffer, request); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
 }

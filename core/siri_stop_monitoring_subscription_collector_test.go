@@ -228,6 +228,11 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
+	objectid2 := model.NewObjectID("test_kind", "value2")
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
+
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
 	stopAreaUpdateEvent := NewStopAreaUpdateRequest(stopArea.Id())
@@ -240,7 +245,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
-	if request.SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
+	if request.XMLSubscriptionEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionEntries()[0].SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
 	}
 }

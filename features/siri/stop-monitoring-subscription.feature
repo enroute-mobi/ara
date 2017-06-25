@@ -308,7 +308,7 @@ Feature: Support SIRI StopMonitoring by subscription
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-            <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
+            <ns5:RequestMessageRef>Edwig:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
             <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
             <ns5:Status>true</ns5:Status>
