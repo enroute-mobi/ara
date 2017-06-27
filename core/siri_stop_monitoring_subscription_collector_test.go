@@ -54,12 +54,18 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		t.Fatal(err)
 	}
 
-	delivery := siri.NewXMLNotifyStopMonitoring(doc.Root())
-	connector.HandleNotifyStopMonitoring(delivery)
+	deliveries := siri.NewXMLNotifyStopMonitoring(doc.Root())
+
+	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription.Save()
+
+	connector.HandleNotifyStopMonitoring(deliveries)
 
 	if len(collectManager.(*TestCollectManager).Events) != 2 {
 		t.Errorf("Wrong number of events in collectManager, expected 2 got %v", len(collectManager.(*TestCollectManager).Events))
 	}
+
 	for _, event := range collectManager.(*TestCollectManager).Events {
 		if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && len(event.StopVisitUpdateEvents) != 2 {
 			t.Errorf("StopArea 6ba7b814-9dad-11d1-0-00c04fd430c8 should have 2 StopVisitEvents, got %v", len(event.StopVisitUpdateEvents))

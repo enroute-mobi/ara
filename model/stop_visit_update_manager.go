@@ -133,10 +133,9 @@ func (updater *StopVisitUpdater) Update() {
 
 	stopVisitAttributes := updater.event.Attributes.StopVisitAttributes()
 
-	// too verbose
-	// logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisitAttributes.ObjectId)
-
 	stopVisit := updater.tx.Model().StopVisits().New()
+
+	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisit.Id())
 
 	stopVisit.StopAreaId = foundStopArea.Id()
 	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()

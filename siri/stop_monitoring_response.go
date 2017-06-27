@@ -13,6 +13,7 @@ import (
 type XMLStopMonitoringDelivery struct {
 	XMLStructure
 
+	subscriptionRef                 string
 	monitoredStopVisits             []*XMLMonitoredStopVisit
 	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
 }

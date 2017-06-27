@@ -1,6 +1,7 @@
 package core
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -128,6 +129,26 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
 	for _, delivery := range notify.StopMonitoringDeliveries() {
+
+		reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
+		matches := reg.FindStringSubmatch(strings.TrimSpace(delivery.SubscriptionRef()))
+
+		if len(matches) == 0 {
+			logger.Log.Printf("Partner %s sent a StopVisitNotify response with a wrong message format: %s\n", connector.Partner().Slug(), delivery.SubscriptionRef())
+			continue
+		}
+		subscriptionId := matches[1]
+		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
+
+		if ok == false {
+			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s and we want %s\n", connector.Partner().Slug(), subscriptionId, connector.Partner().Subscriptions().FindAll()[0].Id())
+			continue
+		}
+		if subscription.Kind() != "StopMonitoring" {
+			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			continue
+		}
+
 		connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery)
 		connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery)
 	}

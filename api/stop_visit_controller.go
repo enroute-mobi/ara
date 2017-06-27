@@ -118,7 +118,8 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	logger.Log.Debugf("Create stopVisit: %s", string(body))
+	//too verbose
+	//logger.Log.Debugf("Create stopVisit: %s", string(body))
 
 	stopVisit := tx.Model().StopVisits().New()
 

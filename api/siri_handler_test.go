@@ -477,6 +477,11 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	soapEnvelope.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
+	partner := referential.Partners().FindAll()[0]
+
+	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("objectidKind", "stopArea1")
@@ -491,6 +496,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	siriHandler_Request(server, soapEnvelope, t)
 
 	// Some Tests
+
 	if count := len(referential.Model().StopVisits().FindAll()); count != 3 {
 		t.Errorf("Notify should have created 3 StopVisits, got: %v", count)
 	}

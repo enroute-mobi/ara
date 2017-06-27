@@ -83,7 +83,6 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
 		return
 	}
-
 	manager.requestStopAreaUpdate(partner, request)
 }
 

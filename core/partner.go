@@ -356,19 +356,18 @@ func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCo
 
 func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
-
 	partnerStatus := PartnerStatus{}
+
 	if partner.CheckStatusClient() == nil {
 		logger.Log.Debugf("No CheckStatusClient connector")
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 		return partnerStatus, errors.New("No CheckStatusClient connector")
 	}
-
 	partnerStatus, err := partner.CheckStatusClient().Status()
+
 	if err != nil {
 		logger.Log.Printf("Error while checking status: %v", err)
 	}
-
 	logger.Log.Debugf("Partner status is %v", partner.PartnerStatus.OperationnalStatus)
 	return partnerStatus, nil
 }

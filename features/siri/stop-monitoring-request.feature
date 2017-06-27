@@ -119,7 +119,7 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                               |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     And I see edwig vehicle_journeys
     And I see edwig stop_visits
@@ -776,4 +776,3 @@ Feature: Support SIRI StopMonitoring by request
         | ParentId  | parent                                   |
       When a minute has passed
       Then the SIRI server should not have received a GetStopMonitoring request
-
