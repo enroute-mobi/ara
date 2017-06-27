@@ -26,6 +26,8 @@ if [ -x $bundle ]; then
 
 		mkdir -p $tmp_dir/cucumber
     $bundle exec cucumber --tags "~@wip" --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
+
+    rm log/edwig.log
 else
     echo "Bundle not detected, cucumber tests are skipped"
 fi
