@@ -550,7 +550,6 @@ Feature: Support SIRI GeneralMessage for Situation
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage/>
               </ns3:GeneralMessageDelivery>
             </Answer>
             <AnswerExtension />
