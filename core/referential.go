@@ -314,6 +314,7 @@ func (manager *MemoryReferentials) Load() error {
 		Referential_id string
 		Slug           string
 		Settings       sql.NullString
+		Tokens         sql.NullString
 	}
 
 	_, err := model.Database.Select(&selectReferentials, "select * from referentials")
@@ -328,6 +329,12 @@ func (manager *MemoryReferentials) Load() error {
 
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
+				return err
+			}
+		}
+
+		if r.Tokens.Valid && len(r.Tokens.String) > 0 {
+			if err = json.Unmarshal([]byte(r.Tokens.String), &referential.Tokens); err != nil {
 				return err
 			}
 		}

@@ -78,6 +78,10 @@ def model_attributes(table)
     attributes["ObjectIDs"] = JSON.parse("{ #{objectids} }")
   end
 
+  if settings = attributes["Settings"]
+    attributes["Settings"] = JSON.parse(settings)
+  end
+
   attributes
 end
 
@@ -110,5 +114,5 @@ def has_attributes(response_array, attributes)
   expect(found_value).not_to be_nil
 
   parsed_attributes.delete("ObjectIDs")
-  expect(found_value).to include(parsed_attributes) 
+  expect(found_value).to include(parsed_attributes)
 end

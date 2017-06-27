@@ -12,3 +12,15 @@ Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors
     raise err
   end
 end
+
+Then(/^one Partner(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
+  response = RestClient.get partners_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response_array = api_attributes(response.body)
+
+  parsed_attributes = model_attributes(attributes)
+  found_value = response_array.find{|a| a["Id"] == parsed_attributes["Id"]}
+
+  expect(found_value).not_to be_nil
+
+  expect(found_value).to include(parsed_attributes)
+end
