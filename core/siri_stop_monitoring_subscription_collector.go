@@ -35,6 +35,8 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(p
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
 	return ok
 }
