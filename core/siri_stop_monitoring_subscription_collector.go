@@ -143,7 +143,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 
 		if ok == false {
-			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s and we want %s\n", connector.Partner().Slug(), subscriptionId, connector.Partner().Subscriptions().FindAll()[0].Id())
+			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			continue
 		}
 		if subscription.Kind() != "StopMonitoring" {

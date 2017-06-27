@@ -135,8 +135,6 @@ func (updater *StopVisitUpdater) Update() {
 
 	stopVisit := updater.tx.Model().StopVisits().New()
 
-	logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisit.Id())
-
 	stopVisit.StopAreaId = foundStopArea.Id()
 	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()
 	stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
@@ -154,6 +152,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.References = stopVisitAttributes.References
 
 	stopVisit.Save()
+	//logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisit.Id())
 }
 
 func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAreaAttributes) *StopArea {
