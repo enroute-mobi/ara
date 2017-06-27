@@ -12,7 +12,6 @@
         <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
       </ServiceRequestInfo>
-
       <Request version="2.0:FR-IDF-2.4">
         <ns2:LineRef>NINOXE:StopPoint:SP:27:LOC</ns2:LineRef>
         <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>

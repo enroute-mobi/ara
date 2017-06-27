@@ -4,7 +4,7 @@ $server = 'http://localhost:8081'
 $adminToken = "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
 $token = "testtoken"
 
-Before do
+def start_edwig
   unless File.directory?("tmp")
     FileUtils.mkdir_p("tmp")
   end
@@ -26,6 +26,10 @@ Before do
 
     raise "Timeout" if Time.now > time_limit
   end
+end
+
+Before('~@database') do
+  start_edwig()
 end
 
 After do
