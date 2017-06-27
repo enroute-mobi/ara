@@ -24,6 +24,7 @@ func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLStopMonitoringSub
 
 func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 	request := getXMLStopMonitoringSubscriptionRequest(t)
+	entry := request.XMLSubscriptionEntries()[0]
 
 	if expected := "RATPDEV:Concerto"; request.RequestorRef() != expected {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", request.RequestorRef(), expected)
@@ -33,20 +34,20 @@ func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", request.RequestTimestamp(), expected)
 	}
 
-	if expected := "RATPDEV:Concerto"; request.SubscriberRef() != expected {
-		t.Errorf("Wrong SubscriberRef:\n got: %v\nwant: %v", request.SubscriberRef(), expected)
+	if expected := "RATPDEV:Concerto"; entry.SubscriberRef() != expected {
+		t.Errorf("Wrong SubscriberRef:\n got: %v\nwant: %v", entry.SubscriberRef(), expected)
 	}
 
 	if expected := "28679112-9dad-11d1-2-00c04fd430c8"; request.MessageIdentifier() != expected {
 		t.Errorf("Wrong MessageIdentifier:\n got: %v\nwant: %v", request.MessageIdentifier(), expected)
 	}
 
-	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; request.SubscriptionIdentifier() != expected {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.SubscriptionIdentifier(), expected)
+	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; entry.SubscriptionIdentifier() != expected {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", entry.SubscriptionIdentifier(), expected)
 	}
 
-	if expected := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC); request.InitialTerminationTime() != expected {
-		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", request.InitialTerminationTime(), expected)
+	if expected := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC); entry.InitialTerminationTime() != expected {
+		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", entry.InitialTerminationTime(), expected)
 	}
 }
 
@@ -54,19 +55,19 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &SIRIStopMonitoringSubscriptionRequest{
-		MessageIdentifier:      "test",
-		RequestorRef:           "test",
-		RequestTimestamp:       date,
-		ConsumerAddress:        "https://edwig-staging.af83.io/test/siri",
-		SubscriberRef:          "SubscriberRef",
-		SubscriptionIdentifier: "SubscriptionIdentifier",
-		InitialTerminationTime: date,
+		ConsumerAddress:   "https://edwig-staging.af83.io/test/siri",
+		MessageIdentifier: "test",
+		RequestorRef:      "test",
+		RequestTimestamp:  date,
 	}
 
 	entry := &SIRIStopMonitoringSubscriptionRequestEntry{
-		MessageIdentifier: "test",
-		MonitoringRef:     "MonitoringRef",
-		RequestTimestamp:  date,
+		MessageIdentifier:      "test",
+		MonitoringRef:          "MonitoringRef",
+		RequestTimestamp:       date,
+		SubscriberRef:          "SubscriberRef",
+		SubscriptionIdentifier: "SubscriptionIdentifier",
+		InitialTerminationTime: date,
 	}
 
 	request.Entries = append(request.Entries, entry)
@@ -85,24 +86,12 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Errorf("Wrong MessageIdentifier:\n got: %v\nwant: %v", smsr.MessageIdentifier(), request.MessageIdentifier)
 	}
 
-	if smsr.ConsumerAddress() != request.ConsumerAddress {
-		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", smsr.ConsumerAddress(), request.ConsumerAddress)
-	}
-
 	if smsr.RequestTimestamp() != request.RequestTimestamp {
 		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", smsr.RequestTimestamp(), request.RequestTimestamp)
 	}
 
-	if smsr.SubscriberRef() != request.SubscriberRef {
-		t.Errorf("Wrong SubscriberRef:\n got: %v\nwant: %v", smsr.SubscriberRef(), request.SubscriberRef)
-	}
-
-	if smsr.SubscriptionIdentifier() != request.SubscriptionIdentifier {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", smsr.SubscriptionIdentifier(), request.SubscriptionIdentifier)
-	}
-
-	if smsr.InitialTerminationTime() != request.InitialTerminationTime {
-		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", smsr.InitialTerminationTime(), request.InitialTerminationTime)
+	if smsr.ConsumerAddress() != request.ConsumerAddress {
+		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", smsr.ConsumerAddress(), request.ConsumerAddress)
 	}
 
 	xse := smsr.XMLSubscriptionEntries()
@@ -122,5 +111,17 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 
 	if xmlEntry.RequestTimestamp() != entry.RequestTimestamp {
 		t.Errorf("Wrong RequestTimestamp:\n got: %v\nwant: %v", xmlEntry.RequestTimestamp(), entry.RequestTimestamp)
+	}
+
+	if xmlEntry.SubscriberRef() != entry.SubscriberRef {
+		t.Errorf("Wrong SubscriberRef:\n got: %v\nwant: %v", xmlEntry.SubscriberRef(), entry.SubscriberRef)
+	}
+
+	if xmlEntry.SubscriptionIdentifier() != entry.SubscriptionIdentifier {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", xmlEntry.SubscriptionIdentifier(), entry.SubscriptionIdentifier)
+	}
+
+	if xmlEntry.InitialTerminationTime() != entry.InitialTerminationTime {
+		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", xmlEntry.InitialTerminationTime(), entry.InitialTerminationTime)
 	}
 }

@@ -45,3 +45,15 @@ Then(/^a Referential "([^"]+)" should (not )?exist$/) do |referential, condition
     expect(responseHash.find{|a| a["Slug"] == referential}).to be_nil
   end
 end
+
+Then(/^one Referential has the following attributes:$/) do |attributes|
+  response = RestClient.get referentials_path, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
+  response_array = api_attributes(response.body)
+
+  parsed_attributes = model_attributes(attributes)
+  found_value = response_array.find{|a| a["Id"] == parsed_attributes["Id"]}
+
+  expect(found_value).not_to be_nil
+
+  expect(found_value).to include(parsed_attributes)
+end

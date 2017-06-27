@@ -49,7 +49,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response.RequestMessageRef = request.MessageIdentifier()
 
 	for _, situation := range tx.Model().Situations().FindAll() {
-		if situation.Channel == "Commercial" {
+		if situation.Channel == "Commercial" || situation.ValidUntil.Before(connector.Clock().Now()) {
 			continue
 		}
 		siriGeneralMessage := &siri.SIRIGeneralMessage{}

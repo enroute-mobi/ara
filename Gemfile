@@ -7,6 +7,7 @@ group :test do
   gem 'netrc'
   gem 'http-cookie'
   gem 'rest-client'
+  gem 'pg'
 end
 
 group :development do

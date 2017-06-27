@@ -25,6 +25,7 @@ func getXMLStopMonitoringSubscriptionResponse(t *testing.T) *XMLStopMonitoringSu
 
 func Test_XMLStopMonitoringSubscriptionResponse(t *testing.T) {
 	response := getXMLStopMonitoringSubscriptionResponse(t)
+	responseStatus := response.ResponseStatus()[0]
 
 	if expected := "28679112-9dad-11d1-2-00c04fd430c8"; response.RequestMessageRef() != expected {
 		t.Errorf("Incorrect RequestMessageRef expected: %v\n got: %v", expected, response.RequestMessageRef())
@@ -34,12 +35,12 @@ func Test_XMLStopMonitoringSubscriptionResponse(t *testing.T) {
 		t.Errorf("Incorrect ResponderRef expected: %v\n got: %v", expected, response.ResponderRef())
 	}
 
-	if expected := "RATPDEV:Concerto"; response.SubscriberRef() != expected {
-		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, response.SubscriberRef())
+	if expected := "RATPDEV:Concerto"; responseStatus.SubscriberRef() != expected {
+		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, responseStatus.SubscriberRef())
 	}
 
-	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; response.SubscriptionRef() != expected {
-		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, response.SubscriptionRef())
+	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; responseStatus.SubscriptionRef() != expected {
+		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, responseStatus.SubscriptionRef())
 	}
 
 	if expected := time.Date(2016, time.September, 22, 6, 01, 20, 227000000, time.UTC); !response.ResponseTimestamp().Equal(expected) {
@@ -50,11 +51,11 @@ func Test_XMLStopMonitoringSubscriptionResponse(t *testing.T) {
 		t.Errorf("Incorrect ValidUntil expected: %v\n got: %v", expected, response.ServiceStartedTime())
 	}
 
-	if expected := time.Date(2016, time.September, 22, 6, 01, 20, 227000000, time.UTC); !response.ValidUntil().Equal(expected) {
-		t.Errorf("Incorrect ValidUntil expected: %v\n got: %v", expected, response.ValidUntil())
+	if expected := time.Date(2016, time.September, 22, 6, 01, 20, 227000000, time.UTC); !responseStatus.ValidUntil().Equal(expected) {
+		t.Errorf("Incorrect ValidUntil expected: %v\n got: %v", expected, responseStatus.ValidUntil())
 	}
 
-	if expected := true; response.Status() != expected {
-		t.Errorf("Incorrect Status expected: %v\n got: %v", expected, response.Status())
+	if expected := true; responseStatus.Status() != expected {
+		t.Errorf("Incorrect Status expected: %v\n got: %v", expected, responseStatus.Status())
 	}
 }

@@ -279,10 +279,12 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 		Referential_id string `db:"referential_id"`
 		Slug           string `db:"slug"`
 		Settings       string `db:"settings"`
+		Tokens         string `db:"tokens"`
 	}{
 		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Slug:           "ratp",
 		Settings:       "{ \"test.key\": \"test-value\" }",
+		Tokens:         "[\"apiToken\"]",
 	}
 
 	model.Database.AddTableWithName(databaseReferential, "referentials")
@@ -312,5 +314,8 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	}
 	if expected := "ratp"; referential.Slug() != ReferentialSlug(expected) {
 		t.Errorf("Wrong Slug:\n got: %v\n expected: %v", referential.Slug(), expected)
+	}
+	if expected := "apiToken"; len(referential.Tokens) != 1 || referential.Tokens[0] != expected {
+		t.Errorf("Wrong Tokens:\n got: %v\n expected: %v", referential.Tokens, expected)
 	}
 }

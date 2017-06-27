@@ -81,10 +81,11 @@ func (subscriber *StopMonitoringSubscriber) Stop() {
 func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	subscription := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
-	var stopAreasToRequest []*model.ObjectID
+	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
 		if resource.SubscribedAt.IsZero() {
-			stopAreasToRequest = append(stopAreasToRequest, resource.Reference.ObjectId)
+			messageIdentifier := subscriber.connector.SIRIPartner().NewMessageIdentifier()
+			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
 		}
 	}
 
@@ -96,20 +97,20 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
-		MessageIdentifier:      subscriber.connector.SIRIPartner().NewMessageIdentifier(),
-		RequestorRef:           subscriber.connector.SIRIPartner().RequestorRef(),
-		RequestTimestamp:       subscriber.Clock().Now(),
-		SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
-		InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-		ConsumerAddress:        subscriber.connector.Partner().Setting("local_url"),
+		ConsumerAddress:   subscriber.connector.Partner().Setting("local_url"),
+		MessageIdentifier: subscriber.connector.SIRIPartner().NewMessageIdentifier(),
+		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
+		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
-	for _, stopAreaObjectid := range stopAreasToRequest {
+	for messageIdentifier, stopAreaObjectid := range stopAreasToRequest {
 		entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
-			MessageIdentifier: siriStopMonitoringSubscriptionRequest.MessageIdentifier,
-			RequestTimestamp:  subscriber.Clock().Now(),
-			MonitoringRef:     stopAreaObjectid.Value(),
+			MessageIdentifier:      messageIdentifier,
+			RequestTimestamp:       subscriber.Clock().Now(),
+			MonitoringRef:          stopAreaObjectid.Value(),
+			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
+			SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
+			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
 
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
@@ -126,14 +127,31 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	logStashEvent["response"] = response.RawXML()
 
-	if response.Status() == true {
-		for _, stopAreaObjectid := range stopAreasToRequest {
-			resource := subscription.Resource(*stopAreaObjectid)
-			if resource != nil {
-				resource.SubscribedAt = subscriber.Clock().Now()
-			}
+	for _, responseStatus := range response.ResponseStatus() {
+		stopAreaObjectid, ok := stopAreasToRequest[responseStatus.RequestMessageRef()]
+		if !ok {
+			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
+			continue
 		}
+		if !responseStatus.Status() {
+			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", stopAreaObjectid.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+			continue
+		}
+		resource := subscription.Resource(*stopAreaObjectid)
+		if resource != nil {
+			logger.Log.Debugf("Response for unknown subscription resource %v", stopAreaObjectid.String())
+		}
+		resource.SubscribedAt = subscriber.Clock().Now()
 	}
+
+	// if response.Status() == true {
+	// 	for _, stopAreaObjectid := range stopAreasToRequest {
+	// resource := subscription.Resource(*stopAreaObjectid)
+	// if resource != nil {
+	// 	resource.SubscribedAt = subscriber.Clock().Now()
+	// }
+	// 	}
+	// }
 }
 
 func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
