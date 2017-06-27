@@ -8,7 +8,7 @@ Given(/^the table "([^"]*)" has the following data:$/) do |table_name, datas|
   end
   request_string.gsub!(/,$/, ';')
 
-  conn = PG.connect dbname: $database
+  conn = PG.connect dbname: $database, user: ENV["POSTGRESQL_ENV_POSTGRES_USER"], password: ENV["POSTGRESQL_ENV_POSTGRES_PASSWORD"]
   conn.exec(request_string)
 end
 

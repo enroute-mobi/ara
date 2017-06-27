@@ -4,7 +4,7 @@ $database = 'edwig_test'
 
 After('@database') do
   # Truncate all tables
-  conn = PG.connect dbname: $database
+  conn = PG.connect dbname: $database, user: ENV["POSTGRESQL_ENV_POSTGRES_USER"], password: ENV["POSTGRESQL_ENV_POSTGRES_PASSWORD"]
   conn.exec(
     "DO $$DECLARE statements CURSOR FOR
       SELECT table_name FROM information_schema.tables
