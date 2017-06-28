@@ -449,20 +449,17 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
-    And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:4:LOC" |
       | Name      | Ligne 4 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Le 15.                                  |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
-      | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:01:00.000+02:00                                        |
@@ -472,7 +469,7 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:30:00.000+02:00                                        |
@@ -520,7 +517,7 @@ Feature: Support SIRI StopMonitoring by request
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
