@@ -165,3 +165,45 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 		t.Error("Can't find StopVisit by Id")
 	}
 }
+
+func benchmarkStopVisitsIndex(sv int, b *testing.B) {
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	for i := 0; i != sv; i++ {
+		line := referential.Model().Lines().New()
+		line.Save()
+
+		vehicleJourney := referential.Model().VehicleJourneys().New()
+		vehicleJourney.LineId = line.Id()
+		vehicleJourney.Save()
+
+		stopVisit := referential.Model().StopVisits().New()
+		stopVisit.VehicleJourneyId = vehicleJourney.Id()
+		stopVisit.Save()
+	}
+
+	for n := 0; n < b.N; n++ {
+		request, err := http.NewRequest("GET", "/default/stop_visits", bytes.NewReader(nil))
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		request.Header.Set("Authorization", "Token token=testToken")
+
+		responseRecorder := httptest.NewRecorder()
+
+		server.HandleFlow(responseRecorder, request)
+	}
+}
+
+func BenchmarkStopVisitsIndex10(b *testing.B)    { benchmarkStopVisitsIndex(10, b) }
+func BenchmarkStopVisitsIndex50(b *testing.B)    { benchmarkStopVisitsIndex(50, b) }
+func BenchmarkStopVisitsIndex100(b *testing.B)   { benchmarkStopVisitsIndex(100, b) }
+func BenchmarkStopVisitsIndex1000(b *testing.B)  { benchmarkStopVisitsIndex(1000, b) }
+func BenchmarkStopVisitsIndex5000(b *testing.B)  { benchmarkStopVisitsIndex(5000, b) }
+func BenchmarkStopVisitsIndex10000(b *testing.B) { benchmarkStopVisitsIndex(10000, b) }
