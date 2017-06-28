@@ -194,7 +194,7 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 		return &line
 	}
 
-	logger.Log.Debugf("Create new Line, objectid: %v", lineAttributes.ObjectId)
+	// logger.Log.Debugf("Create new Line, objectid: %v", lineAttributes.ObjectId)
 
 	line = updater.tx.Model().Lines().New()
 	line.SetObjectID(lineAttributes.ObjectId)
@@ -206,7 +206,7 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 }
 
 func (updater *StopVisitUpdater) CreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) *VehicleJourney {
-	logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
+	// logger.Log.Debugf("Create new VehicleJourney, objectid: %v", vehicleJourneyAttributes.ObjectId)
 
 	vehicleJourney := updater.tx.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)

@@ -41,6 +41,7 @@ type Partners interface {
 	Model() model.Model
 	Referential() *Referential
 	IsEmpty() bool
+	CancelSubscriptions()
 	Load() error
 }
 
@@ -504,6 +505,12 @@ func (manager *PartnerManager) IsEmpty() bool {
 
 func (manager *PartnerManager) Referential() *Referential {
 	return manager.referential
+}
+
+func (manager *PartnerManager) CancelSubscriptions() {
+	for _, partner := range manager.byId {
+		partner.CancelSubscriptions()
+	}
 }
 
 func (manager *PartnerManager) Load() error {
