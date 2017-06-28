@@ -441,7 +441,6 @@ Feature: Support SIRI StopMonitoring by request
       </S:Envelope>
       """
 
-@wip
   Scenario: 3754d - Handle a SIRI StopMonitoring request with filter StopVisitTypes "departure"
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
@@ -581,7 +580,7 @@ Feature: Support SIRI StopMonitoring by request
       </S:Envelope>
       """
 
-  @wip
+
   Scenario: 3754e - Handle a SIRI StopMonitoring request with filter StopVisitTypes "arrivals"
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
