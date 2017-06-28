@@ -603,20 +603,21 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:01:00.000+02:00                                        |
       | Schedule[aimed]#Departure       | 2017-01-01T15:02:00.000+02:00                                        |
     And a StopVisit exists with the following attributes:
-    # StopVisit correspondant au terminus, donc un arrival mais pas de departure
+    # StopVisit correspondant au point de départ de la course, donc un arrival = departure
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:30:00.000+02:00                                        |
+      | Schedule[aimed]#Departure       | 2017-01-01T15:30:00.000+02:00                                        |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
