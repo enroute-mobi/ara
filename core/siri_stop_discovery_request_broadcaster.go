@@ -51,7 +51,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	objectIDKind := connector.RemoteObjectIDKind()
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" {
+		if stopArea.Name == "" || stopArea.CollectedAlways == false {
 			continue
 		}
 
