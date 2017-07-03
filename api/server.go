@@ -24,10 +24,13 @@ type Server struct {
 }
 
 type RequestData struct {
+	Body        []byte
+	Method      string
 	Referential string
 	Ressource   string
 	Id          string
 	Action      string
+	Url         string
 }
 
 func NewRequestDataFromContent(params []string) *RequestData {
@@ -83,6 +86,9 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 	}
 
 	requestData := NewRequestDataFromContent(foundStrings)
+	requestData.Method = request.Method
+	requestData.Url = request.URL.Path
+
 	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Server", version.ApplicationName())
 	return requestData, nil

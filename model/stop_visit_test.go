@@ -210,3 +210,22 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 		t.Errorf("New StopVisit should not be findable by objectid")
 	}
 }
+
+var r []byte
+
+func benchmarkStopVisitsMarshal10000(sv int, b *testing.B) {
+	stopVisits := NewMemoryStopVisits()
+
+	for i := 0; i != sv; i++ {
+		stopVisit := stopVisits.New()
+		stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
+		stopVisits.Save(&stopVisit)
+	}
+
+	for n := 0; n < b.N; n++ {
+		jsonBytes, _ := json.Marshal(stopVisits.FindAll())
+		r = jsonBytes
+	}
+}
+
+func BenchmarkStopVisitsMarshal10000(b *testing.B) { benchmarkStopVisitsMarshal10000(10000, b) }

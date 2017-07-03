@@ -57,6 +57,10 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 
 func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 
+	if requestData.Method == "PUT" || requestData.Method == "POST" {
+		requestData.Body = getRequestBody(response, request)
+	}
+
 	if requestData.Action != "" {
 		if actionResource, ok := controller.restfulRessource.(ActionResource); ok {
 			actionResource.Action(response, requestData)
@@ -64,7 +68,7 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 		}
 	}
 
-	switch request.Method {
+	switch requestData.Method {
 	case "GET":
 		if requestData.Id == "" {
 			controller.restfulRessource.Index(response)
@@ -82,20 +86,18 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		body := getRequestBody(response, request)
-		if body == nil {
+		if requestData.Body == nil {
 			return
 		}
-		controller.restfulRessource.Update(response, requestData.Id, body)
+		controller.restfulRessource.Update(response, requestData.Id, requestData.Body)
 	case "POST":
 		if requestData.Id != "" {
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		body := getRequestBody(response, request)
-		if body == nil {
+		if requestData.Body == nil {
 			return
 		}
-		controller.restfulRessource.Create(response, body)
+		controller.restfulRessource.Create(response, requestData.Body)
 	}
 }

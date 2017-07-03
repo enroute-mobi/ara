@@ -31,6 +31,20 @@ type SubscribedResource struct {
 	SubscribedUntil time.Time
 }
 
+type APISubscription struct {
+	Kind       string
+	References []model.Reference
+}
+
+func (subscription *Subscription) SetDefinition(apisub *APISubscription) {
+	subscription.kind = apisub.Kind
+	for _, ref := range apisub.References {
+		if ref.ObjectId != nil {
+			subscription.CreateAddNewResource(ref)
+		}
+	}
+}
+
 func (subscription *Subscription) Id() SubscriptionId {
 	return subscription.id
 }

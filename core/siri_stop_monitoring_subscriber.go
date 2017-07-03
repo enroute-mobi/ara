@@ -40,6 +40,7 @@ func NewFakeStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCo
 func (subscriber *FakeStopMonitoringSubscriber) Run() {
 	subscriber.prepareSIRIStopMonitoringSubscriptionRequest()
 }
+
 func (subscriber *FakeStopMonitoringSubscriber) Stop() {}
 
 func NewSIRIStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCollector) SIRIStopMonitoringSubscriber {

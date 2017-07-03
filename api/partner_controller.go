@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -21,7 +22,18 @@ func NewPartnerController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {
+func (controller *PartnerController) getActionId(action, url string) string {
+	index := strings.LastIndex(url, action) + len(action) + 1
+	id := url[index:len(url)]
+
+	sz := len(id)
+	if sz > 0 && id[sz-1] == '/' {
+		id = id[:sz-1]
+	}
+	return id
+}
+
+func (controller *PartnerController) subscriptionsIndex(response http.ResponseWriter, requestData *RequestData) {
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
 		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
@@ -32,6 +44,55 @@ func (controller *PartnerController) subscriptions(response http.ResponseWriter,
 	subscriptions := partner.Subscriptions()
 	jsonBytes, _ := json.Marshal(subscriptions.FindAll())
 	response.Write(jsonBytes)
+}
+
+func (controller *PartnerController) subscriptionsDelete(response http.ResponseWriter, requestData *RequestData) {
+	partner := controller.findPartner(requestData.Id)
+	if partner == nil {
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		return
+	}
+	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
+
+	id := controller.getActionId(requestData.Action, requestData.Url)
+	subscription, ok := partner.Subscriptions().Find(core.SubscriptionId(id))
+	if ok {
+		partner.Subscriptions().Delete(&subscription)
+	}
+}
+
+func (controller *PartnerController) subscriptionsCreate(response http.ResponseWriter, requestData *RequestData) {
+	logger.Log.Debugf("Create Subscription: %s", string(requestData.Body))
+
+	partner := controller.findPartner(requestData.Id)
+	if partner == nil {
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		return
+	}
+
+	subscription := partner.Subscriptions().New()
+	apiSubscription := core.APISubscription{}
+	err := json.Unmarshal(requestData.Body, &apiSubscription)
+	if err != nil {
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		return
+	}
+
+	subscription.SetDefinition(&apiSubscription)
+	partner.Subscriptions().Save(&subscription)
+	jsonBytes, _ := subscription.MarshalJSON()
+	response.Write(jsonBytes)
+}
+
+func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {
+	switch requestData.Method {
+	case "GET":
+		controller.subscriptionsIndex(response, requestData)
+	case "POST":
+		controller.subscriptionsCreate(response, requestData)
+	case "DELETE":
+		controller.subscriptionsDelete(response, requestData)
+	}
 }
 
 func (controller *PartnerController) Action(response http.ResponseWriter, requestData *RequestData) {
