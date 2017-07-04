@@ -24,41 +24,58 @@ Feature: Support SIRI EstimatedTimeTable
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-6-00c04fd430c8       |
+      | Name                          | Passage 32                              |
+      | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                        | 6ba7b814-9dad-11d1-6-00c04fd430c8       |
+      | Attribute[DirectionRef]       | Aller                                   |
+      | Attribute[OriginName]         | Le début                                |
+      | Attribute[DestinationName]    | La fin.                                 |
+      | Reference[OriginRef]#Id       | NINOXE:StopPoint:SP:20:LOC-3            |
+      | Reference[DestinationRef]#Id  | NINOXE:StopPoint:SP:27:LOC              |
     And a StopVisit exists with the following attributes:
+    #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
-      | VehicleAtStop                   | true                                                                 |
+      | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+      | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T13:01:00.000+02:00                                        |
+      | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
+    #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
-      | VehicleAtStop                   | true                                                                 |
+      | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:05:00.000Z                                             |
+      | Schedule[aimed]#Arrival         | 2017-01-01T13:05:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T13:06:00.000+02:00                                        |
+      | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
+    #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
       | PassageOrder                    | 6                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
-      | VehicleAtStop                   | true                                                                 |
+      | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:10:00.000Z                                             |
+      | Schedule[aimed]#Arrival         | 2017-01-01T13:10:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T13:11:00.000+02:00                                        |
+      | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
+    #à l'heure
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-3" |
       | PassageOrder                    | 7                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
-      | VehicleAtStop                   | true                                                                 |
+      | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:15:00.000Z                                             |
+      | Schedule[aimed]#Arrival         | 2017-01-01T13:16:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T13:16:00.000+02:00                                        |
+      | ArrivalStatus                   | onTime                                                               |
     And I see edwig vehicle_journeys
     And I see edwig stop_visits
     And I see edwig lines
@@ -93,5 +110,74 @@ Feature: Support SIRI EstimatedTimeTable
       """
     Then I should receive this SIRI response
       """
-
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri"
+                                         xmlns:ns4="http://www.ifopt.org.uk/acsb"
+                                         xmlns:ns5="http://www.ifopt.org.uk/ifopt"
+                                         xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
+                                         xmlns:ns7="http://scma/siri"
+                                         xmlns:ns8="http://wsdl.siri.org.uk"
+                                         xmlns:ns9="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000+02:00</ns3:ResponseTimestamp>
+              <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
+              <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
+              <ns3:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</ns3:ResponseMessageIdentifier>
+              <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000+02:00</ns3:ResponseTimestamp>
+                <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+                <ns3:Status>true</ns3:Status>
+                <ns3:EstimatedJourneyVersionFrame>
+                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
+                  <ns3:EstimatedVehicleJourney>
+                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+                    <ns3:DirectionRef>Aller</ns3:DirectionRef>
+                    <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
+                    <ns3:OriginRef>NINOXE:StopPoint:SP:20:LOC-3</ns3:OriginRef>
+                    <ns3:OriginName>Le début</ns3:OriginName>
+                    <ns3:DestinationRef>NINOXE:StopPoint:SP:27:LOC</ns3:DestinationRef>
+                    <ns3:DestinationName>La fin.</ns3:DestinationName>
+                    <ns3:EstimatedCalls>
+                      <ns3:EstimatedCall>
+                        <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
+                        <ns3:Order>4</ns3:Order>
+                        <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
+                      </ns3:EstimatedCall>
+                      <ns3:EstimatedCall>
+                        <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
+                        <ns3:Order>5</ns3:Order>
+                        <ns3:AimedArrivalTime>2017-01-01T13:00:05.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T13:01:06.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
+                      </ns3:EstimatedCall>
+                      <ns3:EstimatedCall>
+                        <ns3:StopPointRef>NINOXE:StopPoint:SP:26:LOC</ns3:StopPointRef>
+                        <ns3:Order>6</ns3:Order>
+                        <ns3:AimedArrivalTime>2017-01-01T13:10:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T13:11:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
+                      </ns3:EstimatedCall>
+                      <ns3:EstimatedCall>
+                        <ns3:StopPointRef>NINOXE:StopPoint:SP:27:LOC</ns3:StopPointRef>
+                        <ns3:Order>7</ns3:Order>
+                        <ns3:AimedArrivalTime>2017-01-01T13:16:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T13:16:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
+                      </ns3:EstimatedCall>
+                    </ns3:EstimatedCalls>
+                  </ns3:EstimatedVehicleJourney>
+                </ns3:EstimatedJourneyVersionFrame>
+              </ns3:EstimatedTimetableDelivery>
+            </Answer>
+          </ns8:GetEstimatedTimetableResponse>
+        </S:Body>
+      </S:Envelope>
       """
