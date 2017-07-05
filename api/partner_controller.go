@@ -62,7 +62,6 @@ func (controller *PartnerController) subscriptionsDelete(response http.ResponseW
 }
 
 func (controller *PartnerController) subscriptionsCreate(response http.ResponseWriter, requestData *RequestData) {
-	logger.Log.Debugf("Create Subscription: %s", string(requestData.Body))
 
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
@@ -72,6 +71,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 
 	subscription := partner.Subscriptions().New()
 	apiSubscription := core.APISubscription{}
+
 	err := json.Unmarshal(requestData.Body, &apiSubscription)
 	if err != nil {
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
@@ -79,9 +79,12 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	}
 
 	subscription.SetDefinition(&apiSubscription)
-	partner.Subscriptions().Save(&subscription)
+
+	subscription.Save()
 	jsonBytes, _ := subscription.MarshalJSON()
 	response.Write(jsonBytes)
+
+	logger.Log.Debugf("Create Subscription: %s with id %s\n", subscription.AllResource(), subscription.Id())
 }
 
 func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {

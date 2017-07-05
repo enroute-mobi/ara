@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"sort"
 	"time"
+
+	"github.com/af83/edwig/logger"
 )
 
 type StopVisitId string
@@ -323,6 +325,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	if stopVisit.id == "" {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
+	logger.Log.Debugf("=== %v\n", stopVisit.id)
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
 	return true

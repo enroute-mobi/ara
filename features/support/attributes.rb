@@ -72,6 +72,21 @@ def model_attributes(table)
       attributes["References"][name] = { attribute => value }
       attributes.delete key
     end
+
+    if key =~ /ReferenceArray(\d+)/
+      name = $1
+      attribute = $2
+
+      attributes["References"] ||= []
+
+      values = value.split(',')
+      attributes["References"][$1.to_i] = {
+        "Type" => values[0],
+        "ObjectID" => JSON.parse("{ #{values[1]} }")
+      }
+
+      attributes.delete key
+    end
   end
 
   if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])
