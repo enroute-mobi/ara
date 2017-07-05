@@ -86,7 +86,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
 		connector.stopMonitoringSubscriber.Run()
 	}
-	logger.Log.Debugf("ESH T SUR GENRE TU VEUX PAS?\n")
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubscriber(stopMonitoringSubscriber SIRIStopMonitoringSubscriber) {

@@ -62,6 +62,7 @@ func (controller *PartnerController) subscriptionsDelete(response http.ResponseW
 }
 
 func (controller *PartnerController) subscriptionsCreate(response http.ResponseWriter, requestData *RequestData) {
+	logger.Log.Debugf("Create Subscription: %s", string(requestData.Body))
 
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
@@ -83,8 +84,6 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	subscription.Save()
 	jsonBytes, _ := subscription.MarshalJSON()
 	response.Write(jsonBytes)
-
-	logger.Log.Debugf("Create Subscription: %s with id %s\n", subscription.AllResource(), subscription.Id())
 }
 
 func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {

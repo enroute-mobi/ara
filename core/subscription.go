@@ -84,10 +84,6 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (subscription *Subscription) AllResource() map[string]*SubscribedResource {
-	return subscription.resourcesByObjectID
-}
-
 func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
 	sub, present := subscription.resourcesByObjectID[obj.String()]
 	if !present {
