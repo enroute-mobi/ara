@@ -7,7 +7,41 @@ Feature: Support SIRI GeneralMessage by subscription
    Scenario: 3863 - Manage a GM Subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
         """
-    ...
+        <?xml version='1.0' encoding='utf-8'?>
+        <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+            <SubscriptionAnswerInfo
+              xmlns:ns2="http://www.ifopt.org.uk/acsb"
+              xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+              xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+              xmlns:ns5="http://www.siri.org.uk/siri"
+              xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:ResponseTimestamp>2017-01-01T12:01:00.000+02:00</ns5:ResponseTimestamp>
+              <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+              <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+              <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">Subscription:Test:0</ns5:RequestMessageRef>
+            </SubscriptionAnswerInfo>
+            <Answer
+              xmlns:ns2="http://www.ifopt.org.uk/acsb"
+              xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+              xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+              xmlns:ns5="http://www.siri.org.uk/siri"
+              xmlns:ns6="http://wsdl.siri.org.uk/siri">
+              <ns5:ResponseStatus>
+                  <ns5:ResponseTimestamp>2017-01-01T12:01:00.000+02:00</ns5:ResponseTimestamp>
+                  <ns5:RequestMessageRef>GMSubscription:Test:0</ns5:RequestMessageRef>
+                  <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
+                  <ns5:SubscriptionRef>NINOXE:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns5:SubscriptionRef>
+                  <ns5:Status>true</ns5:Status>
+                  <ns5:ValidUntil>2017-02-01T12:00:00.000+02:00</ns5:ValidUntil>
+              </ns5:ResponseStatus>
+              <ns5:ServiceStartedTime>2017-01-01T12:01:00.000+02:00</ns5:ServiceStartedTime>
+            </Answer>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+          </ns1:SubscribeResponse>
+        </S:Body>
+        </S:Envelope>
         """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-subscription-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
@@ -29,7 +63,7 @@ Feature: Support SIRI GeneralMessage by subscription
             <SubscriptionRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
-              <ns2:MessageIdentifier>GMSubsccription:Test:0</ns2:MessageIdentifier>
+              <ns2:MessageIdentifier>GMSubscription:Test:0</ns2:MessageIdentifier>
             </SubscriptionRequestInfo>
 
             <Request version="2.0:FR-IDF-2.4">
@@ -45,7 +79,41 @@ Feature: Support SIRI GeneralMessage by subscription
         """
     Then Then I should receive this SIRI response
     """
-    ...
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+      <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+        <SubscriptionAnswerInfo
+          xmlns:ns2="http://www.ifopt.org.uk/acsb"
+          xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+          xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+          xmlns:ns5="http://www.siri.org.uk/siri"
+          xmlns:ns6="http://wsdl.siri.org.uk/siri">
+          <ns5:ResponseTimestamp>2017-01-01T12:01:00.000+02:00</ns5:ResponseTimestamp>
+          <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+          <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+          <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">Subscription:Test:0</ns5:RequestMessageRef>
+        </SubscriptionAnswerInfo>
+        <Answer
+          xmlns:ns2="http://www.ifopt.org.uk/acsb"
+          xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+          xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+          xmlns:ns5="http://www.siri.org.uk/siri"
+          xmlns:ns6="http://wsdl.siri.org.uk/siri">
+          <ns5:ResponseStatus>
+              <ns5:ResponseTimestamp>2017-01-01T12:01:00.000+02:00</ns5:ResponseTimestamp>
+              <ns5:RequestMessageRef>GMSubscription:Test:0</ns5:RequestMessageRef>
+              <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
+              <ns5:SubscriptionRef>NINOXE:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns5:SubscriptionRef>
+              <ns5:Status>true</ns5:Status>
+              <ns5:ValidUntil>2017-02-01T12:00:00.000+02:00</ns5:ValidUntil>
+          </ns5:ResponseStatus>
+          <ns5:ServiceStartedTime>2017-01-01T12:01:00.000+02:00</ns5:ServiceStartedTime>
+        </Answer>
+        <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      </ns1:SubscribeResponse>
+    </S:Body>
+    </S:Envelope>
     """
 
 @wip
