@@ -72,6 +72,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 
 	subscription := partner.Subscriptions().New()
 	apiSubscription := core.APISubscription{}
+
 	err := json.Unmarshal(requestData.Body, &apiSubscription)
 	if err != nil {
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
@@ -79,7 +80,8 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	}
 
 	subscription.SetDefinition(&apiSubscription)
-	partner.Subscriptions().Save(&subscription)
+
+	subscription.Save()
 	jsonBytes, _ := subscription.MarshalJSON()
 	response.Write(jsonBytes)
 }

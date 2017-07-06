@@ -51,7 +51,9 @@ Feature: Support SIRI StopMonitoring by subscription
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-    And 15 seconds have passed
+    And a Subscription exist with the following attributes:
+      | Kind                    | StopMonitoring                                      |
+      | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
     And a minute has passed
     When I send this SIRI request
       """
@@ -75,7 +77,7 @@ Feature: Support SIRI StopMonitoring by subscription
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
                 <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
@@ -124,7 +126,7 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-      Then the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+      Then the StopVisit "6ba7b814-9dad-11d1-c-00c04fd430c8" has the following attributes:
       | Collected                       | true                                                                 |
       | PassageOrder                    | 4                                                                    |
       | VehicleAtStop                   | false                                                                |
@@ -175,10 +177,13 @@ Feature: Support SIRI StopMonitoring by subscription
           | remote_credential    | test                  |
           | local_credential     | NINOXE:default        |
           | remote_objectid_kind | internal              |
-          And 30 seconds have passed
+        And 30 seconds have passed
         And a StopArea exists with the following attributes:
           | Name      | Test                                     |
           | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        And a Subscription exist with the following attributes:
+          | Kind                    | StopMonitoring                                      |
+          | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
         And a Line exists with the following attributes:
           | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
           | Name      | Ligne 3 Metro                   |
@@ -186,7 +191,6 @@ Feature: Support SIRI StopMonitoring by subscription
           | Name      | Passage 32                              |
           | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
           | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-        And 15 seconds have passed
         And a StopVisit exists with the following attributes:
           | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
           | PassageOrder                    | 4                                                                    |
@@ -219,7 +223,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
                     <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                     <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
-                    <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                    <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                     <ns2:Status>true</ns2:Status>
                     <ns2:MonitoredStopVisitCancellation>
                       <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
@@ -282,17 +286,20 @@ Feature: Support SIRI StopMonitoring by subscription
       | remote_credential    | test                  |
       | local_credential     | test                  |
       | remote_objectid_kind | internal              |
-    And a minute has passed
+    And 30 seconds have passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                                   |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+    And a Subscription exist with the following attributes:
+      | Kind                    | StopMonitoring                                      |
+      | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
+      | ReferenceArray1         | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC"  |
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received a SubscriptionRequest request with 2 "StopMonitoringRequest"
-
 
 
     Scenario: 3737 - Manage a MonitoredStopVisitCancellation
@@ -343,6 +350,9 @@ Feature: Support SIRI StopMonitoring by subscription
       And a StopArea exists with the following attributes:
         | Name      | Test                                     |
         | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      And a Subscription exist with the following attributes:
+        | Kind                    | StopMonitoring                                      |
+        | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
       And a Line exists with the following attributes:
         | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
         | Name      | Ligne 3 Metro                   |
@@ -350,7 +360,6 @@ Feature: Support SIRI StopMonitoring by subscription
         | Name      | Passage 32                              |
         | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
         | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-      And 15 seconds have passed
       And a StopVisit exists with the following attributes:
         | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
         | PassageOrder                    | 4                                                                    |
