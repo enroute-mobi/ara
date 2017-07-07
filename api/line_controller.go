@@ -50,7 +50,7 @@ func (controller *LineController) Show(response http.ResponseWriter, identifier 
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get line %s", identifier)
@@ -66,7 +66,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete line %s", identifier)
@@ -89,7 +89,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
 		return
 	}
 

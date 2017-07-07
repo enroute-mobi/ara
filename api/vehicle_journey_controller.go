@@ -50,7 +50,7 @@ func (controller *VehicleJourneyController) Show(response http.ResponseWriter, i
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get vehicleJourney %s", identifier)
@@ -66,7 +66,7 @@ func (controller *VehicleJourneyController) Delete(response http.ResponseWriter,
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete vehicleJourney %s", identifier)
@@ -89,7 +89,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
 		return
 	}
 

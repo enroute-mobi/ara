@@ -31,7 +31,7 @@ func (controller *ReferentialController) Index(response http.ResponseWriter) {
 func (controller *ReferentialController) Show(response http.ResponseWriter, identifier string) {
 	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get referential %s", identifier)
@@ -43,7 +43,7 @@ func (controller *ReferentialController) Show(response http.ResponseWriter, iden
 func (controller *ReferentialController) Delete(response http.ResponseWriter, identifier string) {
 	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete referential %s", identifier)
@@ -57,7 +57,7 @@ func (controller *ReferentialController) Delete(response http.ResponseWriter, id
 func (controller *ReferentialController) Update(response http.ResponseWriter, identifier string, body []byte) {
 	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
 	}
 

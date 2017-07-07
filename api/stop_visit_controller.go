@@ -66,7 +66,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 
 	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
@@ -89,7 +89,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 404)
 		return
 	}
 

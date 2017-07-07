@@ -50,7 +50,7 @@ func (controller *StopAreaController) Show(response http.ResponseWriter, identif
 
 	stopArea, ok := controller.findStopArea(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get stopArea %s", identifier)
@@ -66,7 +66,7 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 
 	stopArea, ok := controller.findStopArea(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete stopArea %s", identifier)
@@ -89,7 +89,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 
 	stopArea, ok := controller.findStopArea(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), 404)
 		return
 	}
 

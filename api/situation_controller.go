@@ -50,7 +50,7 @@ func (controller *SituationController) Show(response http.ResponseWriter, identi
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get situation %s", identifier)
@@ -66,7 +66,7 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete situation %s", identifier)
@@ -89,7 +89,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
 		return
 	}
 

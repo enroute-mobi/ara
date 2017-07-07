@@ -123,7 +123,7 @@ func (controller *PartnerController) Index(response http.ResponseWriter) {
 func (controller *PartnerController) Show(response http.ResponseWriter, identifier string) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Get partner %s", identifier)
@@ -135,7 +135,7 @@ func (controller *PartnerController) Show(response http.ResponseWriter, identifi
 func (controller *PartnerController) Delete(response http.ResponseWriter, identifier string) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
 		return
 	}
 	logger.Log.Debugf("Delete partner %s", identifier)
@@ -148,7 +148,7 @@ func (controller *PartnerController) Delete(response http.ResponseWriter, identi
 func (controller *PartnerController) Update(response http.ResponseWriter, identifier string, body []byte) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
 		return
 	}
 
