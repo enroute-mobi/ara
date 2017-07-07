@@ -5,24 +5,72 @@ import (
 	"time"
 )
 
-// type StopArea struct {
-// 	ObjectIDConsumer
-// 	model Model
+func Test_Equal(t *testing.T) {
+	type testStruct struct {
+		A int
+		B int
+	}
+	t1 := &testStruct{A: 2, B: 2}
+	t2 := &testStruct{A: 2, B: 2}
+	t3 := &testStruct{A: 2, B: 1}
 
-// 	id       StopAreaId
-// 	ParentId StopAreaId `json:",omitempty"`
+	result, err := Equal(t1, t2)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
+	}
+	if !result.Equal {
+		t.Errorf("Equal should return true, result: %v", result)
+	}
 
-// 	NextCollectAt   time.Time
-// collectedAt     time.Time
-// CollectedUntil  time.Time
-// CollectedAlways bool
+	result, err = Equal(t1, t3)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
+	}
+	if result.Equal {
+		t.Errorf("Equal should return false, result: %v", result)
+	}
+	b, ok := result.DiffMap["B"]
+	if !ok {
+		t.Errorf("DiffMap should contains B: %v", result.DiffMap)
+	}
+	if b != 1 {
+		t.Errorf("Wrong value in diffMap, got: %v expected: 1", b)
+	}
+}
 
-// Name       string
-// LineIds    []LineId `json:"Lines,omitempty"`
-// Attributes Attributes
-// References References
-// 	// ...
-// }
+func Test_Equal_DiffignoreTag(t *testing.T) {
+	type testStruct struct {
+		A int
+		B int `diffignore:"true"`
+	}
+	t1 := &testStruct{A: 2, B: 2}
+	t2 := &testStruct{A: 2, B: 1}
+
+	result, err := Equal(t1, t2)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
+	}
+	if !result.Equal {
+		t.Errorf("Equal should ignore unexported fields, result: %v", result)
+	}
+}
+
+func Test_Equal_Unexported(t *testing.T) {
+	type testStruct struct {
+		A int
+		a int
+	}
+	t1 := &testStruct{A: 2, a: 2}
+	t2 := &testStruct{A: 2, a: 1}
+
+	result, err := Equal(t1, t2)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
+	}
+	if !result.Equal {
+		t.Errorf("Equal should ignore unexported fields, result: %v", result)
+	}
+}
 
 func Test_Equal_StopAreas(t *testing.T) {
 	model := NewMemoryModel()
@@ -61,31 +109,20 @@ func Test_Equal_StopAreas(t *testing.T) {
 		Attributes:      attributes,
 		References:      references,
 	}
-	result, ok := Equal(sa1, sa2)
-	if !ok {
-		t.Errorf("Equal should return true: %v\n result: %v", ok, result)
+	result, err := Equal(sa1, sa2)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
 	}
-	sa3 := &StopArea{
-		model:           model,
-		id:              "12345",
-		NextCollectAt:   testTime,
-		collectedAt:     testTime,
-		CollectedUntil:  testTime,
-		CollectedAlways: true,
-		Name:            "Name",
-		LineIds:         []LineId{"1234"},
-		Attributes:      attributes,
-		References:      references,
+	if !result.Equal {
+		t.Errorf("Equal should return true, result: %v", result)
 	}
-	result, ok = Equal(sa1, sa3)
-	if ok {
-		t.Errorf("Equal should return false: %v\n result: %v", ok, result)
+
+	sa2.Name = "Name2"
+	result, err = Equal(sa1, sa2)
+	if err != nil {
+		t.Fatalf("Error in Equal: %v", err)
 	}
-	id, ok := result["id"]
-	if !ok {
-		t.Errorf("Equal should return a map with id, got: %v", result)
-	}
-	if id != StopAreaId("12345") {
-		t.Errorf("id should be 12345, got: %v. Map: %v", id, result)
+	if result.Equal {
+		t.Errorf("Equal should return false, result: %v", result)
 	}
 }
