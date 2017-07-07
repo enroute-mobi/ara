@@ -45,6 +45,6 @@ Then(/^a Situation "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([
     expect(response.code).to eq(200)
   else
     expect(response.code).to eq(500)
-    expect(response.body).to include("situation not found: #{kind}:#{value}")
+    expect(response.body).to include("Situation not found: #{kind}:#{value}")
   end
 end
