@@ -116,7 +116,6 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
     """
 
-@wip
    Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
