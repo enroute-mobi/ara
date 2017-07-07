@@ -205,6 +205,6 @@ Feature: Support SIRI GeneralMessage by subscription
       </soap:Body>
     </soap:Envelope>
       """
-    Then the Situation has the following attributes:
+    Then a Situation "internal":"2" should not exist in Referential "test"
 
 
