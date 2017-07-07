@@ -3,6 +3,7 @@ package audit
 import (
 	"encoding/json"
 	"net"
+	"time"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -129,11 +130,11 @@ func (logStash *TCPLogStash) send(jsonBytes []byte) {
 
 func (logStash *TCPLogStash) connectLogstash() {
 	for {
+		model.DefaultClock().Sleep(5)
 		var err error
-		logStash.connection, err = net.Dial("tcp", logStash.address)
+		logStash.connection, err = net.DialTimeout("tcp", logStash.address, 5*time.Second)
 		if err == nil {
 			return
 		}
-		model.DefaultClock().Sleep(5)
 	}
 }
