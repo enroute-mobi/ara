@@ -71,11 +71,11 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 
 	// Check response status
 	if response.StatusCode != http.StatusOK {
-		return nil, newSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
+		return nil, NewSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
 	if !strings.Contains(response.Header.Get("Content-Type"), "text/xml") {
-		return nil, newSiriError(fmt.Sprintf("SIRI CRITICAL: HTTP Content-Type %v", response.Header.Get("Content-Type")))
+		return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: HTTP Content-Type %v", response.Header.Get("Content-Type")))
 	}
 
 	// Check if response is gzip
@@ -97,7 +97,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 		return nil, err
 	}
 	if envelope.BodyType() != resource {
-		return nil, newSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
+		return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 	}
 	return envelope.Body(), nil
 }

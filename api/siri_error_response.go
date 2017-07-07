@@ -9,7 +9,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type SiriError struct {
+type SiriErrorResponse struct {
 	response       http.ResponseWriter
 	errCode        string
 	errDescription string
@@ -21,7 +21,7 @@ func siriError(errCode, errDescription string, response http.ResponseWriter) {
 }
 
 func siriErrorWithRequest(errCode, errDescription, request string, response http.ResponseWriter) {
-	SiriError{
+	SiriErrorResponse{
 		response:       response,
 		errCode:        errCode,
 		errDescription: errDescription,
@@ -29,7 +29,7 @@ func siriErrorWithRequest(errCode, errDescription, request string, response http
 	}.sendSiriError()
 }
 
-func (siriError SiriError) sendSiriError() {
+func (siriError SiriErrorResponse) sendSiriError() {
 	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
 
 	// Wrap soap and send response
