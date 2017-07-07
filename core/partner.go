@@ -151,6 +151,16 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	return true
 }
 
+func (partner *APIPartner) ValidatePresenceOfConnector(connector string) bool {
+	for _, listedConnector := range partner.ConnectorTypes {
+		if listedConnector == connector {
+			return true
+		}
+	}
+	partner.Errors.Add(fmt.Sprintf("Connector %s", connector), ERROR_BLANK)
+	return false
+}
+
 func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 	type Alias APIPartner
 	aux := &struct {
