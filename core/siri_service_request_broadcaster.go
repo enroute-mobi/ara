@@ -10,7 +10,7 @@ import (
 )
 
 type ServiceRequestBroadcaster interface {
-	HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse
+	HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error)
 }
 
 type SIRIServiceRequestBroadcaster struct {
@@ -27,7 +27,12 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	return siriServiceRequestBroadcaster
 }
 
-func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse {
+func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error) {
+	stopMonitoringConnector, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	if !ok {
+		return nil, siri.NewSiriErrorWithCode("NotFound", "Can't find a SIRIStopMonitoringRequestBroadcaster connector")
+	}
+
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -46,14 +51,12 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	response.RequestMessageRef = request.MessageIdentifier()
 	response.ResponseTimestamp = connector.Clock().Now()
 
-	stopMonitoringConnector := NewSIRIStopMonitoringRequestBroadcaster(connector.partner)
-
 	for _, stopMonitoringRequest := range request.StopMonitoringRequests() {
 		SMLogStashEvent := make(audit.LogStashEvent)
 
 		logXMLSiriServiceStopMonitoringRequest(logStashEvent, stopMonitoringRequest)
 
-		delivery := stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
+		delivery := stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
 		if !delivery.Status {
 			response.Status = false
 		}
@@ -66,7 +69,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 	logSIRIServiceResponse(logStashEvent, response)
 
-	return response
+	return response, nil
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

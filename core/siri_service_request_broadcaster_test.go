@@ -11,12 +11,53 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
+func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER}
+	partner.RefreshConnectors()
+	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
+	connector := c.(*SIRIServiceRequestBroadcaster)
+
+	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, err := connector.HandleRequests(request)
+	if response != nil || err == nil {
+		t.Fatalf("HandleRequests should return an error")
+	}
+
+	sirierr, ok := err.(*siri.SiriError)
+	if !ok {
+		t.Fatalf("HandleRequests should return a SiriError")
+	}
+	if sirierr.ErrCode() != "NotFound" || sirierr.Error() != "Can't find a SIRIStopMonitoringRequestBroadcaster connector" {
+		t.Errorf("Wrong SiriErr:\n got: %v\n want: NotFound: Can't find a SIRIStopMonitoringRequestBroadcaster connector", sirierr.FullMessage())
+	}
+}
+
 func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	connector := NewSIRIServiceRequestBroadcaster(partner)
+	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
+	partner.RefreshConnectors()
+	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
+	connector := c.(*SIRIServiceRequestBroadcaster)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
@@ -46,7 +87,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request)
+	response, _ := connector.HandleRequests(request)
 
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
@@ -74,7 +115,10 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	connector := NewSIRIServiceRequestBroadcaster(partner)
+	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
+	partner.RefreshConnectors()
+	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
+	connector := c.(*SIRIServiceRequestBroadcaster)
 	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
 	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
@@ -94,7 +138,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request)
+	response, _ := connector.HandleRequests(request)
 
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)

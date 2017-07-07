@@ -38,7 +38,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RemoteObjectIDKind() stri
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubRequest) siri.SIRIStopMonitoringDelivery {
-	// SMRB
 	objectidKind := connector.RemoteObjectIDKind()
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
