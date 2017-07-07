@@ -8,6 +8,7 @@ type TransactionalModel struct {
 	stopAreas       *TransactionalStopAreas
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
+	operators       *TransactionalOperators
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
@@ -17,6 +18,7 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 	model.stopAreas = NewTransactionalStopAreas(parent)
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
+	model.operators = NewTransactionalOperators(parent)
 	return model
 }
 
@@ -42,6 +44,10 @@ func (model *TransactionalModel) StopVisits() StopVisits {
 
 func (model *TransactionalModel) VehicleJourneys() VehicleJourneys {
 	return model.vehicleJourneys
+}
+
+func (model *TransactionalModel) Operators() Operators {
+	return model.operators
 }
 
 func (model *TransactionalModel) NewTransaction() *Transaction {
