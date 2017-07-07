@@ -37,9 +37,20 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RemoteObjectIDKind() stri
 	return connector.partner.Setting("remote_objectid_kind")
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, stopArea model.StopArea, request *siri.XMLStopMonitoringSubRequest) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubRequest) siri.SIRIStopMonitoringDelivery {
+	// SMRB
 	objectidKind := connector.RemoteObjectIDKind()
-	objectid, _ := stopArea.ObjectID(objectidKind)
+	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
+	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+	if !ok {
+		return siri.SIRIStopMonitoringDelivery{
+			RequestMessageRef: request.MessageIdentifier(),
+			Status:            false,
+			ResponseTimestamp: connector.Clock().Now(),
+			ErrorType:         "InvalidDataReferencesError",
+			ErrorText:         fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
+		}
+	}
 
 	if !stopArea.CollectedAlways {
 		stopArea.CollectedUntil = connector.Clock().Now().Add(15 * time.Minute)
@@ -201,18 +212,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	}
 	response.ResponseMessageIdentifier = connector.SIRIPartner().NewResponseMessageIdentifier()
 
-	objectidKind := connector.Partner().Setting("remote_objectid_kind")
-	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
-	if !ok {
-		response.RequestMessageRef = request.MessageIdentifier()
-		response.ResponseTimestamp = connector.Clock().Now()
-		response.Status = false
-		response.ErrorType = "InvalidDataReferencesError"
-		response.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
-	} else {
-		response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, stopArea, &request.XMLStopMonitoringSubRequest)
-	}
+	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringSubRequest)
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 

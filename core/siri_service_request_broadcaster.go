@@ -53,22 +53,9 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 		logXMLSiriServiceStopMonitoringRequest(logStashEvent, stopMonitoringRequest)
 
-		objectidKind := connector.Partner().Setting("remote_objectid_kind")
-		objectid := model.NewObjectID(objectidKind, stopMonitoringRequest.MonitoringRef())
-		stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
-
-		var delivery siri.SIRIStopMonitoringDelivery
-		if !ok {
-			delivery = siri.SIRIStopMonitoringDelivery{
-				RequestMessageRef: stopMonitoringRequest.MessageIdentifier(),
-				Status:            false,
-				ResponseTimestamp: connector.Clock().Now(),
-				ErrorType:         "InvalidDataReferencesError",
-				ErrorText:         fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
-			}
+		delivery := stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
+		if !delivery.Status {
 			response.Status = false
-		} else {
-			delivery = stopMonitoringConnector.getStopMonitoringDelivery(tx, SMLogStashEvent, stopArea, stopMonitoringRequest)
 		}
 
 		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
