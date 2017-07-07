@@ -70,6 +70,9 @@ func (model *TransactionalModel) Commit() error {
 	if err := model.situations.Commit(); err != nil {
 		return err
 	}
+	if err := model.operators.Commit(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -87,6 +90,9 @@ func (model *TransactionalModel) Rollback() error {
 		return err
 	}
 	if err := model.situations.Rollback(); err != nil {
+		return err
+	}
+	if err := model.operators.Rollback(); err != nil {
 		return err
 	}
 	return nil

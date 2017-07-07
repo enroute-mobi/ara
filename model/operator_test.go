@@ -19,11 +19,11 @@ func Test_Operator_MarshalJSON(t *testing.T) {
 	operator := Operator{
 		id:       "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		Name:     "OperatorName",
-		Objectid: ObjectID{"Kind", "Value"},
+		Objectid: &ObjectID{"Kind", "Value"},
 	}
 
-	expected := `{"Name":"OperatorName","Objectid":{"Kind":"Value"}}`
-	jsonBytes, err := json.Marshal(&operator)
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"OperatorName","Objectid":{"Kind":"Value"}}`
+	jsonBytes, err := operator.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func Test_Operator_UnmarshalJSON(t *testing.T) {
 	}
 
 	expectedObjectId := NewObjectID("Kind", "Value")
-	if operator.Objectid != expectedObjectId {
+	if *operator.Objectid != expectedObjectId {
 		t.Errorf("Got wrong Operator Objectid want %v got %v", expectedObjectId, operator.Objectid)
 	}
 }

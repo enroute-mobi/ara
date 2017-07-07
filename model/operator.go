@@ -1,5 +1,7 @@
 package model
 
+import "encoding/json"
+
 type OperatorId string
 
 type Operator struct {
@@ -9,7 +11,7 @@ type Operator struct {
 
 	id       OperatorId `json:",omitempty"`
 	Name     string     `json:",omitempty"`
-	Objectid ObjectID   `json:",omitempty"`
+	Objectid *ObjectID  `json:",omitempty"`
 }
 
 func NewOperator(model Model) *Operator {
@@ -28,6 +30,20 @@ func (operator *Operator) Id() OperatorId {
 func (operator *Operator) Save() (ok bool) {
 	ok = operator.model.Operators().Save(operator)
 	return
+}
+
+func (operator *Operator) MarshalJSON() ([]byte, error) {
+	type Alias Operator
+
+	aux := struct {
+		Id OperatorId
+		*Alias
+	}{
+		Id:    operator.id,
+		Alias: (*Alias)(operator),
+	}
+
+	return json.Marshal(&aux)
 }
 
 type MemoryOperators struct {
