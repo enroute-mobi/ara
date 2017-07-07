@@ -77,7 +77,7 @@ Feature: Support SIRI GeneralMessage by subscription
         </S:Body>
       </S:Envelope>
         """
-    Then Then I should receive this SIRI response
+    Then I should receive this SIRI response
     """
     <?xml version='1.0' encoding='utf-8'?>
     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
