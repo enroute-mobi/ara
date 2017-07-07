@@ -130,7 +130,7 @@ func (logStash *TCPLogStash) send(jsonBytes []byte) {
 
 func (logStash *TCPLogStash) connectLogstash() {
 	for {
-		model.DefaultClock().Sleep(5)
+		model.DefaultClock().Sleep(5 * time.Second)
 		var err error
 		logStash.connection, err = net.DialTimeout("tcp", logStash.address, 5*time.Second)
 		if err == nil {
