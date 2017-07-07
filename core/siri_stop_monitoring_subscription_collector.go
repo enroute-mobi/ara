@@ -136,18 +136,18 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		matches := reg.FindStringSubmatch(strings.TrimSpace(delivery.SubscriptionRef()))
 
 		if len(matches) == 0 {
-			logger.Log.Printf("Partner %s sent a StopVisitNotify response with a wrong message format: %s\n", connector.Partner().Slug(), delivery.SubscriptionRef())
+			logger.Log.Debugf("Partner %s sent a StopVisitNotify response with a wrong message format: %s\n", connector.Partner().Slug(), delivery.SubscriptionRef())
 			continue
 		}
 		subscriptionId := matches[1]
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 
 		if ok == false {
-			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			continue
 		}
 		if subscription.Kind() != "StopMonitoring" {
-			logger.Log.Printf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			continue
 		}
 
