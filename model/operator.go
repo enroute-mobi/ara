@@ -13,9 +13,8 @@ type Operator struct {
 
 	model Model
 
-	id       OperatorId `json:",omitempty"`
-	Name     string     `json:",omitempty"`
-	Objectid *ObjectID  `json:",omitempty"`
+	id   OperatorId `json:",omitempty"`
+	Name string     `json:",omitempty"`
 }
 
 func NewOperator(model Model) *Operator {
@@ -128,7 +127,6 @@ func (manager *MemoryOperators) Load(referentialId string) error {
 		Id            string
 		ReferentialId string `db:"referential_id"`
 		Name          sql.NullString
-		ObjectID      sql.NullString `db:"object_id"`
 		ObjectIDs     sql.NullString `db:"object_ids"`
 	}
 	sqlQuery := fmt.Sprintf("select * from operators where referential_id = '%s'", referentialId)
@@ -153,15 +151,6 @@ func (manager *MemoryOperators) Load(referentialId string) error {
 
 			operator.objectids = NewObjectIDsFromMap(objectIdMap)
 		}
-
-		if so.ObjectID.Valid && len(so.ObjectID.String) > 0 {
-			objectid := &ObjectID{}
-			if err = json.Unmarshal([]byte(so.ObjectID.String), objectid); err != nil {
-				return err
-			}
-			operator.Objectid = objectid
-		}
-
 		manager.Save(&operator)
 	}
 	return nil

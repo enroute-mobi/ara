@@ -17,12 +17,11 @@ func Test_Operator_Id(t *testing.T) {
 
 func Test_Operator_MarshalJSON(t *testing.T) {
 	operator := Operator{
-		id:       "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		Name:     "OperatorName",
-		Objectid: &ObjectID{"Kind", "Value"},
+		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		Name: "OperatorName",
 	}
 
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"OperatorName","Objectid":{"Kind":"Value"}}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"OperatorName"}`
 	jsonBytes, err := operator.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -36,8 +35,7 @@ func Test_Operator_MarshalJSON(t *testing.T) {
 
 func Test_Operator_UnmarshalJSON(t *testing.T) {
 	test := `{
-		"Name": "OperatorName",
-		"Objectid": {"Kind":"Value"}
+		"Name": "OperatorName"
 		}`
 
 	operator := Operator{}
@@ -49,11 +47,6 @@ func Test_Operator_UnmarshalJSON(t *testing.T) {
 
 	if operator.Name != "OperatorName" {
 		t.Errorf("Got wrong Operator Name want OperatorName got %v", operator.Name)
-	}
-
-	expectedObjectId := NewObjectID("Kind", "Value")
-	if *operator.Objectid != expectedObjectId {
-		t.Errorf("Got wrong Operator Objectid want %v got %v", expectedObjectId, operator.Objectid)
 	}
 }
 
@@ -191,13 +184,11 @@ func Test_MemoryOperators_Load(t *testing.T) {
 		ReferentialId string `db:"referential_id"`
 		Name          string `db:"name"`
 		ObjectIDs     string `db:"object_ids"`
-		ObjectID      string `db:"object_id"`
 	}{
 		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Name:          "operator",
 		ObjectIDs:     `{"internal":"value"}`,
-		ObjectID:      `{"internal":"value"}`,
 	}
 
 	Database.AddTableWithName(databaseOperator, "operators")

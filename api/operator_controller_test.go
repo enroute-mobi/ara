@@ -112,8 +112,7 @@ func Test_OperatorController_Show(t *testing.T) {
 func Test_OperatorController_Create(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{
-		"Name":"OperatorName",
-		"Objectid": { "Kind": "Value" } }`)
+		"Name":"OperatorName"}`)
 	_, responseRecorder, referential := prepareOperatorRequest("POST", false, body, t)
 
 	// Check response
@@ -127,7 +126,7 @@ func Test_OperatorController_Create(t *testing.T) {
 		t.Errorf("Operator should be found after POST request")
 	}
 	operatorMarshal, _ := operator.MarshalJSON()
-	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"OperatorName","Objectid":{"Kind":"Value"}}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"OperatorName"}`
 	if responseRecorder.Body.String() != string(expected) && string(operatorMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
