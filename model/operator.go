@@ -152,13 +152,14 @@ func (manager *MemoryOperators) Load(referentialId string) error {
 			}
 
 			operator.objectids = NewObjectIDsFromMap(objectIdMap)
-			if so.ObjectID.Valid && len(so.ObjectID.String) > 0 {
-				objectid := &ObjectID{}
-				if err = json.Unmarshal([]byte(so.ObjectID.String), objectid); err != nil {
-					return err
-				}
-				operator.Objectid = objectid
+		}
+
+		if so.ObjectID.Valid && len(so.ObjectID.String) > 0 {
+			objectid := &ObjectID{}
+			if err = json.Unmarshal([]byte(so.ObjectID.String), objectid); err != nil {
+				return err
 			}
+			operator.Objectid = objectid
 		}
 
 		manager.Save(&operator)
