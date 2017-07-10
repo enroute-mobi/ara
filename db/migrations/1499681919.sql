@@ -4,7 +4,8 @@ CREATE TABLE operators (
   id              uuid PRIMARY KEY,
   referential_id  uuid NOT NULL,
   name            text,
-  object_ids      text
+  object_ids      text,
+  object_id       text
 );
 
 -- +migrate Down
