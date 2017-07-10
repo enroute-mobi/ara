@@ -1,6 +1,10 @@
 package model
 
-import "encoding/json"
+import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+)
 
 type OperatorId string
 
@@ -117,4 +121,47 @@ func (manager *MemoryOperators) Save(operator *Operator) bool {
 func (manager *MemoryOperators) Delete(operator *Operator) bool {
 	delete(manager.byIdentifier, operator.Id())
 	return true
+}
+
+func (manager *MemoryOperators) Load(referentialId string) error {
+	var selectOperators []struct {
+		Id            string
+		ReferentialId string `db:"referential_id"`
+		Name          sql.NullString
+		ObjectID      sql.NullString `db:"object_id"`
+		ObjectIDs     sql.NullString `db:"object_ids"`
+	}
+	sqlQuery := fmt.Sprintf("select * from operators where referential_id = '%s'", referentialId)
+
+	_, err := Database.Select(&selectOperators, sqlQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, so := range selectOperators {
+		operator := manager.New()
+		operator.id = OperatorId(so.Id)
+		if so.Name.Valid {
+			operator.Name = so.Name.String
+		}
+
+		if so.ObjectIDs.Valid && len(so.ObjectIDs.String) > 0 {
+			objectIdMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(so.ObjectIDs.String), &objectIdMap); err != nil {
+				return err
+			}
+
+			operator.objectids = NewObjectIDsFromMap(objectIdMap)
+			if so.ObjectID.Valid && len(so.ObjectID.String) > 0 {
+				objectid := &ObjectID{}
+				if err = json.Unmarshal([]byte(so.ObjectID.String), objectid); err != nil {
+					return err
+				}
+				operator.Objectid = objectid
+			}
+		}
+
+		manager.Save(&operator)
+	}
+	return nil
 }
