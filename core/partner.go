@@ -257,6 +257,24 @@ func (partner *Partner) Definition() *APIPartner {
 	}
 }
 
+func (partner *Partner) Stop() {
+	for _, connector := range partner.connectors {
+		c, ok := connector.(model.Stopable)
+		if ok {
+			c.Stop()
+		}
+	}
+}
+
+func (partner *Partner) Start() {
+	for _, connector := range partner.connectors {
+		c, ok := connector.(model.Startable)
+		if ok {
+			c.Start()
+		}
+	}
+}
+
 func (partner *Partner) CollectPriority() int {
 	value, _ := strconv.Atoi(partner.Settings["collect.priority"])
 	return value
@@ -428,10 +446,16 @@ func (manager *PartnerManager) Guardian() *PartnersGuardian {
 
 func (manager *PartnerManager) Start() {
 	manager.guardian.Start()
+	for _, partner := range manager.byId {
+		partner.Start()
+	}
 }
 
 func (manager *PartnerManager) Stop() {
 	manager.guardian.Stop()
+	for _, partner := range manager.byId {
+		partner.Stop()
+	}
 }
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {

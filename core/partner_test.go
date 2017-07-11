@@ -454,3 +454,32 @@ func Test_MemoryPartners_Load(t *testing.T) {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", partner.Id(), partnerId)
 	}
 }
+
+func Test_Partners_StartStop(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	referentials.Save(referential)
+	partner := referential.Partners().New("partner")
+
+	partner.ConnectorTypes = []string{TEST_STARTABLE_CONNECTOR}
+	partner.RefreshConnectors()
+	partner.Save()
+
+	connector, ok := partner.Connector(TEST_STARTABLE_CONNECTOR)
+	if !ok {
+		t.Fatalf("Connector should have a TestStartableConnector")
+	}
+	if connector.(*TestStartableConnector).started {
+		t.Errorf("Connector should be stoped")
+	}
+
+	referential.Start()
+	if !connector.(*TestStartableConnector).started {
+		t.Errorf("Connector should be started")
+	}
+
+	referential.Stop()
+	if connector.(*TestStartableConnector).started {
+		t.Errorf("Connector should be stoped")
+	}
+}

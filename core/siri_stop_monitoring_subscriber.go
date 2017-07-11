@@ -11,8 +11,9 @@ import (
 )
 
 type SIRIStopMonitoringSubscriber interface {
+	model.Stopable
+
 	Run()
-	Stop()
 }
 
 type SMSubscriber struct {
@@ -50,6 +51,10 @@ func NewSIRIStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCo
 }
 
 func (subscriber *StopMonitoringSubscriber) Run() {
+	if subscriber.stop != nil {
+		return
+	}
+
 	logger.Log.Debugf("Start StopMonitoringSubscriber")
 
 	subscriber.stop = make(chan struct{})

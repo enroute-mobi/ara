@@ -141,6 +141,7 @@ func (controller *PartnerController) Delete(response http.ResponseWriter, identi
 	logger.Log.Debugf("Delete partner %s", identifier)
 
 	jsonBytes, _ := partner.MarshalJSON()
+	partner.Stop()
 	controller.referential.Partners().Delete(partner)
 	response.Write(jsonBytes)
 }
@@ -153,6 +154,9 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 	}
 
 	logger.Log.Debugf("Update partner %s: %s", identifier, string(body))
+
+	partner.Stop()
+	defer partner.Start()
 
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
@@ -202,6 +206,7 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 
 	partner.SetDefinition(apiPartner)
 	controller.referential.Partners().Save(partner)
+	partner.Start()
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }

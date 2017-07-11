@@ -14,6 +14,7 @@ const (
 	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
 	SIRI_CHECK_STATUS_SERVER_TYPE                      = "siri-check-status-server"
 	TEST_VALIDATION_CONNECTOR                          = "test-validation-connector"
+	TEST_STARTABLE_CONNECTOR                           = "test-startable-connector-connector"
 )
 
 const (
@@ -70,6 +71,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case TEST_VALIDATION_CONNECTOR:
 		return &TestValidationFactory{}
+	case TEST_STARTABLE_CONNECTOR:
+		return &TestStartableFactory{}
 	case SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR:
 		return &SIRIStopMonitoringSubscriptionCollectorFactory{}
 	default:
@@ -90,4 +93,25 @@ func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) bool {
 
 func (factory *TestValidationFactory) CreateConnector(partner *Partner) Connector {
 	return &TestValidationConnector{}
+}
+
+type TestStartableFactory struct{}
+type TestStartableConnector struct {
+	started bool
+}
+
+func (factory *TestStartableFactory) Validate(apiPartner *APIPartner) bool {
+	return true
+}
+
+func (factory *TestStartableFactory) CreateConnector(partner *Partner) Connector {
+	return &TestStartableConnector{}
+}
+
+func (connector *TestStartableConnector) Start() {
+	connector.started = true
+}
+
+func (connector *TestStartableConnector) Stop() {
+	connector.started = false
 }

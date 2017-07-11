@@ -13,6 +13,9 @@ import (
 )
 
 type StopMonitoringSubscriptionCollector interface {
+	model.Stopable
+	model.Startable
+
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
 	HandleNotifyStopMonitoring(delivery *siri.XMLNotifyStopMonitoring)
 	HandleTerminatedNotification(termination *siri.XMLStopMonitoringSubscriptionTerminatedResponse)
@@ -51,6 +54,19 @@ func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonit
 	return siriStopMonitoringSubscriptionCollector
 }
 
+func (connector *SIRIStopMonitoringSubscriptionCollector) Stop() {
+	if connector.stopMonitoringSubscriber != nil {
+		connector.stopMonitoringSubscriber.Stop()
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) Start() {
+	if connector.stopMonitoringSubscriber == nil {
+		connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
+	}
+	connector.stopMonitoringSubscriber.Run()
+}
+
 func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
@@ -81,11 +97,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	subscription.CreateAddNewResource(ref)
-
-	if connector.stopMonitoringSubscriber == nil {
-		connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
-		connector.stopMonitoringSubscriber.Run()
-	}
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubscriber(stopMonitoringSubscriber SIRIStopMonitoringSubscriber) {
