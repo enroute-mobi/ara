@@ -27,6 +27,7 @@ func NewSubscription() *Subscription {
 
 type SubscribedResource struct {
 	Reference       model.Reference
+	RetryCount      int
 	SubscribedAt    time.Time
 	SubscribedUntil time.Time
 }

@@ -89,7 +89,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
-		if resource.SubscribedAt.IsZero() {
+		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
 			messageIdentifier := subscriber.connector.SIRIPartner().NewMessageIdentifier()
 			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
 		}
@@ -123,11 +123,14 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	}
 
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
-	// logStashEvent["StopAreasIds"] = strings.Join(stopAreasToRequest, ", ")
 
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
+		for _, stopAreaObjectid := range stopAreasToRequest {
+			resource := subscription.Resource(*stopAreaObjectid)
+			resource.RetryCount++
+		}
 		return
 	}
 
@@ -139,25 +142,19 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
 			continue
 		}
-		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", stopAreaObjectid.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+		resource := subscription.Resource(*stopAreaObjectid)
+		if resource == nil { // Should never happen
+			logger.Log.Debugf("Response for unknown subscription resource %v", stopAreaObjectid.String())
 			continue
 		}
-		resource := subscription.Resource(*stopAreaObjectid)
-		if resource != nil {
-			logger.Log.Debugf("Response for unknown subscription resource %v", stopAreaObjectid.String())
+		if !responseStatus.Status() {
+			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", stopAreaObjectid.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+			resource.RetryCount++
+			continue
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
+		resource.RetryCount = 0
 	}
-
-	// if response.Status() == true {
-	// 	for _, stopAreaObjectid := range stopAreasToRequest {
-	// resource := subscription.Resource(*stopAreaObjectid)
-	// if resource != nil {
-	// 	resource.SubscribedAt = subscriber.Clock().Now()
-	// }
-	// 	}
-	// }
 }
 
 func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
