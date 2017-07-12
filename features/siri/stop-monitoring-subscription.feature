@@ -77,7 +77,7 @@ Feature: Support SIRI StopMonitoring by subscription
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
                 <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
@@ -126,7 +126,7 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-      Then the StopVisit "6ba7b814-9dad-11d1-c-00c04fd430c8" has the following attributes:
+      Then the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
       | Collected                       | true                                                                 |
       | PassageOrder                    | 4                                                                    |
       | VehicleAtStop                   | false                                                                |
@@ -223,7 +223,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
                     <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                     <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
-                    <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                    <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                     <ns2:Status>true</ns2:Status>
                     <ns2:MonitoredStopVisitCancellation>
                       <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
