@@ -557,4 +557,3 @@ Feature: Support SIRI GeneralMessage for Situation
         </S:Body>
       </S:Envelope>
       """
-

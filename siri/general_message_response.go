@@ -15,6 +15,26 @@ type XMLGeneralMessageResponse struct {
 	xmlGeneralMessages []*XMLGeneralMessage
 }
 
+type XMLGeneralMessageDelivery struct {
+	ResponseXMLStructure
+
+	subscriptionRef                 string
+	xmlGeneralMessages              []*XMLGeneralMessage
+	xmlGeneralMessagesCancellations []*XMLGeneralMessageCancellation
+}
+
+func NewXMLGeneralMessageDelivery(node XMLNode) *XMLGeneralMessageDelivery {
+	delivery := &XMLGeneralMessageDelivery{}
+	delivery.node = node
+	return delivery
+}
+
+type XMLGeneralMessageCancellation struct {
+	XMLStructure
+
+	infoMessageIdentifier string
+}
+
 type XMLGeneralMessage struct {
 	XMLStructure
 
@@ -158,7 +178,25 @@ const generalMessageDeliveryTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3
 	<AnswerExtension/>
 </ns8:GetGeneralMessageResponse>`
 
-func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMessage {
+func NewXMLCancelledGeneralMessage(node XMLNode) *XMLGeneralMessageCancellation {
+	cancelledGeneralMessage := &XMLGeneralMessageCancellation{}
+	cancelledGeneralMessage.node = node
+	return cancelledGeneralMessage
+}
+
+func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMessage {
+	if delivery.xmlGeneralMessages == nil {
+		nodes := delivery.findNodes("GeneralMessage")
+		if nodes != nil {
+			for _, node := range nodes {
+				delivery.xmlGeneralMessages = append(delivery.xmlGeneralMessages, NewXMLGeneralMessage(node))
+			}
+		}
+	}
+	return delivery.xmlGeneralMessages
+}
+
+func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
 	if len(response.xmlGeneralMessages) == 0 {
 		nodes := response.findNodes("GeneralMessage")
 		if nodes == nil {
@@ -169,6 +207,20 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessage() []*XMLGeneralMess
 		}
 	}
 	return response.xmlGeneralMessages
+}
+
+func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessagesCancellations() []*XMLGeneralMessageCancellation {
+	if delivery.xmlGeneralMessagesCancellations == nil {
+		cancellations := []*XMLGeneralMessageCancellation{}
+		nodes := delivery.findNodes("GeneralMessageCancellation")
+		if nodes != nil {
+			for _, node := range nodes {
+				cancellations = append(cancellations, NewXMLCancelledGeneralMessage(node))
+			}
+		}
+		delivery.xmlGeneralMessagesCancellations = cancellations
+	}
+	return delivery.xmlGeneralMessagesCancellations
 }
 
 func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
@@ -209,6 +261,13 @@ func NewXMLMessage(node XMLNode) *XMLMessage {
 	message := &XMLMessage{}
 	message.node = node
 	return message
+}
+
+func (visit *XMLGeneralMessageCancellation) InfoMessageIdentifier() string {
+	if visit.infoMessageIdentifier == "" {
+		visit.infoMessageIdentifier = visit.findStringChildContent("InfoMessageIdentifier")
+	}
+	return visit.infoMessageIdentifier
 }
 
 func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {

@@ -217,7 +217,6 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
                   <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 </ServiceDeliveryInfo>
-
                 <Notification>
                   <ns2:StopMonitoringDelivery version="1.3">
                     <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>

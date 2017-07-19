@@ -24,7 +24,7 @@ func getXMLGeneralMessageResponse(t *testing.T) *XMLGeneralMessageResponse {
 
 func Test_XMLGeneralMessage(t *testing.T) {
 	response := getXMLGeneralMessageResponse(t)
-	generalMessage := response.XMLGeneralMessage()[0]
+	generalMessage := response.XMLGeneralMessages()[0]
 	content := generalMessage.Content().(IDFGeneralMessageStructure)
 	lineSection := content.LineSection()
 
@@ -88,12 +88,12 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 		t.Errorf("Wrong ResponseTimestamp: \n got: %v\nwant: %v", s2.ResponseTimestamp(), s1.ResponseTimestamp())
 	}
 
-	if len(s1.XMLGeneralMessage()) != len(s2.XMLGeneralMessage()) {
-		t.Errorf("Wrong XMLGeneralMessage: \n got: %v\nwant: %v", len(s2.XMLGeneralMessage()), len(s1.XMLGeneralMessage()))
+	if len(s1.XMLGeneralMessages()) != len(s2.XMLGeneralMessages()) {
+		t.Errorf("Wrong XMLGeneralMessage: \n got: %v\nwant: %v", len(s2.XMLGeneralMessages()), len(s1.XMLGeneralMessages()))
 	}
 
-	expectedGM := s1.XMLGeneralMessage()[0]
-	gotGM := s2.XMLGeneralMessage()[0]
+	expectedGM := s1.XMLGeneralMessages()[0]
+	gotGM := s2.XMLGeneralMessages()[0]
 
 	if expectedGM.RecordedAtTime() != gotGM.RecordedAtTime() {
 		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", gotGM.RecordedAtTime(), expectedGM.RecordedAtTime())

@@ -15,6 +15,7 @@ type CollectManagerInterface interface {
 
 	UpdateSituation(request *SituationUpdateRequest)
 	HandleSituationUpdateEvent(SituationUpdateSubscriber)
+	BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent)
 }
 
 type CollectManager struct {
@@ -56,6 +57,8 @@ func (manager *TestCollectManager) BroadcastStopAreaUpdateEvent(event *model.Sto
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
 func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
+func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
+}
 
 // TEST END
 
@@ -142,7 +145,7 @@ func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *
 	partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 }
 
-func (manager *CollectManager) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
+func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 	for _, SituationUpdateSubscriber := range manager.SituationUpdateSubscribers {
 		SituationUpdateSubscriber(event)
 	}
@@ -151,6 +154,9 @@ func (manager *CollectManager) broadcastSituationUpdateEvent(event []*model.Situ
 func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) ([]*model.SituationUpdateEvent, error) {
 	logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
 
+	if collect := partner.GeneralMessageSubscriptionCollector(); collect != nil {
+		collect.RequestSituationUpdate(request)
+	}
 	event, err := partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
 	if err != nil {
 		return nil, err
@@ -163,7 +169,11 @@ func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscri
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_DELIVERIES_RESPONSE_COLLECTOR)
+	if partner == nil {
+		partner = manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+	}
+
 	if partner == nil {
 		logger.Log.Debugf("Can't find a partner for Situation %v", request.Id())
 		return
@@ -174,5 +184,5 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 		logger.Log.Printf("Can't request Situation update : %v", err)
 		return
 	}
-	manager.broadcastSituationUpdateEvent(event)
+	manager.BroadcastSituationUpdateEvent(event)
 }

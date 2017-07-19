@@ -81,7 +81,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		return
 	}
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	for _, sr := range subscription.resourcesByObjectID {
 		if sr.Reference.ObjectId.String() == stopAreaObjectid.String() && !sr.SubscribedAt.IsZero() {

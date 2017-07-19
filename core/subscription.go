@@ -63,6 +63,11 @@ func (subscription *Subscription) Save() (ok bool) {
 	return
 }
 
+func (subscription *Subscription) Delete() (ok bool) {
+	ok = subscription.partner.Subscriptions().Delete(subscription)
+	return
+}
+
 func (subscription *Subscription) ResourcesByObjectID() map[string]*SubscribedResource {
 	return subscription.resourcesByObjectID
 }
@@ -138,7 +143,7 @@ type Subscriptions interface {
 	New() Subscription
 	Find(id SubscriptionId) (Subscription, bool)
 	FindAll() []Subscription
-	FindOrCreateByKind(string) *Subscription
+	FindOrCreateByKind(string) (*Subscription, bool)
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
 	NewSubscription() *Subscription
@@ -156,16 +161,16 @@ func (manager *MemorySubscriptions) New() Subscription {
 	return *subscription
 }
 
-func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
+func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscription, bool) {
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
-			return subscription
+			return subscription, true
 		}
 	}
 
 	subscription := manager.NewSubscription()
 	subscription.SetKind(kind)
-	return subscription
+	return subscription, false
 }
 
 func (manager *MemorySubscriptions) Find(id SubscriptionId) (Subscription, bool) {

@@ -134,6 +134,15 @@ func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoring
 	return response, nil
 }
 
+func (client *SOAPClient) GeneralMessageSubscription(request *SIRIGeneralMessageSubscriptionRequest) (*XMLGeneralMessageSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(request, "SubscribeResponse", false)
+	if err != nil {
+		return nil, err
+	}
+	response := NewXMLGeneralMessageSubscriptionResponse(node)
+	return response, nil
+}
+
 func (client *SOAPClient) SituationMonitoring(request *SIRIGeneralMessageRequest) (*XMLGeneralMessageResponse, error) {
 	// WIP
 	node, err := client.prepareAndSendRequest(request, "GetGeneralMessageResponse", false)

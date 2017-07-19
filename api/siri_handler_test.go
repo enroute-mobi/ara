@@ -51,6 +51,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-stop-monitoring-request-broadcaster",
 		"siri-service-request-broadcaster",
 		"siri-stop-monitoring-subscription-collector",
+		"siri-general-message-subscription-collector",
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
@@ -480,7 +481,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
@@ -499,5 +500,31 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 
 	if count := len(referential.Model().StopVisits().FindAll()); count != 3 {
 		t.Errorf("Notify should have created 3 StopVisits, got: %v", count)
+	}
+}
+
+func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+
+	file, err := os.Open("../siri/testdata/notify-general-message.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(string(content))
+
+	server, referential := siriHandler_PrepareServer()
+	partner := referential.Partners().FindAll()[0]
+
+	partner.Subscriptions().FindOrCreateByKind("GeneralMessage")
+
+	siriHandler_Request(server, soapEnvelope, t)
+
+	if count := len(referential.Model().Situations().FindAll()); count != 2 {
+		t.Errorf("Notify should have created 2 Situation, got: %v", count)
 	}
 }

@@ -36,8 +36,12 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 			xmlRequest: siri.NewXMLStopMonitoringRequest(envelope.Body()),
 		}
 	case "NotifyStopMonitoring":
-		return &SIRIStopMonitoringDeliveriesResponseHandler{
+		return &SIRIStopMonitoringRequestDeliveriesResponseHandler{
 			xmlRequest: siri.NewXMLNotifyStopMonitoring(envelope.Body()),
+		}
+	case "NotifyGeneralMessage":
+		return &SIRIGeneralMessageRequestDeliveriesResponseHandler{
+			xmlRequest: siri.NewXMLNotifyGeneralMessage(envelope.Body()),
 		}
 	case "SubscriptionTerminatedNotification":
 		return &SIRIStopMonitoringSubscriptionTerminatedResponseHandler{

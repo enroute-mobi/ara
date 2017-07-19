@@ -57,7 +57,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	deliveries := siri.NewXMLNotifyStopMonitoring(doc.Root())
 
 	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 	subscription.Save()
 
 	connector.HandleNotifyStopMonitoring(deliveries)
@@ -119,7 +119,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) 
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	if len(subscription.ResourcesByObjectID()) != 1 {
 		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
@@ -181,7 +181,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 	subscription.CreateAddNewResource(ref)
 	subscription.Save()
 
@@ -246,7 +246,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
 	connector.stopMonitoringSubscriber.Run()
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)

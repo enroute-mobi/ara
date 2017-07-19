@@ -85,7 +85,7 @@ func (subscriber *StopMonitoringSubscriber) Stop() {
 }
 
 func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
-	subscription := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {

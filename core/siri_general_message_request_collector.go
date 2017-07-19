@@ -57,7 +57,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageResponse) {
-	xmlGeneralMessages := xmlResponse.XMLGeneralMessage()
+	xmlGeneralMessages := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessages) == 0 {
 		return
 	}

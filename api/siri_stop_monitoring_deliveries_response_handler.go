@@ -8,20 +8,20 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type SIRIStopMonitoringDeliveriesResponseHandler struct {
+type SIRIStopMonitoringRequestDeliveriesResponseHandler struct {
 	xmlRequest *siri.XMLNotifyStopMonitoring
 	Partner    core.Partner
 }
 
-func (handler *SIRIStopMonitoringDeliveriesResponseHandler) RequestorRef() string {
+func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) RequestorRef() string {
 	return handler.xmlRequest.ProducerRef()
 }
 
-func (handler *SIRIStopMonitoringDeliveriesResponseHandler) ConnectorType() string {
+func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) ConnectorType() string {
 	return core.SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR
 }
 
-func (handler *SIRIStopMonitoringDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("NotifyStopMonitoring %s\n", handler.xmlRequest.ResponseMessageIdentifier())
 
 	connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
