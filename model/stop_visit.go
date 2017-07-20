@@ -245,6 +245,9 @@ type StopVisits interface {
 	FindAll() []StopVisit
 	Save(stopVisit *StopVisit) bool
 	Delete(stopVisit *StopVisit) bool
+
+	// Not sure about that
+	collection() map[StopVisitId]*StopVisit
 }
 
 func NewMemoryStopVisits() *MemoryStopVisits {
@@ -252,6 +255,10 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 		byIdentifier: make(map[StopVisitId]*StopVisit),
 		byObjectId:   NewObjectIdIndex(),
 	}
+}
+
+func (manager *MemoryStopVisits) collection() map[StopVisitId]*StopVisit {
+	return manager.byIdentifier
 }
 
 func (manager *MemoryStopVisits) New() StopVisit {

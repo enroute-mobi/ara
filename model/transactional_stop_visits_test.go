@@ -103,11 +103,11 @@ func Test_TransactionalStopVisits_Delete(t *testing.T) {
 
 	stopVisits.Delete(&existingStopVisit)
 
-	_, ok := stopVisits.Find(existingStopVisit.Id())
+	_, ok := model.StopVisits().Find(existingStopVisit.Id())
 	if !ok {
 		t.Errorf("StopVisit should not be deleted before commit")
 	}
-	_, ok = stopVisits.FindByObjectId(objectid)
+	_, ok = model.StopVisits().FindByObjectId(objectid)
 	if !ok {
 		t.Errorf("StopVisit should be found by objectid before commit")
 	}
