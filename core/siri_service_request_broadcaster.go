@@ -54,7 +54,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	for _, stopMonitoringRequest := range request.StopMonitoringRequests() {
 		SMLogStashEvent := make(audit.LogStashEvent)
 
-		logXMLSiriServiceStopMonitoringRequest(logStashEvent, stopMonitoringRequest)
+		logXMLSiriServiceStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
 
 		delivery := stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
 		if !delivery.Status {
