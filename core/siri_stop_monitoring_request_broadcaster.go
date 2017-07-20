@@ -120,6 +120,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
 			continue
 		}
+		if _, ok := line.ObjectID(objectidKind); !ok {
+			logger.Log.Printf("Ignore StopVisit %s without Line without correct ObjectID", stopVisit.Id())
+			continue
+		}
 
 		vehicleJourneyId, ok := vehicleJourney.ObjectID(objectidKind)
 		var dataVehicleJourneyRef string

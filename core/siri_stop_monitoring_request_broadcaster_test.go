@@ -57,6 +57,35 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	vehicleJourney.LineId = line.Id()
 
+	stopVisit2 := referential.model.StopVisits().New()
+	stopVisitRef2 := model.Reference{}
+	obj2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:28:LOC")
+	stopVisitRef2.ObjectId = &obj2
+
+	stopVisit2.SetObjectID(obj2)
+	stopVisit2.References.Set("OperatorRef", stopVisitRef)
+	stopVisit2.StopAreaId = stopArea.Id()
+
+	sVSchedule2 := model.StopVisitSchedule{}
+
+	sVSchedule2.SetArrivalTime(connector.Clock().Now().Add(10 * time.Minute))
+	stopVisit2.Schedules["actual"] = &sVSchedule2
+	stopVisit2.Save()
+
+	vehicleJourney2 := referential.model.VehicleJourneys().New()
+	obj2 = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:29:LOC")
+	vehicleJourney2.SetObjectID(obj2)
+	vehicleJourney2.Save()
+
+	stopVisit2.VehicleJourneyId = vehicleJourney2.Id()
+
+	line2 := referential.model.Lines().New()
+	obj = model.NewObjectID("WrongKind", "NINOXE:StopPoint:SP:30:LOC")
+	line2.SetObjectID(obj)
+	line2.Save()
+
+	vehicleJourney2.LineId = line2.Id()
+
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
 	if err != nil {
 		t.Fatal(err)
@@ -99,6 +128,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != operatorRef {
 		t.Errorf("OperatorRef should be the same %v, %v", operatorRef, response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
 	}
+
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *testing.T) {
