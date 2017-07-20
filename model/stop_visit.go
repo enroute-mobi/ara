@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-type StopVisitId string
+// type StopVisitId string
+type StopVisitId ModelId
 
 type StopVisitAttributes struct {
 	ObjectId         ObjectID
@@ -81,6 +82,10 @@ func (stopVisit *StopVisit) Collected(t time.Time) {
 
 func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
+}
+
+func (stopVisit *StopVisit) modelId() ModelId {
+	return ModelId(stopVisit.id)
 }
 
 func (stopVisit *StopVisit) StopArea() StopArea {
@@ -224,6 +229,7 @@ type MemoryStopVisits struct {
 	model Model
 
 	byIdentifier map[StopVisitId]*StopVisit
+	byObjectId   *ObjectIdIndex
 }
 
 type StopVisits interface {
@@ -244,6 +250,7 @@ type StopVisits interface {
 func NewMemoryStopVisits() *MemoryStopVisits {
 	return &MemoryStopVisits{
 		byIdentifier: make(map[StopVisitId]*StopVisit),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
@@ -256,55 +263,70 @@ func (manager *MemoryStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 	stopVisit, ok := manager.byIdentifier[id]
 	if ok {
 		return *stopVisit, true
-	} else {
-		return StopVisit{}, false
-	}
-}
-
-func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
-	for _, stopVisit := range manager.byIdentifier {
-		stopVisitObjectId, _ := stopVisit.ObjectID(objectid.Kind())
-		if stopVisitObjectId.Value() == objectid.Value() {
-			return *stopVisit, true
-		}
 	}
 	return StopVisit{}, false
 }
 
-func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.VehicleJourneyId == id {
-			stopVisits = append(stopVisits, *stopVisit)
-		}
+func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return *manager.byIdentifier[StopVisitId(id)], true
 	}
-	return
+	return StopVisit{}, false
+}
+
+func (manager *MemoryStopVisits) FindBy(selectors ...StopVisitSelector) []StopVisit {
+	return FindStopVisitBy(manager.byIdentifier, selectors...)
+}
+
+func (manager *MemoryStopVisits) FindBySorted(selectors ...StopVisitSelector) []StopVisit {
+	stopVisits := FindStopVisitBy(manager.byIdentifier, selectors...)
+	sort.Sort(ByTime(stopVisits))
+	return stopVisits
+}
+
+func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+	// for _, stopVisit := range manager.byIdentifier {
+	// 	if stopVisit.VehicleJourneyId == id {
+	// 		stopVisits = append(stopVisits, *stopVisit)
+	// 	}
+	// }
+	// return
+	return FindStopVisitBy(manager.byIdentifier, StopVisitSelectorByVehicleJourneyId(id))
 }
 
 // Temp
 func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.StopAreaId == id {
-			stopVisits = append(stopVisits, *stopVisit)
-		}
-	}
-
-	return
+	// for _, stopVisit := range manager.byIdentifier {
+	// 	if stopVisit.StopAreaId == id {
+	// 		stopVisits = append(stopVisits, *stopVisit)
+	// 	}
+	// }
+	// return
+	return FindStopVisitBy(manager.byIdentifier, StopVisitSelectorByStopAreaId(id))
 }
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *stopVisit)
-		}
-	}
+	// for _, stopVisit := range manager.byIdentifier {
+	// 	if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
+	// 		stopVisits = append(stopVisits, *stopVisit)
+	// 	}
+	// }
+	// sort.Sort(ByTime(stopVisits))
+	// return
+
+	stopVisits = FindStopVisitBy(manager.byIdentifier, StopVisitSelectorByStopAreaId(id), StopVisitSelectorFollowing(manager.Clock().Now()))
 	sort.Sort(ByTime(stopVisits))
 	return
 }
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) (stopVisits []StopVisit) {
-	for _, stopAreaId := range stopAreaIds {
-		stopVisits = append(stopVisits, manager.FindFollowingByStopAreaId(stopAreaId)...)
-	}
+	// for _, stopAreaId := range stopAreaIds {
+	// 	stopVisits = append(stopVisits, manager.FindFollowingByStopAreaId(stopAreaId)...)
+	// }
+	// sort.Sort(ByTime(stopVisits))
+	// return
+	stopVisits = FindStopVisitBy(manager.byIdentifier, StopVisitSelectorByStopAreaIds(stopAreaIds), StopVisitSelectorFollowing(manager.Clock().Now()))
 	sort.Sort(ByTime(stopVisits))
 	return
 }
@@ -325,10 +347,12 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	}
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
+	manager.byObjectId.Index(stopVisit)
 	return true
 }
 
 func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
-	delete(manager.byIdentifier, stopVisit.Id())
+	delete(manager.byIdentifier, stopVisit.id)
+	manager.byObjectId.Delete(ModelId(stopVisit.id))
 	return true
 }

@@ -12,8 +12,8 @@ func NewObjectIdIndex() *ObjectIdIndex {
 	}
 }
 
-func (index *ObjectIdIndex) Index(modelId ModelId, model ModelInstance) {
-	currentIndexable, ok := index.byIdentifier[modelId]
+func (index *ObjectIdIndex) Index(model ModelInstance) {
+	currentIndexable, ok := index.byIdentifier[model.modelId()]
 	if ok {
 		for indexedKind, indexedObjectid := range currentIndexable {
 			modelObjectid, ok := model.ObjectID(indexedKind)
@@ -23,13 +23,13 @@ func (index *ObjectIdIndex) Index(modelId ModelId, model ModelInstance) {
 		}
 	}
 
-	if index.byIdentifier[modelId] == nil {
-		index.byIdentifier[modelId] = make(ObjectIDs)
+	if index.byIdentifier[model.modelId()] == nil {
+		index.byIdentifier[model.modelId()] = make(ObjectIDs)
 	}
 
 	for _, objectid := range model.ObjectIDs() {
-		index.byObjectid[objectid] = modelId
-		index.byIdentifier[modelId][objectid.Kind()] = objectid
+		index.byObjectid[objectid] = model.modelId()
+		index.byIdentifier[model.modelId()][objectid.Kind()] = objectid
 	}
 }
 
