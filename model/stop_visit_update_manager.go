@@ -152,7 +152,20 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisit.References = stopVisitAttributes.References
 
 	stopVisit.Save()
+
+	updater.resolveOperator(&stopVisit)
 	//logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisit.Id())
+}
+
+func (updater *StopVisitUpdater) resolveOperator(stopVisit *StopVisit) {
+	if _, ok := stopVisit.References["OperatorRef"]; !ok {
+		return
+	}
+	operator, ok := updater.tx.Model().Operators().FindByObjectId(*stopVisit.References["OperatorRef"].ObjectId)
+	if ok {
+		operatorRef := stopVisit.References["OperatorRef"]
+		operatorRef.Id = string(operator.Id())
+	}
 }
 
 func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAreaAttributes) *StopArea {

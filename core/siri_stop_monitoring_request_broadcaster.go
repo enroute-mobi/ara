@@ -180,6 +180,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		stopVisitRefCopy := stopVisit.References.Copy()
 
 		connector.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx.Model().StopAreas())
+		connector.resolveOperator(stopVisitRefCopy)
 
 		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
 		connector.reformatReferences(stopVisit.ToFormat(), stopVisitRefCopy)
@@ -220,6 +221,20 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
 	return response
+}
+
+func (connector *SIRIStopMonitoringRequestBroadcaster) resolveOperator(references model.References) {
+	operatorRef, _ := references["OperatorRef"]
+	operator, ok := connector.Partner().Model().Operators().Find(model.OperatorId(operatorRef.Id))
+	if !ok {
+		return
+	}
+
+	obj, ok := operator.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+	if !ok {
+		return
+	}
+	references["OperatorRef"].ObjectId.SetValue(obj.Value())
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {

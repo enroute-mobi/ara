@@ -23,7 +23,14 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
 	connector.SetClock(model.NewFakeClock())
 
-	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	objectid := model.NewObjectID("objectidKind", "Un Operator plutot cool")
+
+	operator := referential.Model().Operators().New()
+	operator.SetObjectID(objectid)
+
+	operator.Save()
+
+	objectid = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
@@ -32,6 +39,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisitRef := model.Reference{}
 	obj := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
 	stopVisitRef.ObjectId = &obj
+	stopVisitRef.Id = string(operator.Id())
 
 	stopVisit.SetObjectID(obj)
 	stopVisit.References.Set("OperatorRef", stopVisitRef)
@@ -123,7 +131,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 		t.Fatalf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
 	}
 
-	operatorRef := response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value()
+	operatorRef := "RATPDev:Operator::f258fb23bd8e7574724ab9dd60cd45ff0b979269:" //SHA  OperatorRef
 
 	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != operatorRef {
 		t.Errorf("OperatorRef should be the same %v, %v", operatorRef, response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
