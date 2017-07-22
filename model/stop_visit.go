@@ -258,7 +258,11 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 }
 
 func (manager *MemoryStopVisits) collection() map[StopVisitId]*StopVisit {
-	return manager.byIdentifier
+	collection := make(map[StopVisitId]*StopVisit)
+	for index, value := range manager.byIdentifier {
+		collection[index] = value
+	}
+	return collection
 }
 
 func (manager *MemoryStopVisits) New() StopVisit {
