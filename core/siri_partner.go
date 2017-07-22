@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/siri"
 )
@@ -18,19 +20,27 @@ func NewSIRIPartner(partner *Partner) *SIRIPartner {
 	return &SIRIPartner{partner: partner}
 }
 
-func (connector *SIRIPartner) SOAPClient() *siri.SOAPClient {
-	if connector.soapClient == nil || connector.soapClient.URL() != connector.partner.Setting("remote_url") {
-		siriUrl := connector.partner.Setting("remote_url")
+func (siriPartner *SIRIPartner) SOAPClient() *siri.SOAPClient {
+	if siriPartner.soapClient == nil || siriPartner.soapClient.URL() != siriPartner.partner.Setting("remote_url") {
+		siriUrl := siriPartner.partner.Setting("remote_url")
 		logger.Log.Debugf("Create SIRI SOAPClient to %s", siriUrl)
-		connector.soapClient = siri.NewSOAPClient(siriUrl)
+		siriPartner.soapClient = siri.NewSOAPClient(siriUrl)
 	}
-	return connector.soapClient
+	return siriPartner.soapClient
 }
 
-func (connector *SIRIPartner) RequestorRef() string {
-	return connector.partner.Setting("remote_credential")
+func (siriPartner *SIRIPartner) RequestorRef() string {
+	return siriPartner.partner.Setting("remote_credential")
 }
 
-func (connector *SIRIPartner) Partner() *Partner {
-	return connector.partner
+func (siriPartner *SIRIPartner) Partner() *Partner {
+	return siriPartner.partner
+}
+
+func (siriPartner *SIRIPartner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+	formatString := siriPartner.partner.Setting(fmt.Sprintf("generators.%v", generatorName))
+	if formatString == "" {
+		formatString, _ = defaultIdentifierGenerators[generatorName]
+	}
+	return NewIdentifierGenerator(formatString)
 }
