@@ -415,20 +415,6 @@ func (partner *Partner) Model() model.Model {
 }
 
 func (partner *Partner) DeleteSubscription(sub Subscription) {
-	// for _, sr := range sub.resourcesByObjectID {
-	// 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(partner.manager.NewUUID(), model.StopAreaId(sr.Reference.Id))
-	// 	stopvisits := partner.Referential().Model().StopVisits().FindByStopAreaId(model.StopAreaId(sr.Reference.Id))
-	// 	for _, stopvisit := range stopvisits {
-	// 		objectid, present := stopvisit.ObjectID(partner.Setting("remote_objectid_kind"))
-	// 		if present == true {
-	// 			notcollected := &model.StopVisitNotCollectedEvent{
-	// 				StopVisitObjectId: objectid,
-	// 			}
-	// 			stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, notcollected)
-	// 		}
-	// 	}
-	// 	partner.Referential().CollectManager().BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
-	// }
 	partner.Subscriptions().Delete(&sub)
 }
 

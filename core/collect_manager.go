@@ -175,7 +175,7 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 	}
 
 	if partner == nil {
-		logger.Log.Debugf("Can't find a partner for Situation %v", request.Id())
+		logger.Log.Debugf("Can't find a partner with connector %v", SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
 		return
 	}
 
