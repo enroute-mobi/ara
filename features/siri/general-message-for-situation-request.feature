@@ -175,6 +175,7 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
 
+  @wip
   Scenario: 3009 - Handle a SIRI ServiceDelivery after GM Request to a SIRI server
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """
