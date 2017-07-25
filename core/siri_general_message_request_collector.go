@@ -45,7 +45,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 	xmlGeneralMessageResponse, err := connector.SIRIPartner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
-		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
+		logStashEvent["response"] = fmt.Sprintf("Error during GetGeneralMessage: %v", err)
 		return nil, err
 	}
 
