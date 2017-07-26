@@ -40,11 +40,14 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 
 	partner := referential.Partners().New("partner")
 	partner.Settings = map[string]string{
-		"remote_url":           "",
-		"remote_credential":    "",
-		"remote_objectid_kind": "objectidKind",
-		"local_credential":     "Edwig",
-		"local_url":            "http://edwig",
+		"remote_url":                             "",
+		"remote_credential":                      "",
+		"remote_objectid_kind":                   "objectidKind",
+		"local_credential":                       "Edwig",
+		"local_url":                              "http://edwig",
+		"generators.message_identifier":          "Edwig:Message::%{uuid}:LOC",
+		"generators.response_message_identifier": "Edwig:ResponseMessage::%{uuid}:LOC",
+		"generators.data_frame_identifier":       "RATPDev:DataFrame::%{id}:LOC",
 	}
 	partner.ConnectorTypes = []string{
 		"siri-check-status-server",
@@ -56,13 +59,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
 
-	generator := core.NewFormatMessageIdentifierGenerator("Edwig:Message::%v:LOC")
-	generator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	siriPartner.SetMessageIdentifierGenerator(generator)
-	responseGenerator := core.NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%v:LOC")
-	responseGenerator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	siriPartner.SetResponseMessageIdentifierGenerator(responseGenerator)
-
+	siriPartner.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	partner.Context().SetValue(core.SIRI_PARTNER, siriPartner)
 
 	partner.Save()

@@ -54,13 +54,12 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
@@ -115,13 +114,12 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")

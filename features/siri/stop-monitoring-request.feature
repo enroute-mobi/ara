@@ -80,10 +80,10 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                                   | http://localhost:8090 |
-      | remote_credential                            | test                  |
-      | remote_objectid_kind                         | internal              |
-      | collect.include_stop_areas                   | NINOXE:StopPoint:SP:24:LOC |
+      | remote_url                 | http://localhost:8090      |
+      | remote_credential          | test                       |
+      | remote_objectid_kind       | internal                   |
+      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
@@ -97,7 +97,7 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
+      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
     Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
@@ -187,7 +187,7 @@ Feature: Support SIRI StopMonitoring by request
                 <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+              <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
               <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -363,7 +363,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                        | Line#Name                                             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                       | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | RATPDev:Operator::dbe9523913efc7af28fe2f166da05a9013c8a647:          | StopVisit#Reference[OperatorRef]#ObjectID             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                          | StopVisit#Reference[OperatorRef]#ObjectID             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                    | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                         | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                            | VehicleJourney#Attribute[VehicleFeatureRef]           |
@@ -493,9 +493,9 @@ Feature: Support SIRI StopMonitoring by request
       | remote_objectid_kind | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name            | arrêt 1               |
+      | Name            | arrêt 1                                  |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | CollectedAlways | false |
+      | CollectedAlways | false                                    |
     When a minute has passed
     Then the SIRI server should not have received a GetStopMonitoring request
 
@@ -584,10 +584,10 @@ Feature: Support SIRI StopMonitoring by request
       | remote_objectid_kind | internal |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name            | arrêt 1               |
+      | Name            | arrêt 1                                  |
       | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false |
-      | CollectedAlways | false |
+      | MonitoredAlways | false                                    |
+      | CollectedAlways | false                                    |
     When I send a SIRI GetStopMonitoring request with
       | RequestTimestamp  | 2017-01-01T07:54:00.977Z   |
       | RequestorRef      | test                       |
@@ -643,12 +643,12 @@ Feature: Support SIRI StopMonitoring by request
         | local_credential     | test     |
         | remote_objectid_kind | internal |
       And a StopArea exists with the following attributes:
-        | Name      | Parent                                   |
+        | Name      | Parent               |
         | ObjectIDs | "internal": "parent" |
       And a StopArea exists with the following attributes:
-        | Name      | Child                                    |
-        | ObjectIDs | "internal": "child" |
-        | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
+        | Name      | Child                             |
+        | ObjectIDs | "internal": "child"               |
+        | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       And a Line exists with the following attributes:
         | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
         | Name      | Ligne 3 Metro                   |
@@ -719,7 +719,7 @@ Feature: Support SIRI StopMonitoring by request
                   <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                 </ns3:FramedVehicleJourneyRef>
                 <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                 <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                 <ns3:MonitoredCall>
                   <ns3:StopPointRef>parent</ns3:StopPointRef>
@@ -741,7 +741,7 @@ Feature: Support SIRI StopMonitoring by request
                   <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                 </ns3:FramedVehicleJourneyRef>
                 <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                 <ns3:VehicleJourneyName>Passage 202</ns3:VehicleJourneyName>
                 <ns3:MonitoredCall>
                   <ns3:StopPointRef>child</ns3:StopPointRef>

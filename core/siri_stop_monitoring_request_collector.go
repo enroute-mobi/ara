@@ -79,7 +79,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
-		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
+		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		MonitoringRef:     objectid.Value(),
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),

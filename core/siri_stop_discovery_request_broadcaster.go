@@ -41,7 +41,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	response.Address = connector.Partner().Setting("local_url")
 	response.ProducerRef = connector.Partner().Setting("remote_credential")
 	response.RequestMessageRef = request.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier()
 	response.Status = true
 	response.ResponseTimestamp = connector.Clock().Now()
 

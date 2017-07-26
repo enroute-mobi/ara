@@ -113,7 +113,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -135,7 +135,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -265,7 +265,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -400,7 +400,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -422,7 +422,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -536,7 +536,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -558,7 +558,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -676,7 +676,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -698,7 +698,7 @@ Feature: Support SIRI StopMonitoring by request
                       <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
                     <ns3:MonitoredCall>
                       <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -827,7 +827,7 @@ Feature: Support SIRI StopMonitoring by request
                         <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                       </ns3:FramedVehicleJourneyRef>
                       <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                      <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                      <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                       <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                       <ns3:MonitoredCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
@@ -849,7 +849,7 @@ Feature: Support SIRI StopMonitoring by request
                         <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
                       </ns3:FramedVehicleJourneyRef>
                       <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                      <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                      <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                       <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
                       <ns3:MonitoredCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>

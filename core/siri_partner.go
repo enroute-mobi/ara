@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/af83/edwig/logger"
+	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
 type SIRIPartner struct {
-	MessageIdentifierConsumer
-	ResponseMessageIdentifierConsumer
+	model.UUIDConsumer
 
 	partner *Partner
 
@@ -42,5 +42,5 @@ func (siriPartner *SIRIPartner) IdentifierGenerator(generatorName string) *Ident
 	if formatString == "" {
 		formatString, _ = defaultIdentifierGenerators[generatorName]
 	}
-	return NewIdentifierGenerator(formatString)
+	return NewIdentifierGeneratorWithUUID(formatString, siriPartner.UUIDConsumer)
 }

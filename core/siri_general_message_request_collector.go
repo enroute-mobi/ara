@@ -35,7 +35,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	siriGeneralMessageRequest := &siri.SIRIGeneralMessageRequest{
-		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
+		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
 	}

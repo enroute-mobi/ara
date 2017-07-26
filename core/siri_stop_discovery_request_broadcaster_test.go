@@ -14,10 +14,9 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "test"
+	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	line := referential.Model().Lines().New()
