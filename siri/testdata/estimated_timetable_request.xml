@@ -1,0 +1,21 @@
+<ns7:GetEstimatedTimetable xmlns:ns2="http://www.siri.org.uk/siri"
+                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+                           xmlns:ns6="http://scma/siri"
+                           xmlns:ns7="http://wsdl.siri.org.uk">
+  <ServiceRequestInfo>
+    <ns2:RequestTimestamp>2016-09-07T09:11:25.174Z</ns2:RequestTimestamp>
+    <ns2:RequestorRef>test</ns2:RequestorRef>
+    <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
+  </ServiceRequestInfo>
+  <Request version="2.0:FR-IDF-2.4">
+    <ns2:RequestTimestamp>2016-09-07T09:11:25.174Z</ns2:RequestTimestamp>
+    <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
+    <ns2:Lines>
+      <ns2:LineRef>NINOXE:Line:2:LOC</ns2:LineRef>
+      <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+    </ns2:Lines>
+  </Request>
+  <RequestExtension />
+</ns7:GetStopMonitoring>
