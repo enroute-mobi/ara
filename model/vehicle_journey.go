@@ -132,6 +132,7 @@ type VehicleJourneys interface {
 	New() VehicleJourney
 	Find(id VehicleJourneyId) (VehicleJourney, bool)
 	FindByObjectId(objectid ObjectID) (VehicleJourney, bool)
+	FindByLineId(id LineId) []VehicleJourney
 	FindAll() []VehicleJourney
 	Save(vehicleJourney *VehicleJourney) bool
 	Delete(vehicleJourney *VehicleJourney) bool
@@ -165,6 +166,15 @@ func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (Vehicle
 		}
 	}
 	return VehicleJourney{}, false
+}
+
+func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []VehicleJourney) {
+	for _, vehicleJourney := range manager.byIdentifier {
+		if vehicleJourney.LineId == id {
+			vehicleJourneys = append(vehicleJourneys, *vehicleJourney)
+		}
+	}
+	return
 }
 
 func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
