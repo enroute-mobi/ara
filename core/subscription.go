@@ -30,6 +30,7 @@ type SubscribedResource struct {
 	RetryCount      int
 	SubscribedAt    time.Time
 	SubscribedUntil time.Time
+	LastStates      map[string]lastState `json:",omitempty"`
 }
 
 type APISubscription struct {
@@ -114,6 +115,7 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 	ressource := SubscribedResource{
 		Reference:       reference,
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
+		LastStates:      make(map[string]lastState),
 	}
 
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
@@ -144,6 +146,7 @@ type Subscriptions interface {
 	Find(id SubscriptionId) (Subscription, bool)
 	FindAll() []Subscription
 	FindOrCreateByKind(string) (*Subscription, bool)
+	FindByKind(string) (*Subscription, bool)
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
 	NewSubscription() *Subscription
@@ -159,6 +162,15 @@ func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 func (manager *MemorySubscriptions) New() Subscription {
 	subscription := manager.NewSubscription()
 	return *subscription
+}
+
+func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool) {
+	for _, subscription := range manager.byIdentifier {
+		if subscription.Kind() == kind {
+			return subscription, true
+		}
+	}
+	return nil, false
 }
 
 func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscription, bool) {

@@ -105,7 +105,7 @@ Feature: Support SIRI GeneralMessage by subscription
        | Id                      | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
        | Channel                 | Perturbations                      |
 
-   Scenario: 3865 - Manage a InfoMessageCancellation
+  Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
     """
       <?xml version='1.0' encoding='utf-8'?>

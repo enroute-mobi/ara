@@ -153,3 +153,11 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGeneralMessageRequest
 	generalMessage := NewXMLGeneralMessageResponse(node)
 	return generalMessage, nil
 }
+
+func (client *SOAPClient) NotifyStopMonitoring(request *SIRINotifyStopMonitoring) error {
+	_, err := client.prepareAndSendRequest(request, "NotifyStopMonitoring", false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
