@@ -20,11 +20,11 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
-	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER_TEST}
+	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
 
-	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER_TEST)
+	connector, _ := partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()

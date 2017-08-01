@@ -34,7 +34,7 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 
 	for _, partner := range manager.Referential.Partners().FindAll() {
 		_, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-		_, testConnectorPresent := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER_TEST)
+		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 
 		if !ok && !testConnectorPresent {
 			continue
@@ -90,7 +90,7 @@ func (manager *BrocasterManager) run() {
 			}
 
 			// TEST
-			connector, ok = partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER_TEST)
+			connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 			if ok {
 				connector.(*TestStopMonitoringSubscriptionBroadcaster).handleStopVisitBroadcastEvent(&event)
 				continue

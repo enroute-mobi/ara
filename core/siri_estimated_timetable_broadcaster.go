@@ -126,7 +126,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 		response.EstimatedJourneyVersionFrames = append(response.EstimatedJourneyVersionFrames, journeyFrame)
 	}
 
-	// logSIRIStopMonitoringResponse(logStashEvent, response)
+	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
 	return response
 }

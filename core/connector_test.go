@@ -15,6 +15,7 @@ func Test_Factories_CreateConnector(t *testing.T) {
 			"siri-check-status-server",
 			"test-validation-connector",
 			"siri-general-message-request-broadcaster",
+			"siri-estimated-timetable-broadcaster",
 		},
 		connectors: make(map[string]Connector),
 		manager:    partners,
@@ -44,5 +45,8 @@ func Test_Factories_CreateConnector(t *testing.T) {
 	}
 	if _, ok := partner.Connector("test-validation-connector"); !ok {
 		t.Error("test-validation-connector connector should be initialized")
+	}
+	if _, ok := partner.Connector("siri-estimated-timetable-broadcaster"); !ok {
+		t.Error("siri-estimated-timetable-broadcaster connector should be initialized")
 	}
 }
