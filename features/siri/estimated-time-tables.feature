@@ -5,7 +5,7 @@ Feature: Support SIRI EstimatedTimeTable
 
 @wip
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
-    Given a Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
+    Given a Partner "test" exists with connectors [siri-estimated-timetable-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
