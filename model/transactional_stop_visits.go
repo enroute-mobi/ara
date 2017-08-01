@@ -63,6 +63,22 @@ func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourney
 	return
 }
 
+func (manager *TransactionalStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+	for _, stopVisit := range manager.saved {
+		if stopVisit.VehicleJourneyId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
+			stopVisits = append(stopVisits, *stopVisit)
+		}
+	}
+	for _, modelStopVisit := range manager.model.StopVisits().FindFollowingByVehicleJourneyId(id) {
+		_, saved := manager.saved[modelStopVisit.Id()]
+		if !saved {
+			stopVisits = append(stopVisits, modelStopVisit)
+		}
+	}
+	sort.Sort(ByTime(stopVisits))
+	return
+}
+
 // Temp
 func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	// Check saved StopVisits
