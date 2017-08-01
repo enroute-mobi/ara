@@ -86,6 +86,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
 
 	// Fill StopVisits
+	referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {
 		if request.MaximumStopVisits() > 0 && len(idArray) >= request.MaximumStopVisits() {
 			break
@@ -105,7 +106,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			if !ok {
 				continue
 			}
-			itemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", defaultObjectID.HashValue())
+			itemIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: defaultObjectID.HashValue()})
 		}
 
 		schedules := stopVisit.Schedules
@@ -134,7 +135,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			if !ok {
 				continue
 			}
-			dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
+			dataVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.HashValue()})
 		}
 
 		modelDate := tx.Model().Date()
