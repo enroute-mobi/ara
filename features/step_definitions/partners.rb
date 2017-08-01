@@ -8,8 +8,26 @@ def getFirstPartner()
   response_array[0]["Id"]
 end
 
+["message_identifier", "response_message_identifier", "data_frame_identifier", "reference_identifier", "reference_stop_area_identifier"]
+
+def set_default_generators! attributes
+  default_generators_map = {
+    "generators.message_identifier" => "RATPDev:Message::%{uuid}:LOC",
+    "generators.response_message_identifier" => "RATPDev:ResponseMessage::%{uuid}:LOC",
+    "generators.data_frame_identifier" => "RATPDev:DataFrame::%{id}:LOC",
+    "generators.reference_identifier" => "RATPDev:%{type}::%{default}:LOC",
+    "generators.reference_stop_area_identifier" => "RATPDev:StopPoint:Q:%{default}:LOC"
+  }
+
+  default_generators_map.each do |id, formatString|
+    attributes["settings"][id] = formatString if attributes["settings"][id].nil?
+  end
+end
+
 Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors \[([^"\]]*)\] and the following settings:$/) do |slug, referential, connectors, settings|
 	attributes = {"slug" => slug, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => settings.rows_hash}
+  # Set default generators to avoid updating all cucumber tests
+  set_default_generators!(attributes)
 
   begin
 	  RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}

@@ -146,7 +146,7 @@ Feature: Support SIRI StopMonitoring
               <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
               <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+              <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
               <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
               <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
               <ns3:Monitored>true</ns3:Monitored>
@@ -385,7 +385,7 @@ Feature: Support SIRI StopMonitoring
                     <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
                     <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
                     <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:OperatorRef>RATPDev:Operator::9901377d84631ed7c2c09bbb32d70effaee59cc0:</ns3:OperatorRef>
+                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
                     <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
                     <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
                     <ns3:Monitored>true</ns3:Monitored>

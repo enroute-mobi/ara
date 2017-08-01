@@ -17,13 +17,12 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
-	objectid := model.NewObjectID("objectidKind", "Un Operator plutot cool")
+	objectid := model.NewObjectID("objectidKind", "modelOperatorRef")
 
 	operator := referential.Model().Operators().New()
 	operator.SetObjectID(objectid)
@@ -131,10 +130,8 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 		t.Fatalf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
 	}
 
-	operatorRef := "RATPDev:Operator::f258fb23bd8e7574724ab9dd60cd45ff0b979269:" //SHA  OperatorRef
-
-	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != operatorRef {
-		t.Errorf("OperatorRef should be the same %v, %v", operatorRef, response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
+	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != "modelOperatorRef" {
+		t.Errorf("OperatorRef should be modelOperatorRef, got: %v", response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
 	}
 
 }
@@ -145,10 +142,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -225,10 +221,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -296,10 +291,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")

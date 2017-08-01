@@ -144,6 +144,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		stopPointRef, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
 		stopPointRefObjectId, _ := stopPointRef.ObjectID(objectidKind)
 
+		dataFrameGenerator := connector.SIRIPartner().IdentifierGenerator("data_frame_identifier")
 		monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 			ItemIdentifier: itemIdentifier,
 			MonitoringRef:  objectid.Value(),
@@ -153,7 +154,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			VehicleJourneyName:     vehicleJourney.Name,
 			LineRef:                lineObjectId.Value(),
 			DatedVehicleJourneyRef: dataVehicleJourneyRef,
-			DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
+			DataFrameRef:           dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
 			RecordedAt:             stopVisit.RecordedAt,
 			PublishedLineName:      line.Name,
 			DepartureStatus:        string(stopVisit.DepartureStatus),
@@ -183,7 +184,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		connector.resolveOperator(stopVisitRefCopy)
 
 		connector.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
-		connector.reformatReferences(stopVisit.ToFormat(), stopVisitRefCopy)
 
 		monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 		monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy
@@ -214,7 +214,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	if response.ProducerRef == "" {
 		response.ProducerRef = "Edwig"
 	}
-	response.ResponseMessageIdentifier = connector.SIRIPartner().NewResponseMessageIdentifier()
+	response.ResponseMessageIdentifier = connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier()
 
 	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringSubRequest)
 
@@ -250,30 +250,21 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 				tmp := references[ref]
 				tmp.ObjectId = &obj
 				references[ref] = tmp
+				continue
 			}
-		} else {
-			tmp := references[ref]
-			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
 		}
+		generator := connector.SIRIPartner().IdentifierGenerator("reference_stop_area_identifier")
+		tmp := references[ref]
+		tmp.ObjectId.SetValue(generator.NewIdentifier(IdentifierAttributes{Default: tmp.GetSha1()}))
 	}
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toReformat []string, references model.References) {
+	generator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {
 			tmp := references[ref]
-			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
-		}
-	}
-}
-
-func (connector *SIRIStopMonitoringRequestBroadcaster) reformatStopVisitReferences(references model.References) {
-	toReformat := []string{"OperatorRef"}
-
-	for _, ref := range toReformat {
-		if references[ref] != (model.Reference{}) {
-			tmp := references[ref]
-			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
+			tmp.ObjectId.SetValue(generator.NewIdentifier(IdentifierAttributes{Type: ref[:len(ref)-3], Default: tmp.GetSha1()}))
 		}
 	}
 }

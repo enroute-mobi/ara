@@ -1,6 +1,11 @@
 package core
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+
+	"github.com/af83/edwig/model"
+)
 
 var defaultIdentifierGenerators = map[string]string{
 	"message_identifier":             "%{uuid}",
@@ -11,6 +16,8 @@ var defaultIdentifierGenerators = map[string]string{
 }
 
 type IdentifierGenerator struct {
+	model.UUIDConsumer
+
 	formatString string
 }
 
@@ -18,14 +25,26 @@ type IdentifierAttributes struct {
 	Default string
 	Id      string
 	Type    string
-	UUID    string
 }
 
 func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
 	return &IdentifierGenerator{formatString: formatString}
 }
 
+func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator model.UUIDConsumer) *IdentifierGenerator {
+	return &IdentifierGenerator{formatString: formatString, UUIDConsumer: uuidGenerator}
+}
+
 func (generator *IdentifierGenerator) NewIdentifier(attributes IdentifierAttributes) string {
-	replacer := strings.NewReplacer("%{uuid}", attributes.UUID, "%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Default)
-	return replacer.Replace(generator.formatString)
+	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Default)
+	return generator.handleuuids(replacer.Replace(generator.formatString))
+}
+
+func (generator *IdentifierGenerator) NewMessageIdentifier() string {
+	return generator.handleuuids(generator.formatString)
+}
+
+func (generator *IdentifierGenerator) handleuuids(s string) string {
+	re := regexp.MustCompile("%{uuid}")
+	return re.ReplaceAllStringFunc(s, func(string) string { return generator.NewUUID() })
 }

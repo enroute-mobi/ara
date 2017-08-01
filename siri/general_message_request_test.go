@@ -13,7 +13,7 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
         <ns2:MessageIdentifier>MessageId</ns2:MessageIdentifier>
       </ServiceRequestInfo>
       <Request version="2.0:FR-IDF-2.4">
-        <ns2:RequestTimestamp>2016-09-21T20:14:46.000Z/ns2:RequestTimestamp>
+        <ns2:RequestTimestamp>2016-09-21T20:14:46.000Z</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>MessageId</ns2:MessageIdentifier>
       </Request>
       <RequestExtension/>

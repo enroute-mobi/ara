@@ -26,7 +26,7 @@ const generalMessageRequestTemplate = `<ns7:GetGeneralMessage xmlns:ns2="http://
         <ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
       </ServiceRequestInfo>
       <Request version="2.0:FR-IDF-2.4">
-        <ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}/ns2:RequestTimestamp>
+        <ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
       </Request>
       <RequestExtension/>

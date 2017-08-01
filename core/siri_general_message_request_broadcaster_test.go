@@ -15,11 +15,10 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestStopArea(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	mid := NewFormatMessageIdentifierGenerator("Edwig:ResponseMessage::%s:LOC")
-	mid.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SIRIPartner().SetResponseMessageIdentifierGenerator(mid)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")

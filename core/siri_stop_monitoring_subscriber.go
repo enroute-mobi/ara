@@ -51,10 +51,6 @@ func NewSIRIStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCo
 }
 
 func (subscriber *StopMonitoringSubscriber) Run() {
-	if subscriber.stop != nil {
-		return
-	}
-
 	logger.Log.Debugf("Start StopMonitoringSubscriber")
 
 	subscriber.stop = make(chan struct{})
@@ -90,7 +86,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
 		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-			messageIdentifier := subscriber.connector.SIRIPartner().NewMessageIdentifier()
+			messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
 		}
 	}
@@ -104,7 +100,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Setting("local_url"),
-		MessageIdentifier: subscriber.connector.SIRIPartner().NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}

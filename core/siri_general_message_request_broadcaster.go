@@ -37,7 +37,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Setting("local_url"),
 		ProducerRef:               connector.Partner().Setting("remote_credential"),
-		ResponseMessageIdentifier: connector.SIRIPartner().NewResponseMessageIdentifier(),
+		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
 
 	if response.ProducerRef == "" {

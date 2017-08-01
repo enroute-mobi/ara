@@ -63,12 +63,12 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   connector.Partner().Setting("local_url"),
-		MessageIdentifier: connector.SIRIPartner().NewMessageIdentifier(),
+		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
 	}
 	gmRequest.Entry = &siri.SIRIGeneralMessageSubscriptionRequestEntry{
-		MessageIdentifier:      connector.SIRIPartner().NewMessageIdentifier(),
+		MessageIdentifier:      connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
 		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),

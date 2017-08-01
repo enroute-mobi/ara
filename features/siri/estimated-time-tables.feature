@@ -85,7 +85,7 @@ Feature: Support SIRI EstimatedTimeTable
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7: GetEstimatedTimetable xmlns:ns2="http://www.siri.org.uk/siri"
+          <ns7:GetEstimatedTimetable xmlns:ns2="http://www.siri.org.uk/siri"
                                  xmlns:ns3="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -104,7 +104,7 @@ Feature: Support SIRI EstimatedTimeTable
               </ns2:Lines>
             </Request>
             <RequestExtension />
-          </ns7:GetStopMonitoring>
+          </ns7:GetEstimatedTimetable>
         </S:Body>
       </S:Envelope>
       """
