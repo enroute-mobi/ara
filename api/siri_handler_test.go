@@ -55,6 +55,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-service-request-broadcaster",
 		"siri-stop-monitoring-subscription-collector",
 		"siri-general-message-subscription-collector",
+		"siri-estimated-timetable-broadcaster",
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
@@ -523,5 +524,162 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 
 	if count := len(referential.Model().Situations().FindAll()); count != 2 {
 		t.Errorf("Notify should have created 2 Situation, got: %v", count)
+	}
+}
+
+func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+
+	file, err := os.Open("testdata/estimated_timetable_request.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(string(content))
+
+	server, referential := siriHandler_PrepareServer()
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(model.NewObjectID("objectidKind", "stopArea2"))
+	stopArea2.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.Name = "lineName"
+	line.Save()
+
+	line2 := referential.Model().Lines().New()
+	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.Name = "lineName2"
+	line2.Save()
+
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	vehicleJourney2 := referential.Model().VehicleJourneys().New()
+	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
+	vehicleJourney2.LineId = line2.Id()
+	vehicleJourney2.Save()
+
+	pastStopVisit := referential.Model().StopVisits().New()
+	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "pastStopVisit"))
+	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
+	pastStopVisit.StopAreaId = stopArea.Id()
+	pastStopVisit.PassageOrder = 0
+	pastStopVisit.ArrivalStatus = "onTime"
+	pastStopVisit.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(-1*time.Minute))
+	pastStopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(-1*time.Minute))
+	pastStopVisit.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.PassageOrder = 1
+	stopVisit.ArrivalStatus = "onTime"
+	stopVisit.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit.Save()
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "stopVisit2"))
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.StopAreaId = stopArea2.Id()
+	stopVisit2.PassageOrder = 2
+	stopVisit2.ArrivalStatus = "onTime"
+	stopVisit2.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(2*time.Minute))
+	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(2*time.Minute))
+	stopVisit2.Save()
+
+	stopVisit3 := referential.Model().StopVisits().New()
+	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "stopVisit3"))
+	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
+	stopVisit3.StopAreaId = stopArea.Id()
+	stopVisit3.PassageOrder = 1
+	stopVisit3.ArrivalStatus = "onTime"
+	stopVisit3.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Save()
+
+	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+
+	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	responseBody := envelope.Body().String()
+
+	// TEMP: Find a better way to test?
+	expectedResponseBody := `<ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
+		<ns3:ProducerRef>Edwig</ns3:ProducerRef>
+		<ns3:Address>http://edwig</ns3:Address>
+		<ns3:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+		<ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
+			<ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+			<ns3:Status>true</ns3:Status>
+			<ns3:EstimatedJourneyVersionFrame>
+				<ns3:RecordedAtTime>1984-04-04T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:EstimatedVehicleJourney>
+					<ns3:LineRef>NINOXE:Line:2:LOC</ns3:LineRef>
+					<ns3:DatedVehicleJourneyRef>vehicleJourney</ns3:DatedVehicleJourneyRef>
+					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
+					<ns3:EstimatedCalls>
+						<ns3:EstimatedCall>
+							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
+							<ns3:Order>1</ns3:Order>
+							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
+							<ns3:ActualArrivalTime>1984-04-04T00:01:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
+						</ns3:EstimatedCall>
+						<ns3:EstimatedCall>
+							<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
+							<ns3:Order>2</ns3:Order>
+							<ns3:AimedArrivalTime>1984-04-04T00:02:00.000Z</ns3:AimedArrivalTime>
+							<ns3:ActualArrivalTime>1984-04-04T00:02:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
+						</ns3:EstimatedCall>
+					</ns3:EstimatedCalls>
+				</ns3:EstimatedVehicleJourney>
+			</ns3:EstimatedJourneyVersionFrame>
+			<ns3:EstimatedJourneyVersionFrame>
+				<ns3:RecordedAtTime>1984-04-04T00:00:00.000Z</ns3:RecordedAtTime>
+				<ns3:EstimatedVehicleJourney>
+					<ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+					<ns3:DatedVehicleJourneyRef>vehicleJourney2</ns3:DatedVehicleJourneyRef>
+					<ns3:PublishedLineName>lineName2</ns3:PublishedLineName>
+					<ns3:EstimatedCalls>
+						<ns3:EstimatedCall>
+							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
+							<ns3:Order>1</ns3:Order>
+							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
+							<ns3:ActualArrivalTime>1984-04-04T00:01:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
+						</ns3:EstimatedCall>
+					</ns3:EstimatedCalls>
+				</ns3:EstimatedVehicleJourney>
+			</ns3:EstimatedJourneyVersionFrame>
+		</ns3:EstimatedTimetableDelivery>
+	</Answer>
+</ns8:GetEstimatedTimetableResponse>`
+
+	// Check the response body is what we expect.
+	if responseBody != expectedResponseBody {
+		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
 	}
 }

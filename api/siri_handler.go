@@ -59,6 +59,10 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		return &SIRIGeneralMessageRequestHandler{
 			xmlRequest: siri.NewXMLGeneralMessageRequest(envelope.Body()),
 		}
+	case "GetEstimatedTimetable":
+		return &SIRIEstimatedTimetableRequestHandler{
+			xmlRequest: siri.NewXMLGetEstimatedTimetableRequest(envelope.Body()),
+		}
 	}
 	return nil
 }
