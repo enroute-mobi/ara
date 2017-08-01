@@ -18,7 +18,7 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) RequestorRef(
 }
 
 func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) ConnectorType() string {
-	return core.SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR
+	return core.SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR
 }
 
 func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {

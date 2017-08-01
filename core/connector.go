@@ -2,17 +2,17 @@ package core
 
 const (
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER     = "siri-stop-points-discovery-request-broadcaster"
-	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER           = "siri-general-message-request-broadcaster"
-	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "siri-general-message-request-collector"
-	TEST_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "test-general-message-request-collector"
 	SIRI_SERVICE_REQUEST_BROADCASTER                   = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR             = "siri-stop-monitoring-request-collector"
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR             = "test-stop-monitoring-request-collector"
 	SIRI_STOP_MONITORING_REQUEST_BROADCASTER           = "siri-stop-monitoring-request-broadcaster"
-	SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR = "siri-stop-monitoring-subscription-collector"
+	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR        = "siri-stop-monitoring-subscription-collector"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER      = "siri-stop-monotoring-subscription-broadcaster"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER_TEST = "siri-stop-monotoring-subscription-broadcaster-test"
-	SIRI_GENERAL_MESSAGE_DELIVERIES_RESPONSE_COLLECTOR = "siri-general-message-subscription-collector"
+	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "siri-general-message-request-collector"
+	TEST_GENERAL_MESSAGE_REQUEST_COLLECTOR             = "test-general-message-request-collector"
+	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER           = "siri-general-message-request-broadcaster"
+	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR        = "siri-general-message-subscription-collector"
 	SIRI_CHECK_STATUS_CLIENT_TYPE                      = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
 	SIRI_CHECK_STATUS_SERVER_TYPE                      = "siri-check-status-server"
@@ -76,9 +76,9 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &TestValidationFactory{}
 	case TEST_STARTABLE_CONNECTOR:
 		return &TestStartableFactory{}
-	case SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR:
+	case SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR:
 		return &SIRIStopMonitoringSubscriptionCollectorFactory{}
-	case SIRI_GENERAL_MESSAGE_DELIVERIES_RESPONSE_COLLECTOR:
+	case SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR:
 		return &SIRIGeneralMessageSubscriptionCollectorFactory{}
 	case SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER:
 		return &SIRIStopMonitoringSubscriptionBroadcasterFactory{}

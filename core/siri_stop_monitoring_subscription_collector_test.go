@@ -153,7 +153,7 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	}
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
-	connectors[SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR] = connector
+	connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR] = connector
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)

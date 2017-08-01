@@ -18,7 +18,7 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) RequestorRef(
 }
 
 func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) ConnectorType() string {
-	return core.SIRI_GENERAL_MESSAGE_DELIVERIES_RESPONSE_COLLECTOR
+	return core.SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR
 }
 
 func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {

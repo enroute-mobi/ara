@@ -102,7 +102,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 		}
 		_, connectorPresent := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
 		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
-		_, subscriptionPresent := partner.Connector(SIRI_STOP_MONITORING_DELIVERIES_RESPONSE_COLLECTOR)
+		_, subscriptionPresent := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR)
 
 		if !(connectorPresent || testConnectorPresent || subscriptionPresent) {
 			continue
@@ -169,7 +169,7 @@ func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscri
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_DELIVERIES_RESPONSE_COLLECTOR)
+	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR)
 	if partner == nil {
 		partner = manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
 	}
