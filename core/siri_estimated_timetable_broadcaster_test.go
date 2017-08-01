@@ -47,7 +47,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
 	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
-	vehicleJourney2.LineId = line.Id()
+	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	vehicleJourney3 := referential.model.VehicleJourneys().New()
@@ -130,13 +130,17 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	if len(response.EstimatedJourneyVersionFrames) != 2 {
 		t.Fatalf("Response should have 2 EstimatedJourneyVersionFrames, got: %v", len(response.EstimatedJourneyVersionFrames))
 	}
+	// Test second Line because VehicleJourneys order is random
+	if len(response.EstimatedJourneyVersionFrames[1].EstimatedVehicleJourneys) != 2 {
+		t.Fatalf("Second EstimatedJourneyVersionFrame should have 2 EstimatedVehicleJourneys, got: %v", len(response.EstimatedJourneyVersionFrames[1].EstimatedVehicleJourneys))
+	}
 
 	firstLine := response.EstimatedJourneyVersionFrames[0]
 	if firstLine.RecordedAtTime != connector.Clock().Now() {
 		t.Errorf("Wrong EstimatedJourneyVersionFrames for first EstimatedJourneyVersionFrame:\n got: %v\n want: %v", firstLine.RecordedAtTime, connector.Clock().Now())
 	}
-	if len(firstLine.EstimatedVehicleJourneys) != 2 {
-		t.Fatalf("First EstimatedJourneyVersionFrame should have 2 EstimatedVehicleJourneys, got: %v", len(firstLine.EstimatedVehicleJourneys))
+	if len(firstLine.EstimatedVehicleJourneys) != 1 {
+		t.Fatalf("First EstimatedJourneyVersionFrame should have 1 EstimatedVehicleJourneys, got: %v", len(firstLine.EstimatedVehicleJourneys))
 	}
 	firstVJ := firstLine.EstimatedVehicleJourneys[0]
 	if firstVJ.LineRef != "NINOXE:Line:2:LOC" {
@@ -169,29 +173,29 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	}
 }
 
-// func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
-// 	partner := &Partner{
-// 		slug:           "partner",
-// 		Settings:       make(map[string]string),
-// 		ConnectorTypes: []string{"siri-estimated-timetable-broadcaster"},
-// 		connectors:     make(map[string]Connector),
-// 		manager:        NewPartnerManager(nil),
-// 	}
-// 	apiPartner := partner.Definition()
-// 	apiPartner.Validate()
-// 	if apiPartner.Errors.Empty() {
-// 		t.Errorf("apiPartner should have errors when local_credential and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
-// 	}
+func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
+	partner := &Partner{
+		slug:           "partner",
+		Settings:       make(map[string]string),
+		ConnectorTypes: []string{"siri-estimated-timetable-broadcaster"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
+	}
+	apiPartner := partner.Definition()
+	apiPartner.Validate()
+	if apiPartner.Errors.Empty() {
+		t.Errorf("apiPartner should have errors when local_credential and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+	}
 
-// 	apiPartner.Settings = map[string]string{
-// 		"remote_objectid_kind": "remote_objectid_kind",
-// 		"local_credential":     "local_credential",
-// 	}
-// 	apiPartner.Validate()
-// 	if !apiPartner.Errors.Empty() {
-// 		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_objectid_kind are set, got: %v", apiPartner.Errors)
-// 	}
-// }
+	apiPartner.Settings = map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+		"local_credential":     "local_credential",
+	}
+	apiPartner.Validate()
+	if !apiPartner.Errors.Empty() {
+		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_objectid_kind are set, got: %v", apiPartner.Errors)
+	}
+}
 
 func Test_SIRIEstimatedTimetableBroadcaster_LogXMLStopMonitoringRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
