@@ -85,14 +85,14 @@ const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse x
 			<ns3:EstimatedJourneyVersionFrame>
 				<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
 				<ns3:EstimatedVehicleJourney>
-					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>
-					<ns3:DirectionRef>{{ .Attributes.DirectionRef }}</ns3:DirectionRef>
+					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{ if .Attributes.DirectionRef }}
+					<ns3:DirectionRef>{{ .Attributes.DirectionRef }}</ns3:DirectionRef>{{ end }}
 					<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>
-					<ns3:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</ns3:OriginRef>
-					<ns3:OriginName>{{ .Attributes.OriginName }}</ns3:OriginName>
-					<ns3:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>
-					<ns3:DestinationName>{{ .Attributes.DestinationName }}</ns3:DestinationName>
+					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>{{ if .References.OriginRef }}
+					<ns3:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</ns3:OriginRef>{{ end }}{{ if .Attributes.OriginName }}
+					<ns3:OriginName>{{ .Attributes.OriginName }}</ns3:OriginName>{{ end }}{{ if .References.DestinationRef }}
+					<ns3:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>{{ end }}{{ if .Attributes.DestinationName }}
+					<ns3:DestinationName>{{ .Attributes.DestinationName }}</ns3:DestinationName>{{ end }}
 					<ns3:EstimatedCalls>{{ range .EstimatedCalls }}
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
