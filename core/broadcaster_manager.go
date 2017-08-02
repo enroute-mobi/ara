@@ -40,13 +40,6 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 			continue
 		}
 
-		subs, ok := partner.Subscriptions().FindByKind("stopMonitoring")
-		if !ok {
-			continue
-		}
-		event.SubscriptionId = string(subs.Id())
-
-		ressources := subs.ResourcesByObjectID()
 		stopArea, ok := manager.Referential.Model().StopAreas().Find(event.StopAreaId)
 		if !ok {
 			continue
@@ -56,6 +49,15 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 		if !ok {
 			continue
 		}
+
+		subs, ok := partner.Subscriptions().FindByRessourceId(obj.String())
+		if !ok {
+			continue
+		}
+
+		event.SubscriptionId = string(subs.Id())
+
+		ressources := subs.ResourcesByObjectID()
 
 		ressource, ok := ressources[obj.String()]
 

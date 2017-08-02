@@ -112,6 +112,7 @@ func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource
 
 func (subscription *Subscription) CreateAddNewResource(reference model.Reference) *SubscribedResource {
 	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
+
 	ressource := SubscribedResource{
 		Reference:       reference,
 		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
@@ -150,6 +151,7 @@ type Subscriptions interface {
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
 	NewSubscription() *Subscription
+	FindByRessourceId(id string) (*Subscription, bool)
 }
 
 func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
@@ -169,6 +171,17 @@ func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool
 		if subscription.Kind() == kind {
 			return subscription, true
 		}
+	}
+	return nil, false
+}
+
+func (manager *MemorySubscriptions) FindByRessourceId(id string) (*Subscription, bool) {
+	for _, subscription := range manager.byIdentifier {
+		_, ok := subscription.resourcesByObjectID[id]
+		if !ok {
+			continue
+		}
+		return subscription, true
 	}
 	return nil, false
 }

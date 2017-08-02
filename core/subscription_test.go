@@ -95,3 +95,22 @@ func Test_MemorySubscriptions_Delete(t *testing.T) {
 		t.Errorf("Deleted subscription should not be findable")
 	}
 }
+
+func Test_Subscription_byIdentifier(t *testing.T) {
+	subscriptions := NewMemorySubscriptions(NewPartner())
+	existingSubscription := subscriptions.New()
+	subscriptions.Save(&existingSubscription)
+
+	obj := model.NewObjectID("Kind", "Value")
+	reference := model.Reference{
+		ObjectId: &obj,
+	}
+
+	existingSubscription.CreateAddNewResource(reference)
+
+	_, ok := subscriptions.FindByRessourceId(obj.String())
+
+	if !ok {
+		t.Errorf("Should have found the subscription")
+	}
+}
