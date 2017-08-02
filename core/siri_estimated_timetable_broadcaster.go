@@ -112,8 +112,8 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 				estimatedCall := siri.SIRIEstimatedCall{
 					ArrivalStatus:     string(stopVisit.ArrivalStatus),
-					AimedArrivalTime:  stopVisit.Schedules["aimed"].ArrivalTime(),
-					ActualArrivalTime: stopVisit.Schedules["actual"].ArrivalTime(),
+					AimedArrivalTime:  stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ActualArrivalTime: stopVisit.Schedules.Schedule("actual").ArrivalTime(),
 					Order:             stopVisit.PassageOrder,
 					StopPointRef:      stopPointRef,
 				}
