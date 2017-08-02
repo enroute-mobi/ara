@@ -135,7 +135,13 @@ Feature: Support SIRI EstimatedTimeTable
                   <ns3:EstimatedVehicleJourney>
                     <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
                     <ns3:DirectionRef>Aller</ns3:DirectionRef>
-                    <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>                    <ns3:EstimatedCalls>
+                    <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
+                    <ns3:OriginRef>NINOXE:StopPoint:SP:20:LOC-3</ns3:OriginRef>
+                    <ns3:OriginName>Le début</ns3:OriginName>
+                    <ns3:DestinationRef>NINOXE:StopPoint:SP:27:LOC</ns3:DestinationRef>
+                    <ns3:DestinationName>La fin.</ns3:DestinationName>
+                    <ns3:EstimatedCalls>
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                         <ns3:Order>4</ns3:Order>
