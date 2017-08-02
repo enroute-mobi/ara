@@ -38,7 +38,7 @@ func Test_MemorySubscription_New(t *testing.T) {
 	subcriptions := NewMemorySubscriptions(NewPartner())
 
 	subcription := subcriptions.New()
-	if subcription.Id() != "6ba7b814-9dad-11d1-7-00c04fd430c8" {
+	if subcription.Id() == "" {
 		t.Errorf("New subcription identifier should be an empty string, got: %s", subcription.Id())
 	}
 }
