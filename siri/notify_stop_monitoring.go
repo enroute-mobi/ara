@@ -32,6 +32,13 @@ func (delivery *XMLStopMonitoringDelivery) SubscriptionRef() string {
 	return delivery.subscriptionRef
 }
 
+func (delivery *XMLStopMonitoringDelivery) SubscriberRef() string {
+	if delivery.subscriptionRef == "" {
+		delivery.subscriptionRef = delivery.findStringChildContent("SubscriberRef")
+	}
+	return delivery.subscriptionRef
+}
+
 func NewXMLNotifyStopMonitoring(node xml.Node) *XMLNotifyStopMonitoring {
 	xmlStopMonitoringResponse := &XMLNotifyStopMonitoring{}
 	xmlStopMonitoringResponse.node = NewXMLNode(node)
