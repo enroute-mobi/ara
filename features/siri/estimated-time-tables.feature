@@ -121,7 +121,6 @@ Feature: Support SIRI EstimatedTimeTable
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000+02:00</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>
               <ns3:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
