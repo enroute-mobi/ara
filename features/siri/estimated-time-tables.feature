@@ -30,8 +30,6 @@ Feature: Support SIRI EstimatedTimeTable
       | Attribute[DirectionRef]       | Aller                                   |
       | Attribute[OriginName]         | Le début                                |
       | Attribute[DestinationName]    | La fin.                                 |
-      | Reference[OriginRef]#Id       | NINOXE:StopPoint:SP:20:LOC-3            |
-      | Reference[DestinationRef]#Id  | NINOXE:StopPoint:SP:27:LOC              |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
