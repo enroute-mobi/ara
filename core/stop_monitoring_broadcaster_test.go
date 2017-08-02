@@ -42,8 +42,11 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscriptionRessource, _ := partner.Subscriptions().FindOrCreateByKind("stopMonitoring")
-	subscriptionRessource.CreateAddNewResource(reference)
+	subs := partner.Subscriptions().New()
+	subs.Save()
+	subs.CreateAddNewResource(reference)
+	subs.SetKind(string(subs.Id()))
+	subs.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
@@ -57,9 +60,8 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 }
 
 func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
-	//fakeClock := model.NewFakeClock()
-
 	// Create a test http server
+
 	response := []byte{}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response, _ = ioutil.ReadAll(r.Body)
@@ -100,8 +102,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscriptionRessource, _ := partner.Subscriptions().FindOrCreateByKind("stopMonitoring")
-	subscriptionRessource.CreateAddNewResource(reference)
+	subscription, _ := partner.Subscriptions().FindOrCreateByKind("This Kind should normaly be the exterior Subscription Id")
+	subscription.CreateAddNewResource(reference)
 
 	line := referential.Model().Lines().New()
 	line.SetObjectID(objectid)

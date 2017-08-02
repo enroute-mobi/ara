@@ -97,14 +97,14 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	smb.connector.mutex.Lock()
 
 	events := smb.connector.events
-	smb.connector.events = make(map[model.StopAreaId][]*model.StopVisitBroadcastEvent)
+	smb.connector.events = make(map[SubscriptionId][]*model.StopVisitBroadcastEvent)
 
 	smb.connector.mutex.Unlock()
 
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for _, stopAreaEvents := range events {
+	for _, sub := range events {
 
 		//Voir pour le RequestMessageRef
 
@@ -112,13 +112,13 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
 			ResponseMessageIdentifier: smb.connector.NewUUID(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", stopAreaEvents[0].SubscriptionId),
+			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub[0].SubscriptionId),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 
 			Status: true,
 		}
 
-		for _, event := range stopAreaEvents {
+		for _, event := range sub {
 
 			stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(event.Id)
 			if !ok {
