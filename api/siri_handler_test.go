@@ -578,7 +578,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	pastStopVisit.PassageOrder = 0
 	pastStopVisit.ArrivalStatus = "onTime"
 	pastStopVisit.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(-1*time.Minute))
-	pastStopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(-1*time.Minute))
+	pastStopVisit.Schedules.SetArrivalTime("expected", referential.Clock().Now().Add(-1*time.Minute))
 	pastStopVisit.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
@@ -588,7 +588,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit.PassageOrder = 1
 	stopVisit.ArrivalStatus = "onTime"
 	stopVisit.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(1*time.Minute))
-	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetArrivalTime("expected", referential.Clock().Now().Add(1*time.Minute))
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
@@ -598,7 +598,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit2.PassageOrder = 2
 	stopVisit2.ArrivalStatus = "onTime"
 	stopVisit2.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(2*time.Minute))
-	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(2*time.Minute))
+	stopVisit2.Schedules.SetArrivalTime("expected", referential.Clock().Now().Add(2*time.Minute))
 	stopVisit2.Save()
 
 	stopVisit3 := referential.Model().StopVisits().New()
@@ -608,7 +608,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit3.PassageOrder = 1
 	stopVisit3.ArrivalStatus = "onTime"
 	stopVisit3.Schedules.SetArrivalTime("aimed", referential.Clock().Now().Add(1*time.Minute))
-	stopVisit3.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Schedules.SetArrivalTime("expected", referential.Clock().Now().Add(1*time.Minute))
 	stopVisit3.Save()
 
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
@@ -638,20 +638,19 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<ns3:EstimatedVehicleJourney>
 					<ns3:LineRef>NINOXE:Line:2:LOC</ns3:LineRef>
 					<ns3:DatedVehicleJourneyRef>vehicleJourney</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
 					<ns3:EstimatedCalls>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
 							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ActualArrivalTime>1984-04-04T00:01:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
 						</ns3:EstimatedCall>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
 							<ns3:Order>2</ns3:Order>
 							<ns3:AimedArrivalTime>1984-04-04T00:02:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ActualArrivalTime>1984-04-04T00:02:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
 						</ns3:EstimatedCall>
 					</ns3:EstimatedCalls>
@@ -662,13 +661,12 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<ns3:EstimatedVehicleJourney>
 					<ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
 					<ns3:DatedVehicleJourneyRef>vehicleJourney2</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>lineName2</ns3:PublishedLineName>
 					<ns3:EstimatedCalls>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
 							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ActualArrivalTime>1984-04-04T00:01:00.000Z</ns3:ActualArrivalTime>
+							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
 						</ns3:EstimatedCall>
 					</ns3:EstimatedCalls>

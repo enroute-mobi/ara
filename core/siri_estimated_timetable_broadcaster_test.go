@@ -62,7 +62,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit.PassageOrder = 1
 	stopVisit.ArrivalStatus = "onTime"
 	stopVisit.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
-	stopVisit.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
 	stopVisit.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
@@ -72,7 +72,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit2.PassageOrder = 2
 	stopVisit2.ArrivalStatus = "onTime"
 	stopVisit2.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(2*time.Minute))
-	stopVisit2.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(2*time.Minute))
+	stopVisit2.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(2*time.Minute))
 	stopVisit2.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
@@ -82,7 +82,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit3.PassageOrder = 1
 	stopVisit3.ArrivalStatus = "onTime"
 	stopVisit3.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
-	stopVisit3.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
 	stopVisit3.Save()
 
 	stopVisit4 := referential.model.StopVisits().New()
@@ -92,7 +92,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit4.PassageOrder = 1
 	stopVisit4.ArrivalStatus = "onTime"
 	stopVisit4.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
-	stopVisit4.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit4.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
 	stopVisit4.Save()
 
 	file, err := os.Open("testdata/estimated_timetable_request.xml")
@@ -146,9 +146,6 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	if firstVJ.LineRef != "NINOXE:Line:2:LOC" {
 		t.Errorf("Wrong LineRef for first EstimatedVehicleJourney:\n got: %v\n want: NINOXE:Line:2:LOC", firstVJ.LineRef)
 	}
-	if firstVJ.PublishedLineName != "lineName" {
-		t.Errorf("Wrong PublishedLineName for first EstimatedVehicleJourney:\n got: %v\n want: lineName", firstVJ.PublishedLineName)
-	}
 	if firstVJ.DatedVehicleJourneyRef != "vehicleJourney" {
 		t.Errorf("Wrong DatedVehicleJourneyRef for first EstimatedVehicleJourney:\n got: %v\n want: vehicleJourney", firstVJ.DatedVehicleJourneyRef)
 	}
@@ -168,8 +165,8 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	if !firstEC.AimedArrivalTime.Equal(connector.Clock().Now().Add(1 * time.Minute)) {
 		t.Errorf("Wrong AimedArrivalTime for first EstimatedCall:\n got: %v\n want: %v", firstEC.AimedArrivalTime, connector.Clock().Now())
 	}
-	if !firstEC.ActualArrivalTime.Equal(connector.Clock().Now().Add(1 * time.Minute)) {
-		t.Errorf("Wrong ActualArrivalTime for first EstimatedCall:\n got: %v\n want: %v", firstEC.ActualArrivalTime, connector.Clock().Now())
+	if !firstEC.ExpectedArrivalTime.Equal(connector.Clock().Now().Add(1 * time.Minute)) {
+		t.Errorf("Wrong ExpectedArrivalTime for first EstimatedCall:\n got: %v\n want: %v", firstEC.ExpectedArrivalTime, connector.Clock().Now())
 	}
 }
 

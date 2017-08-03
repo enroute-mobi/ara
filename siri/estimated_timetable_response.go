@@ -32,7 +32,6 @@ type SIRIEstimatedJourneyVersionFrame struct {
 
 type SIRIEstimatedVehicleJourney struct {
 	LineRef                string
-	PublishedLineName      string
 	DatedVehicleJourneyRef string
 
 	Attributes map[string]string
@@ -87,12 +86,9 @@ const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse x
 				<ns3:EstimatedVehicleJourney>
 					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{ if .Attributes.DirectionRef }}
 					<ns3:DirectionRef>{{ .Attributes.DirectionRef }}</ns3:DirectionRef>{{ end }}
-					<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>{{ .PublishedLineName }}</ns3:PublishedLineName>{{ if .References.OriginRef }}
-					<ns3:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</ns3:OriginRef>{{ end }}{{ if .Attributes.OriginName }}
-					<ns3:OriginName>{{ .Attributes.OriginName }}</ns3:OriginName>{{ end }}{{ if .References.DestinationRef }}
-					<ns3:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>{{ end }}{{ if .Attributes.DestinationName }}
-					<ns3:DestinationName>{{ .Attributes.DestinationName }}</ns3:DestinationName>{{ end }}
+					<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
+					<ns3:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</ns3:OriginRef>{{ end }}{{ if .References.DestinationRef }}
+					<ns3:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>{{ end }}
 					<ns3:EstimatedCalls>{{ range .EstimatedCalls }}
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>

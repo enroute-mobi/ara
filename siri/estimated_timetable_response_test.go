@@ -33,11 +33,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 					<ns3:LineRef>line1</ns3:LineRef>
 					<ns3:DirectionRef>direction1</ns3:DirectionRef>
 					<ns3:DatedVehicleJourneyRef>dvjref1</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>line 1</ns3:PublishedLineName>
 					<ns3:OriginRef>origin1</ns3:OriginRef>
-					<ns3:OriginName>origin 1</ns3:OriginName>
 					<ns3:DestinationRef>destination1</ns3:DestinationRef>
-					<ns3:DestinationName>destination 1</ns3:DestinationName>
 					<ns3:EstimatedCalls>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint1</ns3:StopPointRef>
@@ -64,11 +61,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 					<ns3:LineRef>line2</ns3:LineRef>
 					<ns3:DirectionRef>direction2</ns3:DirectionRef>
 					<ns3:DatedVehicleJourneyRef>dvjref2</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>line 2</ns3:PublishedLineName>
 					<ns3:OriginRef>origin2</ns3:OriginRef>
-					<ns3:OriginName>origin 2</ns3:OriginName>
 					<ns3:DestinationRef>destination2</ns3:DestinationRef>
-					<ns3:DestinationName>destination 2</ns3:DestinationName>
 					<ns3:EstimatedCalls>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint3</ns3:StopPointRef>
@@ -84,11 +78,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 					<ns3:LineRef>line3</ns3:LineRef>
 					<ns3:DirectionRef>direction3</ns3:DirectionRef>
 					<ns3:DatedVehicleJourneyRef>dvjref3</ns3:DatedVehicleJourneyRef>
-					<ns3:PublishedLineName>line 3</ns3:PublishedLineName>
 					<ns3:OriginRef>origin3</ns3:OriginRef>
-					<ns3:OriginName>origin 3</ns3:OriginName>
 					<ns3:DestinationRef>destination3</ns3:DestinationRef>
-					<ns3:DestinationName>destination 3</ns3:DestinationName>
 					<ns3:EstimatedCalls>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint4</ns3:StopPointRef>
@@ -140,14 +131,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		ActualDepartureTime: testTime,
 	}
 
-	// LineRef           string
-	// PublishedLineName string
-
-	// Attributes map[string]string
-
 	vehicleJourney1 := SIRIEstimatedVehicleJourney{
 		LineRef:                "line1",
-		PublishedLineName:      "line 1",
 		DatedVehicleJourneyRef: "dvjref1",
 		Attributes: map[string]string{
 			"DirectionRef":    "direction1",
@@ -162,7 +147,6 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	}
 	vehicleJourney2 := SIRIEstimatedVehicleJourney{
 		LineRef:                "line2",
-		PublishedLineName:      "line 2",
 		DatedVehicleJourneyRef: "dvjref2",
 		Attributes: map[string]string{
 			"DirectionRef":    "direction2",
@@ -177,7 +161,6 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	}
 	vehicleJourney3 := SIRIEstimatedVehicleJourney{
 		LineRef:                "line3",
-		PublishedLineName:      "line 3",
 		DatedVehicleJourneyRef: "dvjref3",
 		Attributes: map[string]string{
 			"DirectionRef":    "direction3",

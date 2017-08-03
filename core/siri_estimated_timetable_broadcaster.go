@@ -87,7 +87,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 			estimatedVehicleJourney := siri.SIRIEstimatedVehicleJourney{
 				LineRef:                lineObjectId.Value(),
-				PublishedLineName:      line.Name,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				Attributes:             make(map[string]string),
 				References:             make(map[string]model.Reference),
@@ -111,11 +110,11 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 				}
 
 				estimatedCall := siri.SIRIEstimatedCall{
-					ArrivalStatus:     string(stopVisit.ArrivalStatus),
-					AimedArrivalTime:  stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ActualArrivalTime: stopVisit.Schedules.Schedule("actual").ArrivalTime(),
-					Order:             stopVisit.PassageOrder,
-					StopPointRef:      stopPointRef,
+					ArrivalStatus:       string(stopVisit.ArrivalStatus),
+					AimedArrivalTime:    stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ExpectedArrivalTime: stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+					Order:               stopVisit.PassageOrder,
+					StopPointRef:        stopPointRef,
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
