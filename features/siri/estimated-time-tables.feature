@@ -45,7 +45,7 @@ Feature: Support SIRI EstimatedTimeTable
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2" |
       | PassageOrder                    | 5                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
@@ -56,7 +56,7 @@ Feature: Support SIRI EstimatedTimeTable
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
       | PassageOrder                    | 6                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
@@ -67,7 +67,7 @@ Feature: Support SIRI EstimatedTimeTable
     #à l'heure
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
       | PassageOrder                    | 7                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
@@ -121,7 +121,6 @@ Feature: Support SIRI EstimatedTimeTable
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:Address>http://appli.chouette.mobi/siri_france/siri</ns3:Address>s
               <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
