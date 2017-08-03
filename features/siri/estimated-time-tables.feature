@@ -32,25 +32,25 @@ Feature: Support SIRI EstimatedTimeTable
       | Attribute[DestinationName]    | La fin.                                 |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000+02:00                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T13:01:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000+02:00                                        |
       | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T13:05:00.000+02:00                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T13:06:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:05:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:06:00.000+02:00                                        |
       | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
@@ -60,19 +60,19 @@ Feature: Support SIRI EstimatedTimeTable
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T13:10:00.000+02:00                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T13:11:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:10:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:11:00.000+02:00                                        |
       | ArrivalStatus                   | Delayed                                                              |
     And a StopVisit exists with the following attributes:
     #à l'heure
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-3" |
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
       | PassageOrder                    | 7                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T13:16:00.000+02:00                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T13:16:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:16:00.000+02:00                                        |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:16:00.000+02:00                                        |
       | ArrivalStatus                   | onTime                                                               |
     And I see edwig vehicle_journeys
     And I see edwig stop_visits
@@ -140,29 +140,29 @@ Feature: Support SIRI EstimatedTimeTable
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                         <ns3:Order>4</ns3:Order>
-                        <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                        <ns3:ActualArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:AimedArrivalTime>2017-01-01T15:00:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T15:01:00.000+02:00</ns3:ActualArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
                       </ns3:EstimatedCall>
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
                         <ns3:Order>5</ns3:Order>
-                        <ns3:AimedArrivalTime>2017-01-01T13:00:05.000+02:00</ns3:AimedArrivalTime>
-                        <ns3:ActualArrivalTime>2017-01-01T13:01:06.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:AimedArrivalTime>2017-01-01T15:05:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T15:06:00.000+02:00</ns3:ActualArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
                       </ns3:EstimatedCall>
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:26:LOC</ns3:StopPointRef>
                         <ns3:Order>6</ns3:Order>
-                        <ns3:AimedArrivalTime>2017-01-01T13:10:00.000+02:00</ns3:AimedArrivalTime>
-                        <ns3:ActualArrivalTime>2017-01-01T13:11:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:AimedArrivalTime>2017-01-01T15:10:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T15:11:00.000+02:00</ns3:ActualArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
                       </ns3:EstimatedCall>
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:27:LOC</ns3:StopPointRef>
                         <ns3:Order>7</ns3:Order>
-                        <ns3:AimedArrivalTime>2017-01-01T13:16:00.000+02:00</ns3:AimedArrivalTime>
-                        <ns3:ActualArrivalTime>2017-01-01T13:16:00.000+02:00</ns3:ActualArrivalTime>
+                        <ns3:AimedArrivalTime>2017-01-01T15:16:00.000+02:00</ns3:AimedArrivalTime>
+                        <ns3:ActualArrivalTime>2017-01-01T15:16:00.000+02:00</ns3:ActualArrivalTime>
                         <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
                       </ns3:EstimatedCall>
                     </ns3:EstimatedCalls>
