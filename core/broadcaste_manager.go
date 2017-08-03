@@ -5,31 +5,31 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type BroadcasterManagerInterface interface {
+type BroadcastManagerInterface interface {
 	model.Stopable
 
 	Run()
-	StopVisitBroadcastEvent() chan model.StopVisitBroadcastEvent
+	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
 }
 
-type BroadcasterManager struct {
-	Referential             *Referential
-	stopVisitBroadcastEvent chan model.StopVisitBroadcastEvent
-	stop                    chan struct{}
+type BroadcastManager struct {
+	Referential  *Referential
+	smbEventChan chan model.StopMonitoringBroadcastEvent
+	stop         chan struct{}
 }
 
-func NewBroadcasterManager(referential *Referential) *BroadcasterManager {
-	return &BroadcasterManager{
-		Referential:             referential,
-		stopVisitBroadcastEvent: make(chan model.StopVisitBroadcastEvent, 0),
+func NewBroadcastManager(referential *Referential) *BroadcastManager {
+	return &BroadcastManager{
+		Referential:  referential,
+		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 0),
 	}
 }
 
-func (manager *BroadcasterManager) StopVisitBroadcastEvent() chan model.StopVisitBroadcastEvent {
-	return manager.stopVisitBroadcastEvent
+func (manager *BroadcastManager) GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent {
+	return manager.smbEventChan
 }
 
-func (manager *BroadcasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent(event *model.StopVisitBroadcastEvent) []*Partner {
+func (manager *BroadcastManager) GetPartnersInterrestedByStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) []*Partner {
 	partners := []*Partner{}
 
 	for _, partner := range manager.Referential.Partners().FindAll() {
@@ -75,7 +75,7 @@ func (manager *BroadcasterManager) GetPartnersInterrestedByStopVisitBroadcastEve
 	return partners
 }
 
-func (manager *BroadcasterManager) FindStopAreaFromStopVisitId(svId model.StopVisitId) (*model.StopArea, bool) {
+func (manager *BroadcastManager) FindStopAreaFromStopVisitId(svId model.StopVisitId) (*model.StopArea, bool) {
 	sv, ok := manager.Referential.Model().StopVisits().Find(svId)
 	if !ok {
 		return nil, false
@@ -89,7 +89,7 @@ func (manager *BroadcasterManager) FindStopAreaFromStopVisitId(svId model.StopVi
 	return &sa, true
 }
 
-func (manager *BroadcasterManager) GetStopAreaFromEvent(event *model.StopVisitBroadcastEvent) (*model.StopArea, bool) {
+func (manager *BroadcastManager) GetStopAreaFromEvent(event *model.StopMonitoringBroadcastEvent) (*model.StopArea, bool) {
 
 	switch event.ModelType {
 	case "StopVisit":
@@ -99,15 +99,16 @@ func (manager *BroadcasterManager) GetStopAreaFromEvent(event *model.StopVisitBr
 	}
 }
 
-func (manager *BroadcasterManager) Run() {
-	logger.Log.Debugf("BroadcasterManager start")
+func (manager *BroadcastManager) Run() {
+	logger.Log.Debugf("BroadcastManager start")
 
 	go manager.run()
 }
 
-func (manager *BroadcasterManager) run() {
+func (manager *BroadcastManager) run() {
 	for {
-		event := <-manager.stopVisitBroadcastEvent
+		//RAJOUTER SELECT
+		event := <-manager.smbEventChan
 		for _, partner := range manager.GetPartnersInterrestedByStopVisitBroadcastEvent(&event) {
 			connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 			if ok {
@@ -125,6 +126,6 @@ func (manager *BroadcasterManager) run() {
 	}
 }
 
-func (manager *BroadcasterManager) Stop() {
+func (manager *BroadcastManager) Stop() {
 	close(manager.stop)
 }

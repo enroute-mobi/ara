@@ -1,5 +1,7 @@
 package model
 
+import "github.com/af83/edwig/logger"
+
 type Model interface {
 	Date() Date
 	Lines() Lines
@@ -8,17 +10,18 @@ type Model interface {
 	StopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
 	Operators() Operators
-	// ...
 }
 
 type MemoryModel struct {
 	stopAreas       *MemoryStopAreas
-	stopVisits      StopVisits
+	stopVisits      *MemoryStopVisits
 	vehicleJourneys VehicleJourneys
 	lines           *MemoryLines
 	date            Date
 	situations      Situations
 	operators       Operators
+
+	modelEventsChan chan StopMonitoringBroadcastEvent
 }
 
 func NewMemoryModel() *MemoryModel {
@@ -41,6 +44,7 @@ func NewMemoryModel() *MemoryModel {
 	stopVisits := NewMemoryStopVisits()
 	stopVisits.model = model
 	model.stopVisits = stopVisits
+	model.stopVisits.broadcastEvent = model.broadcastEvent
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	vehicleJourneys.model = model
@@ -51,6 +55,18 @@ func NewMemoryModel() *MemoryModel {
 	model.operators = operators
 
 	return model
+}
+
+func (model *MemoryModel) SetBroadcasteChan(broadcastEventChan chan StopMonitoringBroadcastEvent) {
+	model.modelEventsChan = broadcastEventChan
+}
+
+func (model *MemoryModel) broadcastEvent(event StopMonitoringBroadcastEvent) {
+	select {
+	case model.modelEventsChan <- event:
+	default:
+		logger.Log.Debugf("Cannot send StopMonitoringBroadcastEvent to BrocasterManager")
+	}
 }
 
 func (model *MemoryModel) Clone() *MemoryModel {

@@ -1,6 +1,6 @@
 package model
 
-type StopVisitBroadcastEvent struct {
+type StopMonitoringBroadcastEvent struct {
 	SubscriptionId string
 	ModelId        string
 	ModelType      string

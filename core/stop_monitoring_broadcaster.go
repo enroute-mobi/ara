@@ -97,7 +97,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	smb.connector.mutex.Lock()
 
 	events := smb.connector.events
-	smb.connector.events = make(map[SubscriptionId][]*model.StopVisitBroadcastEvent)
+	smb.connector.events = make(map[SubscriptionId][]*model.StopMonitoringBroadcastEvent)
 
 	smb.connector.mutex.Unlock()
 
@@ -132,7 +132,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	}
 }
 
-func (smb *SMBroadcaster) handleEvent(event *model.StopVisitBroadcastEvent, tx *model.Transaction) []*siri.SIRIMonitoredStopVisit {
+func (smb *SMBroadcaster) handleEvent(event *model.StopMonitoringBroadcastEvent, tx *model.Transaction) []*siri.SIRIMonitoredStopVisit {
 	switch event.ModelType {
 	case "StopVisit":
 		sv := smb.getMonitoredStopVisit(model.StopVisitId(event.ModelId), tx)

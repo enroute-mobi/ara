@@ -10,7 +10,7 @@ type StopMonitoringSubscriptionBroadcaster interface {
 	model.Stopable
 	model.Startable
 
-	handleStopVisitBroadcastEvent(*model.StopVisitBroadcastEvent)
+	handleStopVisitBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 }
 
 type SIRIStopMonitoringSubscriptionBroadcaster struct {
@@ -20,7 +20,7 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 	siriConnector
 
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
-	events                    map[SubscriptionId][]*model.StopVisitBroadcastEvent
+	events                    map[SubscriptionId][]*model.StopMonitoringBroadcastEvent
 	mutex                     *sync.Mutex //protect the map
 }
 
@@ -31,7 +31,7 @@ type TestSIRIStopMonitoringSubscriptionBroadcasterFactory struct{}
 type TestStopMonitoringSubscriptionBroadcaster struct {
 	model.UUIDConsumer
 
-	events                    []*model.StopVisitBroadcastEvent
+	events                    []*model.StopMonitoringBroadcastEvent
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 }
 
@@ -40,7 +40,7 @@ func NewTestStopMonitoringSubscriptionBroadcaster() *TestStopMonitoringSubscript
 	return connector
 }
 
-func (connector *TestStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopVisitBroadcastEvent) {
+func (connector *TestStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 
@@ -69,7 +69,7 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	siriStopMonitoringSubscriptionBroadcaster := &SIRIStopMonitoringSubscriptionBroadcaster{}
 	siriStopMonitoringSubscriptionBroadcaster.partner = partner
 	siriStopMonitoringSubscriptionBroadcaster.mutex = &sync.Mutex{}
-	siriStopMonitoringSubscriptionBroadcaster.events = make(map[SubscriptionId][]*model.StopVisitBroadcastEvent)
+	siriStopMonitoringSubscriptionBroadcaster.events = make(map[SubscriptionId][]*model.StopMonitoringBroadcastEvent)
 
 	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(siriStopMonitoringSubscriptionBroadcaster)
 	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster.Run()
@@ -90,7 +90,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
 	connector.stopMonitoringBroadcaster.Run()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopVisitBroadcastEvent) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.mutex.Lock()
 	connector.events[SubscriptionId(event.SubscriptionId)] = append(connector.events[SubscriptionId(event.SubscriptionId)], event)
 	connector.mutex.Unlock()

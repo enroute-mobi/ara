@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"sort"
 	"time"
-
-	"github.com/af83/edwig/logger"
 )
 
 type StopVisitId string
@@ -220,8 +218,8 @@ type MemoryStopVisits struct {
 
 	model Model
 
-	byIdentifier       map[StopVisitId]*StopVisit
-	BroadcastEventChan chan StopVisitBroadcastEvent
+	byIdentifier   map[StopVisitId]*StopVisit
+	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
 
 type StopVisits interface {
@@ -333,17 +331,14 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
 
-	event := StopVisitBroadcastEvent{
+	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
 		ModelType: "StopVisit",
 	}
 
-	select {
-	case manager.BroadcastEventChan <- event:
-	default:
-		logger.Log.Debugf("BroadcastEventChan closed or full")
+	if manager.broadcastEvent != nil {
+		manager.broadcastEvent(event)
 	}
-
 	return true
 }
 
