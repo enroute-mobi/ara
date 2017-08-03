@@ -3,7 +3,6 @@ Feature: Support SIRI EstimatedTimeTable
   Background:
       Given a Referential "test" is created
 
-@wip
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
     Given a Partner "test" exists with connectors [siri-estimated-timetable-broadcaster] and the following settings:
       | local_credential     | test     |
