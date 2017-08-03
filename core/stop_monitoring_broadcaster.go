@@ -104,7 +104,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for _, sub := range events {
+	for key, sub := range events {
 
 		//Voir pour le RequestMessageRef
 
@@ -112,124 +112,145 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
 			ResponseMessageIdentifier: smb.connector.NewUUID(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub[0].SubscriptionId),
+			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", key),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 
 			Status: true,
 		}
 
+		svIds := make(map[string]bool) //Making sure not to send 2 times the same SV
+
 		for _, event := range sub {
-
-			stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(event.Id)
-			if !ok {
-				continue
-			}
-
-			stopArea, ok := smb.connector.Partner().Model().StopAreas().Find(event.StopAreaId)
-			if !ok {
-				continue
-			}
-			objectidKind := smb.connector.Partner().Setting("remote_objectid_kind")
-
-			objectid, ok := stopArea.ObjectID(objectidKind)
-			if !ok {
-				continue
-			}
-
-			var itemIdentifier string
-			stopVisitId, ok := stopVisit.ObjectID(objectidKind)
-			if ok {
-				itemIdentifier = stopVisitId.Value()
-			} else {
-				defaultObjectID, ok := stopVisit.ObjectID("_default")
-				if !ok {
+			for _, sm := range smb.handleEvent(event, tx) {
+				if _, ok := svIds[sm.ItemIdentifier]; ok {
 					continue
 				}
-				itemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", defaultObjectID.HashValue())
+				delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
 			}
-
-			schedules := stopVisit.Schedules
-
-			vehicleJourney := stopVisit.VehicleJourney()
-			if vehicleJourney == nil {
-				logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
-				continue
-			}
-			line := vehicleJourney.Line()
-			if line == nil {
-				logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
-				continue
-			}
-			if _, ok := line.ObjectID(objectidKind); !ok {
-				logger.Log.Printf("Ignore StopVisit %s without Line without correct ObjectID", stopVisit.Id())
-				continue
-			}
-
-			vehicleJourneyId, ok := vehicleJourney.ObjectID(objectidKind)
-			var dataVehicleJourneyRef string
-			if ok {
-				dataVehicleJourneyRef = vehicleJourneyId.Value()
-			} else {
-				defaultObjectID, ok := vehicleJourney.ObjectID("_default")
-				if !ok {
-					continue
-				}
-				dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
-			}
-
-			modelDate := tx.Model().Date()
-
-			lineObjectId, _ := line.ObjectID(objectidKind)
-
-			stopPointRef, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
-			stopPointRefObjectId, _ := stopPointRef.ObjectID(objectidKind)
-
-			monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
-				ItemIdentifier: itemIdentifier,
-				MonitoringRef:  objectid.Value(),
-				StopPointRef:   stopPointRefObjectId.Value(),
-				StopPointName:  stopPointRef.Name,
-
-				VehicleJourneyName:     vehicleJourney.Name,
-				LineRef:                lineObjectId.Value(),
-				DatedVehicleJourneyRef: dataVehicleJourneyRef,
-				DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
-				RecordedAt:             stopVisit.RecordedAt,
-				PublishedLineName:      line.Name,
-				DepartureStatus:        string(stopVisit.DepartureStatus),
-				ArrivalStatus:          string(stopVisit.ArrivalStatus),
-				Order:                  stopVisit.PassageOrder,
-				VehicleAtStop:          stopVisit.VehicleAtStop,
-				Attributes:             make(map[string]map[string]string),
-				References:             make(map[string]map[string]model.Reference),
-			}
-
-			monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
-			monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
-			monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
-
-			monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
-			monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
-			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
-
-			vehicleJourneyRefCopy := vehicleJourney.References.Copy()
-			stopVisitRefCopy := stopVisit.References.Copy()
-
-			smb.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx.Model().StopAreas())
-			smb.resolveOperator(stopVisitRefCopy)
-
-			smb.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
-
-			monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-			monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy
-
-			monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-			monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy
-
-			delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 		}
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
 	}
+}
+
+func (smb *SMBroadcaster) handleEvent(event *model.StopVisitBroadcastEvent, tx *model.Transaction) []*siri.SIRIMonitoredStopVisit {
+	switch event.ModelType {
+	case "StopVisit":
+		sv := smb.getMonitoredStopVisit(model.StopVisitId(event.ModelId), tx)
+		//Update Subscription status
+		return []*siri.SIRIMonitoredStopVisit{sv}
+	default:
+		return nil
+	}
+}
+
+func (smb *SMBroadcaster) getMonitoredStopVisit(sv model.StopVisitId, tx *model.Transaction) *siri.SIRIMonitoredStopVisit {
+	stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(model.StopVisitId(sv))
+	if !ok {
+		return nil
+	}
+
+	stopArea, ok := smb.connector.Partner().Model().StopAreas().Find(stopVisit.StopAreaId)
+	if !ok {
+		return nil
+	}
+	objectidKind := smb.connector.Partner().Setting("remote_objectid_kind")
+
+	objectid, ok := stopArea.ObjectID(objectidKind)
+	if !ok {
+		return nil
+	}
+
+	var itemIdentifier string
+	stopVisitId, ok := stopVisit.ObjectID(objectidKind)
+	if ok {
+		itemIdentifier = stopVisitId.Value()
+	} else {
+		defaultObjectID, ok := stopVisit.ObjectID("_default")
+		if !ok {
+			return nil
+		}
+		itemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", defaultObjectID.HashValue())
+	}
+
+	schedules := stopVisit.Schedules
+
+	vehicleJourney := stopVisit.VehicleJourney()
+	if vehicleJourney == nil {
+		logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
+		return nil
+	}
+	line := vehicleJourney.Line()
+	if line == nil {
+		logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
+		return nil
+	}
+	if _, ok := line.ObjectID(objectidKind); !ok {
+		logger.Log.Printf("Ignore StopVisit %s without Line without correct ObjectID", stopVisit.Id())
+		return nil
+	}
+
+	vehicleJourneyId, ok := vehicleJourney.ObjectID(objectidKind)
+	var dataVehicleJourneyRef string
+	if ok {
+		dataVehicleJourneyRef = vehicleJourneyId.Value()
+	} else {
+		defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+		if !ok {
+			return nil
+		}
+		dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
+	}
+
+	modelDate := tx.Model().Date()
+
+	lineObjectId, _ := line.ObjectID(objectidKind)
+
+	stopPointRef, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+	stopPointRefObjectId, _ := stopPointRef.ObjectID(objectidKind)
+
+	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
+		ItemIdentifier: itemIdentifier,
+		MonitoringRef:  objectid.Value(),
+		StopPointRef:   stopPointRefObjectId.Value(),
+		StopPointName:  stopPointRef.Name,
+
+		VehicleJourneyName:     vehicleJourney.Name,
+		LineRef:                lineObjectId.Value(),
+		DatedVehicleJourneyRef: dataVehicleJourneyRef,
+		DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
+		RecordedAt:             stopVisit.RecordedAt,
+		PublishedLineName:      line.Name,
+		DepartureStatus:        string(stopVisit.DepartureStatus),
+		ArrivalStatus:          string(stopVisit.ArrivalStatus),
+		Order:                  stopVisit.PassageOrder,
+		VehicleAtStop:          stopVisit.VehicleAtStop,
+		Attributes:             make(map[string]map[string]string),
+		References:             make(map[string]map[string]model.Reference),
+	}
+
+	monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
+	monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
+	monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
+
+	monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
+	monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
+	monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
+
+	vehicleJourneyRefCopy := vehicleJourney.References.Copy()
+	stopVisitRefCopy := stopVisit.References.Copy()
+
+	smb.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx.Model().StopAreas())
+	smb.resolveOperator(stopVisitRefCopy)
+
+	smb.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
+
+	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
+	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy
+
+	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
+	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy
+
+	return monitoredStopVisit
 }
 
 func (connector *SMBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {

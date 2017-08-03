@@ -5,31 +5,31 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type BrocasterManagerInterface interface {
+type BroadcasterManagerInterface interface {
 	model.Stopable
 
 	Run()
 	StopVisitBroadcastEvent() chan model.StopVisitBroadcastEvent
 }
 
-type BrocasterManager struct {
+type BroadcasterManager struct {
 	Referential             *Referential
 	stopVisitBroadcastEvent chan model.StopVisitBroadcastEvent
 	stop                    chan struct{}
 }
 
-func NewBroadcasterManager(referential *Referential) *BrocasterManager {
-	return &BrocasterManager{
+func NewBroadcasterManager(referential *Referential) *BroadcasterManager {
+	return &BroadcasterManager{
 		Referential:             referential,
 		stopVisitBroadcastEvent: make(chan model.StopVisitBroadcastEvent, 0),
 	}
 }
 
-func (manager *BrocasterManager) StopVisitBroadcastEvent() chan model.StopVisitBroadcastEvent {
+func (manager *BroadcasterManager) StopVisitBroadcastEvent() chan model.StopVisitBroadcastEvent {
 	return manager.stopVisitBroadcastEvent
 }
 
-func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent(event *model.StopVisitBroadcastEvent) []*Partner {
+func (manager *BroadcasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent(event *model.StopVisitBroadcastEvent) []*Partner {
 	partners := []*Partner{}
 
 	for _, partner := range manager.Referential.Partners().FindAll() {
@@ -40,7 +40,7 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 			continue
 		}
 
-		stopArea, ok := manager.Referential.Model().StopAreas().Find(event.StopAreaId)
+		stopArea, ok := manager.GetStopAreaFromEvent(event)
 		if !ok {
 			continue
 		}
@@ -65,7 +65,7 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 			continue
 		}
 
-		lastState, ok := ressource.LastStates[string(event.Id)].(*stopVisitLastChange)
+		lastState, ok := ressource.LastStates[string(event.ModelId)]
 
 		if ok == true && !lastState.Ischanged(event) {
 			continue
@@ -75,13 +75,37 @@ func (manager *BrocasterManager) GetPartnersInterrestedByStopVisitBroadcastEvent
 	return partners
 }
 
-func (manager *BrocasterManager) Run() {
+func (manager *BroadcasterManager) FindStopAreaFromStopVisitId(svId model.StopVisitId) (*model.StopArea, bool) {
+	sv, ok := manager.Referential.Model().StopVisits().Find(svId)
+	if !ok {
+		return nil, false
+	}
+
+	sa, ok := manager.Referential.Model().StopAreas().Find(sv.StopAreaId)
+	if !ok {
+		return nil, false
+	}
+
+	return &sa, true
+}
+
+func (manager *BroadcasterManager) GetStopAreaFromEvent(event *model.StopVisitBroadcastEvent) (*model.StopArea, bool) {
+
+	switch event.ModelType {
+	case "StopVisit":
+		return manager.FindStopAreaFromStopVisitId(model.StopVisitId(event.ModelId))
+	default:
+		return nil, false
+	}
+}
+
+func (manager *BroadcasterManager) Run() {
 	logger.Log.Debugf("BroadcasterManager start")
 
 	go manager.run()
 }
 
-func (manager *BrocasterManager) run() {
+func (manager *BroadcasterManager) run() {
 	for {
 		event := <-manager.stopVisitBroadcastEvent
 		for _, partner := range manager.GetPartnersInterrestedByStopVisitBroadcastEvent(&event) {
@@ -101,6 +125,6 @@ func (manager *BrocasterManager) run() {
 	}
 }
 
-func (manager *BrocasterManager) Stop() {
+func (manager *BroadcasterManager) Stop() {
 	close(manager.stop)
 }

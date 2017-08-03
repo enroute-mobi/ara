@@ -25,15 +25,15 @@ type Referential struct {
 
 	Settings map[string]string `json:"Settings,omitempty"`
 
-	collectManager   CollectManagerInterface
-	brocasterManager BrocasterManagerInterface
-	manager          Referentials
-	model            *model.MemoryModel
-	modelGuardian    *ModelGuardian
-	partners         Partners
-	startedAt        time.Time
-	nextReloadAt     time.Time
-	Tokens           []string `json:",omitempty"`
+	collectManager    CollectManagerInterface
+	broacasterManager BroadcasterManagerInterface
+	manager           Referentials
+	model             *model.MemoryModel
+	modelGuardian     *ModelGuardian
+	partners          Partners
+	startedAt         time.Time
+	nextReloadAt      time.Time
+	Tokens            []string `json:",omitempty"`
 }
 
 type Referentials interface {
@@ -273,9 +273,9 @@ func (manager *MemoryReferentials) new() *Referential {
 }
 
 func (manager *MemoryReferentials) initBroadcaster(referential *Referential) {
-	referential.brocasterManager = NewBroadcasterManager(referential)
+	referential.broacasterManager = NewBroadcasterManager(referential)
 	ms := referential.model.StopVisits().(*model.MemoryStopVisits)
-	ms.BroadcastEventChan = referential.brocasterManager.StopVisitBroadcastEvent()
+	ms.BroadcastEventChan = referential.broacasterManager.StopVisitBroadcastEvent()
 }
 
 func (manager *MemoryReferentials) Find(id ReferentialId) *Referential {

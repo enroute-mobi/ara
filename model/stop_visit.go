@@ -334,9 +334,8 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	manager.byIdentifier[stopVisit.id] = stopVisit
 
 	event := StopVisitBroadcastEvent{
-		Id:         stopVisit.id,
-		StopAreaId: stopVisit.StopAreaId,
-		Schedules:  stopVisit.Schedules,
+		ModelId:   string(stopVisit.id),
+		ModelType: "StopVisit",
 	}
 
 	select {

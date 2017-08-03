@@ -18,9 +18,9 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.model = model.NewMemoryModel()
 
-	referential.brocasterManager = NewBroadcasterManager(referential)
-	referential.brocasterManager.Run()
-	referential.Model().StopVisits().(*model.MemoryStopVisits).BroadcastEventChan = referential.brocasterManager.StopVisitBroadcastEvent()
+	referential.broacasterManager = NewBroadcasterManager(referential)
+	referential.broacasterManager.Run()
+	referential.Model().StopVisits().(*model.MemoryStopVisits).BroadcastEventChan = referential.broacasterManager.StopVisitBroadcastEvent()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
@@ -74,9 +74,9 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.model = model.NewMemoryModel()
 
-	referential.brocasterManager = NewBroadcasterManager(referential)
-	referential.brocasterManager.Run()
-	referential.Model().StopVisits().(*model.MemoryStopVisits).BroadcastEventChan = referential.brocasterManager.StopVisitBroadcastEvent()
+	referential.broacasterManager = NewBroadcasterManager(referential)
+	referential.broacasterManager.Run()
+	referential.Model().StopVisits().(*model.MemoryStopVisits).BroadcastEventChan = referential.broacasterManager.StopVisitBroadcastEvent()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"

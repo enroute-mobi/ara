@@ -71,8 +71,8 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	siriStopMonitoringSubscriptionBroadcaster.mutex = &sync.Mutex{}
 	siriStopMonitoringSubscriptionBroadcaster.events = make(map[SubscriptionId][]*model.StopVisitBroadcastEvent)
 
-	// siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(siriStopMonitoringSubscriptionBroadcaster)
-	// siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster.Run()
+	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(siriStopMonitoringSubscriptionBroadcaster)
+	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster.Run()
 
 	return siriStopMonitoringSubscriptionBroadcaster
 }
