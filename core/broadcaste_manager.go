@@ -107,21 +107,25 @@ func (manager *BroadcastManager) Run() {
 
 func (manager *BroadcastManager) run() {
 	for {
-		//RAJOUTER SELECT
-		event := <-manager.smbEventChan
-		for _, partner := range manager.GetPartnersInterrestedByStopVisitBroadcastEvent(&event) {
-			connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-			if ok {
-				connector.(*SIRIStopMonitoringSubscriptionBroadcaster).handleStopVisitBroadcastEvent(&event)
-				continue
-			}
+		select {
+		case event := <-manager.smbEventChan:
+			for _, partner := range manager.GetPartnersInterrestedByStopVisitBroadcastEvent(&event) {
+				connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+				if ok {
+					connector.(*SIRIStopMonitoringSubscriptionBroadcaster).handleStopVisitBroadcastEvent(&event)
+					continue
+				}
 
-			// TEST
-			connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-			if ok {
-				connector.(*TestStopMonitoringSubscriptionBroadcaster).handleStopVisitBroadcastEvent(&event)
-				continue
+				// TEST
+				connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+				if ok {
+					connector.(*TestStopMonitoringSubscriptionBroadcaster).handleStopVisitBroadcastEvent(&event)
+					continue
+				}
 			}
+		case <-manager.stop:
+			logger.Log.Debugf("BroadcastManager Stop")
+			return
 		}
 	}
 }
