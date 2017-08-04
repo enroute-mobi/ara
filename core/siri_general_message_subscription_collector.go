@@ -123,7 +123,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		}
 		connector.cancelGeneralMessage(delivery)
 		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
-		connector.situationUpdateSubscriber(*situationUpdateEvents)
+		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
 }
 
@@ -151,6 +151,16 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())
 			connector.Partner().Model().Situations().Delete(&situation)
 		}
+	}
+}
+
+func (connector *SIRIGeneralMessageSubscriptionCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
+	connector.situationUpdateSubscriber = situationUpdateSubscriber
+}
+
+func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
+	if connector.situationUpdateSubscriber != nil {
+		connector.situationUpdateSubscriber(event)
 	}
 }
 

@@ -122,7 +122,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 	return nil
 }
 
-func (manager *CollectManager) PartnerWithConnector(connector string) *Partner {
+func (manager *CollectManager) partnerWithConnector(connector string) *Partner {
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
@@ -151,17 +151,14 @@ func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.Situ
 	}
 }
 
-func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) ([]*model.SituationUpdateEvent, error) {
+func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) {
 	logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
 
 	if collect := partner.GeneralMessageSubscriptionCollector(); collect != nil {
 		collect.RequestSituationUpdate(request)
+		return
 	}
-	event, err := partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
-	if err != nil {
-		return nil, err
-	}
-	return event, nil
+	partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
 }
 
 func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
@@ -169,9 +166,9 @@ func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscri
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	partner := manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR)
+	partner := manager.partnerWithConnector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR)
 	if partner == nil {
-		partner = manager.PartnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+		partner = manager.partnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
 	}
 
 	if partner == nil {
@@ -179,10 +176,5 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 		return
 	}
 
-	event, err := manager.requestSituationUpdate(partner, request)
-	if err != nil {
-		logger.Log.Printf("Can't request Situation update : %v", err)
-		return
-	}
-	manager.BroadcastSituationUpdateEvent(event)
+	manager.requestSituationUpdate(partner, request)
 }

@@ -20,15 +20,20 @@ type SIRIGeneralMessageRequestCollector struct {
 	model.UUIDConsumer
 
 	siriConnector
+
+	situationUpdateSubscriber SituationUpdateSubscriber
 }
 
 func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessageRequestCollector {
 	siriGeneralMessageRequestCollector := &SIRIGeneralMessageRequestCollector{}
 	siriGeneralMessageRequestCollector.partner = partner
+	manager := partner.Referential().CollectManager()
+	siriGeneralMessageRequestCollector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
+
 	return siriGeneralMessageRequestCollector
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(request *SituationUpdateRequest) ([]*model.SituationUpdateEvent, error) {
+func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
 	logStashEvent := make(audit.LogStashEvent)
 	startTime := connector.Clock().Now()
 
@@ -46,14 +51,14 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["response"] = fmt.Sprintf("Error during GetGeneralMessage: %v", err)
-		return nil, err
+		return
 	}
 
 	logXMLGeneralMessageResponse(logStashEvent, xmlGeneralMessageResponse)
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
 	connector.setSituationUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
 
-	return situationUpdateEvents, nil
+	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageResponse) {
@@ -87,6 +92,16 @@ func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(si
 		situationEvent.SituationAttributes.Channel = xmlGeneralMessage.InfoChannelRef()
 		situationEvent.SituationAttributes.ValidUntil = xmlGeneralMessage.ValidUntilTime()
 		*situationEvents = append(*situationEvents, situationEvent)
+	}
+}
+
+func (connector *SIRIGeneralMessageRequestCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
+	connector.situationUpdateSubscriber = situationUpdateSubscriber
+}
+
+func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
+	if connector.situationUpdateSubscriber != nil {
+		connector.situationUpdateSubscriber(event)
 	}
 }
 

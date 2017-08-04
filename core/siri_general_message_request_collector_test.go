@@ -12,6 +12,14 @@ import (
 	"github.com/af83/edwig/model"
 )
 
+type fakeSituationBroadcaster struct {
+	Events []*model.SituationUpdateEvent
+}
+
+func (fb *fakeSituationBroadcaster) FakeBroadcaster(events []*model.SituationUpdateEvent) {
+	fb.Events = events
+}
+
 func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath string) []*model.SituationUpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 	// Create a test http server
@@ -45,13 +53,14 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	partners.Model().Situations().Save(&situation)
 
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
+
+	fs := fakeSituationBroadcaster{}
+	siriGeneralMessageRequestCollector.SetSituationUpdateSubscriber(fs.FakeBroadcaster)
 	siriGeneralMessageRequestCollector.SetClock(model.NewFakeClock())
 	situationUpdateRequest := NewSituationUpdateRequest(SituationUpdateRequestId(situation.Id()))
-	situationUpdateEvents, err := siriGeneralMessageRequestCollector.RequestSituationUpdate(situationUpdateRequest)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return situationUpdateEvents
+	siriGeneralMessageRequestCollector.RequestSituationUpdate(situationUpdateRequest)
+
+	return fs.Events
 }
 
 func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
