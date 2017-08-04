@@ -10,7 +10,7 @@ import (
 )
 
 type GeneralMessageRequestCollector interface {
-	RequestSituationUpdate(request *SituationUpdateRequest) ([]*model.SituationUpdateEvent, error)
+	RequestSituationUpdate(request *SituationUpdateRequest)
 }
 
 type SIRIGeneralMessageRequestCollectorFactory struct{}
