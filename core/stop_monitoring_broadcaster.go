@@ -96,8 +96,8 @@ func (smb *SMBroadcaster) RemoteObjectIDKind() string {
 func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	smb.connector.mutex.Lock()
 
-	events := smb.connector.events
-	smb.connector.events = make(map[SubscriptionId][]*model.StopMonitoringBroadcastEvent)
+	events := smb.connector.toBroadcast
+	smb.connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
 	smb.connector.mutex.Unlock()
 
@@ -114,32 +114,21 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
 			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", key),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
-
-			Status: true,
+			Status:                    true,
 		}
 
 		svIds := make(map[string]bool) //Making sure not to send 2 times the same SV
 
-		for _, event := range sub {
-			for _, sm := range smb.handleEvent(event, tx) {
-				if _, ok := svIds[sm.ItemIdentifier]; ok {
-					continue
-				}
-				delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
+		for _, svId := range sub {
+			sm := smb.getMonitoredStopVisit(svId, tx)
+
+			if _, ok := svIds[sm.ItemIdentifier]; ok {
+				continue
 			}
+			delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
+			svIds[sm.ItemIdentifier] = true
 		}
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
-	}
-}
-
-func (smb *SMBroadcaster) handleEvent(event *model.StopMonitoringBroadcastEvent, tx *model.Transaction) []*siri.SIRIMonitoredStopVisit {
-	switch event.ModelType {
-	case "StopVisit":
-		sv := smb.getMonitoredStopVisit(model.StopVisitId(event.ModelId), tx)
-		//Update Subscription status
-		return []*siri.SIRIMonitoredStopVisit{sv}
-	default:
-		return nil
 	}
 }
 

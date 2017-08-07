@@ -1,13 +1,13 @@
 package core
 
-import "github.com/af83/edwig/model"
+import "github.com/af83/edwig/siri"
 
 type lastState interface {
-	Ischanged(interface{}) bool
+	Haschanged(interface{}) bool
 }
 
-type stopVisitLastChange struct {
-	Schedules model.StopVisitSchedules
+type stopMonitoringLastChange struct {
+	lastChange siri.SIRIMonitoredStopVisit
 }
 
 type vehicleJourneyLastChange struct {
@@ -16,8 +16,8 @@ type vehicleJourneyLastChange struct {
 type lineLastChange struct {
 }
 
-func (sve *stopVisitLastChange) Ischanged(svbeInterface interface{}) bool {
+func (sve *stopMonitoringLastChange) Haschanged(svbeInterface interface{}) bool {
 	// stopVisitBroadcastEvent := svbeInterface.(model.StopVisitBroadcastEvent)
 	// stopVisitBroadcastEvent.Schedules == sve.Schedules
-	return false
+	return true
 }

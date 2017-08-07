@@ -10,7 +10,7 @@ type StopMonitoringSubscriptionBroadcaster interface {
 	model.Stopable
 	model.Startable
 
-	handleStopVisitBroadcastEvent(*model.StopMonitoringBroadcastEvent)
+	handleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 }
 
 type SIRIStopMonitoringSubscriptionBroadcaster struct {
@@ -20,7 +20,7 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 	siriConnector
 
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
-	events                    map[SubscriptionId][]*model.StopMonitoringBroadcastEvent
+	toBroadcast               map[SubscriptionId][]model.StopVisitId
 	mutex                     *sync.Mutex //protect the map
 }
 
@@ -40,7 +40,7 @@ func NewTestStopMonitoringSubscriptionBroadcaster() *TestStopMonitoringSubscript
 	return connector
 }
 
-func (connector *TestStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *TestStopMonitoringSubscriptionBroadcaster) handleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 
@@ -69,7 +69,7 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	siriStopMonitoringSubscriptionBroadcaster := &SIRIStopMonitoringSubscriptionBroadcaster{}
 	siriStopMonitoringSubscriptionBroadcaster.partner = partner
 	siriStopMonitoringSubscriptionBroadcaster.mutex = &sync.Mutex{}
-	siriStopMonitoringSubscriptionBroadcaster.events = make(map[SubscriptionId][]*model.StopMonitoringBroadcastEvent)
+	siriStopMonitoringSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
 	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(siriStopMonitoringSubscriptionBroadcaster)
 	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster.Run()
@@ -90,8 +90,64 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
 	connector.stopMonitoringBroadcaster.Run()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+	switch event.ModelType {
+	case "StopVisit":
+		sv, ok := connector.Partner().Model().StopVisits().Find(model.StopVisitId(event.ModelId))
+		subId, ok := connector.checkEvent(sv)
+		if ok {
+			connector.addStopVisit(subId, sv.Id())
+		}
+	case "VehicleJourney":
+		for _, sv := range connector.Partner().Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId)) {
+			subId, ok := connector.checkEvent(sv)
+			if ok {
+				connector.addStopVisit(subId, sv.Id())
+			}
+		}
+	default:
+		return
+	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
 	connector.mutex.Lock()
-	connector.events[SubscriptionId(event.SubscriptionId)] = append(connector.events[SubscriptionId(event.SubscriptionId)], event)
+	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], svId)
 	connector.mutex.Unlock()
+}
+
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit) (SubscriptionId, bool) {
+	subId := SubscriptionId(0) //just to return a correct type for errors
+
+	stopArea, ok := connector.Partner().Model().StopAreas().Find(sv.StopAreaId)
+	if !ok {
+		return subId, false
+	}
+
+	obj, ok := stopArea.ObjectID(connector.partner.Setting("remote_objectid_kind"))
+	if !ok {
+		return subId, false
+	}
+
+	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String())
+	if !ok {
+		return subId, false
+	}
+
+	subId = sub.Id()
+
+	ressources := sub.ResourcesByObjectID()
+
+	ressource, ok := ressources[obj.String()]
+
+	if !ok {
+		return subId, false
+	}
+
+	lastState, ok := ressource.LastStates[string(sv.Id())]
+
+	if ok == true && !lastState.Haschanged(sv) {
+		return subId, false
+	}
+	return subId, true
 }
