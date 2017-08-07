@@ -71,9 +71,6 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
-	referential.model.SetBroadcasteChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
-
 	referential.broacasterManager.Run()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")

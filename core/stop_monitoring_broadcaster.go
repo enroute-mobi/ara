@@ -104,8 +104,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for key, sub := range events {
-
+	for key, stopVisits := range events {
 		//Voir pour le RequestMessageRef
 
 		delivery := siri.SIRINotifyStopMonitoring{
@@ -117,16 +116,39 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			Status:                    true,
 		}
 
-		svIds := make(map[string]bool) //Making sure not to send 2 times the same SV
+		svIds := make(map[model.StopVisitId]bool) //Making sure not to send 2 times the same SV
 
-		for _, svId := range sub {
-			sm := smb.getMonitoredStopVisit(svId, tx)
-
-			if _, ok := svIds[sm.ItemIdentifier]; ok {
+		for _, svId := range stopVisits {
+			if _, ok := svIds[svId]; ok == true {
 				continue
 			}
-			delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
-			svIds[sm.ItemIdentifier] = true
+			sm := smb.getMonitoredStopVisit(svId, tx)
+			if sm == nil {
+				continue
+			}
+
+			sub, _ := smb.connector.Partner().Subscriptions().Find(key)
+			obj := model.NewObjectID(smb.connector.Partner().Setting("remote_objectid_kind"), sm.StopPointRef)
+			ressource := sub.Resource(obj)
+
+			for _, svId := range stopVisits {
+				sm := smb.getMonitoredStopVisit(svId, tx)
+
+				if _, ok := svIds[svId]; ok {
+					continue
+				}
+				delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
+				svIds[svId] = true
+
+				lastStateInterface, _ := ressource.LastStates[string(svId)]
+				lastState, ok := lastStateInterface.(*stopMonitoringLastChange)
+				if !ok {
+					continue
+				}
+
+				lastState.UpdateState(*sm)
+				svIds[svId] = false
+			}
 		}
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
 	}
