@@ -21,3 +21,17 @@ func (smlc *stopMonitoringLastChange) UpdateState(sm siri.SIRIMonitoredStopVisit
 	smlc.lastChange = sm
 	return true
 }
+
+type generalMessageLastChange struct {
+	lastChange siri.SIRIGeneralMessage
+}
+
+func (smlc *generalMessageLastChange) Haschanged(situation model.Situation) bool {
+
+	return true
+}
+
+func (smlc *generalMessageLastChange) UpdateState(sm siri.SIRIGeneralMessage) bool {
+	smlc.lastChange = sm
+	return true
+}

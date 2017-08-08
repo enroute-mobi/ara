@@ -9,6 +9,8 @@ const (
 	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR    = "siri-stop-monitoring-subscription-collector"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monotoring-subscription-broadcaster"
 	TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monotoring-subscription-broadcaster-test"
+	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER  = "siri-general-message-subscription-broadcaster"
+	TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER  = "siri-general-message-subscription-broadcaster-test"
 	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "siri-general-message-request-collector"
 	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER       = "siri-general-message-request-broadcaster"
 	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR    = "siri-general-message-subscription-collector"

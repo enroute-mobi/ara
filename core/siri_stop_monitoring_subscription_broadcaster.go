@@ -48,11 +48,11 @@ func (factory *TestSIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(ap
 	return true
 }
 
-// END OF TEST
-
 func (factory *TestSIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewTestStopMonitoringSubscriptionBroadcaster()
 }
+
+// END OF TEST
 
 func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return newSIRIStopMonitoringSubscriptionBroadcaster(partner)
