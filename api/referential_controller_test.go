@@ -137,7 +137,7 @@ func Test_ReferentialController_Create(t *testing.T) {
 	// referential should be 6ba7b814-9dad-11d1-1-00c04fd430c8
 	referential := server.CurrentReferentials().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	if referential == nil {
-		t.Errorf("Referential should be found after POST request")
+		t.Fatal("Referential should be found after POST request")
 	}
 	if expected := core.ReferentialSlug("test"); referential.Slug() != expected {
 		t.Errorf("Invalid referential slug after POST request:\n got: %v\n want: %v", referential.Slug(), expected)

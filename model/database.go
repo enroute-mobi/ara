@@ -75,7 +75,7 @@ func InitTestDb(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	config.Config.ApiKey = ""
 	// Initialize Database
 	Database = InitDB(config.Config.DB)
 }
