@@ -170,9 +170,8 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     Then a Subscription exist with the following attributes:
       | Kind                      | EstimatedTimetable          |
 
-  @wip
-    Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
 
+  Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
