@@ -10,11 +10,14 @@ type BroadcastManagerInterface interface {
 
 	Run()
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
+	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent
 }
 
 type BroadcastManager struct {
-	Referential  *Referential
+	Referential *Referential
+
 	smbEventChan chan model.StopMonitoringBroadcastEvent
+	gmbEventChan chan model.GeneralMessageBroadcastEvent
 	stop         chan struct{}
 }
 
@@ -22,6 +25,7 @@ func NewBroadcastManager(referential *Referential) *BroadcastManager {
 	return &BroadcastManager{
 		Referential:  referential,
 		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 0),
+		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 0),
 	}
 }
 
@@ -29,14 +33,22 @@ func (manager *BroadcastManager) GetStopMonitoringBroadcastEventChan() chan mode
 	return manager.smbEventChan
 }
 
-func (manager *BroadcastManager) GetPartnersWithConnector(event *model.StopMonitoringBroadcastEvent) []*Partner {
+func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent {
+	return manager.gmbEventChan
+}
+
+func (manager *BroadcastManager) GetPartnersWithConnector(connectorTypes []string) []*Partner {
 	partners := []*Partner{}
 
 	for _, partner := range manager.Referential.Partners().FindAll() {
-		_, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-
-		if !ok && !testConnectorPresent {
+		ok := false
+		for _, connectorType := range connectorTypes {
+			if _, present := partner.Connector(connectorType); !present {
+				continue
+			}
+			ok = true
+		}
+		if !ok {
 			continue
 		}
 		partners = append(partners, partner)
@@ -54,7 +66,8 @@ func (manager *BroadcastManager) run() {
 	for {
 		select {
 		case event := <-manager.smbEventChan:
-			for _, partner := range manager.GetPartnersWithConnector(&event) {
+			connectorTypes := []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
 				connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 				if ok {
 					connector.(*SIRIStopMonitoringSubscriptionBroadcaster).handleStopMonitoringBroadcastEvent(&event)
@@ -65,6 +78,22 @@ func (manager *BroadcastManager) run() {
 				connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 				if ok {
 					connector.(*TestStopMonitoringSubscriptionBroadcaster).handleStopMonitoringBroadcastEvent(&event)
+					continue
+				}
+			}
+		case event := <-manager.gmbEventChan:
+			connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
+			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+				connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+				if ok {
+					connector.(*SIRIGeneralMessageSubscriptionBroadcaster).handleGeneralMessageBroadcastEvent(&event)
+					continue
+				}
+
+				// TEST
+				connector, ok = partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+				if ok {
+					connector.(*TestGeneralMessageSubscriptionBroadcaster).handleGeneralMessageBroadcastEvent(&event)
 					continue
 				}
 			}
