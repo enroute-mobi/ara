@@ -21,7 +21,7 @@ type MemoryModel struct {
 	situations      Situations
 	operators       Operators
 
-	modelEventsChan chan StopMonitoringBroadcastEvent
+	SMEventsChan chan StopMonitoringBroadcastEvent
 }
 
 func NewMemoryModel() *MemoryModel {
@@ -44,7 +44,7 @@ func NewMemoryModel() *MemoryModel {
 	stopVisits := NewMemoryStopVisits()
 	stopVisits.model = model
 	model.stopVisits = stopVisits
-	model.stopVisits.broadcastEvent = model.broadcastEvent
+	model.stopVisits.broadcastEvent = model.broadcastSMEvent
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	vehicleJourneys.model = model
@@ -58,12 +58,12 @@ func NewMemoryModel() *MemoryModel {
 }
 
 func (model *MemoryModel) SetBroadcasteChan(broadcastEventChan chan StopMonitoringBroadcastEvent) {
-	model.modelEventsChan = broadcastEventChan
+	model.SMEventsChan = broadcastEventChan
 }
 
-func (model *MemoryModel) broadcastEvent(event StopMonitoringBroadcastEvent) {
+func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	select {
-	case model.modelEventsChan <- event:
+	case model.SMEventsChan <- event:
 	default:
 		logger.Log.Debugf("Cannot send StopMonitoringBroadcastEvent to BrocasterManager")
 	}
