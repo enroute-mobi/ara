@@ -62,6 +62,10 @@ func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonit
 	model.SMEventsChan = broadcastSMEventChan
 }
 
+func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan GeneralMessageBroadcastEvent) {
+	model.GMEventsChan = broadcastGMEventChan
+}
+
 func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	select {
 	case model.SMEventsChan <- event:
