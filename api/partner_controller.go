@@ -210,3 +210,16 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }
+
+func (controller *PartnerController) Save(response http.ResponseWriter) {
+	logger.Log.Debugf("Saving partners to database")
+
+	err := controller.referential.Partners().SaveToDatabase()
+
+	if len(err) != 0 {
+		response.WriteHeader(http.StatusInternalServerError)
+		jsonBytes, _ := json.Marshal(err)
+		response.Write(jsonBytes)
+	}
+	return
+}

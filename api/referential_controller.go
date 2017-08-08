@@ -110,3 +110,16 @@ func (controller *ReferentialController) Create(response http.ResponseWriter, bo
 	jsonBytes, _ := referential.MarshalJSON()
 	response.Write(jsonBytes)
 }
+
+func (controller *ReferentialController) Save(response http.ResponseWriter) {
+	logger.Log.Debugf("Saving referentials to database")
+
+	err := controller.server.CurrentReferentials().SaveToDatabase()
+
+	if len(err) != 0 {
+		response.WriteHeader(http.StatusInternalServerError)
+		jsonBytes, _ := json.Marshal(err)
+		response.Write(jsonBytes)
+	}
+	return
+}

@@ -327,7 +327,6 @@ func Test_PartnerController_Index(t *testing.T) {
 
 func Test_PartnerController_FindPartner(t *testing.T) {
 	// Create a referential
-
 	referentials := core.NewMemoryReferentials()
 	referential := referentials.New("default")
 	referential.Save()
@@ -346,5 +345,62 @@ func Test_PartnerController_FindPartner(t *testing.T) {
 	foundPartner = controller.findPartner(string(partner.Id()))
 	if foundPartner == nil {
 		t.Error("Can't find Partner by Id")
+	}
+}
+
+func Test_PartnerController_Save(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(model.NewRealUUIDGenerator())
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+	errors := referentials.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Cannot save referentials to Database: %v", errors)
+	}
+
+	// Initialize the partners manager
+	referential.Partners().SetUUIDGenerator(model.NewRealUUIDGenerator())
+	// Save a new partner
+	partner := referential.Partners().New("First Partner")
+	referential.Partners().Save(partner)
+
+	// Create a request
+	request, err := http.NewRequest("POST", "/default/partners/save", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+
+	// Test response
+	partnerCheckResponseStatus(responseRecorder, t)
+
+	//Test Results
+	selectPartners := []model.SelectPartner{}
+	sqlQuery := fmt.Sprintf("select * from partners")
+	_, err = model.Database.Select(&selectPartners, sqlQuery)
+	if err != nil {
+		t.Fatalf("Error while fetching partners: %v", err)
+	}
+	if len(selectPartners) == 0 {
+		t.Fatal("Partner should be found")
+	}
+	if selectPartners[0].Id != string(partner.Id()) {
+		t.Errorf("Saved partner has wrong id, got: %v want: %v", selectPartners[0].Id, partner.Id())
+	}
+	if selectPartners[0].ReferentialId != string(referential.Id()) {
+		t.Errorf("Saved partner has wrong referential id, got: %v want: %v", selectPartners[0].ReferentialId, referential.Id())
 	}
 }

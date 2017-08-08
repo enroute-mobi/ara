@@ -1,8 +1,8 @@
 package core
 
 import (
-	"database/sql"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -46,6 +46,7 @@ type Referentials interface {
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 	Load() error
+	SaveToDatabase() map[string]string
 }
 
 var referentials = NewMemoryReferentials()
@@ -314,13 +315,7 @@ func (manager *MemoryReferentials) Delete(referential *Referential) bool {
 }
 
 func (manager *MemoryReferentials) Load() error {
-	var selectReferentials []struct {
-		Referential_id string
-		Slug           string
-		Settings       sql.NullString
-		Tokens         sql.NullString
-	}
-
+	selectReferentials := []model.SelectReferential{}
 	_, err := model.Database.Select(&selectReferentials, "select * from referentials")
 	if err != nil {
 		return err
@@ -349,6 +344,54 @@ func (manager *MemoryReferentials) Load() error {
 
 	logger.Log.Debugf("Loaded Referentials from database")
 	return nil
+}
+
+func (manager *MemoryReferentials) SaveToDatabase() map[string]string {
+	errors := make(map[string]string)
+
+	// Truncate Table
+	_, err := model.Database.Exec("truncate referentials;")
+	if err != nil {
+		errors["internal"] = fmt.Sprintf("Internal error: %v", err)
+		return errors
+	}
+
+	// Insert referentials
+	for _, referential := range manager.byId {
+		dbReferential, err := manager.newDbReferential(referential)
+		if err != nil {
+			errors[string(referential.id)] = fmt.Sprintf("Error while saving referential: %v", err)
+		}
+		err = model.Database.Insert(dbReferential)
+		if err != nil {
+			errors[string(referential.id)] = fmt.Sprintf("Error while saving referential: %v", err)
+		}
+	}
+
+	// Delete partners
+	_, err = model.Database.Exec("delete from partners where referential_id not in (select referential_id from referentials);")
+	if err != nil {
+		errors["internal"] = fmt.Sprintf("Internal error: %v", err)
+	}
+
+	return errors
+}
+
+func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*model.DatabaseReferential, error) {
+	settings, err := json.Marshal(referential.Settings)
+	if err != nil {
+		return nil, err
+	}
+	tokens, err := json.Marshal(referential.Tokens)
+	if err != nil {
+		return nil, err
+	}
+	return &model.DatabaseReferential{
+		ReferentialId: string(referential.id),
+		Slug:          string(referential.slug),
+		Settings:      string(settings),
+		Tokens:        string(tokens),
+	}, nil
 }
 
 func (manager *MemoryReferentials) Start() {

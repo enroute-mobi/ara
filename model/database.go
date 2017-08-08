@@ -13,6 +13,36 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type DatabaseReferential struct {
+	ReferentialId string `db:"referential_id"`
+	Slug          string `db:"slug"`
+	Settings      string `db:"settings"`
+	Tokens        string `db:"tokens"`
+}
+
+type SelectReferential struct {
+	Referential_id string
+	Slug           string
+	Settings       sql.NullString
+	Tokens         sql.NullString
+}
+
+type DatabasePartner struct {
+	Id             string `db:"id"`
+	ReferentialId  string `db:"referential_id"`
+	Slug           string `db:"slug"`
+	Settings       string `db:"settings"`
+	ConnectorTypes string `db:"connector_types"`
+}
+
+type SelectPartner struct {
+	Id             string
+	ReferentialId  string `db:"referential_id"`
+	Slug           string
+	Settings       sql.NullString
+	ConnectorTypes sql.NullString `db:"connector_types"`
+}
+
 var Database *gorp.DbMap
 
 func InitDB(config config.DatabaseConfig) *gorp.DbMap {
@@ -28,6 +58,8 @@ func InitDB(config config.DatabaseConfig) *gorp.DbMap {
 	logger.Log.Debugf("Connected to Database %s", config.Name)
 	// construct a gorp DbMap
 	database := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
+	database.AddTableWithName(DatabaseReferential{}, "referentials")
+	database.AddTableWithName(DatabasePartner{}, "partners")
 
 	return database
 }

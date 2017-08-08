@@ -196,3 +196,43 @@ func Test_ReferentialController_Index(t *testing.T) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), expected)
 	}
 }
+
+func Test_ReferentialController_Save(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(model.NewRealUUIDGenerator())
+	// Save a new referential
+	referential := referentials.New("First Referential")
+	referentials.Save(referential)
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+	// Create a request
+	request, err := http.NewRequest("POST", "/_referentials/save", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+
+	// Test response
+	referentialCheckResponseStatus(responseRecorder, t)
+
+	//Test Results
+	referentials2 := core.NewMemoryReferentials()
+	err = referentials2.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if r := referentials2.Find(core.ReferentialId(referential.Id())); r == nil {
+		t.Errorf("Loaded Referentials should be found")
+	}
+}

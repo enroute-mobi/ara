@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -275,20 +276,13 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	defer model.CleanTestDb(t)
 
 	// Insert Data in the test db
-	var databaseReferential = struct {
-		Referential_id string `db:"referential_id"`
-		Slug           string `db:"slug"`
-		Settings       string `db:"settings"`
-		Tokens         string `db:"tokens"`
-	}{
-		Referential_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Slug:           "ratp",
-		Settings:       "{ \"test.key\": \"test-value\" }",
-		Tokens:         "[\"apiToken\"]",
+	dbRef := model.DatabaseReferential{
+		ReferentialId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Slug:          "ratp",
+		Settings:      "{ \"test.key\": \"test-value\" }",
+		Tokens:        "[\"apiToken\"]",
 	}
-
-	model.Database.AddTableWithName(databaseReferential, "referentials")
-	err := model.Database.Insert(&databaseReferential)
+	err := model.Database.Insert(&dbRef)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -300,7 +294,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	referentialId := ReferentialId(databaseReferential.Referential_id)
+	referentialId := ReferentialId(dbRef.ReferentialId)
 	referential := referentials.Find(referentialId)
 	if referential == nil {
 		t.Errorf("Loaded Referentials should be found")
@@ -317,5 +311,172 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	}
 	if expected := "apiToken"; len(referential.Tokens) != 1 || referential.Tokens[0] != expected {
 		t.Errorf("Wrong Tokens:\n got: %v\n expected: %v", referential.Tokens, expected)
+	}
+}
+
+func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	// Insert Referential in the test db
+	referentials := NewMemoryReferentials()
+	ref := referentials.New("slug")
+	ref.Save()
+
+	errors := referentials.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Referentials: %v", errors)
+	}
+
+	// Insert to times to check uniqueness constraints
+	ref2 := referentials.New("slug2")
+	ref2.Settings = map[string]string{"setting": "value"}
+	ref2.Tokens = []string{"token"}
+	ref2.Save()
+
+	errors = referentials.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Referentials: %v", errors)
+	}
+
+	// Check Referentials
+	referentials2 := NewMemoryReferentials()
+	err := referentials2.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if referential := referentials2.Find(ReferentialId(ref.id)); referential == nil {
+		t.Errorf("Loaded Referentials should be found")
+	}
+	referential := referentials2.Find(ReferentialId(ref2.id))
+	if referential == nil {
+		t.Fatalf("Loaded Referentials should be found")
+	}
+	if referential.slug != "slug2" {
+		t.Errorf("Wrong Referential Slug, got: %v want: slug2", referential.slug)
+	}
+	if len(referential.Settings) != 1 || referential.Setting("setting") != "value" {
+		t.Errorf("Wrong Referential Settings, got: %v want {\"setting\":\"value\"}", referential.Settings)
+	}
+	if len(referential.Tokens) != 1 || referential.Tokens[0] != "token" {
+		t.Errorf("Wrong Referential tokens, got: %v want: [token]", referential.Tokens)
+	}
+}
+
+func Test_MemoryReferentials_SaveToDatabase_CleanPartners(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	// Insert Partner in the test db
+	dbPartner := model.DatabasePartner{
+		Id:             "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId:  "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Slug:           "ratp",
+		Settings:       "{}",
+		ConnectorTypes: "[]",
+	}
+	err := model.Database.Insert(&dbPartner)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Insert Referential in the test db
+	referentials := NewMemoryReferentials()
+	ref := referentials.New("slug")
+	ref.Save()
+
+	errors := referentials.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Referentials: %v", errors)
+	}
+
+	// Check Partner
+	selectPartners := []model.SelectPartner{}
+	sqlQuery := fmt.Sprintf("select * from partners")
+	_, err = model.Database.Select(&selectPartners, sqlQuery)
+	if err != nil {
+		t.Fatalf("Error while fetching partners: %v", err)
+	}
+
+	if len(selectPartners) != 0 {
+		t.Errorf("Partner should not be found")
+	}
+}
+
+func Test_MemoryReferentials_SaveToDatabase_PartnerWithoutReferential(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	referentials := NewMemoryReferentials()
+	ref := referentials.New("slug")
+	ref.Save()
+
+	partner := ref.partners.New("slug")
+	partner.Save()
+
+	errors := ref.partners.SaveToDatabase()
+	if len(errors) != 1 {
+		t.Fatalf("Partner save should return an error, got: %v", errors)
+	}
+}
+
+func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	// Insert Referential in the test db
+	referentials := NewMemoryReferentials()
+	ref := referentials.New("slug")
+	ref.Save()
+
+	errors := referentials.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Referentials: %v", errors)
+	}
+
+	// Insert Partner in the test db
+	partners := ref.partners
+	partner := partners.New("slug")
+	partner.Save()
+
+	errors = partners.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Partners: %v", errors)
+	}
+
+	// Save data in the DB 2 times to check uniqueness constraints
+	partner2 := partners.New("slug2")
+	partner2.Settings = map[string]string{"setting": "value"}
+	partner2.ConnectorTypes = []string{"connector"}
+	partner2.Save()
+
+	errors = partners.SaveToDatabase()
+	if len(errors) != 0 {
+		t.Fatalf("Error while saving Partners: %v", errors)
+	}
+
+	// Check Partners
+	partners2 := NewPartnerManager(ref)
+	err := partners2.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if p := partners2.Find(PartnerId(partner.id)); p == nil {
+		t.Errorf("Loaded Partners should be found")
+	}
+	testPartner := partners2.Find(PartnerId(partner2.id))
+	if testPartner == nil {
+		t.Fatalf("Loaded Partners should be found")
+	}
+	if testPartner.slug != "slug2" {
+		t.Errorf("Wrong Partner Slug, got: %v want: slug2", testPartner.slug)
+	}
+	if len(testPartner.Settings) != 1 || testPartner.Setting("setting") != "value" {
+		t.Errorf("Wrong Partner Settings, got: %v want {\"setting\":\"value\"}", testPartner.Settings)
+	}
+	if len(testPartner.ConnectorTypes) != 1 || testPartner.ConnectorTypes[0] != "connector" {
+		t.Errorf("Wrong Partner ConnectorTypes, got: %v want [connector]", testPartner.ConnectorTypes)
 	}
 }

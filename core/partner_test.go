@@ -419,22 +419,14 @@ func Test_MemoryPartners_Load(t *testing.T) {
 	referentials.Save(referential)
 
 	// Insert Data in the test db
-	var databasePartner = struct {
-		Id             string `db:"id"`
-		ReferentialId  string `db:"referential_id"`
-		Slug           string `db:"slug"`
-		Settings       string `db:"settings"`
-		ConnectorTypes string `db:"connector_types"`
-	}{
+	dbPartner := model.DatabasePartner{
 		Id:             "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:  string(referential.Id()),
 		Slug:           "ratp",
 		Settings:       "{}",
 		ConnectorTypes: "[]",
 	}
-
-	model.Database.AddTableWithName(databasePartner, "partners")
-	err := model.Database.Insert(&databasePartner)
+	err := model.Database.Insert(&dbPartner)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -446,7 +438,7 @@ func Test_MemoryPartners_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	partnerId := PartnerId(databasePartner.Id)
+	partnerId := PartnerId(dbPartner.Id)
 	partner := partners.Find(partnerId)
 	if partner == nil {
 		t.Errorf("Loaded Partners should be found")
@@ -454,6 +446,9 @@ func Test_MemoryPartners_Load(t *testing.T) {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", partner.Id(), partnerId)
 	}
 }
+
+// Tested in Referential
+// func Test_MemoryPartners_SaveToDatabase(t *testing.T) {}
 
 func Test_Partners_StartStop(t *testing.T) {
 	referentials := NewMemoryReferentials()

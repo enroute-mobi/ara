@@ -35,6 +35,10 @@ type ActionResource interface {
 	Action(response http.ResponseWriter, requestData *RequestData)
 }
 
+type Savable interface {
+	Save(response http.ResponseWriter)
+}
+
 type ControllerInterface interface {
 	serve(response http.ResponseWriter, request *http.Request, requestData *RequestData)
 }
@@ -57,9 +61,18 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 }
 
 func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-
-	if requestData.Method == "PUT" || requestData.Method == "POST" {
+	// Check request body
+	if (requestData.Method == "POST" || requestData.Method == "PUT") && requestData.Id != "save" {
 		requestData.Body = getRequestBody(response, request)
+		if requestData.Body == nil {
+			return
+		}
+	}
+
+	// Check request Id
+	if (requestData.Method == "DELETE" || requestData.Method == "PUT") && requestData.Id == "" {
+		http.Error(response, "Invalid request", 400)
+		return
 	}
 
 	if requestData.Action != "" {
@@ -73,30 +86,22 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 	case "GET":
 		if requestData.Id == "" {
 			controller.restfulRessource.Index(response)
-		} else {
-			controller.restfulRessource.Show(response, requestData.Id)
-		}
-	case "DELETE":
-		if requestData.Id == "" {
-			http.Error(response, "Invalid request", 400)
 			return
 		}
+		controller.restfulRessource.Show(response, requestData.Id)
+	case "DELETE":
 		controller.restfulRessource.Delete(response, requestData.Id)
 	case "PUT":
-		if requestData.Id == "" {
-			http.Error(response, "Invalid request", 400)
-			return
-		}
-		if requestData.Body == nil {
-			return
-		}
 		controller.restfulRessource.Update(response, requestData.Id, requestData.Body)
 	case "POST":
+		if requestData.Id == "save" {
+			if savableResource, ok := controller.restfulRessource.(Savable); ok {
+				savableResource.Save(response)
+				return
+			}
+		}
 		if requestData.Id != "" {
 			http.Error(response, "Invalid request", 400)
-			return
-		}
-		if requestData.Body == nil {
 			return
 		}
 		controller.restfulRessource.Create(response, requestData.Body)

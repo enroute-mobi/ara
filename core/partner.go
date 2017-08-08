@@ -1,7 +1,6 @@
 package core
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -43,6 +42,7 @@ type Partners interface {
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
+	SaveToDatabase() map[string]string
 }
 
 type PartnerStatus struct {
@@ -316,7 +316,11 @@ func (partner *Partner) RefreshConnectors() {
 
 	for _, connectorType := range partner.ConnectorTypes {
 		if _, ok := partner.connectors[connectorType]; !ok {
-			partner.connectors[connectorType] = NewConnectorFactory(connectorType).CreateConnector(partner)
+			factory := NewConnectorFactory(connectorType)
+			if factory == nil {
+				continue
+			}
+			partner.connectors[connectorType] = factory.CreateConnector(partner)
 		}
 	}
 	partner.cleanConnectors()
@@ -543,13 +547,7 @@ func (manager *PartnerManager) CancelSubscriptions() {
 }
 
 func (manager *PartnerManager) Load() error {
-	var selectPartners []struct {
-		Id             string
-		ReferentialId  string `db:"referential_id"`
-		Slug           string
-		Settings       sql.NullString
-		ConnectorTypes sql.NullString `db:"connector_types"`
-	}
+	selectPartners := []model.SelectPartner{}
 	sqlQuery := fmt.Sprintf("select * from partners where referential_id = '%s'", manager.referential.Id())
 	_, err := model.Database.Select(&selectPartners, sqlQuery)
 	if err != nil {
@@ -575,4 +573,62 @@ func (manager *PartnerManager) Load() error {
 		manager.Save(partner)
 	}
 	return nil
+}
+
+func (manager *PartnerManager) SaveToDatabase() map[string]string {
+	errors := make(map[string]string)
+
+	// Truncate Table
+	_, err := model.Database.Exec("truncate partners;")
+	if err != nil {
+		errors["internal"] = fmt.Sprintf("Error while saving partner: %v", err)
+		return errors
+	}
+
+	// Insert partners
+	for _, partner := range manager.byId {
+		// Check presence of Referential
+		selectReferentials := []model.SelectReferential{}
+		sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
+		_, err := model.Database.Select(&selectReferentials, sqlQuery)
+		if err != nil {
+			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
+			continue
+		}
+		if len(selectReferentials) == 0 {
+			errors[string(partner.id)] = fmt.Sprintf("Trying to save partner without referential in db")
+			continue
+		}
+		// Save partner
+		dbPartner, err := manager.newDbPartner(partner)
+		if err != nil {
+			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
+			continue
+		}
+		err = model.Database.Insert(dbPartner)
+		if err != nil {
+			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
+			continue
+		}
+	}
+
+	return errors
+}
+
+func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePartner, error) {
+	settings, err := json.Marshal(partner.Settings)
+	if err != nil {
+		return nil, err
+	}
+	connectors, err := json.Marshal(partner.ConnectorTypes)
+	if err != nil {
+		return nil, err
+	}
+	return &model.DatabasePartner{
+		Id:             string(partner.id),
+		ReferentialId:  string(manager.referential.id),
+		Slug:           string(partner.slug),
+		Settings:       string(settings),
+		ConnectorTypes: string(connectors),
+	}, nil
 }
