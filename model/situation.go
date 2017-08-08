@@ -110,7 +110,8 @@ type MemorySituations struct {
 
 	model *MemoryModel
 
-	byIdentifier map[SituationId]*Situation
+	broadcastEvent func(event GeneralMessageBroadcastEvent)
+	byIdentifier   map[SituationId]*Situation
 }
 
 type Situations interface {
@@ -170,6 +171,14 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 	}
 	situation.model = manager.model
 	manager.byIdentifier[situation.Id()] = situation
+
+	event := GeneralMessageBroadcastEvent{
+		SituationId: situation.id,
+	}
+
+	if manager.broadcastEvent != nil {
+		manager.broadcastEvent(event)
+	}
 	return true
 }
 
