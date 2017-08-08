@@ -103,11 +103,10 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 				}
 				var stopPointRef string
 				stopAreaId, ok := stopArea.ObjectID(connector.remoteObjectIDKind())
-				if ok {
-					stopPointRef = stopAreaId.Value()
-				} else {
-					// TO FIX: How to handle when StopArea hasn't an ObjectId of correct Kind ?
+				if !ok {
+					continue
 				}
+				stopPointRef = stopAreaId.Value()
 
 				estimatedCall := siri.SIRIEstimatedCall{
 					ArrivalStatus:       string(stopVisit.ArrivalStatus),
