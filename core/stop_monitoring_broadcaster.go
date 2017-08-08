@@ -2,8 +2,10 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -68,6 +70,8 @@ func (smb *StopMonitoringBroadcaster) run() {
 	for {
 		select {
 		case <-smb.stop:
+			logger.Log.Debugf("stop monitoring broadcaster routine stop")
+
 			return
 		case <-c:
 			logger.Log.Debugf("SIRIStopMonitoringBroadcaster visit")
@@ -99,6 +103,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	smb.connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
 	smb.connector.mutex.Unlock()
+
+	logStashEvent := make(audit.LogStashEvent)
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
@@ -149,7 +156,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				svIds[svId] = false
 			}
 		}
+		logSIRIStopMonitoringNotify(logStashEvent, &delivery)
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
+
 	}
 }
 
@@ -305,4 +314,23 @@ func (connector *SMBroadcaster) reformatReferences(toReformat []string, referenc
 			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
 		}
 	}
+}
+
+func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
+	logStashEvent["producerRef"] = response.ProducerRef
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef
+	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	if !response.Status {
+		logStashEvent["errorType"] = response.ErrorType
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		logStashEvent["errorText"] = response.ErrorText
+	}
+	xml, err := response.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["responseXML"] = xml
 }
