@@ -286,7 +286,7 @@ func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID) bool {
 	}
 	stopAreas := strings.Split(partner.Settings["collect.include_stop_areas"], ",")
 	for _, stopArea := range stopAreas {
-		if stopArea == stopAreaObjectId.Value() {
+		if strings.TrimSpace(stopArea) == stopAreaObjectId.Value() {
 			return true
 		}
 	}
