@@ -22,6 +22,7 @@ type MemoryModel struct {
 	operators       Operators
 
 	SMEventsChan chan StopMonitoringBroadcastEvent
+	GMEventsChan chan GeneralMessageBroadcastEvent
 }
 
 func NewMemoryModel() *MemoryModel {
@@ -57,8 +58,8 @@ func NewMemoryModel() *MemoryModel {
 	return model
 }
 
-func (model *MemoryModel) SetBroadcasteChan(broadcastEventChan chan StopMonitoringBroadcastEvent) {
-	model.SMEventsChan = broadcastEventChan
+func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
+	model.SMEventsChan = broadcastSMEventChan
 }
 
 func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {

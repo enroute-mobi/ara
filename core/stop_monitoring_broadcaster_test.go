@@ -18,7 +18,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.model = model.NewMemoryModel()
 
-	referential.model.SetBroadcasteChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.broacasterManager.Run()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
