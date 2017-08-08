@@ -129,7 +129,6 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                        |
       | ArrivalStatus                   | Delayed                                                              |
 
-  @wip
   Scenario: 4234 - Handle a SIRI EstimatedTimeTable request for subscription
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-collector] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -172,7 +171,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Kind                      | EstimatedTimetable          |
 
   @wip
-    Scenario: 4233 - Manage a ETT Notify after modification of a StopVisit
+    Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
 
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
