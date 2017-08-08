@@ -72,7 +72,6 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	siriStopMonitoringSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
 	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(siriStopMonitoringSubscriptionBroadcaster)
-	siriStopMonitoringSubscriptionBroadcaster.stopMonitoringBroadcaster.Run()
 
 	return siriStopMonitoringSubscriptionBroadcaster
 }
@@ -87,7 +86,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
 	if connector.stopMonitoringBroadcaster == nil {
 		connector.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(connector)
 	}
-	connector.stopMonitoringBroadcaster.Run()
+	connector.stopMonitoringBroadcaster.Start()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {

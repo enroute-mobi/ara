@@ -11,8 +11,7 @@ import (
 
 type SIRIStopMonitoringBroadcaster interface {
 	model.Stopable
-
-	Run()
+	model.Startable
 }
 
 type SMBroadcaster struct {
@@ -39,7 +38,7 @@ func NewFakeStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 	return broadcaster
 }
 
-func (broadcaster *FakeStopMonitoringBroadcaster) Run() {
+func (broadcaster *FakeStopMonitoringBroadcaster) Start() {
 	broadcaster.prepareSIRIStopMonitoringNotify()
 }
 
@@ -52,7 +51,7 @@ func NewSIRIStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 	return broadcaster
 }
 
-func (smb *StopMonitoringBroadcaster) Run() {
+func (smb *StopMonitoringBroadcaster) Start() {
 	if smb.stop != nil {
 		return
 	}

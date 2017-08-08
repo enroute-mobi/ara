@@ -118,7 +118,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit.Save()
 
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
-	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Run()
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 
 	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(response)
 	delivery := notify.StopMonitoringDeliveries()
@@ -136,5 +136,4 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	if len(sv) != 1 {
 		t.Errorf("Should have received 1 StopVisit but got == %v", len(sv))
 	}
-
 }

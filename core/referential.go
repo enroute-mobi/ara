@@ -267,6 +267,7 @@ func (manager *MemoryReferentials) new() *Referential {
 	referential.collectManager = NewCollectManager(referential)
 	referential.broacasterManager = NewBroadcastManager(referential)
 	referential.model.SetBroadcasteChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.broacasterManager.Run()
 
 	referential.modelGuardian = NewModelGuardian(referential)
 	referential.setNextReloadAt()
