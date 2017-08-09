@@ -76,6 +76,10 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIGeneralMessageRequestBroadcasterFactory{}
 	case SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR:
 		return &SIRIGeneralMessageSubscriptionCollectorFactory{}
+	case SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER:
+		return &SIRIGeneralMessageSubscriptionBroadcasterFactory{}
+	case TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER:
+		return &TestSIRIGeneralMessageSubscriptionBroadcasterFactory{}
 	case SIRI_ESTIMATED_TIMETABLE_BROADCASTER:
 		return &SIRIEstimatedTimetableBroadcasterFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
