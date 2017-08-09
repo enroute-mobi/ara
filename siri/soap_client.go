@@ -161,3 +161,11 @@ func (client *SOAPClient) NotifyStopMonitoring(request *SIRINotifyStopMonitoring
 	}
 	return nil
 }
+
+func (client *SOAPClient) NotifyGeneralMessage(request *SIRINotifyGeneralMessage) error {
+	_, err := client.prepareAndSendRequest(request, "NotifyGeneralMessage", false)
+	if err != nil {
+		return err
+	}
+	return nil
+}

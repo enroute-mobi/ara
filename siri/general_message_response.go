@@ -19,6 +19,7 @@ type XMLGeneralMessageDelivery struct {
 	ResponseXMLStructure
 
 	subscriptionRef                 string
+	subscriberRef                   string
 	xmlGeneralMessages              []*XMLGeneralMessage
 	xmlGeneralMessagesCancellations []*XMLGeneralMessageCancellation
 }

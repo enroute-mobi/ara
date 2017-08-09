@@ -129,6 +129,5 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	if ok == true && !lastState.(*generalMessageLastChange).Haschanged(situation) {
 		return subId, false
 	}
-
 	return sub.Id(), true
 }

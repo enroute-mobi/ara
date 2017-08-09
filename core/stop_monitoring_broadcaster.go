@@ -158,7 +158,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		}
 		logSIRIStopMonitoringNotify(logStashEvent, &delivery)
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
-
 	}
 }
 

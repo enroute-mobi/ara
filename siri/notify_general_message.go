@@ -32,6 +32,13 @@ func (delivery *XMLGeneralMessageDelivery) SubscriptionRef() string {
 	return delivery.subscriptionRef
 }
 
+func (delivery *XMLGeneralMessageDelivery) SubscriberRef() string {
+	if delivery.subscriberRef == "" {
+		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
+	}
+	return delivery.subscriberRef
+}
+
 func NewXMLNotifyGeneralMessage(node xml.Node) *XMLNotifyGeneralMessage {
 	xmlGeneralMessageResponse := &XMLNotifyGeneralMessage{}
 	xmlGeneralMessageResponse.node = NewXMLNode(node)
