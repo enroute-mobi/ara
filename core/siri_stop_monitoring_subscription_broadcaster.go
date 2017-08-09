@@ -133,8 +133,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	subId = sub.Id()
-
 	ressources := sub.ResourcesByObjectID()
 
 	ressource, ok := ressources[obj.String()]
@@ -148,5 +146,5 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 	if ok == true && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
 		return subId, false
 	}
-	return subId, true
+	return sub.Id(), true
 }

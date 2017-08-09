@@ -102,7 +102,33 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituation(subId S
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sv model.SituationId) (SubscriptionId, bool) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model.SituationId) (SubscriptionId, bool) {
 	subId := SubscriptionId(0) //just to return a correct type for errors
-	return subId, true
+
+	situation, ok := connector.Partner().Model().Situations().Find(sId)
+	if !ok {
+		return subId, false
+	}
+
+	obj, ok := situation.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+	if !ok {
+		return subId, false
+	}
+
+	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String())
+	if !ok {
+		return subId, false
+	}
+
+	ressources := sub.ResourcesByObjectID()
+
+	ressource, ok := ressources[obj.String()]
+
+	lastState, ok := ressource.LastStates[string(situation.Id())]
+
+	if ok == true && !lastState.(*generalMessageLastChange).Haschanged(situation) {
+		return subId, false
+	}
+
+	return sub.Id(), true
 }
