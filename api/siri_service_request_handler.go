@@ -24,15 +24,7 @@ func (handler *SIRIServiceRequestHandler) ConnectorType() string {
 func (handler *SIRIServiceRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("SiriService %s\n", handler.xmlRequest.MessageIdentifier())
 
-	response, err := connector.(core.ServiceRequestBroadcaster).HandleRequests(handler.xmlRequest)
-	if err != nil {
-		if sirierr, ok := err.(*siri.SiriError); ok {
-			siriErrorWithRequest(sirierr.ErrCode(), sirierr.Error(), handler.xmlRequest.RawXML(), rw)
-			return
-		}
-		// No other errors for the moment
-		return
-	}
+	response := connector.(core.ServiceRequestBroadcaster).HandleRequests(handler.xmlRequest)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)

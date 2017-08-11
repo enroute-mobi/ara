@@ -10,7 +10,7 @@ import (
 )
 
 type ServiceRequestBroadcaster interface {
-	HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error)
+	HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse
 }
 
 type SIRIServiceRequestBroadcaster struct {
@@ -27,12 +27,7 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	return siriServiceRequestBroadcaster
 }
 
-func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) (*siri.SIRIServiceResponse, error) {
-	stopMonitoringConnector, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
-	if !ok {
-		return nil, siri.NewSiriErrorWithCode("NotFound", "Can't find a SIRIStopMonitoringRequestBroadcaster connector")
-	}
-
+func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -56,7 +51,21 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 		logXMLSiriServiceStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
 
-		delivery := stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
+		var delivery siri.SIRIStopMonitoringDelivery
+
+		stopMonitoringConnector, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+		if !ok {
+			delivery = siri.SIRIStopMonitoringDelivery{
+				RequestMessageRef: stopMonitoringRequest.MessageIdentifier(),
+				Status:            false,
+				ResponseTimestamp: connector.Clock().Now(),
+				ErrorType:         "NotFound",
+				ErrorText:         "Can't find a SIRIStopMonitoringRequestBroadcaster connector",
+			}
+		} else {
+			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
+		}
+
 		if !delivery.Status {
 			response.Status = false
 		}
@@ -64,12 +73,12 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
 		audit.CurrentLogStash().WriteEvent(SMLogStashEvent)
 
-		response.Deliveries = append(response.Deliveries, delivery)
+		response.StopMonitoringDeliveries = append(response.StopMonitoringDeliveries, &delivery)
 	}
 
 	logSIRIServiceResponse(logStashEvent, response)
 
-	return response, nil
+	return response
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

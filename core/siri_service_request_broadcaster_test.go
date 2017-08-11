@@ -35,17 +35,23 @@ func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, err := connector.HandleRequests(request)
-	if response != nil || err == nil {
-		t.Fatalf("HandleRequests should return an error")
+	response := connector.HandleRequests(request)
+	if response == nil {
+		t.Fatalf("HandleRequests should return a response")
+	}
+	if len(response.StopMonitoringDeliveries) != 2 {
+		t.Fatal("Response should have 2 StopMonitoring deliveries")
 	}
 
-	sirierr, ok := err.(*siri.SiriError)
-	if !ok {
-		t.Fatalf("HandleRequests should return a SiriError")
+	if response.StopMonitoringDeliveries[0].Status {
+		t.Error("Response status should be false, got true")
 	}
-	if sirierr.ErrCode() != "NotFound" || sirierr.Error() != "Can't find a SIRIStopMonitoringRequestBroadcaster connector" {
-		t.Errorf("Wrong SiriErr:\n got: %v\n want: NotFound: Can't find a SIRIStopMonitoringRequestBroadcaster connector", sirierr.FullMessage())
+	if response.StopMonitoringDeliveries[0].ErrorType != "NotFound" {
+		t.Errorf("Response Errortype should be Notfound, got: %v", response.StopMonitoringDeliveries[0].ErrorType)
+	}
+	expected := "Can't find a SIRIStopMonitoringRequestBroadcaster connector"
+	if response.StopMonitoringDeliveries[0].ErrorText != expected {
+		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.StopMonitoringDeliveries[0].ErrorText, expected)
 	}
 }
 
@@ -86,7 +92,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, _ := connector.HandleRequests(request)
+	response := connector.HandleRequests(request)
 
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
@@ -104,8 +110,8 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	if !response.Status {
 		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
 	}
-	if len(response.Deliveries) != 2 {
-		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.Deliveries))
+	if len(response.StopMonitoringDeliveries) != 2 {
+		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.StopMonitoringDeliveries))
 	}
 }
 
@@ -136,7 +142,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 		t.Fatal(err)
 	}
 
-	response, _ := connector.HandleRequests(request)
+	response := connector.HandleRequests(request)
 
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
@@ -151,11 +157,11 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	if !response.ResponseTimestamp.Equal(time) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
-	if response.Deliveries[0].Status || response.Deliveries[1].Status {
-		t.Errorf("Response deliveries have wrong status:\n got: %v %v\n expected: false", response.Deliveries[0].Status, response.Deliveries[1].Status)
+	if response.StopMonitoringDeliveries[0].Status || response.StopMonitoringDeliveries[1].Status {
+		t.Errorf("Response deliveries have wrong status:\n got: %v %v\n expected: false", response.StopMonitoringDeliveries[0].Status, response.StopMonitoringDeliveries[1].Status)
 	}
-	if len(response.Deliveries) != 2 {
-		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.Deliveries))
+	if len(response.StopMonitoringDeliveries) != 2 {
+		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.StopMonitoringDeliveries))
 	}
 }
 
