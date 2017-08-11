@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -58,7 +57,6 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 
-	fmt.Println("esh komment allet vous")
 	response := []byte{}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response, _ = ioutil.ReadAll(r.Body)
@@ -69,7 +67,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.broacasterManager.Start()
+	referential.Start()
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
