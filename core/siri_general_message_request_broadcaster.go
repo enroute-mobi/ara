@@ -39,14 +39,22 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		ProducerRef:               connector.Partner().Setting("remote_credential"),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
-
 	if response.ProducerRef == "" {
 		response.ProducerRef = "Edwig"
 	}
 
-	response.Status = true
-	response.ResponseTimestamp = connector.Clock().Now()
-	response.RequestMessageRef = request.MessageIdentifier()
+	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, &request.XMLGeneralMessageRequest)
+
+	logSIRIGeneralMessageResponse(logStashEvent, response)
+	return response, nil
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(tx *model.Transaction, request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
+	delivery := siri.SIRIGeneralMessageDelivery{
+		RequestMessageRef: request.MessageIdentifier(),
+		Status:            true,
+		ResponseTimestamp: connector.Clock().Now(),
+	}
 
 	for _, situation := range tx.Model().Situations().FindAll() {
 		if situation.Channel == "Commercial" || situation.ValidUntil.Before(connector.Clock().Now()) {
@@ -75,11 +83,9 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		siriGeneralMessage.RecordedAtTime = situation.RecordedAt
 		siriGeneralMessage.FormatRef = "STIF-IDF"
 
-		response.GeneralMessages = append(response.GeneralMessages, siriGeneralMessage)
+		delivery.GeneralMessages = append(delivery.GeneralMessages, siriGeneralMessage)
 	}
-
-	logSIRIGeneralMessageResponse(logStashEvent, response)
-	return response, nil
+	return delivery
 }
 
 func (connector *SIRIGeneralMessageRequestBroadcaster) RemoteObjectIDKind() string {
