@@ -59,6 +59,8 @@ func (manager *BroadcastManager) GetPartnersWithConnector(connectorTypes []strin
 func (manager *BroadcastManager) Run() {
 	logger.Log.Debugf("BroadcastManager start")
 
+	manager.stop = make(chan struct{})
+
 	go manager.run()
 }
 
@@ -105,5 +107,7 @@ func (manager *BroadcastManager) run() {
 }
 
 func (manager *BroadcastManager) Stop() {
-	close(manager.stop)
+	if manager.stop != nil {
+		close(manager.stop)
+	}
 }

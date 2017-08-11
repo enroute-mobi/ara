@@ -68,6 +68,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.broacasterManager.Run()
+	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
@@ -82,7 +83,6 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster = NewFakeGeneralMessageBroadcaster(connector.(*SIRIGeneralMessageSubscriptionBroadcaster))
 
 	situation := referential.Model().Situations().New()
-	situation.Save()
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)
@@ -116,6 +116,6 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	sv := delivery[0].XMLGeneralMessages()
 
 	if len(sv) != 1 {
-		t.Errorf("Should have received 1 GeneralMessage but got == %v", len(sv))
+		t.Errorf("Should have received 1 GeneralMessage but got == %v\n%v", len(sv), sv)
 	}
 }
