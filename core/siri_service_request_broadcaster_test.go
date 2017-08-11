@@ -11,7 +11,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
+func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -21,7 +21,7 @@ func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
 
-	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	file, err := os.Open("testdata/siri-service-multiple-request-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,8 +39,14 @@ func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
 	if response == nil {
 		t.Fatalf("HandleRequests should return a response")
 	}
-	if len(response.StopMonitoringDeliveries) != 2 {
-		t.Fatal("Response should have 2 StopMonitoring deliveries")
+	if len(response.StopMonitoringDeliveries) != 1 {
+		t.Fatal("Response should have 1 StopMonitoring delivery")
+	}
+	if len(response.GeneralMessageDeliveries) != 1 {
+		t.Fatal("Response should have 1 GeneralMessage delivery")
+	}
+	if len(response.EstimatedTimetableDeliveries) != 1 {
+		t.Fatal("Response should have 1 EstimatedTimetable delivery")
 	}
 
 	if response.StopMonitoringDeliveries[0].Status {
@@ -53,6 +59,28 @@ func Test_SIRISiriServiceRequestBroadcaster_NoSSMRB(t *testing.T) {
 	if response.StopMonitoringDeliveries[0].ErrorText != expected {
 		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.StopMonitoringDeliveries[0].ErrorText, expected)
 	}
+
+	if response.GeneralMessageDeliveries[0].Status {
+		t.Error("Response status should be false, got true")
+	}
+	if response.GeneralMessageDeliveries[0].ErrorType != "NotFound" {
+		t.Errorf("Response Errortype should be Notfound, got: %v", response.GeneralMessageDeliveries[0].ErrorType)
+	}
+	expected = "Can't find a SIRIGeneralMessageRequestBroadcaster connector"
+	if response.GeneralMessageDeliveries[0].ErrorText != expected {
+		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.GeneralMessageDeliveries[0].ErrorText, expected)
+	}
+
+	if response.EstimatedTimetableDeliveries[0].Status {
+		t.Error("Response status should be false, got true")
+	}
+	if response.EstimatedTimetableDeliveries[0].ErrorType != "NotFound" {
+		t.Errorf("Response Errortype should be Notfound, got: %v", response.EstimatedTimetableDeliveries[0].ErrorType)
+	}
+	expected = "Can't find a SIRIEstimatedTimetableBroadcaster connector"
+	if response.EstimatedTimetableDeliveries[0].ErrorText != expected {
+		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.EstimatedTimetableDeliveries[0].ErrorText, expected)
+	}
 }
 
 func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
@@ -61,7 +89,12 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
-	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
+	partner.ConnectorTypes = []string{
+		SIRI_SERVICE_REQUEST_BROADCASTER,
+		SIRI_STOP_MONITORING_REQUEST_BROADCASTER,
+		SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER,
+		SIRI_ESTIMATED_TIMETABLE_BROADCASTER,
+	}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
@@ -73,12 +106,27 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
-	objectid2 := model.NewObjectID("objectidKind", "cladebr")
-	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetObjectID(objectid2)
-	stopArea2.Save()
+	line := referential.model.Lines().New()
+	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line.Name = "lineName"
+	line.Save()
 
-	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.PassageOrder = 1
+	stopVisit.ArrivalStatus = "onTime"
+	stopVisit.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit.Save()
+
+	file, err := os.Open("testdata/siri-service-multiple-request-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,6 +142,9 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 
 	response := connector.HandleRequests(request)
 
+	if response == nil {
+		t.Fatalf("HandleRequests should return a response")
+	}
 	if response.ProducerRef != "Edwig" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
 	}
@@ -110,12 +161,40 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	if !response.Status {
 		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
 	}
-	if len(response.StopMonitoringDeliveries) != 2 {
-		t.Errorf("Response has the wrong number of deliveries:\n got: %v\n expected: 2", len(response.StopMonitoringDeliveries))
+
+	if len(response.StopMonitoringDeliveries) != 1 {
+		t.Fatal("Response should have 1 StopMonitoring delivery")
+	}
+	if !response.StopMonitoringDeliveries[0].Status {
+		xml, err := response.StopMonitoringDeliveries[0].BuildStopMonitoringDeliveryXML()
+		if err != nil {
+			t.Fatalf("Error whild building xml: %v", err)
+		}
+		t.Errorf("StopMonitoring delivery should have status true: %v", xml)
+	}
+	if len(response.GeneralMessageDeliveries) != 1 {
+		t.Fatal("Response should have 1 GeneralMessage delivery")
+	}
+	if !response.GeneralMessageDeliveries[0].Status {
+		xml, err := response.GeneralMessageDeliveries[0].BuildGeneralMessageDeliveryXML()
+		if err != nil {
+			t.Fatalf("Error whild building xml: %v", err)
+		}
+		t.Errorf("GeneralMessage delivery should have status true: %v", xml)
+	}
+	if len(response.EstimatedTimetableDeliveries) != 1 {
+		t.Fatal("Response should have 1 EstimatedTimetable delivery")
+	}
+	if !response.EstimatedTimetableDeliveries[0].Status {
+		xml, err := response.EstimatedTimetableDeliveries[0].BuildEstimatedTimetableDeliveryXML()
+		if err != nil {
+			t.Fatalf("Error whild building xml: %v", err)
+		}
+		t.Errorf("EstimatedTimetable delivery should have status true: %v", xml)
 	}
 }
 
-func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T) {
+func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -128,7 +207,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsNotFound(t *testing.T)
 	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
-	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	file, err := os.Open("testdata/siri-service-smrequest-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +271,7 @@ func Test_SIRIServiceRequestBroadcasterFactory_Validate(t *testing.T) {
 func Test_SIRIServiceRequestBroadcaster_LogXMLSiriServiceRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
-	file, err := os.Open("testdata/siri-service-request-soap.xml")
+	file, err := os.Open("testdata/siri-service-smrequest-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}

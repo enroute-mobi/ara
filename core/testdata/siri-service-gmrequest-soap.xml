@@ -1,0 +1,22 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
+  <SOAP-ENV:Body>
+    <m:GetSiriService xmlns:m="http://wsdl.siri.org.uk">
+      <Request>
+        <m0:ServiceRequestContext>
+        </m0:ServiceRequestContext>
+        <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
+        <m0:RequestorRef>RATPDev:Concerto</m0:RequestorRef>
+        <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
+        <m0:DelegatorRef/>
+        <m0:GeneralMessageRequest version="2.0:FR-IDF-2.4">
+          <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
+          <m0:MessageIdentifier>GetSIRIGeneralMessage:Test:0</m0:MessageIdentifier>
+          <ns2:Extensions>
+            <ns6:IDFGeneralMessageRequestFilter>
+            </ns6:IDFGeneralMessageRequestFilter>
+          </ns2:Extensions>
+        </m0:GeneralMessageRequest>
+      </Request>
+    </m:GetSiriService>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

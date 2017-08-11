@@ -133,7 +133,13 @@ type SIRIMessage struct {
 
 const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
 				  <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
+					<ns3:Status>{{.Status}}</ns3:Status>{{ if not .Status }}
+					<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+						<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
+						<ns3:{{.ErrorType}}>
+							<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
+						</ns3:{{.ErrorType}}>{{ end }}
+					</ns3:ErrorCondition>{{ else }}{{range .GeneralMessages}}
 					<ns3:GeneralMessage>
 						<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
 						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
@@ -156,7 +162,7 @@ const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0
 							  <LineRef>{{ .LineRef }}</LineRef>{{end}}
 							</LineSection>{{end}}
 						</ns3:Content>
-					</ns3:GeneralMessage>{{end}}
+					</ns3:GeneralMessage>{{end}}{{end}}
 				</ns3:GeneralMessageDelivery>`
 
 const generalMessageTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
