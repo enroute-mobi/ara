@@ -18,8 +18,10 @@ const siriServiceResponseTemplate = `<ns1:GetSiriServiceResponse xmlns:ns1="http
 		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>
 		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
 		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
-		<ns3:Status>{{ .Status }}</ns3:Status>{{ range .Deliveries }}
-		{{ .BuildStopMonitoringDeliveryXML }}{{end}}
+		<ns3:Status>{{ .Status }}</ns3:Status>{{ range .StopMonitoringDeliveries }}
+		{{ .BuildStopMonitoringDeliveryXML }}{{ end }}{{ range .GeneralMessageDeliveries }}
+		{{ .BuildGeneralMessageDeliveryXML }}{{ end }}{{ range .EstimatedTimetableDeliveries }}
+		{{ .BuildEstimatedTimetableDeliveryXML }}{{ end }}
 	</Answer>
 </ns1:GetSiriServiceResponse>`
 
@@ -34,7 +36,9 @@ type SIRIServiceResponse struct {
 
 	ResponseTimestamp time.Time
 
-	Deliveries []SIRIStopMonitoringDelivery
+	StopMonitoringDeliveries     []*SIRIStopMonitoringDelivery
+	GeneralMessageDeliveries     []*SIRIGeneralMessageDelivery
+	EstimatedTimetableDeliveries []*SIRIEstimatedTimeTableDelivery
 }
 
 func (response *SIRIServiceResponse) BuildXML() (string, error) {
