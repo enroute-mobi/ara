@@ -9,8 +9,18 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
+type XMLGetGeneralMessage struct {
+	XMLGeneralMessageRequest
+
+	requestorRef string
+}
+
 type XMLGeneralMessageRequest struct {
-	RequestXMLStructure
+	XMLStructure
+
+	messageIdentifier string
+
+	requestTimestamp time.Time
 }
 
 type SIRIGeneralMessageRequest struct {
@@ -32,18 +42,18 @@ const generalMessageRequestTemplate = `<ns7:GetGeneralMessage xmlns:ns2="http://
       <RequestExtension/>
 </ns7:GetGeneralMessage>`
 
-func NewXMLGeneralMessageRequest(node xml.Node) *XMLGeneralMessageRequest {
-	xmlGeneralMessageRequest := &XMLGeneralMessageRequest{}
+func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
+	xmlGeneralMessageRequest := &XMLGetGeneralMessage{}
 	xmlGeneralMessageRequest.node = NewXMLNode(node)
 	return xmlGeneralMessageRequest
 }
 
-func NewXMLGeneralMessageRequestFromContent(content []byte) (*XMLGeneralMessageRequest, error) {
+func NewXMLGetGeneralMessageFromContent(content []byte) (*XMLGetGeneralMessage, error) {
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
 	}
-	request := NewXMLGeneralMessageRequest(doc.Root().XmlNode)
+	request := NewXMLGetGeneralMessage(doc.Root().XmlNode)
 	return request, nil
 }
 
@@ -65,4 +75,25 @@ func (request *SIRIGeneralMessageRequest) BuildXML() (string, error) {
 		return "", err
 	}
 	return buffer.String(), nil
+}
+
+func (request *XMLGetGeneralMessage) RequestorRef() string {
+	if request.requestorRef == "" {
+		request.requestorRef = request.findStringChildContent("RequestorRef")
+	}
+	return request.requestorRef
+}
+
+func (request *XMLGeneralMessageRequest) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
+func (request *XMLGeneralMessageRequest) RequestTimestamp() time.Time {
+	if request.requestTimestamp.IsZero() {
+		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
+	}
+	return request.requestTimestamp
 }

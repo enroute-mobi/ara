@@ -9,7 +9,7 @@ import (
 )
 
 type GeneralMessageRequestBroadcaster interface {
-	Situations(request *siri.XMLGeneralMessageRequest) (*siri.SIRIGeneralMessageResponse, error)
+	Situations(request *siri.XMLGetGeneralMessage) (*siri.SIRIGeneralMessageResponse, error)
 }
 
 type SIRIGeneralMessageRequestBroadcaster struct {
@@ -26,13 +26,13 @@ func NewSIRIGeneralMessageRequestBroadcaster(partner *Partner) *SIRIGeneralMessa
 	return siriGeneralMessageRequestBroadcaster
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGeneralMessageRequest) (*siri.SIRIGeneralMessageResponse, error) {
+func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGetGeneralMessage) (*siri.SIRIGeneralMessageResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-	logXMLGeneralMessageRequest(logStashEvent, request)
+	logXMLGetGeneralMessage(logStashEvent, request)
 
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Setting("local_url"),
@@ -99,7 +99,7 @@ func (factory *SIRIGeneralMessageRequestBroadcasterFactory) CreateConnector(part
 	return NewSIRIGeneralMessageRequestBroadcaster(partner)
 }
 
-func logXMLGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) {
+func logXMLGetGeneralMessage(logStashEvent audit.LogStashEvent, request *siri.XMLGetGeneralMessage) {
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestXML"] = request.RawXML()

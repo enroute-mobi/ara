@@ -10,7 +10,7 @@ import (
 )
 
 type SIRIGeneralMessageRequestHandler struct {
-	xmlRequest *siri.XMLGeneralMessageRequest
+	xmlRequest *siri.XMLGetGeneralMessage
 }
 
 func (handler *SIRIGeneralMessageRequestHandler) RequestorRef() string {

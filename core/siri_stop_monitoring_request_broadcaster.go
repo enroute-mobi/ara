@@ -13,7 +13,7 @@ import (
 )
 
 type StopMonitoringRequestBroadcaster interface {
-	RequestStopArea(request *siri.XMLStopMonitoringRequest) *siri.SIRIStopMonitoringResponse
+	RequestStopArea(request *siri.XMLGetStopMonitoring) *siri.SIRIStopMonitoringResponse
 }
 
 type SIRIStopMonitoringRequestBroadcaster struct {
@@ -37,7 +37,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RemoteObjectIDKind() stri
 	return connector.partner.Setting("remote_objectid_kind")
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubRequest) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
 	objectidKind := connector.RemoteObjectIDKind()
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
@@ -200,14 +200,14 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	return delivery
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLStopMonitoringRequest) *siri.SIRIStopMonitoringResponse {
+func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLGetStopMonitoring) *siri.SIRIStopMonitoringResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	logXMLStopMonitoringRequest(logStashEvent, request)
+	logXMLGetStopMonitoring(logStashEvent, request)
 
 	response := new(siri.SIRIStopMonitoringResponse)
 	response.Address = connector.Partner().Setting("local_url")
@@ -217,7 +217,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	}
 	response.ResponseMessageIdentifier = connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier()
 
-	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringSubRequest)
+	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringRequest)
 
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
@@ -280,7 +280,7 @@ func (factory *SIRIStopMonitoringRequestBroadcasterFactory) CreateConnector(part
 	return NewSIRIStopMonitoringRequestBroadcaster(partner)
 }
 
-func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) {
+func logXMLGetStopMonitoring(logStashEvent audit.LogStashEvent, request *siri.XMLGetStopMonitoring) {
 	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()

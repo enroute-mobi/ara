@@ -33,7 +33,7 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		}
 	case "GetStopMonitoring":
 		return &SIRIStopMonitoringRequestHandler{
-			xmlRequest: siri.NewXMLStopMonitoringRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLGetStopMonitoring(envelope.Body()),
 		}
 	case "NotifyStopMonitoring":
 		return &SIRIStopMonitoringRequestDeliveriesResponseHandler{
@@ -57,11 +57,11 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		}
 	case "GetGeneralMessage":
 		return &SIRIGeneralMessageRequestHandler{
-			xmlRequest: siri.NewXMLGeneralMessageRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLGetGeneralMessage(envelope.Body()),
 		}
 	case "GetEstimatedTimetable":
 		return &SIRIEstimatedTimetableRequestHandler{
-			xmlRequest: siri.NewXMLGetEstimatedTimetableRequest(envelope.Body()),
+			xmlRequest: siri.NewXMLGetEstimatedTimetable(envelope.Body()),
 		}
 	}
 	return nil

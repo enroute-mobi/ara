@@ -10,7 +10,7 @@ import (
 )
 
 type SIRIEstimatedTimetableRequestHandler struct {
-	xmlRequest *siri.XMLGetEstimatedTimetableRequest
+	xmlRequest *siri.XMLGetEstimatedTimetable
 	Partner    core.Partner
 }
 

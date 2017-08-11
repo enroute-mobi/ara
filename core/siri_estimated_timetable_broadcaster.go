@@ -10,7 +10,7 @@ import (
 )
 
 type EstimatedTimetableBroadcaster interface {
-	RequestLine(request *siri.XMLGetEstimatedTimetableRequest) *siri.SIRIEstimatedTimeTableResponse
+	RequestLine(request *siri.XMLGetEstimatedTimetable) *siri.SIRIEstimatedTimeTableResponse
 }
 
 type SIRIEstimatedTimetableBroadcaster struct {
@@ -34,7 +34,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) remoteObjectIDKind() string 
 	return connector.partner.Setting("remote_objectid_kind")
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetableRequest) *siri.SIRIEstimatedTimeTableResponse {
+func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable) *siri.SIRIEstimatedTimeTableResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -159,7 +159,7 @@ func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner
 	return NewSIRIEstimatedTimetableBroadcaster(partner)
 }
 
-func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGetEstimatedTimetableRequest) {
+func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGetEstimatedTimetable) {
 	logStashEvent["Connector"] = "EstimatedTimetableBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()

@@ -102,7 +102,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +203,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -273,7 +273,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -305,7 +305,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -357,7 +357,7 @@ func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 	}
 }
 
-func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLStopMonitoringRequest(t *testing.T) {
+func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLGetStopMonitoring(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
@@ -369,12 +369,12 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLStopMonitoringRequest(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopMonitoringRequestFromContent(content)
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	logXMLStopMonitoringRequest(logStashEvent, request)
+	logXMLGetStopMonitoring(logStashEvent, request)
 	if logStashEvent["Connector"] != "StopMonitoringRequestBroadcaster" {
 		t.Errorf("Wrong Connector logged:\n got: %v\n expected: StopMonitoringRequestBroadcaster", logStashEvent["messageIdentifier"])
 	}

@@ -35,7 +35,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestStopArea(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGeneralMessageRequestFromContent(content)
+	request, err := siri.NewXMLGetGeneralMessageFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

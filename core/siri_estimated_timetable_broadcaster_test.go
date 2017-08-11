@@ -104,7 +104,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetEstimatedTimetableRequestFromContent(content)
+	request, err := siri.NewXMLGetEstimatedTimetableFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +194,7 @@ func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	}
 }
 
-func Test_SIRIEstimatedTimetableBroadcaster_LogXMLStopMonitoringRequest(t *testing.T) {
+func Test_SIRIEstimatedTimetableBroadcaster_LogXMLGetStopMonitoring(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 
 	file, err := os.Open("testdata/estimated_timetable_request.xml")
@@ -206,7 +206,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogXMLStopMonitoringRequest(t *testi
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetEstimatedTimetableRequestFromContent(content)
+	request, err := siri.NewXMLGetEstimatedTimetableFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

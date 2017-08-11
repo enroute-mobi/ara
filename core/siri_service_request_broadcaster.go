@@ -104,7 +104,7 @@ func logSIRIServiceResponse(logStashEvent audit.LogStashEvent, response *siri.SI
 	logStashEvent["responseXML"] = xml
 }
 
-func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubRequest) {
+func logXMLSiriServiceStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) {
 	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster for SIRIServiceRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()

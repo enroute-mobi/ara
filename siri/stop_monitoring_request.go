@@ -9,13 +9,13 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
-type XMLStopMonitoringRequest struct {
-	XMLStopMonitoringSubRequest
+type XMLGetStopMonitoring struct {
+	XMLStopMonitoringRequest
 
 	requestorRef string
 }
 
-type XMLStopMonitoringSubRequest struct {
+type XMLStopMonitoringRequest struct {
 	XMLStructure
 
 	messageIdentifier string
@@ -57,18 +57,18 @@ const stopMonitoringRequestTemplate = `<ns7:GetStopMonitoring xmlns:ns2="http://
 	<RequestExtension />
 </ns7:GetStopMonitoring>`
 
-func NewXMLStopMonitoringRequest(node xml.Node) *XMLStopMonitoringRequest {
-	xmlStopMonitoringRequest := &XMLStopMonitoringRequest{}
+func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {
+	xmlStopMonitoringRequest := &XMLGetStopMonitoring{}
 	xmlStopMonitoringRequest.node = NewXMLNode(node)
 	return xmlStopMonitoringRequest
 }
 
-func NewXMLStopMonitoringRequestFromContent(content []byte) (*XMLStopMonitoringRequest, error) {
+func NewXMLGetStopMonitoringFromContent(content []byte) (*XMLGetStopMonitoring, error) {
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
 	}
-	request := NewXMLStopMonitoringRequest(doc.Root().XmlNode)
+	request := NewXMLGetStopMonitoring(doc.Root().XmlNode)
 	return request, nil
 }
 
@@ -85,7 +85,7 @@ func NewSIRIStopMonitoringRequest(
 	}
 }
 
-func (request *XMLStopMonitoringRequest) RequestorRef() string {
+func (request *XMLGetStopMonitoring) RequestorRef() string {
 	if request.requestorRef == "" {
 		request.requestorRef = request.findStringChildContent("RequestorRef")
 	}
@@ -101,56 +101,56 @@ func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
 	return buffer.String(), nil
 }
 
-func (request *XMLStopMonitoringSubRequest) MessageIdentifier() string {
+func (request *XMLStopMonitoringRequest) MessageIdentifier() string {
 	if request.messageIdentifier == "" {
 		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
 	}
 	return request.messageIdentifier
 }
 
-func (request *XMLStopMonitoringSubRequest) MonitoringRef() string {
+func (request *XMLStopMonitoringRequest) MonitoringRef() string {
 	if request.monitoringRef == "" {
 		request.monitoringRef = request.findStringChildContent("MonitoringRef")
 	}
 	return request.monitoringRef
 }
 
-func (request *XMLStopMonitoringSubRequest) StopVisitTypes() string {
+func (request *XMLStopMonitoringRequest) StopVisitTypes() string {
 	if request.stopVisitTypes == "" {
 		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
 	}
 	return request.stopVisitTypes
 }
 
-func (request *XMLStopMonitoringSubRequest) LineRef() string {
+func (request *XMLStopMonitoringRequest) LineRef() string {
 	if request.lineRef == "" {
 		request.lineRef = request.findStringChildContent("LineRef")
 	}
 	return request.lineRef
 }
 
-func (request *XMLStopMonitoringSubRequest) MaximumStopVisits() int {
+func (request *XMLStopMonitoringRequest) MaximumStopVisits() int {
 	if request.maximumStopVisits == 0 {
 		request.maximumStopVisits = request.findIntChildContent("MaximumStopVisits")
 	}
 	return request.maximumStopVisits
 }
 
-func (request *XMLStopMonitoringSubRequest) RequestTimestamp() time.Time {
+func (request *XMLStopMonitoringRequest) RequestTimestamp() time.Time {
 	if request.requestTimestamp.IsZero() {
 		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
 	}
 	return request.requestTimestamp
 }
 
-func (request *XMLStopMonitoringSubRequest) PreviewInterval() time.Duration {
+func (request *XMLStopMonitoringRequest) PreviewInterval() time.Duration {
 	if request.previewInterval == 0 {
 		request.previewInterval = request.findDurationChildContent("PreviewInterval")
 	}
 	return request.previewInterval
 }
 
-func (request *XMLStopMonitoringSubRequest) StartTime() time.Time {
+func (request *XMLStopMonitoringRequest) StartTime() time.Time {
 	if request.startTime.IsZero() {
 		request.startTime = request.findTimeChildContent("StartTime")
 	}

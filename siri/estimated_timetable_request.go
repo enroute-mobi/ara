@@ -2,33 +2,44 @@ package siri
 
 import (
 	"strings"
+	"time"
 
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
-type XMLGetEstimatedTimetableRequest struct {
-	RequestXMLStructure
+type XMLGetEstimatedTimetable struct {
+	XMLEstimatedTimetableRequest
+
+	requestorRef string
+}
+
+type XMLEstimatedTimetableRequest struct {
+	XMLStructure
+
+	messageIdentifier string
+
+	requestTimestamp time.Time
 
 	lines []string
 }
 
-func NewXMLGetEstimatedTimetableRequest(node xml.Node) *XMLGetEstimatedTimetableRequest {
-	xmlCheckStatusRequest := &XMLGetEstimatedTimetableRequest{}
+func NewXMLGetEstimatedTimetable(node xml.Node) *XMLGetEstimatedTimetable {
+	xmlCheckStatusRequest := &XMLGetEstimatedTimetable{}
 	xmlCheckStatusRequest.node = NewXMLNode(node)
 	return xmlCheckStatusRequest
 }
 
-func NewXMLGetEstimatedTimetableRequestFromContent(content []byte) (*XMLGetEstimatedTimetableRequest, error) {
+func NewXMLGetEstimatedTimetableFromContent(content []byte) (*XMLGetEstimatedTimetable, error) {
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
 	}
-	request := NewXMLGetEstimatedTimetableRequest(doc.Root().XmlNode)
+	request := NewXMLGetEstimatedTimetable(doc.Root().XmlNode)
 	return request, nil
 }
 
-func (request *XMLGetEstimatedTimetableRequest) Lines() []string {
+func (request *XMLEstimatedTimetableRequest) Lines() []string {
 	if len(request.lines) == 0 {
 		nodes := request.findNodes("LineRef")
 		if nodes != nil {
@@ -38,4 +49,25 @@ func (request *XMLGetEstimatedTimetableRequest) Lines() []string {
 		}
 	}
 	return request.lines
+}
+
+func (request *XMLGetEstimatedTimetable) RequestorRef() string {
+	if request.requestorRef == "" {
+		request.requestorRef = request.findStringChildContent("RequestorRef")
+	}
+	return request.requestorRef
+}
+
+func (request *XMLEstimatedTimetableRequest) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
+func (request *XMLEstimatedTimetableRequest) RequestTimestamp() time.Time {
+	if request.requestTimestamp.IsZero() {
+		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
+	}
+	return request.requestTimestamp
 }
