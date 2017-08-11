@@ -38,7 +38,7 @@ type SIRIServiceResponse struct {
 
 	StopMonitoringDeliveries     []*SIRIStopMonitoringDelivery
 	GeneralMessageDeliveries     []*SIRIGeneralMessageDelivery
-	EstimatedTimetableDeliveries []*SIRIEstimatedTimeTableDelivery
+	EstimatedTimetableDeliveries []*SIRIEstimatedTimetableDelivery
 }
 
 func (response *SIRIServiceResponse) BuildXML() (string, error) {

@@ -9,14 +9,14 @@ import (
 )
 
 type SIRIEstimatedTimeTableResponse struct {
-	SIRIEstimatedTimeTableDelivery
+	SIRIEstimatedTimetableDelivery
 
 	Address                   string
 	ProducerRef               string
 	ResponseMessageIdentifier string
 }
 
-type SIRIEstimatedTimeTableDelivery struct {
+type SIRIEstimatedTimetableDelivery struct {
 	RequestMessageRef string
 
 	ResponseTimestamp time.Time
@@ -125,7 +125,7 @@ func (response *SIRIEstimatedTimeTableResponse) BuildXML() (string, error) {
 	return buffer.String(), nil
 }
 
-func (delivery *SIRIEstimatedTimeTableDelivery) BuildEstimatedTimetableDeliveryXML() (string, error) {
+func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryXML() (string, error) {
 	var buffer bytes.Buffer
 	var estimatedTimetableDelivery = template.Must(template.New("estimatedTimetableDelivery").Parse(estimatedTimetableDeliveryTemplate))
 	if err := estimatedTimetableDelivery.Execute(&buffer, delivery); err != nil {

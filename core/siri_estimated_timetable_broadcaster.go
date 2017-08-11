@@ -38,8 +38,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	currentTime := connector.Clock().Now()
-
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -47,15 +45,27 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 	response := &siri.SIRIEstimatedTimeTableResponse{
 		Address:                   connector.Partner().Setting("local_url"),
+		ProducerRef:               connector.Partner().Setting("remote_credential"),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
-	response.RequestMessageRef = request.MessageIdentifier()
-	response.ResponseTimestamp = currentTime
-	response.Status = true
-
-	response.ProducerRef = connector.Partner().Setting("remote_credential")
 	if response.ProducerRef == "" {
 		response.ProducerRef = "Edwig"
+	}
+
+	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest)
+
+	logSIRIEstimatedTimetableResponse(logStashEvent, response)
+
+	return response
+}
+
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, request *siri.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
+	currentTime := connector.Clock().Now()
+
+	delivery := siri.SIRIEstimatedTimetableDelivery{
+		RequestMessageRef: request.MessageIdentifier(),
+		ResponseTimestamp: currentTime,
+		Status:            true,
 	}
 
 	// SIRIEstimatedJourneyVersionFrame
@@ -121,12 +131,10 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 		}
-		response.EstimatedJourneyVersionFrames = append(response.EstimatedJourneyVersionFrames, journeyFrame)
+		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
 
-	logSIRIEstimatedTimetableResponse(logStashEvent, response)
-
-	return response
+	return delivery
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) (references map[string]model.Reference) {
