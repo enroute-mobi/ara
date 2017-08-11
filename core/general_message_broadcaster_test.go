@@ -68,7 +68,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.Start()
-	defer referential.broacasterManager.Stop()
+	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
