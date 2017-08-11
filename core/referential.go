@@ -125,6 +125,7 @@ func (referential *Referential) Start() {
 
 	referential.partners.Start()
 	referential.modelGuardian.Start()
+	referential.broacasterManager.Start()
 }
 
 func (referential *Referential) Stop() {
@@ -161,10 +162,6 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 	if !referential.partners.IsEmpty() {
 		aux.Partners = referential.partners
 	}
-
-	// if len(referential.Tokens) > 0 {
-	// 	referentialMap["Tokens"] = referential.Tokens
-	// }
 
 	return json.Marshal(&aux)
 }
@@ -266,7 +263,6 @@ func (manager *MemoryReferentials) new() *Referential {
 	referential.partners = NewPartnerManager(referential)
 	referential.collectManager = NewCollectManager(referential)
 	referential.broacasterManager = NewBroadcastManager(referential)
-	referential.broacasterManager.Run()
 
 	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())

@@ -17,6 +17,8 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
+	referential.Start()
+	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
@@ -67,7 +69,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.broacasterManager.Run()
+	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")

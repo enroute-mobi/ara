@@ -19,7 +19,8 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
-	referential.broacasterManager.Run()
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
@@ -71,7 +72,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.broacasterManager.Run()
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"

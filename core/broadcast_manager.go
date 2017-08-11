@@ -6,9 +6,9 @@ import (
 )
 
 type BroadcastManagerInterface interface {
+	model.Startable
 	model.Stopable
 
-	Run()
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
 	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent
 }
@@ -56,7 +56,7 @@ func (manager *BroadcastManager) GetPartnersWithConnector(connectorTypes []strin
 	return partners
 }
 
-func (manager *BroadcastManager) Run() {
+func (manager *BroadcastManager) Start() {
 	logger.Log.Debugf("BroadcastManager start")
 
 	manager.stop = make(chan struct{})

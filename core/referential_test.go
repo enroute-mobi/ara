@@ -31,13 +31,8 @@ func Test_Referential_Slug(t *testing.T) {
 
 func Test_Referential_StartedAt(t *testing.T) {
 	model.SetDefaultClock(model.NewFakeClock())
-	referential := &Referential{
-		slug:     "referential",
-		Settings: make(map[string]string),
-	}
-	referential.partners = NewPartnerManager(referential)
-	referential.modelGuardian = NewModelGuardian(referential)
-	referential.model = model.NewMemoryModel()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
 	referential.Start()
 	referential.Stop()
 
