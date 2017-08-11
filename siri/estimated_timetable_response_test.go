@@ -98,7 +98,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 
 	testTime := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 
-	call1 := SIRIEstimatedCall{
+	call1 := &SIRIEstimatedCall{
 		ArrivalStatus:       "astatus1",
 		DepartureStatus:     "dstatus1",
 		StopPointRef:        "stopPoint1",
@@ -106,7 +106,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		ActualArrivalTime:   testTime,
 		ActualDepartureTime: testTime,
 	}
-	call2 := SIRIEstimatedCall{
+	call2 := &SIRIEstimatedCall{
 		ArrivalStatus:       "astatus2",
 		DepartureStatus:     "dstatus2",
 		StopPointRef:        "stopPoint2",
@@ -114,7 +114,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		ActualArrivalTime:   testTime,
 		ActualDepartureTime: testTime,
 	}
-	call3 := SIRIEstimatedCall{
+	call3 := &SIRIEstimatedCall{
 		ArrivalStatus:       "astatus3",
 		DepartureStatus:     "dstatus3",
 		StopPointRef:        "stopPoint3",
@@ -122,7 +122,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		ActualArrivalTime:   testTime,
 		ActualDepartureTime: testTime,
 	}
-	call4 := SIRIEstimatedCall{
+	call4 := &SIRIEstimatedCall{
 		ArrivalStatus:       "astatus4",
 		DepartureStatus:     "dstatus4",
 		StopPointRef:        "stopPoint4",
@@ -131,7 +131,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		ActualDepartureTime: testTime,
 	}
 
-	vehicleJourney1 := SIRIEstimatedVehicleJourney{
+	vehicleJourney1 := &SIRIEstimatedVehicleJourney{
 		LineRef:                "line1",
 		DatedVehicleJourneyRef: "dvjref1",
 		Attributes: map[string]string{
@@ -143,9 +143,9 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
 		},
-		EstimatedCalls: []SIRIEstimatedCall{call1, call2},
+		EstimatedCalls: []*SIRIEstimatedCall{call1, call2},
 	}
-	vehicleJourney2 := SIRIEstimatedVehicleJourney{
+	vehicleJourney2 := &SIRIEstimatedVehicleJourney{
 		LineRef:                "line2",
 		DatedVehicleJourneyRef: "dvjref2",
 		Attributes: map[string]string{
@@ -157,9 +157,9 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin2")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination2")),
 		},
-		EstimatedCalls: []SIRIEstimatedCall{call3},
+		EstimatedCalls: []*SIRIEstimatedCall{call3},
 	}
-	vehicleJourney3 := SIRIEstimatedVehicleJourney{
+	vehicleJourney3 := &SIRIEstimatedVehicleJourney{
 		LineRef:                "line3",
 		DatedVehicleJourneyRef: "dvjref3",
 		Attributes: map[string]string{
@@ -171,27 +171,27 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin3")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination3")),
 		},
-		EstimatedCalls: []SIRIEstimatedCall{call4},
+		EstimatedCalls: []*SIRIEstimatedCall{call4},
 	}
 
-	journeyVersion1 := SIRIEstimatedJourneyVersionFrame{
+	journeyVersion1 := &SIRIEstimatedJourneyVersionFrame{
 		RecordedAtTime:           testTime,
-		EstimatedVehicleJourneys: []SIRIEstimatedVehicleJourney{vehicleJourney1},
+		EstimatedVehicleJourneys: []*SIRIEstimatedVehicleJourney{vehicleJourney1},
 	}
-	journeyVersion2 := SIRIEstimatedJourneyVersionFrame{
+	journeyVersion2 := &SIRIEstimatedJourneyVersionFrame{
 		RecordedAtTime:           testTime,
-		EstimatedVehicleJourneys: []SIRIEstimatedVehicleJourney{vehicleJourney2, vehicleJourney3},
+		EstimatedVehicleJourneys: []*SIRIEstimatedVehicleJourney{vehicleJourney2, vehicleJourney3},
 	}
 
 	response := &SIRIEstimatedTimeTableResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
-		RequestMessageRef:         "request",
 		ResponseMessageIdentifier: "response",
-		ResponseTimestamp:         testTime,
-		Status:                    true,
-		EstimatedJourneyVersionFrames: []SIRIEstimatedJourneyVersionFrame{journeyVersion1, journeyVersion2},
 	}
+	response.RequestMessageRef = "request"
+	response.Status = true
+	response.ResponseTimestamp = testTime
+	response.EstimatedJourneyVersionFrames = []*SIRIEstimatedJourneyVersionFrame{journeyVersion1, journeyVersion2}
 
 	xml, err := response.BuildXML()
 	if err != nil {

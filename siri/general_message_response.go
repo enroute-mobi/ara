@@ -131,7 +131,7 @@ type SIRIMessage struct {
 	NumberOfCharPerLine int
 }
 
-const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
 				  <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
 					<ns3:Status>{{.Status}}</ns3:Status>{{range .GeneralMessages}}
 					<ns3:GeneralMessage>
@@ -159,7 +159,7 @@ const generalMessageTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-
 					</ns3:GeneralMessage>{{end}}
 				</ns3:GeneralMessageDelivery>`
 
-const generalMessageDeliveryTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
+const generalMessageTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
 															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
 															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
 															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
@@ -174,7 +174,7 @@ const generalMessageDeliveryTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3
 		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		{{ .BuildGeneralMessageXML }}
+		{{ .BuildGeneralMessageDeliveryXML }}
 	</Answer>
 	<AnswerExtension/>
 </ns8:GetGeneralMessageResponse>`
@@ -441,16 +441,16 @@ func (message *XMLMessage) NumberOfCharPerLine() int {
 
 func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageDeliveryTemplate))
+	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageTemplate))
 	if err := generalMessage.Execute(&buffer, response); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil
 }
 
-func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageXML() (string, error) {
+func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageDeliveryXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessageDelivery = template.Must(template.New("generalMessageDelivery").Parse(generalMessageTemplate))
+	var generalMessageDelivery = template.Must(template.New("generalMessageDelivery").Parse(generalMessageDeliveryTemplate))
 	if err := generalMessageDelivery.Execute(&buffer, delivery); err != nil {
 		return "", err
 	}

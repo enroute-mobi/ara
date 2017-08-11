@@ -47,11 +47,11 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 	response := &siri.SIRIEstimatedTimeTableResponse{
 		Address:                   connector.Partner().Setting("local_url"),
-		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-		ResponseTimestamp:         currentTime,
-		Status:                    true,
 	}
+	response.RequestMessageRef = request.MessageIdentifier()
+	response.ResponseTimestamp = currentTime
+	response.Status = true
 
 	response.ProducerRef = connector.Partner().Setting("remote_credential")
 	if response.ProducerRef == "" {
@@ -65,7 +65,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 		if !ok {
 			continue
 		}
-		journeyFrame := siri.SIRIEstimatedJourneyVersionFrame{
+		journeyFrame := &siri.SIRIEstimatedJourneyVersionFrame{
 			RecordedAtTime: currentTime,
 		}
 
@@ -85,7 +85,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.HashValue()})
 			}
 
-			estimatedVehicleJourney := siri.SIRIEstimatedVehicleJourney{
+			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
 				LineRef:                lineObjectId.Value(),
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				Attributes:             make(map[string]string),
@@ -108,7 +108,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 				}
 				stopPointRef = stopAreaId.Value()
 
-				estimatedCall := siri.SIRIEstimatedCall{
+				estimatedCall := &siri.SIRIEstimatedCall{
 					ArrivalStatus:       string(stopVisit.ArrivalStatus),
 					AimedArrivalTime:    stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
 					ExpectedArrivalTime: stopVisit.Schedules.Schedule("expected").ArrivalTime(),

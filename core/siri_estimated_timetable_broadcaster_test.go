@@ -236,11 +236,11 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 	response := &siri.SIRIEstimatedTimeTableResponse{
 		Address:                   "edwig.edwig",
 		ProducerRef:               "NINOXE:default",
-		RequestMessageRef:         "EstimatedTimetable:Test:0",
 		ResponseMessageIdentifier: "fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26",
-		ResponseTimestamp:         time,
-		Status:                    true,
 	}
+	response.RequestMessageRef = "EstimatedTimetable:Test:0"
+	response.ResponseTimestamp = time
+	response.Status = true
 
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 

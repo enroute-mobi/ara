@@ -9,10 +9,15 @@ import (
 )
 
 type SIRIEstimatedTimeTableResponse struct {
+	SIRIEstimatedTimeTableDelivery
+
 	Address                   string
 	ProducerRef               string
-	RequestMessageRef         string
 	ResponseMessageIdentifier string
+}
+
+type SIRIEstimatedTimeTableDelivery struct {
+	RequestMessageRef string
 
 	ResponseTimestamp time.Time
 
@@ -21,13 +26,13 @@ type SIRIEstimatedTimeTableResponse struct {
 	ErrorNumber int
 	ErrorText   string
 
-	EstimatedJourneyVersionFrames []SIRIEstimatedJourneyVersionFrame
+	EstimatedJourneyVersionFrames []*SIRIEstimatedJourneyVersionFrame
 }
 
 type SIRIEstimatedJourneyVersionFrame struct {
 	RecordedAtTime time.Time
 
-	EstimatedVehicleJourneys []SIRIEstimatedVehicleJourney
+	EstimatedVehicleJourneys []*SIRIEstimatedVehicleJourney
 }
 
 type SIRIEstimatedVehicleJourney struct {
@@ -37,7 +42,7 @@ type SIRIEstimatedVehicleJourney struct {
 	Attributes map[string]string
 	References map[string]model.Reference
 
-	EstimatedCalls []SIRIEstimatedCall
+	EstimatedCalls []*SIRIEstimatedCall
 }
 
 type SIRIEstimatedCall struct {
@@ -71,7 +76,11 @@ const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse x
 		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+		{{ .BuildEstimatedTimetableDeliveryXML }}
+	</Answer>
+</ns8:GetEstimatedTimetableResponse>`
+
+const estimatedTimetableDeliveryTemplate = `<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
 			<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
 			<ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
@@ -105,14 +114,21 @@ const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse x
 					</ns3:EstimatedCalls>
 				</ns3:EstimatedVehicleJourney>{{ end }}
 			</ns3:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
-		</ns3:EstimatedTimetableDelivery>
-	</Answer>
-</ns8:GetEstimatedTimetableResponse>`
+		</ns3:EstimatedTimetableDelivery>`
 
 func (response *SIRIEstimatedTimeTableResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriResponse = template.Must(template.New("siriResponse").Parse(estimatedTimeTableResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (delivery *SIRIEstimatedTimeTableDelivery) BuildEstimatedTimetableDeliveryXML() (string, error) {
+	var buffer bytes.Buffer
+	var estimatedTimetableDelivery = template.Must(template.New("estimatedTimetableDelivery").Parse(estimatedTimetableDeliveryTemplate))
+	if err := estimatedTimetableDelivery.Execute(&buffer, delivery); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil
