@@ -46,6 +46,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	subs.Save()
 	subs.CreateAddNewResource(reference)
 	subs.SetKind(string(subs.Id()))
+	subs.SetExternalId("externalId")
 	subs.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
@@ -99,8 +100,10 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscription, _ := partner.Subscriptions().FindOrCreateByKind("This Kind should normaly be the exterior Subscription Id")
+	subscription := partner.Subscriptions().New()
+	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
+	subscription.Save()
 
 	line := referential.Model().Lines().New()
 	line.SetObjectID(objectid)
@@ -131,6 +134,10 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	if delivery[0].SubscriberRef() != "external" {
 		t.Errorf("SubscriberRef should be external but got == %v", delivery[0].SubscriberRef())
+	}
+
+	if delivery[0].SubscriptionRef() != "Edwig:Subscription::externalId:LOC" {
+		t.Errorf("SubscriptionRef should be externalId but got == %v", delivery[0].SubscriptionRef())
 	}
 
 	sv := delivery[0].XMLMonitoredStopVisits()

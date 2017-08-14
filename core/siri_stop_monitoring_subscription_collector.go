@@ -34,6 +34,9 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST); !ok {
+		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST)
+	}
 	return NewSIRIStopMonitoringSubscriptionCollector(partner)
 }
 

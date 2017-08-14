@@ -1,9 +1,13 @@
 package core
 
 import (
+	"regexp"
+	"strings"
 	"sync"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
+	"github.com/af83/edwig/siri"
 )
 
 type GeneralMessageSubscriptionBroadcaster interface {
@@ -11,6 +15,7 @@ type GeneralMessageSubscriptionBroadcaster interface {
 	model.Startable
 
 	handleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
+	HandleSubscriptionRequest([]*siri.XMLGeneralMessageSubscriptionRequestEntry)
 }
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
@@ -25,34 +30,6 @@ type SIRIGeneralMessageSubscriptionBroadcaster struct {
 }
 
 type SIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
-
-type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
-
-type TestGeneralMessageSubscriptionBroadcaster struct {
-	model.UUIDConsumer
-
-	events                    []*model.GeneralMessageBroadcastEvent
-	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
-}
-
-func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscriptionBroadcaster {
-	connector := &TestGeneralMessageSubscriptionBroadcaster{}
-	return connector
-}
-
-func (connector *TestGeneralMessageSubscriptionBroadcaster) handleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
-	connector.events = append(connector.events, event)
-}
-
-func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
-
-func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
-	return NewTestGeneralMessageSubscriptionBroadcaster()
-}
-
-// END OF TEST
 
 func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return newSIRIGeneralMessageSubscriptionBroadcaster(partner)
@@ -110,24 +87,100 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return subId, false
 	}
 
-	obj, ok := situation.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+	_, ok = situation.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
 	if !ok {
 		return subId, false
 	}
 
-	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String())
+	sub, ok := connector.partner.Subscriptions().FindByKind("situation")
 	if !ok {
 		return subId, false
 	}
 
-	ressources := sub.ResourcesByObjectID()
+	// The ressource is the StopArea linked to the situation.
+	// then inside the ressouce we check for the LastStates that is a map[situationId] SIRIGeneralMessageBroadcaster
+	// We normaly could be able to find the stopArea thought the situation if we save the stopArea associated with it
 
-	ressource, ok := ressources[obj.String()]
-
-	lastState, ok := ressource.LastStates[string(situation.Id())]
-
-	if ok == true && !lastState.(*generalMessageLastChange).Haschanged(situation) {
-		return subId, false
-	}
+	// ressources := sub.ResourcesByObjectID()
+	//
+	// ressource, ok := ressources[obj.String()]
+	//
+	// lastState, ok := ressource.LastStates[string(situation.Id())]
+	//
+	// if ok == true && !lastState.(*generalMessageLastChange).Haschanged(situation) {
+	// 	return subId, false
+	// }
 	return sub.Id(), true
 }
+
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(gms []*siri.XMLGeneralMessageSubscriptionRequestEntry) []siri.SIRIResponseStatus {
+	if len(gms) == 0 {
+		return []siri.SIRIResponseStatus{}
+	}
+
+	resps := []siri.SIRIResponseStatus{}
+
+	for _, gm := range gms {
+		rs := siri.SIRIResponseStatus{
+			RequestMessageRef: gm.MessageIdentifier(),
+			SubscriberRef:     gm.SubscriberRef(),
+			SubscriptionRef:   gm.SubscriptionIdentifier(),
+			Status:            true,
+			ResponseTimestamp: connector.Clock().Now(),
+			ValidUntil:        gm.InitialTerminationTime(),
+		}
+
+		reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
+		matches := reg.FindStringSubmatch(strings.TrimSpace(gm.SubscriptionIdentifier()))
+
+		if len(matches) == 0 {
+			logger.Log.Debugf("Partner %s sent a Subscription Request response with a wrong SubscriptionRef format: %s\n", connector.Partner().Slug(), gm.SubscriptionIdentifier())
+			rs.Status = false
+			resps = append(resps, rs)
+			continue
+		}
+		externalId := matches[1]
+
+		sub, ok := connector.Partner().Subscriptions().FindByExternalId(externalId)
+
+		if !ok {
+			sub = connector.Partner().Subscriptions().NewSubscription()
+			sub.SetKind("Situation")
+			sub.SetExternalId(externalId)
+			sub.partner = connector.Partner()
+			sub.Save()
+		}
+		resps = append(resps, rs)
+	}
+	return resps
+}
+
+// Start Test
+
+type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
+
+type TestGeneralMessageSubscriptionBroadcaster struct {
+	model.UUIDConsumer
+
+	events                    []*model.GeneralMessageBroadcastEvent
+	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
+}
+
+func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscriptionBroadcaster {
+	connector := &TestGeneralMessageSubscriptionBroadcaster{}
+	return connector
+}
+
+func (connector *TestGeneralMessageSubscriptionBroadcaster) handleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+	connector.events = append(connector.events, event)
+}
+
+func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
+	return true
+}
+
+func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
+	return NewTestGeneralMessageSubscriptionBroadcaster()
+}
+
+// END OF TEST

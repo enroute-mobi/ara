@@ -199,14 +199,14 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 
-	request := &siri.XMLStopMonitoringSubscriptionRequest{}
+	request := &siri.XMLSubscriptionRequest{}
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
 			t.Errorf("Request ContentLength should be zero")
 		}
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLStopMonitoringSubscriptionRequestFromContent(body)
+		request, _ = siri.NewXMLSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 
@@ -251,7 +251,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
-	if request.XMLSubscriptionEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionEntries()[0].SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
+	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
 	}
 }

@@ -11,14 +11,14 @@ import (
 )
 
 func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
-	request := &siri.XMLGeneralMessageSubscriptionRequest{}
+	request := &siri.XMLSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
 			t.Errorf("Request ContentLength should be zero")
 		}
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLGeneralMessageSubscriptionRequestFromContent(body)
+		request, _ = siri.NewXMLSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 
@@ -55,7 +55,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
 
-	if len(request.XMLSubscriptionEntries()) != 1 {
-		t.Errorf("Wrong XMLSubscriptionEntries:\n got: %v\nwant: 1", len(request.XMLSubscriptionEntries()))
+	if len(request.XMLSubscriptionGMEntries()) != 1 {
+		t.Errorf("Wrong XMLSubscriptionEntries:\n got: %v\nwant: 1", len(request.XMLSubscriptionGMEntries()))
 	}
 }

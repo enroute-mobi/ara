@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func getXMLGeneralMessageSubscriptionRequest(t *testing.T) *XMLGeneralMessageSubscriptionRequest {
+func getXMLGeneralMessageSubscriptionRequest(t *testing.T) *XMLSubscriptionRequest {
 	file, err := os.Open("../core/testdata/generalmessagesubscription-request-soap.xml")
 	defer file.Close()
 	if err != nil {
@@ -18,13 +18,17 @@ func getXMLGeneralMessageSubscriptionRequest(t *testing.T) *XMLGeneralMessageSub
 		t.Fatal(err)
 	}
 
-	request, _ := NewXMLGeneralMessageSubscriptionRequestFromContent(content)
+	request, _ := NewXMLSubscriptionRequestFromContent(content)
 	return request
 }
 
 func Test_XMLGeneralMessageSubscriptionRequest(t *testing.T) {
 	request := getXMLGeneralMessageSubscriptionRequest(t)
-	entry := request.XMLSubscriptionEntries()[0]
+	entry := request.XMLSubscriptionGMEntries()[0]
+
+	if len(request.XMLSubscriptionGMEntries()) != 1 {
+		t.Errorf("Wrong len should be 1 got %v", len(request.XMLSubscriptionGMEntries()))
+	}
 
 	if expected := "RATPDEV:Concerto"; request.RequestorRef() != expected {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", request.RequestorRef(), expected)
@@ -75,7 +79,7 @@ func Test_SIRIGeneralMessageSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	smsr, err := NewXMLGeneralMessageSubscriptionRequestFromContent([]byte(xml))
+	smsr, err := NewXMLSubscriptionRequestFromContent([]byte(xml))
 
 	if smsr.RequestorRef() != request.RequestorRef {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", smsr.RequestorRef(), request.RequestorRef)
@@ -93,7 +97,7 @@ func Test_SIRIGeneralMessageSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", smsr.ConsumerAddress(), request.ConsumerAddress)
 	}
 
-	xse := smsr.XMLSubscriptionEntries()
+	xse := smsr.XMLSubscriptionGMEntries()
 	if len(xse) != 1 {
 		t.Errorf("Wrong number of subscriptions entries :\n got: %v\nwant: %v", len(xse), 1)
 	}

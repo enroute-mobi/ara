@@ -113,11 +113,13 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	for key, stopVisits := range events {
 		//Voir pour le RequestMessageRef
 
+		sub, _ := smb.connector.Partner().Subscriptions().Find(key)
+
 		delivery := siri.SIRINotifyStopMonitoring{
 			ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
 			ResponseMessageIdentifier: smb.connector.NewUUID(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", key),
+			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub.ExternalId()),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
 		}
@@ -133,7 +135,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				continue
 			}
 
-			sub, _ := smb.connector.Partner().Subscriptions().Find(key)
 			obj := model.NewObjectID(smb.connector.Partner().Setting("remote_objectid_kind"), sm.StopPointRef)
 			ressource := sub.Resource(obj)
 

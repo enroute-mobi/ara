@@ -28,7 +28,6 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 	connector, _ := partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 
 	situation := referential.Model().Situations().New()
-	//situation.Save()
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)
@@ -93,7 +92,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "Situation",
 	}
 
-	subscription, _ := partner.Subscriptions().FindOrCreateByKind("This Kind should normaly be the exterior Subscription Id")
+	subscription, _ := partner.Subscriptions().FindOrCreateByKind("situation")
 	subscription.CreateAddNewResource(reference)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLStopMonitoringSubscriptionRequest {
+func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLSubscriptionRequest {
 	file, err := os.Open("../core/testdata/stopmonitoringsubscription-request-soap.xml")
 	defer file.Close()
 	if err != nil {
@@ -18,13 +18,13 @@ func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLStopMonitoringSub
 		t.Fatal(err)
 	}
 
-	request, _ := NewXMLStopMonitoringSubscriptionRequestFromContent(content)
+	request, _ := NewXMLSubscriptionRequestFromContent(content)
 	return request
 }
 
 func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 	request := getXMLStopMonitoringSubscriptionRequest(t)
-	entry := request.XMLSubscriptionEntries()[0]
+	entry := request.XMLSubscriptionSMEntries()[0]
 
 	if expected := "RATPDEV:Concerto"; request.RequestorRef() != expected {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", request.RequestorRef(), expected)
@@ -76,7 +76,7 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	smsr, err := NewXMLStopMonitoringSubscriptionRequestFromContent([]byte(xml))
+	smsr, err := NewXMLSubscriptionRequestFromContent([]byte(xml))
 
 	if smsr.RequestorRef() != request.RequestorRef {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", smsr.RequestorRef(), request.RequestorRef)
@@ -94,7 +94,7 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", smsr.ConsumerAddress(), request.ConsumerAddress)
 	}
 
-	xse := smsr.XMLSubscriptionEntries()
+	xse := smsr.XMLSubscriptionSMEntries()
 	if len(xse) != 1 {
 		t.Errorf("Wrong number of subscriptions entries :\n got: %v\nwant: %v", len(xse), 1)
 	}

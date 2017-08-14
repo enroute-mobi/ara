@@ -1,6 +1,8 @@
 package siri
 
 import (
+	"bytes"
+	"html/template"
 	"strconv"
 	"strings"
 	"time"
@@ -87,7 +89,7 @@ const stopMonitoringSubscriptionResponseTemplate = `<ns1:SubscribeResponse xmlns
             <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>{{.RequestMessageRef}}</ns5:RequestMessageRef>
             <ns5:SubscriberRef>{{.SubscriberRef}}</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>{{.SubscriptionIdentifier}}</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>{{.SubscriptionRef}}</ns5:SubscriptionRef>
             <ns5:Status>{{.Status}}</ns5:Status>{{ if not .Status }}
 						<ns5:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
 							<ns5:OtherError number="{{.ErrorNumber}}">{{ else }}
@@ -252,4 +254,13 @@ func (response *XMLResponseStatus) ErrorDescription() string {
 		response.errorDescription = response.findStringChildContent("Description")
 	}
 	return response.errorDescription
+}
+
+func (response *SIRIStopMonitoringSubscriptionResponse) BuildXML() (string, error) {
+	var buffer bytes.Buffer
+	var siriResponse = template.Must(template.New("SubscribeResponse").Parse(stopMonitoringSubscriptionResponseTemplate))
+	if err := siriResponse.Execute(&buffer, response); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
 }

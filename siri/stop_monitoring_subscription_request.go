@@ -4,18 +4,7 @@ import (
 	"bytes"
 	"text/template"
 	"time"
-
-	"github.com/jbowtie/gokogiri"
-	"github.com/jbowtie/gokogiri/xml"
 )
-
-type XMLStopMonitoringSubscriptionRequest struct {
-	RequestXMLStructure
-
-	consumerAddress string
-
-	entries []*XMLStopMonitoringSubscriptionRequestEntry
-}
 
 type XMLStopMonitoringSubscriptionRequestEntry struct {
 	XMLStructure
@@ -74,45 +63,10 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
   <RequestExtension />
 </ws:Subscribe>`
 
-func NewXMLStopMonitoringSubscriptionRequest(node xml.Node) *XMLStopMonitoringSubscriptionRequest {
-	xmlStopMonitoringSubscriptionRequest := &XMLStopMonitoringSubscriptionRequest{}
-	xmlStopMonitoringSubscriptionRequest.node = NewXMLNode(node)
-	return xmlStopMonitoringSubscriptionRequest
-}
-
 func NewXMLStopMonitoringSubscriptionRequestEntry(node XMLNode) *XMLStopMonitoringSubscriptionRequestEntry {
 	xmlStopMonitoringSubscriptionRequestEntry := &XMLStopMonitoringSubscriptionRequestEntry{}
 	xmlStopMonitoringSubscriptionRequestEntry.node = node
 	return xmlStopMonitoringSubscriptionRequestEntry
-}
-
-func NewXMLStopMonitoringSubscriptionRequestFromContent(content []byte) (*XMLStopMonitoringSubscriptionRequest, error) {
-	doc, err := gokogiri.ParseXml(content)
-	if err != nil {
-		return nil, err
-	}
-	request := NewXMLStopMonitoringSubscriptionRequest(doc.Root().XmlNode)
-	return request, nil
-}
-
-func (request *XMLStopMonitoringSubscriptionRequest) XMLSubscriptionEntries() []*XMLStopMonitoringSubscriptionRequestEntry {
-	if len(request.entries) != 0 {
-		return request.entries
-	}
-	nodes := request.findNodes("StopMonitoringSubscriptionRequest")
-	if nodes != nil {
-		for _, stopMonitoring := range nodes {
-			request.entries = append(request.entries, NewXMLStopMonitoringSubscriptionRequestEntry(stopMonitoring))
-		}
-	}
-	return request.entries
-}
-
-func (request *XMLStopMonitoringSubscriptionRequest) ConsumerAddress() string {
-	if request.consumerAddress == "" {
-		request.consumerAddress = request.findStringChildContent("ConsumerAddress")
-	}
-	return request.consumerAddress
 }
 
 func (request *XMLStopMonitoringSubscriptionRequestEntry) SubscriberRef() string {

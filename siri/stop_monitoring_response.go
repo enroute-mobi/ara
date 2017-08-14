@@ -14,6 +14,7 @@ type XMLStopMonitoringDelivery struct {
 	XMLStructure
 
 	subscriptionRef                 string
+	subscriberRef                   string
 	monitoredStopVisits             []*XMLMonitoredStopVisit
 	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
 }

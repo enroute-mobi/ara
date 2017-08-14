@@ -5,17 +5,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
-
-type XMLGeneralMessageSubscriptionRequest struct {
-	RequestXMLStructure
-
-	consumerAddress string
-
-	entries []*XMLGeneralMessageSubscriptionRequestEntry
-}
 
 type XMLGeneralMessageSubscriptionRequestEntry struct {
 	XMLStructure
@@ -76,45 +67,10 @@ func NewXMLGeneralMessageSubscriptionResponse(node xml.Node) *XMLGeneralMessageS
 	return xmlGeneralMessageSubscriptionResponse
 }
 
-func NewXMLGeneralMessageSubscriptionRequest(node xml.Node) *XMLGeneralMessageSubscriptionRequest {
-	xmlGeneralMessageSubscriptionRequest := &XMLGeneralMessageSubscriptionRequest{}
-	xmlGeneralMessageSubscriptionRequest.node = NewXMLNode(node)
-	return xmlGeneralMessageSubscriptionRequest
-}
-
 func NewXMLGeneralMessageSubscriptionRequestEntry(node XMLNode) *XMLGeneralMessageSubscriptionRequestEntry {
 	xmlGeneralMessageSubscriptionRequestEntry := &XMLGeneralMessageSubscriptionRequestEntry{}
 	xmlGeneralMessageSubscriptionRequestEntry.node = node
 	return xmlGeneralMessageSubscriptionRequestEntry
-}
-
-func NewXMLGeneralMessageSubscriptionRequestFromContent(content []byte) (*XMLGeneralMessageSubscriptionRequest, error) {
-	doc, err := gokogiri.ParseXml(content)
-	if err != nil {
-		return nil, err
-	}
-	request := NewXMLGeneralMessageSubscriptionRequest(doc.Root().XmlNode)
-	return request, nil
-}
-
-func (request *XMLGeneralMessageSubscriptionRequest) XMLSubscriptionEntries() []*XMLGeneralMessageSubscriptionRequestEntry {
-	if len(request.entries) != 0 {
-		return request.entries
-	}
-	nodes := request.findNodes("GeneralMessageSubscriptionRequest")
-	if nodes != nil {
-		for _, generalMessage := range nodes {
-			request.entries = append(request.entries, NewXMLGeneralMessageSubscriptionRequestEntry(generalMessage))
-		}
-	}
-	return request.entries
-}
-
-func (request *XMLGeneralMessageSubscriptionRequest) ConsumerAddress() string {
-	if request.consumerAddress == "" {
-		request.consumerAddress = request.findStringChildContent("ConsumerAddress")
-	}
-	return request.consumerAddress
 }
 
 func (request *XMLGeneralMessageSubscriptionRequestEntry) SubscriberRef() string {

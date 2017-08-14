@@ -15,6 +15,7 @@ type Subscription struct {
 
 	id                  SubscriptionId
 	kind                string
+	externalId          string
 	partner             *Partner
 	resourcesByObjectID map[string]*SubscribedResource
 }
@@ -55,8 +56,16 @@ func (subscription *Subscription) Kind() string {
 	return subscription.kind
 }
 
+func (subscription *Subscription) ExternalId() string {
+	return subscription.externalId
+}
+
 func (subscription *Subscription) SetKind(kind string) {
 	subscription.kind = kind
+}
+
+func (subscription *Subscription) SetExternalId(externalId string) {
+	subscription.externalId = externalId
 }
 
 func (subscription *Subscription) Save() (ok bool) {
@@ -152,6 +161,7 @@ type Subscriptions interface {
 	Delete(Subscription *Subscription) bool
 	NewSubscription() *Subscription
 	FindByRessourceId(id string) (*Subscription, bool)
+	FindByExternalId(externalId string) (*Subscription, bool)
 }
 
 func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
@@ -169,6 +179,15 @@ func (manager *MemorySubscriptions) New() Subscription {
 func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool) {
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
+			return subscription, true
+		}
+	}
+	return nil, false
+}
+
+func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscription, bool) {
+	for _, subscription := range manager.byIdentifier {
+		if subscription.ExternalId() == externalId {
 			return subscription, true
 		}
 	}

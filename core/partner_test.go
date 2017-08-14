@@ -36,6 +36,15 @@ func Test_Partner_Slug(t *testing.T) {
 	}
 }
 
+func Test_Partner_AddConnector(t *testing.T) {
+	partner := NewPartner()
+
+	partner.AddConnector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	if _, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER); !ok {
+		t.Errorf("connector %v should have been created", SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	}
+}
+
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := NewPartner()
 
