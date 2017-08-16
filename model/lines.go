@@ -191,12 +191,14 @@ func (manager *MemoryLines) Load(referentialId string) error {
 	var selectLines []struct {
 		Id            string
 		ReferentialId string `db:"referential_id"`
+		ModelName     string `db:"model_name"`
 		Name          sql.NullString
 		ObjectIDs     sql.NullString `db:"object_ids"`
 		Attributes    sql.NullString
 		References    sql.NullString `db:"siri_references"`
 	}
-	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s'", referentialId)
+	modelName := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
 	_, err := Database.Select(&selectLines, sqlQuery)
 	if err != nil {
 		return err

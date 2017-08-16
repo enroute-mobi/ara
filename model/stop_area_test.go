@@ -270,6 +270,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	var databaseStopArea = struct {
 		Id              string    `db:"id"`
 		ReferentialId   string    `db:"referential_id"`
+		ModelName       string    `db:"model_name"`
 		Name            string    `db:"name"`
 		ObjectIDs       string    `db:"object_ids"`
 		Attributes      string    `db:"attributes"`
@@ -281,6 +282,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:   "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ModelName:       "2017-01-01",
 		Name:            "stopArea",
 		ObjectIDs:       `{"internal":"value"}`,
 		Attributes:      "{}",
@@ -298,7 +300,13 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	stopAreas := NewMemoryStopAreas()
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	stopAreas := model.StopAreas().(*MemoryStopAreas)
 	err = stopAreas.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if err != nil {
 		t.Fatal(err)
@@ -307,7 +315,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	stopAreaId := StopAreaId(databaseStopArea.Id)
 	stopArea, ok := stopAreas.Find(stopAreaId)
 	if !ok {
-		t.Fatal("Loaded StopAreas should be found")
+		t.Fatalf("Loaded StopAreas should be found")
 	}
 
 	if stopArea.id != stopAreaId {

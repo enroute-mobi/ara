@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_Line_Id(t *testing.T) {
@@ -201,6 +202,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 	var databaseLine = struct {
 		Id            string `db:"id"`
 		ReferentialId string `db:"referential_id"`
+		ModelName     string `db:"model_name"`
 		Name          string `db:"name"`
 		ObjectIDs     string `db:"object_ids"`
 		Attributes    string `db:"attributes"`
@@ -208,6 +210,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}{
 		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ModelName:     "2017-01-01",
 		Name:          "line",
 		ObjectIDs:     `{"internal":"value"}`,
 		Attributes:    "{}",
@@ -221,7 +224,13 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	lines := NewMemoryLines()
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	lines := model.Lines().(*MemoryLines)
 	err = lines.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if err != nil {
 		t.Fatal(err)
@@ -230,7 +239,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 	lineId := LineId(databaseLine.Id)
 	line, ok := lines.Find(lineId)
 	if !ok {
-		t.Fatal("Loaded Liness should be found")
+		t.Fatal("Loaded Lines should be found")
 	}
 
 	if line.id != lineId {
