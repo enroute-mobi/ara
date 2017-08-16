@@ -78,10 +78,20 @@ func InitTestDb(t *testing.T) {
 	config.Config.ApiKey = ""
 	// Initialize Database
 	Database = InitDB(config.Config.DB)
+
+	err = Database.TruncateTables()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = Database.Exec("BEGIN;")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func CleanTestDb(t *testing.T) {
-	err := Database.TruncateTables()
+	_, err := Database.Exec("ROLLBACK;")
 	if err != nil {
 		t.Fatal(err)
 	}
