@@ -15,7 +15,7 @@ type Model interface {
 type MemoryModel struct {
 	stopAreas       *MemoryStopAreas
 	stopVisits      *MemoryStopVisits
-	vehicleJourneys VehicleJourneys
+	vehicleJourneys *MemoryVehicleJourneys
 	lines           *MemoryLines
 	date            Date
 	situations      *MemorySituations
@@ -127,7 +127,7 @@ func (model *MemoryModel) NewTransaction() *Transaction {
 func (model *MemoryModel) Load(referentialId string) error {
 	model.stopAreas.Load(referentialId)
 	model.lines.Load(referentialId)
-	// model.vehicleJourneys.Load(referentialId)
+	model.vehicleJourneys.Load(referentialId)
 	// model.stopVisits.Load(referentialId)
 	return nil
 }

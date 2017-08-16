@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_VehicleJourney_Id(t *testing.T) {
@@ -206,5 +207,69 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 	_, ok = vehicleJourneys.FindByObjectId(objectid)
 	if ok {
 		t.Errorf("Deleted VehicleJourney should not be findable by objectid")
+	}
+}
+
+func Test_MemoryVehicleJourneys_Load(t *testing.T) {
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	// Insert Data in the test db
+	var databaseVehicleJourney = struct {
+		Id            string `db:"id"`
+		ReferentialId string `db:"referential_id"`
+		ModelName     string `db:"model_name"`
+		Name          string `db:"name"`
+		ObjectIDs     string `db:"object_ids"`
+		LineId        string `db:"line_id"`
+		Attributes    string `db:"attributes"`
+		References    string `db:"siri_references"`
+	}{
+		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ModelName:     "2017-01-01",
+		Name:          "vehicleJourney",
+		ObjectIDs:     `{"internal":"value"}`,
+		LineId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Attributes:    "{}",
+		References:    "{}",
+	}
+
+	Database.AddTableWithName(databaseVehicleJourney, "vehicle_journeys")
+	err := Database.Insert(&databaseVehicleJourney)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	vehicleJourneys := model.VehicleJourneys().(*MemoryVehicleJourneys)
+	err = vehicleJourneys.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vehicleJourneyId := VehicleJourneyId(databaseVehicleJourney.Id)
+	vehicleJourney, ok := vehicleJourneys.Find(vehicleJourneyId)
+	if !ok {
+		t.Fatalf("Loaded VehicleJourneys should be found")
+	}
+
+	if vehicleJourney.id != vehicleJourneyId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", vehicleJourney.id, vehicleJourneyId)
+	}
+	if vehicleJourney.Name != "vehicleJourney" {
+		t.Errorf("Wrong Name:\n got: %v\n expected: vehicleJourney", vehicleJourney.Name)
+	}
+	if objectid, ok := vehicleJourney.ObjectID("internal"); !ok || objectid.Value() != "value" {
+		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	}
+	if vehicleJourney.LineId != "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" {
+		t.Errorf("Wrong LineId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", vehicleJourney.LineId)
 	}
 }
