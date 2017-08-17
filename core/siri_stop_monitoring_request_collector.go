@@ -108,7 +108,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	collectedStopVisitObjectIDs := []model.ObjectID{}
 	for _, stopVisit := range connector.Partner().Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
-		if stopVisit.IsCollected() == true {
+		if stopVisit.IsCollected() {
 			objectId, ok := stopVisit.ObjectID(objectidKind)
 			if ok {
 				collectedStopVisitObjectIDs = append(collectedStopVisitObjectIDs, objectId)

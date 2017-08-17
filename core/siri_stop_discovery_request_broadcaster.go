@@ -88,6 +88,9 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) RemoteObjectIDKind() string {
+	if connector.partner.Setting("siri-stop-points-discovery-request-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-stop-points-discovery-request-broadcaster.remote_objectid_kind")
+	}
 	return connector.Partner().Setting("remote_objectid_kind")
 }
 

@@ -111,7 +111,7 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 	defer tx.Close()
 
 	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
-		if stopVisit.IsCollected() == true {
+		if stopVisit.IsCollected() {
 			continue
 		}
 
@@ -168,7 +168,7 @@ func (simulator *ActualAttributesSimulator) AfterDepartureTime() bool {
 }
 
 func (simulator *ActualAttributesSimulator) Simulate() bool {
-	if simulator.stopVisit.IsCollected() == true {
+	if simulator.stopVisit.IsCollected() {
 		return false
 	}
 
