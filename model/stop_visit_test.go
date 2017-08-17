@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_StopVisit_Id(t *testing.T) {
@@ -208,6 +209,91 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 	_, ok = stopVisits.FindByObjectId(objectid)
 	if ok {
 		t.Errorf("New StopVisit should not be findable by objectid")
+	}
+}
+
+func Test_MemoryStopVisits_Load(t *testing.T) {
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	testTime := time.Now()
+	// Insert Data in the test db
+	var databaseStopVisit = struct {
+		Id               string
+		ReferentialId    string    `db:"referential_id"`
+		ModelName        string    `db:"model_name"`
+		ObjectIDs        string    `db:"object_ids"`
+		StopAreaId       string    `db:"stop_area_id"`
+		VehicleJourneyId string    `db:"vehicle_journey_id"`
+		ArrivalStatus    string    `db:"arrival_status"`
+		DepartureStatus  string    `db:"departure_status"`
+		Schedules        string    `db:"schedules"`
+		Attributes       string    `db:"attributes"`
+		References       string    `db:"siri_references"`
+		Collected        bool      `db:"collected"`
+		VehicleAtStop    bool      `db:"vehicle_at_stop"`
+		CollectedAt      time.Time `db:"collected_at"`
+		RecordedAt       time.Time `db:"recorded_at"`
+		PassageOrder     int       `db:"passage_order"`
+	}{
+		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId:    "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ModelName:        "2017-01-01",
+		ObjectIDs:        `{"internal":"value"}`,
+		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ArrivalStatus:    "onTime",
+		DepartureStatus:  "onTime",
+		Schedules:        `[{"Kind":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
+		Collected:        true,
+		VehicleAtStop:    true,
+		CollectedAt:      testTime,
+		RecordedAt:       testTime,
+		PassageOrder:     1,
+		Attributes:       "{}",
+		References:       "{}",
+	}
+
+	Database.AddTableWithName(databaseStopVisit, "stop_visits")
+	err := Database.Insert(&databaseStopVisit)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	stopVisits := model.StopVisits().(*MemoryStopVisits)
+	err = stopVisits.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stopVisitId := StopVisitId(databaseStopVisit.Id)
+	stopVisit, ok := stopVisits.Find(stopVisitId)
+	if !ok {
+		t.Fatalf("Loaded StopVisits should be found")
+	}
+
+	if stopVisit.id != stopVisitId {
+		t.Errorf("Wrong Id:\n got: %v\n expected: %v", stopVisit.id, stopVisitId)
+	}
+	if objectid, ok := stopVisit.ObjectID("internal"); !ok || objectid.Value() != "value" {
+		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	}
+	if sv.PassageOrder != 1 {
+		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", sv.PassageOrder)
+	}
+	sv := stopVisit.Schedules.Schedule("expected")
+	if sv == nil {
+		t.Fatal("StopVisit should have an 'expected' Schedule")
+	}
+	if sv.DepartureTime().Equal(testTime) {
+		t.Errorf("StopVisitSchedule should have Departure time %v, got: %v", testTime, sv.DepartureTime())
 	}
 }
 

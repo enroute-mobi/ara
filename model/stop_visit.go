@@ -1,9 +1,13 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"sort"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type StopVisitId string
@@ -345,4 +349,96 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	delete(manager.byIdentifier, stopVisit.Id())
 	return true
+}
+
+func (manager *MemoryStopVisits) Load(referentialId string) error {
+	var selectStopVisits []struct {
+		Id               string
+		ReferentialId    string         `db:"referential_id"`
+		ModelName        string         `db:"model_name"`
+		ObjectIDs        sql.NullString `db:"object_ids"`
+		StopAreaId       sql.NullString `db:"stop_area_id"`
+		VehicleJourneyId sql.NullString `db:"vehicle_journey_id"`
+		ArrivalStatus    sql.NullString `db:"arrival_status"`
+		DepartureStatus  sql.NullString `db:"departure_status"`
+		Schedules        sql.NullString `db:"schedules"`
+		Attributes       sql.NullString `db:"attributes"`
+		References       sql.NullString `db:"siri_references"`
+		Collected        sql.NullBool   `db:"collected"`
+		VehicleAtStop    sql.NullBool   `db:"vehicle_at_stop"`
+		CollectedAt      pq.NullTime    `db:"collected_at"`
+		RecordedAt       pq.NullTime    `db:"recorded_at"`
+		PassageOrder     sql.NullInt64  `db:"passage_order"`
+	}
+	modelName := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
+	_, err := Database.Select(&selectStopVisits, sqlQuery)
+	if err != nil {
+		return err
+	}
+	for _, sv := range selectStopVisits {
+		stopVisit := manager.New()
+		stopVisit.id = StopVisitId(sv.Id)
+		if sv.StopAreaId.Valid {
+			stopVisit.StopAreaId = StopAreaId(sv.StopAreaId.String)
+		}
+		if sv.VehicleJourneyId.Valid {
+			stopVisit.VehicleJourneyId = VehicleJourneyId(sv.VehicleJourneyId.String)
+		}
+		if sv.ArrivalStatus.Valid {
+			stopVisit.ArrivalStatus = StopVisitArrivalStatus(sv.ArrivalStatus.String)
+		}
+		if sv.DepartureStatus.Valid {
+			stopVisit.DepartureStatus = StopVisitDepartureStatus(sv.DepartureStatus.String)
+		}
+		if sv.Collected.Valid {
+			stopVisit.collected = sv.Collected.Bool
+		}
+		if sv.VehicleAtStop.Valid {
+			stopVisit.VehicleAtStop = sv.VehicleAtStop.Bool
+		}
+		if sv.CollectedAt.Valid {
+			stopVisit.collectedAt = sv.CollectedAt.Time
+		}
+		if sv.RecordedAt.Valid {
+			stopVisit.RecordedAt = sv.RecordedAt.Time
+		}
+		if sv.PassageOrder.Valid {
+			stopVisit.PassageOrder = int(sv.PassageOrder.Int64)
+		}
+
+		if sv.Attributes.Valid && len(sv.Attributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sv.Attributes.String), &stopVisit.Attributes); err != nil {
+				return err
+			}
+		}
+
+		if sv.References.Valid && len(sv.References.String) > 0 {
+			if err = json.Unmarshal([]byte(sv.References.String), &stopVisit.References); err != nil {
+				return err
+			}
+		}
+
+		if sv.ObjectIDs.Valid && len(sv.ObjectIDs.String) > 0 {
+			objectIdMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sv.ObjectIDs.String), &objectIdMap); err != nil {
+				return err
+			}
+			stopVisit.objectids = NewObjectIDsFromMap(objectIdMap)
+		}
+
+		if sv.Schedules.Valid && len(sv.Schedules.String) > 0 {
+			scheduleSlice := []StopVisitSchedule{}
+			if err = json.Unmarshal([]byte(sv.Schedules.String), &scheduleSlice); err != nil {
+				return err
+			}
+			stopVisit.Schedules = NewStopVisitSchedules()
+			for _, schedule := range scheduleSlice {
+				stopVisit.Schedules.SetSchedule(schedule.Kind(), schedule.DepartureTime(), schedule.ArrivalTime())
+			}
+		}
+
+		manager.Save(&stopVisit)
+	}
+	return nil
 }
