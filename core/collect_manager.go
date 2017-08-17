@@ -115,7 +115,7 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 			continue
 		}
 
-		if partner.CanCollect(stopAreaObjectID) {
+		if partner.CanCollect(stopAreaObjectID, stopArea.LineIds) {
 			return partner
 		}
 	}

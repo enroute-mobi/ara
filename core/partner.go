@@ -280,13 +280,33 @@ func (partner *Partner) CollectPriority() int {
 	return value
 }
 
-func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID) bool {
-	if partner.Settings["collect.include_stop_areas"] == "" {
+func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds model.StopAreaLineIds) bool {
+	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" {
 		return true
+	}
+	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds)
+}
+
+func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
+	if partner.Setting("collect.include_stop_areas") == "" {
+		return false
 	}
 	stopAreas := strings.Split(partner.Settings["collect.include_stop_areas"], ",")
 	for _, stopArea := range stopAreas {
 		if strings.TrimSpace(stopArea) == stopAreaObjectId.Value() {
+			return true
+		}
+	}
+	return false
+}
+
+func (partner *Partner) collectLine(lineIds model.StopAreaLineIds) bool {
+	if partner.Setting("collect.include_lines") == "" {
+		return false
+	}
+	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
+	for _, line := range lines {
+		if lineIds.Contains(model.LineId(strings.TrimSpace(line))) {
 			return true
 		}
 	}

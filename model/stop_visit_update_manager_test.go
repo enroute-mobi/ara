@@ -46,16 +46,16 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 	manager.UpdateStopVisit(event)
 	stopVisit, ok := model.StopVisits().FindByObjectId(objectid)
 	if !ok {
-		t.Errorf("StopVisit should be created by findOrCreateStopArea")
+		t.Fatalf("StopVisit should be created by findOrCreateStopVisit")
 	}
 	if len(model.Lines().FindAll()) != 1 {
-		t.Errorf("Line should be created by findOrCreateStopArea")
+		t.Fatalf("Line should be created by findOrCreateLine")
 	}
 	if len(model.StopAreas().FindAll()) != 1 {
-		t.Errorf("StopArea should be created by findOrCreateStopArea")
+		t.Fatalf("StopArea should be created by findOrCreateStopArea")
 	}
 	if len(model.VehicleJourneys().FindAll()) != 1 {
-		t.Errorf("VehicleJourney should be created by findOrCreateStopArea")
+		t.Fatalf("VehicleJourney should be created by findOrCreateVehicleJourney")
 	}
 
 	if stopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
@@ -66,6 +66,13 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 	}
 	if stopVisit.PassageOrder != 1 {
 		t.Errorf("StopVisit PassageOrder should be 1, got: %v", stopVisit.PassageOrder)
+	}
+
+	// Check if the SA have the Line in LineIds
+	lineId := model.Lines().FindAll()[0].Id()
+	lineIds := model.StopAreas().FindAll()[0].LineIds
+	if len(lineIds) != 1 && lineIds[0] != lineId {
+		t.Errorf("StopArea should have %v in LineIds, got: %v", lineId, lineIds)
 	}
 }
 

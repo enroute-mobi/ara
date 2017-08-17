@@ -30,7 +30,7 @@ type StopArea struct {
 	CollectedAlways bool
 
 	Name       string
-	LineIds    []LineId `json:"Lines,omitempty"`
+	LineIds    StopAreaLineIds `json:"Lines,omitempty"`
 	Attributes Attributes
 	References References
 	// ...
