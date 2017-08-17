@@ -129,6 +129,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		for _, situationId := range situationIds {
 			situation, ok := connector.Partner().Model().Situations().Find(situationId)
 			if !ok {
+				logger.Log.Debugf("Could not find situation : %v in general message broadcaster", situationId)
 				continue
 			}
 
@@ -163,7 +164,6 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
 
-		//fmt.Println(notify.BuildXML())
 		connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
 		logSIRIGeneralMessageNotify(logStashEvent, &notify)
 	}

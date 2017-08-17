@@ -61,6 +61,9 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 }
 
 func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
+	fakeClock := model.NewFakeClock()
+	model.SetDefaultClock(fakeClock)
+
 	// Create a test http server
 
 	response := []byte{}
@@ -73,6 +76,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	// Create a test http server
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
+	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
@@ -86,6 +90,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	referential.Partners().Save(partner)
 
 	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).SetClock(fakeClock)
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster = NewFakeStopMonitoringBroadcaster(connector.(*SIRIStopMonitoringSubscriptionBroadcaster))
 
 	stopArea := referential.Model().StopAreas().New()
@@ -103,6 +108,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	subscription := partner.Subscriptions().New()
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
+	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
 	subscription.Save()
 
 	line := referential.Model().Lines().New()
@@ -118,6 +124,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.SetObjectID(objectid)
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 	stopVisit.Save()
@@ -144,5 +151,21 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	if len(sv) != 1 {
 		t.Errorf("Should have received 1 StopVisit but got == %v", len(sv))
+	}
+
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit.Save()
+
+	time.Sleep(10 * time.Millisecond)
+	if len := len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast); len != 0 {
+		t.Errorf("No stopVisit should need to be broadcasted %v", len)
+	}
+
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(10*time.Minute))
+	stopVisit.Save()
+
+	time.Sleep(10 * time.Millisecond)
+	if len := len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast); len != 1 {
+		t.Errorf("1 stopVisit should need to be broadcasted %v", len)
 	}
 }

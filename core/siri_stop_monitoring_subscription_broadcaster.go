@@ -110,23 +110,32 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	ressources := sub.ResourcesByObjectID()
+	resources := sub.ResourcesByObjectID()
 
-	ressource, ok := ressources[obj.String()]
+	resource, ok := resources[obj.String()]
 
 	if !ok {
 		return subId, false
 	}
 
-	lastState, ok := ressource.LastStates[string(sv.Id())]
+	lastState, ok := resource.LastStates[string(sv.Id())]
 
-	if ok == true && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
+	if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
 		return subId, false
 	}
+
+	if !ok {
+		smlc := &stopMonitoringLastChange{}
+		smlc.SetSubscription(sub)
+		resource.LastStates[string(sv.Id())] = smlc
+	}
+
 	return sub.Id(), true
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(sms []*siri.XMLStopMonitoringSubscriptionRequestEntry) []siri.SIRIResponseStatus {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+	sms := request.XMLSubscriptionSMEntries()
+
 	if len(sms) <= 0 {
 		return []siri.SIRIResponseStatus{}
 	}
@@ -183,9 +192,22 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		r := sub.CreateAddNewResource(ref)
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
+		connector.fillOptions(sub, r, request, sm)
+
 		resps = append(resps, rs)
 	}
 	return resps
+}
+
+func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
+	ro := r.ResourcesOptions()
+	ro["StopVisitTypes"] = sm.StopVisitTypes()
+
+	so := s.SubscriptionOptions()
+
+	so["IncrementalUpdates"] = request.IncrementalUpdates()
+	so["MaximumStopVisits"] = request.MaximumStopVisits()
+	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
 }
 
 // START TEST

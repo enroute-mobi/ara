@@ -18,20 +18,27 @@ type Subscription struct {
 	externalId          string
 	partner             *Partner
 	resourcesByObjectID map[string]*SubscribedResource
+	subscriptionOptions map[string]string
 }
 
 func NewSubscription() *Subscription {
 	return &Subscription{
 		resourcesByObjectID: make(map[string]*SubscribedResource),
+		subscriptionOptions: make(map[string]string),
 	}
 }
 
 type SubscribedResource struct {
-	Reference       model.Reference
-	RetryCount      int
-	SubscribedAt    time.Time
-	SubscribedUntil time.Time
-	LastStates      map[string]lastState `json:",omitempty"`
+	Reference        model.Reference
+	RetryCount       int
+	SubscribedAt     time.Time
+	SubscribedUntil  time.Time
+	LastStates       map[string]lastState `json:",omitempty"`
+	resourcesOptions map[string]string
+}
+
+func (sr *SubscribedResource) ResourcesOptions() map[string]string {
+	return sr.resourcesOptions
 }
 
 type APISubscription struct {
@@ -58,6 +65,10 @@ func (subscription *Subscription) Kind() string {
 
 func (subscription *Subscription) ExternalId() string {
 	return subscription.externalId
+}
+
+func (subscription *Subscription) SubscriptionOptions() map[string]string {
+	return subscription.subscriptionOptions
 }
 
 func (subscription *Subscription) SetKind(kind string) {
@@ -123,11 +134,11 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
 
 	ressource := SubscribedResource{
-		Reference:       reference,
-		SubscribedUntil: subscription.Clock().Now().Add(1 * time.Minute),
-		LastStates:      make(map[string]lastState),
+		Reference:        reference,
+		SubscribedUntil:  subscription.Clock().Now().Add(1 * time.Minute),
+		LastStates:       make(map[string]lastState),
+		resourcesOptions: make(map[string]string),
 	}
-
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
 	return &ressource
 }

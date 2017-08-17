@@ -111,6 +111,13 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) RequestTimestamp() tim
 	return request.requestTimestamp
 }
 
+func (request *XMLStopMonitoringSubscriptionRequestEntry) StopVisitTypes() string {
+	if request.stopVisitTypes == "" {
+		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
+	}
+	return request.stopVisitTypes
+}
+
 func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringSubscriptionRequestTemplate))

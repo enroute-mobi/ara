@@ -15,7 +15,7 @@ type GeneralMessageSubscriptionBroadcaster interface {
 	model.Startable
 
 	handleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
-	HandleSubscriptionRequest([]*siri.XMLGeneralMessageSubscriptionRequestEntry)
+	HandleSubscriptionRequest(*siri.XMLSubscriptionRequest)
 }
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
@@ -113,7 +113,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	return sub.Id(), true
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(gms []*siri.XMLGeneralMessageSubscriptionRequestEntry) []siri.SIRIResponseStatus {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+
+	gms := request.XMLSubscriptionGMEntries()
+
 	if len(gms) == 0 {
 		return []siri.SIRIResponseStatus{}
 	}

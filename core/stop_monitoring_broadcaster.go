@@ -114,8 +114,10 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		//Voir pour le RequestMessageRef
 
 		sub, _ := smb.connector.Partner().Subscriptions().Find(key)
+		maxSv, _ := strconv.Atoi(sub.SubscriptionOptions()["MaximumStopVisit"])
+		svList := 0
 
-		delivery := siri.SIRINotifyStopMonitoring{
+		delivery := &siri.SIRINotifyStopMonitoring{
 			ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
 			ResponseMessageIdentifier: smb.connector.NewUUID(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
@@ -127,51 +129,74 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		svIds := make(map[model.StopVisitId]bool) //Making sure not to send 2 times the same SV
 
 		for _, svId := range stopVisits {
-			if _, ok := svIds[svId]; ok == true {
+
+			if maxSv != 0 && maxSv >= svList {
+				logSIRIStopMonitoringNotify(logStashEvent, delivery)
+				smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
+
+				svList = 0
+				delivery = &siri.SIRINotifyStopMonitoring{
+					ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
+					ResponseMessageIdentifier: smb.connector.NewUUID(),
+					SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
+					SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub.ExternalId()),
+					ResponseTimestamp:         smb.connector.Clock().Now(),
+					Status:                    true,
+				}
+			}
+			if _, ok := svIds[svId]; ok {
 				continue
 			}
-			sm := smb.getMonitoredStopVisit(svId, tx)
-			if sm == nil {
+
+			stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(model.StopVisitId(svId))
+			if !ok {
 				continue
 			}
 
-			obj := model.NewObjectID(smb.connector.Partner().Setting("remote_objectid_kind"), sm.StopPointRef)
-			ressource := sub.Resource(obj)
-
-			for _, svId := range stopVisits {
-				sm := smb.getMonitoredStopVisit(svId, tx)
-
-				if _, ok := svIds[svId]; ok {
-					continue
-				}
-				delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
-				svIds[svId] = true
-
-				lastStateInterface, _ := ressource.LastStates[string(svId)]
-				lastState, ok := lastStateInterface.(*stopMonitoringLastChange)
-				if !ok {
-					continue
-				}
-
-				lastState.UpdateState(*sm)
-				svIds[svId] = false
+			stopArea, ok := smb.connector.Partner().Model().StopAreas().Find(stopVisit.StopAreaId)
+			if !ok {
+				continue
 			}
+
+			objectidKind := smb.connector.Partner().Setting("remote_objectid_kind")
+
+			objectid, ok := stopArea.ObjectID(objectidKind)
+			if !ok {
+				continue
+			}
+
+			resource := sub.Resource(objectid)
+			if resource == nil {
+				continue
+			}
+
+			options := resource.ResourcesOptions()
+
+			sm := smb.getMonitoredStopVisit(stopVisit, stopArea, options, tx)
+
+			delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, sm)
+			svIds[svId] = true
+
+			lastStateInterface, _ := resource.LastStates[string(svId)]
+			lastState, ok := lastStateInterface.(*stopMonitoringLastChange)
+			if !ok {
+				continue
+			}
+
+			lastState.UpdateState(stopVisit)
+			svIds[svId] = false
+			svList = svList + 1
 		}
-		logSIRIStopMonitoringNotify(logStashEvent, &delivery)
-		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(&delivery)
+		if len(delivery.MonitoredStopVisits) == 0 {
+			continue
+		}
+		logSIRIStopMonitoringNotify(logStashEvent, delivery)
+		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
 	}
 }
 
-func (smb *SMBroadcaster) getMonitoredStopVisit(sv model.StopVisitId, tx *model.Transaction) *siri.SIRIMonitoredStopVisit {
-	stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(model.StopVisitId(sv))
-	if !ok {
-		return nil
-	}
+func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopArea model.StopArea, options map[string]string, tx *model.Transaction) *siri.SIRIMonitoredStopVisit {
 
-	stopArea, ok := smb.connector.Partner().Model().StopAreas().Find(stopVisit.StopAreaId)
-	if !ok {
-		return nil
-	}
 	objectidKind := smb.connector.Partner().Setting("remote_objectid_kind")
 
 	objectid, ok := stopArea.ObjectID(objectidKind)
@@ -247,13 +272,17 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(sv model.StopVisitId, tx *model.
 		References:             make(map[string]map[string]model.Reference),
 	}
 
-	monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
-	monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
-	monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
+	if options["StopVisitTypes"] != "departures" {
+		monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
+		monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
+		monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
+	}
 
-	monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
-	monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
-	monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
+	if options["StopVisitTypes"] != "arrivals" {
+		monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
+		monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
+		monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
+	}
 
 	vehicleJourneyRefCopy := vehicleJourney.References.Copy()
 	stopVisitRefCopy := stopVisit.References.Copy()

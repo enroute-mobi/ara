@@ -46,22 +46,22 @@ func (connector *SIRISubscriptionRequest) Dispatch(request *siri.XMLSubscription
 		RequestMessageRef: request.MessageIdentifier(),
 	}
 
-	gms := request.XMLSubscriptionGMEntries()
-	sms := request.XMLSubscriptionSMEntries()
-
 	gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 
 	if ok {
-		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(gms) {
+		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
 		}
+		return &response
 	}
 
 	smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 	if ok {
-		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(sms) {
+		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
+		return &response
 	}
-	return &response
+
+	return nil
 }
