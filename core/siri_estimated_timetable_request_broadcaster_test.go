@@ -174,7 +174,7 @@ func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
 		slug:           "partner",
 		Settings:       make(map[string]string),
-		ConnectorTypes: []string{"siri-estimated-timetable-broadcaster"},
+		ConnectorTypes: []string{"siri-estimated-timetable-request-broadcaster"},
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
@@ -272,7 +272,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
 
-	partner.Settings["siri-estimated-timetable-broadcaster.remote_objectid_kind"] = "Kind1"
+	partner.Settings["siri-estimated-timetable-request-broadcaster.remote_objectid_kind"] = "Kind1"
 	partner.Settings["remote_objectid_kind"] = "Kind2"
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
@@ -286,7 +286,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
 
-	partner.Settings["siri-estimated-timetable-broadcaster.remote_objectid_kind"] = ""
+	partner.Settings["siri-estimated-timetable-request-broadcaster.remote_objectid_kind"] = ""
 	partner.Settings["remote_objectid_kind"] = "Kind2"
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)

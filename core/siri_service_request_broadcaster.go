@@ -135,7 +135,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 
 		var delivery siri.SIRIEstimatedTimetableDelivery
 
-		estimatedTimetabeConnector, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_BROADCASTER)
+		estimatedTimetabeConnector, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 		if !ok {
 			delivery = siri.SIRIEstimatedTimetableDelivery{
 				RequestMessageRef: estimatedTimetableRequest.MessageIdentifier(),

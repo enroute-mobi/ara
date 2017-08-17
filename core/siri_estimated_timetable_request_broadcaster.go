@@ -28,8 +28,8 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) remoteObjectIDKind() string {
-	if connector.partner.Setting("siri-estimated-timetable-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-estimated-timetable-broadcaster.remote_objectid_kind")
+	if connector.partner.Setting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind")
 	}
 	return connector.partner.Setting("remote_objectid_kind")
 }

@@ -19,7 +19,7 @@ func (handler *SIRIEstimatedTimetableRequestHandler) RequestorRef() string {
 }
 
 func (handler *SIRIEstimatedTimetableRequestHandler) ConnectorType() string {
-	return core.SIRI_ESTIMATED_TIMETABLE_BROADCASTER
+	return core.SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER
 }
 
 func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
