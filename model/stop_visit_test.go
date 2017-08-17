@@ -285,15 +285,15 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	if objectid, ok := stopVisit.ObjectID("internal"); !ok || objectid.Value() != "value" {
 		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
 	}
-	if sv.PassageOrder != 1 {
-		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", sv.PassageOrder)
+	if stopVisit.PassageOrder != 1 {
+		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", stopVisit.PassageOrder)
 	}
-	sv := stopVisit.Schedules.Schedule("expected")
-	if sv == nil {
+	svs := stopVisit.Schedules.Schedule("expected")
+	if svs == nil {
 		t.Fatal("StopVisit should have an 'expected' Schedule")
 	}
-	if sv.DepartureTime().Equal(testTime) {
-		t.Errorf("StopVisitSchedule should have Departure time %v, got: %v", testTime, sv.DepartureTime())
+	if svs.DepartureTime().Equal(testTime) {
+		t.Errorf("StopVisitSchedule should have Departure time %v, got: %v", testTime, svs.DepartureTime())
 	}
 }
 
