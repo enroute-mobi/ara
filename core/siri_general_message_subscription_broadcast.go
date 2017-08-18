@@ -117,10 +117,6 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 
 	gms := request.XMLSubscriptionGMEntries()
 
-	if len(gms) == 0 {
-		return []siri.SIRIResponseStatus{}
-	}
-
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, gm := range gms {

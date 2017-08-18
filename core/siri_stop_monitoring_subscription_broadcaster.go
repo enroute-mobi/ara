@@ -136,10 +136,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
 	sms := request.XMLSubscriptionSMEntries()
 
-	if len(sms) <= 0 {
-		return []siri.SIRIResponseStatus{}
-	}
-
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, sm := range sms {
