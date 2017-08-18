@@ -115,7 +115,20 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 			continue
 		}
 
-		if partner.CanCollect(stopAreaObjectID, stopArea.LineIds) {
+		lineIds := make(map[string]struct{})
+		for _, lineId := range stopArea.LineIds {
+			line, ok := manager.referential.Model().Lines().Find(lineId)
+			if !ok {
+				continue
+			}
+			lineObjectID, ok := line.ObjectID(partnerKind)
+			if !ok {
+				continue
+			}
+			lineIds[lineObjectID.Value()] = struct{}{}
+		}
+
+		if partner.CanCollect(stopAreaObjectID, lineIds) {
 			return partner
 		}
 	}
