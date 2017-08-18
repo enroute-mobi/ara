@@ -34,8 +34,8 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
-	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST); !ok {
-		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST)
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
+		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	}
 	return NewSIRIStopMonitoringSubscriptionCollector(partner)
 }
@@ -245,7 +245,7 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *sir
 }
 
 func logSIRISubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
+	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()

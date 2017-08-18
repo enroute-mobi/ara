@@ -19,13 +19,13 @@ func (handler *SIRISubscribeRequestHandler) RequestorRef() string {
 }
 
 func (handler *SIRISubscribeRequestHandler) ConnectorType() string {
-	return core.SIRI_SUBSCRIPTION_REQUEST
+	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
 func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("SubscribeRequest %s\n", handler.xmlRequest.MessageIdentifier())
 
-	response := connector.(core.SubscriptionRequest).Dispatch(handler.xmlRequest)
+	response := connector.(core.SubscriptionRequestDispatcher).Dispatch(handler.xmlRequest)
 
 	xmlResponse, err := response.BuildXML()
 	if err != nil {

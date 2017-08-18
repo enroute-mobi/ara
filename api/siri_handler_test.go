@@ -642,6 +642,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
 							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
@@ -649,6 +650,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
 							<ns3:Order>2</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>1984-04-04T00:02:00.000Z</ns3:AimedArrivalTime>
 							<ns3:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
@@ -665,6 +667,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
 							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
 							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>

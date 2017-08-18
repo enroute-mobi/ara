@@ -5,13 +5,13 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type SubscriptionRequest interface {
+type SubscriptionRequestDispatcher interface {
 	Dispatch(*siri.XMLSubscriptionRequest) *siri.SIRIStopMonitoringSubscriptionResponse
 }
 
-type SIRISubscriptionRequestFactory struct{}
+type SIRISubscriptionRequestDispatcherFactory struct{}
 
-type SIRISubscriptionRequest struct {
+type SIRISubscriptionRequestDispatcher struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
@@ -20,25 +20,25 @@ type SIRISubscriptionRequest struct {
 	xmlRequest siri.XMLSubscriptionRequest
 }
 
-func (factory *SIRISubscriptionRequestFactory) Validate(apiPartner *APIPartner) bool {
+func (factory *SIRISubscriptionRequestDispatcherFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
 	return ok
 }
 
-func (factory *SIRISubscriptionRequestFactory) CreateConnector(partner *Partner) Connector {
-	return NewSIRISubscriptionRequest(partner)
+func (factory *SIRISubscriptionRequestDispatcherFactory) CreateConnector(partner *Partner) Connector {
+	return NewSIRISubscriptionRequestDispatcher(partner)
 }
 
-func NewSIRISubscriptionRequest(partner *Partner) *SIRISubscriptionRequest {
-	siriSubscriptionRequest := &SIRISubscriptionRequest{}
+func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionRequestDispatcher {
+	siriSubscriptionRequest := &SIRISubscriptionRequestDispatcher{}
 	siriSubscriptionRequest.partner = partner
 
 	return siriSubscriptionRequest
 }
 
-func (connector *SIRISubscriptionRequest) Dispatch(request *siri.XMLSubscriptionRequest) *siri.SIRIStopMonitoringSubscriptionResponse {
+func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) *siri.SIRIStopMonitoringSubscriptionResponse {
 	response := siri.SIRIStopMonitoringSubscriptionResponse{
 		Address:           connector.Partner().Setting("local_url"),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),

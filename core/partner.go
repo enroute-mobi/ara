@@ -411,7 +411,7 @@ func (partner *Partner) GeneralMessageSubscriptionCollector() GeneralMessageSubs
 	return nil
 }
 
-func (partner *Partner) StopMonitoringSubscriptionRequestCollector() StopMonitoringSubscriptionCollector {
+func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubscriptionCollector {
 	// WIP
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR]
 	if ok {

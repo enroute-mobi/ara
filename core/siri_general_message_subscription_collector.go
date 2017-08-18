@@ -30,8 +30,8 @@ type SIRIGeneralMessageSubscriptionCollector struct {
 type SIRIGeneralMessageSubscriptionCollectorFactory struct{}
 
 func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
-	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST); !ok {
-		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST)
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
+		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	}
 
 	return NewSIRIGeneralMessageSubscriptionCollector(partner)
