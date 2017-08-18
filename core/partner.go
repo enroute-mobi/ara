@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
@@ -276,11 +277,11 @@ func (partner *Partner) Start() {
 }
 
 func (partner *Partner) CollectPriority() int {
-	value, _ := strconv.Atoi(partner.Settings["collect.priority"])
+	value, _ := strconv.Atoi(partner.Setting("collect.priority"))
 	return value
 }
 
-func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds model.StopAreaLineIds) bool {
+func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
 	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" {
 		return true
 	}
@@ -300,13 +301,13 @@ func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
 	return false
 }
 
-func (partner *Partner) collectLine(lineIds model.StopAreaLineIds) bool {
+func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
 	if partner.Setting("collect.include_lines") == "" {
 		return false
 	}
 	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
 	for _, line := range lines {
-		if lineIds.Contains(model.LineId(strings.TrimSpace(line))) {
+		if _, ok := lineIds[line]; ok {
 			return true
 		}
 	}
@@ -464,6 +465,13 @@ func (partner *Partner) CancelSubscriptions() {
 		logger.Log.Printf("Deleting subscription id %v and kind %v", sub.Id(), sub.Kind())
 		partner.DeleteSubscription(sub)
 	}
+}
+
+func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
+	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent["Referential"] = string(partner.manager.Referential().Slug())
+	logStashEvent["Partner"] = string(partner.slug)
+	return logStashEvent
 }
 
 func NewPartnerManager(referential *Referential) *PartnerManager {

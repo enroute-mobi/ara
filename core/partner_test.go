@@ -172,7 +172,7 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
 	partner.Settings["collect.include_stop_areas"] = "NINOXE:StopPoint:SP:24:LOC"
-	if partner.CanCollect(stopAreaObjectId, []model.LineId{}) != true {
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) != true {
 		t.Errorf("Partner can collect should return true")
 	}
 }
@@ -181,7 +181,7 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-	lines := []model.LineId{"NINOXE:Line:SP:24:"}
+	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
 
 	partner.Settings["collect.include_lines"] = "NINOXE:Line:SP:24:"
 	if partner.CanCollect(stopAreaObjectId, lines) != true {
@@ -194,7 +194,7 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 	partner.Settings = make(map[string]string)
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
-	if partner.CanCollect(stopAreaObjectId, []model.LineId{}) != true {
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) != true {
 		t.Errorf("Partner can collect should return true")
 	}
 }
@@ -205,7 +205,7 @@ func Test_Partner_CanCollectFalse(t *testing.T) {
 	stopAreaObjectId := model.NewObjectID("internal", "BAD_VALUE")
 
 	partner.Settings["collect.include_stop_areas"] = "NINOXE:StopPoint:SP:24:LOC"
-	if partner.CanCollect(stopAreaObjectId, []model.LineId{}) != false {
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) != false {
 		t.Errorf("Partner can collect should return flase")
 	}
 }
@@ -216,7 +216,7 @@ func Test_Partner_CanCollectFalseLine(t *testing.T) {
 	stopAreaObjectId := model.NewObjectID("internal", "BAD_VALUE")
 
 	partner.Settings["collect.include_lines"] = "NINOXE:Line:SP:24:"
-	if partner.CanCollect(stopAreaObjectId, []model.LineId{}) != false {
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) != false {
 		t.Errorf("Partner can collect should return flase")
 	}
 }
