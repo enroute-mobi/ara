@@ -25,7 +25,11 @@ func (handler *SIRISubscribeRequestHandler) ConnectorType() string {
 func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
 	logger.Log.Debugf("SubscribeRequest %s\n", handler.xmlRequest.MessageIdentifier())
 
-	response := connector.(core.SubscriptionRequestDispatcher).Dispatch(handler.xmlRequest)
+	response, err := connector.(core.SubscriptionRequestDispatcher).Dispatch(handler.xmlRequest)
+	if err != nil {
+		siriErrorWithRequest("NotFound", err.Error(), handler.xmlRequest.RawXML(), rw)
+		return
+	}
 
 	xmlResponse, err := response.BuildXML()
 	if err != nil {

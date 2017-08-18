@@ -34,7 +34,10 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	if err != nil {
+		t.Fatalf("Error while handling subscription request: %v", err)
+	}
 
 	if len(response.ResponseStatus) != 1 {
 		t.Errorf("Wrong ResponseStatus size want 1 got : %v", len(response.ResponseStatus))
@@ -75,7 +78,10 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	if err != nil {
+		t.Fatalf("Error while handling subscription request: %v", err)
+	}
 
 	if len(response.ResponseStatus) != 1 {
 		t.Errorf("Wrong ResponseStatus size want 1 got : %v", len(response.ResponseStatus))

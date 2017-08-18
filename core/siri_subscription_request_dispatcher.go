@@ -1,12 +1,14 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
 type SubscriptionRequestDispatcher interface {
-	Dispatch(*siri.XMLSubscriptionRequest) *siri.SIRIStopMonitoringSubscriptionResponse
+	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error)
 }
 
 type SIRISubscriptionRequestDispatcherFactory struct{}
@@ -38,7 +40,7 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 	return siriSubscriptionRequest
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) *siri.SIRIStopMonitoringSubscriptionResponse {
+func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error) {
 	response := siri.SIRIStopMonitoringSubscriptionResponse{
 		Address:           connector.Partner().Setting("local_url"),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
@@ -46,22 +48,27 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		RequestMessageRef: request.MessageIdentifier(),
 	}
 
-	gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
-
-	if ok && len(request.XMLSubscriptionGMEntries()) > 0 {
+	if len(request.XMLSubscriptionGMEntries()) > 0 {
+		gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("No GeneralMessageSubscriptionBroadcaster Connector")
+		}
 		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
 		}
-		return &response
+		return &response, nil
 	}
 
-	smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-	if ok && len(request.XMLSubscriptionSMEntries()) > 0 {
+	if len(request.XMLSubscriptionSMEntries()) > 0 {
+		smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("No StopMonitoringSubscriptionBroadcaster Connector")
+		}
 		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
-		return &response
+		return &response, nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("Subscription not supported")
 }
