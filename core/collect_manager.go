@@ -151,7 +151,7 @@ func (manager *CollectManager) partnerWithConnector(connector string) *Partner {
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) {
 	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
-	if collect := partner.StopMonitoringSubscriptionRequestCollector(); collect != nil {
+	if collect := partner.StopMonitoringSubscriptionCollector(); collect != nil {
 		collect.RequestStopAreaUpdate(request)
 		return
 	}

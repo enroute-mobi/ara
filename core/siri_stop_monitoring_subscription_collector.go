@@ -34,8 +34,8 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
-	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST); !ok {
-		partner.AddConnector(SIRI_SUBSCRIPTION_REQUEST)
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
+		partner.CreateSubscriptionRequestDispatcher()
 	}
 	return NewSIRIStopMonitoringSubscriptionCollector(partner)
 }
@@ -86,13 +86,16 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 
 	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 
-	for _, sr := range subscription.resourcesByObjectID {
-		if sr.Reference.ObjectId.String() == stopAreaObjectid.String() && !sr.SubscribedAt.IsZero() {
-			sr.SubscribedUntil = sr.SubscribedUntil.Add(1 * time.Minute)
-			return
+	// If we find the resource, we add time to SubscribedUntil if the subscription is active
+	resource := subscription.Resource(stopAreaObjectid)
+	if resource != nil {
+		if !resource.SubscribedAt.IsZero() {
+			resource.SubscribedUntil = resource.SubscribedUntil.Add(1 * time.Minute)
 		}
+		return
 	}
 
+	// Else we create a new resource
 	ref := model.Reference{
 		ObjectId: &stopAreaObjectid,
 		Id:       string(request.StopAreaId()),
@@ -245,7 +248,7 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *sir
 }
 
 func logSIRISubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent["Connector"] = "StopMonitoringSubscriptionRequestCollector"
+	logStashEvent["Connector"] = "StopMonitoringSubscriptionCollector"
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()

@@ -39,6 +39,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus1</ns3:ArrivalStatus>
 							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
@@ -47,6 +48,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint2</ns3:StopPointRef>
 							<ns3:Order>2</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus2</ns3:ArrivalStatus>
 							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
@@ -67,6 +69,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint3</ns3:StopPointRef>
 							<ns3:Order>3</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus3</ns3:ArrivalStatus>
 							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
@@ -84,6 +87,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint4</ns3:StopPointRef>
 							<ns3:Order>4</ns3:Order>
+							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
 							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus4</ns3:ArrivalStatus>
 							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>

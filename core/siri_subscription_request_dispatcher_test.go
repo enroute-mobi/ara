@@ -16,11 +16,11 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "_internal"
-	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST, SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
 
-	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST)
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
@@ -34,7 +34,10 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response := connector.(*SIRISubscriptionRequest).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	if err != nil {
+		t.Fatalf("Error while handling subscription request: %v", err)
+	}
 
 	if len(response.ResponseStatus) != 1 {
 		t.Errorf("Wrong ResponseStatus size want 1 got : %v", len(response.ResponseStatus))
@@ -65,17 +68,20 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "_internal"
-	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST, SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
+	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
 
-	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST)
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response := connector.(*SIRISubscriptionRequest).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	if err != nil {
+		t.Fatalf("Error while handling subscription request: %v", err)
+	}
 
 	if len(response.ResponseStatus) != 1 {
 		t.Errorf("Wrong ResponseStatus size want 1 got : %v", len(response.ResponseStatus))
