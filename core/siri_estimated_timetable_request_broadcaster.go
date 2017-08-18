@@ -38,7 +38,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	logXMLEstimatedTimetableRequest(logStashEvent, request)
@@ -111,19 +111,23 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				if !ok {
 					continue
 				}
-				var stopPointRef string
 				stopAreaId, ok := stopArea.ObjectID(connector.remoteObjectIDKind())
 				if !ok {
 					continue
 				}
-				stopPointRef = stopAreaId.Value()
 
 				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:       string(stopVisit.ArrivalStatus),
-					AimedArrivalTime:    stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ExpectedArrivalTime: stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-					Order:               stopVisit.PassageOrder,
-					StopPointRef:        stopPointRef,
+					ArrivalStatus:         string(stopVisit.ArrivalStatus),
+					DepartureStatus:       string(stopVisit.DepartureStatus),
+					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+					Order:              stopVisit.PassageOrder,
+					StopPointRef:       stopAreaId.Value(),
+					StopPointName:      stopArea.Name,
+					DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
+					VehicleAtStop:      stopVisit.VehicleAtStop,
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
@@ -157,6 +161,12 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 	return
 }
 
+func (connector *SIRIEstimatedTimetableBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "EstimatedTimetableRequestBroadcaster"
+	return event
+}
+
 func (factory *SIRIEstimatedTimetableBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
@@ -168,7 +178,6 @@ func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner
 }
 
 func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGetEstimatedTimetable) {
-	logStashEvent["Connector"] = "EstimatedTimetableBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -182,11 +191,6 @@ func logSIRIEstimatedTimetableResponse(logStashEvent audit.LogStashEvent, respon
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	if !response.Status {
-		logStashEvent["errorType"] = response.ErrorType
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		logStashEvent["errorText"] = response.ErrorText
-	}
 	xml, err := response.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)

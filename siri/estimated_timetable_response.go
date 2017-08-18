@@ -46,19 +46,21 @@ type SIRIEstimatedVehicleJourney struct {
 }
 
 type SIRIEstimatedCall struct {
-	ArrivalStatus   string
-	DepartureStatus string
-	StopPointRef    string
+	ArrivalStatus      string
+	DepartureStatus    string
+	StopPointRef       string
+	StopPointName      string
+	DestinationDisplay string
+
+	VehicleAtStop bool
 
 	Order int
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time
-	ActualArrivalTime   time.Time
 
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
-	ActualDepartureTime   time.Time
 }
 
 const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri"
@@ -101,13 +103,14 @@ const estimatedTimetableDeliveryTemplate = `<ns3:EstimatedTimetableDelivery vers
 					<ns3:EstimatedCalls>{{ range .EstimatedCalls }}
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
-							<ns3:Order>{{ .Order }}</ns3:Order>{{ if not .AimedArrivalTime.IsZero }}
-							<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ActualArrivalTime.IsZero }}
-							<ns3:ActualArrivalTime>{{ .ActualArrivalTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns3:ActualArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
+							<ns3:Order>{{ .Order }}</ns3:Order>{{ if .StopPointName }}
+							<ns3:StopPointName>{{ .StopPointName }}</ns3:StopPointName>{{ end }}
+							<ns3:VehicleAtStop>{{ .VehicleAtStop }}</ns3:VehicleAtStop>{{ if .DestinationDisplay }}
+							<ns3:DestinationDisplay>{{ .DestinationDisplay }}</ns3:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
 							<ns3:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
 							<ns3:ArrivalStatus>{{ .ArrivalStatus }}</ns3:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
-							<ns3:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedDepartureTime>{{ end }}{{ if not .ActualDepartureTime.IsZero }}
-							<ns3:ActualDepartureTime>{{ .ActualDepartureTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns3:ActualDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
+							<ns3:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
 							<ns3:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
 							<ns3:DepartureStatus>{{ .DepartureStatus }}</ns3:DepartureStatus>{{end}}
 						</ns3:EstimatedCall>{{ end }}

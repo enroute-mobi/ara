@@ -3,7 +3,6 @@ Feature: Support SIRI EstimatedTimeTable
   Background:
       Given a Referential "test" is created
 
-@wip
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
     Given a Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential     | test     |
@@ -157,6 +156,8 @@ Feature: Support SIRI EstimatedTimeTable
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
                         <ns3:Order>5</ns3:Order>
+                        <ns3:StopPointName>Test</ns3:StopPointName>
+                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                         <ns3:AimedArrivalTime>2017-01-01T15:05:00.000Z</ns3:AimedArrivalTime>
                         <ns3:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</ns3:ExpectedArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
@@ -164,6 +165,8 @@ Feature: Support SIRI EstimatedTimeTable
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:26:LOC</ns3:StopPointRef>
                         <ns3:Order>6</ns3:Order>
+                        <ns3:StopPointName>Test</ns3:StopPointName>
+                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                         <ns3:AimedArrivalTime>2017-01-01T15:10:00.000Z</ns3:AimedArrivalTime>
                         <ns3:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</ns3:ExpectedArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
@@ -171,6 +174,8 @@ Feature: Support SIRI EstimatedTimeTable
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:27:LOC</ns3:StopPointRef>
                         <ns3:Order>7</ns3:Order>
+                        <ns3:StopPointName>Test</ns3:StopPointName>
+                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                         <ns3:AimedArrivalTime>2017-01-01T15:16:00.000Z</ns3:AimedArrivalTime>
                         <ns3:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</ns3:ExpectedArrivalTime>
                         <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>

@@ -212,9 +212,6 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogXMLGetStopMonitoring(t *testing.T
 	}
 
 	logXMLEstimatedTimetableRequest(logStashEvent, request)
-	if logStashEvent["Connector"] != "EstimatedTimetableBroadcaster" {
-		t.Errorf("Wrong Connector logged:\n got: %v\n expected: EstimatedTimetableBroadcaster", logStashEvent["messageIdentifier"])
-	}
 	if logStashEvent["messageIdentifier"] != "EstimatedTimetable:Test:0" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: EstimatedTimetable:Test:0", logStashEvent["messageIdentifier"])
 	}

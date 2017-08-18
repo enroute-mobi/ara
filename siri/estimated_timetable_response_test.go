@@ -39,17 +39,17 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint1</ns3:StopPointRef>
 							<ns3:Order>1</ns3:Order>
-							<ns3:ActualArrivalTime>2016-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
+							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus1</ns3:ArrivalStatus>
-							<ns3:ActualDepartureTime>2016-09-21T20:14:46.000Z</ns3:ActualDepartureTime>
+							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 							<ns3:DepartureStatus>dstatus1</ns3:DepartureStatus>
 						</ns3:EstimatedCall>
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint2</ns3:StopPointRef>
 							<ns3:Order>2</ns3:Order>
-							<ns3:ActualArrivalTime>2016-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
+							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus2</ns3:ArrivalStatus>
-							<ns3:ActualDepartureTime>2016-09-21T20:14:46.000Z</ns3:ActualDepartureTime>
+							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 							<ns3:DepartureStatus>dstatus2</ns3:DepartureStatus>
 						</ns3:EstimatedCall>
 					</ns3:EstimatedCalls>
@@ -67,9 +67,9 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint3</ns3:StopPointRef>
 							<ns3:Order>3</ns3:Order>
-							<ns3:ActualArrivalTime>2016-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
+							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus3</ns3:ArrivalStatus>
-							<ns3:ActualDepartureTime>2016-09-21T20:14:46.000Z</ns3:ActualDepartureTime>
+							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 							<ns3:DepartureStatus>dstatus3</ns3:DepartureStatus>
 						</ns3:EstimatedCall>
 					</ns3:EstimatedCalls>
@@ -84,9 +84,9 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 						<ns3:EstimatedCall>
 							<ns3:StopPointRef>stopPoint4</ns3:StopPointRef>
 							<ns3:Order>4</ns3:Order>
-							<ns3:ActualArrivalTime>2016-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
+							<ns3:AimedArrivalTime>2016-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
 							<ns3:ArrivalStatus>astatus4</ns3:ArrivalStatus>
-							<ns3:ActualDepartureTime>2016-09-21T20:14:46.000Z</ns3:ActualDepartureTime>
+							<ns3:AimedDepartureTime>2016-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
 							<ns3:DepartureStatus>dstatus4</ns3:DepartureStatus>
 						</ns3:EstimatedCall>
 					</ns3:EstimatedCalls>
@@ -99,36 +99,36 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	testTime := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 
 	call1 := &SIRIEstimatedCall{
-		ArrivalStatus:       "astatus1",
-		DepartureStatus:     "dstatus1",
-		StopPointRef:        "stopPoint1",
-		Order:               1,
-		ActualArrivalTime:   testTime,
-		ActualDepartureTime: testTime,
+		ArrivalStatus:      "astatus1",
+		DepartureStatus:    "dstatus1",
+		StopPointRef:       "stopPoint1",
+		Order:              1,
+		AimedArrivalTime:   testTime,
+		AimedDepartureTime: testTime,
 	}
 	call2 := &SIRIEstimatedCall{
-		ArrivalStatus:       "astatus2",
-		DepartureStatus:     "dstatus2",
-		StopPointRef:        "stopPoint2",
-		Order:               2,
-		ActualArrivalTime:   testTime,
-		ActualDepartureTime: testTime,
+		ArrivalStatus:      "astatus2",
+		DepartureStatus:    "dstatus2",
+		StopPointRef:       "stopPoint2",
+		Order:              2,
+		AimedArrivalTime:   testTime,
+		AimedDepartureTime: testTime,
 	}
 	call3 := &SIRIEstimatedCall{
-		ArrivalStatus:       "astatus3",
-		DepartureStatus:     "dstatus3",
-		StopPointRef:        "stopPoint3",
-		Order:               3,
-		ActualArrivalTime:   testTime,
-		ActualDepartureTime: testTime,
+		ArrivalStatus:      "astatus3",
+		DepartureStatus:    "dstatus3",
+		StopPointRef:       "stopPoint3",
+		Order:              3,
+		AimedArrivalTime:   testTime,
+		AimedDepartureTime: testTime,
 	}
 	call4 := &SIRIEstimatedCall{
-		ArrivalStatus:       "astatus4",
-		DepartureStatus:     "dstatus4",
-		StopPointRef:        "stopPoint4",
-		Order:               4,
-		ActualArrivalTime:   testTime,
-		ActualDepartureTime: testTime,
+		ArrivalStatus:      "astatus4",
+		DepartureStatus:    "dstatus4",
+		StopPointRef:       "stopPoint4",
+		Order:              4,
+		AimedArrivalTime:   testTime,
+		AimedDepartureTime: testTime,
 	}
 
 	vehicleJourney1 := &SIRIEstimatedVehicleJourney{
