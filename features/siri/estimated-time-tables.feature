@@ -3,12 +3,13 @@ Feature: Support SIRI EstimatedTimeTable
   Background:
       Given a Referential "test" is created
 
+@wip
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
     Given a Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Name      | Tutute                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -33,13 +34,18 @@ Feature: Support SIRI EstimatedTimeTable
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
+      | VehicleAtStop                   | false                                                                |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
+      | Schedule[aimed]#Departure       | 2017-01-01T15:01:00.000Z                                             |
+      | Schedule[expected]#Departure    | 2017-01-01T15:02:00.000Z                                             |
+      | DepartureStatus                 | Delayed                                                              |
+      | Attribute[DestinationDisplay]   | Pouet-pouet                                                          |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2" |
@@ -138,9 +144,15 @@ Feature: Support SIRI EstimatedTimeTable
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
                         <ns3:Order>4</ns3:Order>
+                        <ns3:StopPointName>Tutute</ns3:StopPointName>
+                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
+                        <ns3:DestinationDisplay>Pouet-pouet</ns3:DestinationDisplay>
                         <ns3:AimedArrivalTime>2017-01-01T15:00:00.000Z</ns3:AimedArrivalTime>
                         <ns3:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</ns3:ExpectedArrivalTime>
                         <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
+                        <ns3:AimedDepartureTime>2017-01-01T15:01:00.000Z</ns3:AimedDepartureTime>
+                        <ns3:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</ns3:ExpectedDepartureTime>
+                        <ns3:DepartureStatus>Delayed</ns3:DepartureStatus>
                       </ns3:EstimatedCall>
                       <ns3:EstimatedCall>
                         <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
