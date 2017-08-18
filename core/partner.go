@@ -364,20 +364,8 @@ func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	return connector, ok
 }
 
-func (partner *Partner) AddConnector(connectorType string) (Connector, bool) {
-	if c, ok := partner.Connector(connectorType); ok {
-		return c, false
-	}
-
-	factory := NewConnectorFactory(connectorType)
-	if factory == nil {
-		return nil, false
-	}
-
-	connector := factory.CreateConnector(partner)
-	partner.connectors[connectorType] = connector
-
-	return connector, true
+func (partner *Partner) CreateSubscriptionRequestDispatcher() {
+	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = NewSIRISubscriptionRequestDispatcher(partner)
 }
 
 func (partner *Partner) CheckStatusClient() CheckStatusClient {
