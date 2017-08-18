@@ -58,7 +58,7 @@ func (smb *StopMonitoringBroadcaster) Start() {
 		return
 	}
 
-	logger.Log.Debugf("Start StopMonitoringBroadcaster")
+	logger.Log.Debugf("Start S	topMonitoringBroadcaster")
 
 	smb.stop = make(chan struct{})
 	go smb.run()

@@ -191,8 +191,24 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		connector.fillOptions(sub, r, request, sm)
 
 		resps = append(resps, rs)
+
+		connector.AddStopAreaStopVisits(sa, sub, r)
 	}
 	return resps
+}
+
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) AddStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
+	svs := connector.Partner().Model().StopVisits().FindFollowingByStopAreaId(sa.Id())
+	for _, sv := range svs {
+		_, ok := sv.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+		if !ok {
+			continue
+		}
+		smlc := &stopMonitoringLastChange{}
+		smlc.SetSubscription(sub)
+		res.LastStates[string(sv.Id())] = smlc
+		connector.addStopVisit(sub.Id(), sv.Id())
+	}
 }
 
 func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
