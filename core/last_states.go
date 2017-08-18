@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,10 +28,8 @@ func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
 	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
 	if ok {
-		fmt.Println("salut les gens \n")
 		duration := smlc.getOptionDuration(option)
 		refTime := stopVisit.ReferenceTime()
-		fmt.Println(refTime, "  ", smlc.lastTimeUpdate.Add(duration), "   ", duration)
 		if smlc.lastTimeUpdate.Add(duration).After(refTime) {
 			return false
 		}
@@ -42,7 +39,6 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 
 func (smlc *stopMonitoringLastChange) UpdateState(stopVisit model.StopVisit) bool {
 	smlc.lastTimeUpdate = stopVisit.ReferenceTime()
-	fmt.Println("The reference time is  %v", stopVisit.ReferenceTime())
 	return true
 }
 
