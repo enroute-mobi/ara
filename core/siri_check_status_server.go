@@ -28,7 +28,7 @@ func NewSIRICheckStatusServer(partner *Partner) *SIRICheckStatusServer {
 }
 
 func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatusRequest) (*siri.SIRICheckStatusResponse, error) {
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	logXMLCheckStatusRequest(logStashEvent, request)
@@ -50,6 +50,12 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 	return response, nil
 }
 
+func (connector *SIRICheckStatusServer) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "CheckStatusServer"
+	return event
+}
+
 func (factory *SIRICheckStatusServerFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("local_credential")
 	return ok
@@ -60,7 +66,6 @@ func (factory *SIRICheckStatusServerFactory) CreateConnector(partner *Partner) C
 }
 
 func logXMLCheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.XMLCheckStatusRequest) {
-	logStashEvent["Connector"] = "CheckStatusServer"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -73,6 +78,13 @@ func logSIRICheckStatusResponse(logStashEvent audit.LogStashEvent, response *sir
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	if !response.Status {
+		logStashEvent["errorType"] = response.ErrorType
+		if response.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		}
+		logStashEvent["errorText"] = response.ErrorText
+	}
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime.String()
 	xml, err := response.BuildXML()

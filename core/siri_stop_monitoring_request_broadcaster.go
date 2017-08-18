@@ -80,7 +80,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	selector := model.CompositeStopVisitSelector(selectors)
 
 	// Prepare Id Array for logstash
-	var idArray []string
+	var stopVisitArray []string
 
 	// Find Descendants
 	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
@@ -88,14 +88,14 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Fill StopVisits
 	referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {
-		if request.MaximumStopVisits() > 0 && len(idArray) >= request.MaximumStopVisits() {
+		if request.MaximumStopVisits() > 0 && len(stopVisitArray) >= request.MaximumStopVisits() {
 			break
 		}
 		if !selector(stopVisit) {
 			continue
 		}
 
-		idArray = append(idArray, string(stopVisit.Id()))
+		stopVisitArray = append(stopVisitArray, string(stopVisit.Id()))
 
 		var itemIdentifier string
 		stopVisitId, ok := stopVisit.ObjectID(objectidKind)
@@ -122,7 +122,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			continue
 		}
 		if _, ok := line.ObjectID(objectidKind); !ok {
-			logger.Log.Printf("Ignore StopVisit %s without Line without correct ObjectID", stopVisit.Id())
+			logger.Log.Printf("Ignore StopVisit %s with Line without correct ObjectID", stopVisit.Id())
 			continue
 		}
 
@@ -195,7 +195,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 	}
 
-	logStashEvent["StopVisitIds"] = strings.Join(idArray, ", ")
+	logStashEvent["StopVisitIds"] = strings.Join(stopVisitArray, ", ")
 
 	return delivery
 }
@@ -204,7 +204,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	logXMLGetStopMonitoring(logStashEvent, request)
@@ -270,6 +270,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) reformatReferences(toRefo
 	}
 }
 
+func (connector *SIRIStopMonitoringRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "StopMonitoringRequestBroadcaster"
+	return event
+}
+
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
@@ -281,7 +287,6 @@ func (factory *SIRIStopMonitoringRequestBroadcasterFactory) CreateConnector(part
 }
 
 func logXMLGetStopMonitoring(logStashEvent audit.LogStashEvent, request *siri.XMLGetStopMonitoring) {
-	logStashEvent["Connector"] = "StopMonitoringRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
 	logStashEvent["requestorRef"] = request.RequestorRef()

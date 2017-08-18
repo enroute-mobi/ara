@@ -166,9 +166,6 @@ func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing
 	}
 
 	logSIRIStopMonitoringRequest(logStashEvent, request)
-	if logStashEvent["Connector"] != "StopMonitoringRequestCollector" {
-		t.Errorf("Wrong Connector logged:\n got: %v\n expected: StopMonitoringRequestCollector", logStashEvent["messageIdentifier"])
-	}
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}

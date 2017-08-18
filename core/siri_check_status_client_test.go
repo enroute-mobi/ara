@@ -30,12 +30,10 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Partne
 	defer ts.Close()
 
 	// Create a CheckStatusClient
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"remote_url": ts.URL,
-		},
-	}
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
+	partner := referential.Partners().New("slug")
+	partner.Settings["remote_url"] = ts.URL
 	checkStatusClient := NewSIRICheckStatusClient(partner)
 
 	partnerStatus, err := checkStatusClient.Status()
@@ -46,22 +44,18 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Partne
 	return partnerStatus
 }
 
-func testCheckStatusLogStash(t *testing.T) {
-	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
-	if len(events) != 1 {
-		t.Errorf("Logstash should have recieved an event, got: %v", events)
-	}
-	if len(events[0]) != 14 {
-		t.Errorf("LogstashEvent should have 13 values, got: %v", events[0])
-	}
-}
-
 func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
 	partnerStatus := prepare_siriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
 	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 		t.Errorf("Wrong status found:\n got: %v\n expected: up", partnerStatus.OperationnalStatus)
 	}
-	testCheckStatusLogStash(t)
+	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
+	if len(events) != 1 {
+		t.Errorf("Logstash should have recieved an event, got: %v", events)
+	}
+	if len(events[0]) != 16 {
+		t.Errorf("LogstashEvent should have 16 values, got %v:\n%v", len(events[0]), events[0])
+	}
 }
 
 func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
@@ -69,7 +63,13 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
 		t.Errorf("Wrong status found:\n got: %v\n expected: down", partnerStatus.OperationnalStatus)
 	}
-	testCheckStatusLogStash(t)
+	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
+	if len(events) != 1 {
+		t.Errorf("Logstash should have recieved an event, got: %v", events)
+	}
+	if len(events[0]) != 19 {
+		t.Errorf("LogstashEvent should have 19 values, got %v:\n%v", len(events[0]), events[0])
+	}
 }
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
@@ -105,9 +105,6 @@ func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 		MessageIdentifier: "0000-0000-0000-0000",
 	}
 	logSIRICheckStatusRequest(logStashEvent, request)
-	if logStashEvent["Connector"] != "CheckStatusClient" {
-		t.Errorf("Wrong Connector logged:\n got: %v\n expected: CheckStatusClient", logStashEvent["messageIdentifier"])
-	}
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}

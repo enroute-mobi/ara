@@ -36,7 +36,6 @@ func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector
 	return &TestStopMonitoringRequestCollector{}
 }
 
-// WIP
 func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
 	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), request.StopAreaId())
 	stopAreaUpdateEvent.StopVisitUpdateEvents = append(stopAreaUpdateEvent.StopVisitUpdateEvents, &model.StopVisitUpdateEvent{})
@@ -60,10 +59,10 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	logStashEvent := make(audit.LogStashEvent)
-	startTime := connector.Clock().Now()
-
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	startTime := connector.Clock().Now()
 
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
@@ -147,6 +146,12 @@ func (connector *SIRIStopMonitoringRequestCollector) SetStopAreaUpdateSubscriber
 	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
 }
 
+func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "StopMonitoringRequestCollector"
+	return event
+}
+
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
@@ -159,7 +164,6 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 }
 
 func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
-	logStashEvent["Connector"] = "StopMonitoringRequestCollector"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -182,16 +186,23 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 	if !response.Status() {
 		logStashEvent["errorType"] = response.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		if response.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		}
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
 	}
 }
 
 func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateEvent *model.StopAreaUpdateEvent) {
-	var idArray []string
+	var updateEvents []string
 	for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
-		idArray = append(idArray, stopVisitUpdateEvent.Id)
+		updateEvents = append(updateEvents, stopVisitUpdateEvent.StopVisitObjectid.Value())
 	}
-	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
+	logStashEvent["StopVisitUpdateEvents"] = strings.Join(updateEvents, ", ")
+	var notCollectedEvents []string
+	for _, stopVisitNotCollectedEvent := range stopAreaUpdateEvent.StopVisitNotCollectedEvents {
+		notCollectedEvents = append(notCollectedEvents, stopVisitNotCollectedEvent.StopVisitObjectId.Value())
+	}
+	logStashEvent["StopVisitNotCollectedEvents"] = strings.Join(notCollectedEvents, ", ")
 }
