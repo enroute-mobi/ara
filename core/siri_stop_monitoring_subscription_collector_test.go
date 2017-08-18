@@ -244,7 +244,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	stopAreaUpdateEvent := NewStopAreaUpdateRequest(stopArea.Id())
 	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
-	connector.stopMonitoringSubscriber.Run()
+	connector.stopMonitoringSubscriber.Start()
 
 	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
 

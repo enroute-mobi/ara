@@ -49,25 +49,21 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartn
 }
 
 func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonitoringSubscriptionCollector {
-	siriStopMonitoringSubscriptionCollector := &SIRIStopMonitoringSubscriptionCollector{}
-	siriStopMonitoringSubscriptionCollector.partner = partner
+	connector := &SIRIStopMonitoringSubscriptionCollector{}
+	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriStopMonitoringSubscriptionCollector.stopAreaUpdateSubscriber = manager.BroadcastStopAreaUpdateEvent
+	connector.stopAreaUpdateSubscriber = manager.BroadcastStopAreaUpdateEvent
+	connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
 
-	return siriStopMonitoringSubscriptionCollector
+	return connector
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) Stop() {
-	if connector.stopMonitoringSubscriber != nil {
-		connector.stopMonitoringSubscriber.Stop()
-	}
+	connector.stopMonitoringSubscriber.Stop()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) Start() {
-	if connector.stopMonitoringSubscriber == nil {
-		connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
-	}
-	connector.stopMonitoringSubscriber.Run()
+	connector.stopMonitoringSubscriber.Start()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {

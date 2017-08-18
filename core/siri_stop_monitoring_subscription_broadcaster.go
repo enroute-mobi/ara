@@ -54,15 +54,10 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Stop() {
-	if connector.stopMonitoringBroadcaster != nil {
-		connector.stopMonitoringBroadcaster.Stop()
-	}
+	connector.stopMonitoringBroadcaster.Stop()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
-	if connector.stopMonitoringBroadcaster == nil {
-		connector.stopMonitoringBroadcaster = NewSIRIStopMonitoringBroadcaster(connector)
-	}
 	connector.stopMonitoringBroadcaster.Start()
 }
 
