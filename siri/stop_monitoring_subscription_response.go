@@ -96,8 +96,8 @@ const stopMonitoringSubscriptionResponseTemplate = `<ns1:SubscribeResponse xmlns
 							<ns5:{{.ErrorType}}>{{ end }}
 								<ns5:ErrorText>{{.ErrorText}}</ns5:ErrorText>
 							</ns5:{{.ErrorType}}>
-						</ns5:ErrorCondition>{{ end }}
-            <ns5:ValidUntil>{{.ValidUntil}}</ns5:ValidUntil>
+						</ns5:ErrorCondition>{{ end }}{{ if not .ValidUntil.IsZero }}
+            <ns5:ValidUntil>{{.ValidUntil}}</ns5:ValidUntil>{{ end }}
         </ns5:ResponseStatus>{{ end }}
         <ns5:ServiceStartedTime>{{.ServiceStartedTime}}</ns5:ServiceStartedTime>
     </Answer>

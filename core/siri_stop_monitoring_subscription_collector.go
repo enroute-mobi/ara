@@ -127,11 +127,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotifi
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTerminatedEvents(terminations []*siri.XMLSubscriptionTerminated) {
 	for _, termination := range terminations {
-		sub, present := connector.partner.Subscriptions().Find(SubscriptionId(termination.SubscriptionRef()))
-		if !present {
-			continue
-		}
-		connector.partner.DeleteSubscription(sub)
+		connector.partner.Subscriptions().DeleteById(SubscriptionId(termination.SubscriptionRef()))
 	}
 }
 

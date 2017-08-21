@@ -121,7 +121,7 @@ func Test_PartnerController_Action_Subscriber(t *testing.T) {
 	rdata.Server = server
 
 	sub := partner.Subscriptions()
-	sub.NewSubscription()
+	sub.New("kind")
 
 	responseRecorder := sendRequest(rdata, t)
 	partnerCheckResponseStatus(responseRecorder, t)

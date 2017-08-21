@@ -17,7 +17,10 @@ func Test_Subscription_Id(t *testing.T) {
 }
 
 func Test_subscription_MarshalJSON(t *testing.T) {
-	subscription := NewSubscription()
+	subscription := &Subscription{
+		resourcesByObjectID: make(map[string]*SubscribedResource),
+		subscriptionOptions: make(map[string]string),
+	}
 	subscription.id = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	subscription.kind = "salut"
 	subscription.CreateAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
@@ -37,7 +40,7 @@ func Test_subscription_MarshalJSON(t *testing.T) {
 func Test_MemorySubscription_New(t *testing.T) {
 	subcriptions := NewMemorySubscriptions(NewPartner())
 
-	subcription := subcriptions.New()
+	subcription := subcriptions.New("kind")
 	if subcription.Id() == "" {
 		t.Errorf("New subcription identifier should be an empty string, got: %s", subcription.Id())
 	}
@@ -54,8 +57,7 @@ func Test_MemorySubscriptions_Find_NotFound(t *testing.T) {
 func Test_MemorySubscriptions_Find(t *testing.T) {
 	subscriptions := NewMemorySubscriptions(NewPartner())
 
-	existingSubscription := subscriptions.New()
-	subscriptions.Save(&existingSubscription)
+	existingSubscription := subscriptions.New("kind")
 
 	subscriptionId := existingSubscription.Id()
 
@@ -72,8 +74,7 @@ func Test_MemorySubscriptions_FindAll(t *testing.T) {
 	subscriptions := NewMemorySubscriptions(NewPartner())
 
 	for i := 0; i < 5; i++ {
-		existingSubscription := subscriptions.New()
-		subscriptions.Save(&existingSubscription)
+		subscriptions.New("kind")
 	}
 
 	foundSubscriptions := subscriptions.FindAll()
@@ -85,10 +86,9 @@ func Test_MemorySubscriptions_FindAll(t *testing.T) {
 
 func Test_MemorySubscriptions_Delete(t *testing.T) {
 	subscriptions := NewMemorySubscriptions(NewPartner())
-	existingSubscription := subscriptions.New()
-	subscriptions.Save(&existingSubscription)
+	existingSubscription := subscriptions.New("kind")
 
-	subscriptions.Delete(&existingSubscription)
+	subscriptions.Delete(existingSubscription)
 
 	_, ok := subscriptions.Find(existingSubscription.Id())
 	if ok {
@@ -98,8 +98,7 @@ func Test_MemorySubscriptions_Delete(t *testing.T) {
 
 func Test_Subscription_byIdentifier(t *testing.T) {
 	subscriptions := NewMemorySubscriptions(NewPartner())
-	existingSubscription := subscriptions.New()
-	subscriptions.Save(&existingSubscription)
+	existingSubscription := subscriptions.New("kind")
 
 	obj := model.NewObjectID("Kind", "Value")
 	reference := model.Reference{

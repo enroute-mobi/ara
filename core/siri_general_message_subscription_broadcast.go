@@ -1,11 +1,8 @@
 package core
 
 import (
-	"regexp"
-	"strings"
 	"sync"
 
-	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -53,6 +50,13 @@ func newSIRIGeneralMessageSubscriptionBroadcaster(partner *Partner) *SIRIGeneral
 	return siriGeneralMessageSubscriptionBroadcaster
 }
 
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) RemoteObjectIDKind() string {
+	if connector.partner.Setting("siri-general-message-subscription-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-general-message-subscription-broadcaster.remote_objectid_kind")
+	}
+	return connector.partner.Setting("remote_objectid_kind")
+}
+
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Stop() {
 	if connector.generalMessageBroadcaster != nil {
 		connector.generalMessageBroadcaster.Stop()
@@ -87,7 +91,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return subId, false
 	}
 
-	_, ok = situation.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+	_, ok = situation.ObjectID(connector.RemoteObjectIDKind())
 	if !ok {
 		return subId, false
 	}
@@ -129,24 +133,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			ValidUntil:        gm.InitialTerminationTime(),
 		}
 
-		reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
-		matches := reg.FindStringSubmatch(strings.TrimSpace(gm.SubscriptionIdentifier()))
-
-		if len(matches) == 0 {
-			logger.Log.Debugf("Partner %s sent a Subscription Request response with a wrong SubscriptionRef format: %s\n", connector.Partner().Slug(), gm.SubscriptionIdentifier())
-			rs.Status = false
-			resps = append(resps, rs)
-			continue
-		}
-		externalId := matches[1]
-
-		sub, ok := connector.Partner().Subscriptions().FindByExternalId(externalId)
-
+		_, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().NewSubscription()
-			sub.SetKind("Situation")
-			sub.SetExternalId(externalId)
-			sub.partner = connector.Partner()
+			sub := connector.Partner().Subscriptions().New("Situation")
+			sub.SetExternalId(gm.SubscriptionIdentifier())
 			sub.Save()
 		}
 		resps = append(resps, rs)

@@ -443,16 +443,8 @@ func (partner *Partner) Model() model.Model {
 	return partner.manager.Model()
 }
 
-func (partner *Partner) DeleteSubscription(sub Subscription) {
-	partner.Subscriptions().Delete(&sub)
-}
-
 func (partner *Partner) CancelSubscriptions() {
-	subscriptions := partner.subscriptionManager.FindAll()
-	for _, sub := range subscriptions {
-		logger.Log.Printf("Deleting subscription id %v and kind %v", sub.Id(), sub.Kind())
-		partner.DeleteSubscription(sub)
-	}
+	partner.subscriptionManager.CancelSubscriptions()
 }
 
 func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {

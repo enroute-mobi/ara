@@ -1,11 +1,8 @@
 package core
 
 import (
-	"regexp"
-	"strings"
 	"sync"
 
-	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -53,6 +50,13 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	return siriStopMonitoringSubscriptionBroadcaster
 }
 
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) RemoteObjectIDKind() string {
+	if connector.partner.Setting("siri-stop-monitoring-subscription-broadcaster.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-stop-monitoring-subscription-broadcaster.remote_objectid_kind")
+	}
+	return connector.partner.Setting("remote_objectid_kind")
+}
+
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Stop() {
 	connector.stopMonitoringBroadcaster.Stop()
 }
@@ -95,7 +99,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	obj, ok := stopArea.ObjectID(connector.partner.Setting("remote_objectid_kind"))
+	obj, ok := stopArea.ObjectID(connector.RemoteObjectIDKind())
 	if !ok {
 		return subId, false
 	}
@@ -139,39 +143,20 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			RequestMessageRef: sm.MessageIdentifier(),
 			SubscriberRef:     sm.SubscriberRef(),
 			SubscriptionRef:   sm.SubscriptionIdentifier(),
-			Status:            true,
 			ResponseTimestamp: connector.Clock().Now(),
-			ValidUntil:        sm.InitialTerminationTime(),
 		}
 
-		reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
-		matches := reg.FindStringSubmatch(strings.TrimSpace(sm.SubscriptionIdentifier()))
-
-		if len(matches) == 0 {
-			logger.Log.Debugf("Partner %s sent a Subscription Request response with a wrong SubscriptionRef format: %s\n", connector.Partner().Slug(), sm.SubscriptionIdentifier())
-			rs.Status = false
-			resps = append(resps, rs)
-			continue
-		}
-		externalId := matches[1]
-
-		sub, ok := connector.Partner().Subscriptions().FindByExternalId(externalId)
-
-		if !ok {
-			sub = connector.Partner().Subscriptions().NewSubscription()
-			sub.SetKind("StopArea")
-			sub.SetExternalId(externalId)
-			sub.partner = connector.Partner()
-			sub.Save()
-		}
-
-		objectid := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), sm.MonitoringRef())
+		objectid := model.NewObjectID(connector.RemoteObjectIDKind(), sm.MonitoringRef())
 		sa, ok := connector.Partner().Model().StopAreas().FindByObjectId(objectid)
-
 		if !ok {
-			rs.Status = false
 			resps = append(resps, rs)
 			continue
+		}
+
+		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
+		if !ok {
+			sub = connector.Partner().Subscriptions().New("StopArea")
+			sub.SetExternalId(sm.SubscriptionIdentifier())
 		}
 
 		ref := model.Reference{
@@ -184,7 +169,10 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
 		connector.fillOptions(sub, r, request, sm)
+		sub.Save()
 
+		rs.Status = true
+		rs.ValidUntil = sm.InitialTerminationTime()
 		resps = append(resps, rs)
 
 		connector.AddStopAreaStopVisits(sa, sub, r)

@@ -55,10 +55,7 @@ func (controller *PartnerController) subscriptionsDelete(response http.ResponseW
 	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
 
 	id := controller.getActionId(requestData.Action, requestData.Url)
-	subscription, ok := partner.Subscriptions().Find(core.SubscriptionId(id))
-	if ok {
-		partner.Subscriptions().Delete(&subscription)
-	}
+	partner.Subscriptions().DeleteById(core.SubscriptionId(id))
 }
 
 func (controller *PartnerController) subscriptionsCreate(response http.ResponseWriter, requestData *RequestData) {
@@ -70,7 +67,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 		return
 	}
 
-	subscription := partner.Subscriptions().New()
+	subscription := partner.Subscriptions().New("")
 	apiSubscription := core.APISubscription{}
 
 	err := json.Unmarshal(requestData.Body, &apiSubscription)

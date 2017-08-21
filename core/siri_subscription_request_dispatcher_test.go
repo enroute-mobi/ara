@@ -51,13 +51,9 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	if !ok {
 		t.Errorf("Should have been able to find the stopArea ressource : %v", objectid.String())
 	}
-
-	if sub.ExternalId() != "6ba7b814-9dad-11d1-2-00c04fd430c8" {
-		t.Errorf("Wrong ExternalId value want: 6ba7b814-9dad-11d1-2-00c04fd430c8 got: %v", sub.ExternalId())
-	}
-
-	if sub.partner.Id() != partner.Id() {
-		t.Errorf("Wrong Partner Id value want: %v got: %v", partner.Id(), sub.partner.Id())
+	externalId := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"
+	if sub.ExternalId() != externalId {
+		t.Errorf("Wrong ExternalId value want: %v got: %v", externalId, sub.ExternalId())
 	}
 }
 
@@ -96,11 +92,8 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 		t.Errorf("Could not find a subscription with kind of Situation")
 	}
 
-	if sub.ExternalId() != "6ba7b814-9dad-11d1-2-00c04fd430c8" {
-		t.Errorf("Wrong ExternalId value want: 6ba7b814-9dad-11d1-2-00c04fd430c8 got: %v", sub.ExternalId())
-	}
-
-	if sub.partner.Id() != partner.Id() {
-		t.Errorf("Wrong Partner Id value want: %v got: %v", partner.Id(), sub.partner.Id())
+	externalId := "NINOXE:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"
+	if sub.ExternalId() != externalId {
+		t.Errorf("Wrong ExternalId value want: %v got: %v", externalId, sub.ExternalId())
 	}
 }

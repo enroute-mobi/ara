@@ -239,8 +239,7 @@ func Test_Partner_Subcription(t *testing.T) {
 	partner := NewPartner()
 
 	sub := partner.Subscriptions()
-	nsub := sub.New()
-	nsub.Save()
+	sub.New("kind")
 
 	if len(partner.Subscriptions().FindAll()) != 1 {
 		t.Errorf("Wrong number of subcriptions want : %v got: %v", 1, len(sub.FindAll()))

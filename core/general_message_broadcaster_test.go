@@ -38,10 +38,9 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 		Type:     "Situation",
 	}
 
-	subs := partner.Subscriptions().New()
+	subs := partner.Subscriptions().New("kind")
 	subs.Save()
 	subs.CreateAddNewResource(reference)
-	subs.SetKind(string(subs.Id()))
 	subs.Save()
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 

@@ -12,20 +12,13 @@ type SubscriptionId string
 
 type Subscription struct {
 	model.ClockConsumer
+	manager Subscriptions
 
 	id                  SubscriptionId
 	kind                string
 	externalId          string
-	partner             *Partner
 	resourcesByObjectID map[string]*SubscribedResource
 	subscriptionOptions map[string]string
-}
-
-func NewSubscription() *Subscription {
-	return &Subscription{
-		resourcesByObjectID: make(map[string]*SubscribedResource),
-		subscriptionOptions: make(map[string]string),
-	}
 }
 
 type SubscribedResource struct {
@@ -80,12 +73,12 @@ func (subscription *Subscription) SetExternalId(externalId string) {
 }
 
 func (subscription *Subscription) Save() (ok bool) {
-	ok = subscription.partner.Subscriptions().Save(subscription)
+	ok = subscription.manager.Save(subscription)
 	return
 }
 
 func (subscription *Subscription) Delete() (ok bool) {
-	ok = subscription.partner.Subscriptions().Delete(subscription)
+	ok = subscription.manager.Delete(subscription)
 	return
 }
 
@@ -163,14 +156,15 @@ func (manager *MemorySubscriptions) MarshalJSON() ([]byte, error) {
 type Subscriptions interface {
 	model.UUIDInterface
 
-	New() Subscription
-	Find(id SubscriptionId) (Subscription, bool)
-	FindAll() []Subscription
+	New(kind string) *Subscription
+	Find(id SubscriptionId) (*Subscription, bool)
+	FindAll() []*Subscription
 	FindOrCreateByKind(string) (*Subscription, bool)
 	FindByKind(string) (*Subscription, bool)
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
-	NewSubscription() *Subscription
+	DeleteById(id SubscriptionId)
+	CancelSubscriptions()
 	FindByRessourceId(id string) (*Subscription, bool)
 	FindByExternalId(externalId string) (*Subscription, bool)
 }
@@ -182,9 +176,15 @@ func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 	}
 }
 
-func (manager *MemorySubscriptions) New() Subscription {
-	subscription := manager.NewSubscription()
-	return *subscription
+func (manager *MemorySubscriptions) New(kind string) *Subscription {
+	subscription := &Subscription{
+		kind:                kind,
+		manager:             manager,
+		resourcesByObjectID: make(map[string]*SubscribedResource),
+		subscriptionOptions: make(map[string]string),
+	}
+	subscription.Save()
+	return subscription
 }
 
 func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool) {
@@ -223,33 +223,25 @@ func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscripti
 		}
 	}
 
-	subscription := manager.NewSubscription()
-	subscription.SetKind(kind)
+	subscription := manager.New(kind)
 	return subscription, false
 }
 
-func (manager *MemorySubscriptions) Find(id SubscriptionId) (Subscription, bool) {
+func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool) {
 	subscription, ok := manager.byIdentifier[id]
 	if ok {
-		return *subscription, true
+		return subscription, true
 	} else {
-		return Subscription{}, false
+		return nil, false
 	}
 }
 
-func (manager *MemorySubscriptions) NewSubscription() *Subscription {
-	sub := NewSubscription()
-	manager.Save(sub)
-
-	return sub
-}
-
-func (manager *MemorySubscriptions) FindAll() (subscriptions []Subscription) {
+func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
 	if len(manager.byIdentifier) == 0 {
-		return []Subscription{}
+		return []*Subscription{}
 	}
 	for _, subscription := range manager.byIdentifier {
-		subscriptions = append(subscriptions, *subscription)
+		subscriptions = append(subscriptions, subscription)
 	}
 	return
 }
@@ -258,7 +250,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	if subscription.Id() == "" {
 		subscription.id = SubscriptionId(manager.NewUUID())
 	}
-	subscription.partner = manager.partner
+	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
 	return true
 }
@@ -266,4 +258,14 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 func (manager *MemorySubscriptions) Delete(subscription *Subscription) bool {
 	delete(manager.byIdentifier, subscription.Id())
 	return true
+}
+
+func (manager *MemorySubscriptions) DeleteById(id SubscriptionId) {
+	delete(manager.byIdentifier, id)
+}
+
+func (manager *MemorySubscriptions) CancelSubscriptions() {
+	for id := range manager.byIdentifier {
+		delete(manager.byIdentifier, id)
+	}
 }

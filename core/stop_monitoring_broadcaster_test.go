@@ -42,10 +42,9 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subs := partner.Subscriptions().New()
+	subs := partner.Subscriptions().New("kind")
 	subs.Save()
 	subs.CreateAddNewResource(reference)
-	subs.SetKind(string(subs.Id()))
 	subs.SetExternalId("externalId")
 	subs.Save()
 
@@ -105,7 +104,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscription := partner.Subscriptions().New()
+	subscription := partner.Subscriptions().New("sub")
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
 	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
