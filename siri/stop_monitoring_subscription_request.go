@@ -44,23 +44,23 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
 		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
-  </SubscriptionRequestInfo>
+	</SubscriptionRequestInfo>
 	<Request>{{ range .Entries }}
 		<siri:StopMonitoringSubscriptionRequest>
-			<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
-			<SubscriptionIdentifier>{{.SubscriptionIdentifier}}</SubscriptionIdentifier>
-			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>
-			<StopMonitoringRequest>
-				<MessageIdentifier>{{.MessageIdentifier}}</MessageIdentifier>
-				<RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</RequestTimestamp>
-				<MonitoringRef>{{.MonitoringRef}}</MonitoringRef>
-				<StopVisitTypes>all</StopVisitTypes>
-      </StopMonitoringRequest>
-      <IncrementalUpdates>true</IncrementalUpdates>
-    	<ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
-    </siri:StopMonitoringSubscriptionRequest>{{end}}
+			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
+			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
+			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
+			<siri:StopMonitoringRequest>
+				<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
+				<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
+				<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
+				<siri:StopVisitTypes>all</siri:StopVisitTypes>
+			</siri:StopMonitoringRequest>
+			<siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+			<siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+		</siri:StopMonitoringSubscriptionRequest>{{end}}
 	</Request>
-  <RequestExtension />
+	<RequestExtension />
 </ws:Subscribe>`
 
 func NewXMLStopMonitoringSubscriptionRequestEntry(node XMLNode) *XMLStopMonitoringSubscriptionRequestEntry {
