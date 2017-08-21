@@ -90,7 +90,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RemoteObjectIDKindAbsent(t *testi
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.RemoteObjectIDKind() != "Kind2" {
+	if connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "Kind2" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
 	}
 }
@@ -104,7 +104,7 @@ func Test_SIRIGeneralMessageBroadcaster_RemoteObjectIDKindPresent(t *testing.T) 
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.RemoteObjectIDKind() != "Kind1" {
+	if connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "Kind1" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
 	}
 }

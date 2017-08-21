@@ -50,13 +50,6 @@ func newSIRIGeneralMessageSubscriptionBroadcaster(partner *Partner) *SIRIGeneral
 	return siriGeneralMessageSubscriptionBroadcaster
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-general-message-subscription-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-general-message-subscription-broadcaster.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
-}
-
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Stop() {
 	if connector.generalMessageBroadcaster != nil {
 		connector.generalMessageBroadcaster.Stop()
@@ -91,7 +84,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return subId, false
 	}
 
-	_, ok = situation.ObjectID(connector.RemoteObjectIDKind())
+	_, ok = situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
 	if !ok {
 		return subId, false
 	}

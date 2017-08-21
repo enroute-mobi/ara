@@ -221,6 +221,13 @@ func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
 }
 
+func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
+	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
+		return setting
+	}
+	return partner.Setting("remote_objectid_kind")
+}
+
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }

@@ -61,7 +61,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 			continue
 		}
 		siriGeneralMessage := &siri.SIRIGeneralMessage{}
-		objectid, present := situation.ObjectID(connector.RemoteObjectIDKind())
+		objectid, present := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
 		if !present {
 			objectid, _ = situation.ObjectID("_default")
 		}
@@ -86,13 +86,6 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 		delivery.GeneralMessages = append(delivery.GeneralMessages, siriGeneralMessage)
 	}
 	return delivery
-}
-
-func (connector *SIRIGeneralMessageRequestBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

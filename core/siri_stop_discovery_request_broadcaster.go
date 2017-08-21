@@ -52,7 +52,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	var annotedStopPointArray []string
 
-	objectIDKind := connector.RemoteObjectIDKind()
+	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
 		if stopArea.Name == "" || stopArea.CollectedAlways == false {
 			continue
@@ -90,13 +90,6 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 
 	return response, nil
-}
-
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-stop-points-discovery-request-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-stop-points-discovery-request-broadcaster.remote_objectid_kind")
-	}
-	return connector.Partner().Setting("remote_objectid_kind")
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {

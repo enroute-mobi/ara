@@ -30,15 +30,8 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 	return siriStopMonitoringRequestBroadcaster
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
-}
-
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
-	objectidKind := connector.RemoteObjectIDKind()
+	objectidKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
 	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
@@ -246,7 +239,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 			continue
 		}
 		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
-			obj, ok := foundStopArea.ObjectID(connector.RemoteObjectIDKind())
+			obj, ok := foundStopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER))
 			if ok {
 				tmp := references[ref]
 				tmp.ObjectId = &obj

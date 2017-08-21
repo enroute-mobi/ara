@@ -50,13 +50,6 @@ func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMon
 	return siriStopMonitoringSubscriptionBroadcaster
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-stop-monitoring-subscription-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-stop-monitoring-subscription-broadcaster.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
-}
-
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Stop() {
 	connector.stopMonitoringBroadcaster.Stop()
 }
@@ -99,7 +92,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	obj, ok := stopArea.ObjectID(connector.RemoteObjectIDKind())
+	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
 	if !ok {
 		return subId, false
 	}
@@ -146,7 +139,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			ResponseTimestamp: connector.Clock().Now(),
 		}
 
-		objectid := model.NewObjectID(connector.RemoteObjectIDKind(), sm.MonitoringRef())
+		objectid := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER), sm.MonitoringRef())
 		sa, ok := connector.Partner().Model().StopAreas().FindByObjectId(objectid)
 		if !ok {
 			resps = append(resps, rs)
@@ -182,7 +175,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) AddStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
 	svs := connector.Partner().Model().StopVisits().FindFollowingByStopAreaId(sa.Id())
 	for _, sv := range svs {
-		_, ok := sv.ObjectID(connector.RemoteObjectIDKind())
+		_, ok := sv.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
 		if !ok {
 			continue
 		}

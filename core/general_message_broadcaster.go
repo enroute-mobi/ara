@@ -89,13 +89,6 @@ func (gmb *GeneralMessageBroadcaster) Stop() {
 	}
 }
 
-func (gmb *GMBroadcaster) RemoteObjectIDKind() string {
-	if gmb.connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind") != "" {
-		return gmb.connector.partner.Setting("siri-general-message-request-broadcaster.remote_objectid_kind")
-	}
-	return gmb.connector.partner.Setting("remote_objectid_kind")
-}
-
 func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 	connector := gmb.connector
 
@@ -138,7 +131,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			// }
 
 			siriGeneralMessage := &siri.SIRIGeneralMessage{}
-			objectid, present := situation.ObjectID(gmb.RemoteObjectIDKind())
+			objectid, present := situation.ObjectID(gmb.connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
 			if !present {
 				objectid, _ = situation.ObjectID("_default")
 			}

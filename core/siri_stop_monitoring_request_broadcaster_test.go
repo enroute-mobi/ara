@@ -440,7 +440,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RemoteObjectIDKindPresent(t *test
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 
-	if connector.RemoteObjectIDKind() != "Kind1" {
+	if connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "Kind1" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
 	}
 }
@@ -454,7 +454,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RemoteObjectIDKindAbsent(t *testi
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 
-	if connector.RemoteObjectIDKind() != "Kind2" {
+	if connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "Kind2" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
 	}
 }

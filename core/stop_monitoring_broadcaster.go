@@ -89,13 +89,6 @@ func (smb *StopMonitoringBroadcaster) Stop() {
 	}
 }
 
-func (smb *SMBroadcaster) RemoteObjectIDKind() string {
-	if smb.connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind") != "" {
-		return smb.connector.partner.Setting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind")
-	}
-	return smb.connector.partner.Setting("remote_objectid_kind")
-}
-
 func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	smb.connector.mutex.Lock()
 
@@ -309,7 +302,7 @@ func (connector *SMBroadcaster) resolveVehiculeJourneyReferences(references mode
 			continue
 		}
 		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
-			obj, ok := foundStopArea.ObjectID(connector.RemoteObjectIDKind())
+			obj, ok := foundStopArea.ObjectID(connector.connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
 			if ok {
 				tmp := references[ref]
 				tmp.ObjectId = &obj
