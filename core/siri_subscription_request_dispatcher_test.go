@@ -111,10 +111,10 @@ func Test_CancelSubscription(t *testing.T) {
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
 
-	sub := partner.Subscriptions().New()
+	sub := partner.Subscriptions().New("Test")
 	sub.SetExternalId("6ba7b814-9dad-11d1-1-00c04fd430c8")
 
-	partner.Subscriptions().Save(&sub)
+	partner.Subscriptions().Save(sub)
 
 	file, _ := os.Open("testdata/terminated_subscription_request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
