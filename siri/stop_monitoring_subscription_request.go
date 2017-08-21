@@ -45,7 +45,7 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
 		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
 	</SubscriptionRequestInfo>
-	<Request>{{ range .Entries }}
+	<Request version="2.0:FR-IDF-2.4">{{ range .Entries }}
 		<siri:StopMonitoringSubscriptionRequest>
 			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
 			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
