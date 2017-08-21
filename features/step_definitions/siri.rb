@@ -136,7 +136,7 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with (\
 
   document = REXML::Document.new(last_siri_request)
 
-  nodes = REXML::XPath.match(document, "//#{requestType}", { "siri" => "http://www.siri.org.uk/siri" })
+  nodes = REXML::XPath.match(document, "//*[local-name()='#{requestType}']", { "siri" => "http://www.siri.org.uk/siri" })
 
   expect(nodes.length).to eq(requestNumber.to_i)
 end
