@@ -169,7 +169,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
 		connector.fillOptions(sub, r, request, sm)
-		sub.Save()
 
 		rs.Status = true
 		rs.ValidUntil = sm.InitialTerminationTime()
@@ -183,7 +182,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) AddStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
 	svs := connector.Partner().Model().StopVisits().FindFollowingByStopAreaId(sa.Id())
 	for _, sv := range svs {
-		_, ok := sv.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
+		_, ok := sv.ObjectID(connector.RemoteObjectIDKind())
 		if !ok {
 			continue
 		}
