@@ -2,13 +2,17 @@ package core
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
 type SubscriptionRequestDispatcher interface {
 	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error)
+	CancelSubscription(*siri.XMLTerminatedSubscriptionRequest) *siri.SIRITerminatedSubscriptionResponse
 }
 
 type SIRISubscriptionRequestDispatcherFactory struct{}
@@ -71,4 +75,36 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	}
 
 	return nil, fmt.Errorf("Subscription not supported")
+}
+
+func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLTerminatedSubscriptionRequest) *siri.SIRITerminatedSubscriptionResponse {
+	resp := &siri.SIRITerminatedSubscriptionResponse{
+		ResponseTimestamp: connector.Clock().Now(),
+		ResponderRef:      connector.SIRIPartner().RequestorRef(),
+		Status:            true,
+		SubscriberRef:     connector.SIRIPartner().RequestorRef(),
+		SubscriptionRef:   r.SubscriptionRef(),
+	}
+
+	reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
+	matches := reg.FindStringSubmatch(strings.TrimSpace(r.SubscriptionRef()))
+
+	if len(matches) == 0 {
+		logger.Log.Debugf("Partner %s sent a TerminateSubscriptionRequest response with a wrong message format: %s\n", connector.Partner().Slug(), r.SubscriptionRef())
+
+		resp.Status = false
+		return resp
+	}
+	subscriptionId := matches[1]
+
+	sub, ok := connector.Partner().Subscriptions().FindByExternalId(subscriptionId)
+	if !ok {
+		logger.Log.Debugf("Could not Unsubscribe to unknow subscription %v", resp.SubscriptionRef)
+
+		resp.Status = false
+		return resp
+	}
+
+	sub.Delete()
+	return resp
 }
