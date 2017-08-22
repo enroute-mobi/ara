@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -34,10 +35,10 @@ func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessage
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
-	logStashEvent := make(audit.LogStashEvent)
-	startTime := connector.Clock().Now()
-
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	startTime := connector.Clock().Now()
 
 	siriGeneralMessageRequest := &siri.SIRIGeneralMessageRequest{
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
@@ -58,6 +59,8 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
 	connector.setSituationUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
 
+	logSituationUpdateEvents(logStashEvent, situationUpdateEvents)
+
 	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
 }
 
@@ -72,7 +75,7 @@ func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(si
 			CreatedAt:         connector.Clock().Now(),
 			RecordedAt:        xmlGeneralMessage.RecordedAtTime(),
 			SituationObjectID: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlGeneralMessage.InfoMessageIdentifier()),
-			Version:           int64(xmlGeneralMessage.InfoMessageVersion()),
+			Version:           xmlGeneralMessage.InfoMessageVersion(),
 			ProducerRef:       xmlResponse.ProducerRef(),
 		}
 		situationEvent.SetId(model.SituationUpdateRequestId(connector.NewUUID()))
@@ -105,6 +108,12 @@ func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEve
 	}
 }
 
+func (connector *SIRIGeneralMessageRequestCollector) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "GeneralMessageRequestCollector"
+	return event
+}
+
 func (factory *SIRIGeneralMessageRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
@@ -117,7 +126,6 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 }
 
 func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageRequest) {
-	logStashEvent["Connector"] = "GeneralMessageRequestCollector"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
@@ -135,6 +143,22 @@ func logXMLGeneralMessageResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = response.RawXML()
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
+	if !response.Status() {
+		logStashEvent["errorType"] = response.ErrorType()
+		if response.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		}
+		logStashEvent["errorText"] = response.ErrorText()
+		logStashEvent["errorDescription"] = response.ErrorDescription()
+	}
+	logStashEvent["responseXML"] = response.RawXML()
+}
+
+func logSituationUpdateEvents(logStashEvent audit.LogStashEvent, situations []*model.SituationUpdateEvent) {
+	var updateEvents []string
+	for _, situationUpdateEvent := range situations {
+		updateEvents = append(updateEvents, situationUpdateEvent.SituationObjectID.Value())
+	}
+	logStashEvent["SituationUpdateEvents"] = strings.Join(updateEvents, ", ")
 }

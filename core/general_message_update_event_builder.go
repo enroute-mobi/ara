@@ -21,7 +21,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 		CreatedAt:         builder.Clock().Now(),
 		RecordedAt:        builder.Clock().Now(),
 		SituationObjectID: model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlGeneralMessageEvent.InfoMessageIdentifier()),
-		Version:           int64(xmlGeneralMessageEvent.InfoMessageVersion()),
+		Version:           xmlGeneralMessageEvent.InfoMessageVersion(),
 		ProducerRef:       producerRef,
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))

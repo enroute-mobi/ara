@@ -214,6 +214,7 @@ func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes
 
 	line = updater.tx.Model().Lines().New()
 	line.SetObjectID(lineAttributes.ObjectId)
+	line.SetObjectID(NewObjectID("_default", lineAttributes.ObjectId.HashValue()))
 	line.Name = lineAttributes.Name
 
 	line.Save()

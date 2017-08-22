@@ -106,7 +106,7 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 		t.Errorf("Wrong RecorderAt for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.RecordedAt)
 	}
 
-	if expected := 1; situationEvent.Version != int64(expected) {
+	if expected := 1; situationEvent.Version != expected {
 		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.Version)
 	}
 

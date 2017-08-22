@@ -46,7 +46,7 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 
 func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error) {
 	response := siri.SIRIStopMonitoringSubscriptionResponse{
-		Address:           connector.Partner().Setting("local_url"),
+		Address:           connector.Partner().Address(),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
 		ResponseTimestamp: connector.Clock().Now(),
 		RequestMessageRef: request.MessageIdentifier(),

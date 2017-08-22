@@ -39,15 +39,12 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	logXMLStopPointDiscoveryRequest(logStashEvent, request)
 
 	response := &siri.SIRIStopPointsDiscoveryResponse{
-		Address:                   connector.Partner().Setting("local_url"),
-		ProducerRef:               connector.Partner().Setting("remote_credential"),
+		Address:                   connector.Partner().Address(),
+		ProducerRef:               connector.Partner().ProducerRef(),
 		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
-	}
-	if response.ProducerRef == "" {
-		response.ProducerRef = "Edwig"
 	}
 
 	var annotedStopPointArray []string

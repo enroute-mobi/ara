@@ -11,7 +11,7 @@ type GeneralMessageSubscriptionBroadcaster interface {
 	model.Stopable
 	model.Startable
 
-	handleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
+	HandleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
 	HandleSubscriptionRequest(*siri.XMLSubscriptionRequest)
 }
 
@@ -63,7 +63,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Start() {
 	connector.generalMessageBroadcaster.Start()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) handleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
 	subId, ok := connector.checkEvent(event.SituationId)
 	if ok {
 		connector.addSituation(subId, event.SituationId)
@@ -153,7 +153,7 @@ func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscript
 	return connector
 }
 
-func (connector *TestGeneralMessageSubscriptionBroadcaster) handleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 

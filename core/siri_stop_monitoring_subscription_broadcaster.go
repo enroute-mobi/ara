@@ -11,7 +11,7 @@ type StopMonitoringSubscriptionBroadcaster interface {
 	model.Stopable
 	model.Startable
 
-	handleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
+	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 	HandleSubscriptionRequest([]*siri.XMLStopMonitoringSubscriptionRequestEntry)
 }
 
@@ -58,7 +58,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
 	connector.stopMonitoringBroadcaster.Start()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) handleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	switch event.ModelType {
 	case "StopVisit":
 		sv, ok := connector.Partner().Model().StopVisits().Find(model.StopVisitId(event.ModelId))
@@ -213,7 +213,7 @@ func NewTestStopMonitoringSubscriptionBroadcaster() *TestStopMonitoringSubscript
 	return connector
 }
 
-func (connector *TestStopMonitoringSubscriptionBroadcaster) handleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *TestStopMonitoringSubscriptionBroadcaster) HandleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 

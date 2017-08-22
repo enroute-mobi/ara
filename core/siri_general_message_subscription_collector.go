@@ -60,13 +60,14 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	subscription, found := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessage")
-
 	if found {
 		return
 	}
 
+	referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
-		ConsumerAddress:   connector.Partner().Setting("local_url"),
+		ConsumerAddress:   connector.Partner().Address(),
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
@@ -75,7 +76,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		MessageIdentifier:      connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
+		SubscriptionIdentifier: referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: string(subscription.Id())}),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
 

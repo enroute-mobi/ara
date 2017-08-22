@@ -94,11 +94,13 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
+	referenceGenerator := subscriber.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
-		ConsumerAddress:   subscriber.connector.Partner().Setting("local_url"),
+		ConsumerAddress:   subscriber.connector.Partner().Address(),
 		MessageIdentifier: subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
@@ -110,7 +112,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			RequestTimestamp:       subscriber.Clock().Now(),
 			MonitoringRef:          stopAreaObjectid.Value(),
 			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier: fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()),
+			SubscriptionIdentifier: referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: string(subscription.Id())}),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
 

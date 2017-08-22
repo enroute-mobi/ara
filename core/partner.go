@@ -228,6 +228,24 @@ func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 	return partner.Setting("remote_objectid_kind")
 }
 
+func (partner *Partner) ProducerRef() string {
+	producerRef := partner.Setting("remote_credential")
+	if producerRef == "" {
+		producerRef = "Edwig"
+	}
+	return producerRef
+}
+
+// Ref Issue #4300
+func (partner *Partner) Address() string {
+	// address := partner.Setting("local_url")
+	// if address == "" {
+	// 	address = config.Config.DefaultAddress
+	// }
+	// return address
+	return partner.Setting("local_url")
+}
+
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }

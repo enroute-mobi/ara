@@ -72,14 +72,14 @@ func (manager *BroadcastManager) run() {
 			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
 				connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 				if ok {
-					connector.(*SIRIStopMonitoringSubscriptionBroadcaster).handleStopMonitoringBroadcastEvent(&event)
+					connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
 					continue
 				}
 
 				// TEST
 				connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 				if ok {
-					connector.(*TestStopMonitoringSubscriptionBroadcaster).handleStopMonitoringBroadcastEvent(&event)
+					connector.(*TestStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
 					continue
 				}
 			}
@@ -88,14 +88,14 @@ func (manager *BroadcastManager) run() {
 			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
 				connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 				if ok {
-					connector.(*SIRIGeneralMessageSubscriptionBroadcaster).handleGeneralMessageBroadcastEvent(&event)
+					connector.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
 					continue
 				}
 
 				// TEST
 				connector, ok = partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 				if ok {
-					connector.(*TestGeneralMessageSubscriptionBroadcaster).handleGeneralMessageBroadcastEvent(&event)
+					connector.(*TestGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
 					continue
 				}
 			}

@@ -211,12 +211,9 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogXMLGetStopMonitoring(t *testing.T
 		t.Fatal(err)
 	}
 
-	logXMLEstimatedTimetableRequest(logStashEvent, request)
+	logXMLEstimatedTimetableRequest(logStashEvent, &request.XMLEstimatedTimetableRequest)
 	if logStashEvent["messageIdentifier"] != "EstimatedTimetable:Test:0" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: EstimatedTimetable:Test:0", logStashEvent["messageIdentifier"])
-	}
-	if logStashEvent["requestorRef"] != "test" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: test", logStashEvent["requestorRef"])
 	}
 	if logStashEvent["requestTimestamp"] != "2016-09-07 09:11:25.174 +0000 UTC" {
 		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: 2016-09-07 09:11:25.174 +0000 UTC", logStashEvent["requestTimestamp"])
@@ -239,6 +236,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 	response.ResponseTimestamp = time
 	response.Status = true
 
+	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery)
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "edwig.edwig" {
@@ -274,7 +272,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 
-	if connector.remoteObjectIDKind() != "Kind1" {
+	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind1" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
 	}
 }
@@ -288,7 +286,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 
-	if connector.remoteObjectIDKind() != "Kind2" {
+	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind2" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
 	}
 }

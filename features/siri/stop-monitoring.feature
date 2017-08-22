@@ -135,13 +135,13 @@ Feature: Support SIRI StopMonitoring
           <ns3:Status>true</ns3:Status>
           <ns3:MonitoredStopVisit>
             <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
-            <ns3:ItemIdentifier>RATPDev:Item::4d25c8186b19a5b1993e4a401aebec7fc5e8bd15:LOC</ns3:ItemIdentifier>
+            <ns3:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</ns3:ItemIdentifier>
             <ns3:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
             <ns3:MonitoredVehicleJourney>
               <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
               <ns3:FramedVehicleJourneyRef>
                 <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::5d5ddf96f5db438e2f4e24af3c074e2d0733cc4e:LOC</ns3:DatedVehicleJourneyRef>
+                <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</ns3:DatedVehicleJourneyRef>
               </ns3:FramedVehicleJourneyRef>
               <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
               <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
@@ -374,13 +374,13 @@ Feature: Support SIRI StopMonitoring
                 <ns3:Status>true</ns3:Status>
                 <ns3:MonitoredStopVisit>
                   <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::4d25c8186b19a5b1993e4a401aebec7fc5e8bd15:LOC</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
                     <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
                     <ns3:FramedVehicleJourneyRef>
                       <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::5d5ddf96f5db438e2f4e24af3c074e2d0733cc4e:LOC</ns3:DatedVehicleJourneyRef>
+                      <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</ns3:DatedVehicleJourneyRef>
                     </ns3:FramedVehicleJourneyRef>
                     <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
                     <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>

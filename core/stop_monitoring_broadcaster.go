@@ -103,18 +103,25 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
+	referenceGenerator := smb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+
 	for key, stopVisits := range events {
 		//Voir pour le RequestMessageRef
 
-		sub, _ := smb.connector.Partner().Subscriptions().Find(key)
+		sub, ok := smb.connector.Partner().Subscriptions().Find(key)
+		if !ok {
+			continue
+		}
+
 		maxSv, _ := strconv.Atoi(sub.SubscriptionOptions()["MaximumStopVisit"])
 		svList := 0
 
 		delivery := &siri.SIRINotifyStopMonitoring{
-			ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
+			Address:                   smb.connector.Partner().Address(),
+			ProducerRef:               smb.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: smb.connector.NewUUID(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub.ExternalId()),
+			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
 		}
@@ -129,10 +136,10 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 				svList = 0
 				delivery = &siri.SIRINotifyStopMonitoring{
-					ProducerRef:               smb.connector.Partner().Setting("remote_credential"),
+					ProducerRef:               smb.connector.Partner().ProducerRef(),
 					ResponseMessageIdentifier: smb.connector.NewUUID(),
 					SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-					SubscriptionIdentifier:    fmt.Sprintf("Edwig:Subscription::%v:LOC", sub.ExternalId()),
+					SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
 					ResponseTimestamp:         smb.connector.Clock().Now(),
 					Status:                    true,
 				}
@@ -183,8 +190,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		if len(delivery.MonitoredStopVisits) == 0 {
 			continue
 		}
-		logSIRIStopMonitoringNotify(logStashEvent, delivery)
+
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
+		logSIRIStopMonitoringNotify(logStashEvent, delivery)
 	}
 }
 

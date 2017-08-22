@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -27,13 +28,6 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 	return broadcaster
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) remoteObjectIDKind() string {
-	if connector.partner.Setting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
-}
-
 func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable) *siri.SIRIEstimatedTimeTableResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
@@ -41,19 +35,18 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	logXMLEstimatedTimetableRequest(logStashEvent, request)
+	logXMLEstimatedTimetableRequest(logStashEvent, &request.XMLEstimatedTimetableRequest)
+	logStashEvent["requestorRef"] = request.RequestorRef()
 
 	response := &siri.SIRIEstimatedTimeTableResponse{
-		Address:                   connector.Partner().Setting("local_url"),
-		ProducerRef:               connector.Partner().Setting("remote_credential"),
+		Address:                   connector.Partner().Address(),
+		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-	}
-	if response.ProducerRef == "" {
-		response.ProducerRef = "Edwig"
 	}
 
 	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest)
 
+	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery)
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
 	return response
@@ -70,11 +63,12 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 	// SIRIEstimatedJourneyVersionFrame
 	for _, lineId := range request.Lines() {
-		lineObjectId := model.NewObjectID(connector.remoteObjectIDKind(), lineId)
+		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), lineId)
 		line, ok := tx.Model().Lines().FindByObjectId(lineObjectId)
 		if !ok {
 			continue
 		}
+
 		journeyFrame := &siri.SIRIEstimatedJourneyVersionFrame{
 			RecordedAtTime: currentTime,
 		}
@@ -82,7 +76,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		// SIRIEstimatedVehicleJourney
 		for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(line.Id()) {
 			// Handle vehicleJourney Objectid
-			vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.remoteObjectIDKind())
+			vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			var datedVehicleJourneyRef string
 			if ok {
 				datedVehicleJourneyRef = vehicleJourneyId.Value()
@@ -92,7 +86,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					continue
 				}
 				referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.HashValue()})
+				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
 			}
 
 			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
@@ -111,7 +105,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				if !ok {
 					continue
 				}
-				stopAreaId, ok := stopArea.ObjectID(connector.remoteObjectIDKind())
+				stopAreaId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 				if !ok {
 					continue
 				}
@@ -135,6 +129,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 		}
+
 		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
 
@@ -148,14 +143,14 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 			continue
 		}
 		if foundStopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(ref.Id)); ok {
-			obj, ok := foundStopArea.ObjectID(connector.remoteObjectIDKind())
+			obj, ok := foundStopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			if ok {
 				references[refType] = *model.NewReference(obj)
 				continue
 			}
 		}
 		generator := connector.SIRIPartner().IdentifierGenerator("reference_stop_area_identifier")
-		defaultObjectID := model.NewObjectID(connector.remoteObjectIDKind(), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
+		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
 		references[refType] = *model.NewReference(defaultObjectID)
 	}
 	return
@@ -177,20 +172,30 @@ func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner
 	return NewSIRIEstimatedTimetableBroadcaster(partner)
 }
 
-func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGetEstimatedTimetable) {
+func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLEstimatedTimetableRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+	logStashEvent["requestedLines"] = strings.Join(request.Lines(), ",")
 	logStashEvent["requestXML"] = request.RawXML()
+}
+
+func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery) {
+	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
+	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+	if !delivery.Status {
+		logStashEvent["errorType"] = delivery.ErrorType
+		if delivery.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+		}
+		logStashEvent["errorText"] = delivery.ErrorText
+	}
 }
 
 func logSIRIEstimatedTimetableResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIEstimatedTimeTableResponse) {
 	logStashEvent["address"] = response.Address
 	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	xml, err := response.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)

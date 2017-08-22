@@ -2,6 +2,8 @@ package core
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -30,41 +32,67 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-	logXMLGetGeneralMessage(logStashEvent, request)
+
+	logXMLGeneralMessageRequest(logStashEvent, &request.XMLGeneralMessageRequest)
+	logStashEvent["requestorRef"] = request.RequestorRef()
 
 	response := &siri.SIRIGeneralMessageResponse{
-		Address:                   connector.Partner().Setting("local_url"),
-		ProducerRef:               connector.Partner().Setting("remote_credential"),
+		Address:                   connector.Partner().Address(),
+		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
-	if response.ProducerRef == "" {
-		response.ProducerRef = "Edwig"
-	}
 
-	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, &request.XMLGeneralMessageRequest)
+	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
 
+	logSIRIGeneralMessageDelivery(logStashEvent, response.SIRIGeneralMessageDelivery)
 	logSIRIGeneralMessageResponse(logStashEvent, response)
+
 	return response, nil
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(tx *model.Transaction, request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
+func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
+	referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+
 	delivery := siri.SIRIGeneralMessageDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
 	}
 
+	// Prepare Id Array
+	var messageArray []string
+
 	for _, situation := range tx.Model().Situations().FindAll() {
 		if situation.Channel == "Commercial" || situation.ValidUntil.Before(connector.Clock().Now()) {
 			continue
 		}
-		siriGeneralMessage := &siri.SIRIGeneralMessage{}
+
+		var infoMessageIdentifier string
 		objectid, present := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
-		if !present {
-			objectid, _ = situation.ObjectID("_default")
+		if present {
+			infoMessageIdentifier = objectid.Value()
+		} else {
+			objectid, present = situation.ObjectID("_default")
+			if !present {
+				continue
+			}
+			infoMessageIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Default: objectid.Value()})
 		}
+
+		messageArray = append(messageArray, infoMessageIdentifier)
+
+		siriGeneralMessage := &siri.SIRIGeneralMessage{
+			ItemIdentifier:        referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: connector.NewUUID()}),
+			InfoMessageIdentifier: infoMessageIdentifier,
+			InfoChannelRef:        situation.Channel,
+			InfoMessageVersion:    situation.Version,
+			ValidUntilTime:        situation.ValidUntil,
+			RecordedAtTime:        situation.RecordedAt,
+			FormatRef:             "STIF-IDF",
+		}
+
 		for _, message := range situation.Messages {
 			siriMessage := &siri.SIRIMessage{
 				Content:             message.Content,
@@ -75,17 +103,18 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 			siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 		}
 
-		siriGeneralMessage.ItemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", connector.NewUUID())
-		siriGeneralMessage.InfoMessageIdentifier = fmt.Sprintf("Edwig:InfoMessage::%s:LOC", objectid.Value())
-		siriGeneralMessage.InfoChannelRef = situation.Channel
-		siriGeneralMessage.InfoMessageVersion = situation.Version
-		siriGeneralMessage.ValidUntilTime = situation.ValidUntil
-		siriGeneralMessage.RecordedAtTime = situation.RecordedAt
-		siriGeneralMessage.FormatRef = "STIF-IDF"
-
 		delivery.GeneralMessages = append(delivery.GeneralMessages, siriGeneralMessage)
 	}
+
+	logStashEvent["MessageIds"] = strings.Join(messageArray, ", ")
+
 	return delivery
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "GeneralMessageRequestBroadcaster"
+	return event
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
@@ -98,14 +127,29 @@ func (factory *SIRIGeneralMessageRequestBroadcasterFactory) CreateConnector(part
 	return NewSIRIGeneralMessageRequestBroadcaster(partner)
 }
 
-func logXMLGetGeneralMessage(logStashEvent audit.LogStashEvent, request *siri.XMLGetGeneralMessage) {
-	logStashEvent["requestorRef"] = request.RequestorRef()
+func logXMLGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) {
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestXML"] = request.RawXML()
 }
 
+func logSIRIGeneralMessageDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIGeneralMessageDelivery) {
+	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
+	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+	if !delivery.Status {
+		logStashEvent["errorType"] = delivery.ErrorType
+		if delivery.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+		}
+		logStashEvent["errorText"] = delivery.ErrorText
+	}
+}
+
 func logSIRIGeneralMessageResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIGeneralMessageResponse) {
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["address"] = response.Address
+	logStashEvent["producerRef"] = response.ProducerRef
+	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	xml, err := response.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)

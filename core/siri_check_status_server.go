@@ -33,17 +33,15 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 
 	logXMLCheckStatusRequest(logStashEvent, request)
 
-	response := new(siri.SIRICheckStatusResponse)
-	response.Address = connector.Partner().Setting("local_url")
-	response.ProducerRef = connector.Partner().Setting("remote_credential")
-	if response.ProducerRef == "" {
-		response.ProducerRef = "Edwig"
+	response := &siri.SIRICheckStatusResponse{
+		Address:                   connector.Partner().Address(),
+		ProducerRef:               connector.Partner().ProducerRef(),
+		RequestMessageRef:         request.MessageIdentifier(),
+		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		Status:             true,
+		ResponseTimestamp:  connector.Clock().Now(),
+		ServiceStartedTime: connector.Partner().Referential().StartedAt(),
 	}
-	response.RequestMessageRef = request.MessageIdentifier()
-	response.ResponseMessageIdentifier = connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier()
-	response.Status = true
-	response.ResponseTimestamp = connector.Clock().Now()
-	response.ServiceStartedTime = connector.Partner().Referential().StartedAt()
 
 	logSIRICheckStatusResponse(logStashEvent, response)
 

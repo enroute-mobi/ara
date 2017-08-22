@@ -251,7 +251,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
-	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Edwig:Subscription::%v:LOC", subscription.Id()) {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), "Edwig:Subscription::NINOXE:StopPoint:SP:24:LOC:LOC")
+	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Subscription:%v", subscription.Id()) {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), "Subscription::NINOXE:StopPoint:SP:24:LOC")
 	}
 }

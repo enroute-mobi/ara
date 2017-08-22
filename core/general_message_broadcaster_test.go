@@ -81,6 +81,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster = NewFakeGeneralMessageBroadcaster(connector.(*SIRIGeneralMessageSubscriptionBroadcaster))
 
 	situation := referential.Model().Situations().New()
+	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)

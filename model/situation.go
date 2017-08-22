@@ -29,7 +29,7 @@ type Situation struct {
 	Format      string `json:",omitempty"`
 	Channel     string `json:",omitempty"`
 	ProducerRef string `json:",omitempty"`
-	Version     int64  `json:",omitempty"`
+	Version     int    `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {

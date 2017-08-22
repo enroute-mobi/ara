@@ -374,12 +374,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogXMLGetStopMonitoring(t *testin
 		t.Fatal(err)
 	}
 
-	logXMLGetStopMonitoring(logStashEvent, request)
+	logXMLStopMonitoringRequest(logStashEvent, &request.XMLStopMonitoringRequest)
 	if logStashEvent["messageIdentifier"] != "StopMonitoring:Test:0" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: StopMonitoring:Test:0", logStashEvent["messageIdentifier"])
-	}
-	if logStashEvent["requestorRef"] != "NINOXE:default" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["requestorRef"])
 	}
 	if logStashEvent["monitoringRef"] != "NINOXE:StopPoint:SP:24:LOC" {
 		t.Errorf("Wrong monitoringRef logged:\n got: %v\n expected: NINOXE:StopPoint:SP:24:LOC", logStashEvent["monitoringRef"])
@@ -405,6 +402,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 	response.Status = true
 	response.ResponseTimestamp = time
 
+	logSIRIStopMonitoringDelivery(logStashEvent, response.SIRIStopMonitoringDelivery)
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "edwig.edwig" {

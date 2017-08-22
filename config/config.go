@@ -21,10 +21,10 @@ type DatabaseConfig struct {
 var Config = struct {
 	DB DatabaseConfig
 
+	ApiKey   string
+	Debug    bool
 	LogStash string
 	Syslog   bool
-	Debug    bool
-	ApiKey   string
 }{}
 
 func LoadConfig(path string) error {

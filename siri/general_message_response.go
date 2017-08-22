@@ -107,7 +107,7 @@ type SIRIGeneralMessage struct {
 	ItemIdentifier        string
 	InfoMessageIdentifier string
 	FormatRef             string
-	InfoMessageVersion    int64
+	InfoMessageVersion    int
 	InfoChannelRef        string
 
 	LineRefContent    string

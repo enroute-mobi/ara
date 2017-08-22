@@ -7,6 +7,7 @@ import (
 )
 
 type SIRINotifyStopMonitoring struct {
+	Address                   string
 	RequestMessageRef         string
 	ProducerRef               string
 	ResponseMessageIdentifier string
@@ -25,7 +26,8 @@ type SIRINotifyStopMonitoring struct {
 const stopMonitoringNotifyTemplate = `<ns1:NotifyStopMonitoring xmlns:ns1="http://wsdl.siri.org.uk">
   <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
     <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
-    <ns5:ProducerRef>{{ .ProducerRef }}</ns5:ProducerRef>
+    <ns5:ProducerRef>{{ .ProducerRef }}</ns5:ProducerRef>{{ if .Address }}
+    <ns5:Address>{{ .Address }}</ns5:Address>{{ end }}
     <ns5:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns5:ResponseMessageIdentifier>
     <ns5:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>
   </ServiceDeliveryInfo>

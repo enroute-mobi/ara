@@ -74,7 +74,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::2:LOC</ns3:InfoMessageIdentifier>
+                  <ns3:InfoMessageIdentifier>2</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
@@ -156,7 +156,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:formatRef>STIF-IDF</ns3:formatRef>
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>Edwig:InfoMessage::test:LOC</ns3:InfoMessageIdentifier>
+                  <ns3:InfoMessageIdentifier>test</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>

@@ -59,11 +59,6 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	startTime := connector.Clock().Now()
-
 	stopArea, ok := connector.Partner().Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoringRequestCollector for unknown StopArea %v", request.StopAreaId())
@@ -76,6 +71,11 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
 		return
 	}
+
+	logStashEvent := connector.newLogStashEvent()
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	startTime := connector.Clock().Now()
 
 	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
