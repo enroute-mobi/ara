@@ -154,6 +154,17 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGeneralMessageRequest
 	return generalMessage, nil
 }
 
+func (client *SOAPClient) TerminatedSubscription(request *SIRITerminatedSubscriptionRequest) (*XMLTerminatedSubscriptionResponse, error) {
+	// WIP
+	node, err := client.prepareAndSendRequest(request, "TerminateSubscriptionRequest", false)
+	if err != nil {
+		return nil, err
+	}
+
+	terminatedSub := NewXMLTerminatedSubscriptionResponse(node)
+	return terminatedSub, nil
+}
+
 func (client *SOAPClient) NotifyStopMonitoring(request *SIRINotifyStopMonitoring) error {
 	_, err := client.prepareAndSendRequest(request, "NotifyStopMonitoring", false)
 	if err != nil {

@@ -255,3 +255,44 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), "Subscription::NINOXE:StopPoint:SP:24:LOC")
 	}
 }
+
+func Test_SIRIStopMonitoringTerminatedSubscriptionRequest(t *testing.T) {
+	request := &siri.XMLTerminatedSubscriptionRequest{}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		request, _ = siri.NewXMLTerminatedSubscriptionRequestFromContent(body)
+	}))
+	defer ts.Close()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+	partners := NewPartnerManager(referential)
+
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"local_url":            "http://example.com/test/siri",
+			"remote_url":           ts.URL,
+			"remote_objectid_kind": "test_kind",
+		},
+		manager: partners,
+	}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	file, _ := os.Open("testdata/notify-stop-monitoring.xml")
+	content, _ := ioutil.ReadAll(file)
+
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+
+	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(content)
+
+	connector.HandleNotifyStopMonitoring(notify)
+
+	if request.SubscriptionRef() != "Edwig:Subscription::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("salut == %v", request.RawXML())
+	}
+}

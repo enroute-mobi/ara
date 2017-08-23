@@ -22,6 +22,7 @@ type StopMonitoringSubscriptionCollector interface {
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
+	model.ClockConsumer
 	model.UUIDConsumer
 
 	siriConnector
@@ -111,6 +112,13 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdat
 	}
 }
 
+func (connector *SIRIStopMonitoringSubscriptionCollector) RemoteObjectIDKind() string {
+	if connector.partner.Setting("siri-stop-monitoring-subscription-collector.remote_objectid_kind") != "" {
+		return connector.partner.Setting("siri-stop-monitoring-subscription-collector.remote_objectid_kind")
+	}
+	return connector.partner.Setting("remote_objectid_kind")
+}
+
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotification(response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -149,6 +157,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 		if ok == false {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
 		if subscription.Kind() != "StopMonitoring" {
@@ -165,6 +174,15 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	for _, event := range stopAreaUpdateEvents {
 		connector.broadcastStopAreaUpdateEvent(event)
 	}
+}
+
+func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(subId string) {
+	request := &siri.SIRITerminatedSubscriptionRequest{
+		RequestTimestamp: connector.Clock().Now(),
+		SubscriptionRef:  subId,
+		RequestorRef:     connector.RemoteObjectIDKind(),
+	}
+	connector.SIRIPartner().SOAPClient().TerminatedSubscription(request)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery) {

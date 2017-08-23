@@ -22,12 +22,11 @@ type XMLTerminatedSubscriptionRequest struct {
 	subscriptionRef string
 }
 
-const terminateSubscriptionRequestTemplate = `<ns1:TerminateSubscriptionRequest xmlns:ns1="http://wsdl.siri.org.uk">
+const terminateSubscriptionRequestTemplate = `<ns1:TerminateSubscriptionRequest xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
   <ServiceRequestInfo
    xmlns:ns2="http://www.ifopt.org.uk/acsb"
    xmlns:ns3="http://www.ifopt.org.uk/ifopt"
    xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-   xmlns:ns5="http://www.siri.org.uk/siri"
    xmlns:ns6="http://wsdl.siri.org.uk/siri">
     <ns5:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:RequestTimestamp>
     <ns5:RequestorRef>{{.RequestorRef}}</ns5:RequestorRef>
