@@ -112,13 +112,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastStopAreaUpdat
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) RemoteObjectIDKind() string {
-	if connector.partner.Setting("siri-stop-monitoring-subscription-collector.remote_objectid_kind") != "" {
-		return connector.partner.Setting("siri-stop-monitoring-subscription-collector.remote_objectid_kind")
-	}
-	return connector.partner.Setting("remote_objectid_kind")
-}
-
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotification(response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -180,7 +173,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	request := &siri.SIRITerminatedSubscriptionRequest{
 		RequestTimestamp: connector.Clock().Now(),
 		SubscriptionRef:  subId,
-		RequestorRef:     connector.RemoteObjectIDKind(),
+		RequestorRef:     connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
 	}
 	connector.SIRIPartner().SOAPClient().TerminatedSubscription(request)
 }

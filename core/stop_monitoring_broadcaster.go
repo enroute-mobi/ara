@@ -119,9 +119,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		delivery := &siri.SIRINotifyStopMonitoring{
 			Address:                   smb.connector.Partner().Address(),
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: smb.connector.NewUUID(),
+			ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    sub.ExternalId(),
+			SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
 		}
@@ -137,7 +137,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				svList = 0
 				delivery = &siri.SIRINotifyStopMonitoring{
 					ProducerRef:               smb.connector.Partner().ProducerRef(),
-					ResponseMessageIdentifier: smb.connector.NewUUID(),
+					ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 					SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
 					SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
 					ResponseTimestamp:         smb.connector.Clock().Now(),
@@ -198,6 +198,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopArea model.StopArea, options map[string]string, tx *model.Transaction) *siri.SIRIMonitoredStopVisit {
 
+	referenceGenerator := smb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 	objectidKind := smb.connector.Partner().Setting("remote_objectid_kind")
 
 	objectid, ok := stopArea.ObjectID(objectidKind)
@@ -214,7 +215,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 		if !ok {
 			return nil
 		}
-		itemIdentifier = fmt.Sprintf("RATPDev:Item::%s:LOC", defaultObjectID.HashValue())
+		itemIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: defaultObjectID.HashValue()})
 	}
 
 	schedules := stopVisit.Schedules
@@ -253,6 +254,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 	stopPointRef, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
 	stopPointRefObjectId, _ := stopPointRef.ObjectID(objectidKind)
 
+	dataFrameGenerator := smb.connector.SIRIPartner().IdentifierGenerator("data_frame_identifier")
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 		ItemIdentifier: itemIdentifier,
 		MonitoringRef:  objectid.Value(),
@@ -262,7 +264,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 		VehicleJourneyName:     vehicleJourney.Name,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,
-		DataFrameRef:           fmt.Sprintf("RATPDev:DataFrame::%s:LOC", modelDate.String()),
+		DataFrameRef:           dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
 		RecordedAt:             stopVisit.RecordedAt,
 		PublishedLineName:      line.Name,
 		DepartureStatus:        string(stopVisit.DepartureStatus),
@@ -302,7 +304,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 	return monitoredStopVisit
 }
 
-func (connector *SMBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {
+func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
@@ -310,16 +312,17 @@ func (connector *SMBroadcaster) resolveVehiculeJourneyReferences(references mode
 			continue
 		}
 		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
-			obj, ok := foundStopArea.ObjectID(connector.connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
+			obj, ok := foundStopArea.ObjectID(smb.connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER))
 			if ok {
 				tmp := references[ref]
 				tmp.ObjectId = &obj
 				references[ref] = tmp
+				continue
 			}
-		} else {
-			tmp := references[ref]
-			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
 		}
+		generator := smb.connector.SIRIPartner().IdentifierGenerator("reference_stop_area_identifier")
+		tmp := references[ref]
+		tmp.ObjectId.SetValue(generator.NewIdentifier(IdentifierAttributes{Default: tmp.GetSha1()}))
 	}
 }
 
@@ -337,11 +340,12 @@ func (smb *SMBroadcaster) resolveOperator(references model.References) {
 	references["OperatorRef"].ObjectId.SetValue(obj.Value())
 }
 
-func (connector *SMBroadcaster) reformatReferences(toReformat []string, references model.References) {
+func (smb *SMBroadcaster) reformatReferences(toReformat []string, references model.References) {
+	generator := smb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 	for _, ref := range toReformat {
 		if references[ref] != (model.Reference{}) {
 			tmp := references[ref]
-			tmp.ObjectId.SetValue(tmp.Getformat(ref, tmp.GetSha1()))
+			tmp.ObjectId.SetValue(generator.NewIdentifier(IdentifierAttributes{Type: ref[:len(ref)-3], Default: tmp.GetSha1()}))
 		}
 	}
 }

@@ -113,7 +113,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: gmb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             gmb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    sub.ExternalId(),
+			SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
 			Status:                    true,
 		}
 
