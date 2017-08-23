@@ -3,15 +3,17 @@ package siri
 import (
 	"bytes"
 	"html/template"
+	"time"
 
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
 type SIRITerminatedSubscriptionRequest struct {
-	ResponseXMLStructure
+	RequestorRef     string
+	RequestTimestamp time.Time
 
-	SubscriberRef string
+	SubscriptionRef string
 }
 
 type XMLTerminatedSubscriptionRequest struct {
@@ -27,9 +29,8 @@ const terminateSubscriptionRequestTemplate = `<ns1:TerminateSubscriptionRequest 
    xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
    xmlns:ns5="http://www.siri.org.uk/siri"
    xmlns:ns6="http://wsdl.siri.org.uk/siri">
-    <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
-    <ns5:RequestorRef>{{.ResponderRef}}</ns5:RequestorRef>
-    <ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
+    <ns5:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:RequestTimestamp>
+    <ns5:RequestorRef>{{.RequestorRef}}</ns5:RequestorRef>
   </ServiceRequestInfo>
   <Request version="2.0:FR-IDF-2.4">
     <ns5:SubscriptionRef>{{.SubscriptionRef}}</ns5:SubscriptionRef>
