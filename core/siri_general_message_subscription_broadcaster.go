@@ -29,6 +29,9 @@ type SIRIGeneralMessageSubscriptionBroadcaster struct {
 type SIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 
 func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
+		partner.CreateSubscriptionRequestDispatcher()
+	}
 	return newSIRIGeneralMessageSubscriptionBroadcaster(partner)
 }
 

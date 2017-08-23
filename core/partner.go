@@ -376,12 +376,27 @@ func (partner *Partner) RefreshConnectors() {
 func (partner *Partner) cleanConnectors() {
 	sort.Strings(partner.ConnectorTypes)
 
-	for connectorType, _ := range partner.connectors {
+	for connectorType := range partner.connectors {
+		if connectorType == SIRI_SUBSCRIPTION_REQUEST_DISPATCHER && partner.hasSubscribers() {
+			continue
+		}
 		found := sort.SearchStrings(partner.ConnectorTypes, connectorType)
 		if found == len(partner.ConnectorTypes) || partner.ConnectorTypes[found] != connectorType {
 			delete(partner.connectors, connectorType)
 		}
 	}
+}
+
+func (partner *Partner) hasSubscribers() bool {
+	_, ok := partner.connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+	_, ok = partner.connectors[SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+	return false
 }
 
 func (partner *Partner) Connector(connectorType string) (Connector, bool) {

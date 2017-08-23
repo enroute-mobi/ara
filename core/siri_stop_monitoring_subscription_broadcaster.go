@@ -29,6 +29,9 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 type SIRIStopMonitoringSubscriptionBroadcasterFactory struct{}
 
 func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
+	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
+		partner.CreateSubscriptionRequestDispatcher()
+	}
 	return newSIRIStopMonitoringSubscriptionBroadcaster(partner)
 }
 

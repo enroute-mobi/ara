@@ -22,7 +22,6 @@ type StopMonitoringSubscriptionCollector interface {
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
-	// model.ClockConsumer
 	model.UUIDConsumer
 
 	siriConnector
@@ -34,9 +33,6 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
-	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
-		partner.CreateSubscriptionRequestDispatcher()
-	}
 	return NewSIRIStopMonitoringSubscriptionCollector(partner)
 }
 
