@@ -2,8 +2,11 @@ package core
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -129,5 +132,98 @@ func Test_CancelSubscription(t *testing.T) {
 
 	if _, ok := partner.Subscriptions().FindByExternalId("6ba7b814-9dad-11d1-1-00c04fd430c8"); ok {
 		t.Errorf("Subscription shouldn't exist")
+	}
+}
+
+func Test_ReceiveStateSM(t *testing.T) {
+	fakeClock := model.NewFakeClock()
+	model.SetDefaultClock(fakeClock)
+
+	// Create a test http server
+
+	response := []byte{}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response, _ = ioutil.ReadAll(r.Body)
+		w.Header().Add("Content-Type", "text/xml")
+	}))
+	defer ts.Close()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.model = model.NewMemoryModel()
+
+	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "_internal"
+	partner.Settings["remote_credential"] = "external"
+	partner.Settings["remote_url"] = ts.URL
+	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
+	connector2, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+
+	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).SetClock(fakeClock)
+	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster = NewFakeStopMonitoringBroadcaster(connector2.(*SIRIStopMonitoringSubscriptionBroadcaster))
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+
+	objectid := model.NewObjectID("_internal", "coicogn2")
+
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid)
+	line.Save()
+
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.Save()
+
+	objectid = model.NewObjectID("_internal", "value")
+
+	sv1 := referential.Model().StopVisits().New()
+	sv1.SetObjectID(objectid)
+	sv1.StopAreaId = stopArea.Id()
+	sv1.VehicleJourneyId = vehicleJourney.Id()
+	sv1.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
+	sv1.Save()
+
+	objectid = model.NewObjectID("_internal", "value2")
+	sv2 := referential.Model().StopVisits().New()
+	sv2.SetObjectID(objectid)
+	sv2.StopAreaId = stopArea.Id()
+	sv2.VehicleJourneyId = vehicleJourney.Id()
+	sv2.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
+	sv2.Save()
+
+	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
+	body, _ := ioutil.ReadAll(file)
+	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+
+	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
+	sv1.Save()
+	sv2.Save()
+
+	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
+	time.Sleep(10 * time.Millisecond)
+
+	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(response)
+	delivery := notify.StopMonitoringDeliveries()
+
+	if len(delivery) != 1 {
+		t.Errorf("Should have received 1 delivery but got == %v", len(delivery))
+	}
+
+	if len(delivery[0].XMLMonitoredStopVisits()) != 2 {
+		t.Errorf("Should have received 2 Monitored stop visit but got %v", len(delivery[0].XMLMonitoredStopVisits()))
 	}
 }
