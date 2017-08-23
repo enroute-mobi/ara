@@ -1,9 +1,18 @@
 package siri
 
 import (
+	"bytes"
+	"html/template"
+
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
+
+type SIRITerminatedSubscriptionRequest struct {
+	ResponseXMLStructure
+
+	SubscriberRef string
+}
 
 type XMLTerminatedSubscriptionRequest struct {
 	RequestXMLStructure
@@ -11,7 +20,7 @@ type XMLTerminatedSubscriptionRequest struct {
 	subscriptionRef string
 }
 
-const TerminateSubscriptionRequest = `<ns1:TerminateSubscriptionRequest xmlns:ns1="http://wsdl.siri.org.uk">
+const terminateSubscriptionRequestTemplate = `<ns1:TerminateSubscriptionRequest xmlns:ns1="http://wsdl.siri.org.uk">
   <ServiceRequestInfo
    xmlns:ns2="http://www.ifopt.org.uk/acsb"
    xmlns:ns3="http://www.ifopt.org.uk/ifopt"
@@ -48,4 +57,13 @@ func (request *XMLTerminatedSubscriptionRequest) SubscriptionRef() string {
 		request.subscriptionRef = request.findStringChildContent("SubscriptionRef")
 	}
 	return request.subscriptionRef
+}
+
+func (request *SIRITerminatedSubscriptionRequest) BuildXML() (string, error) {
+	var buffer bytes.Buffer
+	var terminatedSubscriptionRequest = template.Must(template.New("terminateSubscriptionRequestTemplate").Parse(terminateSubscriptionRequestTemplate))
+	if err := terminatedSubscriptionRequest.Execute(&buffer, request); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
 }
