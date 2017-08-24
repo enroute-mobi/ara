@@ -215,7 +215,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 		if !ok {
 			return nil
 		}
-		itemIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: defaultObjectID.HashValue()})
+		itemIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: defaultObjectID.Value()})
 	}
 
 	schedules := stopVisit.Schedules
@@ -244,7 +244,7 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 		if !ok {
 			return nil
 		}
-		dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.HashValue())
+		dataVehicleJourneyRef = fmt.Sprintf("RATPDev:VehicleJourney::%s:LOC", defaultObjectID.Value())
 	}
 
 	modelDate := tx.Model().Date()
