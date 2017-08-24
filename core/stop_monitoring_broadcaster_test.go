@@ -142,7 +142,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		t.Errorf("SubscriberRef should be external but got == %v", delivery[0].SubscriberRef())
 	}
 
-	if delivery[0].SubscriptionRef() != "Subscription:externalId" {
+	if delivery[0].SubscriptionRef() != "externalId" {
 		t.Errorf("SubscriptionRef should be externalId but got == %v", delivery[0].SubscriptionRef())
 	}
 

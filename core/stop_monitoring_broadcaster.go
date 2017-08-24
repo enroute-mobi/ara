@@ -103,8 +103,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	referenceGenerator := smb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
-
 	for key, stopVisits := range events {
 		//Voir pour le RequestMessageRef
 
@@ -121,7 +119,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
+			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
 		}
@@ -139,7 +137,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 					ProducerRef:               smb.connector.Partner().ProducerRef(),
 					ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 					SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
-					SubscriptionIdentifier:    referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: sub.ExternalId()}),
+					SubscriptionIdentifier:    sub.ExternalId(),
 					ResponseTimestamp:         smb.connector.Clock().Now(),
 					Status:                    true,
 				}
