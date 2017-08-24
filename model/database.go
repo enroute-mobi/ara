@@ -79,7 +79,7 @@ func InitTestDb(t *testing.T) {
 	// Initialize Database
 	Database = InitDB(config.Config.DB)
 
-	err = Database.TruncateTables()
+	_, err = Database.Exec("TRUNCATE referentials, partners, lines, operators, stop_areas, stop_visits;")
 	if err != nil {
 		t.Fatal(err)
 	}
