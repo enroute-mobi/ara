@@ -146,12 +146,12 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				continue
 			}
 
-			stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(model.StopVisitId(svId))
+			stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(svId))
 			if !ok {
 				continue
 			}
 
-			stopArea, ok := smb.connector.Partner().Model().StopAreas().Find(stopVisit.StopAreaId)
+			stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
 			if !ok {
 				continue
 			}
@@ -288,8 +288,8 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 	vehicleJourneyRefCopy := vehicleJourney.References.Copy()
 	stopVisitRefCopy := stopVisit.References.Copy()
 
-	smb.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx.Model().StopAreas())
-	smb.resolveOperator(stopVisitRefCopy)
+	smb.resolveVehiculeJourneyReferences(vehicleJourneyRefCopy, tx)
+	smb.resolveOperator(stopVisitRefCopy, tx)
 
 	smb.reformatReferences(vehicleJourney.ToFormat(), vehicleJourneyRefCopy)
 
@@ -302,14 +302,14 @@ func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopA
 	return monitoredStopVisit
 }
 
-func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.References, manager model.StopAreas) {
+func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.References, tx *model.Transaction) {
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
 		if references[ref] == (model.Reference{}) {
 			continue
 		}
-		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
+		if foundStopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(references[ref].Id)); ok {
 			obj, ok := foundStopArea.ObjectID(smb.connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER))
 			if ok {
 				tmp := references[ref]
@@ -324,9 +324,9 @@ func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.Refe
 	}
 }
 
-func (smb *SMBroadcaster) resolveOperator(references model.References) {
+func (smb *SMBroadcaster) resolveOperator(references model.References, tx *model.Transaction) {
 	operatorRef, _ := references["OperatorRef"]
-	operator, ok := smb.connector.Partner().Model().Operators().Find(model.OperatorId(operatorRef.Id))
+	operator, ok := tx.Model().Operators().Find(model.OperatorId(operatorRef.Id))
 	if !ok {
 		return
 	}

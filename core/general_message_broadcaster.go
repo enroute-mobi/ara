@@ -97,6 +97,9 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 
 	gmb.connector.mutex.Unlock()
 
+	tx := gmb.connector.Partner().Referential().NewTransaction()
+	defer tx.Close()
+
 	referenceGenerator := gmb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 
 	for subId, situationIds := range events {
@@ -118,7 +121,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		}
 
 		for _, situationId := range situationIds {
-			situation, ok := gmb.connector.Partner().Model().Situations().Find(situationId)
+			situation, ok := tx.Model().Situations().Find(situationId)
 			if !ok {
 				logger.Log.Debugf("Could not find situation : %v in general message broadcaster", situationId)
 				continue

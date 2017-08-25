@@ -218,8 +218,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) resolveOperator(references model.References) {
+	tx := connector.Partner().Referential().NewTransaction()
+	defer tx.Close()
+
 	operatorRef, _ := references["OperatorRef"]
-	operator, ok := connector.Partner().Model().Operators().Find(model.OperatorId(operatorRef.Id))
+	operator, ok := tx.Model().Operators().Find(model.OperatorId(operatorRef.Id))
 	if !ok {
 		return
 	}

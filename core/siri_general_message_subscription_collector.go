@@ -140,6 +140,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdat
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
 	xmlGmCancellations := xmlResponse.XMLGeneralMessagesCancellations()
+	tx := connector.Partner().Referential().NewTransaction()
+	defer tx.Close()
 
 	if len(xmlGmCancellations) == 0 {
 		return
@@ -147,10 +149,10 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 
 	for _, cancellation := range xmlGmCancellations {
 		obj := model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), cancellation.InfoMessageIdentifier())
-		situation, ok := connector.Partner().Model().Situations().FindByObjectId(obj)
+		situation, ok := tx.Model().Situations().FindByObjectId(obj)
 		if ok {
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())
-			connector.Partner().Model().Situations().Delete(&situation)
+			tx.Model().Situations().Delete(&situation)
 		}
 	}
 }

@@ -81,8 +81,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituation(subId S
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model.SituationId) (SubscriptionId, bool) {
 	subId := SubscriptionId(0) //just to return a correct type for errors
+	tx := connector.Partner().Referential().NewTransaction()
+	defer tx.Close()
 
-	situation, ok := connector.Partner().Model().Situations().Find(sId)
+	situation, ok := tx.Model().Situations().Find(sId)
 	if !ok {
 		return subId, false
 	}
