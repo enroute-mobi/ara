@@ -66,14 +66,14 @@ func Test_SIRIGeneralMessageSubscriptionRequest_BuildXML(t *testing.T) {
 	}
 
 	entry := &SIRIGeneralMessageSubscriptionRequestEntry{
-		MessageIdentifier:      "test",
-		RequestTimestamp:       date,
 		SubscriberRef:          "SubscriberRef",
 		SubscriptionIdentifier: "SubscriptionIdentifier",
 		InitialTerminationTime: date,
 	}
+	entry.MessageIdentifier = "test"
+	entry.RequestTimestamp = date
 
-	request.Entry = entry
+	request.Entries = []*SIRIGeneralMessageSubscriptionRequestEntry{entry}
 	xml, err := request.BuildXML()
 	if err != nil {
 		t.Fatal(err)

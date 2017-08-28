@@ -29,18 +29,6 @@ type SIRIGeneralMessageSubscriptionCollector struct {
 
 type SIRIGeneralMessageSubscriptionCollectorFactory struct{}
 
-func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
-	return NewSIRIGeneralMessageSubscriptionCollector(partner)
-}
-
-func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
-	return ok
-}
-
 func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMessageSubscriptionCollector {
 	siriGeneralMessageSubscriptionCollector := &SIRIGeneralMessageSubscriptionCollector{}
 	siriGeneralMessageSubscriptionCollector.partner = partner
@@ -52,7 +40,7 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	subscription, found := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessage")
@@ -68,18 +56,22 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
 	}
-	gmRequest.Entry = &siri.SIRIGeneralMessageSubscriptionRequestEntry{
-		MessageIdentifier:      connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
-		RequestTimestamp:       connector.Clock().Now(),
+	entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
 		SubscriptionIdentifier: referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: string(subscription.Id())}),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
+	entry.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	entry.RequestTimestamp = connector.Clock().Now()
+
+	gmRequest.Entries = append(gmRequest.Entries, entry)
 
 	logSIRIGeneralMessageSubscriptionRequest(logStashEvent, gmRequest)
+
 	response, err := connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing %v", err)
+		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscription.Delete()
 		return
 	}
@@ -89,13 +81,14 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 
 	if !responseStatus.Status() {
 		logger.Log.Debugf("Subscription status false for General Message Subscription %v %v ", responseStatus.ErrorType(), responseStatus.ErrorText())
+		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscription.Delete()
 		return
 	}
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	logXMLGeneralMessageDelivery(logStashEvent, notify)
@@ -167,8 +160,41 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpda
 	}
 }
 
+func (connector *SIRIGeneralMessageSubscriptionCollector) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "GeneralMessageSubscriptionCollector"
+	return event
+}
+
+func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(partner *Partner) Connector {
+	return NewSIRIGeneralMessageSubscriptionCollector(partner)
+}
+
+func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
+	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
+	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	return ok
+}
+
+func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
+	logStashEvent["consumerAddress"] = request.ConsumerAddress
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+	// logStashEvent["subscriberRef"] = request.SubscriberRef
+	// logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier
+	logStashEvent["requestorRef"] = request.RequestorRef
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+	// logStashEvent["initialTerminationTime"] = request.InitialTerminationTime.String()
+	xml, err := request.BuildXML()
+	if err != nil {
+		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["requestXML"] = xml
+}
+
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent["Connector"] = "GeneralMessageSubscriptionCollector"
 	logStashEvent["address"] = notify.Address()
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
@@ -182,17 +208,4 @@ func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *sir
 		logStashEvent["errorText"] = notify.ErrorText()
 		logStashEvent["errorDescription"] = notify.ErrorDescription()
 	}
-}
-
-func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
-	logStashEvent["Connector"] = "SIRIGeneralMessageSubscriber"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	xml, err := request.BuildXML()
-	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["requestXML"] = xml
 }

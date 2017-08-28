@@ -40,11 +40,11 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 
 	startTime := connector.Clock().Now()
 
-	siriGeneralMessageRequest := &siri.SIRIGeneralMessageRequest{
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
-		RequestorRef:      connector.SIRIPartner().RequestorRef(),
-		RequestTimestamp:  connector.Clock().Now(),
+	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
+		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
+	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	logSIRIGeneralMessageRequest(logStashEvent, siriGeneralMessageRequest)
 
@@ -125,7 +125,7 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIGeneralMessageRequestCollector(partner)
 }
 
-func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageRequest) {
+func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetGeneralMessageRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

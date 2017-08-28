@@ -79,10 +79,10 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText>Les autres non</MessageText>
-                    </Message>
+                    <ns3:Message>
+                      <ns3:MessageType>longMessage</ns3:MessageType>
+                      <ns3:MessageText>Les autres non</ns3:MessageText>
+                    </ns3:Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
               </ns3:GeneralMessageDelivery>
@@ -161,10 +161,10 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
-                    </Message>
+                    <ns3:Message>
+                      <ns3:MessageType>longMessage</ns3:MessageType>
+                      <ns3:MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</ns3:MessageText>
+                    </ns3:Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
               </ns3:GeneralMessageDelivery>

@@ -165,7 +165,6 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
-
 		gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
 		logSIRIGeneralMessageNotify(logStashEvent, &notify)
 	}

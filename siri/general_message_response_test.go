@@ -26,7 +26,7 @@ func Test_XMLGeneralMessage(t *testing.T) {
 	response := getXMLGeneralMessageResponse(t)
 	generalMessage := response.XMLGeneralMessages()[0]
 	content := generalMessage.Content().(IDFGeneralMessageStructure)
-	lineSection := content.LineSection()
+	lineSection := content.LineSections()[0]
 
 	if expected := time.Date(2017, time.March, 29, 03, 30, 06, 0, generalMessage.RecordedAtTime().Location()); generalMessage.RecordedAtTime() != expected {
 		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", generalMessage.RecordedAtTime(), expected)
@@ -133,8 +133,8 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 		t.Errorf("Wrong Message NumberOfLines: \n got: %v\nwant: %v", expedtedMessages.numberOfLines, gotMessages.numberOfLines)
 	}
 
-	expectedLineSection := expectedContent.LineSection()
-	gotLineSection := gotContent.LineSection()
+	expectedLineSection := expectedContent.LineSections()[0]
+	gotLineSection := gotContent.LineSections()[0]
 
 	if expectedLineSection.LineRef() != gotLineSection.LineRef() {
 		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.LineRef(), expectedLineSection.LineRef())
@@ -202,12 +202,16 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 		ResponseMessageIdentifier: "identifier",
 	}
 
+	lineSection := &SIRILineSection{
+		FirstStop: "NINOXE:StopPoint:SP:24:LOC",
+		LastStop:  "NINOXE:StopPoint:SP:12:LOC",
+		LineRef:   "NINOXE:Line::3:LOC",
+	}
+
 	gM := &SIRIGeneralMessage{
 		RecordedAtTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		ValidUntilTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
-		FirstStop:      "NINOXE:StopPoint:SP:24:LOC",
-		LastStop:       "NINOXE:StopPoint:SP:12:LOC",
-		LineRef:        "NINOXE:Line::3:LOC",
+		LineSections:   []*SIRILineSection{lineSection},
 	}
 
 	request.Status = true

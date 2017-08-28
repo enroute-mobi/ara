@@ -143,7 +143,7 @@ func (client *SOAPClient) GeneralMessageSubscription(request *SIRIGeneralMessage
 	return response, nil
 }
 
-func (client *SOAPClient) SituationMonitoring(request *SIRIGeneralMessageRequest) (*XMLGeneralMessageResponse, error) {
+func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequest) (*XMLGeneralMessageResponse, error) {
 	// WIP
 	node, err := client.prepareAndSendRequest(request, "GetGeneralMessageResponse", false)
 	if err != nil {

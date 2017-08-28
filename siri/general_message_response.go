@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 	"time"
 
@@ -15,21 +16,6 @@ type XMLGeneralMessageResponse struct {
 	xmlGeneralMessages []*XMLGeneralMessage
 }
 
-type XMLGeneralMessageDelivery struct {
-	ResponseXMLStructure
-
-	subscriptionRef                 string
-	subscriberRef                   string
-	xmlGeneralMessages              []*XMLGeneralMessage
-	xmlGeneralMessagesCancellations []*XMLGeneralMessageCancellation
-}
-
-func NewXMLGeneralMessageDelivery(node XMLNode) *XMLGeneralMessageDelivery {
-	delivery := &XMLGeneralMessageDelivery{}
-	delivery.node = node
-	return delivery
-}
-
 type XMLGeneralMessageCancellation struct {
 	XMLStructure
 
@@ -39,30 +25,32 @@ type XMLGeneralMessageCancellation struct {
 type XMLGeneralMessage struct {
 	XMLStructure
 
-	recordedAtTime        time.Time
-	validUntilTime        time.Time
 	itemIdentifier        string
 	infoMessageIdentifier string
 	infoChannelRef        string
 	formatRef             string
-	infoMessageVersion    int
-	numberOfLines         int
-	numberOfCharPerLine   int
-	content               interface{}
+
+	infoMessageVersion int
+
+	recordedAtTime time.Time
+	validUntilTime time.Time
+
+	content interface{}
 }
 
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	messages          []*XMLMessage
-	lineRef           string
-	stopPointRef      string
-	journeyPatternRef string
-	destinationRef    string
-	routeRef          string
-	format            string
-	groupOfLinesRef   string
-	lineSection       IDFLineSectionStructure
+	lineRef           []string
+	stopPointRef      []string
+	journeyPatternRef []string
+	destinationRef    []string
+	routeRef          []string
+	format            []string
+	groupOfLinesRef   []string
+
+	lineSections []*IDFLineSectionStructure
+	messages     []*XMLMessage
 }
 
 type XMLMessage struct {
@@ -110,15 +98,18 @@ type SIRIGeneralMessage struct {
 	InfoMessageVersion    int
 	InfoChannelRef        string
 
-	LineRefContent    string
-	StopPointRef      string
-	JourneyPatternRef string
-	DestinationRef    string
-	RouteRef          string
-	GroupOfLinesRef   string
+	LineRef           []string
+	StopPointRef      []string
+	JourneyPatternRef []string
+	DestinationRef    []string
+	RouteRef          []string
+	GroupOfLinesRef   []string
 
-	Messages []*SIRIMessage
+	LineSections []*SIRILineSection
+	Messages     []*SIRIMessage
+}
 
+type SIRILineSection struct {
 	FirstStop string
 	LastStop  string
 	LineRef   string
@@ -131,41 +122,7 @@ type SIRIMessage struct {
 	NumberOfCharPerLine int
 }
 
-const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-				  <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-					<ns3:Status>{{.Status}}</ns3:Status>{{ if not .Status }}
-					<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-						<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
-						<ns3:{{.ErrorType}}>
-							<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
-						</ns3:{{.ErrorType}}>{{ end }}
-					</ns3:ErrorCondition>{{ else }}{{range .GeneralMessages}}
-					<ns3:GeneralMessage>
-						<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
-						<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
-						<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
-						<ns3:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</ns3:InfoMessageIdentifier>
-						<ns3:InfoMessageVersion>{{ .InfoMessageVersion }}</ns3:InfoMessageVersion>
-						<ns3:InfoChannelRef>{{ .InfoChannelRef }}</ns3:InfoChannelRef>
-						<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
-						<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-						xsi:type="ns9:IDFLineSectionStructure">{{range .Messages}}
-							<Message>{{if .Type}}
-								<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
-								<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines }}
-								<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
-								<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
-							</Message>{{end}}{{ if or .FirstStop .LastStop .LineRef }}
-							<LineSection>{{ if .FirstStop }}
-								<FirstStop>{{ .FirstStop }}</FirstStop>{{end}}{{if .LastStop }}
-							  <LastStop>{{ .LastStop }}</LastStop>{{end}}{{if .LineRef }}
-							  <LineRef>{{ .LineRef }}</LineRef>{{end}}
-							</LineSection>{{end}}
-						</ns3:Content>
-					</ns3:GeneralMessage>{{end}}{{end}}
-				</ns3:GeneralMessageDelivery>`
-
-const generalMessageTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
+const generalMessageResponseTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
 															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
 															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
 															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
@@ -185,63 +142,47 @@ const generalMessageTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http:/
 	<AnswerExtension/>
 </ns8:GetGeneralMessageResponse>`
 
-func NewXMLCancelledGeneralMessage(node XMLNode) *XMLGeneralMessageCancellation {
-	cancelledGeneralMessage := &XMLGeneralMessageCancellation{}
-	cancelledGeneralMessage.node = node
-	return cancelledGeneralMessage
-}
+const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
+			<ns3:Status>{{.Status}}</ns3:Status>{{ if not .Status }}
+			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<ns3:{{.ErrorType}}>{{ end }}
+					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
+				</ns3:{{.ErrorType}}>
+			</ns3:ErrorCondition>{{ else }}{{range .GeneralMessages}}
+			{{ .BuildGeneralMessageXML }}{{end}}{{end}}
+		</ns3:GeneralMessageDelivery>`
 
-func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMessage {
-	if delivery.xmlGeneralMessages == nil {
-		nodes := delivery.findNodes("GeneralMessage")
-		if nodes != nil {
-			for _, node := range nodes {
-				delivery.xmlGeneralMessages = append(delivery.xmlGeneralMessages, NewXMLGeneralMessage(node))
-			}
-		}
-	}
-	return delivery.xmlGeneralMessages
-}
-
-func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
-	if len(response.xmlGeneralMessages) == 0 {
-		nodes := response.findNodes("GeneralMessage")
-		if nodes == nil {
-			return response.xmlGeneralMessages
-		}
-		for _, generalMessage := range nodes {
-			response.xmlGeneralMessages = append(response.xmlGeneralMessages, NewXMLGeneralMessage(generalMessage))
-		}
-	}
-	return response.xmlGeneralMessages
-}
-
-func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessagesCancellations() []*XMLGeneralMessageCancellation {
-	if delivery.xmlGeneralMessagesCancellations == nil {
-		cancellations := []*XMLGeneralMessageCancellation{}
-		nodes := delivery.findNodes("GeneralMessageCancellation")
-		if nodes != nil {
-			for _, node := range nodes {
-				cancellations = append(cancellations, NewXMLCancelledGeneralMessage(node))
-			}
-		}
-		delivery.xmlGeneralMessagesCancellations = cancellations
-	}
-	return delivery.xmlGeneralMessagesCancellations
-}
-
-func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
-	if len(visit.messages) == 0 {
-		nodes := visit.findNodes("Message")
-		if nodes == nil {
-			return visit.messages
-		}
-		for _, messageNode := range nodes {
-			visit.messages = append(visit.messages, NewXMLMessage(messageNode))
-		}
-	}
-	return visit.messages
-}
+const generalMessageTemplate = `<ns3:GeneralMessage>
+				<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
+				<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
+				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
+				<ns3:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</ns3:InfoMessageIdentifier>
+				<ns3:InfoMessageVersion>{{ .InfoMessageVersion }}</ns3:InfoMessageVersion>
+				<ns3:InfoChannelRef>{{ .InfoChannelRef }}</ns3:InfoChannelRef>
+				<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
+				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xsi:type="ns9:IDFLineSectionStructure">{{range .LineRef }}
+					<ns3:LineRef>{{ . }}</ns3:LineRef>{{end}}{{range .StopPointRef }}
+					<ns3:StopPointRef>{{ . }}</ns3:StopPointRef>{{end}}{{range .JourneyPatternRef }}
+					<ns3:JourneyPatternRef>{{ . }}</ns3:JourneyPatternRef>{{end}}{{range .DestinationRef }}
+					<ns3:DestinationRef>{{ . }}</ns3:DestinationRef>{{end}}{{range .RouteRef }}
+					<ns3:RouteRef>{{ . }}</ns3:RouteRef>{{end}}{{range .GroupOfLinesRef }}
+					<ns3:GroupOfLinesRef>{{ . }}</ns3:GroupOfLinesRef>{{end}}{{ range .LineSections }}
+					<ns3:LineSection>{{ if .FirstStop }}
+						<ns3:FirstStop>{{ .FirstStop }}</ns3:FirstStop>{{end}}{{if .LastStop }}
+						<ns3:LastStop>{{ .LastStop }}</ns3:LastStop>{{end}}{{if .LineRef }}
+						<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{end}}
+					</ns3:LineSection>{{end}}{{range .Messages}}
+					<ns3:Message>{{if .Type}}
+						<ns3:MessageType>{{ .Type }}</ns3:MessageType>{{end}}{{if .Content }}
+						<ns3:MessageText>{{ .Content }}</ns3:MessageText>{{end}}{{if .NumberOfLines }}
+						<ns3:NumberOfLines>{{ .NumberOfLines }}</ns3:NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
+						<ns3:NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</ns3:NumberOfCharPerLine>{{end}}
+					</ns3:Message>{{end}}
+				</ns3:Content>
+			</ns3:GeneralMessage>`
 
 func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
 	doc, err := gokogiri.ParseXml(content)
@@ -258,16 +199,41 @@ func NewXMLGeneralMessageResponse(node xml.Node) *XMLGeneralMessageResponse {
 	return xmlGeneralMessageResponse
 }
 
+func NewXMLCancelledGeneralMessage(node XMLNode) *XMLGeneralMessageCancellation {
+	cancelledGeneralMessage := &XMLGeneralMessageCancellation{}
+	cancelledGeneralMessage.node = node
+	return cancelledGeneralMessage
+}
+
 func NewXMLGeneralMessage(node XMLNode) *XMLGeneralMessage {
 	generalMessage := &XMLGeneralMessage{}
 	generalMessage.node = node
 	return generalMessage
 }
 
+func NewXMLLineSection(node XMLNode) *IDFLineSectionStructure {
+	lineSection := &IDFLineSectionStructure{}
+	lineSection.node = node
+	return lineSection
+}
+
 func NewXMLMessage(node XMLNode) *XMLMessage {
 	message := &XMLMessage{}
 	message.node = node
 	return message
+}
+
+func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
+	if len(response.xmlGeneralMessages) == 0 {
+		nodes := response.findNodes("GeneralMessage")
+		if nodes == nil {
+			return response.xmlGeneralMessages
+		}
+		for _, generalMessage := range nodes {
+			response.xmlGeneralMessages = append(response.xmlGeneralMessages, NewXMLGeneralMessage(generalMessage))
+		}
+	}
+	return response.xmlGeneralMessages
 }
 
 func (visit *XMLGeneralMessageCancellation) InfoMessageIdentifier() string {
@@ -340,60 +306,100 @@ func (visit *XMLGeneralMessage) Content() interface{} {
 	return visit.content
 }
 
-func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() string {
-	if visit.groupOfLinesRef == "" {
-		visit.groupOfLinesRef = visit.findStringChildContent("GroupOfLinesRef")
+func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() []string {
+	if len(visit.groupOfLinesRef) == 0 {
+		nodes := visit.findNodes("GroupOfLinesRef")
+		if nodes != nil {
+			for _, groupOfLinesRef := range nodes {
+				visit.groupOfLinesRef = append(visit.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.groupOfLinesRef
 }
 
-func (visit *IDFGeneralMessageStructure) RouteRef() string {
-	if visit.routeRef == "" {
-		visit.routeRef = visit.findStringChildContent("RouteRef")
+func (visit *IDFGeneralMessageStructure) RouteRef() []string {
+	if len(visit.routeRef) == 0 {
+		nodes := visit.findNodes("RouteRef")
+		if nodes != nil {
+			for _, routeRef := range nodes {
+				visit.routeRef = append(visit.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.routeRef
 }
 
-func (visit *IDFGeneralMessageStructure) DestinationRef() string {
-	if visit.destinationRef == "" {
-		visit.destinationRef = visit.findStringChildContent("DestinationRef")
+func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
+	if len(visit.destinationRef) == 0 {
+		nodes := visit.findNodes("DestinationRef")
+		if nodes != nil {
+			for _, destinationRef := range nodes {
+				visit.destinationRef = append(visit.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.destinationRef
 }
 
-func (visit *IDFGeneralMessageStructure) JourneyPatternRef() string {
-	if visit.journeyPatternRef == "" {
-		visit.journeyPatternRef = visit.findStringChildContent("JourneyPatternRef")
+func (visit *IDFGeneralMessageStructure) JourneyPatternRef() []string {
+	if len(visit.journeyPatternRef) == 0 {
+		nodes := visit.findNodes("JourneyPatternRef")
+		if nodes != nil {
+			for _, journeyPatternRef := range nodes {
+				visit.journeyPatternRef = append(visit.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.journeyPatternRef
 }
 
-func (visit *IDFGeneralMessageStructure) StopPointRef() string {
-	if visit.stopPointRef == "" {
-		visit.stopPointRef = visit.findStringChildContent("StopPointRef")
+func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
+	if len(visit.stopPointRef) == 0 {
+		nodes := visit.findNodes("StopPointRef")
+		if nodes != nil {
+			for _, stopPointRef := range nodes {
+				visit.stopPointRef = append(visit.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.stopPointRef
 }
 
-func (visit *IDFGeneralMessageStructure) LineRef() string {
-	if visit.lineRef == "" {
-		visit.lineRef = visit.findStringChildContent("LineRef")
+func (visit *IDFGeneralMessageStructure) LineRef() []string {
+	if len(visit.lineRef) == 0 {
+		nodes := visit.findNodes("LineRef")
+		if nodes != nil {
+			for _, lineRef := range nodes {
+				visit.lineRef = append(visit.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))
+			}
+		}
 	}
 	return visit.lineRef
 }
 
-func (visit *IDFGeneralMessageStructure) createNewLineSection() IDFLineSectionStructure {
-	visit.lineSection = IDFLineSectionStructure{}
-	visit.lineSection.node = NewXMLNode(visit.findNode("LineSection"))
-	return visit.lineSection
+func (visit *IDFGeneralMessageStructure) LineSections() []*IDFLineSectionStructure {
+	if len(visit.lineSections) == 0 {
+		nodes := visit.findNodes("LineSection")
+		if nodes != nil {
+			for _, lineNode := range nodes {
+				visit.lineSections = append(visit.lineSections, NewXMLLineSection(lineNode))
+			}
+		}
+	}
+	return visit.lineSections
 }
 
-func (visit *IDFGeneralMessageStructure) LineSection() IDFLineSectionStructure {
-	emptyStruct := IDFLineSectionStructure{}
-	if visit.lineSection != emptyStruct {
-		return visit.lineSection
+func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
+	if len(visit.messages) == 0 {
+		nodes := visit.findNodes("Message")
+		if nodes != nil {
+			for _, messageNode := range nodes {
+				visit.messages = append(visit.messages, NewXMLMessage(messageNode))
+			}
+		}
 	}
-	return visit.createNewLineSection()
+	return visit.messages
 }
 
 func (visit *IDFLineSectionStructure) FirstStop() string {
@@ -447,7 +453,7 @@ func (message *XMLMessage) NumberOfCharPerLine() int {
 
 func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageTemplate))
+	var generalMessage = template.Must(template.New("generalMessageResponse").Parse(generalMessageResponseTemplate))
 	if err := generalMessage.Execute(&buffer, response); err != nil {
 		return "", err
 	}
@@ -458,6 +464,15 @@ func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageDeliveryXML() (st
 	var buffer bytes.Buffer
 	var generalMessageDelivery = template.Must(template.New("generalMessageDelivery").Parse(generalMessageDeliveryTemplate))
 	if err := generalMessageDelivery.Execute(&buffer, delivery); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (message *SIRIGeneralMessage) BuildGeneralMessageXML() (string, error) {
+	var buffer bytes.Buffer
+	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageTemplate))
+	if err := generalMessage.Execute(&buffer, message); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil
