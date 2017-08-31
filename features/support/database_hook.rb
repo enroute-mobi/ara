@@ -8,12 +8,10 @@ After('@database') do
   conn.exec(
     "DO $$DECLARE statements CURSOR FOR
       SELECT table_name FROM information_schema.tables
-      WHERE table_schema='public';
+      WHERE table_schema='public' AND table_name NOT IN ('gorp_migrations', 'ar_internal_metadata', 'schema_migrations')
     BEGIN
       FOR stmt IN statements LOOP
-        IF stmt.table_name <> 'gorp_migrations' THEN
-          EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.table_name) || ' CASCADE;';
-        END IF;
+        EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.table_name) || ' CASCADE;';
       END LOOP;
     END$$;")
 end
