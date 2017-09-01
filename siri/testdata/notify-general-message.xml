@@ -10,7 +10,7 @@
        <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
        <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
        <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
-       <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-38-00c04fd430c8:LOC</ns5:SubscriptionRef>
+       <ns5:SubscriptionRef>6ba7b814-9dad-11d1-38-00c04fd430c8</ns5:SubscriptionRef>
        <ns3:Status>true</ns3:Status>
        <ns3:GeneralMessage>
           <ns3:RecordedAtTime>2017-03-29T03:30:06.000+01:00</ns3:RecordedAtTime>
