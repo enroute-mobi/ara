@@ -13,6 +13,7 @@ var defaultIdentifierGenerators = map[string]string{
 	"data_frame_identifier":          "%{id}",
 	"reference_identifier":           "%{type}:%{default}",
 	"reference_stop_area_identifier": "%{default}",
+	"subscription_identifier":        "%{id}",
 }
 
 type IdentifierGenerator struct {
