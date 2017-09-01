@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -81,6 +82,7 @@ func (subscriber *StopMonitoringSubscriber) Stop() {
 
 func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	subscription, _ := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	monitoringRefList := []string{}
 
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
@@ -93,8 +95,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	if len(stopAreasToRequest) == 0 {
 		return
 	}
-
-	referenceGenerator := subscriber.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -112,14 +112,16 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			RequestTimestamp:       subscriber.Clock().Now(),
 			MonitoringRef:          stopAreaObjectid.Value(),
 			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier: referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: string(subscription.Id())}),
+			SubscriptionIdentifier: string(subscription.Id()),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
 
+		monitoringRefList = append(monitoringRefList, stopAreaObjectid.Value())
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 	}
 
-	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
+	logStashEvent["MonitoringRef"] = strings.Join(monitoringRefList, ", ")
+	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest, monitoringRefList)
 
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
@@ -154,8 +156,8 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	}
 }
 
-func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
-	logStashEvent["Connector"] = "SIRIStopMonitoringSubscriber"
+func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest, monitorinRefList []string) {
+	logStashEvent["Connector"] = "SIRIStopMonitoringSubscriptionCollector"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
