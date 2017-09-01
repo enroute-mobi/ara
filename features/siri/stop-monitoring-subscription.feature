@@ -43,10 +43,11 @@ Feature: Support SIRI StopMonitoring by subscription
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_url                         | http://localhost:8090           |
+      | remote_credential                  | test                            |
+      | local_credential                   | NINOXE:default                  |
+      | remote_objectid_kind               | internal                        |
+      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC  |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -177,6 +178,7 @@ Feature: Support SIRI StopMonitoring by subscription
           | remote_credential    | test                  |
           | local_credential     | NINOXE:default        |
           | remote_objectid_kind | internal              |
+          | generators.subscription_identifier | Edwig:Subscription::%{id}:LOC |
         And 30 seconds have passed
         And a StopArea exists with the following attributes:
           | Name      | Test                                     |
