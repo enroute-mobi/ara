@@ -2,7 +2,7 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
@@ -13,7 +13,8 @@ type SIRITerminatedSubscriptionRequest struct {
 	RequestorRef     string
 	RequestTimestamp time.Time
 
-	SubscriptionRef string
+	MessageIdentifier string
+	SubscriptionRef   string
 }
 
 type XMLTerminatedSubscriptionRequest struct {
