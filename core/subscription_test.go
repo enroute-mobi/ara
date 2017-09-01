@@ -25,7 +25,7 @@ func Test_subscription_MarshalJSON(t *testing.T) {
 	subscription.kind = "salut"
 	subscription.CreateAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
 
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Kind":"salut","Resources":[{"Reference":{"ObjectId":{"test":"value"}},"RetryCount":0,"SubscribedAt":"0001-01-01T00:00:00Z","SubscribedUntil":"1984-04-04T00:01:00Z"}]}`
+	expected := `{"SubscriptionRef":"6ba7b814-9dad-11d1-0-00c04fd430c8","Kind":"salut","Resources":[{"Reference":{"ObjectId":{"test":"value"}},"RetryCount":0,"SubscribedAt":"0001-01-01T00:00:00Z","SubscribedUntil":"1984-04-04T00:01:00Z"}]}`
 	jsonBytes, err := subscription.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
