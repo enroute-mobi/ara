@@ -297,7 +297,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 }
 
-var r []byte
+var r []byte //against Compilator optimisation
 
 func benchmarkStopVisitsMarshal10000(sv int, b *testing.B) {
 	stopVisits := NewMemoryStopVisits()
