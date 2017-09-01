@@ -36,6 +36,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	partner.Settings["remote_objectid_kind"] = "_internal"
+	partner.Settings["generators.subscription_identifier"] = "Subscription::%{id}::LOC"
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
@@ -190,17 +191,13 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
 		t.Errorf("Subscriptions should not be found \n")
 	}
-
-	// stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
-	// if stopVisit.IsCollected() != false {
-	// 	t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
-	// }
 }
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 
 	request := &siri.XMLSubscriptionRequest{}
 	// Create a test http server
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
 			t.Errorf("Request ContentLength should be zero")
@@ -220,13 +217,16 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	partner := &Partner{
 		context: make(Context),
 		Settings: map[string]string{
-			"local_url":            "http://example.com/test/siri",
-			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test_kind",
+			"local_url":                          "http://example.com/test/siri",
+			"remote_url":                         ts.URL,
+			"remote_objectid_kind":               "test_kind",
+			"generators.subscription_identifier": "Subscription::%{id}::LOC",
 		},
 		manager: partners,
 	}
+
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	partners.Save(partner)
 
 	objectid := model.NewObjectID("test_kind", "value")
@@ -251,8 +251,10 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
-	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != fmt.Sprintf("Subscription:%v", subscription.Id()) {
-		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), "Subscription::NINOXE:StopPoint:SP:24:LOC")
+
+	expectedUuid := fmt.Sprintf("%v", subscription.Id())
+	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != expectedUuid {
+		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), expectedUuid)
 	}
 }
 
@@ -274,9 +276,10 @@ func Test_SIRIStopMonitoringTerminatedSubscriptionRequest(t *testing.T) {
 	partner := &Partner{
 		context: make(Context),
 		Settings: map[string]string{
-			"local_url":            "http://example.com/test/siri",
-			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test_kind",
+			"local_url":                          "http://example.com/test/siri",
+			"remote_url":                         ts.URL,
+			"remote_objectid_kind":               "test_kind",
+			"generators.subscription_identifier": "Subscription::%{id}::LOC",
 		},
 		manager: partners,
 	}
@@ -292,7 +295,7 @@ func Test_SIRIStopMonitoringTerminatedSubscriptionRequest(t *testing.T) {
 
 	connector.HandleNotifyStopMonitoring(notify)
 
-	if request.SubscriptionRef() != "Edwig:Subscription::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("salut == %v", request.RawXML())
+	if expected := "Subscription::6ba7b814-9dad-11d1-0-00c04fd430c8::LOC"; request.SubscriptionRef() != expected {
+		t.Errorf("Wrong SubscriptionRef want : %v  got %v :", expected, request.SubscriptionRef())
 	}
 }
