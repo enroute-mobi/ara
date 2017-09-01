@@ -69,6 +69,11 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 			continue
 		}
 
+		// Filters
+		if !connector.checkInfoChannelRef(request.InfoChannelRef(), situation.Channel) {
+			continue
+		}
+
 		var infoMessageIdentifier string
 		objectid, present := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
 		if present {
@@ -91,6 +96,23 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 			ValidUntilTime:        situation.ValidUntil,
 			RecordedAtTime:        situation.RecordedAt,
 			FormatRef:             "STIF-IDF",
+		}
+		for _, reference := range situation.References {
+			id, ok := connector.resolveReference(tx, reference)
+			if !ok {
+				continue
+			}
+			siriGeneralMessage.References = append(siriGeneralMessage.References, &siri.SIRIReference{Kind: reference.Type, Id: id})
+		}
+		for _, lineSection := range situation.LineSections {
+			siriLineSection, ok := connector.handleLineSection(tx, *lineSection)
+			if !ok {
+				continue
+			}
+			siriGeneralMessage.LineSections = append(siriGeneralMessage.LineSections, siriLineSection)
+		}
+		if len(siriGeneralMessage.References) == 0 && len(siriGeneralMessage.LineSections) == 0 {
+			continue
 		}
 
 		for _, message := range situation.Messages {
@@ -115,6 +137,75 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) newLogStashEvent() audit.
 	event := connector.partner.NewLogStashEvent()
 	event["connector"] = "GeneralMessageRequestBroadcaster"
 	return event
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) checkInfoChannelRef(requestChannels []string, channel string) bool {
+	if len(requestChannels) == 0 {
+		return true
+	}
+
+	for i := range requestChannels {
+		if requestChannels[i] == channel {
+			return true
+		}
+	}
+	return false
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) handleLineSection(tx *model.Transaction, lineSection model.References) (*siri.SIRILineSection, bool) {
+	siriLineSection := &siri.SIRILineSection{}
+	lineSectionMap := make(map[string]string)
+
+	for kind, reference := range lineSection {
+		ref, ok := connector.resolveReference(tx, &reference)
+		if !ok {
+			return nil, false
+		}
+		lineSectionMap[kind] = ref
+	}
+
+	siriLineSection.FirstStop = lineSectionMap["FirstStop"]
+	siriLineSection.LastStop = lineSectionMap["LastStop"]
+	siriLineSection.LineRef = lineSectionMap["LineRef"]
+
+	return siriLineSection, true
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) resolveReference(tx *model.Transaction, reference *model.Reference) (string, bool) {
+	switch reference.Type {
+	case "LineRef":
+		return connector.resolveLineRef(tx, reference)
+	case "StopPointRef", "DestinationRef", "FirstStop", "LastStop":
+		return connector.resolveStopAreaRef(tx, reference)
+	default:
+		generator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+		kind := reference.Type
+		return generator.NewIdentifier(IdentifierAttributes{Type: kind[:len(kind)-3], Default: reference.GetSha1()}), true
+	}
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) resolveLineRef(tx *model.Transaction, reference *model.Reference) (string, bool) {
+	line, ok := tx.Model().Lines().FindByObjectId(*reference.ObjectId)
+	if !ok {
+		return "", false
+	}
+	lineObjectId, ok := line.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
+	if !ok {
+		return "", false
+	}
+	return lineObjectId.Value(), true
+}
+
+func (connector *SIRIGeneralMessageRequestBroadcaster) resolveStopAreaRef(tx *model.Transaction, reference *model.Reference) (string, bool) {
+	stopArea, ok := tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	if !ok {
+		return "", false
+	}
+	stopAreaObjectId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
+	if !ok {
+		return "", false
+	}
+	return stopAreaObjectId.Value(), true
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {

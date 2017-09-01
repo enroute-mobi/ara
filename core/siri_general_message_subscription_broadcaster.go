@@ -99,19 +99,6 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return subId, false
 	}
 
-	// The ressource is the StopArea linked to the situation.
-	// then inside the ressouce we check for the LastStates that is a map[situationId] SIRIGeneralMessageBroadcaster
-	// We normaly could be able to find the stopArea thought the situation if we save the stopArea associated with it
-
-	// ressources := sub.ResourcesByObjectID()
-	//
-	// ressource, ok := ressources[obj.String()]
-	//
-	// lastState, ok := ressource.LastStates[string(situation.Id())]
-	//
-	// if ok == true && !lastState.(*generalMessageLastChange).Haschanged(situation) {
-	// 	return subId, false
-	// }
 	return sub.Id(), true
 }
 

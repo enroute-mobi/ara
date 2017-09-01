@@ -39,7 +39,6 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -75,13 +74,13 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		subscription.Delete()
 		return
 	}
-	responseStatus := response.ResponseStatus()
+	logXMLGeneralMessageSubscriptionResponse(logStashEvent, response)
 
-	logStashEvent["response"] = response.RawXML()
+	responseStatus := response.ResponseStatus()
+	logXMLResponseStatus(logStashEvent, &responseStatus)
 
 	if !responseStatus.Status() {
 		logger.Log.Debugf("Subscription status false for General Message Subscription %v %v ", responseStatus.ErrorType(), responseStatus.ErrorText())
-		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscription.Delete()
 		return
 	}
@@ -117,18 +116,16 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		}
 		connector.cancelGeneralMessage(delivery)
 		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
+
+		logSituationUpdateEvents(logStashEvent, *situationUpdateEvents)
+
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
-	xmlGm := xmlResponse.XMLGeneralMessages()
-	if len(xmlGm) == 0 {
-		return
-	}
-
-	builder := newGeneralMessageUpdateEventBuilder(connector.partner)
-	builder.SetGeneralMessageUpdateEvents(events, xmlResponse)
+	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
+	builder.SetGeneralMessageDeliveryUpdateEvents(events, xmlResponse)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -181,17 +178,37 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartn
 func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
 	logStashEvent["consumerAddress"] = request.ConsumerAddress
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	// logStashEvent["subscriberRef"] = request.SubscriberRef
-	// logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	// logStashEvent["initialTerminationTime"] = request.InitialTerminationTime.String()
 	xml, err := request.BuildXML()
 	if err != nil {
 		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
 		return
 	}
 	logStashEvent["requestXML"] = xml
+}
+
+func logXMLGeneralMessageSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLGeneralMessageSubscriptionResponse) {
+	logStashEvent["address"] = response.Address()
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
+	logStashEvent["responderRef"] = response.ResponderRef()
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
+	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime().String()
+	logStashEvent["responseXML"] = response.RawXML()
+}
+
+func logXMLResponseStatus(logStashEvent audit.LogStashEvent, responseStatus *siri.XMLResponseStatus) {
+	logStashEvent["subscriberRef"] = responseStatus.SubscriberRef()
+	logStashEvent["subscriptionRef"] = responseStatus.SubscriptionRef()
+	logStashEvent["status"] = strconv.FormatBool(responseStatus.Status())
+	if !responseStatus.Status() {
+		logStashEvent["errorType"] = responseStatus.ErrorType()
+		if responseStatus.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(responseStatus.ErrorNumber())
+		}
+		logStashEvent["errorText"] = responseStatus.ErrorText()
+		logStashEvent["errorDescription"] = responseStatus.ErrorDescription()
+	}
 }
 
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
@@ -204,7 +221,9 @@ func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	logStashEvent["status"] = strconv.FormatBool(notify.Status())
 	if !notify.Status() {
 		logStashEvent["errorType"] = notify.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+		if notify.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+		}
 		logStashEvent["errorText"] = notify.ErrorText()
 		logStashEvent["errorDescription"] = notify.ErrorDescription()
 	}

@@ -46,7 +46,6 @@ type IDFGeneralMessageStructure struct {
 	journeyPatternRef []string
 	destinationRef    []string
 	routeRef          []string
-	format            []string
 	groupOfLinesRef   []string
 
 	lineSections []*IDFLineSectionStructure
@@ -98,15 +97,14 @@ type SIRIGeneralMessage struct {
 	InfoMessageVersion    int
 	InfoChannelRef        string
 
-	LineRef           []string
-	StopPointRef      []string
-	JourneyPatternRef []string
-	DestinationRef    []string
-	RouteRef          []string
-	GroupOfLinesRef   []string
-
+	References   []*SIRIReference
 	LineSections []*SIRILineSection
 	Messages     []*SIRIMessage
+}
+
+type SIRIReference struct {
+	Kind string
+	Id   string
 }
 
 type SIRILineSection struct {
@@ -154,8 +152,7 @@ const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0
 			{{ .BuildGeneralMessageXML }}{{end}}{{end}}
 		</ns3:GeneralMessageDelivery>`
 
-const generalMessageTemplate = `<ns3:GeneralMessage>
-				<ns3:formatRef>{{ .FormatRef }}</ns3:formatRef>
+const generalMessageTemplate = `{{ if .FormatRef }}<ns3:GeneralMessage formatRef="{{ .FormatRef }}">{{ else }}<ns3:GeneralMessage>{{ end }}
 				<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
 				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
 				<ns3:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</ns3:InfoMessageIdentifier>
@@ -163,13 +160,8 @@ const generalMessageTemplate = `<ns3:GeneralMessage>
 				<ns3:InfoChannelRef>{{ .InfoChannelRef }}</ns3:InfoChannelRef>
 				<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
 				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:type="ns9:IDFLineSectionStructure">{{range .LineRef }}
-					<ns3:LineRef>{{ . }}</ns3:LineRef>{{end}}{{range .StopPointRef }}
-					<ns3:StopPointRef>{{ . }}</ns3:StopPointRef>{{end}}{{range .JourneyPatternRef }}
-					<ns3:JourneyPatternRef>{{ . }}</ns3:JourneyPatternRef>{{end}}{{range .DestinationRef }}
-					<ns3:DestinationRef>{{ . }}</ns3:DestinationRef>{{end}}{{range .RouteRef }}
-					<ns3:RouteRef>{{ . }}</ns3:RouteRef>{{end}}{{range .GroupOfLinesRef }}
-					<ns3:GroupOfLinesRef>{{ . }}</ns3:GroupOfLinesRef>{{end}}{{ range .LineSections }}
+				xsi:type="ns9:IDFLineSectionStructure">{{range .References }}
+					<ns3:{{ .Kind }}>{{ .Id }}</ns3:{{ .Kind }}>{{end}}{{ range .LineSections }}
 					<ns3:LineSection>{{ if .FirstStop }}
 						<ns3:FirstStop>{{ .FirstStop }}</ns3:FirstStop>{{end}}{{if .LastStop }}
 						<ns3:LastStop>{{ .LastStop }}</ns3:LastStop>{{end}}{{if .LineRef }}
@@ -287,7 +279,7 @@ func (visit *XMLGeneralMessage) InfoChannelRef() string {
 
 func (visit *XMLGeneralMessage) FormatRef() string {
 	if visit.formatRef == "" {
-		visit.formatRef = visit.findStringChildContent("formatRef")
+		visit.formatRef = visit.node.NativeNode().Attr("formatRef")
 	}
 	return visit.formatRef
 }
@@ -368,7 +360,7 @@ func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
 
 func (visit *IDFGeneralMessageStructure) LineRef() []string {
 	if len(visit.lineRef) == 0 {
-		nodes := visit.findNodes("LineRef")
+		nodes := visit.findDirectChildrenNodes("LineRef")
 		if nodes != nil {
 			for _, lineRef := range nodes {
 				visit.lineRef = append(visit.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))

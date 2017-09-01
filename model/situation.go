@@ -21,8 +21,9 @@ type Situation struct {
 
 	id SituationId
 
-	References References
-	Messages   []*Message
+	References   []*Reference
+	LineSections []*References
+	Messages     []*Message
 
 	RecordedAt  time.Time
 	ValidUntil  time.Time
@@ -34,8 +35,7 @@ type Situation struct {
 
 func NewSituation(model Model) *Situation {
 	situation := &Situation{
-		model:      model,
-		References: NewReferences(),
+		model: model,
 	}
 
 	situation.objectids = make(ObjectIDs)
@@ -74,12 +74,13 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 func (situation *Situation) MarshalJSON() ([]byte, error) {
 	type Alias Situation
 	aux := struct {
-		Id         SituationId
-		ObjectIDs  ObjectIDs  `json:",omitempty"`
-		RecordedAt *time.Time `json:",omitempty"`
-		ValidUntil *time.Time `json:",omitempty"`
-		Messages   []*Message `json:",omitempty"`
-		References References `json:",omitempty"`
+		Id           SituationId
+		ObjectIDs    ObjectIDs     `json:",omitempty"`
+		RecordedAt   *time.Time    `json:",omitempty"`
+		ValidUntil   *time.Time    `json:",omitempty"`
+		Messages     []*Message    `json:",omitempty"`
+		References   []*Reference  `json:",omitempty"`
+		LineSections []*References `json:",omitempty"`
 		*Alias
 	}{
 		Id:    situation.id,
@@ -92,8 +93,11 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	if len(situation.Messages) != 0 {
 		aux.Messages = situation.Messages
 	}
-	if !situation.References.IsEmpty() {
+	if len(situation.References) != 0 {
 		aux.References = situation.References
+	}
+	if len(situation.LineSections) != 0 {
+		aux.LineSections = situation.LineSections
 	}
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt

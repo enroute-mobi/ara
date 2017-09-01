@@ -131,7 +131,14 @@ func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 }
 
 func (xmlStruct *XMLStructure) findNodes(localName string) []XMLNode {
-	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
+	return xmlStruct.nodes(fmt.Sprintf(".//*[local-name()='%s']", localName))
+}
+
+func (xmlStruct *XMLStructure) findDirectChildrenNodes(localName string) []XMLNode {
+	return xmlStruct.nodes(fmt.Sprintf("./*[local-name()='%s']", localName))
+}
+
+func (xmlStruct *XMLStructure) nodes(xpath string) []XMLNode {
 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
 	if err != nil {
 		return nil
