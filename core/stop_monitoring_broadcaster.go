@@ -97,15 +97,15 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 	smb.connector.mutex.Unlock()
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := smb.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	tx := smb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	for key, stopVisits := range events {
-		//Voir pour le RequestMessageRef
 
+		//Voir pour le RequestMessageRef
 		sub, ok := smb.connector.Partner().Subscriptions().Find(key)
 		if !ok {
 			continue
@@ -192,6 +192,12 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
 		logSIRIStopMonitoringNotify(logStashEvent, delivery)
 	}
+}
+
+func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := smb.connector.partner.NewLogStashEvent()
+	event["connector"] = "StopMonitoringSubscriptionBroadcaster"
+	return event
 }
 
 func (smb *SMBroadcaster) getMonitoredStopVisit(stopVisit model.StopVisit, stopArea model.StopArea, options map[string]string, tx *model.Transaction) *siri.SIRIMonitoredStopVisit {
