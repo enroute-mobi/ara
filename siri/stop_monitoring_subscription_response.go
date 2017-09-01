@@ -2,7 +2,7 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"strconv"
 	"strings"
 	"time"
