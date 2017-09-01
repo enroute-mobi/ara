@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/lib/pq"
@@ -151,6 +152,7 @@ type MemoryStopAreas struct {
 
 	model *MemoryModel
 
+	mutex        *sync.RWMutex
 	byIdentifier map[StopAreaId]*StopArea
 }
 
@@ -168,6 +170,7 @@ type StopAreas interface {
 
 func NewMemoryStopAreas() *MemoryStopAreas {
 	return &MemoryStopAreas{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
 	}
 }
@@ -191,6 +194,9 @@ func (manager *MemoryStopAreas) New() StopArea {
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	stopArea, ok := manager.byIdentifier[id]
 	if ok {
 		return *stopArea, true
@@ -200,6 +206,9 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 }
 
 func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, stopArea := range manager.byIdentifier {
 		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
 		if stopAreaObjectId.Value() == objectid.Value() {
@@ -210,6 +219,9 @@ func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, boo
 }
 
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	if len(manager.byIdentifier) == 0 {
 		return []StopArea{}
 	}
@@ -220,6 +232,9 @@ func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
 }
 
 func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
@@ -229,11 +244,17 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 }
 
 func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	delete(manager.byIdentifier, stopArea.Id())
 	return true
 }
 
 func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	stopAreaIds = []StopAreaId{stopAreaId}
 	for _, stopArea := range manager.byIdentifier {
 		if stopArea.ParentId == stopAreaId {
