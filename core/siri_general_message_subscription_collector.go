@@ -2,9 +2,7 @@ package core
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -60,8 +58,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		return
 	}
 
-	referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
-
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   connector.Partner().Address(),
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
@@ -72,7 +68,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		MessageIdentifier:      connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestTimestamp:       connector.Clock().Now(),
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Subscription", Default: string(subscription.Id())}),
+		SubscriptionIdentifier: connector.SIRIPartner().IdentifierGenerator("subscription_identifier").NewMessageIdentifier(),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
 
@@ -103,19 +99,13 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
 
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
-		reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
-		matches := reg.FindStringSubmatch(strings.TrimSpace(delivery.SubscriptionRef()))
 
-		if len(matches) == 0 {
-			logger.Log.Printf("Partner %s sent a GeneralMessage response with a wrong message format: %s\n", connector.Partner().Slug(), delivery.SubscriptionRef())
-			continue
-		}
-
-		subscriptionId := matches[1]
+		subscriptionId := delivery.SubscriptionRef()
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 
 		if ok == false {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
 		if subscription.Kind() != "GeneralMessage" {
@@ -126,6 +116,32 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
+}
+
+func (connector *SIRIGeneralMessageSubscriptionCollector) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "GeneralMessageSubscriptionCollector"
+	return event
+}
+
+func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(subId string) {
+	logStashEvent := connector.newLogStashEvent()
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	request := &siri.SIRITerminatedSubscriptionRequest{
+		RequestTimestamp: connector.Clock().Now(),
+		SubscriptionRef:  subId,
+		RequestorRef:     connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
+	}
+
+	response, err := connector.SIRIPartner().SOAPClient().TerminatedSubscription(request)
+
+	if err != nil {
+		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
+		return
+	}
+
+	logSIRITerminatedSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -168,7 +184,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpda
 }
 
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent["Connector"] = "GeneralMessageSubscriptionCollector"
 	logStashEvent["address"] = notify.Address()
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
@@ -185,7 +200,6 @@ func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *sir
 }
 
 func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
-	logStashEvent["Connector"] = "SIRIGeneralMessageSubscriber"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
