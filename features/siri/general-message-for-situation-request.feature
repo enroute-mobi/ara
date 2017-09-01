@@ -4,7 +4,8 @@ Feature: Support SIRI GeneralMessage for Situation
       Given a Referential "test" is created
 
   # Should be fixed by #3797
-  @wip # Now a Situation without any Ref is not send
+  # Now a Situation without any Ref is not send
+  @wip
   Scenario: Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "1"                                 |
@@ -93,7 +94,8 @@ Feature: Support SIRI GeneralMessage for Situation
       """
 
   # Should be fixed by 3800 and 3801
-  @wip #Same as previous
+  # Same as previous scenario
+  @wip
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "external" : "test"                                                        |
