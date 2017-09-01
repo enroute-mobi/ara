@@ -100,10 +100,8 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 	tx := gmb.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	referenceGenerator := gmb.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
-
 	for subId, situationIds := range events {
-		logStashEvent := make(audit.LogStashEvent)
+		logStashEvent := gmb.newLogStashEvent()
 		defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		sub, ok := gmb.connector.Partner().Subscriptions().Find(subId)
@@ -140,11 +138,11 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 				if !ok {
 					continue
 				}
-				infoMessageIdentifier = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Default: objectid.Value()})
+				infoMessageIdentifier = gmb.connector.SIRIPartner().IdentifierGenerator("InfoMessage").NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Default: objectid.Value()})
 			}
 
 			siriGeneralMessage := &siri.SIRIGeneralMessage{
-				ItemIdentifier:        referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: gmb.connector.NewUUID()}),
+				ItemIdentifier:        gmb.connector.SIRIPartner().IdentifierGenerator("InfoMessage").NewIdentifier(IdentifierAttributes{Type: "Item", Default: gmb.connector.NewUUID()}),
 				InfoMessageIdentifier: infoMessageIdentifier,
 				InfoChannelRef:        situation.Channel,
 				InfoMessageVersion:    situation.Version,
@@ -169,6 +167,12 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
 		logSIRIGeneralMessageNotify(logStashEvent, &notify)
 	}
+}
+
+func (gmb *GMBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := gmb.connector.partner.NewLogStashEvent()
+	event["connector"] = "GeneralMessageSubscriptionBroadcaster"
+	return event
 }
 
 func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyGeneralMessage) {
