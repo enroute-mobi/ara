@@ -13,8 +13,8 @@ type Operator struct {
 
 	model Model
 
-	id   OperatorId `json:",omitempty"`
-	Name string     `json:",omitempty"`
+	id   OperatorId
+	Name string `json:",omitempty"`
 }
 
 func NewOperator(model Model) *Operator {
