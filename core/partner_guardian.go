@@ -41,12 +41,22 @@ func (guardian *PartnersGuardian) Run() {
 			logger.Log.Debugf("Check partners status")
 			for _, partner := range guardian.partners.FindAll() {
 				go guardian.checkPartnerStatus(partner)
+				go guardian.routineWork(partner)
 			}
 		}
 	}
 }
 
-func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) {
+func (guardian *PartnersGuardian) routineWork(partner *Partner) {
+	s := guardian.checkPartnerStatus(partner)
+	if !s {
+		return
+	}
+
+	guardian.checkSubscriptionsTerminatedTime(partner)
+}
+
+func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Log.Printf("Recovered error %v in checkPartnerStatus for partner %#v", r, partner)
@@ -56,8 +66,26 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) {
 	partnerStatus, _ := partner.CheckStatus()
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN || partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
+		partner.PartnerStatus = partnerStatus
 		partner.CancelSubscriptions()
+		return false
 	}
 
 	partner.PartnerStatus = partnerStatus
+	return true
+}
+
+func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Partner) {
+	if partner.Subscriptions() == nil {
+		return
+	}
+
+	for _, sub := range partner.Subscriptions().FindAll() {
+		for key, value := range sub.ResourcesByObjectID() {
+			if !value.SubscribedUntil.Before(guardian.Clock().Now()) {
+				continue
+			}
+			sub.DeleteResource(key)
+		}
+	}
 }
