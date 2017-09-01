@@ -221,6 +221,12 @@ func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
 }
 
+func (partner *Partner) Generator(name string) *IdentifierGenerator {
+	sp := NewSIRIPartner(partner)
+
+	return sp.IdentifierGenerator(name)
+}
+
 func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
 		return setting
