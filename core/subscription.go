@@ -14,9 +14,10 @@ type Subscription struct {
 	model.ClockConsumer
 	manager Subscriptions
 
-	id                  SubscriptionId
-	kind                string
-	externalId          string
+	id         SubscriptionId
+	kind       string
+	externalId string
+
 	resourcesByObjectID map[string]*SubscribedResource
 	subscriptionOptions map[string]string
 }
@@ -93,7 +94,7 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	}
 
 	aux := struct {
-		Id        SubscriptionId
+		Id        SubscriptionId        `json:"SubscriptionRef,omitempty"`
 		Kind      string                `json:",omitempty"`
 		Resources []*SubscribedResource `json:",omitempty"`
 	}{
@@ -134,6 +135,10 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 	}
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
 	return &ressource
+}
+
+func (subscription *Subscription) DeleteResource(key string) {
+	delete(subscription.resourcesByObjectID, key)
 }
 
 type MemorySubscriptions struct {
@@ -248,8 +253,10 @@ func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
 
 func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	if subscription.Id() == "" {
-		subscription.id = SubscriptionId(manager.NewUUID())
+		generator := manager.partner.Generator("subscription_identifier")
+		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
+
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
 	return true
