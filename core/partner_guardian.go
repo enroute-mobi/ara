@@ -40,7 +40,6 @@ func (guardian *PartnersGuardian) Run() {
 		case <-guardian.Clock().After(30 * time.Second):
 			logger.Log.Debugf("Check partners status")
 			for _, partner := range guardian.partners.FindAll() {
-				go guardian.checkPartnerStatus(partner)
 				go guardian.routineWork(partner)
 			}
 		}

@@ -170,9 +170,9 @@ const stopMonitoringDeliveryTemplate = `<ns3:StopMonitoringDelivery version="2.0
 			<ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
 			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
 				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
-				<ns3:{{.ErrorType}}>
+				<ns3:{{.ErrorType}}>{{ end }}
 					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
-				</ns3:{{.ErrorType}}>{{ end }}
+				</ns3:{{.ErrorType}}>
 			</ns3:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
 			<ns3:MonitoredStopVisit>
 				<ns3:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>

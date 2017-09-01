@@ -299,7 +299,6 @@ Feature: Support SIRI StopMonitoring by subscription
       | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
       | ReferenceArray1         | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC"  |
     When a minute has passed
-    And a minute has passed
     Then the SIRI server should have received a SubscriptionRequest request with 2 "StopMonitoringRequest"
 
 

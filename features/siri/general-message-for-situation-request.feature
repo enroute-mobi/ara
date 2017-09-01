@@ -4,6 +4,8 @@ Feature: Support SIRI GeneralMessage for Situation
       Given a Referential "test" is created
 
   # Should be fixed by #3797
+  # Now a Situation without any Ref is not send
+  @wip
   Scenario: Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "1"                                 |
@@ -27,7 +29,6 @@ Feature: Support SIRI GeneralMessage for Situation
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-      <SOAP-ENV:Header/>
       <S:Body>
         <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
@@ -70,8 +71,7 @@ Feature: Support SIRI GeneralMessage for Situation
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage>
-                  <ns3:formatRef>STIF-IDF</ns3:formatRef>
+                <ns3:GeneralMessage formatRef="STIF-IDF">
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
                   <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>2</ns3:InfoMessageIdentifier>
@@ -79,10 +79,10 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText>Les autres non</MessageText>
-                    </Message>
+                    <ns3:Message>
+                      <ns3:MessageType>longMessage</ns3:MessageType>
+                      <ns3:MessageText>Les autres non</ns3:MessageText>
+                    </ns3:Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
               </ns3:GeneralMessageDelivery>
@@ -94,6 +94,8 @@ Feature: Support SIRI GeneralMessage for Situation
       """
 
   # Should be fixed by 3800 and 3801
+  # Same as previous scenario
+  @wip
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "external" : "test"                                                        |
@@ -109,7 +111,6 @@ Feature: Support SIRI GeneralMessage for Situation
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-      <SOAP-ENV:Header/>
       <S:Body>
         <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
@@ -161,10 +162,10 @@ Feature: Support SIRI GeneralMessage for Situation
                   <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
-                    </Message>
+                    <ns3:Message>
+                      <ns3:MessageType>longMessage</ns3:MessageType>
+                      <ns3:MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</ns3:MessageText>
+                    </ns3:Message>
                   </ns3:Content>
                 </ns3:GeneralMessage>
               </ns3:GeneralMessageDelivery>

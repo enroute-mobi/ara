@@ -40,11 +40,11 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 
 	startTime := connector.Clock().Now()
 
-	siriGeneralMessageRequest := &siri.SIRIGeneralMessageRequest{
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
-		RequestorRef:      connector.SIRIPartner().RequestorRef(),
-		RequestTimestamp:  connector.Clock().Now(),
+	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
+		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
+	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	logSIRIGeneralMessageRequest(logStashEvent, siriGeneralMessageRequest)
 
@@ -65,37 +65,8 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageResponse) {
-	xmlGeneralMessages := xmlResponse.XMLGeneralMessages()
-	if len(xmlGeneralMessages) == 0 {
-		return
-	}
-
-	for _, xmlGeneralMessage := range xmlGeneralMessages {
-		situationEvent := &model.SituationUpdateEvent{
-			CreatedAt:         connector.Clock().Now(),
-			RecordedAt:        xmlGeneralMessage.RecordedAtTime(),
-			SituationObjectID: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlGeneralMessage.InfoMessageIdentifier()),
-			Version:           xmlGeneralMessage.InfoMessageVersion(),
-			ProducerRef:       xmlResponse.ProducerRef(),
-		}
-		situationEvent.SetId(model.SituationUpdateRequestId(connector.NewUUID()))
-		if xmlGeneralMessage.Content() != nil {
-			content := xmlGeneralMessage.Content().(siri.IDFGeneralMessageStructure)
-			for _, xmlMessage := range content.Messages() {
-				message := &model.Message{
-					Content:             xmlMessage.MessageText(),
-					Type:                xmlMessage.MessageType(),
-					NumberOfLines:       xmlMessage.NumberOfLines(),
-					NumberOfCharPerLine: xmlMessage.NumberOfCharPerLine(),
-				}
-				situationEvent.SituationAttributes.Messages = append(situationEvent.SituationAttributes.Messages, message)
-			}
-		}
-		situationEvent.SituationAttributes.Format = xmlGeneralMessage.FormatRef()
-		situationEvent.SituationAttributes.Channel = xmlGeneralMessage.InfoChannelRef()
-		situationEvent.SituationAttributes.ValidUntil = xmlGeneralMessage.ValidUntilTime()
-		*situationEvents = append(*situationEvents, situationEvent)
-	}
+	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
+	builder.SetGeneralMessageResponseUpdateEvents(situationEvents, xmlResponse)
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
@@ -125,7 +96,7 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIGeneralMessageRequestCollector(partner)
 }
 
-func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageRequest) {
+func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetGeneralMessageRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

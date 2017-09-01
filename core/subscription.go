@@ -2,6 +2,8 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
+	"sync"
 	"time"
 
 	"github.com/af83/edwig/logger"
@@ -144,6 +146,7 @@ func (subscription *Subscription) DeleteResource(key string) {
 type MemorySubscriptions struct {
 	model.UUIDConsumer
 
+	mutex   *sync.RWMutex
 	partner *Partner
 
 	byIdentifier map[SubscriptionId]*Subscription
@@ -176,12 +179,14 @@ type Subscriptions interface {
 
 func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 	return &MemorySubscriptions{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SubscriptionId]*Subscription),
 		partner:      partner,
 	}
 }
 
 func (manager *MemorySubscriptions) New(kind string) *Subscription {
+	logger.Log.Debugf("creating subscription with kind %v", kind)
 	subscription := &Subscription{
 		kind:                kind,
 		manager:             manager,
@@ -193,6 +198,9 @@ func (manager *MemorySubscriptions) New(kind string) *Subscription {
 }
 
 func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
 			return subscription, true
@@ -202,6 +210,9 @@ func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool
 }
 
 func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscription, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, subscription := range manager.byIdentifier {
 		if subscription.ExternalId() == externalId {
 			return subscription, true
@@ -211,6 +222,9 @@ func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscr
 }
 
 func (manager *MemorySubscriptions) FindByRessourceId(id string) (*Subscription, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, subscription := range manager.byIdentifier {
 		_, ok := subscription.resourcesByObjectID[id]
 		if !ok {
@@ -222,17 +236,24 @@ func (manager *MemorySubscriptions) FindByRessourceId(id string) (*Subscription,
 }
 
 func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscription, bool) {
+	manager.mutex.RLock()
+
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
 			return subscription, true
 		}
 	}
+	manager.mutex.RUnlock()
 
 	subscription := manager.New(kind)
 	return subscription, false
 }
 
 func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool) {
+	fmt.Println("in find")
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	subscription, ok := manager.byIdentifier[id]
 	if ok {
 		return subscription, true
@@ -242,6 +263,12 @@ func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool
 }
 
 func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
+	fmt.Println("in find all")
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	fmt.Println("after find all")
+
 	if len(manager.byIdentifier) == 0 {
 		return []*Subscription{}
 	}
@@ -252,26 +279,53 @@ func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
 }
 
 func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
+	fmt.Println("before")
+
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	fmt.Println("after")
+
 	if subscription.Id() == "" {
 		generator := manager.partner.Generator("subscription_identifier")
 		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 
+	fmt.Println("sub ===== ", subscription.Id())
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
+
 	return true
 }
 
 func (manager *MemorySubscriptions) Delete(subscription *Subscription) bool {
+	fmt.Println("D")
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	fmt.Println("C")
+
 	delete(manager.byIdentifier, subscription.Id())
 	return true
 }
 
 func (manager *MemorySubscriptions) DeleteById(id SubscriptionId) {
+	fmt.Println("DD")
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	fmt.Println("CC")
+
 	delete(manager.byIdentifier, id)
 }
 
 func (manager *MemorySubscriptions) CancelSubscriptions() {
+	fmt.Println("DDD")
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	fmt.Println("CCC")
+
 	for id := range manager.byIdentifier {
 		delete(manager.byIdentifier, id)
 	}

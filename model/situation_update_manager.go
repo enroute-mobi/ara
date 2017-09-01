@@ -51,6 +51,7 @@ func (updater *SituationUpdater) Update() {
 		situation.ProducerRef = event.ProducerRef
 
 		situation.References = event.SituationAttributes.References
+		situation.LineSections = event.SituationAttributes.LineSections
 		situation.Messages = event.SituationAttributes.Messages
 		situation.ValidUntil = event.SituationAttributes.ValidUntil
 		situation.Channel = event.SituationAttributes.Channel

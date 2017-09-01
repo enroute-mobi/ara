@@ -24,11 +24,10 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 	event.SituationAttributes = SituationAttributes{
 		Format:     "format",
 		Channel:    "channel",
-		References: NewReferences(),
 		Messages:   []*Message{message},
 		ValidUntil: testTime,
 	}
-	event.SituationAttributes.References.Set("type", Reference{ObjectId: &objectid, Id: "id", Type: "type"})
+	event.SituationAttributes.References = append(event.SituationAttributes.References, &Reference{ObjectId: &objectid, Id: "id", Type: "type"})
 
 	return
 }
@@ -43,7 +42,6 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 
 	testSituation := Situation{
 		id:          situation.id,
-		References:  NewReferences(),
 		Messages:    []*Message{message},
 		RecordedAt:  testTime,
 		ValidUntil:  testTime,
@@ -56,7 +54,7 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 	testSituation.objectids = make(ObjectIDs)
 	testSituation.SetObjectID(objectid)
 	testSituation.SetObjectID(NewObjectID("_default", objectid.HashValue()))
-	testSituation.References.Set("type", Reference{ObjectId: &objectid, Id: "id", Type: "type"})
+	testSituation.References = append(testSituation.References, &Reference{ObjectId: &objectid, Id: "id", Type: "type"})
 
 	return reflect.DeepEqual(situation, testSituation)
 }

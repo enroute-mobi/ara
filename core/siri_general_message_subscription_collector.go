@@ -64,24 +64,29 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  connector.Clock().Now(),
 	}
-	gmRequest.Entry = &siri.SIRIGeneralMessageSubscriptionRequestEntry{
-		MessageIdentifier:      connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
-		RequestTimestamp:       connector.Clock().Now(),
+
+	entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
 		SubscriptionIdentifier: connector.SIRIPartner().IdentifierGenerator("subscription_identifier").NewMessageIdentifier(),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
+	entry.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	entry.RequestTimestamp = connector.Clock().Now()
+
+	gmRequest.Entries = append(gmRequest.Entries, entry)
 
 	logSIRIGeneralMessageSubscriptionRequest(logStashEvent, gmRequest)
 	response, err := connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing %v", err)
+		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscription.Delete()
 		return
 	}
-	responseStatus := response.ResponseStatus()
+	logXMLGeneralMessageSubscriptionResponse(logStashEvent, response)
 
-	logStashEvent["response"] = response.RawXML()
+	responseStatus := response.ResponseStatus()
+	logXMLResponseStatus(logStashEvent, &responseStatus)
 
 	if !responseStatus.Status() {
 		logger.Log.Debugf("Subscription status false for General Message Subscription %v %v ", responseStatus.ErrorType(), responseStatus.ErrorText())
@@ -99,7 +104,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
 
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
-
 		subscriptionId := delivery.SubscriptionRef()
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 
@@ -145,13 +149,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
-	xmlGm := xmlResponse.XMLGeneralMessages()
-	if len(xmlGm) == 0 {
-		return
-	}
-
-	builder := newGeneralMessageUpdateEventBuilder(connector.partner)
-	builder.SetGeneralMessageUpdateEvents(events, xmlResponse)
+	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
+	builder.SetGeneralMessageDeliveryUpdateEvents(events, xmlResponse)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -209,4 +208,27 @@ func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent,
 		return
 	}
 	logStashEvent["requestXML"] = xml
+}
+
+func logXMLGeneralMessageSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLGeneralMessageSubscriptionResponse) {
+	logStashEvent["address"] = response.Address()
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
+	logStashEvent["responderRef"] = response.ResponderRef()
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
+	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime().String()
+	logStashEvent["responseXML"] = response.RawXML()
+}
+
+func logXMLResponseStatus(logStashEvent audit.LogStashEvent, responseStatus *siri.XMLResponseStatus) {
+	logStashEvent["subscriberRef"] = responseStatus.SubscriberRef()
+	logStashEvent["subscriptionRef"] = responseStatus.SubscriptionRef()
+	logStashEvent["status"] = strconv.FormatBool(responseStatus.Status())
+	if !responseStatus.Status() {
+		logStashEvent["errorType"] = responseStatus.ErrorType()
+		if responseStatus.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(responseStatus.ErrorNumber())
+		}
+		logStashEvent["errorText"] = responseStatus.ErrorText()
+		logStashEvent["errorDescription"] = responseStatus.ErrorDescription()
+	}
 }

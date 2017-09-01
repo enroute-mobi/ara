@@ -19,7 +19,7 @@ type MemoryModel struct {
 	lines           *MemoryLines
 	date            Date
 	situations      *MemorySituations
-	operators       Operators
+	operators       *MemoryOperators
 
 	SMEventsChan chan StopMonitoringBroadcastEvent
 	GMEventsChan chan GeneralMessageBroadcastEvent
@@ -129,5 +129,6 @@ func (model *MemoryModel) Load(referentialId string) error {
 	model.lines.Load(referentialId)
 	model.vehicleJourneys.Load(referentialId)
 	model.stopVisits.Load(referentialId)
+	model.operators.Load(referentialId)
 	return nil
 }

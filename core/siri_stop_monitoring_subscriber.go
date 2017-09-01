@@ -86,6 +86,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
+		logger.Log.Debugf("resource == %v", resource.Reference.ObjectId.String())
 		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
 			messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
@@ -123,10 +124,14 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logStashEvent["MonitoringRef"] = strings.Join(monitoringRefList, ", ")
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest, monitoringRefList)
 
+	v, _ := siriStopMonitoringSubscriptionRequest.BuildXML()
+	logger.Log.Debugf("request == %v", v)
+
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		for _, stopAreaObjectid := range stopAreasToRequest {
+			logger.Log.Debugf("%v", *stopAreaObjectid)
 			resource := subscription.Resource(*stopAreaObjectid)
 			resource.RetryCount++
 		}
