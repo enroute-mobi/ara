@@ -2,7 +2,7 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/jbowtie/gokogiri"
@@ -12,6 +12,7 @@ import (
 type XMLTerminatedSubscriptionResponse struct {
 	ResponseXMLStructure
 
+	responderRef    string
 	subscriberRef   string
 	subscriptionRef string
 }
@@ -34,7 +35,8 @@ const terminatedSubscriptionResponseTemplate = `<ns3:TerminateSubscriptionRespon
   <ns3:Status>{{.Status}}</ns3:Status>{{if not .Status}}
   <ns3:ErrorCondition>
     <ns3:UnknownSubscriptionError/>
-  </ns3: ErrorCondition>{{end}}
+  </ns3:ErrorCondition>{{end}}
+  </ns3:TerminationResponseStatus>
 </ns3:TerminateSubscriptionResponse>`
 
 func NewXMLTerminatedSubscriptionResponse(node xml.Node) *XMLTerminatedSubscriptionResponse {
@@ -57,6 +59,13 @@ func (response *XMLTerminatedSubscriptionResponse) SubscriptionRef() string {
 		response.subscriptionRef = response.findStringChildContent("SubscriptionRef")
 	}
 	return response.subscriptionRef
+}
+
+func (response *XMLTerminatedSubscriptionResponse) ResponderRef() string {
+	if response.responderRef == "" {
+		response.responderRef = response.findStringChildContent("ResponderRef")
+	}
+	return response.responderRef
 }
 
 func (response *XMLTerminatedSubscriptionResponse) SubscriberRef() string {
