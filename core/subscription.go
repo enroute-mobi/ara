@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
 	"sync"
 	"time"
 
@@ -250,7 +249,6 @@ func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscripti
 }
 
 func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool) {
-	fmt.Println("in find")
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -263,11 +261,8 @@ func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool
 }
 
 func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
-	fmt.Println("in find all")
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
-
-	fmt.Println("after find all")
 
 	if len(manager.byIdentifier) == 0 {
 		return []*Subscription{}
@@ -279,19 +274,14 @@ func (manager *MemorySubscriptions) FindAll() (subscriptions []*Subscription) {
 }
 
 func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
-	fmt.Println("before")
-
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
-
-	fmt.Println("after")
 
 	if subscription.Id() == "" {
 		generator := manager.partner.Generator("subscription_identifier")
 		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 
-	fmt.Println("sub ===== ", subscription.Id())
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
 
@@ -299,32 +289,23 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 }
 
 func (manager *MemorySubscriptions) Delete(subscription *Subscription) bool {
-	fmt.Println("D")
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
-
-	fmt.Println("C")
 
 	delete(manager.byIdentifier, subscription.Id())
 	return true
 }
 
 func (manager *MemorySubscriptions) DeleteById(id SubscriptionId) {
-	fmt.Println("DD")
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
-
-	fmt.Println("CC")
 
 	delete(manager.byIdentifier, id)
 }
 
 func (manager *MemorySubscriptions) CancelSubscriptions() {
-	fmt.Println("DDD")
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
-
-	fmt.Println("CCC")
 
 	for id := range manager.byIdentifier {
 		delete(manager.byIdentifier, id)

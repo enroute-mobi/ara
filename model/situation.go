@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -177,7 +176,6 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 	situation.model = manager.model
 	manager.byIdentifier[situation.Id()] = situation
 
-	fmt.Println("================================================= %v", situation.Id())
 	event := GeneralMessageBroadcastEvent{
 		SituationId: situation.id,
 	}

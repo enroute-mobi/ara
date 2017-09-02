@@ -364,7 +364,6 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 		stopVisit.id = StopVisitId(manager.NewUUID())
 	}
 
-	fmt.Println("STOP VISIT == ", stopVisit.Id())
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
 
