@@ -239,6 +239,7 @@ func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscripti
 
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
+			manager.mutex.RUnlock()
 			return subscription, true
 		}
 	}
