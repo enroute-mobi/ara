@@ -3,10 +3,8 @@ Feature: Support SIRI GeneralMessage for Situation
   Background:
       Given a Referential "test" is created
 
-  # Should be fixed by #3797
-  # Now a Situation without any Ref is not send
   @wip
-  Scenario: Ignore situations associatd to the Commercial channel
+  Scenario: 3797 - Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "1"                                 |
       | RecordedAt              | 2017-01-01T03:30:06+02:00                        |
@@ -15,6 +13,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T20:30:06+02:00                        |
       | Messages[0]#MessageType | longMessage                                      |
       | Messages[0]#MessageText | Les situations commercials doivent être ignorées |
+      | References[0]           | LineRef:NINOXE:Line:3:LOC    |
     And a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "2"          |
       | RecordedAt              | 2017-01-01T03:30:06+02:00 |
@@ -23,6 +22,10 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T20:30:06+02:00 |
       | Messages[0]#MessageType | longMessage               |
       | Messages[0]#MessageText | Les autres non            |
+      | References[0]           | LineRef:NINOXE:Line:3:LOC    |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
     And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | TestPartner |
       | remote_objectid_kind | internal    |
