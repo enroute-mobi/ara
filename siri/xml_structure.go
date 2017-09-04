@@ -166,6 +166,11 @@ func (xmlStruct *XMLStructure) findStringChildContent(localName string) string {
 	return strings.TrimSpace(node.Content())
 }
 
+func (xmlStruct *XMLStructure) containSelfClosing(localName string) bool {
+	node := xmlStruct.findNode(localName)
+	return node != nil
+}
+
 func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time {
 	node := xmlStruct.findNode(localName)
 	if node == nil {

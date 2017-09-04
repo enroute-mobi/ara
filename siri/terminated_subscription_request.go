@@ -20,6 +20,7 @@ type SIRITerminatedSubscriptionRequest struct {
 type XMLTerminatedSubscriptionRequest struct {
 	RequestXMLStructure
 
+	canceltype      Bool
 	subscriptionRef string
 }
 
@@ -58,6 +59,13 @@ func (request *XMLTerminatedSubscriptionRequest) SubscriptionRef() string {
 		request.subscriptionRef = request.findStringChildContent("SubscriptionRef")
 	}
 	return request.subscriptionRef
+}
+
+func (request *XMLTerminatedSubscriptionRequest) Canceltype() bool {
+	if !request.canceltype.Defined {
+		request.canceltype.SetValue(request.containSelfClosing("All"))
+	}
+	return request.canceltype.Value
 }
 
 func (request *SIRITerminatedSubscriptionRequest) BuildXML() (string, error) {
