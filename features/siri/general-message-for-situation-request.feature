@@ -13,16 +13,16 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T20:30:06+02:00                        |
       | Messages[0]#MessageType | longMessage                                      |
       | Messages[0]#MessageText | Les situations commercials doivent être ignorées |
-      | References[0]           | LineRef:NINOXE:Line:3:LOC    |
+      | References[0]           | LineRef:{"internal":"NINOXE:Line:3:LOC"}         |
     And a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "2"          |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00 |
-      | Version                 | 1                         |
-      | Channel                 | Perturbations             |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00 |
-      | Messages[0]#MessageType | longMessage               |
-      | Messages[0]#MessageText | Les autres non            |
-      | References[0]           | LineRef:NINOXE:Line:3:LOC    |
+      | ObjectIDs               | "internal" : "2"                         |
+      | RecordedAt              | 2017-01-01T03:30:06+02:00                |
+      | Version                 | 1                                        |
+      | Channel                 | Perturbations                            |
+      | ValidUntil              | 2017-01-01T20:30:06+02:00                |
+      | Messages[0]#MessageType | longMessage                              |
+      | Messages[0]#MessageText | Les autres non                           |
+      | References[0]           | LineRef:{"internal":"NINOXE:Line:3:LOC"} |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -239,7 +239,7 @@ Feature: Support SIRI GeneralMessage for Situation
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1"                                                        |
+      | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
       | Channel                 | Commercial                                                                 |
@@ -294,7 +294,7 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
     And a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "NINOXE:GeneralMessage:27_1"                                                        |
+      | ObjectIDs               | "external" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
       | Version                 | 1                                                                          |
       | Channel                 | Perturbation                                                               |

@@ -72,7 +72,7 @@ def model_attributes(table)
       end
 
       kind, objectid = value.split(":",2)
-      attributes["References"][reference_number] = { "Kind" => kind, "ObjectId" => objectid }
+      attributes["References"][reference_number] = { "Type" => kind, "ObjectId" => JSON.parse(objectid) }
       attributes.delete key
     end
 
