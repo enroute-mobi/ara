@@ -3,7 +3,6 @@ Feature: Support SIRI GeneralMessage for Situation
   Background:
       Given a Referential "test" is created
 
-  @wip
   Scenario: 3797 - Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "1"                                 |
