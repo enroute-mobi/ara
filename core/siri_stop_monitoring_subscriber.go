@@ -124,9 +124,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logStashEvent["MonitoringRef"] = strings.Join(monitoringRefList, ", ")
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest, monitoringRefList)
 
-	v, _ := siriStopMonitoringSubscriptionRequest.BuildXML()
-	logger.Log.Debugf("request == %v", v)
-
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
