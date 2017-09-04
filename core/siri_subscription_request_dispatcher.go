@@ -84,6 +84,11 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 		SubscriptionRef:   r.SubscriptionRef(),
 	}
 
+	if r.Canceltype() == true {
+		connector.Partner().CancelSubscriptions()
+		return resp
+	}
+
 	subscriptionId := r.SubscriptionRef()
 
 	sub, ok := connector.Partner().Subscriptions().FindByExternalId(subscriptionId)

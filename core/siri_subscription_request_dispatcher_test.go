@@ -135,6 +135,45 @@ func Test_CancelSubscription(t *testing.T) {
 	}
 }
 
+func Test_CancelSubscriptionAll(t *testing.T) {
+	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.model = model.NewMemoryModel()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "_internal"
+	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	sub := partner.Subscriptions().New("Test")
+	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
+
+	partner.Subscriptions().Save(sub)
+
+	sub = partner.Subscriptions().New("Test")
+	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c9:LOC")
+
+	partner.Subscriptions().Save(sub)
+
+	file, _ := os.Open("testdata/terminated_subscription_request_all-soap.xml")
+	body, _ := ioutil.ReadAll(file)
+	request, _ := siri.NewXMLTerminatedSubscriptionRequestFromContent(body)
+
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
+	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
+
+	if response.Status != true {
+		t.Errorf("Status should be true but got false")
+	}
+
+	if len(partner.Subscriptions().FindAll()) != 0 {
+		t.Errorf("Subscription shouldn't exist")
+	}
+}
+
 func Test_ReceiveStateSM(t *testing.T) {
 	fakeClock := model.NewFakeClock()
 	model.SetDefaultClock(fakeClock)
