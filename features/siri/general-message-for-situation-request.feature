@@ -67,7 +67,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <ServiceDeliveryInfo>
               <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
               <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
+              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
               <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -76,12 +76,13 @@ Feature: Support SIRI GeneralMessage for Situation
                 <ns3:Status>true</ns3:Status>
                 <ns3:GeneralMessage formatRef="STIF-IDF">
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>2</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>
                   <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
                   <ns3:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
+                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
                     <ns3:Message>
                       <ns3:MessageType>longMessage</ns3:MessageType>
                       <ns3:MessageText>Les autres non</ns3:MessageText>
