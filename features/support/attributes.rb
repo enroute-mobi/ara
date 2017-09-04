@@ -60,6 +60,22 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Situation References are an array of Reference
+    # Format: | Reference[0] | Kind:ObjectId |
+    if key =~ /References\[(\d+)\]/
+      reference_number = $1.to_i
+
+      attributes["References"] ||= []
+
+      until attributes["References"].length >= reference_number+1
+        attributes["References"] << {}
+      end
+
+      kind, objectid = value.split(":",2)
+      attributes["References"][reference_number] = { "Kind" => kind, "ObjectId" => objectid }
+      attributes.delete key
+    end
+
     if key =~ /Reference\[([^\]]+)\]#(ObjectID|Id)/
       name = $1
       attribute = $2
