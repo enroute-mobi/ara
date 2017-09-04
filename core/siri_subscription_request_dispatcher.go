@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
@@ -86,16 +84,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 		SubscriptionRef:   r.SubscriptionRef(),
 	}
 
-	reg := regexp.MustCompile(`\w+:Subscription::([\w+-?]+):LOC`)
-	matches := reg.FindStringSubmatch(strings.TrimSpace(r.SubscriptionRef()))
-
-	if len(matches) == 0 {
-		logger.Log.Debugf("Partner %s sent a TerminateSubscriptionRequest response with a wrong message format: %s\n", connector.Partner().Slug(), r.SubscriptionRef())
-
-		resp.Status = false
-		return resp
-	}
-	subscriptionId := matches[1]
+	subscriptionId := r.SubscriptionRef()
 
 	sub, ok := connector.Partner().Subscriptions().FindByExternalId(subscriptionId)
 	if !ok {

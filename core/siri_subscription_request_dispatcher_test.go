@@ -115,7 +115,7 @@ func Test_CancelSubscription(t *testing.T) {
 	referential.Partners().Save(partner)
 
 	sub := partner.Subscriptions().New("Test")
-	sub.SetExternalId("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
 
 	partner.Subscriptions().Save(sub)
 
@@ -130,7 +130,7 @@ func Test_CancelSubscription(t *testing.T) {
 		t.Errorf("Status should be true but got false")
 	}
 
-	if _, ok := partner.Subscriptions().FindByExternalId("6ba7b814-9dad-11d1-1-00c04fd430c8"); ok {
+	if _, ok := partner.Subscriptions().FindByExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC"); ok {
 		t.Errorf("Subscription shouldn't exist")
 	}
 }
