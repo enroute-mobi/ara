@@ -25,9 +25,9 @@ type XMLEstimatedTimetableRequest struct {
 }
 
 func NewXMLGetEstimatedTimetable(node xml.Node) *XMLGetEstimatedTimetable {
-	xmlCheckStatusRequest := &XMLGetEstimatedTimetable{}
-	xmlCheckStatusRequest.node = NewXMLNode(node)
-	return xmlCheckStatusRequest
+	xmlGetEstimatedTimetable := &XMLGetEstimatedTimetable{}
+	xmlGetEstimatedTimetable.node = NewXMLNode(node)
+	return xmlGetEstimatedTimetable
 }
 
 func NewXMLGetEstimatedTimetableFromContent(content []byte) (*XMLGetEstimatedTimetable, error) {
