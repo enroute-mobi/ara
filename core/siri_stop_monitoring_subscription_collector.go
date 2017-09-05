@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -253,6 +254,13 @@ func logSIRITerminatedSubscriptionRequest(logStashEvent audit.LogStashEvent, req
 	logStashEvent["SubscriptionRef"] = request.SubscriptionRef
 	logStashEvent["RequestorRef"] = request.RequestorRef
 	logStashEvent["MessageIdentifier"] = request.MessageIdentifier
+
+	xml, err := request.BuildXML()
+	if err != nil {
+		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["requestXML"] = xml
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
@@ -276,6 +284,7 @@ func logSIRITerminatedSubscriptionResponse(logStashEvent audit.LogStashEvent, re
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef()
 	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
+	logStashEvent["responseXML"] = response.RawXML()
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 
 	if !response.Status() {
