@@ -14,8 +14,9 @@ type XMLSubscriptionRequest struct {
 	maximumStopVisits   string
 	incrementalUpdates  string
 
-	smEntries []*XMLStopMonitoringSubscriptionRequestEntry
-	gmEntries []*XMLGeneralMessageSubscriptionRequestEntry
+	smEntries  []*XMLStopMonitoringSubscriptionRequestEntry
+	gmEntries  []*XMLGeneralMessageSubscriptionRequestEntry
+	ettEntries []*XMLEstimatedTimetableSubscriptionRequestEntry
 }
 
 func NewXMLSubscriptionRequestFromContent(content []byte) (*XMLSubscriptionRequest, error) {
@@ -44,6 +45,19 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSMEntries() []*XMLStopMoni
 		}
 	}
 	return request.smEntries
+}
+
+func (request *XMLSubscriptionRequest) XMLSubscriptionETTEntries() []*XMLEstimatedTimetableSubscriptionRequestEntry {
+	if len(request.ettEntries) != 0 {
+		return request.ettEntries
+	}
+	nodes := request.findNodes("EstimatedTimetableSubscriptionRequest")
+	if nodes != nil {
+		for _, ett := range nodes {
+			request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
+		}
+	}
+	return request.ettEntries
 }
 
 func (request *XMLSubscriptionRequest) XMLSubscriptionGMEntries() []*XMLGeneralMessageSubscriptionRequestEntry {

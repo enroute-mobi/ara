@@ -83,6 +83,7 @@ func (manager *BroadcastManager) run() {
 					continue
 				}
 			}
+
 		case event := <-manager.gmbEventChan:
 			connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
