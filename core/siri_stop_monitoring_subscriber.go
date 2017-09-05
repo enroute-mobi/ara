@@ -86,7 +86,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	stopAreasToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
-		logger.Log.Debugf("resource == %v", resource.Reference.ObjectId.String())
 		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
 			messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
