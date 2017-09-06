@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -188,15 +187,7 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 }
 
 func (manager *MemoryLines) Load(referentialId string) error {
-	var selectLines []struct {
-		Id            string
-		ReferentialId string `db:"referential_id"`
-		ModelName     string `db:"model_name"`
-		Name          sql.NullString
-		ObjectIDs     sql.NullString `db:"object_ids"`
-		Attributes    sql.NullString
-		References    sql.NullString `db:"siri_references"`
-	}
+	var selectLines []SelectLine
 	modelName := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
 	_, err := Database.Select(&selectLines, sqlQuery)

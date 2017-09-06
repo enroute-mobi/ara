@@ -215,16 +215,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 	defer CleanTestDb(t)
 
 	// Insert Data in the test db
-	var databaseVehicleJourney = struct {
-		Id            string `db:"id"`
-		ReferentialId string `db:"referential_id"`
-		ModelName     string `db:"model_name"`
-		Name          string `db:"name"`
-		ObjectIDs     string `db:"object_ids"`
-		LineId        string `db:"line_id"`
-		Attributes    string `db:"attributes"`
-		References    string `db:"siri_references"`
-	}{
+	databaseVehicleJourney := DatabaseVehicleJourney{
 		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ModelName:     "2017-01-01",

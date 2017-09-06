@@ -218,24 +218,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 
 	testTime := time.Now()
 	// Insert Data in the test db
-	var databaseStopVisit = struct {
-		Id               string
-		ReferentialId    string    `db:"referential_id"`
-		ModelName        string    `db:"model_name"`
-		ObjectIDs        string    `db:"object_ids"`
-		StopAreaId       string    `db:"stop_area_id"`
-		VehicleJourneyId string    `db:"vehicle_journey_id"`
-		ArrivalStatus    string    `db:"arrival_status"`
-		DepartureStatus  string    `db:"departure_status"`
-		Schedules        string    `db:"schedules"`
-		Attributes       string    `db:"attributes"`
-		References       string    `db:"siri_references"`
-		Collected        bool      `db:"collected"`
-		VehicleAtStop    bool      `db:"vehicle_at_stop"`
-		CollectedAt      time.Time `db:"collected_at"`
-		RecordedAt       time.Time `db:"recorded_at"`
-		PassageOrder     int       `db:"passage_order"`
-	}{
+	databaseStopVisit := DatabaseStopVisit{
 		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:    "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ModelName:        "2017-01-01",

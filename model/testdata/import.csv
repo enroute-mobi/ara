@@ -1,0 +1,4 @@
+stop_area,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"stopAreaObjectid"},"[""d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"",""e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]",{},{},2017-09-06T01:01:01.000Z,2017-09-06T01:01:01.000Z,2017-09-06T01:01:01.000Z,true,true
+line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"lineObjectid"},{},{}
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyObjectid"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,{},{}
+stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitObjectid"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,Arrived,Departed,[],{},{},2017-09-06T01:01:01.000Z,2017-09-06T01:01:01.000Z,true,true,1

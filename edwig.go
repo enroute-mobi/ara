@@ -128,10 +128,16 @@ func main() {
 
 		database := model.InitDB(config.Config.DB)
 		defer model.CloseDB(database)
-		err = model.ApplyMigrations(migrateFlags.Args()[0], *migrationFilesPtr, database.Db)
-		if err != nil {
-			break
-		}
+		err = model.ApplyMigrations(migrateFlags.Arg(0), *migrationFilesPtr, database.Db)
+	case "load":
+		loadFlags := flag.NewFlagSet("load", flag.ExitOnError)
+		loadFlags.Parse(flag.Args()[1:])
+
+		// Init Database
+		model.Database = model.InitDB(config.Config.DB)
+		defer model.CloseDB(model.Database)
+
+		err = model.LoadFromCSV(loadFlags.Arg(0))
 	}
 
 	if err != nil {

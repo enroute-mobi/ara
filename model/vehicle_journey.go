@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -206,16 +205,7 @@ func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) boo
 }
 
 func (manager *MemoryVehicleJourneys) Load(referentialId string) error {
-	var selectVehicleJourneys []struct {
-		Id            string
-		ReferentialId string `db:"referential_id"`
-		ModelName     string `db:"model_name"`
-		Name          sql.NullString
-		ObjectIDs     sql.NullString `db:"object_ids"`
-		LineId        sql.NullString `db:"line_id"`
-		Attributes    sql.NullString
-		References    sql.NullString `db:"siri_references"`
-	}
+	var selectVehicleJourneys []SelectVehicleJourney
 	modelName := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
 	_, err := Database.Select(&selectVehicleJourneys, sqlQuery)

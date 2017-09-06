@@ -1,13 +1,10 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type StopAreaId string
@@ -270,28 +267,15 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 }
 
 func (manager *MemoryStopAreas) Load(referentialId string) error {
-	var selectStopAreas []struct {
-		Id              string
-		ReferentialId   string `db:"referential_id"`
-		ModelName       string `db:"model_name"`
-		Name            sql.NullString
-		ObjectIDs       sql.NullString `db:"object_ids"`
-		ParentId        sql.NullString `db:"parent_id"`
-		Attributes      sql.NullString
-		References      sql.NullString `db:"siri_references"`
-		LineIds         sql.NullString `db:"line_ids"`
-		NextCollectAt   pq.NullTime    `db:"next_collect_at"`
-		CollectedAt     pq.NullTime    `db:"collected_at"`
-		CollectedUntil  pq.NullTime    `db:"collected_until"`
-		CollectedAlways sql.NullBool   `db:"collected_always"`
-		CollectChildren sql.NullBool   `db:"collect_children"`
-	}
+	var selectStopAreas []SelectStopArea
 	modelName := manager.model.Date()
+
 	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
 	_, err := Database.Select(&selectStopAreas, sqlQuery)
 	if err != nil {
 		return err
 	}
+
 	for _, sa := range selectStopAreas {
 		stopArea := manager.New()
 		stopArea.id = StopAreaId(sa.Id)

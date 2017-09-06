@@ -267,22 +267,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 
 	testTime := time.Now()
 	// Insert Data in the test db
-	var databaseStopArea = struct {
-		Id              string    `db:"id"`
-		ReferentialId   string    `db:"referential_id"`
-		ParentId        string    `db:"parent_id"`
-		ModelName       string    `db:"model_name"`
-		Name            string    `db:"name"`
-		ObjectIDs       string    `db:"object_ids"`
-		LineIds         string    `db:"line_ids"`
-		Attributes      string    `db:"attributes"`
-		References      string    `db:"siri_references"`
-		NextCollectAt   time.Time `db:"next_collect_at"`
-		CollectedAt     time.Time `db:"collected_at"`
-		CollectedUntil  time.Time `db:"collected_until"`
-		CollectedAlways bool      `db:"collected_always"`
-		CollectChildren bool      `db:"collect_children"`
-	}{
+	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:   "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ParentId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",

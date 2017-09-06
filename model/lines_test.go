@@ -199,15 +199,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 	defer CleanTestDb(t)
 
 	// Insert Data in the test db
-	var databaseLine = struct {
-		Id            string `db:"id"`
-		ReferentialId string `db:"referential_id"`
-		ModelName     string `db:"model_name"`
-		Name          string `db:"name"`
-		ObjectIDs     string `db:"object_ids"`
-		Attributes    string `db:"attributes"`
-		References    string `db:"siri_references"`
-	}{
+	databaseLine := DatabaseLine{
 		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ModelName:     "2017-01-01",

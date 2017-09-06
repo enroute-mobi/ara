@@ -1,14 +1,11 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sort"
 	"sync"
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type StopVisitId string
@@ -388,25 +385,9 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 }
 
 func (manager *MemoryStopVisits) Load(referentialId string) error {
-	var selectStopVisits []struct {
-		Id               string
-		ReferentialId    string         `db:"referential_id"`
-		ModelName        string         `db:"model_name"`
-		ObjectIDs        sql.NullString `db:"object_ids"`
-		StopAreaId       sql.NullString `db:"stop_area_id"`
-		VehicleJourneyId sql.NullString `db:"vehicle_journey_id"`
-		ArrivalStatus    sql.NullString `db:"arrival_status"`
-		DepartureStatus  sql.NullString `db:"departure_status"`
-		Schedules        sql.NullString `db:"schedules"`
-		Attributes       sql.NullString `db:"attributes"`
-		References       sql.NullString `db:"siri_references"`
-		Collected        sql.NullBool   `db:"collected"`
-		VehicleAtStop    sql.NullBool   `db:"vehicle_at_stop"`
-		CollectedAt      pq.NullTime    `db:"collected_at"`
-		RecordedAt       pq.NullTime    `db:"recorded_at"`
-		PassageOrder     sql.NullInt64  `db:"passage_order"`
-	}
+	var selectStopVisits []SelectStopVisit
 	modelName := manager.model.Date()
+
 	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
 	_, err := Database.Select(&selectStopVisits, sqlQuery)
 	if err != nil {
