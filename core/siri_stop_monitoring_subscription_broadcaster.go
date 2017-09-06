@@ -142,7 +142,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, sm := range sms {
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: sm.MessageIdentifier(),
 			SubscriberRef:     sm.SubscriberRef(),

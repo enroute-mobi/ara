@@ -23,7 +23,7 @@ func (request *XMLEstimatedTimetableSubscriptionRequestEntry) SubscriberRef() st
 	return request.subscriberRef
 }
 
-func (request *XMLEstimatedTimetableSubscriptionRequestEntry) SubscriptionRef() string {
+func (request *XMLEstimatedTimetableSubscriptionRequestEntry) SubscriptionIdentifier() string {
 	if request.subscriptionRef == "" {
 		request.subscriptionRef = request.findStringChildContent("SubscriptionRef")
 	}

@@ -12,6 +12,43 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
+func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
+	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.model = model.NewMemoryModel()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "_internal"
+	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
+
+	line := referential.Model().Lines().New()
+	line.Save()
+
+	file, _ := os.Open("testdata/estimatedtimetable-request-soap.xml")
+	body, _ := ioutil.ReadAll(file)
+	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+
+	if err != nil {
+		t.Fatalf("Error while handling subscription request: %v", err)
+	}
+
+	if len(response.ResponseStatus) != 1 {
+		t.Errorf("Wrong ResponseStatus size want 1 got : %v", len(response.ResponseStatus))
+	}
+
+	if !response.ResponseStatus[0].Status {
+		t.Errorf("Wrong first ResponseStatus status want true got : %v", response.ResponseStatus[0].Status)
+	}
+}
+
 func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")

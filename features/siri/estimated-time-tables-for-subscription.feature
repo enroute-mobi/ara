@@ -294,6 +294,3 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
       </ns1:NotifyEstimatedTimetable>
       """
-
-
-

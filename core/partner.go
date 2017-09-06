@@ -402,6 +402,12 @@ func (partner *Partner) hasSubscribers() bool {
 	if ok {
 		return true
 	}
+
+	_, ok = partner.connectors[SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+
 	return false
 }
 

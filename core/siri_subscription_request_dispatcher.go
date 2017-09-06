@@ -72,6 +72,18 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		return &response, nil
 	}
 
+	if len(request.XMLSubscriptionETTEntries()) > 0 {
+		smbc, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("No EstimatedTimeTableSubscriptionBroadcaster Connector")
+		}
+		for _, smr := range smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
+			response.ResponseStatus = append(response.ResponseStatus, smr)
+		}
+		return &response, nil
+
+	}
+
 	return nil, fmt.Errorf("Subscription not supported")
 }
 
