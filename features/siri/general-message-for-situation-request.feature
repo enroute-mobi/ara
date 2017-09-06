@@ -96,9 +96,6 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
 
-  # Should be fixed by 3800 and 3801
-  # Same as previous scenario
-  @wip
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
       | ObjectIDs               | "external" : "test"                                                        |
@@ -108,9 +105,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T20:30:06+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | References[0]           | LineRef:{"internal":"NINOXE:Line:3:LOC"} |
+      | References[0]           | LineRef:{"external":"NINOXE:Line:3:LOC"} |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
@@ -160,10 +157,9 @@ Feature: Support SIRI GeneralMessage for Situation
               <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
                 <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage>
-                  <ns3:formatRef>STIF-IDF</ns3:formatRef>
+                <ns3:GeneralMessage formatRef="STIF-IDF">
                   <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ItemIdentifier>
+                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
                   <ns3:InfoMessageIdentifier>test</ns3:InfoMessageIdentifier>
                   <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
                   <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
