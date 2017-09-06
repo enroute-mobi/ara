@@ -32,6 +32,7 @@ const terminateSubscriptionRequestTemplate = `<ns1:TerminateSubscriptionRequest 
    xmlns:ns6="http://wsdl.siri.org.uk/siri">
     <ns5:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:RequestTimestamp>
     <ns5:RequestorRef>{{.RequestorRef}}</ns5:RequestorRef>
+    <ns5:MessageIdentifier>{{ .MessageIdentifier }}</ns5:MessageIdentifier>
   </ServiceRequestInfo>
   <Request version="2.0:FR-IDF-2.4">
     <ns5:SubscriptionRef>{{.SubscriptionRef}}</ns5:SubscriptionRef>
