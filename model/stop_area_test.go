@@ -270,27 +270,33 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	var databaseStopArea = struct {
 		Id              string    `db:"id"`
 		ReferentialId   string    `db:"referential_id"`
+		ParentId        string    `db:"parent_id"`
 		ModelName       string    `db:"model_name"`
 		Name            string    `db:"name"`
 		ObjectIDs       string    `db:"object_ids"`
+		LineIds         string    `db:"line_ids"`
 		Attributes      string    `db:"attributes"`
 		References      string    `db:"siri_references"`
 		NextCollectAt   time.Time `db:"next_collect_at"`
 		CollectedAt     time.Time `db:"collected_at"`
 		CollectedUntil  time.Time `db:"collected_until"`
 		CollectedAlways bool      `db:"collected_always"`
+		CollectChildren bool      `db:"collect_children"`
 	}{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:   "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ParentId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
 		ObjectIDs:       `{"internal":"value"}`,
+		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
 		References:      "{}",
 		NextCollectAt:   testTime,
 		CollectedAt:     testTime,
 		CollectedUntil:  testTime,
 		CollectedAlways: true,
+		CollectChildren: true,
 	}
 
 	Database.AddTableWithName(databaseStopArea, "stop_areas")
@@ -321,6 +327,9 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if stopArea.id != stopAreaId {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", stopArea.id, stopAreaId)
 	}
+	if stopArea.ParentId != StopAreaId("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") {
+		t.Errorf("Wrong ParentId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", stopArea.ParentId)
+	}
 	if stopArea.Name != "stopArea" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: stopArea", stopArea.Name)
 	}
@@ -330,6 +339,9 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
 	}
+	if !stopArea.CollectChildren {
+		t.Errorf("Wrong CollectChildren:\n got: %v\n expected: true", stopArea.CollectChildren)
+	}
 	if stopArea.NextCollectAt.Equal(testTime) {
 		t.Errorf("Wrong NextCollectAt:\n got: %v\n expected: %v", stopArea.NextCollectAt, testTime)
 	}
@@ -338,5 +350,11 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 	if stopArea.CollectedUntil.Equal(testTime) {
 		t.Errorf("Wrong CollectedUntil:\n got: %v\n expected: %v", stopArea.CollectedUntil, testTime)
+	}
+	if len(stopArea.LineIds) != 2 {
+		t.Fatalf("StopArea should have 2 LineIds, got: %v", len(stopArea.LineIds))
+	}
+	if stopArea.LineIds[0] != "d0eebc99-9c0b" || stopArea.LineIds[1] != "e0eebc99-9c0b" {
+		t.Errorf("Wrong LineIds:\n got: %v\n expected: [d0eebc99-9c0b,e0eebc99-9c0b]", stopArea.LineIds)
 	}
 }

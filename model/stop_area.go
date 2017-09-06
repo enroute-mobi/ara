@@ -276,12 +276,15 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 		ModelName       string `db:"model_name"`
 		Name            sql.NullString
 		ObjectIDs       sql.NullString `db:"object_ids"`
+		ParentId        sql.NullString `db:"parent_id"`
 		Attributes      sql.NullString
 		References      sql.NullString `db:"siri_references"`
+		LineIds         sql.NullString `db:"line_ids"`
 		NextCollectAt   pq.NullTime    `db:"next_collect_at"`
 		CollectedAt     pq.NullTime    `db:"collected_at"`
 		CollectedUntil  pq.NullTime    `db:"collected_until"`
 		CollectedAlways sql.NullBool   `db:"collected_always"`
+		CollectChildren sql.NullBool   `db:"collect_children"`
 	}
 	modelName := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
@@ -295,17 +298,33 @@ func (manager *MemoryStopAreas) Load(referentialId string) error {
 		if sa.Name.Valid {
 			stopArea.Name = sa.Name.String
 		}
+		if sa.ParentId.Valid {
+			stopArea.ParentId = StopAreaId(sa.ParentId.String)
+		}
 		if sa.NextCollectAt.Valid {
 			stopArea.NextCollectAt = sa.NextCollectAt.Time
 		}
 		if sa.CollectedAt.Valid {
 			stopArea.collectedAt = sa.CollectedAt.Time
 		}
+		if sa.CollectedUntil.Valid {
+			stopArea.CollectedUntil = sa.CollectedUntil.Time
+		}
 		if sa.CollectedAlways.Valid {
 			stopArea.CollectedAlways = sa.CollectedAlways.Bool
 		}
-		if sa.CollectedUntil.Valid {
-			stopArea.CollectedUntil = sa.CollectedUntil.Time
+		if sa.CollectChildren.Valid {
+			stopArea.CollectChildren = sa.CollectChildren.Bool
+		}
+
+		if sa.LineIds.Valid && len(sa.LineIds.String) > 0 {
+			var lineIds []string
+			if err = json.Unmarshal([]byte(sa.LineIds.String), &lineIds); err != nil {
+				return err
+			}
+			for i := range lineIds {
+				stopArea.LineIds = append(stopArea.LineIds, LineId(lineIds[i]))
+			}
 		}
 
 		if sa.Attributes.Valid && len(sa.Attributes.String) > 0 {
