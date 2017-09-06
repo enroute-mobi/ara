@@ -3,6 +3,7 @@ Feature: Support SIRI StopLinesDiscovery
   Background:
     Given a Referential "test" is created
 
+@wip
   Scenario: 4397 - Handle a SIRI StopLinesDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-lines-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
