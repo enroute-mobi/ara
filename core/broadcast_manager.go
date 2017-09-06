@@ -69,6 +69,7 @@ func (manager *BroadcastManager) run() {
 		select {
 		case event := <-manager.smbEventChan:
 			manager.smsbEvent_handler(event)
+			manager.ettsbEvent_handler(event)
 		case event := <-manager.gmbEventChan:
 			manager.gmsbEvent_handler(event)
 		case <-manager.stop:
@@ -93,6 +94,14 @@ func (manager *BroadcastManager) smsbEvent_handler(event model.StopMonitoringBro
 			connector.(*TestStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
 			continue
 		}
+	}
+}
+
+func (manager *BroadcastManager) ettsbEvent_handler(event model.StopMonitoringBroadcastEvent) {
+	connectorTypes := []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+		connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleStopVisitBroadcastEvent(&event)
 	}
 }
 
