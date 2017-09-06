@@ -70,7 +70,13 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	now := guardian.Clock().Now()
 
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.ParentId != "" || !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
+		if stopArea.ParentId != "" {
+			parent, ok := stopArea.Parent()
+			if ok && !parent.CollectChildren {
+				continue
+			}
+		}
+		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
 			continue
 		}
 

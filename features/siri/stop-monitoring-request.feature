@@ -773,6 +773,30 @@ Feature: Support SIRI StopMonitoring by request
       And a StopArea exists with the following attributes:
         | Name      | Test 1                                   |
         | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-        | ParentId  | parent                                   |
+        | ParentId  | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
+      And a StopArea exists with the following attributes:
+        | Name      | Test 2                                   |
+        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       When a minute has passed
       Then the SIRI server should not have received a GetStopMonitoring request
+
+  Scenario: Perform a SIRI StopMonitoring request when StopArea has a parent with CollectChildren
+      Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+        """
+        """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+        | remote_url                 | http://localhost:8090      |
+        | remote_credential          | test                       |
+        | remote_objectid_kind       | internal                   |
+        | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+      And a minute has passed
+      And a StopArea exists with the following attributes:
+        | Name      | Test 1                                   |
+        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        | ParentId  | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
+      And a StopArea exists with the following attributes:
+        | Name            | Test 2                                   |
+        | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+        | CollectChildren | true                                     |
+      When a minute has passed
+      Then the SIRI server should have received 1 GetStopMonitoring request

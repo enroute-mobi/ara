@@ -142,7 +142,7 @@ func Test_StopAreaController_Index(t *testing.T) {
 	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","CollectedAlways":true,"Name":"First StopArea"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","CollectedAlways":true,"Name":"First StopArea","CollectChildren":false}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

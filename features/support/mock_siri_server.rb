@@ -102,6 +102,10 @@ class SIRIServer
     !requests.empty?
   end
 
+  def received_requests?(count = 1)
+    requests.length == count
+  end
+
 end
 
 After do

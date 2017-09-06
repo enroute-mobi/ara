@@ -30,10 +30,11 @@ type StopArea struct {
 	CollectedUntil  time.Time
 	CollectedAlways bool
 
-	Name       string
-	LineIds    StopAreaLineIds `json:"Lines,omitempty"`
-	Attributes Attributes
-	References References
+	Name            string
+	LineIds         StopAreaLineIds `json:"Lines,omitempty"`
+	CollectChildren bool
+	Attributes      Attributes
+	References      References
 	// ...
 }
 
@@ -120,6 +121,10 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 		}
 	}
 	return
+}
+
+func (stopArea *StopArea) Parent() (StopArea, bool) {
+	return stopArea.model.StopAreas().Find(stopArea.ParentId)
 }
 
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {

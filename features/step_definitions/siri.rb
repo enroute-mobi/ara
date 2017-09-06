@@ -118,6 +118,11 @@ Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (GetStopMonitor
   expect(SIRIServer.find(name).received_request?).to be_falsy
 end
 
+Then(/^the (?:"([^"]*)" )?SIRI server should have received (\d+) (GetStopMonitoring) request(?:s)?$/) do |name, count, message_type|
+  name ||= "default"
+  expect(SIRIServer.find(name).received_requests?(count.to_i)).to be_truthy
+end
+
 Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with:$/) do |name, attributes|
   name ||= "default"
   last_siri_request = SIRIServer.find(name).requests.last.body
