@@ -5,13 +5,13 @@ Feature: Support SIRI subscription
 
   @wip
   Scenario: 4377 - Change status of subscription with termination request
-    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-collector] and the following settings:
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
       | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind      | EstimatedTimetable  |
+      | Kind      | StopMonitoring      |
       | deleted   | false               |
     And a minute has passed
     When I send this SIRI request
@@ -38,5 +38,5 @@ Feature: Support SIRI subscription
       </S:Envelope>
       """
     Then a Subscription exist with the following attributes:
-      | Kind      | EstimatedTimetable  |
+      | Kind      | StopMonitoring      |
       | deleted   | true                |
