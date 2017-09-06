@@ -68,41 +68,48 @@ func (manager *BroadcastManager) run() {
 	for {
 		select {
 		case event := <-manager.smbEventChan:
-			connectorTypes := []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
-			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
-				connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-				if ok {
-					connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
-					continue
-				}
-
-				// TEST
-				connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-				if ok {
-					connector.(*TestStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
-					continue
-				}
-			}
-
+			manager.smsbEvent_handler(event)
 		case event := <-manager.gmbEventChan:
-			connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
-			for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
-				connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
-				if ok {
-					connector.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
-					continue
-				}
-
-				// TEST
-				connector, ok = partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
-				if ok {
-					connector.(*TestGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
-					continue
-				}
-			}
+			manager.gmsbEvent_handler(event)
 		case <-manager.stop:
 			logger.Log.Debugf("BroadcastManager Stop")
 			return
+		}
+	}
+}
+
+func (manager *BroadcastManager) smsbEvent_handler(event model.StopMonitoringBroadcastEvent) {
+	connectorTypes := []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+		connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
+			continue
+		}
+
+		// TEST
+		connector, ok = partner.Connector(TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*TestStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
+			continue
+		}
+	}
+}
+
+func (manager *BroadcastManager) gmsbEvent_handler(event model.GeneralMessageBroadcastEvent) {
+	connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+		connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
+			continue
+		}
+
+		// TEST
+		connector, ok = partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*TestGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
+			continue
 		}
 	}
 }
