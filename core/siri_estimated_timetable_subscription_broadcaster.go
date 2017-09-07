@@ -88,10 +88,18 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 			r := sub.CreateAddNewResource(ref)
 			r.SubscribedUntil = ett.InitialTerminationTime()
+			connector.fillOptions(sub, request)
+
+			rs.ValidUntil = ett.InitialTerminationTime()
 		}
 		resps = append(resps, rs)
 	}
 	return resps
+}
+
+func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *siri.XMLSubscriptionRequest) {
+	so := s.SubscriptionOptions()
+	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
@@ -110,5 +118,38 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(sub
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) (SubscriptionId, bool) {
-	return SubscriptionId(0), true
+	subId := SubscriptionId(0)
+
+	vj, ok := connector.Partner().Model().VehicleJourneys().Find(sv.VehicleJourneyId)
+	if !ok {
+		return subId, false
+	}
+
+	line, ok := connector.Partner().Model().Lines().Find(vj.LineId)
+	if !ok {
+		return subId, false
+	}
+
+	lineObj, ok := line.ObjectID(connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+	if !ok {
+		return subId, false
+	}
+
+	sub, ok := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String())
+	if !ok {
+		return subId, false
+	}
+
+	r := sub.Resource(lineObj)
+	if r == nil {
+		return subId, false
+	}
+
+	lastState, ok := r.LastStates[string(sv.Id())]
+
+	if !ok {
+		lastState.(*estimatedTimeTable).InitState(&sv, sub)
+	}
+
+	return subId, lastState.(*estimatedTimeTable).Haschanged(&sv)
 }
