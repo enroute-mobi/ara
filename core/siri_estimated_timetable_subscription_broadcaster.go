@@ -153,3 +153,30 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(sv mo
 
 	return subId, lastState.(*estimatedTimeTable).Haschanged(&sv)
 }
+
+// START TEST
+
+type TestSIRIETTSubscriptionBroadcasterFactory struct{}
+
+type TestETTSubscriptionBroadcaster struct {
+	model.UUIDConsumer
+
+	events []*model.StopMonitoringBroadcastEvent
+}
+
+func NewTestETTSubscriptionBroadcaster() *TestETTSubscriptionBroadcaster {
+	connector := &TestETTSubscriptionBroadcaster{}
+	return connector
+}
+
+func (connector *TestETTSubscriptionBroadcaster) HandleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+	connector.events = append(connector.events, event)
+}
+
+func (factory *TestSIRIETTSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
+	return true
+}
+
+func (factory *TestSIRIETTSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
+	return NewTestETTSubscriptionBroadcaster()
+}

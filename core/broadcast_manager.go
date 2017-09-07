@@ -98,10 +98,19 @@ func (manager *BroadcastManager) smsbEvent_handler(event model.StopMonitoringBro
 }
 
 func (manager *BroadcastManager) ettsbEvent_handler(event model.StopMonitoringBroadcastEvent) {
-	connectorTypes := []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
+	connectorTypes := []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER, TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
-		connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-		connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleStopVisitBroadcastEvent(&event)
+		connector, ok := partner.Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleStopVisitBroadcastEvent(&event)
+			continue
+		}
+
+		connector, ok = partner.Connector(TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*TestETTSubscriptionBroadcaster).HandleStopVisitBroadcastEvent(&event)
+			continue
+		}
 	}
 }
 
