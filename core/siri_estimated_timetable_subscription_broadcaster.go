@@ -19,9 +19,9 @@ type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 
 	siriConnector
 
-	//stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
-	toBroadcast map[SubscriptionId][]model.StopVisitId
-	mutex       *sync.Mutex //protect the map
+	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
+	toBroadcast                   map[SubscriptionId][]model.StopVisitId
+	mutex                         *sync.Mutex //protect the map
 }
 
 type SIRIEstimatedTimetableSubscriptionBroadcasterFactory struct{}
@@ -46,6 +46,7 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	siriEstimatedTimeTableSubscriptionBroadcaster.mutex = &sync.Mutex{}
 	siriEstimatedTimeTableSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
+	siriEstimatedTimeTableSubscriptionBroadcaster.estimatedTimeTableBroadcaster = NewSIRIEstimatedTimeTableBroadcaster(siriEstimatedTimeTableSubscriptionBroadcaster)
 	return siriEstimatedTimeTableSubscriptionBroadcaster
 }
 
