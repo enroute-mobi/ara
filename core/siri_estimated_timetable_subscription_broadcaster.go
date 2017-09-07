@@ -20,7 +20,7 @@ type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 	siriConnector
 
 	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
-	toBroadcast                   map[SubscriptionId][]model.StopVisitId
+	toBroadcast                   map[SubscriptionId][]model.LineId
 	mutex                         *sync.Mutex //protect the map
 }
 
@@ -44,7 +44,7 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	siriEstimatedTimeTableSubscriptionBroadcaster := &SIRIEstimatedTimeTableSubscriptionBroadcaster{}
 	siriEstimatedTimeTableSubscriptionBroadcaster.partner = partner
 	siriEstimatedTimeTableSubscriptionBroadcaster.mutex = &sync.Mutex{}
-	siriEstimatedTimeTableSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
+	siriEstimatedTimeTableSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.LineId)
 
 	siriEstimatedTimeTableSubscriptionBroadcaster.estimatedTimeTableBroadcaster = NewSIRIEstimatedTimeTableBroadcaster(siriEstimatedTimeTableSubscriptionBroadcaster)
 	return siriEstimatedTimeTableSubscriptionBroadcaster
@@ -110,49 +110,60 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleStopVisitB
 	if event.ModelType != "StopVisit" {
 		return
 	}
+
+	connector.checkEvent(model.StopVisitId(event.ModelId), tx)
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLine(subId SubscriptionId, lineId model.LineId) {
 	connector.mutex.Lock()
-	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], svId)
+	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], lineId)
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) (SubscriptionId, bool) {
-	subId := SubscriptionId(0)
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId, tx *model.Transaction) {
+	sv, ok := connector.Partner().Model().StopVisits().Find(svId)
+
+	if !ok {
+		return
+	}
 
 	vj, ok := connector.Partner().Model().VehicleJourneys().Find(sv.VehicleJourneyId)
 	if !ok {
-		return subId, false
+		return
 	}
 
 	line, ok := connector.Partner().Model().Lines().Find(vj.LineId)
 	if !ok {
-		return subId, false
+		return
 	}
 
 	lineObj, ok := line.ObjectID(connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 	if !ok {
-		return subId, false
+		return
 	}
 
 	sub, ok := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String())
 	if !ok {
-		return subId, false
+		return
 	}
 
 	r := sub.Resource(lineObj)
 	if r == nil {
-		return subId, false
+		return
 	}
 
 	lastState, ok := r.LastStates[string(sv.Id())]
 
 	if !ok {
+		r.LastStates[string(sv.Id())] = &estimatedTimeTable{}
+		lastState, _ = r.LastStates[string(sv.Id())]
 		lastState.(*estimatedTimeTable).InitState(&sv, sub)
 	}
 
-	return subId, lastState.(*estimatedTimeTable).Haschanged(&sv)
+	if ok = lastState.(*estimatedTimeTable).Haschanged(&sv); !ok {
+		return
+	}
+	connector.addLine(sub.Id(), line.Id())
 }
 
 // START TEST
