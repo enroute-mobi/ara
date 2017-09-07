@@ -130,7 +130,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		return
 	}
 
-	logSIRIDeleteSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
+	logXMLDeleteSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {

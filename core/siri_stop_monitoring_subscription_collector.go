@@ -119,7 +119,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotifi
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	logSIRISubscriptionTerminatedResponse(logStashEvent, response)
+	logXMLSubscriptionTerminatedResponse(logStashEvent, response)
 
 	subscriptionTerminated := response.XMLSubscriptionTerminateds()
 	connector.setSubscriptionTerminatedEvents(subscriptionTerminated)
@@ -187,7 +187,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
 		return
 	}
-	logSIRIDeleteSubscriptionResponse(logStashEvent, response)
+	logXMLDeleteSubscriptionResponse(logStashEvent, response)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
@@ -280,23 +280,20 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	}
 }
 
-func logSIRIDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLDeleteSubscriptionResponse) {
+func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLDeleteSubscriptionResponse) {
 	logStashEvent["responderRef"] = response.ResponderRef()
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef()
-	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
 	logStashEvent["responseXML"] = response.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(response.Status())
 
-	if !response.Status() {
-		logStashEvent["errorType"] = response.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
-		logStashEvent["errorText"] = response.ErrorText()
-		logStashEvent["errorDescription"] = response.ErrorDescription()
+	var subscriptionIds []string
+	for _, responseStatus := range response.ResponseStatus() {
+		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
 	}
+	logStashEvent["SubscriptionRefs"] = strings.Join(subscriptionIds, ", ")
 }
 
-func logSIRISubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+func logXMLSubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()

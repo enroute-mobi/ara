@@ -88,28 +88,45 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse {
+	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
-		ResponseTimestamp: connector.Clock().Now(),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
-		Status:            true,
-		SubscriberRef:     connector.SIRIPartner().RequestorRef(),
-		SubscriptionRef:   r.SubscriptionRef(),
+		RequestMessageRef: r.MessageIdentifier(),
+		ResponseTimestamp: currentTime,
 	}
 
-	if r.CancelAll() == true {
+	if r.CancelAll() {
+		for _, subscription := range connector.Partner().Subscriptions().FindAll() {
+			responseStatus := &siri.SIRITerminationResponseStatus{
+				SubscriberRef:     r.RequestorRef(),
+				SubscriptionRef:   subscription.ExternalId(),
+				ResponseTimestamp: currentTime,
+				Status:            true,
+			}
+			resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
+		}
 		connector.Partner().CancelSubscriptions()
 		return resp
 	}
 
-	subscriptionId := r.SubscriptionRef()
+	responseStatus := &siri.SIRITerminationResponseStatus{
+		SubscriberRef:     r.RequestorRef(),
+		SubscriptionRef:   r.SubscriptionRef(),
+		ResponseTimestamp: currentTime,
+	}
 
-	sub, ok := connector.Partner().Subscriptions().FindByExternalId(subscriptionId)
+	resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
+
+	sub, ok := connector.Partner().Subscriptions().FindByExternalId(r.SubscriptionRef())
 	if !ok {
-		logger.Log.Debugf("Could not Unsubscribe to unknow subscription %v", resp.SubscriptionRef)
+		logger.Log.Debugf("Could not Unsubscribe to unknow subscription %v", r.SubscriptionRef())
 
-		resp.Status = false
+		responseStatus.ErrorType = "InvalidDataReferencesError"
+		responseStatus.ErrorText = fmt.Sprintf("Subscription not found: '%s'", r.SubscriptionRef())
 		return resp
 	}
+
+	responseStatus.Status = true
 
 	sub.Delete()
 	return resp

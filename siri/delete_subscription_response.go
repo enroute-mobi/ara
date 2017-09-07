@@ -2,6 +2,8 @@ package siri
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
 	"text/template"
 	"time"
 
@@ -10,36 +12,73 @@ import (
 )
 
 type XMLDeleteSubscriptionResponse struct {
-	ResponseXMLStructure
+	XMLStructure
 
-	responderRef    string
-	subscriberRef   string
-	subscriptionRef string
+	responderRef      string
+	requestMessageRef string
+
+	responseTimestamp time.Time
+
+	responseStatus []*XMLTerminationResponseStatus
+}
+
+type XMLTerminationResponseStatus struct {
+	XMLStructure
+
+	subscriberRef     string
+	subscriptionRef   string
+	responseTimestamp time.Time
+
+	status           Bool
+	errorType        string
+	errorNumber      int
+	errorText        string
+	errorDescription string
 }
 
 type SIRIDeleteSubscriptionResponse struct {
-	ResponseTimestamp time.Time
 	ResponderRef      string
-	Status            bool
+	RequestMessageRef string
+	ResponseTimestamp time.Time
 
-	SubscriberRef   string
-	SubscriptionRef string
+	ResponseStatus []*SIRITerminationResponseStatus
 }
 
-const deleteSubscriptionResponseTemplate = `<ns3:DeleteSubscriptionResponse version="2.0:FR-IDF-2.4">
-  <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
-  <ns3:ResponderRef>{{ .ResponderRef }}</ns3:ResponderRef>
-  <ns5:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>
-  <ns3:TerminationResponseStatus>
-	  <ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-	  <ns3:SubscriberRef>{{ .SubscriberRef }}</ns3:SubscriberRef>
-	  <ns3:SubscriptionRef>{{ .SubscriptionRef }}</ns3:SubscriptionRef>
-	  <ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
-	  <ns3:ErrorCondition>
-	    <ns3:UnknownSubscriptionError/>
-	  </ns3:ErrorCondition>{{ end }}
-  </ns3:TerminationResponseStatus>
-</ns3:DeleteSubscriptionResponse>`
+type SIRITerminationResponseStatus struct {
+	SubscriberRef     string
+	SubscriptionRef   string
+	ResponseTimestamp time.Time
+
+	Status      bool
+	ErrorType   string
+	ErrorNumber string
+	ErrorText   string
+}
+
+const deleteSubscriptionResponseTemplate = `<sw:DeleteSubscriptionResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<DeleteSubscriptionAnswerInfo>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
+		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>
+	</DeleteSubscriptionAnswerInfo>
+	<Answer>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
+		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>{{ range .ResponseStatus }}
+		<siri:TerminationResponseStatus>
+			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+			<siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
+			<siri:SubscriptionRef>{{ .SubscriptionRef }}</siri:SubscriptionRef>
+			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
+			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<siri:{{.ErrorType}}>{{ end }}
+					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+				</siri:{{.ErrorType}}>
+			</siri:ErrorCondition>{{ else }}
+		</siri:TerminationResponseStatus>{{ end }}
+	</Answer>
+</sw:DeleteSubscriptionResponse>`
 
 func NewXMLDeleteSubscriptionResponse(node xml.Node) *XMLDeleteSubscriptionResponse {
 	xmlDeleteSubscriptionResponse := &XMLDeleteSubscriptionResponse{}
@@ -56,11 +95,10 @@ func NewXMLDeleteSubscriptionResponseFromContent(content []byte) (*XMLDeleteSubs
 	return request, nil
 }
 
-func (response *XMLDeleteSubscriptionResponse) SubscriptionRef() string {
-	if response.subscriptionRef == "" {
-		response.subscriptionRef = response.findStringChildContent("SubscriptionRef")
-	}
-	return response.subscriptionRef
+func NewXMLTerminationResponseStatus(node XMLNode) *XMLTerminationResponseStatus {
+	responseStatus := &XMLTerminationResponseStatus{}
+	responseStatus.node = node
+	return responseStatus
 }
 
 func (response *XMLDeleteSubscriptionResponse) ResponderRef() string {
@@ -70,11 +108,104 @@ func (response *XMLDeleteSubscriptionResponse) ResponderRef() string {
 	return response.responderRef
 }
 
-func (response *XMLDeleteSubscriptionResponse) SubscriberRef() string {
+func (response *XMLDeleteSubscriptionResponse) RequestMessageRef() string {
+	if response.requestMessageRef == "" {
+		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
+	}
+	return response.requestMessageRef
+}
+
+func (response *XMLDeleteSubscriptionResponse) ResponseTimestamp() time.Time {
+	if response.responseTimestamp.IsZero() {
+		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
+	}
+	return response.responseTimestamp
+}
+
+func (response *XMLDeleteSubscriptionResponse) ResponseStatus() []*XMLTerminationResponseStatus {
+	if len(response.responseStatus) == 0 {
+		nodes := response.findNodes("TerminationResponseStatus")
+		if nodes == nil {
+			return response.responseStatus
+		}
+		for _, responseStatus := range nodes {
+			response.responseStatus = append(response.responseStatus, NewXMLTerminationResponseStatus(responseStatus))
+		}
+	}
+	return response.responseStatus
+}
+
+func (response *XMLTerminationResponseStatus) SubscriptionRef() string {
+	if response.subscriptionRef == "" {
+		response.subscriptionRef = response.findStringChildContent("SubscriptionRef")
+	}
+	return response.subscriptionRef
+}
+
+func (response *XMLTerminationResponseStatus) SubscriberRef() string {
 	if response.subscriptionRef == "" {
 		response.subscriptionRef = response.findStringChildContent("SubscriberRef")
 	}
 	return response.subscriptionRef
+}
+
+func (response *XMLTerminationResponseStatus) ResponseTimestamp() time.Time {
+	if response.responseTimestamp.IsZero() {
+		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
+	}
+	return response.responseTimestamp
+}
+
+func (response *XMLTerminationResponseStatus) Status() bool {
+	if !response.status.Defined {
+		response.status.SetValue(response.findBoolChildContent("Status"))
+	}
+	return response.status.Value
+}
+
+func (response *XMLTerminationResponseStatus) ErrorType() string {
+	if !response.Status() && response.errorType == "" {
+		node := response.findNode("ErrorText")
+		if node != nil {
+			response.errorType = node.Parent().Name()
+			// Find errorText and errorNumber to avoir too much parsing
+			response.errorText = strings.TrimSpace(node.Content())
+			if response.errorType == "OtherError" {
+				n, err := strconv.Atoi(node.Parent().Attr("number"))
+				if err != nil {
+					return ""
+				}
+				response.errorNumber = n
+			}
+		}
+	}
+	return response.errorType
+}
+
+func (response *XMLTerminationResponseStatus) ErrorNumber() int {
+	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
+		node := response.findNode("ErrorText")
+		n, err := strconv.Atoi(node.Parent().Attr("number"))
+		if err != nil {
+			return -1
+		}
+		response.errorNumber = n
+	}
+	return response.errorNumber
+}
+
+func (response *XMLTerminationResponseStatus) ErrorText() string {
+	if !response.Status() && response.errorText == "" {
+		response.errorText = response.findStringChildContent("ErrorText")
+	}
+	return response.errorText
+}
+
+func (response *XMLTerminationResponseStatus) ErrorDescription() string {
+	if !response.Status() && response.errorDescription == "" {
+		response.errorDescription = response.findStringChildContent("Description")
+	}
+	return response.errorDescription
 }
 
 func (notify *SIRIDeleteSubscriptionResponse) BuildXML() (string, error) {

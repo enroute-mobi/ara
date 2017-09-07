@@ -25,22 +25,18 @@ type XMLDeleteSubscriptionRequest struct {
 	subscriptionRef string
 }
 
-const deleteSubscriptionRequestTemplate = `<ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-	<DeleteSubscriptionInfo
-	 xmlns:ns2="http://www.ifopt.org.uk/acsb"
-	 xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-	 xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-	 xmlns:ns6="http://wsdl.siri.org.uk/siri">
-		<ns5:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:RequestTimestamp>
-		<ns5:RequestorRef>{{.RequestorRef}}</ns5:RequestorRef>
-		<ns5:MessageIdentifier>{{ .MessageIdentifier }}</ns5:MessageIdentifier>
+const deleteSubscriptionRequestTemplate = `<sw:DeleteSubscription xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<DeleteSubscriptionInfo>
+		<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
+		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
+		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
 	</DeleteSubscriptionInfo>
 	<Request version="2.0:FR-IDF-2.4">{{ if .CancelAll }}
-		<ns5:All/>{{ else }}
-		<ns5:SubscriptionRef>{{.SubscriptionRef}}</ns5:SubscriptionRef>{{ end }}
+		<siri:All/>{{ else }}
+		<siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>{{ end }}
 	</Request>
 	<RequestExtension/>
-</ns1:DeleteSubscription>`
+</sw:DeleteSubscription>`
 
 func NewXMLDeleteSubscriptionRequest(node xml.Node) *XMLDeleteSubscriptionRequest {
 	xmlDeleteSubscriptionRequest := &XMLDeleteSubscriptionRequest{}

@@ -163,7 +163,10 @@ func Test_CancelSubscription(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
 
-	if response.Status != true {
+	if len(response.ResponseStatus) != 1 {
+		t.Fatalf("Response should have 1 responseStatus, got: %v", len(response.ResponseStatus))
+	}
+	if !response.ResponseStatus[0].Status {
 		t.Errorf("Status should be true but got false")
 	}
 
@@ -202,8 +205,11 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
 
-	if response.Status != true {
-		t.Errorf("Status should be true but got false")
+	if len(response.ResponseStatus) != 2 {
+		t.Fatalf("Response should have 1 responseStatus, got: %v", len(response.ResponseStatus))
+	}
+	if !response.ResponseStatus[0].Status || !response.ResponseStatus[1].Status {
+		t.Errorf("Status should be true but got false: %v %v", response.ResponseStatus[0].Status, response.ResponseStatus[1].Status)
 	}
 
 	if len(partner.Subscriptions().FindAll()) != 0 {
