@@ -10,7 +10,7 @@ import (
 
 type SubscriptionRequestDispatcher interface {
 	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error)
-	CancelSubscription(*siri.XMLTerminatedSubscriptionRequest) *siri.SIRITerminatedSubscriptionResponse
+	CancelSubscription(*siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse
 }
 
 type SIRISubscriptionRequestDispatcherFactory struct{}
@@ -75,8 +75,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	return nil, fmt.Errorf("Subscription not supported")
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLTerminatedSubscriptionRequest) *siri.SIRITerminatedSubscriptionResponse {
-	resp := &siri.SIRITerminatedSubscriptionResponse{
+func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse {
+	resp := &siri.SIRIDeleteSubscriptionResponse{
 		ResponseTimestamp: connector.Clock().Now(),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
 		Status:            true,
@@ -84,7 +84,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 		SubscriptionRef:   r.SubscriptionRef(),
 	}
 
-	if r.Canceltype() == true {
+	if r.CancelAll() == true {
 		connector.Partner().CancelSubscriptions()
 		return resp
 	}

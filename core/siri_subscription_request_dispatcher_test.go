@@ -121,7 +121,7 @@ func Test_CancelSubscription(t *testing.T) {
 
 	file, _ := os.Open("testdata/terminated_subscription_request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLTerminatedSubscriptionRequestFromContent(body)
+	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
@@ -160,7 +160,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 
 	file, _ := os.Open("testdata/terminated_subscription_request_all-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLTerminatedSubscriptionRequestFromContent(body)
+	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)

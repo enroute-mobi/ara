@@ -154,14 +154,14 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequ
 	return generalMessage, nil
 }
 
-func (client *SOAPClient) TerminatedSubscription(request *SIRITerminatedSubscriptionRequest) (*XMLTerminatedSubscriptionResponse, error) {
+func (client *SOAPClient) DeleteSubscription(request *SIRIDeleteSubscriptionRequest) (*XMLDeleteSubscriptionResponse, error) {
 	// WIP
-	node, err := client.prepareAndSendRequest(request, "TerminateSubscriptionRequest", false)
+	node, err := client.prepareAndSendRequest(request, "DeleteSubscription", false)
 	if err != nil {
 		return nil, err
 	}
 
-	terminatedSub := NewXMLTerminatedSubscriptionResponse(node)
+	terminatedSub := NewXMLDeleteSubscriptionResponse(node)
 	return terminatedSub, nil
 }
 

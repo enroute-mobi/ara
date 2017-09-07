@@ -117,20 +117,20 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	request := &siri.SIRITerminatedSubscriptionRequest{
+	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp: connector.Clock().Now(),
 		SubscriptionRef:  subId,
 		RequestorRef:     connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
 	}
 
-	response, err := connector.SIRIPartner().SOAPClient().TerminatedSubscription(request)
+	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
 
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
 		return
 	}
 
-	logSIRITerminatedSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
+	logSIRIDeleteSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {

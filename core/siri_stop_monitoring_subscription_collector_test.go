@@ -258,12 +258,12 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	}
 }
 
-func Test_SIRIStopMonitoringTerminatedSubscriptionRequest(t *testing.T) {
-	request := &siri.XMLTerminatedSubscriptionRequest{}
+func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
+	request := &siri.XMLDeleteSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLTerminatedSubscriptionRequestFromContent(body)
+		request, _ = siri.NewXMLDeleteSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 

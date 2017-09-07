@@ -76,7 +76,7 @@ type ResponseXMLStructure struct {
 	responseMessageIdentifier string
 	responseTimestamp         time.Time
 
-	status           bool
+	status           Bool
 	errorType        string
 	errorNumber      int
 	errorText        string
@@ -301,10 +301,10 @@ func (response *ResponseXMLStructure) ResponseTimestamp() time.Time {
 }
 
 func (response *ResponseXMLStructure) Status() bool {
-	if !response.status {
-		response.status = response.findBoolChildContent("Status")
+	if !response.status.Defined {
+		response.status.SetValue(response.findBoolChildContent("Status"))
 	}
-	return response.status
+	return response.status.Value
 }
 
 func (response *ResponseXMLStructure) ErrorType() string {

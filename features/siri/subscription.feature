@@ -19,7 +19,7 @@ Feature: Support SIRI subscription
         <?xml version='1.0' encoding='utf-8'?>
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns1:TerminateSubscriptionRequest xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
+          <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
             <ServiceRequestInfo
              xmlns:ns2="http://www.ifopt.org.uk/acsb"
              xmlns:ns3="http://www.ifopt.org.uk/ifopt"
@@ -33,7 +33,7 @@ Feature: Support SIRI subscription
               <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:SubscriptionRef>
             </Request>
             <RequestExtension/>
-          </ns1:TerminateSubscriptionRequest>
+          </ns1:DeleteSubscription>
         </S:Body>
       </S:Envelope>
       """

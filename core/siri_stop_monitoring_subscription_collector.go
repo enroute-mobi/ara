@@ -174,20 +174,20 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	request := &siri.SIRITerminatedSubscriptionRequest{
+	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER),
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
-	logSIRITerminatedSubscriptionRequest(logStashEvent, request)
+	logSIRIDeleteSubscriptionRequest(logStashEvent, request)
 
-	response, err := connector.SIRIPartner().SOAPClient().TerminatedSubscription(request)
+	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
 		return
 	}
-	logSIRITerminatedSubscriptionResponse(logStashEvent, response)
+	logSIRIDeleteSubscriptionResponse(logStashEvent, response)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
@@ -250,7 +250,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 	return event
 }
 
-func logSIRITerminatedSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRITerminatedSubscriptionRequest) {
+func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest) {
 	logStashEvent["RequestTimestamp"] = request.RequestTimestamp.String()
 	logStashEvent["SubscriptionRef"] = request.SubscriptionRef
 	logStashEvent["RequestorRef"] = request.RequestorRef
@@ -280,7 +280,7 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	}
 }
 
-func logSIRITerminatedSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLTerminatedSubscriptionResponse) {
+func logSIRIDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLDeleteSubscriptionResponse) {
 	logStashEvent["responderRef"] = response.ResponderRef()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef()

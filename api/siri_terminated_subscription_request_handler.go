@@ -9,21 +9,21 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type SIRITerminatedSubscriptionRequestHandler struct {
-	xmlRequest *siri.XMLTerminatedSubscriptionRequest
+type SIRIDeleteSubscriptionRequestHandler struct {
+	xmlRequest *siri.XMLDeleteSubscriptionRequest
 	Partner    core.Partner
 }
 
-func (handler *SIRITerminatedSubscriptionRequestHandler) RequestorRef() string {
+func (handler *SIRIDeleteSubscriptionRequestHandler) RequestorRef() string {
 	return handler.xmlRequest.RequestorRef()
 }
 
-func (handler *SIRITerminatedSubscriptionRequestHandler) ConnectorType() string {
+func (handler *SIRIDeleteSubscriptionRequestHandler) ConnectorType() string {
 	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
-func (handler *SIRITerminatedSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
-	logger.Log.Debugf("TerminatedSubscription %s cancel subscription: %s\n", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
+func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+	logger.Log.Debugf("DeleteSubscription %s cancel subscription: %s\n", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
 
 	response := connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest)
 
