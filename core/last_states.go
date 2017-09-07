@@ -42,6 +42,51 @@ func (smlc *stopMonitoringLastChange) UpdateState(stopVisit model.StopVisit) boo
 	return true
 }
 
+type estimatedTimeTable struct {
+	optionParser
+
+	subscription    *Subscription
+	lastTimeUpdate  time.Time
+	departureStatus model.StopVisitDepartureStatus
+	vehicleAtStop   bool
+}
+
+func (ettlc *estimatedTimeTable) SetSubscription(sub *Subscription) {
+	ettlc.subscription = sub
+}
+
+func (ettlc *estimatedTimeTable) InitState(sv *model.StopVisit, sub *Subscription) {
+	ettlc.subscription = sub
+	ettlc.lastTimeUpdate = sv.ReferenceTime()
+	ettlc.vehicleAtStop = sv.VehicleAtStop
+}
+
+func (ettlc *estimatedTimeTable) Haschanged(stopVisit *model.StopVisit) bool {
+	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
+		return false
+	}
+
+	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
+		ettlc.departureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
+		return true
+	}
+
+	if stopVisit.VehicleAtStop == true {
+		ettlc.vehicleAtStop = true
+		return true
+	}
+
+	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
+	if ok {
+		duration := ettlc.getOptionDuration(option)
+		refTime := stopVisit.ReferenceTime()
+		if ettlc.lastTimeUpdate.Add(duration).After(refTime) {
+			return false
+		}
+	}
+	return true
+}
+
 type generalMessageLastChange struct {
 	optionParser
 
@@ -51,7 +96,6 @@ type generalMessageLastChange struct {
 }
 
 func (sglc *generalMessageLastChange) Haschanged(situation model.Situation) bool {
-
 	return true
 }
 
