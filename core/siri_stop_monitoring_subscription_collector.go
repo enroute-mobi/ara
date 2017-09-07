@@ -134,7 +134,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTermina
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-	monitoringRefMap := make(map[string]bool)
+	monitoringRefMap := make(map[string]struct{})
 
 	logXMLStopMonitoringDelivery(logStashEvent, notify)
 
@@ -163,6 +163,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	}
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
+	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
 
 	for _, event := range stopAreaUpdateEvents {
 		connector.broadcastStopAreaUpdateEvent(event)
@@ -189,7 +190,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logSIRITerminatedSubscriptionResponse(logStashEvent, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]bool) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
 	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
 	if len(xmlStopVisitEvents) == 0 {
 		return
@@ -198,7 +199,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	builder := newStopVisitUpdateEventBuilder(connector.partner)
 
 	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
-		monitoringRefMap[xmlStopVisitEvent.StopPointRef()] = true
+		monitoringRefMap[xmlStopVisitEvent.StopPointRef()] = struct{}{}
 		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
 		stopArea, ok := tx.Model().StopAreas().FindByObjectId(stopAreaObjectId)
 		if !ok {
@@ -215,14 +216,14 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]bool) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
 	xmlStopVisitCancellationEvents := xmlResponse.XMLMonitoredStopVisitCancellations()
 	if len(xmlStopVisitCancellationEvents) == 0 {
 		return
 	}
 
 	for _, xmlStopVisitCancellationEvent := range xmlStopVisitCancellationEvents {
-		monitoringRefMap[xmlStopVisitCancellationEvent.MonitoringRef()] = true
+		monitoringRefMap[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
 
 		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitCancellationEvent.MonitoringRef())
 		stopArea, ok := tx.Model().StopAreas().FindByObjectId(stopAreaObjectId)
@@ -325,4 +326,14 @@ func logStopVisitUpdateEventsFromMap(logStashEvent audit.LogStashEvent, stopArea
 	}
 	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
 	logStashEvent["StopVisitCancelledEventIds"] = strings.Join(cancelledIdArray, ", ")
+}
+
+func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
+	refSlice := make([]string, len(refs))
+	i := 0
+	for monitoringRef := range refs {
+		refSlice[i] = monitoringRef
+		i++
+	}
+	logStashEvent["MonitoringRefs"] = strings.Join(refSlice, ", ")
 }
