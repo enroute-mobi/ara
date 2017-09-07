@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/af83/edwig/model"
@@ -122,6 +123,9 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		if !ok {
 			sub := connector.Partner().Subscriptions().New("Situation")
 			sub.SetExternalId(gm.SubscriptionIdentifier())
+			sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
+			sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
+			sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
 			sub.Save()
 		}
 		resps = append(resps, rs)

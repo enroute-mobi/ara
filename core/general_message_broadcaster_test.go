@@ -85,6 +85,9 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)
+	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
+	routeReference.Type = "RouteRef"
+	situation.References = append(situation.References, routeReference)
 
 	reference := model.Reference{
 		ObjectId: &objectid,

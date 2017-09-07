@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -118,6 +119,18 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			Status:                    true,
 		}
 
+		// Prepare Id Array
+		var messageArray []string
+
+		builder := NewBroadcastGeneralMessageBuilder(gmb.connector.SIRIPartner())
+		builder.InfoChannelRef = strings.Split(sub.SubscriptionOptions()["InfoChannelRef"], ",")
+		if sub.SubscriptionOptions()["LineRef"] != "" {
+			builder.SetLineRef(strings.Split(sub.SubscriptionOptions()["LineRef"], ","))
+		}
+		if sub.SubscriptionOptions()["StopPointRef"] != "" {
+			builder.SetStopPointRef(strings.Split(sub.SubscriptionOptions()["StopPointRef"], ","))
+		}
+
 		for _, situationId := range situationIds {
 			situation, ok := tx.Model().Situations().Find(situationId)
 			if !ok {
@@ -125,44 +138,14 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 				continue
 			}
 
-			if situation.Channel == "Commercial" || situation.ValidUntil.Before(gmb.connector.Clock().Now()) {
+			siriGeneralMessage := builder.BuildGeneralMessage(tx, situation)
+			if siriGeneralMessage == nil {
 				continue
 			}
-
-			var infoMessageIdentifier string
-			objectid, present := situation.ObjectID(gmb.connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER))
-			if present {
-				infoMessageIdentifier = objectid.Value()
-			} else {
-				objectid, present = situation.ObjectID("_default")
-				if !ok {
-					continue
-				}
-				infoMessageIdentifier = gmb.connector.SIRIPartner().IdentifierGenerator("InfoMessage").NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Default: objectid.Value()})
-			}
-
-			siriGeneralMessage := &siri.SIRIGeneralMessage{
-				ItemIdentifier:        gmb.connector.SIRIPartner().IdentifierGenerator("InfoMessage").NewIdentifier(IdentifierAttributes{Type: "Item", Default: gmb.connector.NewUUID()}),
-				InfoMessageIdentifier: infoMessageIdentifier,
-				InfoChannelRef:        situation.Channel,
-				InfoMessageVersion:    situation.Version,
-				ValidUntilTime:        situation.ValidUntil,
-				RecordedAtTime:        situation.RecordedAt,
-				FormatRef:             "STIF-IDF",
-			}
-
-			for _, message := range situation.Messages {
-				siriMessage := &siri.SIRIMessage{
-					Content:             message.Content,
-					Type:                message.Type,
-					NumberOfLines:       message.NumberOfLines,
-					NumberOfCharPerLine: message.NumberOfCharPerLine,
-				}
-				siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
-			}
-
+			messageArray = append(messageArray, siriGeneralMessage.InfoMessageIdentifier)
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
+
 		gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
 		logSIRIGeneralMessageNotify(logStashEvent, &notify)
 	}
