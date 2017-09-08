@@ -152,6 +152,8 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		objectid := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER), sm.MonitoringRef())
 		sa, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 		if !ok {
+			rs.ErrorType = "InvalidDataReferencesError"
+			rs.ErrorText = "Stop Area not found"
 			resps = append(resps, rs)
 			continue
 		}
