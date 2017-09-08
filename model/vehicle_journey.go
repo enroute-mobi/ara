@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 )
 
 type VehicleJourneyId string
@@ -126,6 +127,7 @@ type MemoryVehicleJourneys struct {
 
 	model Model
 
+	mutex        *sync.RWMutex
 	byIdentifier map[VehicleJourneyId]*VehicleJourney
 }
 
@@ -143,6 +145,7 @@ type VehicleJourneys interface {
 
 func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	return &MemoryVehicleJourneys{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[VehicleJourneyId]*VehicleJourney),
 	}
 }
@@ -153,6 +156,9 @@ func (manager *MemoryVehicleJourneys) New() VehicleJourney {
 }
 
 func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	vehicleJourney, ok := manager.byIdentifier[id]
 	if ok {
 		return *vehicleJourney, true
@@ -162,6 +168,9 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney,
 }
 
 func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (VehicleJourney, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, vehicleJourney := range manager.byIdentifier {
 		vehicleJourneyObjectId, _ := vehicleJourney.ObjectID(objectid.Kind())
 		if vehicleJourneyObjectId.Value() == objectid.Value() {
@@ -172,6 +181,9 @@ func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (Vehicle
 }
 
 func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []VehicleJourney) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, vehicleJourney := range manager.byIdentifier {
 		if vehicleJourney.LineId == id {
 			vehicleJourneys = append(vehicleJourneys, *vehicleJourney)
@@ -181,6 +193,9 @@ func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys [
 }
 
 func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	if len(manager.byIdentifier) == 0 {
 		return []VehicleJourney{}
 	}
@@ -191,6 +206,9 @@ func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourne
 }
 
 func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	if vehicleJourney.Id() == "" {
 		vehicleJourney.id = VehicleJourneyId(manager.NewUUID())
 	}
@@ -200,6 +218,9 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 }
 
 func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	delete(manager.byIdentifier, vehicleJourney.Id())
 	return true
 }
