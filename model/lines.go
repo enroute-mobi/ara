@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 )
 
 type LineId string
@@ -106,6 +107,7 @@ type MemoryLines struct {
 
 	model Model
 
+	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
 }
 
@@ -122,6 +124,7 @@ type Lines interface {
 
 func NewMemoryLines() *MemoryLines {
 	return &MemoryLines{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
 	}
 }
@@ -144,6 +147,9 @@ func (manager *MemoryLines) New() Line {
 }
 
 func (manager *MemoryLines) Find(id LineId) (Line, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	line, ok := manager.byIdentifier[id]
 	if ok {
 		return *line, true
@@ -153,6 +159,9 @@ func (manager *MemoryLines) Find(id LineId) (Line, bool) {
 }
 
 func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, line := range manager.byIdentifier {
 		lineObjectId, _ := line.ObjectID(objectid.Kind())
 		if lineObjectId.Value() == objectid.Value() {
@@ -163,6 +172,9 @@ func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
 }
 
 func (manager *MemoryLines) FindAll() (lines []Line) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	if len(manager.byIdentifier) == 0 {
 		return []Line{}
 	}
@@ -173,6 +185,9 @@ func (manager *MemoryLines) FindAll() (lines []Line) {
 }
 
 func (manager *MemoryLines) Save(line *Line) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	if line.Id() == "" {
 		line.id = LineId(manager.NewUUID())
 	}
@@ -182,6 +197,9 @@ func (manager *MemoryLines) Save(line *Line) bool {
 }
 
 func (manager *MemoryLines) Delete(line *Line) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	delete(manager.byIdentifier, line.Id())
 	return true
 }
