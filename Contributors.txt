@@ -1,0 +1,4 @@
+Copyright (c) 2011-2012 Zhigang Chen and Hampton Catlin                       github.com/jbowtie/gokogiri
+Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake  github.com/lib/pq
+Copyright (C) 2014-2017 by Ruben Vermeersch <ruben@rocketeer.be>              github.com/rubenv/sql-migrate
+Copyright (c) 2014 - Gustavo Niemeyer <gustavo@niemeyer.net>                  github.com/niemeyer/gopkg
