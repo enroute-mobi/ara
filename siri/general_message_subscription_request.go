@@ -53,6 +53,7 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 		</GeneralMessageSubscriptionRequest>{{ end }}
 			<RequestExtension />
 	</Request>
+	<RequestExtension/>
 </sw:Subscribe>`
 
 func NewXMLGeneralMessageSubscriptionResponse(node xml.Node) *XMLGeneralMessageSubscriptionResponse {

@@ -46,6 +46,7 @@ const checkStatusResponseTemplate = `<sw:CheckStatusResponse xmlns:sw="http://ws
 		</siri:ErrorCondition>{{ end }}
 		<siri:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ServiceStartedTime>
 	</Answer>
+	<AnswerExtension/>
 </sw:CheckStatusResponse>`
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {

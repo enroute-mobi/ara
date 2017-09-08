@@ -79,6 +79,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	response, err := connector.SIRIPartner().SOAPClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
+		logStashEvent["status"] = "false"
 		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 		return partnerStatus, err

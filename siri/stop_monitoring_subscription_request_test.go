@@ -62,13 +62,13 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 	}
 
 	entry := &SIRIStopMonitoringSubscriptionRequestEntry{
-		MessageIdentifier:      "test",
-		MonitoringRef:          "MonitoringRef",
-		RequestTimestamp:       date,
 		SubscriberRef:          "SubscriberRef",
 		SubscriptionIdentifier: "SubscriptionIdentifier",
 		InitialTerminationTime: date,
 	}
+	entry.MessageIdentifier = "test"
+	entry.MonitoringRef = "MonitoringRef"
+	entry.RequestTimestamp = date
 
 	request.Entries = append(request.Entries, entry)
 	xml, err := request.BuildXML()

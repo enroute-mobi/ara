@@ -80,18 +80,19 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	startTime := connector.Clock().Now()
 
-	siriStopMonitoringRequest := &siri.SIRIStopMonitoringRequest{
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
-		MonitoringRef:     objectid.Value(),
-		RequestorRef:      connector.SIRIPartner().RequestorRef(),
-		RequestTimestamp:  connector.Clock().Now(),
+	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
+		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
+	siriStopMonitoringRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
+	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 
 	logSIRIStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
 
 	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
+		logStashEvent["status"] = "false"
 		logStashEvent["response"] = fmt.Sprintf("Error during StopMonitoring request: %v", err)
 		return
 	}
@@ -166,7 +167,7 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIStopMonitoringRequestCollector(partner)
 }
 
-func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringRequest) {
+func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetStopMonitoringRequest) {
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef

@@ -118,6 +118,7 @@ func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
 		</siri:ErrorCondition>
 		<siri:ServiceStartedTime>2016-09-21T03:30:22.000Z</siri:ServiceStartedTime>
 	</Answer>
+	<AnswerExtension/>
 </sw:CheckStatusResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	serviceStartedTime := time.Date(2016, time.September, 21, 3, 30, 22, 0, time.UTC)

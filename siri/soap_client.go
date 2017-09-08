@@ -112,7 +112,7 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	return checkStatus, nil
 }
 
-func (client *SOAPClient) StopMonitoring(request *SIRIStopMonitoringRequest) (*XMLStopMonitoringResponse, error) {
+func (client *SOAPClient) StopMonitoring(request *SIRIGetStopMonitoringRequest) (*XMLStopMonitoringResponse, error) {
 	// WIP
 	node, err := client.prepareAndSendRequest(request, "GetStopMonitoringResponse", false)
 	if err != nil {

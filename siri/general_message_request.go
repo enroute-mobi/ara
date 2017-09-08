@@ -65,6 +65,7 @@ const getGeneralMessageRequestTemplate = `<sw:GetGeneralMessage xmlns:sw="http:/
 	<Request version="2.0:FR-IDF-2.4">
 		{{ .BuildGeneralMessageRequestXML }}
 	</Request>
+	<RequestExtension/>
 </sw:GetGeneralMessage>`
 
 const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>

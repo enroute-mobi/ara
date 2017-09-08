@@ -70,12 +70,13 @@ func Test_SIRIStopMonitoringRequest_BuildXML(t *testing.T) {
 	<RequestExtension />
 </sw:GetStopMonitoring>`
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-	request := &SIRIStopMonitoringRequest{
-		MessageIdentifier: "test",
-		MonitoringRef:     "test",
-		RequestorRef:      "test",
-		RequestTimestamp:  date,
+	request := &SIRIGetStopMonitoringRequest{
+		RequestorRef: "test",
 	}
+	request.MessageIdentifier = "test"
+	request.MonitoringRef = "test"
+	request.RequestTimestamp = date
+
 	xml, err := request.BuildXML()
 	if err != nil {
 		t.Fatal(err)

@@ -74,6 +74,7 @@ const estimatedTimeTableResponseTemplate = `<sw:GetEstimatedTimetableResponse xm
 	<Answer>
 		{{ .BuildEstimatedTimetableDeliveryXML }}
 	</Answer>
+	<AnswerExtension/>
 </sw:GetEstimatedTimetableResponse>`
 
 const estimatedTimetableDeliveryTemplate = `<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">

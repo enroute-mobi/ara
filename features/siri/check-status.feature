@@ -42,6 +42,7 @@ Feature: Support SIRI CheckStatus
         <siri:Status>true</siri:Status>
         <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
       </Answer>
+      <AnswerExtension/>
     </sw:CheckStatusResponse>
   </S:Body>
 </S:Envelope>

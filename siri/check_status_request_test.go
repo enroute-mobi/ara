@@ -50,6 +50,7 @@ func Test_SIRICheckStatusRequest_BuildXML(t *testing.T) {
 		<siri:RequestorRef>test</siri:RequestorRef>
 		<siri:MessageIdentifier>test</siri:MessageIdentifier>
 	</Request>
+	<RequestExtension/>
 </sw:CheckStatus>`
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := NewSIRICheckStatusRequest("test", date, "test")

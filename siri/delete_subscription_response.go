@@ -78,6 +78,7 @@ const deleteSubscriptionResponseTemplate = `<sw:DeleteSubscriptionResponse xmlns
 			</siri:ErrorCondition>{{ else }}
 		</siri:TerminationResponseStatus>{{ end }}
 	</Answer>
+	<AnswerExtension/>
 </sw:DeleteSubscriptionResponse>`
 
 func NewXMLDeleteSubscriptionResponse(node xml.Node) *XMLDeleteSubscriptionResponse {

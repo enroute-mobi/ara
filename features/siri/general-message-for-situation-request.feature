@@ -84,6 +84,7 @@ Feature: Support SIRI GeneralMessage for Situation
                 </siri:GeneralMessage>
               </siri:GeneralMessageDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
@@ -161,6 +162,7 @@ Feature: Support SIRI GeneralMessage for Situation
                 </siri:GeneralMessage>
               </siri:GeneralMessageDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
@@ -350,6 +352,7 @@ Feature: Support SIRI GeneralMessage for Situation
                 <siri:Status>true</siri:Status>
               </siri:GeneralMessageDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>

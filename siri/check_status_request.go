@@ -25,6 +25,7 @@ const checkStatusRequestTemplate = `<sw:CheckStatus xmlns:sw="http://wsdl.siri.o
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
 	</Request>
+	<RequestExtension/>
 </sw:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {

@@ -29,13 +29,12 @@ type SIRIStopMonitoringSubscriptionRequest struct {
 }
 
 type SIRIStopMonitoringSubscriptionRequestEntry struct {
-	MessageIdentifier      string
-	MonitoringRef          string
+	SIRIStopMonitoringRequest
+
 	SubscriberRef          string
 	SubscriptionIdentifier string
 
 	InitialTerminationTime time.Time
-	RequestTimestamp       time.Time
 }
 
 const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -51,10 +50,7 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
 			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
 			<siri:StopMonitoringRequest>
-				<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-				<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-				<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
-				<siri:StopVisitTypes>all</siri:StopVisitTypes>
+				{{ .BuildStopMonitoringRequestXML }}
 			</siri:StopMonitoringRequest>
 			<siri:IncrementalUpdates>true</siri:IncrementalUpdates>
 			<siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
