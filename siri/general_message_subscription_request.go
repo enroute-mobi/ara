@@ -51,7 +51,6 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 				{{ .BuildGeneralMessageRequestXML }}
 			</siri:GeneralMessageRequest>
 		</GeneralMessageSubscriptionRequest>{{ end }}
-			<RequestExtension />
 	</Request>
 	<RequestExtension/>
 </sw:Subscribe>`
