@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -115,8 +117,11 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		delivery := ett.getEstimatedTimetableDelivery(tx, lines)
 		delivery.SubscriptionIdentifier = string(subId)
 		delivery.SubscriberRef = connector.SIRIPartner().RequestorRef()
+		logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent, &delivery)
 		notify.Deliveries = append(notify.Deliveries, &delivery)
 	}
+
+	logSIRINotifyEstimatedTimeTable(logStashEvent, notify)
 	connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(notify)
 }
 
@@ -233,4 +238,31 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := smb.connector.partner.NewLogStashEvent()
 	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
 	return event
+}
+
+func logSIRINotifyEstimatedTimeTable(logStashEvent audit.LogStashEvent, notify *siri.SIRINotifyEstimatedTimeTable) {
+	logStashEvent["ResponseTimestamp"] = notify.ResponseTimestamp.String()
+	logStashEvent["ProducerRef"] = notify.ProducerRef
+	logStashEvent["ResponseMessageIdentifier"] = notify.ResponseMessageIdentifier
+
+	xml, err := notify.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["responseXML"] = xml
+}
+
+func logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent audit.LogStashEvent, delivery *siri.SIRIEstimatedTimetableSubscriptionDelivery) {
+	logStashEvent["ResponseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["SubscriberRef"] = delivery.SubscriberRef
+	logStashEvent["SubscriptionIdentifier"] = delivery.SubscriptionIdentifier
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+	if !delivery.Status {
+		logStashEvent["errorType"] = delivery.ErrorType
+		if delivery.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+		}
+		logStashEvent["errorText"] = delivery.ErrorText
+	}
 }

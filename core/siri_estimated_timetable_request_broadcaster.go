@@ -132,7 +132,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
-
 	return delivery
 }
 
