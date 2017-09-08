@@ -64,7 +64,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
 	if len(response.AnnotatedStopPoints) != 2 {
-		t.Errorf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 1", len(response.AnnotatedStopPoints))
+		t.Errorf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2", len(response.AnnotatedStopPoints))
 	}
 
 	if response.AnnotatedStopPoints[0].StopName != "First" {

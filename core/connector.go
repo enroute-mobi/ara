@@ -2,6 +2,7 @@ package core
 
 const (
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER    = "siri-stop-points-discovery-request-broadcaster"
+	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER          = "siri-lines-discovery-request-broadcaster"
 	SIRI_SERVICE_REQUEST_BROADCASTER                  = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR            = "siri-stop-monitoring-request-collector"
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR            = "test-stop-monitoring-request-collector"
@@ -9,11 +10,11 @@ const (
 	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR       = "siri-stop-monitoring-subscription-collector"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER     = "siri-stop-monitoring-subscription-broadcaster"
 	TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER     = "siri-stop-monitoring-subscription-broadcaster-test"
-	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster"
-	TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster-test"
 	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR            = "siri-general-message-request-collector"
 	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER          = "siri-general-message-request-broadcaster"
 	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR       = "siri-general-message-subscription-collector"
+	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster"
+	TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster-test"
 	SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER      = "siri-estimated-timetable-request-broadcaster"
 	SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster"
 	TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster-test"
@@ -59,6 +60,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
 	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER:
 		return &SIRIStopPointsDiscoveryRequestBroadcasterFactory{}
+	case SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER:
+		return &SIRILinesDiscoveryRequestBroadcasterFactory{}
 	case SIRI_SERVICE_REQUEST_BROADCASTER:
 		return &SIRIServiceRequestBroadcasterFactory{}
 	case SIRI_STOP_MONITORING_REQUEST_COLLECTOR:
