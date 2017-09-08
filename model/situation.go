@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"sync"
 	"time"
 )
 
@@ -114,6 +115,7 @@ type MemorySituations struct {
 
 	model *MemoryModel
 
+	mutex          *sync.RWMutex
 	broadcastEvent func(event GeneralMessageBroadcastEvent)
 	byIdentifier   map[SituationId]*Situation
 }
@@ -131,6 +133,7 @@ type Situations interface {
 
 func NewMemorySituations() *MemorySituations {
 	return &MemorySituations{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SituationId]*Situation),
 	}
 }
@@ -141,6 +144,9 @@ func (manager *MemorySituations) New() Situation {
 }
 
 func (manager *MemorySituations) Find(id SituationId) (Situation, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	situation, ok := manager.byIdentifier[id]
 	if ok {
 		return *situation, true
@@ -150,6 +156,9 @@ func (manager *MemorySituations) Find(id SituationId) (Situation, bool) {
 }
 
 func (manager *MemorySituations) FindAll() (situations []Situation) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	if len(manager.byIdentifier) == 0 {
 		return []Situation{}
 	}
@@ -160,6 +169,9 @@ func (manager *MemorySituations) FindAll() (situations []Situation) {
 }
 
 func (manager *MemorySituations) FindByObjectId(objectid ObjectID) (Situation, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
 	for _, situation := range manager.byIdentifier {
 		situationObjectId, _ := situation.ObjectID(objectid.Kind())
 		if situationObjectId.Value() == objectid.Value() {
@@ -170,6 +182,9 @@ func (manager *MemorySituations) FindByObjectId(objectid ObjectID) (Situation, b
 }
 
 func (manager *MemorySituations) Save(situation *Situation) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	if situation.Id() == "" {
 		situation.id = SituationId(manager.NewUUID())
 	}
@@ -187,6 +202,9 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 }
 
 func (manager *MemorySituations) Delete(situation *Situation) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	delete(manager.byIdentifier, situation.Id())
 	return true
 }
