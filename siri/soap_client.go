@@ -180,3 +180,11 @@ func (client *SOAPClient) NotifyGeneralMessage(request *SIRINotifyGeneralMessage
 	}
 	return nil
 }
+
+func (client *SOAPClient) NotifyEstimatedTimeTable(request *SIRINotifyEstimatedTimeTable) error {
+	_, err := client.prepareAndSendRequest(request, "NotifyEstimatedTimeTable", false)
+	if err != nil {
+		return err
+	}
+	return nil
+}

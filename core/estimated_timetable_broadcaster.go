@@ -105,7 +105,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 	currentTime := connector.Clock().Now()
 
-	notify := siri.SIRIEstimatedTimeTable{
+	notify := &siri.SIRINotifyEstimatedTimeTable{
 		ResponseTimestamp:         currentTime,
 		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
@@ -117,11 +117,13 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		delivery.SubscriberRef = connector.SIRIPartner().RequestorRef()
 		notify.Deliveries = append(notify.Deliveries, &delivery)
 	}
+	connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(notify)
 }
 
 func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, lines []model.LineId) siri.SIRIEstimatedTimetableSubscriptionDelivery {
 	connector := ett.connector
 	currentTime := connector.Clock().Now()
+	sentlines := make(map[model.LineId]bool)
 
 	delivery := siri.SIRIEstimatedTimetableSubscriptionDelivery{
 		ResponseTimestamp: currentTime,
@@ -129,6 +131,11 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 	}
 
 	for _, lineId := range lines {
+		if _, ok := sentlines[lineId]; ok {
+			continue
+		}
+
+		sentlines[lineId] = true
 		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), string(lineId))
 		line, ok := tx.Model().Lines().FindByObjectId(lineObjectId)
 		if !ok {
