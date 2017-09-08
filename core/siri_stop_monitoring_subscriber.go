@@ -108,13 +108,13 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	for messageIdentifier, stopAreaObjectid := range stopAreasToRequest {
 		entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
-			MessageIdentifier:      messageIdentifier,
-			RequestTimestamp:       subscriber.Clock().Now(),
-			MonitoringRef:          stopAreaObjectid.Value(),
 			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
 			SubscriptionIdentifier: string(subscription.Id()),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
+		entry.MessageIdentifier = messageIdentifier
+		entry.RequestTimestamp = subscriber.Clock().Now()
+		entry.MonitoringRef = stopAreaObjectid.Value()
 
 		monitoringRefList = append(monitoringRefList, stopAreaObjectid.Value())
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)

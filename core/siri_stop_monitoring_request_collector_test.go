@@ -158,12 +158,12 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-	request := &siri.SIRIStopMonitoringRequest{
-		MessageIdentifier: "0000-0000-0000-0000",
-		MonitoringRef:     "test",
-		RequestorRef:      "Edwig",
-		RequestTimestamp:  time,
+	request := &siri.SIRIGetStopMonitoringRequest{
+		RequestorRef: "Edwig",
 	}
+	request.MessageIdentifier = "0000-0000-0000-0000"
+	request.MonitoringRef = "test"
+	request.RequestTimestamp = time
 
 	logSIRIStopMonitoringRequest(logStashEvent, request)
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {

@@ -31,26 +31,34 @@ type XMLStopMonitoringRequest struct {
 	requestTimestamp time.Time
 }
 
+type SIRIGetStopMonitoringRequest struct {
+	SIRIStopMonitoringRequest
+
+	RequestorRef string
+}
+
 type SIRIStopMonitoringRequest struct {
 	MessageIdentifier string
 	MonitoringRef     string
-	RequestorRef      string
-	RequestTimestamp  time.Time
+
+	RequestTimestamp time.Time
 }
 
-const stopMonitoringRequestTemplate = `<sw:GetStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+const getStopMonitoringRequestTemplate = `<sw:GetStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceRequestInfo>
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
 	</ServiceRequestInfo>
 	<Request version="2.0:FR-IDF-2.4">
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
-		<siri:StopVisitTypes>all</siri:StopVisitTypes>
+		{{ .BuildStopMonitoringRequestXML }}
 	</Request>
 </sw:GetStopMonitoring>`
+
+const stopMonitoringRequestTemplate = `<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
+		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
+		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
+		<siri:StopVisitTypes>all</siri:StopVisitTypes>`
 
 func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {
 	xmlStopMonitoringRequest := &XMLGetStopMonitoring{}
@@ -67,17 +75,18 @@ func NewXMLGetStopMonitoringFromContent(content []byte) (*XMLGetStopMonitoring, 
 	return request, nil
 }
 
-func NewSIRIStopMonitoringRequest(
+func NewSIRIGetStopMonitoringRequest(
 	messageIdentifier,
 	monitoringRef,
 	requestorRef string,
-	requestTimestamp time.Time) *SIRIStopMonitoringRequest {
-	return &SIRIStopMonitoringRequest{
-		MessageIdentifier: messageIdentifier,
-		MonitoringRef:     monitoringRef,
-		RequestorRef:      requestorRef,
-		RequestTimestamp:  requestTimestamp,
+	requestTimestamp time.Time) *SIRIGetStopMonitoringRequest {
+	request := &SIRIGetStopMonitoringRequest{
+		RequestorRef: requestorRef,
 	}
+	request.MessageIdentifier = messageIdentifier
+	request.MonitoringRef = monitoringRef
+	request.RequestTimestamp = requestTimestamp
+	return request
 }
 
 func (request *XMLGetStopMonitoring) RequestorRef() string {
@@ -87,7 +96,16 @@ func (request *XMLGetStopMonitoring) RequestorRef() string {
 	return request.requestorRef
 }
 
-func (request *SIRIStopMonitoringRequest) BuildXML() (string, error) {
+func (request *SIRIGetStopMonitoringRequest) BuildXML() (string, error) {
+	var buffer bytes.Buffer
+	var siriRequest = template.Must(template.New("siriRequest").Parse(getStopMonitoringRequestTemplate))
+	if err := siriRequest.Execute(&buffer, request); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (request *SIRIStopMonitoringRequest) BuildStopMonitoringRequestXML() (string, error) {
 	var buffer bytes.Buffer
 	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringRequestTemplate))
 	if err := siriRequest.Execute(&buffer, request); err != nil {

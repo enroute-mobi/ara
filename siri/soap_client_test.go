@@ -117,12 +117,12 @@ func Test_SOAPClient_StopMonitoring(t *testing.T) {
 
 	// Create and send request
 	client := NewSOAPClient(ts.URL)
-	request := &SIRIStopMonitoringRequest{
-		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-32-00c04fd430c8:LOC",
-		MonitoringRef:     "STIF:StopArea:SP:6ba7b814-9dad-11d1-32-00c04fd430c8",
-		RequestorRef:      "Edwig",
-		RequestTimestamp:  time.Now(),
+	request := &SIRIGetStopMonitoringRequest{
+		RequestorRef: "Edwig",
 	}
+	request.MessageIdentifier = "Edwig:Message::6ba7b814-9dad-11d1-32-00c04fd430c8:LOC"
+	request.MonitoringRef = "STIF:StopArea:SP:6ba7b814-9dad-11d1-32-00c04fd430c8"
+	request.RequestTimestamp = time.Now()
 
 	response, err := client.StopMonitoring(request)
 	if err != nil {

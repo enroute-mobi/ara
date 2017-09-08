@@ -195,7 +195,7 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	request, err := siri.NewSIRIStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
+	request, err := siri.NewSIRIGetStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
 		"Edwig",
 		model.DefaultClock().Now()).BuildXML()
