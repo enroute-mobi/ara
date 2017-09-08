@@ -10,7 +10,6 @@ import (
 
 type SIRIGeneralMessageRequestDeliveriesResponseHandler struct {
 	xmlRequest *siri.XMLNotifyGeneralMessage
-	Partner    core.Partner
 }
 
 func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) RequestorRef() string {

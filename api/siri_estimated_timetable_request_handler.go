@@ -11,7 +11,6 @@ import (
 
 type SIRIEstimatedTimetableRequestHandler struct {
 	xmlRequest *siri.XMLGetEstimatedTimetable
-	Partner    core.Partner
 }
 
 func (handler *SIRIEstimatedTimetableRequestHandler) RequestorRef() string {

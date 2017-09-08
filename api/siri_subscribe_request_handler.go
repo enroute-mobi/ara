@@ -11,7 +11,6 @@ import (
 
 type SIRISubscribeRequestHandler struct {
 	xmlRequest *siri.XMLSubscriptionRequest
-	Partner    core.Partner
 }
 
 func (handler *SIRISubscribeRequestHandler) RequestorRef() string {

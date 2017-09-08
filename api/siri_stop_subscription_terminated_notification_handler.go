@@ -10,7 +10,6 @@ import (
 
 type SIRIStopMonitoringSubscriptionTerminatedResponseHandler struct {
 	xmlRequest *siri.XMLStopMonitoringSubscriptionTerminatedResponse
-	Partner    core.Partner
 }
 
 func (handler *SIRIStopMonitoringSubscriptionTerminatedResponseHandler) RequestorRef() string {
