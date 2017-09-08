@@ -128,43 +128,38 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     Then I send this SIRI request
       """
       <ns1:NotifyEstimatedTimetable xmlns:ns1="http://wsdl.siri.org.uk">
-       <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-         <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
-         <ns5:ProducerRef>Edwig</ns5:ProducerRef>
-         <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:427843</ns5:ResponseMessageIdentifier>
-         <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
-       </ServiceDeliveryInfo>
-       <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-         <ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+        <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+          <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
+          <ns5:ProducerRef>Edwig</ns5:ProducerRef>
+          <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:427843</ns5:ResponseMessageIdentifier>
+          <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
+        </ServiceDeliveryInfo>
+        <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+          <ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
             <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
             <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
             <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-38-00c04fd430c8:LOC</ns5:SubscriptionRef>
             <ns3:Status>true</ns3:Status>
-            <ns3:EstimatedTimetable>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
-              <ns3:Status>true</ns3:Status>
-              <ns3:EstimatedJourneyVersionFrame>
-                <ns3:RecordedAtTime>2017-01-01T12:00:00.000Z</ns3:RecordedAtTime>
-                <ns3:EstimatedVehicleJourney>
-                  <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                  <ns3:DirectionRef>Aller</ns3:DirectionRef>
-                  <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                  <ns3:EstimatedCalls>
-                    <ns3:EstimatedCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:AimedArrivalTime>2017-01-01T15:00:00.000Z</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
-                    </ns3:EstimatedCall>
-                  </ns3:EstimatedCalls>
-                </ns3:EstimatedVehicleJourney>
-              </ns3:EstimatedJourneyVersionFrame>
-            </ns3:EstimatedTimetable>
-         </ns3:EstimatedTimetableDelivery>
-       </Notification>
+            <ns3:EstimatedJourneyVersionFrame>
+              <ns3:RecordedAtTime>2017-01-01T12:00:00.000Z</ns3:RecordedAtTime>
+              <ns3:EstimatedVehicleJourney>
+                <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+                <ns3:DirectionRef>Aller</ns3:DirectionRef>
+                <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
+                <ns3:EstimatedCalls>
+                  <ns3:EstimatedCall>
+                    <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
+                    <ns3:Order>4</ns3:Order>
+                    <ns3:AimedArrivalTime>2017-01-01T15:00:00.000Z</ns3:AimedArrivalTime>
+                    <ns3:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</ns3:ExpectedArrivalTime>
+                    <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
+                  </ns3:EstimatedCall>
+                </ns3:EstimatedCalls>
+              </ns3:EstimatedVehicleJourney>
+            </ns3:EstimatedJourneyVersionFrame>
+          </ns3:EstimatedTimetableDelivery>
+        </Notification>
       <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
       </ns1:NotifyEstimatedTimetable>
       """
