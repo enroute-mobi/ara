@@ -126,6 +126,8 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
+		logStashEvent["status"] = "false"
+		logStashEvent["response"] = fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
 		for _, stopAreaObjectid := range stopAreasToRequest {
 			logger.Log.Debugf("%v", *stopAreaObjectid)
 			resource := subscription.Resource(*stopAreaObjectid)

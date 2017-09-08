@@ -67,6 +67,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	response, err := connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing %v", err)
+		logStashEvent["status"] = "false"
 		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscription.Delete()
 		return
@@ -127,6 +128,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
+		logStashEvent["status"] = "false"
+		logStashEvent["response"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
 		return
 	}
 
