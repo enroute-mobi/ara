@@ -67,6 +67,7 @@ func Test_SIRIStopMonitoringRequest_BuildXML(t *testing.T) {
 		<siri:MonitoringRef>test</siri:MonitoringRef>
 		<siri:StopVisitTypes>all</siri:StopVisitTypes>
 	</Request>
+	<RequestExtension />
 </sw:GetStopMonitoring>`
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &SIRIStopMonitoringRequest{

@@ -67,6 +67,7 @@ const generalMessageNotifyTemplate = `<sw:NotifyGeneralMessage xmlns:sw="http://
 			{{ .BuildGeneralMessageXML }}{{ end }}{{ end }}
 		 </siri:GeneralMessageDelivery>
 	</Notification>
+	<NotificationExtension />
 </sw:NotifyGeneralMessage>`
 
 func NewXMLNotifyGeneralMessage(node xml.Node) *XMLNotifyGeneralMessage {

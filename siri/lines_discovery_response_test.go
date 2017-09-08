@@ -30,6 +30,7 @@ func Test_SIRILinesDiscoveryResponse_BuildXML(t *testing.T) {
 			<siri:Monitored>true</siri:Monitored>
 		</siri:AnnotatedLineStructure>
 	</Answer>
+	<AnswerExtension/>
 </sw:LinesDiscoveryResponse>`
 
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)

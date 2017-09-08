@@ -60,6 +60,7 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 			<siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
 		</siri:StopMonitoringSubscriptionRequest>{{end}}
 	</Request>
+	<RequestExtension />
 </ws:Subscribe>`
 
 func NewXMLStopMonitoringSubscriptionRequestEntry(node XMLNode) *XMLStopMonitoringSubscriptionRequestEntry {

@@ -71,6 +71,7 @@ const estimatedTimeTablenotifyTemplate = `<sw:NotifyEstimatedTimetable xmlns:sw=
 			</siri:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
 		</siri:EstimatedTimetableDelivery>{{end}}
 	</Notification>
+	<NotificationExtension/>
 </sw:NotifyEstimatedTimetable>`
 
 func (notify *SIRINotifyEstimatedTimeTable) BuildXML() (string, error) {

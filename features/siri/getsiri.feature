@@ -173,6 +173,7 @@ Feature: Support SIRI GetSIRI
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>
@@ -319,6 +320,7 @@ Feature: Support SIRI GetSIRI
                 </siri:ErrorCondition>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>

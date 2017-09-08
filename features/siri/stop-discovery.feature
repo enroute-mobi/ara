@@ -84,6 +84,7 @@ Feature: Support SIRI StopDiscovery
                 <siri:StopName>Test 2</siri:StopName>
               </siri:AnnotatedStopPointRef>
             </Answer>
+            <AnswerExtension/>
           </sw:StopPointsDiscoveryResponse>
         </S:Body>
       </S:Envelope>

@@ -17,6 +17,7 @@ const siriServiceResponseTemplate = `<sw:GetSiriServiceResponse xmlns:sw="http:/
 		{{ .BuildGeneralMessageDeliveryXML }}{{ end }}{{ range .EstimatedTimetableDeliveries }}
 		{{ .BuildEstimatedTimetableDeliveryXML }}{{ end }}
 	</Answer>
+	<AnswerExtension />
 </sw:GetSiriServiceResponse>`
 
 type SIRIServiceResponse struct {

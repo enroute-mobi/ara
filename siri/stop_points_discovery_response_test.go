@@ -33,6 +33,7 @@ func Test_SIRIStopDiscoveryResponse_BuildXML(t *testing.T) {
 			<siri:StopName>Test 3</siri:StopName>
 		</siri:AnnotatedStopPointRef>
 	</Answer>
+	<AnswerExtension />
 </sw:StopPointsDiscoveryResponse>`
 
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)

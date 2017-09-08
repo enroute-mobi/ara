@@ -50,6 +50,7 @@ const stopMonitoringRequestTemplate = `<sw:GetStopMonitoring xmlns:sw="http://ws
 		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
 		<siri:StopVisitTypes>all</siri:StopVisitTypes>
 	</Request>
+	<RequestExtension />
 </sw:GetStopMonitoring>`
 
 func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {

@@ -46,6 +46,7 @@ const linesDiscoveryResponseTemplate = `<sw:LinesDiscoveryResponse xmlns:sw="htt
 			<siri:Monitored>{{ .Monitored }}</siri:Monitored>
 		</siri:AnnotatedLineStructure>{{ end }}
 	</Answer>
+	<AnswerExtension/>
 </sw:LinesDiscoveryResponse>`
 
 func (response *SIRILinesDiscoveryResponse) BuildXML() (string, error) {

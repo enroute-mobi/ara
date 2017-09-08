@@ -161,6 +161,7 @@ Feature: Support SIRI StopMonitoring
           </siri:MonitoredStopVisit>
         </siri:StopMonitoringDelivery>
       </Answer>
+      <AnswerExtension/>
     </sw:GetStopMonitoringResponse>
   </S:Body>
 </S:Envelope>
@@ -389,6 +390,7 @@ Feature: Support SIRI StopMonitoring
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>

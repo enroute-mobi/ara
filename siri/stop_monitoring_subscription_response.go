@@ -91,6 +91,7 @@ const stopMonitoringSubscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:
         </siri:ResponseStatus>{{ end }}
         <siri:ServiceStartedTime>{{.ServiceStartedTime}}</siri:ServiceStartedTime>
     </Answer>
+		<AnswerExtension />
 </sw:SubscribeResponse>`
 
 func NewXMLStopMonitoringSubscriptionResponse(node xml.Node) *XMLStopMonitoringSubscriptionResponse {

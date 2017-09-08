@@ -142,6 +142,7 @@ Feature: Support SIRI StopMonitoring by request
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
@@ -265,6 +266,7 @@ Feature: Support SIRI StopMonitoring by request
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
@@ -415,6 +417,7 @@ Feature: Support SIRI StopMonitoring by request
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
@@ -544,6 +547,7 @@ Feature: Support SIRI StopMonitoring by request
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
@@ -677,6 +681,7 @@ Feature: Support SIRI StopMonitoring by request
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
@@ -821,6 +826,7 @@ Feature: Support SIRI StopMonitoring by request
                   </siri:MonitoredStopVisit>
                 </siri:StopMonitoringDelivery>
               </Answer>
+              <AnswerExtension/>
             </sw:GetStopMonitoringResponse>
           </S:Body>
         </S:Envelope>

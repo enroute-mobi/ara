@@ -453,6 +453,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 			</siri:MonitoredStopVisit>
 		</siri:StopMonitoringDelivery>
 	</Answer>
+	<AnswerExtension/>
 </sw:GetSiriServiceResponse>`
 
 	// Check the response body is what we expect.
@@ -743,6 +744,7 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 			<siri:Monitored>true</siri:Monitored>
 		</siri:AnnotatedLineStructure>
 	</Answer>
+	<AnswerExtension/>
 </sw:LinesDiscoveryResponse>`
 
 	// Check the response body is what we expect.

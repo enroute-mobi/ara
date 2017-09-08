@@ -262,6 +262,7 @@ const stopMonitoringResponseTemplate = `<sw:GetStopMonitoringResponse xmlns:sw="
 	<Answer>
 		{{ .BuildStopMonitoringDeliveryXML }}
 	</Answer>
+	<AnswerExtension/>
 </sw:GetStopMonitoringResponse>`
 
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {

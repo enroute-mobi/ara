@@ -51,6 +51,7 @@ const stopDiscoveryResponseTemplate = `<sw:StopPointsDiscoveryResponse xmlns:sw=
 			</siri:Lines>{{ end }}
 		</siri:AnnotatedStopPointRef>{{ end }}
 	</Answer>
+	<AnswerExtension />
 </sw:StopPointsDiscoveryResponse>`
 
 func (response *SIRIStopPointsDiscoveryResponse) BuildXML() (string, error) {
