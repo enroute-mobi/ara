@@ -367,93 +367,93 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	responseBody := envelope.Body().String()
 
 	// TEMP: Find a better way to test?
-	expectedResponseBody := `<ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
-	<Answer xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns9="http://wsdl.siri.org.uk/siri">
-		<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>Edwig</ns3:ProducerRef>
-		<ns3:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-		<ns3:Status>true</ns3:Status>
-		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-			<ns3:Status>true</ns3:Status>
-			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>first</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>stopArea1</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
-					<ns3:LineRef>stopArea1</ns3:LineRef>
-					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>stopArea1</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:MonitoredCall>
-						<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
-						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-						<ns3:ActualArrivalTime>1984-04-04T01:00:00.000Z</ns3:ActualArrivalTime>
-					</ns3:MonitoredCall>
-				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>
-			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>second</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>stopArea1</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
-					<ns3:LineRef>stopArea1</ns3:LineRef>
-					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>stopArea1</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:MonitoredCall>
-						<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
-						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-						<ns3:ActualArrivalTime>1984-04-04T02:00:00.000Z</ns3:ActualArrivalTime>
-					</ns3:MonitoredCall>
-				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>
-		</ns3:StopMonitoringDelivery>
-		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-			<ns3:Status>true</ns3:Status>
-			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>fourth</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>stopArea2</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
-					<ns3:LineRef>stopArea2</ns3:LineRef>
-					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>stopArea2</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:MonitoredCall>
-						<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
-						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-						<ns3:ActualArrivalTime>1984-04-04T01:00:00.000Z</ns3:ActualArrivalTime>
-					</ns3:MonitoredCall>
-				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>
-			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>third</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>stopArea2</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
-					<ns3:LineRef>stopArea2</ns3:LineRef>
-					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>stopArea2</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:MonitoredCall>
-						<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
-						<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-						<ns3:ActualArrivalTime>1984-04-04T02:00:00.000Z</ns3:ActualArrivalTime>
-					</ns3:MonitoredCall>
-				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>
-		</ns3:StopMonitoringDelivery>
+	expectedResponseBody := `<sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<Answer>
+		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>Edwig</siri:ProducerRef>
+		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+		<siri:Status>true</siri:Status>
+		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+			<siri:MonitoredStopVisit>
+				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:ItemIdentifier>first</siri:ItemIdentifier>
+				<siri:MonitoringRef>stopArea1</siri:MonitoringRef>
+				<siri:MonitoredVehicleJourney>
+					<siri:LineRef>stopArea1</siri:LineRef>
+					<siri:FramedVehicleJourneyRef>
+						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
+						<siri:DatedVehicleJourneyRef>stopArea1</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>
+					<siri:MonitoredCall>
+						<siri:StopPointRef>stopArea1</siri:StopPointRef>
+						<siri:VehicleAtStop>false</siri:VehicleAtStop>
+						<siri:ActualArrivalTime>1984-04-04T01:00:00.000Z</siri:ActualArrivalTime>
+					</siri:MonitoredCall>
+				</siri:MonitoredVehicleJourney>
+			</siri:MonitoredStopVisit>
+			<siri:MonitoredStopVisit>
+				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:ItemIdentifier>second</siri:ItemIdentifier>
+				<siri:MonitoringRef>stopArea1</siri:MonitoringRef>
+				<siri:MonitoredVehicleJourney>
+					<siri:LineRef>stopArea1</siri:LineRef>
+					<siri:FramedVehicleJourneyRef>
+						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
+						<siri:DatedVehicleJourneyRef>stopArea1</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>
+					<siri:MonitoredCall>
+						<siri:StopPointRef>stopArea1</siri:StopPointRef>
+						<siri:VehicleAtStop>false</siri:VehicleAtStop>
+						<siri:ActualArrivalTime>1984-04-04T02:00:00.000Z</siri:ActualArrivalTime>
+					</siri:MonitoredCall>
+				</siri:MonitoredVehicleJourney>
+			</siri:MonitoredStopVisit>
+		</siri:StopMonitoringDelivery>
+		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+			<siri:MonitoredStopVisit>
+				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:ItemIdentifier>fourth</siri:ItemIdentifier>
+				<siri:MonitoringRef>stopArea2</siri:MonitoringRef>
+				<siri:MonitoredVehicleJourney>
+					<siri:LineRef>stopArea2</siri:LineRef>
+					<siri:FramedVehicleJourneyRef>
+						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
+						<siri:DatedVehicleJourneyRef>stopArea2</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>
+					<siri:MonitoredCall>
+						<siri:StopPointRef>stopArea2</siri:StopPointRef>
+						<siri:VehicleAtStop>false</siri:VehicleAtStop>
+						<siri:ActualArrivalTime>1984-04-04T01:00:00.000Z</siri:ActualArrivalTime>
+					</siri:MonitoredCall>
+				</siri:MonitoredVehicleJourney>
+			</siri:MonitoredStopVisit>
+			<siri:MonitoredStopVisit>
+				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:ItemIdentifier>third</siri:ItemIdentifier>
+				<siri:MonitoringRef>stopArea2</siri:MonitoringRef>
+				<siri:MonitoredVehicleJourney>
+					<siri:LineRef>stopArea2</siri:LineRef>
+					<siri:FramedVehicleJourneyRef>
+						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
+						<siri:DatedVehicleJourneyRef>stopArea2</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>
+					<siri:MonitoredCall>
+						<siri:StopPointRef>stopArea2</siri:StopPointRef>
+						<siri:VehicleAtStop>false</siri:VehicleAtStop>
+						<siri:ActualArrivalTime>1984-04-04T02:00:00.000Z</siri:ActualArrivalTime>
+					</siri:MonitoredCall>
+				</siri:MonitoredVehicleJourney>
+			</siri:MonitoredStopVisit>
+		</siri:StopMonitoringDelivery>
 	</Answer>
-</ns1:GetSiriServiceResponse>`
+</sw:GetSiriServiceResponse>`
 
 	// Check the response body is what we expect.
 	if responseBody != expectedResponseBody {
@@ -620,64 +620,64 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	}
 	responseBody := envelope.Body().String()
 
-	expectedResponseBody := `<ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	expectedResponseBody := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>Edwig</ns3:ProducerRef>
-		<ns3:Address>http://edwig</ns3:Address>
-		<ns3:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>Edwig</siri:ProducerRef>
+		<siri:Address>http://edwig</siri:Address>
+		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
-			<ns3:Status>true</ns3:Status>
-			<ns3:EstimatedJourneyVersionFrame>
-				<ns3:RecordedAtTime>1984-04-04T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:EstimatedVehicleJourney>
-					<ns3:LineRef>NINOXE:Line:2:LOC</ns3:LineRef>
-					<ns3:DatedVehicleJourneyRef>vehicleJourney</ns3:DatedVehicleJourneyRef>
-					<ns3:EstimatedCalls>
-						<ns3:EstimatedCall>
-							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
-							<ns3:Order>1</ns3:Order>
-							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
-							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-						</ns3:EstimatedCall>
-						<ns3:EstimatedCall>
-							<ns3:StopPointRef>stopArea2</ns3:StopPointRef>
-							<ns3:Order>2</ns3:Order>
-							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-							<ns3:AimedArrivalTime>1984-04-04T00:02:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</ns3:ExpectedArrivalTime>
-							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-						</ns3:EstimatedCall>
-					</ns3:EstimatedCalls>
-				</ns3:EstimatedVehicleJourney>
-			</ns3:EstimatedJourneyVersionFrame>
-			<ns3:EstimatedJourneyVersionFrame>
-				<ns3:RecordedAtTime>1984-04-04T00:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:EstimatedVehicleJourney>
-					<ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-					<ns3:DatedVehicleJourneyRef>vehicleJourney2</ns3:DatedVehicleJourneyRef>
-					<ns3:EstimatedCalls>
-						<ns3:EstimatedCall>
-							<ns3:StopPointRef>stopArea1</ns3:StopPointRef>
-							<ns3:Order>1</ns3:Order>
-							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-							<ns3:AimedArrivalTime>1984-04-04T00:01:00.000Z</ns3:AimedArrivalTime>
-							<ns3:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</ns3:ExpectedArrivalTime>
-							<ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-						</ns3:EstimatedCall>
-					</ns3:EstimatedCalls>
-				</ns3:EstimatedVehicleJourney>
-			</ns3:EstimatedJourneyVersionFrame>
-		</ns3:EstimatedTimetableDelivery>
+		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
+					<siri:DatedVehicleJourneyRef>vehicleJourney</siri:DatedVehicleJourneyRef>
+					<siri:EstimatedCalls>
+						<siri:EstimatedCall>
+							<siri:StopPointRef>stopArea1</siri:StopPointRef>
+							<siri:Order>1</siri:Order>
+							<siri:VehicleAtStop>false</siri:VehicleAtStop>
+							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
+							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
+							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+						</siri:EstimatedCall>
+						<siri:EstimatedCall>
+							<siri:StopPointRef>stopArea2</siri:StopPointRef>
+							<siri:Order>2</siri:Order>
+							<siri:VehicleAtStop>false</siri:VehicleAtStop>
+							<siri:AimedArrivalTime>1984-04-04T00:02:00.000Z</siri:AimedArrivalTime>
+							<siri:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</siri:ExpectedArrivalTime>
+							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+						</siri:EstimatedCall>
+					</siri:EstimatedCalls>
+				</siri:EstimatedVehicleJourney>
+			</siri:EstimatedJourneyVersionFrame>
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+					<siri:DatedVehicleJourneyRef>vehicleJourney2</siri:DatedVehicleJourneyRef>
+					<siri:EstimatedCalls>
+						<siri:EstimatedCall>
+							<siri:StopPointRef>stopArea1</siri:StopPointRef>
+							<siri:Order>1</siri:Order>
+							<siri:VehicleAtStop>false</siri:VehicleAtStop>
+							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
+							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
+							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+						</siri:EstimatedCall>
+					</siri:EstimatedCalls>
+				</siri:EstimatedVehicleJourney>
+			</siri:EstimatedJourneyVersionFrame>
+		</siri:EstimatedTimetableDelivery>
 	</Answer>
-</ns8:GetEstimatedTimetableResponse>`
+</sw:GetEstimatedTimetableResponse>`
 
 	// Check the response body is what we expect.
 	if responseBody != expectedResponseBody {

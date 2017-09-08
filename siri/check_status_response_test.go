@@ -101,31 +101,24 @@ func Test_XMLCheckStatusRequest_ServiceStartedTime(t *testing.T) {
 }
 
 func Test_SIRICheckStatusResponse_BuildXML(t *testing.T) {
-	expectedXML := `<ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
-												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-												 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-												 xmlns:ns6="http://scma/siri"
-												 xmlns:ns7="http://wsdl.siri.org.uk"
-												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
+	expectedXML := `<sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
-		<ns2:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns2:ResponseTimestamp>
-		<ns2:ProducerRef>producer</ns2:ProducerRef>
-		<ns2:Address>address</ns2:Address>
-		<ns2:ResponseMessageIdentifier>identifier</ns2:ResponseMessageIdentifier>
-		<ns2:RequestMessageRef>ref</ns2:RequestMessageRef>
+		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>producer</siri:ProducerRef>
+		<siri:Address>address</siri:Address>
+		<siri:ResponseMessageIdentifier>identifier</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>ref</siri:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>
-		<ns2:Status>false</ns2:Status>
-		<ns2:ErrorCondition>
-			<ns2:OtherError number="103">
-				<ns2:ErrorText>text</ns2:ErrorText>
-			</ns2:OtherError>
-		</ns2:ErrorCondition>
-		<ns2:ServiceStartedTime>2016-09-21T03:30:22.000Z</ns2:ServiceStartedTime>
+		<siri:Status>false</siri:Status>
+		<siri:ErrorCondition>
+			<siri:OtherError number="103">
+				<siri:ErrorText>text</siri:ErrorText>
+			</siri:OtherError>
+		</siri:ErrorCondition>
+		<siri:ServiceStartedTime>2016-09-21T03:30:22.000Z</siri:ServiceStartedTime>
 	</Answer>
-	<AnswerExtension />
-</ns7:CheckStatusResponse>`
+</sw:CheckStatusResponse>`
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 	serviceStartedTime := time.Date(2016, time.September, 21, 3, 30, 22, 0, time.UTC)
 	request := NewSIRICheckStatusResponse("address", "producer", "ref", "identifier", false, "OtherError", 103, "text", responseTimestamp, serviceStartedTime)

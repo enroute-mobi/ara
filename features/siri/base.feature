@@ -11,7 +11,7 @@ Feature: Support SIRI request
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
-    <S:Fault xmlns:ns4='http://www.w3.org/2003/05/soap-envelope'>
+    <S:Fault>
       <faultcode>S:Client</faultcode>
       <faultstring>Invalid Request: Empty body</faultstring>
     </S:Fault>
@@ -29,7 +29,7 @@ Invalid Request
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
-    <S:Fault xmlns:ns4='http://www.w3.org/2003/05/soap-envelope'>
+    <S:Fault>
       <faultcode>S:Client</faultcode>
       <faultstring>Invalid Request: failed to parse xml input</faultstring>
     </S:Fault>

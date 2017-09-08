@@ -123,29 +123,22 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 }
 
 func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
-	expectedXML := `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	expectedXML := `<sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>producer</ns3:ProducerRef>
-		<ns3:Address>address</ns3:Address>
-		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>producer</siri:ProducerRef>
+		<siri:Address>address</siri:Address>
+		<siri:ResponseMessageIdentifier>identifier</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>ref</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
-			<ns3:Status>true</ns3:Status>
-		</ns3:StopMonitoringDelivery>
+		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>ref</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+		</siri:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension/>
-</ns8:GetStopMonitoringResponse>`
+</sw:GetStopMonitoringResponse>`
 
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
 
@@ -165,58 +158,51 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 
-	expectedXML = `<ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	expectedXML = `<sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>producer</ns3:ProducerRef>
-		<ns3:Address>address</ns3:Address>
-		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>producer</siri:ProducerRef>
+		<siri:Address>address</siri:Address>
+		<siri:ResponseMessageIdentifier>identifier</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>ref</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		<ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
-			<ns3:Status>true</ns3:Status>
-			<ns3:MonitoredStopVisit>
-				<ns3:RecordedAtTime>2015-09-21T20:14:46.000Z</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>itemId</ns3:ItemIdentifier>
-				<ns3:MonitoringRef>monitoringRef</ns3:MonitoringRef>
-				<ns3:MonitoredVehicleJourney>
-					<ns3:LineRef>lineRef</ns3:LineRef>
-					<ns3:FramedVehicleJourneyRef>
-						<ns3:DataFrameRef>2016-09-21</ns3:DataFrameRef>
-						<ns3:DatedVehicleJourneyRef>vehicleJourney#ObjectID</ns3:DatedVehicleJourneyRef>
-					</ns3:FramedVehicleJourneyRef>
-					<ns3:PublishedLineName>lineName</ns3:PublishedLineName>
-					<ns3:OperatorRef>OperatorRef</ns3:OperatorRef>
-					<ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-					<ns3:VehicleJourneyName>NameOfVj</ns3:VehicleJourneyName>
-					<ns3:Delay>30</ns3:Delay>
-					<ns3:MonitoredCall>
-						<ns3:StopPointRef>stopPointRef</ns3:StopPointRef>
-						<ns3:Order>1</ns3:Order>
-						<ns3:StopPointName>stopPointName</ns3:StopPointName>
-						<ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-						<ns3:AimedArrivalTime>2017-09-21T20:14:46.000Z</ns3:AimedArrivalTime>
-						<ns3:ActualArrivalTime>2018-09-21T20:14:46.000Z</ns3:ActualArrivalTime>
-						<ns3:ArrivalStatus>arrStatus</ns3:ArrivalStatus>
-						<ns3:AimedDepartureTime>2019-09-21T20:14:46.000Z</ns3:AimedDepartureTime>
-						<ns3:ExpectedDepartureTime>2020-09-21T20:14:46.000Z</ns3:ExpectedDepartureTime>
-						<ns3:DepartureStatus>depStatus</ns3:DepartureStatus>
-					</ns3:MonitoredCall>
-				</ns3:MonitoredVehicleJourney>
-			</ns3:MonitoredStopVisit>
-		</ns3:StopMonitoringDelivery>
+		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>ref</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+			<siri:MonitoredStopVisit>
+				<siri:RecordedAtTime>2015-09-21T20:14:46.000Z</siri:RecordedAtTime>
+				<siri:ItemIdentifier>itemId</siri:ItemIdentifier>
+				<siri:MonitoringRef>monitoringRef</siri:MonitoringRef>
+				<siri:MonitoredVehicleJourney>
+					<siri:LineRef>lineRef</siri:LineRef>
+					<siri:FramedVehicleJourneyRef>
+						<siri:DataFrameRef>2016-09-21</siri:DataFrameRef>
+						<siri:DatedVehicleJourneyRef>vehicleJourney#ObjectID</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>
+					<siri:PublishedLineName>lineName</siri:PublishedLineName>
+					<siri:OperatorRef>OperatorRef</siri:OperatorRef>
+					<siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
+					<siri:VehicleJourneyName>NameOfVj</siri:VehicleJourneyName>
+					<siri:Delay>30</siri:Delay>
+					<siri:MonitoredCall>
+						<siri:StopPointRef>stopPointRef</siri:StopPointRef>
+						<siri:Order>1</siri:Order>
+						<siri:StopPointName>stopPointName</siri:StopPointName>
+						<siri:VehicleAtStop>true</siri:VehicleAtStop>
+						<siri:AimedArrivalTime>2017-09-21T20:14:46.000Z</siri:AimedArrivalTime>
+						<siri:ActualArrivalTime>2018-09-21T20:14:46.000Z</siri:ActualArrivalTime>
+						<siri:ArrivalStatus>arrStatus</siri:ArrivalStatus>
+						<siri:AimedDepartureTime>2019-09-21T20:14:46.000Z</siri:AimedDepartureTime>
+						<siri:ExpectedDepartureTime>2020-09-21T20:14:46.000Z</siri:ExpectedDepartureTime>
+						<siri:DepartureStatus>depStatus</siri:DepartureStatus>
+					</siri:MonitoredCall>
+				</siri:MonitoredVehicleJourney>
+			</siri:MonitoredStopVisit>
+		</siri:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension/>
-</ns8:GetStopMonitoringResponse>`
+</sw:GetStopMonitoringResponse>`
 	siriMonitoredStopVisit := &SIRIMonitoredStopVisit{
 		ItemIdentifier:     "itemId",
 		MonitoringRef:      "monitoringRef",

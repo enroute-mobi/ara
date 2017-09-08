@@ -28,32 +28,25 @@ type SIRICheckStatusResponse struct {
 	ServiceStartedTime        time.Time
 }
 
-const checkStatusResponseTemplate = `<ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
-												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-												 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-												 xmlns:ns6="http://scma/siri"
-												 xmlns:ns7="http://wsdl.siri.org.uk"
-												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
+const checkStatusResponseTemplate = `<sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
-		<ns2:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ResponseTimestamp>
-		<ns2:ProducerRef>{{.ProducerRef}}</ns2:ProducerRef>{{ if .Address }}
-		<ns2:Address>{{ .Address }}</ns2:Address>{{ end }}
-		<ns2:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ns2:ResponseMessageIdentifier>
-		<ns2:RequestMessageRef>{{.RequestMessageRef}}</ns2:RequestMessageRef>
+		<siri:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{.ProducerRef}}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
+		<siri:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{.RequestMessageRef}}</siri:RequestMessageRef>
 	</CheckStatusAnswerInfo>
 	<Answer>
-		<ns2:Status>{{.Status}}</ns2:Status>{{ if not .Status }}
-		<ns2:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-			<ns2:OtherError number="{{.ErrorNumber}}">{{ else }}
-			<ns2:{{.ErrorType}}>{{ end }}
-				<ns2:ErrorText>{{.ErrorText}}</ns2:ErrorText>
-			</ns2:{{.ErrorType}}>
-		</ns2:ErrorCondition>{{ end }}
-		<ns2:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:ServiceStartedTime>
+		<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
+		<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+			<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+			<siri:{{.ErrorType}}>{{ end }}
+				<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+			</siri:{{.ErrorType}}>
+		</siri:ErrorCondition>{{ end }}
+		<siri:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ServiceStartedTime>
 	</Answer>
-	<AnswerExtension />
-</ns7:CheckStatusResponse>`
+</sw:CheckStatusResponse>`
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
 	xmlCheckStatusResponse := &XMLCheckStatusResponse{}

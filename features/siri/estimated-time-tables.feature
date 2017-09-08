@@ -88,7 +88,7 @@ Feature: Support SIRI EstimatedTimeTable
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetEstimatedTimetable xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -115,77 +115,71 @@ Feature: Support SIRI EstimatedTimeTable
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri"
-                                         xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                                         xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                                         xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                                         xmlns:ns7="http://scma/siri"
-                                         xmlns:ns8="http://wsdl.siri.org.uk"
-                                         xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>EstimatedTimetable:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:EstimatedJourneyVersionFrame>
-                  <ns3:RecordedAtTime>2017-01-01T12:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:EstimatedVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Aller</ns3:DirectionRef>
-                    <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    <ns3:EstimatedCalls>
-                      <ns3:EstimatedCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                        <ns3:Order>4</ns3:Order>
-                        <ns3:StopPointName>Tutute</ns3:StopPointName>
-                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                        <ns3:DestinationDisplay>Pouet-pouet</ns3:DestinationDisplay>
-                        <ns3:AimedArrivalTime>2017-01-01T15:00:00.000Z</ns3:AimedArrivalTime>
-                        <ns3:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</ns3:ExpectedArrivalTime>
-                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
-                        <ns3:AimedDepartureTime>2017-01-01T15:01:00.000Z</ns3:AimedDepartureTime>
-                        <ns3:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</ns3:ExpectedDepartureTime>
-                        <ns3:DepartureStatus>Delayed</ns3:DepartureStatus>
-                      </ns3:EstimatedCall>
-                      <ns3:EstimatedCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:25:LOC</ns3:StopPointRef>
-                        <ns3:Order>5</ns3:Order>
-                        <ns3:StopPointName>Test</ns3:StopPointName>
-                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                        <ns3:AimedArrivalTime>2017-01-01T15:05:00.000Z</ns3:AimedArrivalTime>
-                        <ns3:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</ns3:ExpectedArrivalTime>
-                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
-                      </ns3:EstimatedCall>
-                      <ns3:EstimatedCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:26:LOC</ns3:StopPointRef>
-                        <ns3:Order>6</ns3:Order>
-                        <ns3:StopPointName>Test</ns3:StopPointName>
-                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                        <ns3:AimedArrivalTime>2017-01-01T15:10:00.000Z</ns3:AimedArrivalTime>
-                        <ns3:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</ns3:ExpectedArrivalTime>
-                        <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
-                      </ns3:EstimatedCall>
-                      <ns3:EstimatedCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:27:LOC</ns3:StopPointRef>
-                        <ns3:Order>7</ns3:Order>
-                        <ns3:StopPointName>Test</ns3:StopPointName>
-                        <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                        <ns3:AimedArrivalTime>2017-01-01T15:16:00.000Z</ns3:AimedArrivalTime>
-                        <ns3:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</ns3:ExpectedArrivalTime>
-                        <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                      </ns3:EstimatedCall>
-                    </ns3:EstimatedCalls>
-                  </ns3:EstimatedVehicleJourney>
-                </ns3:EstimatedJourneyVersionFrame>
-              </ns3:EstimatedTimetableDelivery>
+              <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:EstimatedJourneyVersionFrame>
+                  <siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
+                  <siri:EstimatedVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:DirectionRef>Aller</siri:DirectionRef>
+                    <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:EstimatedCalls>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        <siri:Order>4</siri:Order>
+                        <siri:StopPointName>Tutute</siri:StopPointName>
+                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                        <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
+                        <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
+                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
+                        <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
+                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                      </siri:EstimatedCall>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
+                        <siri:Order>5</siri:Order>
+                        <siri:StopPointName>Test</siri:StopPointName>
+                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                        <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
+                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                      </siri:EstimatedCall>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
+                        <siri:Order>6</siri:Order>
+                        <siri:StopPointName>Test</siri:StopPointName>
+                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                        <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
+                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                      </siri:EstimatedCall>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
+                        <siri:Order>7</siri:Order>
+                        <siri:StopPointName>Test</siri:StopPointName>
+                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                        <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
+                        <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                      </siri:EstimatedCall>
+                    </siri:EstimatedCalls>
+                  </siri:EstimatedVehicleJourney>
+                </siri:EstimatedJourneyVersionFrame>
+              </siri:EstimatedTimetableDelivery>
             </Answer>
-          </ns8:GetEstimatedTimetableResponse>
+          </sw:GetEstimatedTimetableResponse>
         </S:Body>
       </S:Envelope>
       """

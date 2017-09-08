@@ -57,7 +57,7 @@ Feature: Support SIRI StopMonitoring by request
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -84,72 +84,65 @@ Feature: Support SIRI StopMonitoring by request
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-2</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T15:00:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-2</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T15:00:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -208,7 +201,7 @@ Feature: Support SIRI StopMonitoring by request
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -236,50 +229,43 @@ Feature: Support SIRI StopMonitoring by request
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -344,7 +330,7 @@ Feature: Support SIRI StopMonitoring by request
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -371,72 +357,65 @@ Feature: Support SIRI StopMonitoring by request
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:02:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T14:02:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T14:30:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -481,7 +460,7 @@ Feature: Support SIRI StopMonitoring by request
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -507,72 +486,65 @@ Feature: Support SIRI StopMonitoring by request
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedDepartureTime>2017-01-01T15:02:00.000+02:00</ns3:AimedDepartureTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedDepartureTime>2017-01-01T15:30:00.000+02:00</ns3:AimedDepartureTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedDepartureTime>2017-01-01T15:02:00.000+02:00</siri:AimedDepartureTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedDepartureTime>2017-01-01T15:30:00.000+02:00</siri:AimedDepartureTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -621,7 +593,7 @@ Feature: Support SIRI StopMonitoring by request
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -647,72 +619,65 @@ Feature: Support SIRI StopMonitoring by request
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T15:01:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:4:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 4 Metro</ns3:PublishedLineName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:VehicleJourneyName>Le 15.</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Test</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T15:30:00.000+02:00</ns3:AimedArrivalTime>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T15:01:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:4:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T15:30:00.000+02:00</siri:AimedArrivalTime>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -771,7 +736,7 @@ Feature: Support SIRI StopMonitoring by request
       <SOAP-ENV:Header />
       <S:Body>
         <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                               xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                               xmlns:siri="http://www.ifopt.org.uk/acsb"
                                xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -798,72 +763,65 @@ Feature: Support SIRI StopMonitoring by request
         <?xml version='1.0' encoding='utf-8'?>
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
           <S:Body>
-            <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-            xmlns:ns4="http://www.ifopt.org.uk/acsb"
-            xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-            xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-            xmlns:ns7="http://scma/siri"
-            xmlns:ns8="http://wsdl.siri.org.uk"
-            xmlns:ns9="http://wsdl.siri.org.uk/siri">
+            <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
               <ServiceDeliveryInfo>
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-                <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-                <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:ProducerRef>Edwig</siri:ProducerRef>
+                <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
               </ServiceDeliveryInfo>
               <Answer>
-                <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                  <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                  <ns3:RequestMessageRef>StopMonitoring:Test:0</ns3:RequestMessageRef>
-                  <ns3:Status>true</ns3:Status>
-                  <ns3:MonitoredStopVisit>
-                    <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                    <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                    <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                    <ns3:MonitoredVehicleJourney>
-                      <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                      <ns3:FramedVehicleJourneyRef>
-                        <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                        <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                      </ns3:FramedVehicleJourneyRef>
-                      <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                      <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                      <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                      <ns3:MonitoredCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                        <ns3:Order>4</ns3:Order>
-                        <ns3:StopPointName>Test</ns3:StopPointName>
-                        <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                        <ns3:AimedArrivalTime>2017-01-01T16:00:00.000+02:00</ns3:AimedArrivalTime>
-                      </ns3:MonitoredCall>
-                    </ns3:MonitoredVehicleJourney>
-                  </ns3:MonitoredStopVisit>
-                  <ns3:MonitoredStopVisit>
-                    <ns3:RecordedAtTime>0001-01-01T00:00:00.000Z</ns3:RecordedAtTime>
-                    <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                    <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                    <ns3:MonitoredVehicleJourney>
-                      <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                      <ns3:FramedVehicleJourneyRef>
-                        <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                        <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                      </ns3:FramedVehicleJourneyRef>
-                      <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                      <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                      <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                      <ns3:MonitoredCall>
-                        <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                        <ns3:Order>4</ns3:Order>
-                        <ns3:StopPointName>Test</ns3:StopPointName>
-                        <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                        <ns3:AimedArrivalTime>2017-01-01T16:30:00.000+02:00</ns3:AimedArrivalTime>
-                      </ns3:MonitoredCall>
-                    </ns3:MonitoredVehicleJourney>
-                  </ns3:MonitoredStopVisit>
-                </ns3:StopMonitoringDelivery>
+                <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                  <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                  <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                  <siri:Status>true</siri:Status>
+                  <siri:MonitoredStopVisit>
+                    <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                    <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                    <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                    <siri:MonitoredVehicleJourney>
+                      <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                      <siri:FramedVehicleJourneyRef>
+                        <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                        <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                      </siri:FramedVehicleJourneyRef>
+                      <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                      <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                      <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                      <siri:MonitoredCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        <siri:Order>4</siri:Order>
+                        <siri:StopPointName>Test</siri:StopPointName>
+                        <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                        <siri:AimedArrivalTime>2017-01-01T16:00:00.000+02:00</siri:AimedArrivalTime>
+                      </siri:MonitoredCall>
+                    </siri:MonitoredVehicleJourney>
+                  </siri:MonitoredStopVisit>
+                  <siri:MonitoredStopVisit>
+                    <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+                    <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                    <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                    <siri:MonitoredVehicleJourney>
+                      <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                      <siri:FramedVehicleJourneyRef>
+                        <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                        <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                      </siri:FramedVehicleJourneyRef>
+                      <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                      <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                      <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                      <siri:MonitoredCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        <siri:Order>4</siri:Order>
+                        <siri:StopPointName>Test</siri:StopPointName>
+                        <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                        <siri:AimedArrivalTime>2017-01-01T16:30:00.000+02:00</siri:AimedArrivalTime>
+                      </siri:MonitoredCall>
+                    </siri:MonitoredVehicleJourney>
+                  </siri:MonitoredStopVisit>
+                </siri:StopMonitoringDelivery>
               </Answer>
-              <AnswerExtension />
-            </ns8:GetStopMonitoringResponse>
+            </sw:GetStopMonitoringResponse>
           </S:Body>
         </S:Envelope>
         """

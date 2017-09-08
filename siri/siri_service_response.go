@@ -6,24 +6,18 @@ import (
 	"time"
 )
 
-const siriServiceResponseTemplate = `<ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
-	<Answer xmlns:ns3="http://www.siri.org.uk/siri"
-					xmlns:ns4="http://www.ifopt.org.uk/acsb"
-					xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-					xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-					xmlns:ns7="http://scma/siri"
-					xmlns:ns8="http://wsdl.siri.org.uk"
-					xmlns:ns9="http://wsdl.siri.org.uk/siri">
-		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>
-		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
-		<ns3:Status>{{ .Status }}</ns3:Status>{{ range .StopMonitoringDeliveries }}
+const siriServiceResponseTemplate = `<sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<Answer>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>
+		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
+		<siri:Status>{{ .Status }}</siri:Status>{{ range .StopMonitoringDeliveries }}
 		{{ .BuildStopMonitoringDeliveryXML }}{{ end }}{{ range .GeneralMessageDeliveries }}
 		{{ .BuildGeneralMessageDeliveryXML }}{{ end }}{{ range .EstimatedTimetableDeliveries }}
 		{{ .BuildEstimatedTimetableDeliveryXML }}{{ end }}
 	</Answer>
-</ns1:GetSiriServiceResponse>`
+</sw:GetSiriServiceResponse>`
 
 type SIRIServiceResponse struct {
 	ProducerRef               string

@@ -24,7 +24,7 @@ Feature: Support SIRI StopLinesDiscovery
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns7:StopLinesDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                           xmlns:siri="http://www.ifopt.org.uk/acsb"
                            xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                            xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -43,29 +43,29 @@ Feature: Support SIRI StopLinesDiscovery
       <?xml version="1.0" encoding="UTF-8"?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:StopLinesDiscoveryResponse xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:StopLinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <Answer version="2.0">
-            <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-            <ns3:Address>address</ns3:Address>
-            <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-            <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
-            <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-            <ns3:Status>true</ns3:Status>
-              <ns3:AnnotatedLineStructure>
-                <ns3:LineRef>STIF:Line::C00272:</ns3:LineRef>
-                <ns3:LineName>Line 1</ns3:LineName>
-              </ns3:AnnotatedLineStructure>
-              <ns3:AnnotatedLineStructure>
-                <ns3:LineRef>STIF:Line::C00273:</ns3:LineRef>
-                <ns3:LineName>Line 2</ns3:LineName>
-              </ns3:AnnotatedLineStructure>
-              <ns3:AnnotatedLineStructure>
-                <ns3:LineRef>STIF:Line::C00274:</ns3:LineRef>
-                <ns3:LineName>Line 3</ns3:LineName>
-              </ns3:AnnotatedLineStructure>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:Address>address</siri:Address>
+            <siri:ProducerRef>Edwig</siri:ProducerRef>
+            <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:Status>true</siri:Status>
+              <siri:AnnotatedLineStructure>
+                <siri:LineRef>STIF:Line::C00272:</siri:LineRef>
+                <siri:LineName>Line 1</siri:LineName>
+              </siri:AnnotatedLineStructure>
+              <siri:AnnotatedLineStructure>
+                <siri:LineRef>STIF:Line::C00273:</siri:LineRef>
+                <siri:LineName>Line 2</siri:LineName>
+              </siri:AnnotatedLineStructure>
+              <siri:AnnotatedLineStructure>
+                <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
+                <siri:LineName>Line 3</siri:LineName>
+              </siri:AnnotatedLineStructure>
             </Answer>
             <AnswerExtension />
-          </ns8:StopLinesDiscoveryResponse>
+          </sw:StopLinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>
       """

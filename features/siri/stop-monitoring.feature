@@ -11,13 +11,13 @@ Feature: Support SIRI StopMonitoring
   <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
   <soap:Body>
     <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:StopMonitoringDelivery version="1.3">
           <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -56,7 +56,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -89,7 +89,7 @@ Feature: Support SIRI StopMonitoring
   <SOAP-ENV:Header />
   <S:Body>
     <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                           xmlns:siri="http://www.ifopt.org.uk/acsb"
                            xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                            xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -114,61 +114,54 @@ Feature: Support SIRI StopMonitoring
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
-    <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-    xmlns:ns4="http://www.ifopt.org.uk/acsb"
-    xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-    xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-    xmlns:ns7="http://scma/siri"
-    xmlns:ns8="http://wsdl.siri.org.uk"
-    xmlns:ns9="http://wsdl.siri.org.uk/siri">
+    <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <ServiceDeliveryInfo>
-        <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
-        <ns3:ProducerRef>RATPDev</ns3:ProducerRef>
-        <ns3:Address>https://api.concerto.ratpdev.com/concerto/siri</ns3:Address>
-        <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-f-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-        <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
+        <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+        <siri:ProducerRef>RATPDev</siri:ProducerRef>
+        <siri:Address>https://api.concerto.ratpdev.com/concerto/siri</siri:Address>
+        <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-f-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+        <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
-        <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-          <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
-          <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
-          <ns3:Status>true</ns3:Status>
-          <ns3:MonitoredStopVisit>
-            <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
-            <ns3:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</ns3:ItemIdentifier>
-            <ns3:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
-            <ns3:MonitoredVehicleJourney>
-              <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
-              <ns3:FramedVehicleJourneyRef>
-                <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</ns3:DatedVehicleJourneyRef>
-              </ns3:FramedVehicleJourneyRef>
-              <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
-              <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
-              <ns3:DirectionName>Aller</ns3:DirectionName>
-              <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-              <ns3:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
-              <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
-              <ns3:Monitored>true</ns3:Monitored>
-              <ns3:MonitoredCall>
-                <ns3:StopPointRef>STIF:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
-                <ns3:Order>44</ns3:Order>
-                <ns3:StopPointName>Arletty</ns3:StopPointName>
-                <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                <ns3:AimedArrivalTime>2017-01-01T13:43:05.000+01:00</ns3:AimedArrivalTime>
-                <ns3:ExpectedArrivalTime>2017-01-01T13:43:05.000+01:00</ns3:ExpectedArrivalTime>
-                <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                <ns3:AimedDepartureTime>2017-01-01T13:43:05.000+01:00</ns3:AimedDepartureTime>
-                <ns3:ExpectedDepartureTime>2017-01-01T13:43:05.000+01:00</ns3:ExpectedDepartureTime>
-                <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
-              </ns3:MonitoredCall>
-            </ns3:MonitoredVehicleJourney>
-          </ns3:MonitoredStopVisit>
-        </ns3:StopMonitoringDelivery>
+        <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+          <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+          <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+          <siri:Status>true</siri:Status>
+          <siri:MonitoredStopVisit>
+            <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
+            <siri:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</siri:ItemIdentifier>
+            <siri:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</siri:MonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:LineRef>STIF:Line::C00001:</siri:LineRef>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+              <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+              <siri:DirectionName>Aller</siri:DirectionName>
+              <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+              <siri:DestinationRef>STIF:StopPoint:Q:875fdetgyh765:</siri:DestinationRef>
+              <siri:DestinationName>Méliès - Croix Bonnet</siri:DestinationName>
+              <siri:Monitored>true</siri:Monitored>
+              <siri:MonitoredCall>
+                <siri:StopPointRef>STIF:StopPoint:Q:eeft52df543d:</siri:StopPointRef>
+                <siri:Order>44</siri:Order>
+                <siri:StopPointName>Arletty</siri:StopPointName>
+                <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                <siri:DestinationDisplay>Méliès - Croix Bonnet</siri:DestinationDisplay>
+                <siri:AimedArrivalTime>2017-01-01T13:43:05.000+01:00</siri:AimedArrivalTime>
+                <siri:ExpectedArrivalTime>2017-01-01T13:43:05.000+01:00</siri:ExpectedArrivalTime>
+                <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                <siri:AimedDepartureTime>2017-01-01T13:43:05.000+01:00</siri:AimedDepartureTime>
+                <siri:ExpectedDepartureTime>2017-01-01T13:43:05.000+01:00</siri:ExpectedDepartureTime>
+                <siri:DepartureStatus>onTime</siri:DepartureStatus>
+              </siri:MonitoredCall>
+            </siri:MonitoredVehicleJourney>
+          </siri:MonitoredStopVisit>
+        </siri:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
-    </ns8:GetStopMonitoringResponse>
+    </sw:GetStopMonitoringResponse>
   </S:Body>
 </S:Envelope>
       """
@@ -198,13 +191,13 @@ Feature: Support SIRI StopMonitoring
   <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
   <soap:Body>
     <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:StopMonitoringDelivery version="1.3">
           <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -243,7 +236,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -274,13 +267,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -315,7 +308,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -329,7 +322,7 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header />
         <S:Body>
           <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
+                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
                                  xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                                  xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
                                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
@@ -354,56 +347,49 @@ Feature: Support SIRI StopMonitoring
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:04:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>RATPDev</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-14-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:04:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>RATPDev</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-14-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:04:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>STIF:Line::C00001:</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
-                    <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:OperatorRef>CdF:Company::410:LOC</ns3:OperatorRef>
-                    <ns3:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</ns3:DestinationRef>
-                    <ns3:DestinationName>Méliès - Croix Bonnet</ns3:DestinationName>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>RATPDev:StopPoint:Q:eeft52df543d:</ns3:StopPointRef>
-                      <ns3:Order>44</ns3:Order>
-                      <ns3:StopPointName>Arletty</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                      <ns3:ArrivalStatus>cancelled</ns3:ArrivalStatus>
-                      <ns3:DepartureStatus>cancelled</ns3:DepartureStatus>
-                      </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:04:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>RATPDev:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</siri:ItemIdentifier>
+                  <siri:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>STIF:Line::C00001:</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+                    <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+                    <siri:DirectionName>Aller</siri:DirectionName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+                    <siri:DestinationRef>RATPDev:StopPoint:Q:875fdetgyh765:</siri:DestinationRef>
+                    <siri:DestinationName>Méliès - Croix Bonnet</siri:DestinationName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>RATPDev:StopPoint:Q:eeft52df543d:</siri:StopPointRef>
+                      <siri:Order>44</siri:Order>
+                      <siri:StopPointName>Arletty</siri:StopPointName>
+                      <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                      <siri:DestinationDisplay>Méliès - Croix Bonnet</siri:DestinationDisplay>
+                      <siri:ArrivalStatus>cancelled</siri:ArrivalStatus>
+                      <siri:DepartureStatus>cancelled</siri:DepartureStatus>
+                      </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetStopMonitoringResponse>
+          </sw:GetStopMonitoringResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -418,13 +404,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -527,7 +513,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -550,13 +536,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -627,7 +613,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -661,13 +647,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>first</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>first:ResponseMessage::6ba:LOC</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -706,7 +692,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -717,13 +703,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>second</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>second:ResponseMessage::tf7:LOC</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:1</ns5:RequestMessageRef>
@@ -762,7 +748,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -795,13 +781,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>first</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>first:ResponseMessage::6ba:LOC</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -840,7 +826,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -851,13 +837,13 @@ Feature: Support SIRI StopMonitoring
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
         <soap:Body>
           <ns1:GetStopMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
               <ns5:ProducerRef>first</ns5:ProducerRef>
               <ns5:ResponseMessageIdentifier>first:ResponseMessage::6ba:LOC</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -896,7 +882,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>

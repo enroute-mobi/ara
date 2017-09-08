@@ -151,30 +151,24 @@ func checkGeneralMessagesEquivalence(s1 *XMLGeneralMessageResponse, s2 *XMLGener
 }
 
 func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
-	expectedXML := `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+	expectedXML := `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>producer</ns3:ProducerRef>
-		<ns3:Address>address</ns3:Address>
-		<ns3:ResponseMessageIdentifier>identifier</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>ref</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>producer</siri:ProducerRef>
+		<siri:Address>address</siri:Address>
+		<siri:ResponseMessageIdentifier>identifier</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>ref</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
-		<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>2016-09-21T20:14:46.000Z</ns3:ResponseTimestamp>
-			<ns3:Status>true</ns3:Status>
-			<ns3:GeneralMessage formatRef="STIF-IDF">
-				<ns3:RecordedAtTime>2016-09-21T20:14:46.000Z</ns3:RecordedAtTime>
-				<ns3:ValidUntilTime>2016-09-21T20:14:46.000Z</ns3:ValidUntilTime>
-				<ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-				<ns3:InfoChannelRef>Chan</ns3:InfoChannelRef>
-				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+			<siri:Status>true</siri:Status>
+			<siri:GeneralMessage formatRef="STIF-IDF">
+				<siri:RecordedAtTime>2016-09-21T20:14:46.000Z</siri:RecordedAtTime>
+				<siri:ValidUntilTime>2016-09-21T20:14:46.000Z</siri:ValidUntilTime>
+				<siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+				<siri:InfoChannelRef>Chan</siri:InfoChannelRef>
+				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFGeneralMessageStructure">
 					<Message>
 						<MessageType>Je suis de type texte</MessageType>
@@ -185,12 +179,11 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 					  <LastStop>NINOXE:StopPoint:SP:12:LOC</LastStop>
 					  <LineRef>NINOXE:Line::3:LOC</LineRef>
 					</LineSection>
-				</ns3:Content>
-			</ns3:GeneralMessage>{{end}}
-		</ns3:GeneralMessageDelivery>
+				</siri:Content>
+			</siri:GeneralMessage>{{end}}
+		</siri:GeneralMessageDelivery>
 	</Answer>
-	<AnswerExtension/>
-</ns8:GetGeneralMessageResponse>`
+</sw:GetGeneralMessageResponse>`
 
 	response, _ := NewXMLGeneralMessageResponseFromContent([]byte(expectedXML))
 	responseTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)

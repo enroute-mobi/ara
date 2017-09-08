@@ -35,7 +35,6 @@ const deleteSubscriptionRequestTemplate = `<sw:DeleteSubscription xmlns:sw="http
 		<siri:All/>{{ else }}
 		<siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>{{ end }}
 	</Request>
-	<RequestExtension/>
 </sw:DeleteSubscription>`
 
 func NewXMLDeleteSubscriptionRequest(node xml.Node) *XMLDeleteSubscriptionRequest {

@@ -43,37 +43,31 @@ type SIRINotifyGeneralMessage struct {
 	GeneralMessages []*SIRIGeneralMessage
 }
 
-const generalMessageNotifyTemplate = `<ns8:NotifyGeneralMessage xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk">
+const generalMessageNotifyTemplate = `<sw:NotifyGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
-		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
-		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
+		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
-	<Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-		<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-			<ns5:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>
-			<ns5:SubscriberRef>{{ .SubscriberRef }}</ns5:SubscriberRef>
-			<ns5:SubscriptionRef>{{ .SubscriptionIdentifier }}</ns5:SubscriptionRef>
-			<ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
-			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<ns3:OtherError number="{{ .ErrorNumber }}">{{ else }}
-				<ns3:{{ .ErrorType }}>{{ end }}
-					<ns3:ErrorText>{{ .ErrorText }}</ns3:ErrorText>
-				</ns3:{{ .ErrorType }}>
-			</ns3:ErrorCondition>{{ else }}{{ range .GeneralMessages }}
+	<Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+		<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
+			<siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
+			<siri:SubscriptionRef>{{ .SubscriptionIdentifier }}</siri:SubscriptionRef>
+			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
+			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<siri:OtherError number="{{ .ErrorNumber }}">{{ else }}
+				<siri:{{ .ErrorType }}>{{ end }}
+					<siri:ErrorText>{{ .ErrorText }}</siri:ErrorText>
+				</siri:{{ .ErrorType }}>
+			</siri:ErrorCondition>{{ else }}{{ range .GeneralMessages }}
 			{{ .BuildGeneralMessageXML }}{{ end }}{{ end }}
-		 </ns3:GeneralMessageDelivery>
-		</Notification>
- <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-</ns8:NotifyGeneralMessage>`
+		 </siri:GeneralMessageDelivery>
+	</Notification>
+</sw:NotifyGeneralMessage>`
 
 func NewXMLNotifyGeneralMessage(node xml.Node) *XMLNotifyGeneralMessage {
 	xmlGeneralMessageResponse := &XMLNotifyGeneralMessage{}

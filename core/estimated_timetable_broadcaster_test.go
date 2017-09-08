@@ -97,47 +97,35 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	expected := `<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 <S:Body>
-<ns1:NotifyEstimatedTimetable
-	xmlns:ns1="http://wsdl.siri.org.uk"
-	xmlns:ns2="http://www.ifopt.org.uk/acsb"
-	xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-	xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-	xmlns:ns5="http://www.siri.org.uk/siri"
-	xmlns:ns6="http://wsdl.siri.org.uk/siri">
+<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns5:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns5:ResponseTimestamp>
-		<ns5:ProducerRef>external</ns5:ProducerRef>
-		<ns5:ResponseMessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:ResponseMessageIdentifier>
+		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>external</siri:ProducerRef>
+		<siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:ResponseMessageIdentifier>
 	</ServiceDeliveryInfo>
 	<Notification>
-		<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
-			<ns5:SubscriberRef>external</ns5:SubscriberRef>
-			<ns5:SubscriptionRef>6ba7b814-9dad-11d1-1-00c04fd430c8</ns5:SubscriptionRef>
-			<ns3:Status>true</ns3:Status>
-			<ns3:EstimatedJourneyVersionFrame>
-				<ns3:RecordedAtTime>2017-01-01T12:00:00.000Z</ns3:RecordedAtTime>
-				<ns3:EstimatedVehicleJourney>
-					<ns3:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</ns3:LineRef>
-					<ns3:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</ns3:DatedVehicleJourneyRef>
-					<ns3:EstimatedCalls>
-						<ns3:EstimatedCall>
-							<ns3:StopPointRef>6ba7b814-9dad-11d1-0-00c04fd430c8</ns3:StopPointRef>
-							<ns3:Order>0</ns3:Order>
-							<ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-						</ns3:EstimatedCall>
-					</ns3:EstimatedCalls>
-				</ns3:EstimatedVehicleJourney>
-			</ns3:EstimatedJourneyVersionFrame>
-		</ns3:EstimatedTimetableDelivery>
+		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+			<siri:SubscriberRef>external</siri:SubscriberRef>
+			<siri:SubscriptionRef>6ba7b814-9dad-11d1-1-00c04fd430c8</siri:SubscriptionRef>
+			<siri:Status>true</siri:Status>
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
+					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
+					<siri:EstimatedCalls>
+						<siri:EstimatedCall>
+							<siri:StopPointRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:StopPointRef>
+							<siri:Order>0</siri:Order>
+							<siri:VehicleAtStop>false</siri:VehicleAtStop>
+						</siri:EstimatedCall>
+					</siri:EstimatedCalls>
+				</siri:EstimatedVehicleJourney>
+			</siri:EstimatedJourneyVersionFrame>
+		</siri:EstimatedTimetableDelivery>
 	</Notification>
-	<NotifyExtension
-		xmlns:ns2="http://www.ifopt.org.uk/acsb"
-		xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-		xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-		xmlns:ns5="http://www.siri.org.uk/siri"
-		xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-	</ns1:NotifyEstimatedTimetable>
+</sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>`
 

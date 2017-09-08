@@ -120,61 +120,54 @@ type SIRIMessage struct {
 	NumberOfCharPerLine int
 }
 
-const generalMessageResponseTemplate = `<ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
-		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
-		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
+		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
 		{{ .BuildGeneralMessageDeliveryXML }}
 	</Answer>
-	<AnswerExtension/>
-</ns8:GetGeneralMessageResponse>`
+</sw:GetGeneralMessageResponse>`
 
-const generalMessageDeliveryTemplate = `<ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-			<ns3:Status>{{.Status}}</ns3:Status>{{ if not .Status }}
-			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
-				<ns3:{{.ErrorType}}>{{ end }}
-					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
-				</ns3:{{.ErrorType}}>
-			</ns3:ErrorCondition>{{ else }}{{range .GeneralMessages}}
+const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+			<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
+			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<siri:{{.ErrorType}}>{{ end }}
+					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+				</siri:{{.ErrorType}}>
+			</siri:ErrorCondition>{{ else }}{{range .GeneralMessages}}
 			{{ .BuildGeneralMessageXML }}{{end}}{{end}}
-		</ns3:GeneralMessageDelivery>`
+		</siri:GeneralMessageDelivery>`
 
-const generalMessageTemplate = `{{ if .FormatRef }}<ns3:GeneralMessage formatRef="{{ .FormatRef }}">{{ else }}<ns3:GeneralMessage>{{ end }}
-				<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>
-				<ns3:ItemIdentifier>{{ .ItemIdentifier }}</ns3:ItemIdentifier>
-				<ns3:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</ns3:InfoMessageIdentifier>
-				<ns3:InfoMessageVersion>{{ .InfoMessageVersion }}</ns3:InfoMessageVersion>
-				<ns3:InfoChannelRef>{{ .InfoChannelRef }}</ns3:InfoChannelRef>
-				<ns3:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ValidUntilTime>
-				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+const generalMessageTemplate = `{{ if .FormatRef }}<siri:GeneralMessage formatRef="{{ .FormatRef }}">{{ else }}<siri:GeneralMessage>{{ end }}
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
+				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
+				<siri:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</siri:InfoMessageIdentifier>
+				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
+				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
+				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
+				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFLineSectionStructure">{{range .References }}
-					<ns3:{{ .Kind }}>{{ .Id }}</ns3:{{ .Kind }}>{{end}}{{ range .LineSections }}
-					<ns3:LineSection>{{ if .FirstStop }}
-						<ns3:FirstStop>{{ .FirstStop }}</ns3:FirstStop>{{end}}{{if .LastStop }}
-						<ns3:LastStop>{{ .LastStop }}</ns3:LastStop>{{end}}{{if .LineRef }}
-						<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{end}}
-					</ns3:LineSection>{{end}}{{range .Messages}}
-					<ns3:Message>{{if .Type}}
-						<ns3:MessageType>{{ .Type }}</ns3:MessageType>{{end}}{{if .Content }}
-						<ns3:MessageText>{{ .Content }}</ns3:MessageText>{{end}}{{if .NumberOfLines }}
-						<ns3:NumberOfLines>{{ .NumberOfLines }}</ns3:NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
-						<ns3:NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</ns3:NumberOfCharPerLine>{{end}}
-					</ns3:Message>{{end}}
-				</ns3:Content>
-			</ns3:GeneralMessage>`
+					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
+					<siri:LineSection>{{ if .FirstStop }}
+						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
+						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
+						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
+					</siri:LineSection>{{end}}{{range .Messages}}
+					<siri:Message>{{if .Type}}
+						<siri:MessageType>{{ .Type }}</siri:MessageType>{{end}}{{if .Content }}
+						<siri:MessageText>{{ .Content }}</siri:MessageText>{{end}}{{if .NumberOfLines }}
+						<siri:NumberOfLines>{{ .NumberOfLines }}</siri:NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
+						<siri:NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</siri:NumberOfCharPerLine>{{end}}
+					</siri:Message>{{end}}
+				</siri:Content>
+			</siri:GeneralMessage>`
 
 func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
 	doc, err := gokogiri.ParseXml(content)

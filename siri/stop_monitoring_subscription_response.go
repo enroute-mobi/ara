@@ -67,42 +67,31 @@ type SIRIResponseStatus struct {
 	ValidUntil        time.Time
 }
 
-const stopMonitoringSubscriptionResponseTemplate = `<ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-    <SubscriptionAnswerInfo
-			xmlns:ns2="http://www.ifopt.org.uk/acsb"
-			xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-			xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-			xmlns:ns5="http://www.siri.org.uk/siri"
-			xmlns:ns6="http://wsdl.siri.org.uk/siri">
-        <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
-        <ns5:Address>{{.Address}}</ns5:Address>
-        <ns5:ResponderRef>{{.ResponderRef}}</ns5:ResponderRef>
-        <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">{{.RequestMessageRef}}</ns5:RequestMessageRef>
+const stopMonitoringSubscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+    <SubscriptionAnswerInfo>
+        <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+        <siri:Address>{{.Address}}</siri:Address>
+        <siri:ResponderRef>{{.ResponderRef}}</siri:ResponderRef>
+        <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">{{.RequestMessageRef}}</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>
-    <Answer
-			xmlns:ns2="http://www.ifopt.org.uk/acsb"
-			xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-			xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-			xmlns:ns5="http://www.siri.org.uk/siri"
-			xmlns:ns6="http://wsdl.siri.org.uk/siri">{{ range .ResponseStatus }}
-        <ns5:ResponseStatus>
-            <ns5:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
-            <ns5:RequestMessageRef>{{.RequestMessageRef}}</ns5:RequestMessageRef>
-            <ns5:SubscriberRef>{{.SubscriberRef}}</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>{{.SubscriptionRef}}</ns5:SubscriptionRef>
-            <ns5:Status>{{.Status}}</ns5:Status>{{ if not .Status }}
-						<ns5:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-							<ns5:OtherError number="{{.ErrorNumber}}">{{ else }}
-							<ns5:{{.ErrorType}}>{{ end }}
-								<ns5:ErrorText>{{.ErrorText}}</ns5:ErrorText>
-							</ns5:{{.ErrorType}}>
-						</ns5:ErrorCondition>{{ end }}{{ if not .ValidUntil.IsZero }}
-            <ns5:ValidUntil>{{.ValidUntil}}</ns5:ValidUntil>{{ end }}
-        </ns5:ResponseStatus>{{ end }}
-        <ns5:ServiceStartedTime>{{.ServiceStartedTime}}</ns5:ServiceStartedTime>
+    <Answer>{{ range .ResponseStatus }}
+        <siri:ResponseStatus>
+            <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+            <siri:RequestMessageRef>{{.RequestMessageRef}}</siri:RequestMessageRef>
+            <siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
+            <siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>
+            <siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
+						<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+							<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+							<siri:{{.ErrorType}}>{{ end }}
+								<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+							</siri:{{.ErrorType}}>
+						</siri:ErrorCondition>{{ end }}{{ if not .ValidUntil.IsZero }}
+            <siri:ValidUntil>{{.ValidUntil}}</siri:ValidUntil>{{ end }}
+        </siri:ResponseStatus>{{ end }}
+        <siri:ServiceStartedTime>{{.ServiceStartedTime}}</siri:ServiceStartedTime>
     </Answer>
-    <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-</ns1:SubscribeResponse>`
+</sw:SubscribeResponse>`
 
 func NewXMLStopMonitoringSubscriptionResponse(node xml.Node) *XMLStopMonitoringSubscriptionResponse {
 	xmlStopMonitoringSubscriptionResponse := &XMLStopMonitoringSubscriptionResponse{}

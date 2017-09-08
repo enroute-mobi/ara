@@ -56,36 +56,30 @@ type SIRIGeneralMessageRequest struct {
 	GroupOfLinesRef   []string
 }
 
-const getGeneralMessageRequestTemplate = `<ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri"
-											 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-											 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-											 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-											 xmlns:ns6="http://wsdl.siri.org.uk/siri"
-											 xmlns:ns7="http://wsdl.siri.org.uk">
+const getGeneralMessageRequestTemplate = `<sw:GetGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
 	<ServiceRequestInfo>
-		<ns2:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns2:RequestTimestamp>
-		<ns2:RequestorRef>{{ .RequestorRef }}</ns2:RequestorRef>
-		<ns2:MessageIdentifier>{{ .MessageIdentifier }}</ns2:MessageIdentifier>
+		<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
+		<siri:RequestorRef>{{ .RequestorRef }}</siri:RequestorRef>
+		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
 	</ServiceRequestInfo>
 	<Request version="2.0:FR-IDF-2.4">
 		{{ .BuildGeneralMessageRequestXML }}
 	</Request>
-	<RequestExtension/>
-</ns7:GetGeneralMessage>`
+</sw:GetGeneralMessage>`
 
-const generalMessageRequestTemplate = `<ns2:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns2:RequestTimestamp>
-		<ns2:MessageIdentifier>{{ .MessageIdentifier }}</ns2:MessageIdentifier>{{ range .InfoChannelRef }}
-		<ns2:InfoChannelRef>{{ . }}</ns2:InfoChannelRef>{{ end }}{{ if .Filters }}
-		<ns2:Extensions>
-			<ns6:IDFGeneralMessageRequestFilter>{{ range .LineRef }}
-				<ns6:LineRef>{{ . }}</ns6:LineRef>{{ end }}{{ range .StopPointRef }}
-				<ns6:StopPointRef>{{ . }}</ns6:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
-				<ns6:JourneyPatternRef>{{ . }}</ns6:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
-				<ns6:DestinationRef>{{ . }}</ns6:DestinationRef>{{ end }}{{ range .RouteRef }}
-				<ns6:RouteRef>{{ . }}</ns6:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
-				<ns6:GroupOfLinesRef>{{ . }}</ns6:GroupOfLinesRef>{{ end }}
-			</ns6:IDFGeneralMessageRequestFilter>
-		</ns2:Extensions>{{ end }}`
+const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
+		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>{{ range .InfoChannelRef }}
+		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}{{ if .Filters }}
+		<siri:Extensions>
+			<sws:IDFGeneralMessageRequestFilter>{{ range .LineRef }}
+				<sws:LineRef>{{ . }}</sws:LineRef>{{ end }}{{ range .StopPointRef }}
+				<sws:StopPointRef>{{ . }}</sws:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
+				<sws:JourneyPatternRef>{{ . }}</sws:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
+				<sws:DestinationRef>{{ . }}</sws:DestinationRef>{{ end }}{{ range .RouteRef }}
+				<sws:RouteRef>{{ . }}</sws:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
+				<sws:GroupOfLinesRef>{{ . }}</sws:GroupOfLinesRef>{{ end }}
+			</sws:IDFGeneralMessageRequestFilter>
+		</siri:Extensions>{{ end }}`
 
 func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
 	xmlGeneralMessageRequest := &XMLGetGeneralMessage{}

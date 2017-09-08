@@ -35,30 +35,24 @@ type SIRIGeneralMessageSubscriptionRequestEntry struct {
 	InitialTerminationTime time.Time
 }
 
-const generalMessageSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ns2="http://www.siri.org.uk/siri"
-											 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-											 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-											 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-											 xmlns:ns6="http://scma/siri"
-											 xmlns:ns7="http://wsdl.siri.org.uk">
+const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
 	<SubscriptionRequestInfo>
-		<ns2:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ns2:RequestTimestamp>
-		<ns2:RequestorRef>{{.RequestorRef}}</ns2:RequestorRef>
-		<ns2:MessageIdentifier>{{.MessageIdentifier}}</ns2:MessageIdentifier>
-		<ns2:ConsumerAddress>{{.ConsumerAddress}}</ns2:ConsumerAddress>
+		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
+		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
+		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
+		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>
 	</SubscriptionRequestInfo>
 	<Request version="2.0:FR-IDF-2.4">{{ range .Entries }}
 		<GeneralMessageSubscriptionRequest>
-			<ns5:SubscriberRef>{{.SubscriberRef}}</ns5:SubscriberRef>
-			<ns5:SubscriptionRef>{{.SubscriptionIdentifier}}</ns5:SubscriptionRef>
-			<ns5:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ns5:InitialTerminationTime>
-			<ns2:GeneralMessageRequest>
+			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
+			<siri:SubscriptionRef>{{.SubscriptionIdentifier}}</siri:SubscriptionRef>
+			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
+			<siri:GeneralMessageRequest>
 				{{ .BuildGeneralMessageRequestXML }}
-			</ns2:GeneralMessageRequest>
+			</siri:GeneralMessageRequest>
 		</GeneralMessageSubscriptionRequest>{{ end }}
 	</Request>
-	<RequestExtension />
-</ws:Subscribe>`
+</sw:Subscribe>`
 
 func NewXMLGeneralMessageSubscriptionResponse(node xml.Node) *XMLGeneralMessageSubscriptionResponse {
 	xmlGeneralMessageSubscriptionResponse := &XMLGeneralMessageSubscriptionResponse{}

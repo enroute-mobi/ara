@@ -35,7 +35,7 @@ func (siriError SiriErrorResponse) sendSiriError() {
 	// Wrap soap and send response
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(fmt.Sprintf(`
-  <S:Fault xmlns:ns4="http://www.w3.org/2003/05/soap-envelope">
+  <S:Fault>
     <faultcode>S:%s</faultcode>
     <faultstring>%s</faultstring>
   </S:Fault>`, siriError.errCode, siriError.errDescription))

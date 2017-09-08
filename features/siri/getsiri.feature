@@ -96,90 +96,84 @@ Feature: Support SIRI GetSIRI
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
-          <Answer xmlns:ns3="http://www.siri.org.uk/siri"
-                  xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                  xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                  xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                  xmlns:ns7="http://scma/siri"
-                  xmlns:ns8="http://wsdl.siri.org.uk"
-                  xmlns:ns9="http://wsdl.siri.org.uk/siri">
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-              <ns3:Status>true</ns3:Status>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2017-01-12T10:52:46.042+01:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>SIRI:34852540</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>boaarle</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>CdF:Line::415:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>boaarle</ns3:StopPointRef>
-                      <ns3:Order>44</ns3:Order>
-                      <ns3:StopPointName>Test 1</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                      <ns3:AimedArrivalTime>2017-01-12T11:42:54.000+01:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-12T11:42:54.000+01:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                      <ns3:AimedDepartureTime>2017-01-12T11:42:54.000+01:00</ns3:AimedDepartureTime>
-                      <ns3:ExpectedDepartureTime>2017-01-12T11:42:54.000+01:00</ns3:ExpectedDepartureTime>
-                      <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2017-01-12T10:52:46.050+01:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>SIRI:34863800</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>cladebr</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>CdF:Line::475:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>cladebr</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>5CAR621689196575</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>RATPDev:JourneyPattern::3eb50093508f11b474950daa6b0b8632660a32a6:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 475</ns3:PublishedLineName>
-                    <ns3:DirectionName>Aller</ns3:DirectionName>
-                    <ns3:DestinationRef>RATPDev:StopPoint:Q:9dd925e2cd515383ad6d975e761cea71ea1a79e7:LOC</ns3:DestinationRef>
-                    <ns3:DestinationName>PARIS - Porte d'Orléans</ns3:DestinationName>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>cladebr</ns3:StopPointRef>
-                      <ns3:Order>11</ns3:Order>
-                      <ns3:StopPointName>Test 2</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:DestinationDisplay>PARIS - Porte d'Orléans</ns3:DestinationDisplay>
-                      <ns3:AimedArrivalTime>2017-01-12T11:41:00.000+01:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-12T11:41:00.000+01:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                      <ns3:AimedDepartureTime>2017-01-12T11:41:00.000+01:00</ns3:AimedDepartureTime>
-                      <ns3:ExpectedDepartureTime>2017-01-12T11:41:00.000+01:00</ns3:ExpectedDepartureTime>
-                      <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
+          <sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <Answer>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+              <siri:Status>true</siri:Status>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2017-01-12T10:52:46.042+01:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>SIRI:34852540</siri:ItemIdentifier>
+                  <siri:MonitoringRef>boaarle</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>CdF:Line::415:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+                    <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>boaarle</siri:StopPointRef>
+                      <siri:Order>44</siri:Order>
+                      <siri:StopPointName>Test 1</siri:StopPointName>
+                      <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                      <siri:DestinationDisplay>Méliès - Croix Bonnet</siri:DestinationDisplay>
+                      <siri:AimedArrivalTime>2017-01-12T11:42:54.000+01:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-12T11:42:54.000+01:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-12T11:42:54.000+01:00</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-12T11:42:54.000+01:00</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>onTime</siri:DepartureStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2017-01-12T10:52:46.050+01:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>SIRI:34863800</siri:ItemIdentifier>
+                  <siri:MonitoringRef>cladebr</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>CdF:Line::475:LOC</siri:LineRef>
+                    <siri:DirectionRef>cladebr</siri:DirectionRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>5CAR621689196575</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:JourneyPatternRef>RATPDev:JourneyPattern::3eb50093508f11b474950daa6b0b8632660a32a6:LOC</siri:JourneyPatternRef>
+                    <siri:PublishedLineName>Ligne 475</siri:PublishedLineName>
+                    <siri:DirectionName>Aller</siri:DirectionName>
+                    <siri:DestinationRef>RATPDev:StopPoint:Q:9dd925e2cd515383ad6d975e761cea71ea1a79e7:LOC</siri:DestinationRef>
+                    <siri:DestinationName>PARIS - Porte d'Orléans</siri:DestinationName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>cladebr</siri:StopPointRef>
+                      <siri:Order>11</siri:Order>
+                      <siri:StopPointName>Test 2</siri:StopPointName>
+                      <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                      <siri:DestinationDisplay>PARIS - Porte d'Orléans</siri:DestinationDisplay>
+                      <siri:AimedArrivalTime>2017-01-12T11:41:00.000+01:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-12T11:41:00.000+01:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-12T11:41:00.000+01:00</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-12T11:41:00.000+01:00</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>onTime</siri:DepartureStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Answer>
-          </ns1:GetSiriServiceResponse>
+          </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -275,63 +269,57 @@ Feature: Support SIRI GetSIRI
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns1:GetSiriServiceResponse xmlns:ns1="http://wsdl.siri.org.uk">
-          <Answer xmlns:ns3="http://www.siri.org.uk/siri"
-                  xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                  xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                  xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                  xmlns:ns7="http://scma/siri"
-                  xmlns:ns8="http://wsdl.siri.org.uk"
-                  xmlns:ns9="http://wsdl.siri.org.uk/siri">
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-              <ns3:Status>false</ns3:Status>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:0</ns3:RequestMessageRef>
-                <ns3:Status>true</ns3:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2017-01-12T10:52:46.042+01:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>SIRI:34852540</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>boaarle</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>CdF:Line::415:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:PublishedLineName>Ligne 415</ns3:PublishedLineName>
-                    <ns3:VehicleJourneyName>Passage 32</ns3:VehicleJourneyName>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>boaarle</ns3:StopPointRef>
-                      <ns3:Order>44</ns3:Order>
-                      <ns3:StopPointName>Test 1</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:DestinationDisplay>Méliès - Croix Bonnet</ns3:DestinationDisplay>
-                      <ns3:AimedArrivalTime>2017-01-12T11:42:54.000+01:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-12T11:42:54.000+01:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                      <ns3:AimedDepartureTime>2017-01-12T11:42:54.000+01:00</ns3:AimedDepartureTime>
-                      <ns3:ExpectedDepartureTime>2017-01-12T11:42:54.000+01:00</ns3:ExpectedDepartureTime>
-                      <ns3:DepartureStatus>onTime</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns3:StopMonitoringDelivery>
-              <ns3:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:RequestMessageRef>GetSIRIStopMonitoring:Test:1</ns3:RequestMessageRef>
-                <ns3:Status>false</ns3:Status>
-                <ns3:ErrorCondition>
-                  <ns3:InvalidDataReferencesError>
-                    <ns3:ErrorText>StopArea not found: 'unknown'</ns3:ErrorText>
-                  </ns3:InvalidDataReferencesError>
-                </ns3:ErrorCondition>
-              </ns3:StopMonitoringDelivery>
+          <sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <Answer>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+              <siri:Status>false</siri:Status>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2017-01-12T10:52:46.042+01:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>SIRI:34852540</siri:ItemIdentifier>
+                  <siri:MonitoringRef>boaarle</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>CdF:Line::415:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+                    <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>boaarle</siri:StopPointRef>
+                      <siri:Order>44</siri:Order>
+                      <siri:StopPointName>Test 1</siri:StopPointName>
+                      <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                      <siri:DestinationDisplay>Méliès - Croix Bonnet</siri:DestinationDisplay>
+                      <siri:AimedArrivalTime>2017-01-12T11:42:54.000+01:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-12T11:42:54.000+01:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-12T11:42:54.000+01:00</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-12T11:42:54.000+01:00</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>onTime</siri:DepartureStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:1</siri:RequestMessageRef>
+                <siri:Status>false</siri:Status>
+                <siri:ErrorCondition>
+                  <siri:InvalidDataReferencesError>
+                    <siri:ErrorText>StopArea not found: 'unknown'</siri:ErrorText>
+                  </siri:InvalidDataReferencesError>
+                </siri:ErrorCondition>
+              </siri:StopMonitoringDelivery>
             </Answer>
-          </ns1:GetSiriServiceResponse>
+          </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>
       """

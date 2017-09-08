@@ -63,61 +63,55 @@ type SIRIEstimatedCall struct {
 	ExpectedDepartureTime time.Time
 }
 
-const estimatedTimeTableResponseTemplate = `<ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri"
-																	 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-																	 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-																	 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-																	 xmlns:ns7="http://scma/siri"
-																	 xmlns:ns8="http://wsdl.siri.org.uk"
-																	 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+const estimatedTimeTableResponseTemplate = `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
-		<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-		<ns3:ProducerRef>{{ .ProducerRef }}</ns3:ProducerRef>{{ if .Address }}
-		<ns3:Address>{{ .Address }}</ns3:Address>{{ end }}
-		<ns3:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ns3:ResponseMessageIdentifier>
-		<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
+		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>
 		{{ .BuildEstimatedTimetableDeliveryXML }}
 	</Answer>
-</ns8:GetEstimatedTimetableResponse>`
+</sw:GetEstimatedTimetableResponse>`
 
-const estimatedTimetableDeliveryTemplate = `<ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-			<ns3:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ResponseTimestamp>
-			<ns3:RequestMessageRef>{{ .RequestMessageRef }}</ns3:RequestMessageRef>
-			<ns3:Status>{{ .Status }}</ns3:Status>{{ if not .Status }}
-			<ns3:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<ns3:OtherError number="{{.ErrorNumber}}">{{ else }}
-				<ns3:{{.ErrorType}}>{{ end }}
-					<ns3:ErrorText>{{.ErrorText}}</ns3:ErrorText>
-				</ns3:{{.ErrorType}}>
-			</ns3:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
-			<ns3:EstimatedJourneyVersionFrame>
-				<ns3:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
-				<ns3:EstimatedVehicleJourney>
-					<ns3:LineRef>{{ .LineRef }}</ns3:LineRef>{{ if .Attributes.DirectionRef }}
-					<ns3:DirectionRef>{{ .Attributes.DirectionRef }}</ns3:DirectionRef>{{ end }}
-					<ns3:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</ns3:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
-					<ns3:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</ns3:OriginRef>{{ end }}{{ if .References.DestinationRef }}
-					<ns3:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</ns3:DestinationRef>{{ end }}
-					<ns3:EstimatedCalls>{{ range .EstimatedCalls }}
-						<ns3:EstimatedCall>
-							<ns3:StopPointRef>{{ .StopPointRef }}</ns3:StopPointRef>
-							<ns3:Order>{{ .Order }}</ns3:Order>{{ if .StopPointName }}
-							<ns3:StopPointName>{{ .StopPointName }}</ns3:StopPointName>{{ end }}
-							<ns3:VehicleAtStop>{{ .VehicleAtStop }}</ns3:VehicleAtStop>{{ if .DestinationDisplay }}
-							<ns3:DestinationDisplay>{{ .DestinationDisplay }}</ns3:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
-							<ns3:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
-							<ns3:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
-							<ns3:ArrivalStatus>{{ .ArrivalStatus }}</ns3:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
-							<ns3:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
-							<ns3:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ns3:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
-							<ns3:DepartureStatus>{{ .DepartureStatus }}</ns3:DepartureStatus>{{end}}
-						</ns3:EstimatedCall>{{ end }}
-					</ns3:EstimatedCalls>
-				</ns3:EstimatedVehicleJourney>{{ end }}
-			</ns3:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
-		</ns3:EstimatedTimetableDelivery>`
+const estimatedTimetableDeliveryTemplate = `<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
+			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
+			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<siri:{{.ErrorType}}>{{ end }}
+					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+				</siri:{{.ErrorType}}>
+			</siri:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
+					<siri:DirectionRef>{{ .Attributes.DirectionRef }}</siri:DirectionRef>{{ end }}
+					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
+					<siri:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
+					<siri:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{ end }}
+					<siri:EstimatedCalls>{{ range .EstimatedCalls }}
+						<siri:EstimatedCall>
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
+							<siri:Order>{{ .Order }}</siri:Order>{{ if .StopPointName }}
+							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}
+							<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{ if .DestinationDisplay }}
+							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
+							<siri:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
+							<siri:ArrivalStatus>{{ .ArrivalStatus }}</siri:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
+							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
+							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
+							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
+						</siri:EstimatedCall>{{ end }}
+					</siri:EstimatedCalls>
+				</siri:EstimatedVehicleJourney>{{ end }}
+			</siri:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
+		</siri:EstimatedTimetableDelivery>`
 
 func (response *SIRIEstimatedTimeTableResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer

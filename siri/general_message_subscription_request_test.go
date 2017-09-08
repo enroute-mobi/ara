@@ -80,6 +80,9 @@ func Test_SIRIGeneralMessageSubscriptionRequest_BuildXML(t *testing.T) {
 	}
 
 	smsr, err := NewXMLSubscriptionRequestFromContent([]byte(xml))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if smsr.RequestorRef() != request.RequestorRef {
 		t.Errorf("Wrong RequestorRef:\n got: %v\nwant: %v", smsr.RequestorRef(), request.RequestorRef)

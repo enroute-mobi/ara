@@ -32,7 +32,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>TestPartner</ns2:RequestorRef>
@@ -56,42 +56,35 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage formatRef="STIF-IDF">
-                  <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>2</ns3:InfoMessageIdentifier>
-                  <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Perturbations</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:Message>
-                      <ns3:MessageType>longMessage</ns3:MessageType>
-                      <ns3:MessageText>Les autres non</ns3:MessageText>
-                    </ns3:Message>
-                  </ns3:Content>
-                </ns3:GeneralMessage>
-              </ns3:GeneralMessageDelivery>
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+                <siri:GeneralMessage formatRef="STIF-IDF">
+                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>2</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Perturbations</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:Message>
+                      <siri:MessageType>longMessage</siri:MessageType>
+                      <siri:MessageText>Les autres non</siri:MessageText>
+                    </siri:Message>
+                  </siri:Content>
+                </siri:GeneralMessage>
+              </siri:GeneralMessageDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetGeneralMessageResponse>
+          </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -116,7 +109,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
@@ -140,42 +133,35 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage formatRef="STIF-IDF">
-                  <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>test</ns3:InfoMessageIdentifier>
-                  <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>2017-01-01T20:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:Message>
-                      <ns3:MessageType>longMessage</ns3:MessageType>
-                      <ns3:MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</ns3:MessageText>
-                    </ns3:Message>
-                  </ns3:Content>
-                </ns3:GeneralMessage>
-              </ns3:GeneralMessageDelivery>
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+                <siri:GeneralMessage formatRef="STIF-IDF">
+                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>test</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:Message>
+                      <siri:MessageType>longMessage</siri:MessageType>
+                      <siri:MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</siri:MessageText>
+                    </siri:Message>
+                  </siri:Content>
+                </siri:GeneralMessage>
+              </siri:GeneralMessageDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetGeneralMessageResponse>
+          </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -186,49 +172,39 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>
-              2017-03-29T16:48:00.993+02:00</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
-              <ns3:Address>
-              http://appli.chouette.mobi/siri_france/siri</ns3:Address>
-              <ns3:ResponseMessageIdentifier>
-              b28e8207-f030-4932-966c-3e6099fad4ef</ns3:ResponseMessageIdentifier>
+              <siri:ResponseTimestamp>
+              2017-03-29T16:48:00.993+02:00</siri:ResponseTimestamp>
+              <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+              <siri:Address>http://appli.chouette.mobi/siri_france/siri</siri:Address>
+              <siri:ResponseMessageIdentifier>b28e8207-f030-4932-966c-3e6099fad4ef</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>
-                2017-03-29T16:48:00.039+02:00</ns3:ResponseTimestamp>
-                <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage formatRef="FRANCE">
-                  <ns3:RecordedAtTime>
-                  2017-03-29T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>
-                  NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
-                  <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>
-                  2017-03-29T20:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:type="ns9:IDFGeneralMessageStructure">
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+                <siri:GeneralMessage formatRef="FRANCE">
+                  <siri:RecordedAtTime>
+                  2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>3477</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>
+                  NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>
+                  2017-03-29T20:30:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content>
                     <Message>
                       <MessageType>longMessage</MessageType>
                       <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                     </Message>
-                  </ns3:Content>
-                </ns3:GeneralMessage>
-              </ns3:GeneralMessageDelivery>
+                  </siri:Content>
+                </siri:GeneralMessage>
+              </siri:GeneralMessageDelivery>
             </Answer>
             <AnswerExtension />
-          </ns8:GetGeneralMessageResponse>
+          </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -255,42 +231,42 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
+          <sw:GetGeneralMessageResponse xmlns:siri="http://www.siri.org.uk/siri"
           xmlns:ns4="http://www.ifopt.org.uk/acsb"
           xmlns:ns5="http://www.ifopt.org.uk/ifopt"
           xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
           xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
+          xmlns:sw="http://wsdl.siri.org.uk"
           xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:00:00.000Z</ns3:ResponseTimestamp>
-                <ns3:Status>true</ns3:Status>
-                <ns3:GeneralMessage>
-                  <ns3:formatRef>STIF-IDF</ns3:formatRef>
-                  <ns3:RecordedAtTime>2017-01-01T03:30:06.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ItemIdentifier>
-                  <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
-                  <ns3:InfoMessageVersion>1</ns3:InfoMessageVersion>
-                  <ns3:InfoChannelRef>Perturbation</ns3:InfoChannelRef>
-                  <ns3:ValidUntilTime>2017-01-07T20:30:06.000+02:00</ns3:ValidUntilTime>
-                  <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+                <siri:GeneralMessage>
+                  <siri:formatRef>STIF-IDF</siri:formatRef>
+                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>2017-01-07T20:30:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
                     <Message>
                       <MessageType>longMessage</MessageType>
                       <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                     </Message>
-                  </ns3:Content>
-                </ns3:GeneralMessage>
-              </ns3:GeneralMessageDelivery>
+                  </siri:Content>
+                </siri:GeneralMessage>
+              </siri:GeneralMessageDelivery>
             </Answer>
             <AnswerExtension />
-          </ns8:GetGeneralMessageResponse>
+          </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
       """
@@ -337,7 +313,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <SOAP-ENV:Header/>
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
@@ -361,27 +337,20 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:ns8="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
-              <ns3:ProducerRef>Edwig</ns3:ProducerRef>
-              <ns3:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns3:ResponseMessageIdentifier>
-              <ns3:RequestMessageRef>GeneralMessage:Test:0</ns3:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
-                <ns3:ResponseTimestamp>2017-01-01T12:02:00.000Z</ns3:ResponseTimestamp>
-                <ns3:Status>true</ns3:Status>
-              </ns3:GeneralMessageDelivery>
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+              </siri:GeneralMessageDelivery>
             </Answer>
-            <AnswerExtension />
-          </ns8:GetGeneralMessageResponse>
+          </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
       """
