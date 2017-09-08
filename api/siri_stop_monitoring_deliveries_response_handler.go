@@ -10,7 +10,6 @@ import (
 
 type SIRIStopMonitoringRequestDeliveriesResponseHandler struct {
 	xmlRequest *siri.XMLNotifyStopMonitoring
-	Partner    core.Partner
 }
 
 func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) RequestorRef() string {

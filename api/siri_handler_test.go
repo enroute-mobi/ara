@@ -56,6 +56,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-stop-monitoring-subscription-collector",
 		"siri-general-message-subscription-collector",
 		"siri-estimated-timetable-request-broadcaster",
+		"siri-lines-discovery-request-broadcaster",
 	}
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
@@ -619,7 +620,6 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	}
 	responseBody := envelope.Body().String()
 
-	// TEMP: Find a better way to test?
 	expectedResponseBody := `<ns8:GetEstimatedTimetableResponse xmlns:ns3="http://www.siri.org.uk/siri" xmlns:ns4="http://www.ifopt.org.uk/acsb" xmlns:ns5="http://www.ifopt.org.uk/ifopt" xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns7="http://scma/siri" xmlns:ns8="http://wsdl.siri.org.uk" xmlns:ns9="http://wsdl.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<ns3:ResponseTimestamp>1984-04-04T00:00:00.000Z</ns3:ResponseTimestamp>
@@ -678,6 +678,72 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 		</ns3:EstimatedTimetableDelivery>
 	</Answer>
 </ns8:GetEstimatedTimetableResponse>`
+
+	// Check the response body is what we expect.
+	if responseBody != expectedResponseBody {
+		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
+	}
+}
+
+func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
+	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+
+	file, err := os.Open("testdata/lines-discovery-request.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	soapEnvelope.WriteXML(string(content))
+
+	server, referential := siriHandler_PrepareServer()
+
+	line := referential.Model().Lines().New()
+	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.Name = "lineName"
+	line.Save()
+
+	line2 := referential.Model().Lines().New()
+	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.Name = "lineName2"
+	line2.Save()
+
+	line3 := referential.Model().Lines().New()
+	line3.SetObjectID(model.NewObjectID("objectidKind2", "NINOXE:Line:4:LOC"))
+	line3.Name = "lineName3"
+	line3.Save()
+
+	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+
+	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	responseBody := envelope.Body().String()
+
+	expectedResponseBody := `<sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<Answer version="2.0">
+		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+		<siri:Address>http://edwig</siri:Address>
+		<siri:ProducerRef>Edwig</siri:ProducerRef>
+		<siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+		<siri:Status>true</siri:Status>
+		<siri:AnnotatedLineStructure>
+			<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
+			<siri:LineName>lineName</siri:LineName>
+			<siri:Monitored>true</siri:Monitored>
+		</siri:AnnotatedLineStructure>
+		<siri:AnnotatedLineStructure>
+			<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+			<siri:LineName>lineName2</siri:LineName>
+			<siri:Monitored>true</siri:Monitored>
+		</siri:AnnotatedLineStructure>
+	</Answer>
+</sw:LinesDiscoveryResponse>`
 
 	// Check the response body is what we expect.
 	if responseBody != expectedResponseBody {

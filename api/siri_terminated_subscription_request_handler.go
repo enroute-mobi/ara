@@ -11,7 +11,6 @@ import (
 
 type SIRIDeleteSubscriptionRequestHandler struct {
 	xmlRequest *siri.XMLDeleteSubscriptionRequest
-	Partner    core.Partner
 }
 
 func (handler *SIRIDeleteSubscriptionRequestHandler) RequestorRef() string {
