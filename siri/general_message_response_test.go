@@ -183,6 +183,7 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 			</siri:GeneralMessage>{{end}}
 		</siri:GeneralMessageDelivery>
 	</Answer>
+	<AnswerExtension/>
 </sw:GetGeneralMessageResponse>`
 
 	response, _ := NewXMLGeneralMessageResponseFromContent([]byte(expectedXML))

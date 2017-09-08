@@ -131,6 +131,7 @@ const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="
 	<Answer>
 		{{ .BuildGeneralMessageDeliveryXML }}
 	</Answer>
+	<AnswerExtension/>
 </sw:GetGeneralMessageResponse>`
 
 const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">

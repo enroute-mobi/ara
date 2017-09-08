@@ -16,6 +16,7 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
 		<siri:RequestTimestamp>2016-09-21T20:14:46.000Z</siri:RequestTimestamp>
 		<siri:MessageIdentifier>MessageId</siri:MessageIdentifier>
 	</Request>
+	<RequestExtension/>
 </sw:GetGeneralMessage>`
 
 	requestTimestamp := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)

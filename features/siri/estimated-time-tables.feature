@@ -179,6 +179,7 @@ Feature: Support SIRI EstimatedTimeTable
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
             </Answer>
+            <AnswerExtension/>
           </sw:GetEstimatedTimetableResponse>
         </S:Body>
       </S:Envelope>

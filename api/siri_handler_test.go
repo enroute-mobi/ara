@@ -677,6 +677,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
 	</Answer>
+	<AnswerExtension/>
 </sw:GetEstimatedTimetableResponse>`
 
 	// Check the response body is what we expect.

@@ -92,6 +92,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
 	</Answer>
+	<AnswerExtension/>
 </sw:GetEstimatedTimetableResponse>`
 
 	testTime := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
