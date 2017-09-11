@@ -19,6 +19,10 @@ When(/^a StopVisit is created (?:in Referential "([^"]+)" )?with the following a
   end
 end
 
+When(/^the StopVisit "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
+  RestClient.put stop_visit_path(identifier), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+end
+
 Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, attributes|
   response = RestClient.get stop_visit_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
   stopVisitAttributes = api_attributes(response.body)
