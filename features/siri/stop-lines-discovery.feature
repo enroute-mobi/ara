@@ -3,9 +3,8 @@ Feature: Support SIRI StopLinesDiscovery
   Background:
     Given a Referential "test" is created
 
-@wip
   Scenario: 4397 - Handle a SIRI StopLinesDiscovery request
-    Given a Partner "test" exists with connectors [siri-stop-lines-discovery-request-broadcaster] and the following settings:
+    Given a Partner "test" exists with connectors [siri-lines-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
       | local_url            | address  |
@@ -23,7 +22,7 @@ Feature: Support SIRI StopLinesDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopLinesDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
+          <ns7:LinesDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
                            xmlns:siri="http://www.ifopt.org.uk/acsb"
                            xmlns:ns4="http://www.ifopt.org.uk/ifopt"
                            xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
@@ -34,7 +33,7 @@ Feature: Support SIRI StopLinesDiscovery
               <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
             </Request>
             <RequestExtension />
-          </ns7:StopLinesDiscovery>
+          </ns7:LinesDiscovery>
         </S:Body>
         </S:Envelope>
         """
@@ -43,29 +42,32 @@ Feature: Support SIRI StopLinesDiscovery
       <?xml version="1.0" encoding="UTF-8"?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:StopLinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <Answer version="2.0">
             <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
             <siri:Address>address</siri:Address>
             <siri:ProducerRef>Edwig</siri:ProducerRef>
             <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
-            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
             <siri:Status>true</siri:Status>
               <siri:AnnotatedLineStructure>
                 <siri:LineRef>STIF:Line::C00272:</siri:LineRef>
                 <siri:LineName>Line 1</siri:LineName>
+                <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineStructure>
               <siri:AnnotatedLineStructure>
                 <siri:LineRef>STIF:Line::C00273:</siri:LineRef>
                 <siri:LineName>Line 2</siri:LineName>
+                <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineStructure>
               <siri:AnnotatedLineStructure>
                 <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
                 <siri:LineName>Line 3</siri:LineName>
+                <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineStructure>
             </Answer>
             <AnswerExtension />
-          </sw:StopLinesDiscoveryResponse>
+          </sw:LinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>
       """
