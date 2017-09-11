@@ -114,9 +114,13 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	}
 
 	for subId, lines := range events {
+		sub, _ := connector.Partner().Subscriptions().Find(subId)
+
 		delivery := ett.getEstimatedTimetableDelivery(tx, lines)
 		delivery.SubscriptionIdentifier = string(subId)
 		delivery.SubscriberRef = connector.SIRIPartner().RequestorRef()
+		delivery.RequestMessageRef = sub.SubscriptionOptions()["MessageIdentifier"]
+
 		logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent, &delivery)
 		notify.Deliveries = append(notify.Deliveries, &delivery)
 	}

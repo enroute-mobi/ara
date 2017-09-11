@@ -126,6 +126,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
 			sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
 			sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
+			sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
 			sub.Save()
 		}
 		resps = append(resps, rs)

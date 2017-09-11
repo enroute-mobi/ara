@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"time"
 )
@@ -17,6 +18,7 @@ type SIRIEstimatedTimetableSubscriptionDelivery struct {
 	ResponseTimestamp      time.Time
 	SubscriberRef          string
 	SubscriptionIdentifier string
+	RequestMessageRef      string
 
 	Status      bool
 	ErrorType   string
@@ -35,6 +37,7 @@ const estimatedTimeTablenotifyTemplate = `<sw:NotifyEstimatedTimetable xmlns:sw=
 	<Notification>{{range .Deliveries}}
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>{{.RequestMessageRef}}</siri:RequestMessageRef>
 			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
 			<siri:SubscriptionRef>{{.SubscriptionIdentifier}}</siri:SubscriptionRef>
 			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
@@ -78,6 +81,7 @@ func (notify *SIRINotifyEstimatedTimeTable) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var notifyDelivery = template.Must(template.New("estimatedTimeTableNotify").Parse(estimatedTimeTablenotifyTemplate))
 	if err := notifyDelivery.Execute(&buffer, notify); err != nil {
+		fmt.Println("err ============== ", err.Error())
 		return "", err
 	}
 	return buffer.String(), nil

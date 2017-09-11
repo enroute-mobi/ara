@@ -122,6 +122,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
+			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 		}
 
 		svIds := make(map[model.StopVisitId]bool) //Making sure not to send 2 times the same SV
@@ -138,6 +139,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 					ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 					SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
 					SubscriptionIdentifier:    sub.ExternalId(),
+					RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 					ResponseTimestamp:         smb.connector.Clock().Now(),
 					Status:                    true,
 				}

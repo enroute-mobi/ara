@@ -210,6 +210,7 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 	so["IncrementalUpdates"] = request.IncrementalUpdates()
 	so["MaximumStopVisits"] = request.MaximumStopVisits()
 	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
+	so["MessageIdentifier"] = request.MessageIdentifier()
 }
 
 // START TEST

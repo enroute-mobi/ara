@@ -66,6 +66,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	subscription := partner.Subscriptions().New("sub")
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
+	subscription.SubscriptionOptions()["MessageIdentifier"] = "MessageIdentifier"
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
@@ -106,6 +107,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	<Notification>
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
 			<siri:SubscriberRef>external</siri:SubscriberRef>
 			<siri:SubscriptionRef>6ba7b814-9dad-11d1-1-00c04fd430c8</siri:SubscriptionRef>
 			<siri:Status>true</siri:Status>
