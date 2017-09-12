@@ -357,6 +357,7 @@ func (smb *SMBroadcaster) reformatReferences(toReformat []string, references mod
 }
 
 func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
+	logStashEvent["Type"] = "NotifyStopMonitoring"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier

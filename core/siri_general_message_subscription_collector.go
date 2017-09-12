@@ -189,6 +189,7 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartn
 }
 
 func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
+	logStashEvent["Type"] = "GeneralMessageSubscriptionRequest"
 	logStashEvent["consumerAddress"] = request.ConsumerAddress
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef

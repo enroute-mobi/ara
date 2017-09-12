@@ -96,7 +96,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	logStashEvent := make(audit.LogStashEvent)
+	logStashEvent := subscriber.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
@@ -159,8 +159,14 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	}
 }
 
+func (smb *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
+	event := smb.connector.partner.NewLogStashEvent()
+	event["connector"] = "SIRIStopMonitoringSubscriptionCollector"
+	return event
+}
+
 func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest, monitorinRefList []string) {
-	logStashEvent["Connector"] = "SIRIStopMonitoringSubscriptionCollector"
+	logStashEvent["Type"] = "StopMonitoringSubscriptionRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

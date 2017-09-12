@@ -245,6 +245,7 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRINotifyEstimatedTimeTable(logStashEvent audit.LogStashEvent, notify *siri.SIRINotifyEstimatedTimeTable) {
+	logStashEvent["Type"] = "NotifyEstimatedTimetable"
 	logStashEvent["ResponseTimestamp"] = notify.ResponseTimestamp.String()
 	logStashEvent["ProducerRef"] = notify.ProducerRef
 	logStashEvent["ResponseMessageIdentifier"] = notify.ResponseMessageIdentifier
