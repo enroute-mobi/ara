@@ -203,6 +203,7 @@ func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent,
 }
 
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
+	logStashEvent["Type"] = "NotifyGeneralMessageCollected"
 	logStashEvent["address"] = notify.Address()
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
