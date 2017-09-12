@@ -32,7 +32,7 @@ class SIRIServer
 	  @http_server = WEBrick::HTTPServer.new(Port: uri.port, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
 
 	  @http_server.mount_proc uri.path do |req, res|
-		  if req.body =~ /sw:CheckStatus/
+      if req.body =~ /sw:CheckStatus/
 			  res.body = %Q{<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>

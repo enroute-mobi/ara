@@ -44,7 +44,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     Then a Subscription exist with the following attributes:
       | Kind                      | EstimatedTimetable          |
 
-
+@wip
   Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -84,7 +84,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-collector] and the following settings:
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
@@ -115,17 +115,12 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                        |
       | ArrivalStatus                   | onTime                                                              |
     And a minute has passed
-    When a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
-      | PassageOrder                    | 4                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
-      | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                        |
+    And a minute has passed
+    When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
+      | Schedule[expected]#Arrival      | 2017-01-01T15:01:01.000Z                                        |
       | ArrivalStatus                   | Delayed                                                              |
-    Then I send this SIRI request
+    And a minute has passed
+    Then I should receive this SIRI response
       """
       <ns1:NotifyEstimatedTimetable xmlns:ns1="http://wsdl.siri.org.uk">
         <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
