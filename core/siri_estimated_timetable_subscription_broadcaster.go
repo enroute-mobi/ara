@@ -9,6 +9,9 @@ import (
 )
 
 type EstimatedTimeTableSubscriptionBroadcaster interface {
+	model.Stopable
+	model.Startable
+
 	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 	HandleSubscriptionRequest([]*siri.XMLEstimatedTimetableSubscriptionRequestEntry) []siri.SIRIResponseStatus
 }
@@ -96,6 +99,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		resps = append(resps, rs)
 	}
 	return resps
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {
+	connector.estimatedTimeTableBroadcaster.Stop()
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Start() {
+	connector.estimatedTimeTableBroadcaster.Start()
 }
 
 func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *siri.XMLSubscriptionRequest) {
