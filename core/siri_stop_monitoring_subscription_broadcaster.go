@@ -3,6 +3,7 @@ package core
 import (
 	"sync"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -134,6 +135,10 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+
+	logStashEvent := connector.newLogStashEvent()
+	logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent, request)
+
 	sms := request.XMLSubscriptionSMEntries()
 
 	tx := connector.Partner().Referential().NewTransaction()
@@ -142,6 +147,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, sm := range sms {
+		logSIRIStopMonitoringBroadcasterEntries(logStashEvent, sm)
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: sm.MessageIdentifier(),
 			SubscriberRef:     sm.SubscriberRef(),
@@ -211,6 +217,31 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 	so["MaximumStopVisits"] = request.MaximumStopVisits()
 	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
 	so["MessageIdentifier"] = request.MessageIdentifier()
+}
+
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "SIRIStopMonitoringSubscriptionBroadcaster"
+	return event
+}
+
+func logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
+	logStashEvent["Type"] = "StopMonitoringSubscriptions"
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+
+	xml := request.RawXML()
+	logStashEvent["requestXML"] = xml
+}
+
+func logSIRIStopMonitoringBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLStopMonitoringSubscriptionRequestEntry) {
+	logStashEvent["Type"] = "StopMonitoringSubscription"
+	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
+	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
+
+	xml := gmEntries.RawXML()
+	logStashEvent["requestXML"] = xml
 }
 
 // START TEST

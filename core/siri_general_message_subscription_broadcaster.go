@@ -4,6 +4,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -105,11 +106,16 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
 
+	logStashEvent := connector.newLogStashEvent()
+	logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent, request)
+
 	gms := request.XMLSubscriptionGMEntries()
 
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, gm := range gms {
+		logSIRIGeneralMessageBroadcasterEntries(logStashEvent, gm)
+
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: gm.MessageIdentifier(),
 			SubscriberRef:     gm.SubscriberRef(),
@@ -132,6 +138,31 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		resps = append(resps, rs)
 	}
 	return resps
+}
+
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "SIRIGeneralMessageSubscriptionBroadcaster"
+	return event
+}
+
+func logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
+	logStashEvent["Type"] = "GeneralMessageSubscriptions"
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+
+	xml := request.RawXML()
+	logStashEvent["requestXML"] = xml
+}
+
+func logSIRIGeneralMessageBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLGeneralMessageSubscriptionRequestEntry) {
+	logStashEvent["Type"] = "GeneralMessageSubscription"
+	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
+	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
+
+	xml := gmEntries.RawXML()
+	logStashEvent["requestXML"] = xml
 }
 
 // Start Test

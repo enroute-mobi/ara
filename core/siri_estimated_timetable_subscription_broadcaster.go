@@ -3,6 +3,7 @@ package core
 import (
 	"sync"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -54,6 +55,10 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+
+	logStashEvent := connector.newLogStashEvent()
+	logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent, request)
+
 	ettEntries := request.XMLSubscriptionETTEntries()
 
 	tx := connector.Partner().Referential().NewTransaction()
@@ -78,8 +83,15 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		}
 
 		for _, lineId := range ett.Lines() {
+			logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent, ett)
+
 			_, ok := connector.Partner().Model().Lines().Find(model.LineId(lineId))
 			if !ok {
+				rs.Status = false
+				rs.ErrorType = "InvalidDataReferencesError"
+				rs.ErrorText = "Could not find line"
+
+				resps = append(resps, rs)
 				logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line with id : %v", lineId)
 				continue
 			}
@@ -175,6 +187,31 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 	connector.addLine(sub.Id(), line.Id())
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
+	event := connector.partner.NewLogStashEvent()
+	event["connector"] = "SIRIEstimatedTimeTableSubscriptionBroadcaster"
+	return event
+}
+
+func logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
+	logStashEvent["Type"] = "EstimatedTimeTableSubscriptions"
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+
+	xml := request.RawXML()
+	logStashEvent["requestXML"] = xml
+}
+
+func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
+	logStashEvent["Type"] = "EstimatedTimeTableSubscription"
+	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
+	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
+
+	xml := gmEntries.RawXML()
+	logStashEvent["requestXML"] = xml
 }
 
 // START TEST
