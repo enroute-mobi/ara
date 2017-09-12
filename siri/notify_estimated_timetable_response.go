@@ -2,7 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"time"
 )
@@ -81,7 +80,6 @@ func (notify *SIRINotifyEstimatedTimeTable) BuildXML() (string, error) {
 	var buffer bytes.Buffer
 	var notifyDelivery = template.Must(template.New("estimatedTimeTableNotify").Parse(estimatedTimeTablenotifyTemplate))
 	if err := notifyDelivery.Execute(&buffer, notify); err != nil {
-		fmt.Println("err ============== ", err.Error())
 		return "", err
 	}
 	return buffer.String(), nil
