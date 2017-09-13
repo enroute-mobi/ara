@@ -19,11 +19,11 @@ type BroadcastGeneralMessageBuilder struct {
 	InfoChannelRef []string
 }
 
-func NewBroadcastGeneralMessageBuilder(siriPartner *SIRIPartner) *BroadcastGeneralMessageBuilder {
+func NewBroadcastGeneralMessageBuilder(siriPartner *SIRIPartner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
 		siriPartner:        siriPartner,
 		referenceGenerator: siriPartner.IdentifierGenerator("reference_identifier"),
-		remoteObjectidKind: siriPartner.Partner().RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
+		remoteObjectidKind: siriPartner.Partner().RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),
 	}

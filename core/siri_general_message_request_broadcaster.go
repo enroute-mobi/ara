@@ -62,7 +62,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 	// Prepare Id Array
 	var messageArray []string
 
-	builder := NewBroadcastGeneralMessageBuilder(connector.SIRIPartner())
+	builder := NewBroadcastGeneralMessageBuilder(connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
 	builder.InfoChannelRef = request.InfoChannelRef()
 	builder.SetLineRef(request.LineRef())
 	builder.SetStopPointRef(request.StopPointRef())
