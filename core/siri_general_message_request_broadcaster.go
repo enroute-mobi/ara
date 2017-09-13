@@ -62,13 +62,13 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 	// Prepare Id Array
 	var messageArray []string
 
-	builder := NewBroadcastGeneralMessageBuilder(connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
+	builder := NewBroadcastGeneralMessageBuilder(tx, connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
 	builder.InfoChannelRef = request.InfoChannelRef()
 	builder.SetLineRef(request.LineRef())
 	builder.SetStopPointRef(request.StopPointRef())
 
 	for _, situation := range tx.Model().Situations().FindAll() {
-		siriGeneralMessage := builder.BuildGeneralMessage(tx, situation)
+		siriGeneralMessage := builder.BuildGeneralMessage(situation)
 		if siriGeneralMessage == nil {
 			continue
 		}
