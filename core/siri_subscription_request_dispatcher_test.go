@@ -127,9 +127,9 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 		t.Errorf("Wrong first ResponseStatus status want true got : %v", response.ResponseStatus[0].Status)
 	}
 
-	sub, ok := partner.Subscriptions().FindByKind("Situation")
+	sub, ok := partner.Subscriptions().FindByKind("GeneralMessageBroadcast")
 	if !ok {
-		t.Errorf("Could not find a subscription with kind of Situation")
+		t.Fatalf("Could not find a subscription with kind of Situation")
 	}
 
 	externalId := "NINOXE:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"

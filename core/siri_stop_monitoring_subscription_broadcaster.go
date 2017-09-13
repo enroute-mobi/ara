@@ -166,7 +166,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("StopArea")
+			sub = connector.Partner().Subscriptions().New("StopMonitoringBroadcast")
 			sub.SetExternalId(sm.SubscriptionIdentifier())
 		}
 
@@ -177,6 +177,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		}
 
 		r := sub.CreateAddNewResource(ref)
+		r.SubscribedAt = connector.Clock().Now()
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
 		connector.fillOptions(sub, r, request, sm)

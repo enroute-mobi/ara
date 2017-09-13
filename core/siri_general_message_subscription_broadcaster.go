@@ -127,7 +127,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 
 		_, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
-			sub := connector.Partner().Subscriptions().New("Situation")
+			sub := connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
 			sub.SetExternalId(gm.SubscriptionIdentifier())
 			sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
 			sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
