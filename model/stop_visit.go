@@ -6,6 +6,8 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/af83/edwig/logger"
 )
 
 type StopVisitId string
@@ -364,6 +366,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
 
+	logger.Log.Debugf("stop visit ==== %v", stopVisit.Id())
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
 		ModelType: "StopVisit",
