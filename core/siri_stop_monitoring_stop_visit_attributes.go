@@ -86,11 +86,11 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyReferences() model.References {
 	refMap := model.NewReferences()
 
-	refMap.SetObjectId("PlaceRef", model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef()), "")
-	refMap.SetObjectId("JourneyPatternRef", model.NewObjectID(attributes.objectid_kind, attributes.response.JourneyPatternRef()), "")
-	refMap.SetObjectId("RouteRef", model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef()), "")
-	refMap.SetObjectId("DestinationRef", model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef()), "")
-	refMap.SetObjectId("OriginRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef()), "")
+	refMap.SetObjectId("PlaceRef", model.NewObjectID(attributes.objectid_kind, attributes.response.PlaceRef()))
+	refMap.SetObjectId("JourneyPatternRef", model.NewObjectID(attributes.objectid_kind, attributes.response.JourneyPatternRef()))
+	refMap.SetObjectId("RouteRef", model.NewObjectID(attributes.objectid_kind, attributes.response.RouteRef()))
+	refMap.SetObjectId("DestinationRef", model.NewObjectID(attributes.objectid_kind, attributes.response.DestinationRef()))
+	refMap.SetObjectId("OriginRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OriginRef()))
 	return refMap
 }
 
@@ -115,7 +115,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitAttributes() model
 
 func (attributes *SIRIStopVisitUpdateAttributes) FillStopVisitReferences() model.References {
 	refMap := model.NewReferences()
-	refMap.SetObjectId("OperatorRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OperatorRef()), "")
+	refMap.SetObjectId("OperatorRef", model.NewObjectID(attributes.objectid_kind, attributes.response.OperatorRef()))
 	return refMap
 }
 

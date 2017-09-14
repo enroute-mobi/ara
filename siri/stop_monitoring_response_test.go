@@ -238,8 +238,8 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
-	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId, Id: "42"}
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId, Id: "1337"}
+	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId}
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId}
 
 	response.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = response.BuildXML()

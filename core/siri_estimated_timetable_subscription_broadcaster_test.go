@@ -34,7 +34,6 @@ func Test_EstimatedTimeTableBroadcaster_Create_Events(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(line.Id()),
 		Type:     "Line",
 	}
 

@@ -221,10 +221,10 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) (references map[string]model.Reference) {
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
 		ref, ok := vehicleJourney.Reference(refType)
-		if !ok || ref == (model.Reference{}) {
+		if !ok || ref == (model.Reference{}) || ref.ObjectId == nil {
 			continue
 		}
-		if foundStopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(ref.Id)); ok {
+		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
 			obj, ok := foundStopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			if ok {
 				references[refType] = *model.NewReference(obj)

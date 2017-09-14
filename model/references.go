@@ -17,11 +17,11 @@ func (references References) Set(key string, value Reference) {
 	references[key] = value
 }
 
-func (references References) SetObjectId(key string, obj ObjectID, id string) {
+func (references References) SetObjectId(key string, obj ObjectID) {
 	if obj.Kind() == "" || obj.Value() == "" {
 		return
 	}
-	references[key] = Reference{ObjectId: &obj, Id: id}
+	references[key] = Reference{ObjectId: &obj}
 }
 
 func (references References) IsEmpty() bool {
@@ -33,7 +33,6 @@ func (references References) Copy() References {
 
 	for key, value := range references {
 		newReferences[key] = Reference{
-			Id:   value.Id,
 			Type: value.Type,
 		}
 		if value.ObjectId != nil {

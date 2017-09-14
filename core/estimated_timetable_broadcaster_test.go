@@ -59,7 +59,6 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(line.Id()),
 		Type:     "Line",
 	}
 

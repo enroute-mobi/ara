@@ -34,7 +34,6 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(situation.Id()),
 		Type:     "Situation",
 	}
 
@@ -91,7 +90,6 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(situation.Id()),
 		Type:     "Situation",
 	}
 

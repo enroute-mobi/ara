@@ -82,7 +82,7 @@ func Test_Equal_StopAreas(t *testing.T) {
 	references := NewReferences()
 	obj := NewObjectID("kind", "value")
 
-	reference := Reference{ObjectId: &obj, Id: ""}
+	reference := Reference{ObjectId: &obj}
 	references.Set("key", reference)
 
 	sa1 := &StopArea{

@@ -178,7 +178,6 @@ func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
 	objId := model.NewObjectID("_internal", "coicogn2")
 	ref := model.Reference{
 		ObjectId: &objId,
-		Id:       string(stopArea.Id()),
 		Type:     "StopArea",
 	}
 

@@ -111,14 +111,13 @@ func (updater *StopVisitUpdater) Update() {
 
 		foundVehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DatedVehicleJourneyRef))
 		if ok {
-			foundVehicleJourney.References.SetObjectId("DestinationRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationRef), "")
-			foundVehicleJourney.References.SetObjectId("DestinationName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationName), "")
-			foundVehicleJourney.References.SetObjectId("OriginRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginRef), "")
-			foundVehicleJourney.References.SetObjectId("OriginName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginName), "")
+			foundVehicleJourney.References.SetObjectId("DestinationRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationRef))
+			foundVehicleJourney.References.SetObjectId("DestinationName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationName))
+			foundVehicleJourney.References.SetObjectId("OriginRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginRef))
+			foundVehicleJourney.References.SetObjectId("OriginName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginName))
 		} else {
 			foundVehicleJourney = *updater.CreateVehicleJourney(updater.event.Attributes.VehicleJourneyAttributes())
 		}
-		updater.resolveVehiculeJourneyReferences(foundVehicleJourney)
 
 		foundVehicleJourney.Save()
 
@@ -156,19 +155,7 @@ func (updater *StopVisitUpdater) Update() {
 
 	stopVisit.Save()
 
-	updater.resolveOperator(&stopVisit)
 	//logger.Log.Debugf("Create new StopVisit, objectid: %v", stopVisit.Id())
-}
-
-func (updater *StopVisitUpdater) resolveOperator(stopVisit *StopVisit) {
-	if _, ok := stopVisit.References["OperatorRef"]; !ok {
-		return
-	}
-	operator, ok := updater.tx.Model().Operators().FindByObjectId(*stopVisit.References["OperatorRef"].ObjectId)
-	if ok {
-		operatorRef := stopVisit.References["OperatorRef"]
-		operatorRef.Id = string(operator.Id())
-	}
 }
 
 func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAreaAttributes) *StopArea {
@@ -186,22 +173,6 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 	stopArea.NextCollectAt = updater.Clock().Now().Add(1 * time.Minute)
 	stopArea.Save()
 	return &stopArea
-}
-
-func (updater *StopVisitUpdater) resolveVehiculeJourneyReferences(foundVehicleJourney VehicleJourney) error {
-	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
-
-	for _, ref := range toResolve {
-		if foundVehicleJourney.References[ref] != (Reference{}) {
-			foundStopArea, ok := updater.tx.Model().StopAreas().FindByObjectId(*(foundVehicleJourney.References[ref].ObjectId))
-			if ok {
-				reference := foundVehicleJourney.References[ref]
-				reference.Id = string(foundStopArea.Id())
-				foundVehicleJourney.References[ref] = reference
-			}
-		}
-	}
-	return nil
 }
 
 func (updater *StopVisitUpdater) findOrCreateLine(lineAttributes *LineAttributes) *Line {
@@ -235,8 +206,6 @@ func (updater *StopVisitUpdater) CreateVehicleJourney(vehicleJourneyAttributes *
 	vehicleJourney.References = vehicleJourneyAttributes.References
 	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
 
-	updater.resolveVehiculeJourneyReferences(vehicleJourney)
-
 	vehicleJourney.Save()
 
 	return &vehicleJourney
@@ -245,7 +214,6 @@ func (updater *StopVisitUpdater) CreateVehicleJourney(vehicleJourneyAttributes *
 func (updater *StopVisitUpdater) findOrCreateVehicleJourney(vehicleJourneyAttributes *VehicleJourneyAttributes) *VehicleJourney {
 	vehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(vehicleJourneyAttributes.ObjectId)
 	if ok {
-		updater.resolveVehiculeJourneyReferences(vehicleJourney)
 		return &vehicleJourney
 	}
 

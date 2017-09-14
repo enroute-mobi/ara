@@ -78,8 +78,8 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	objId := model.NewObjectID("_internal", "coicogn2")
 	ref := model.Reference{
 		ObjectId: &objId,
-		Id:       string(stopArea.Id()),
-		Type:     "StopArea",
+
+		Type: "StopArea",
 	}
 
 	subscription, _ := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")

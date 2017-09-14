@@ -4,7 +4,6 @@ import "encoding/json"
 
 type Reference struct {
 	ObjectId *ObjectID `json:",omitempty"`
-	Id       string    `json:",omitempty"`
 	Type     string    `json:",omitempty"`
 }
 

@@ -314,10 +314,10 @@ func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.Refe
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
-		if references[ref] == (model.Reference{}) {
+		if references[ref] == (model.Reference{}) || references[ref].ObjectId == nil {
 			continue
 		}
-		if foundStopArea, ok := tx.Model().StopAreas().Find(model.StopAreaId(references[ref].Id)); ok {
+		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*references[ref].ObjectId); ok {
 			obj, ok := foundStopArea.ObjectID(smb.connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER))
 			if ok {
 				tmp := references[ref]
@@ -334,7 +334,11 @@ func (smb *SMBroadcaster) resolveVehiculeJourneyReferences(references model.Refe
 
 func (smb *SMBroadcaster) resolveOperator(references model.References, tx *model.Transaction) {
 	operatorRef, _ := references["OperatorRef"]
-	operator, ok := tx.Model().Operators().Find(model.OperatorId(operatorRef.Id))
+	if operatorRef.ObjectId == nil {
+		return
+	}
+
+	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
 		return
 	}

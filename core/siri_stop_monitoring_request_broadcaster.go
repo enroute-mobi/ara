@@ -221,8 +221,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveOperator(reference
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	operatorRef, _ := references["OperatorRef"]
-	operator, ok := tx.Model().Operators().Find(model.OperatorId(operatorRef.Id))
+	operatorRef, ok := references["OperatorRef"]
+	if !ok {
+		return
+	}
+
+	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
 		return
 	}
@@ -238,10 +242,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) resolveVehiculeJourneyRef
 	toResolve := []string{"PlaceRef", "OriginRef", "DestinationRef"}
 
 	for _, ref := range toResolve {
-		if references[ref] == (model.Reference{}) {
+		if references[ref] == (model.Reference{}) || references[ref].ObjectId == nil {
 			continue
 		}
-		if foundStopArea, ok := manager.Find(model.StopAreaId(references[ref].Id)); ok {
+
+		if foundStopArea, ok := manager.FindByObjectId(*references[ref].ObjectId); ok {
 			obj, ok := foundStopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER))
 			if ok {
 				tmp := references[ref]

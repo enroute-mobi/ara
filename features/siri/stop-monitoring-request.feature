@@ -309,11 +309,11 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#Id           | 6ba7b814-9dad-11d1-3-00c04fd430c8               |
+      | Reference[DestinationRef]#ObjectID     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
       | Reference[JourneyPatternRef]#ObjectID  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[OriginRef]#Id                | 6ba7b814-9dad-11d1-4-00c04fd430c8               |
+      | Reference[OriginRef]#ObjectID          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
       | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#Id                 | 6ba7b814-9dad-11d1-5-00c04fd430c8               |
+      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |

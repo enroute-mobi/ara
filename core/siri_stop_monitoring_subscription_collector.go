@@ -94,7 +94,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	// Else we create a new resource
 	ref := model.Reference{
 		ObjectId: &stopAreaObjectid,
-		Id:       string(request.StopAreaId()),
 		Type:     "StopArea",
 	}
 

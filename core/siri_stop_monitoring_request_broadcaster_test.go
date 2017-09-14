@@ -36,11 +36,10 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	stopVisit := referential.model.StopVisits().New()
 	stopVisitRef := model.Reference{}
-	obj := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
-	stopVisitRef.ObjectId = &obj
-	stopVisitRef.Id = string(operator.Id())
+	obj1 := model.NewObjectID("objectidKind", "modelOperatorRef")
+	stopVisitRef.ObjectId = &obj1
 
-	stopVisit.SetObjectID(obj)
+	stopVisit.SetObjectID(obj1)
 	stopVisit.References.Set("OperatorRef", stopVisitRef)
 	stopVisit.StopAreaId = stopArea.Id()
 
@@ -51,7 +50,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	obj = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:26:LOC")
+	obj := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:26:LOC")
 	vehicleJourney.SetObjectID(obj)
 	vehicleJourney.Save()
 

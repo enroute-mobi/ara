@@ -38,7 +38,6 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(stopArea.Id()),
 		Type:     "StopArea",
 	}
 
@@ -100,7 +99,6 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference := model.Reference{
 		ObjectId: &objectid,
-		Id:       string(stopArea.Id()),
 		Type:     "StopArea",
 	}
 

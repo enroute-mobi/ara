@@ -46,22 +46,22 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	if len(event.SituationAttributes.References) != 12 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
 	}
-	if event.SituationAttributes.References[0].ObjectId.Value() != "lineRef1" || event.SituationAttributes.References[0].Id != "" {
+	if event.SituationAttributes.References[0].ObjectId.Value() != "lineRef1" {
 		t.Errorf("Wrong first LineRef: %v", event.SituationAttributes.References[0])
 	}
-	if event.SituationAttributes.References[2].ObjectId.Value() != "stopPointRef1" || event.SituationAttributes.References[2].Id != "" {
+	if event.SituationAttributes.References[2].ObjectId.Value() != "stopPointRef1" {
 		t.Errorf("Wrong first StopPointRef: %v", event.SituationAttributes.References[2])
 	}
-	if event.SituationAttributes.References[4].ObjectId.Value() != "journeyPatternRef1" || event.SituationAttributes.References[4].Id != "" {
+	if event.SituationAttributes.References[4].ObjectId.Value() != "journeyPatternRef1" {
 		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[4])
 	}
-	if event.SituationAttributes.References[6].ObjectId.Value() != "destinationRef1" || event.SituationAttributes.References[6].Id != "" {
+	if event.SituationAttributes.References[6].ObjectId.Value() != "destinationRef1" {
 		t.Errorf("Wrong first DestinationRef: %v", event.SituationAttributes.References[6])
 	}
-	if event.SituationAttributes.References[8].ObjectId.Value() != "routeRef1" || event.SituationAttributes.References[8].Id != "" {
+	if event.SituationAttributes.References[8].ObjectId.Value() != "routeRef1" {
 		t.Errorf("Wrong first RouteRef: %v", event.SituationAttributes.References[8])
 	}
-	if event.SituationAttributes.References[10].ObjectId.Value() != "groupOfLineRef1" || event.SituationAttributes.References[10].Id != "" {
+	if event.SituationAttributes.References[10].ObjectId.Value() != "groupOfLineRef1" {
 		t.Errorf("Wrong first GroupOfLinesRef: %v", event.SituationAttributes.References[10])
 	}
 

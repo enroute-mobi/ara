@@ -172,7 +172,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		ref := model.Reference{
 			ObjectId: &objectid,
-			Id:       string(sa.Id()),
 			Type:     "StopArea",
 		}
 

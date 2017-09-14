@@ -98,7 +98,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
 			ref := model.Reference{
 				ObjectId: &lineObjectId,
-				Id:       lineId,
 				Type:     "line",
 			}
 
