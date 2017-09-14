@@ -78,7 +78,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("EstimatedTimeTable")
+			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
 			sub.SetExternalId(ett.SubscriptionIdentifier())
 		}
 
@@ -102,6 +102,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			}
 
 			r := sub.CreateAddNewResource(ref)
+			r.SubscribedAt = connector.Clock().Now()
 			r.SubscribedUntil = ett.InitialTerminationTime()
 			connector.fillOptions(sub, request)
 

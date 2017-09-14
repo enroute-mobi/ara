@@ -164,6 +164,20 @@ type SIRIMonitoredStopVisit struct {
 	References map[string]map[string]model.Reference
 }
 
+const stopMonitoringResponseTemplate = `<sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
+		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		{{ .BuildStopMonitoringDeliveryXML }}
+	</Answer>
+	<AnswerExtension/>
+</sw:GetStopMonitoringResponse>`
+
 const stopMonitoringDeliveryTemplate = `<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
@@ -174,7 +188,10 @@ const stopMonitoringDeliveryTemplate = `<siri:StopMonitoringDelivery version="2.
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
 			</siri:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
-			<siri:MonitoredStopVisit>
+			{{ .BuildMonitoredStopVisitXML }}{{ end }}{{ end }}
+		</siri:StopMonitoringDelivery>`
+
+const monitoredStopVisitTemplate = `<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>{{ .RecordedAt.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
 				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
 				<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>
@@ -248,22 +265,7 @@ const stopMonitoringDeliveryTemplate = `<siri:StopMonitoringDelivery version="2.
 						<siri:NumberOfStopsAway>{{ .Attributes.StopVisitAttributes.NumberOfStopsAway }}</siri:NumberOfStopsAway>{{end}}
 					</siri:MonitoredCall>
 				</siri:MonitoredVehicleJourney>
-			</siri:MonitoredStopVisit>{{ end }}{{ end }}
-		</siri:StopMonitoringDelivery>`
-
-const stopMonitoringResponseTemplate = `<sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<ServiceDeliveryInfo>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
-		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
-		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-	</ServiceDeliveryInfo>
-	<Answer>
-		{{ .BuildStopMonitoringDeliveryXML }}
-	</Answer>
-	<AnswerExtension/>
-</sw:GetStopMonitoringResponse>`
+			</siri:MonitoredStopVisit>`
 
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {
 	xmlStopMonitoringResponse := &XMLStopMonitoringResponse{}
@@ -791,6 +793,15 @@ func (delivery *SIRIStopMonitoringDelivery) BuildStopMonitoringDeliveryXML() (st
 	var buffer bytes.Buffer
 	var stopMonitoringDelivery = template.Must(template.New("stopMonitoringDelivery").Parse(stopMonitoringDeliveryTemplate))
 	if err := stopMonitoringDelivery.Execute(&buffer, delivery); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (stopVisit *SIRIMonitoredStopVisit) BuildMonitoredStopVisitXML() (string, error) {
+	var buffer bytes.Buffer
+	var stopMonitoringDelivery = template.Must(template.New("monitoredStopVisit").Parse(monitoredStopVisitTemplate))
+	if err := stopMonitoringDelivery.Execute(&buffer, stopVisit); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil

@@ -123,7 +123,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		// Prepare Id Array
 		var messageArray []string
 
-		builder := NewBroadcastGeneralMessageBuilder(gmb.connector.SIRIPartner())
+		builder := NewBroadcastGeneralMessageBuilder(tx, gmb.connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		builder.InfoChannelRef = strings.Split(sub.SubscriptionOptions()["InfoChannelRef"], ",")
 		if sub.SubscriptionOptions()["LineRef"] != "" {
 			builder.SetLineRef(strings.Split(sub.SubscriptionOptions()["LineRef"], ","))
@@ -139,7 +139,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 				continue
 			}
 
-			siriGeneralMessage := builder.BuildGeneralMessage(tx, situation)
+			siriGeneralMessage := builder.BuildGeneralMessage(situation)
 			if siriGeneralMessage == nil {
 				continue
 			}

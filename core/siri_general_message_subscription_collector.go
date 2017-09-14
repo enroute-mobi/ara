@@ -40,7 +40,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	subscription, found := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessage")
+	subscription, found := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 	if found {
 		return
 	}

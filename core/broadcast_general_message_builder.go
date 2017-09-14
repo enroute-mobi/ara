@@ -10,6 +10,7 @@ type BroadcastGeneralMessageBuilder struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
+	tx                 *model.Transaction
 	siriPartner        *SIRIPartner
 	referenceGenerator *IdentifierGenerator
 	remoteObjectidKind string
@@ -19,11 +20,12 @@ type BroadcastGeneralMessageBuilder struct {
 	InfoChannelRef []string
 }
 
-func NewBroadcastGeneralMessageBuilder(siriPartner *SIRIPartner) *BroadcastGeneralMessageBuilder {
+func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
+		tx:                 tx,
 		siriPartner:        siriPartner,
 		referenceGenerator: siriPartner.IdentifierGenerator("reference_identifier"),
-		remoteObjectidKind: siriPartner.Partner().RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
+		remoteObjectidKind: siriPartner.Partner().RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),
 	}
@@ -49,7 +51,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 	}
 }
 
-func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(tx *model.Transaction, situation model.Situation) *siri.SIRIGeneralMessage {
+func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
 	if situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
 		return nil
 	}
@@ -81,7 +83,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(tx *model.Tra
 		FormatRef:             "STIF-IDF",
 	}
 	for _, reference := range situation.References {
-		id, ok := builder.resolveReference(tx, reference)
+		id, ok := builder.resolveReference(reference)
 		if !ok {
 			continue
 		}
@@ -91,7 +93,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(tx *model.Tra
 		return nil
 	}
 	for _, lineSection := range situation.LineSections {
-		siriLineSection, ok := builder.handleLineSection(tx, *lineSection)
+		siriLineSection, ok := builder.handleLineSection(*lineSection)
 		if !ok {
 			continue
 		}
@@ -127,12 +129,12 @@ func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChanne
 	return false
 }
 
-func (builder *BroadcastGeneralMessageBuilder) handleLineSection(tx *model.Transaction, lineSection model.References) (*siri.SIRILineSection, bool) {
+func (builder *BroadcastGeneralMessageBuilder) handleLineSection(lineSection model.References) (*siri.SIRILineSection, bool) {
 	siriLineSection := &siri.SIRILineSection{}
 	lineSectionMap := make(map[string]string)
 
 	for kind, reference := range lineSection {
-		ref, ok := builder.resolveReference(tx, &reference)
+		ref, ok := builder.resolveReference(&reference)
 		if !ok {
 			return nil, false
 		}
@@ -146,20 +148,20 @@ func (builder *BroadcastGeneralMessageBuilder) handleLineSection(tx *model.Trans
 	return siriLineSection, true
 }
 
-func (builder *BroadcastGeneralMessageBuilder) resolveReference(tx *model.Transaction, reference *model.Reference) (string, bool) {
+func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model.Reference) (string, bool) {
 	switch reference.Type {
 	case "LineRef":
-		return builder.resolveLineRef(tx, reference)
+		return builder.resolveLineRef(reference)
 	case "StopPointRef", "DestinationRef", "FirstStop", "LastStop":
-		return builder.resolveStopAreaRef(tx, reference)
+		return builder.resolveStopAreaRef(reference)
 	default:
 		kind := reference.Type
 		return builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: kind[:len(kind)-3], Default: reference.GetSha1()}), true
 	}
 }
 
-func (builder *BroadcastGeneralMessageBuilder) resolveLineRef(tx *model.Transaction, reference *model.Reference) (string, bool) {
-	line, ok := tx.Model().Lines().FindByObjectId(*reference.ObjectId)
+func (builder *BroadcastGeneralMessageBuilder) resolveLineRef(reference *model.Reference) (string, bool) {
+	line, ok := builder.tx.Model().Lines().FindByObjectId(*reference.ObjectId)
 	if !ok {
 		return "", false
 	}
@@ -170,8 +172,8 @@ func (builder *BroadcastGeneralMessageBuilder) resolveLineRef(tx *model.Transact
 	return lineObjectId.Value(), true
 }
 
-func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(tx *model.Transaction, reference *model.Reference) (string, bool) {
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(reference *model.Reference) (string, bool) {
+	stopArea, ok := builder.tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if !ok {
 		return "", false
 	}
