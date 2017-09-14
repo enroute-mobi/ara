@@ -149,7 +149,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
-		if subscription.Kind() != "StopMonitoring" {
+		if subscription.Kind() != "StopMonitoringCollect" {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			continue
 		}

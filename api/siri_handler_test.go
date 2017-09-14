@@ -481,7 +481,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	subscription, _ := partner.Subscriptions().FindOrCreateByKind("StopMonitoring")
+	subscription, _ := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
