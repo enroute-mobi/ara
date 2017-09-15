@@ -182,7 +182,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		lastState, _ = r.LastStates[string(sv.Id())]
 		lastState.(*estimatedTimeTableLastChange).InitState(&sv, sub)
 	}
-
 	if ok = lastState.(*estimatedTimeTableLastChange).Haschanged(&sv); !ok {
 		return
 	}

@@ -84,13 +84,14 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind                      | EstimatedTimetable          |
+      | Kind                      | EstimatedTimetable                     |
+      | ReferenceArray0           | Line, "internal": "NINOXE:Line:3:LOC"  |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -100,26 +101,25 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     And a VehicleJourney exists with the following attributes:
       | Name                          | Passage 32                              |
       | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                        | 6ba7b814-9dad-11d1-6-00c04fd430c8       |
+      | LineId                        | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | Attribute[DirectionRef]       | Aller                                   |
       | Attribute[OriginName]         | Le début                                |
       | Attribute[DestinationName]    | La fin.                                 |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                        |
-      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                        |
-      | ArrivalStatus                   | onTime                                                              |
-    And a minute has passed
-    And a minute has passed
-    When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
-      | Schedule[expected]#Arrival      | 2017-01-01T15:01:01.000Z                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And 10 seconds have passed
+    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+      | Schedule[expected]#Arrival      | 2017-01-01T15:01:01.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
-    And a minute has passed
+    And 10 seconds have passed
     Then I should receive this SIRI response
       """
       <ns1:NotifyEstimatedTimetable xmlns:ns1="http://wsdl.siri.org.uk">

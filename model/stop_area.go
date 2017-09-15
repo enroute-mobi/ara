@@ -240,6 +240,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
+
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
 	return true

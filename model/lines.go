@@ -191,6 +191,7 @@ func (manager *MemoryLines) Save(line *Line) bool {
 	if line.Id() == "" {
 		line.id = LineId(manager.NewUUID())
 	}
+
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
 	return true

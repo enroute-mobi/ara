@@ -212,6 +212,7 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 	if vehicleJourney.Id() == "" {
 		vehicleJourney.id = VehicleJourneyId(manager.NewUUID())
 	}
+
 	vehicleJourney.model = manager.model
 	manager.byIdentifier[vehicleJourney.Id()] = vehicleJourney
 	return true

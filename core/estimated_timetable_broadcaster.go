@@ -145,8 +145,12 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 		}
 
 		sentlines[lineId] = true
-		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), string(lineId))
-		line, ok := tx.Model().Lines().FindByObjectId(lineObjectId)
+		line, ok := tx.Model().Lines().Find(lineId)
+		if !ok {
+			continue
+		}
+
+		lineObjectId, ok := line.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 		if !ok {
 			continue
 		}
@@ -158,7 +162,8 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 		// SIRIEstimatedVehicleJourney
 		for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(line.Id()) {
 			// Handle vehicleJourney Objectid
-			vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+
+			vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 			var datedVehicleJourneyRef string
 			if ok {
 				datedVehicleJourneyRef = vehicleJourneyId.Value()
@@ -167,6 +172,7 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 				if !ok {
 					continue
 				}
+
 				referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
 				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
 			}
@@ -216,10 +222,8 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 				}
 				lastState.UpdateState(stopVisit)
 			}
-
 			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 		}
-
 		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
 

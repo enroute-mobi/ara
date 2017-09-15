@@ -72,6 +72,7 @@ func (ettlc *estimatedTimeTableLastChange) InitState(sv *model.StopVisit, sub *S
 	ettlc.subscription = sub
 	ettlc.schedules = sv.Schedules.Copy()
 	ettlc.vehicleAtStop = sv.VehicleAtStop
+	ettlc.departureStatus = sv.DepartureStatus
 }
 
 func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
@@ -79,7 +80,7 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 		return false
 	}
 
-	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
+	if stopVisit.DepartureStatus != ettlc.departureStatus {
 		return true
 	}
 
