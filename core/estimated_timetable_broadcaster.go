@@ -116,7 +116,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	for subId, lines := range events {
 		sub, _ := connector.Partner().Subscriptions().Find(subId)
 
-		delivery := ett.getEstimatedTimetableDelivery(tx, lines)
+		delivery := ett.getEstimatedTimetableDelivery(tx, lines, sub)
 		delivery.SubscriptionIdentifier = string(subId)
 		delivery.SubscriberRef = connector.SIRIPartner().RequestorRef()
 		delivery.RequestMessageRef = sub.SubscriptionOptions()["MessageIdentifier"]
@@ -129,7 +129,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(notify)
 }
 
-func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, lines []model.LineId) siri.SIRIEstimatedTimetableSubscriptionDelivery {
+func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, lines []model.LineId, sub *Subscription) siri.SIRIEstimatedTimetableSubscriptionDelivery {
 	connector := ett.connector
 	currentTime := connector.Clock().Now()
 	sentlines := make(map[model.LineId]bool)
@@ -207,6 +207,14 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+
+				resource := sub.Resource(lineObjectId)
+				lastStateInterface, _ := resource.LastStates[string(stopVisit.Id())]
+				lastState, ok := lastStateInterface.(*estimatedTimeTableLastChange)
+				if !ok {
+					continue
+				}
+				lastState.UpdateState(stopVisit)
 			}
 
 			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)

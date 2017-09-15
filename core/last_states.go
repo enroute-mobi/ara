@@ -16,75 +16,97 @@ type lastState interface {
 
 type stopMonitoringLastChange struct {
 	optionParser
+	schedulesHandler
 
-	subscription   *Subscription
-	lastTimeUpdate time.Time
+	subscription *Subscription
+	schedules    model.StopVisitSchedules
 }
 
 func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
 	smlc.subscription = sub
 }
 
+func (smlc *stopMonitoringLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
+	smlc.subscription = sub
+	sv.Schedules.Copy()
+}
+
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
 	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if ok {
-		duration := smlc.getOptionDuration(option)
-		refTime := stopVisit.ReferenceTime()
-		if smlc.lastTimeUpdate.Add(duration).After(refTime) {
-			return false
+	if !ok {
+		return true
+	}
+
+	duration := smlc.getOptionDuration(option)
+	for key, _ := range stopVisit.Schedules {
+		ok = smlc.handleArrivalTime(stopVisit.Schedules[key], smlc.schedules[key], duration)
+		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules[key], smlc.schedules[key], duration)
+		if ok {
+			return true
 		}
 	}
-	return true
+
+	return false
 }
 
 func (smlc *stopMonitoringLastChange) UpdateState(stopVisit model.StopVisit) bool {
-	smlc.lastTimeUpdate = stopVisit.ReferenceTime()
+	smlc.schedules = stopVisit.Schedules.Copy()
 	return true
 }
 
-type estimatedTimeTable struct {
+type estimatedTimeTableLastChange struct {
 	optionParser
+	schedulesHandler
 
 	subscription    *Subscription
-	lastTimeUpdate  time.Time
+	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	vehicleAtStop   bool
 }
 
-func (ettlc *estimatedTimeTable) SetSubscription(sub *Subscription) {
+func (ettlc *estimatedTimeTableLastChange) SetSubscription(sub *Subscription) {
 	ettlc.subscription = sub
 }
 
-func (ettlc *estimatedTimeTable) InitState(sv *model.StopVisit, sub *Subscription) {
+func (ettlc *estimatedTimeTableLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
 	ettlc.subscription = sub
-	ettlc.lastTimeUpdate = sv.ReferenceTime()
+	ettlc.schedules = sv.Schedules.Copy()
 	ettlc.vehicleAtStop = sv.VehicleAtStop
 }
 
-func (ettlc *estimatedTimeTable) Haschanged(stopVisit *model.StopVisit) bool {
+func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
 	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return false
 	}
 
 	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
-		ettlc.departureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
 		return true
 	}
 
 	if stopVisit.VehicleAtStop == true {
-		ettlc.vehicleAtStop = true
 		return true
 	}
 
 	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if ok {
-		duration := ettlc.getOptionDuration(option)
-		refTime := stopVisit.ReferenceTime()
-		if ettlc.lastTimeUpdate.Add(duration).After(refTime) {
-			return false
+	if !ok {
+		return true
+	}
+
+	duration := ettlc.getOptionDuration(option)
+	for key, _ := range stopVisit.Schedules {
+		ok = ettlc.handleArrivalTime(stopVisit.Schedules[key], ettlc.schedules[key], duration)
+		ok = ok || ettlc.handleDepartedTime(stopVisit.Schedules[key], ettlc.schedules[key], duration)
+		if ok {
+			return true
 		}
 	}
-	return true
+	return false
+}
+
+func (ettlc *estimatedTimeTableLastChange) UpdateState(sv model.StopVisit) {
+	ettlc.vehicleAtStop = sv.VehicleAtStop
+	ettlc.schedules = sv.Schedules.Copy()
+	ettlc.departureStatus = sv.DepartureStatus
 }
 
 type generalMessageLastChange struct {
@@ -106,6 +128,23 @@ func (sglc *generalMessageLastChange) UpdateState(sm siri.SIRIGeneralMessage) bo
 
 func (sglc *generalMessageLastChange) SetSubscription(sub *Subscription) {
 	sglc.subscription = sub
+}
+
+type schedulesHandler struct{}
+
+func (sh *schedulesHandler) handleArrivalTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
+	if sc.ArrivalTime().IsZero() || !sc.ArrivalTime().After(lssc.ArrivalTime().Add(2*time.Minute)) {
+		return false
+	}
+	return true
+}
+
+func (sh *schedulesHandler) handleDepartedTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
+	if sc.DepartureTime().IsZero() || !sc.DepartureTime().After(lssc.ArrivalTime().Add(2*time.Minute)) {
+		return false
+	}
+
+	return true
 }
 
 type optionParser struct{}

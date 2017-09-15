@@ -81,6 +81,21 @@ func NewStopVisitSchedules() StopVisitSchedules {
 	return schedules
 }
 
+func (schedules StopVisitSchedules) Copy() StopVisitSchedules {
+	cpy := NewStopVisitSchedules()
+
+	for key, value := range schedules {
+		svc := StopVisitSchedule{
+			kind:          value.Kind(),
+			arrivalTime:   value.ArrivalTime(),
+			departureTime: value.DepartureTime(),
+		}
+
+		cpy[key] = &svc
+	}
+	return cpy
+}
+
 func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
 	for key, value := range newSchedules {
 		(*schedules)[key] = value

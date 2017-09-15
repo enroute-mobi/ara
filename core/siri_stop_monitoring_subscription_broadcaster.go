@@ -127,7 +127,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 
 	if !ok {
 		smlc := &stopMonitoringLastChange{}
-		smlc.SetSubscription(sub)
+		smlc.InitState(&sv, sub)
 		resource.LastStates[string(sv.Id())] = smlc
 	}
 
@@ -201,7 +201,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) AddStopAreaStopVisit
 			continue
 		}
 		smlc := &stopMonitoringLastChange{}
-		smlc.SetSubscription(sub)
+		smlc.InitState(&sv, sub)
 		res.LastStates[string(sv.Id())] = smlc
 		connector.addStopVisit(sub.Id(), sv.Id())
 	}
