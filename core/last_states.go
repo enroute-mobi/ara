@@ -80,10 +80,6 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 		return false
 	}
 
-	if stopVisit.DepartureStatus != ettlc.departureStatus {
-		return true
-	}
-
 	if stopVisit.VehicleAtStop == true {
 		return true
 	}
@@ -134,17 +130,17 @@ func (sglc *generalMessageLastChange) SetSubscription(sub *Subscription) {
 type schedulesHandler struct{}
 
 func (sh *schedulesHandler) handleArrivalTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
-	if sc.ArrivalTime().IsZero() || !sc.ArrivalTime().After(lssc.ArrivalTime().Add(2*time.Minute)) {
-		return false
-	}
-	return true
+	return sh.handleTime(sc.ArrivalTime(), lssc.ArrivalTime(), duration)
 }
 
 func (sh *schedulesHandler) handleDepartedTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
-	if sc.DepartureTime().IsZero() || !sc.DepartureTime().After(lssc.ArrivalTime().Add(2*time.Minute)) {
+	return sh.handleTime(sc.DepartureTime(), lssc.DepartureTime(), duration)
+}
+
+func (sh *schedulesHandler) handleTime(scTime, lsscTime time.Time, duration time.Duration) bool {
+	if scTime.IsZero() || !scTime.After(lsscTime.Add(2*time.Minute)) {
 		return false
 	}
-
 	return true
 }
 
