@@ -146,6 +146,13 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with (\
   expect(nodes.length).to eq(requestNumber.to_i)
 end
 
+Then(/^the (?:"([^"]*)" )?SIRI server should receive this response$/) do |name, expected_xml|
+  name ||= "default"
+  last_siri_request = SIRIServer.find(name).requests.last.body
+  expect(normalized_xml(last_siri_request).strip).to eq(normalized_xml(expected_xml).strip)
+
+end
+
 Then (/^I send this SIRI ServiceDelivery$/) do |request|
   send_siri_request request
 end

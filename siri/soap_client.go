@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/version"
 	"github.com/jbowtie/gokogiri/xml"
 	"golang.org/x/text/encoding/charmap"
@@ -63,12 +64,14 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
+	logger.Log.Printf("%v", soapEnvelope)
 	response, err := http.DefaultClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
 
+	logger.Log.Printf("RESPONSE == %v", response.StatusCode)
 	// Check response status
 	if response.StatusCode != http.StatusOK {
 		return nil, NewSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))

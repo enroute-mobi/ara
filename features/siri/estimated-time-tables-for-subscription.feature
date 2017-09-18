@@ -120,41 +120,46 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Schedule[expected]#Arrival      | 2017-01-01T15:01:01.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
     And 10 seconds have passed
-    Then I should receive this SIRI response
+    Then the SIRI server should receive this response
       """
-      <ns1:NotifyEstimatedTimetable xmlns:ns1="http://wsdl.siri.org.uk">
-        <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-          <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
-          <ns5:ProducerRef>Edwig</ns5:ProducerRef>
-          <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:427843</ns5:ResponseMessageIdentifier>
-          <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
-        </ServiceDeliveryInfo>
-        <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
-          <ns3:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-            <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
-            <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
-            <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-38-00c04fd430c8:LOC</ns5:SubscriptionRef>
-            <ns3:Status>true</ns3:Status>
-            <ns3:EstimatedJourneyVersionFrame>
-              <ns3:RecordedAtTime>2017-01-01T12:00:00.000Z</ns3:RecordedAtTime>
-              <ns3:EstimatedVehicleJourney>
-                <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                <ns3:DirectionRef>Aller</ns3:DirectionRef>
-                <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                <ns3:EstimatedCalls>
-                  <ns3:EstimatedCall>
-                    <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                    <ns3:Order>4</ns3:Order>
-                    <ns3:AimedArrivalTime>2017-01-01T15:00:00.000Z</ns3:AimedArrivalTime>
-                    <ns3:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</ns3:ExpectedArrivalTime>
-                    <ns3:ArrivalStatus>Delayed</ns3:ArrivalStatus>
-                  </ns3:EstimatedCall>
-                </ns3:EstimatedCalls>
-              </ns3:EstimatedVehicleJourney>
-            </ns3:EstimatedJourneyVersionFrame>
-          </ns3:EstimatedTimetableDelivery>
-        </Notification>
-      <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-      </ns1:NotifyEstimatedTimetable>
+      <?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>test</siri:ProducerRef>
+		<siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+	</ServiceDeliveryInfo>
+	<Notification>
+		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef></siri:RequestMessageRef>
+			<siri:SubscriberRef>test</siri:SubscriberRef>
+			<siri:SubscriptionRef>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:SubscriptionRef>
+			<siri:Status>true</siri:Status>
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+					<siri:DirectionRef>Aller</siri:DirectionRef>
+					<siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+					<siri:EstimatedCalls>
+						<siri:EstimatedCall>
+							<siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+							<siri:Order>4</siri:Order>
+							<siri:StopPointName>Test</siri:StopPointName>
+							<siri:VehicleAtStop>false</siri:VehicleAtStop>
+							<siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
+							<siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+						</siri:EstimatedCall>
+					</siri:EstimatedCalls>
+				</siri:EstimatedVehicleJourney>
+			</siri:EstimatedJourneyVersionFrame>
+		</siri:EstimatedTimetableDelivery>
+	</Notification>
+	<NotificationExtension/>
+</sw:NotifyEstimatedTimetable>
+</S:Body>
+</S:Envelope>
       """
