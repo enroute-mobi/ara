@@ -20,6 +20,9 @@ type stopMonitoringLastChange struct {
 
 	subscription *Subscription
 	schedules    model.StopVisitSchedules
+
+	departureStatus model.StopVisitDepartureStatus
+	arrivalStatuts  model.StopVisitArrivalStatus
 }
 
 func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
@@ -32,8 +35,13 @@ func (smlc *stopMonitoringLastChange) InitState(sv *model.StopVisit, sub *Subscr
 }
 
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
+
 	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
 	if !ok {
+		return true
+	}
+
+	if smlc.handleArrivalStatus(stopVisit.ArrivalStatus, smlc.arrivalStatuts) || smlc.handleDepartureStatus(stopVisit.DepartureStatus, smlc.departureStatus) {
 		return true
 	}
 
@@ -51,6 +59,9 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 
 func (smlc *stopMonitoringLastChange) UpdateState(stopVisit model.StopVisit) bool {
 	smlc.schedules = stopVisit.Schedules.Copy()
+	smlc.arrivalStatuts = stopVisit.ArrivalStatus
+	smlc.departureStatus = stopVisit.DepartureStatus
+
 	return true
 }
 
@@ -61,6 +72,7 @@ type estimatedTimeTableLastChange struct {
 	subscription    *Subscription
 	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
+	arrivalStatuts  model.StopVisitArrivalStatus
 	vehicleAtStop   bool
 }
 
@@ -84,6 +96,10 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 		return true
 	}
 
+	if ettlc.handleArrivalStatus(stopVisit.ArrivalStatus, ettlc.arrivalStatuts) || ettlc.handleDepartureStatus(stopVisit.DepartureStatus, ettlc.departureStatus) {
+		return true
+	}
+
 	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
 	if !ok {
 		return true
@@ -104,6 +120,7 @@ func (ettlc *estimatedTimeTableLastChange) UpdateState(sv model.StopVisit) {
 	ettlc.vehicleAtStop = sv.VehicleAtStop
 	ettlc.schedules = sv.Schedules.Copy()
 	ettlc.departureStatus = sv.DepartureStatus
+	ettlc.arrivalStatuts = sv.ArrivalStatus
 }
 
 type generalMessageLastChange struct {
@@ -142,6 +159,30 @@ func (sh *schedulesHandler) handleTime(scTime, lsscTime time.Time, duration time
 		return false
 	}
 	return true
+}
+
+func (sh *schedulesHandler) handleArrivalStatus(svAs model.StopVisitArrivalStatus, ettlcAs model.StopVisitArrivalStatus) bool {
+	if svAs == ettlcAs {
+		return false
+	}
+
+	if svAs == model.STOP_VISIT_ARRIVAL_MISSED || svAs == model.STOP_VISIT_ARRIVAL_NOT_EXPECTED || svAs == model.STOP_VISIT_ARRIVAL_CANCELLED || svAs == model.STOP_VISIT_ARRIVAL_NOREPORT {
+		return true
+	}
+
+	return false
+}
+
+func (sh *schedulesHandler) handleDepartureStatus(svDs model.StopVisitDepartureStatus, ettlcDs model.StopVisitDepartureStatus) bool {
+	if svDs == ettlcDs {
+		return false
+	}
+
+	if svDs == model.STOP_VISIT_DEPARTURE_NOREPORT || svDs == model.STOP_VISIT_DEPARTURE_CANCELLED {
+		return true
+	}
+
+	return false
 }
 
 type optionParser struct{}
