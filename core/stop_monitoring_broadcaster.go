@@ -54,10 +54,6 @@ func NewSIRIStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 }
 
 func (smb *StopMonitoringBroadcaster) Start() {
-	if smb.stop != nil {
-		return
-	}
-
 	logger.Log.Debugf("Start StopMonitoringBroadcaster")
 
 	smb.stop = make(chan struct{})

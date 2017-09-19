@@ -41,6 +41,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 			ResponseTimestamp: connector.Clock().Now(),
 			ErrorType:         "InvalidDataReferencesError",
 			ErrorText:         fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
+			MonitoringRef:     request.MonitoringRef(),
 		}
 	}
 
@@ -54,6 +55,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		RequestMessageRef: request.MessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
+		MonitoringRef:     request.MonitoringRef(),
 	}
 
 	// Prepare StopVisit Selectors
@@ -160,6 +162,7 @@ func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *sir
 func logSIRIStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIStopMonitoringDelivery) {
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["monitoringRef"] = delivery.MonitoringRef
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		logStashEvent["errorType"] = delivery.ErrorType
