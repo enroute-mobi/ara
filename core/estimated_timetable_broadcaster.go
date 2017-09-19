@@ -54,10 +54,6 @@ func NewSIRIEstimatedTimeTableBroadcaster(connector *SIRIEstimatedTimeTableSubsc
 }
 
 func (ett *EstimatedTimeTableBroadcaster) Start() {
-	if ett.stop != nil {
-		return
-	}
-
 	logger.Log.Debugf("Start EstimatedTimeTableBroadcaster")
 
 	ett.stop = make(chan struct{})

@@ -55,10 +55,6 @@ func NewSIRIGeneralMessageBroadcaster(connector *SIRIGeneralMessageSubscriptionB
 }
 
 func (gmb *GeneralMessageBroadcaster) Start() {
-	if gmb.stop != nil {
-		return
-	}
-
 	logger.Log.Debugf("Start GeneralMessageBroadcaster")
 
 	gmb.stop = make(chan struct{})
