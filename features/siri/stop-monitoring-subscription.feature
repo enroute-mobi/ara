@@ -410,7 +410,7 @@ Feature: Support SIRI StopMonitoring by subscription
       Then the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" has the following attributes:
         | DepartureStatus | cancelled  |
 
-@wip
+
   Scenario: 4448 - Manage a SM Notify after modification of a StopVisit
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
