@@ -156,7 +156,7 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequ
 
 func (client *SOAPClient) DeleteSubscription(request *SIRIDeleteSubscriptionRequest) (*XMLDeleteSubscriptionResponse, error) {
 	// WIP
-	node, err := client.prepareAndSendRequest(request, "DeleteSubscription", false)
+	node, err := client.prepareAndSendRequest(request, "DeleteSubscriptionResponse", false)
 	if err != nil {
 		return nil, err
 	}
