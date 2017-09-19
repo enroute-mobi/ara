@@ -106,6 +106,7 @@ Feature: Support SIRI GetSIRI
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2017-01-12T10:52:46.042+01:00</siri:RecordedAtTime>
@@ -138,6 +139,7 @@ Feature: Support SIRI GetSIRI
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>cladebr</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2017-01-12T10:52:46.050+01:00</siri:RecordedAtTime>
@@ -280,6 +282,7 @@ Feature: Support SIRI GetSIRI
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2017-01-12T10:52:46.042+01:00</siri:RecordedAtTime>
@@ -312,6 +315,7 @@ Feature: Support SIRI GetSIRI
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:1</siri:RequestMessageRef>
+                <siri:MonitoringRef>unknown</siri:MonitoringRef>
                 <siri:Status>false</siri:Status>
                 <siri:ErrorCondition>
                   <siri:InvalidDataReferencesError>

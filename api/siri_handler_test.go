@@ -377,6 +377,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+			<siri:MonitoringRef>stopArea1</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
 			<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
@@ -416,6 +417,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
+			<siri:MonitoringRef>stopArea2</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
 			<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>

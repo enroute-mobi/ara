@@ -27,6 +27,7 @@ Feature: Support SIRI StopMonitoring by request
         <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
           <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
@@ -170,6 +171,7 @@ Feature: Support SIRI StopMonitoring by request
         <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
           <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
@@ -253,6 +255,7 @@ Feature: Support SIRI StopMonitoring by request
         <siri:StopMonitoringDelivery version='2.0:FR-IDF-2.4'>
           <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
           <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
         </siri:StopMonitoringDelivery>
       </Answer>
@@ -430,6 +433,7 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
@@ -519,6 +523,7 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
@@ -621,6 +626,7 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:MonitoringRef>unknown</siri:MonitoringRef>
                 <siri:Status>false</siri:Status>
                 <siri:ErrorCondition>
                   <siri:InvalidDataReferencesError>
@@ -698,6 +704,7 @@ Feature: Support SIRI StopMonitoring by request
           <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
             <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
             <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+            <siri:MonitoringRef>parent</siri:MonitoringRef>
             <siri:Status>true</siri:Status>
             <siri:MonitoredStopVisit>
               <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>

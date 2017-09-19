@@ -135,6 +135,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>ref</siri:RequestMessageRef>
+			<siri:MonitoringRef>MonitoringRef</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
 		</siri:StopMonitoringDelivery>
 	</Answer>
@@ -151,6 +152,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	response.RequestMessageRef = "ref"
 	response.Status = true
 	response.ResponseTimestamp = responseTimestamp
+	response.MonitoringRef = "MonitoringRef"
 	xml, err := response.BuildXML()
 	if err != nil {
 		t.Fatal(err)
@@ -171,6 +173,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>ref</siri:RequestMessageRef>
+			<siri:MonitoringRef>MonitoringRef</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
 			<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>2015-09-21T20:14:46.000Z</siri:RecordedAtTime>

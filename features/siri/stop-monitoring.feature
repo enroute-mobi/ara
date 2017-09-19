@@ -20,6 +20,7 @@ Feature: Support SIRI StopMonitoring
         <ns5:StopMonitoringDelivery version="1.3">
           <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+          <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
           <ns5:Status>true</ns5:Status>
           <ns5:MonitoredStopVisit>
             <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -125,6 +126,7 @@ Feature: Support SIRI StopMonitoring
         <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
           <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+          <siri:MonitoringRef>STIF:StopPoint:Q:eeft52df543d:</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
@@ -201,6 +203,7 @@ Feature: Support SIRI StopMonitoring
         <ns5:StopMonitoringDelivery version="1.3">
           <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+          <ns5:MonitoringRef>boaarle</ns5:MonitoringRef>
           <ns5:Status>true</ns5:Status>
           <ns5:MonitoredStopVisit>
             <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -277,6 +280,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -358,6 +362,7 @@ Feature: Support SIRI StopMonitoring
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:04:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+                <siri:MonitoringRef>RATPDev:StopPoint:Q:eeft52df543d:</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
@@ -415,6 +420,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:00:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -547,6 +553,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -658,6 +665,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -714,6 +722,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:1</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaboon</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -792,6 +801,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
@@ -848,6 +858,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
+                <siri:MonitoringRef>boaarle</siri:MonitoringRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:MonitoredStopVisit>
                   <ns5:RecordedAtTime>2017-01-01T11:47:15.600+01:00</ns5:RecordedAtTime>
