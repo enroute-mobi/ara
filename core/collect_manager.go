@@ -135,19 +135,6 @@ func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Part
 	return nil
 }
 
-func (manager *CollectManager) partnerWithConnector(connector string) *Partner {
-	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			continue
-		}
-		_, connectorPresent := partner.Connector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
-		if connectorPresent {
-			return partner
-		}
-	}
-	return nil
-}
-
 func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) {
 	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
@@ -179,15 +166,19 @@ func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscri
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	partner := manager.partnerWithConnector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR)
-	if partner == nil {
-		partner = manager.partnerWithConnector(SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
+	for _, partner := range manager.referential.Partners().FindAll() {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+		if connector := partner.GeneralMessageSubscriptionCollector(); connector != nil {
+			logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
+			connector.RequestSituationUpdate(request)
+			continue
+		}
+		if connector := partner.GeneralMessageRequestCollector(); connector != nil {
+			logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
+			connector.RequestSituationUpdate(request)
+			continue
+		}
 	}
-
-	if partner == nil {
-		logger.Log.Debugf("Can't find a partner with connector %v", SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR)
-		return
-	}
-
-	manager.requestSituationUpdate(partner, request)
 }

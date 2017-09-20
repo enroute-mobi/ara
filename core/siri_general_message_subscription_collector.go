@@ -54,7 +54,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 
 	entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
 		SubscriberRef:          connector.SIRIPartner().RequestorRef(),
-		SubscriptionIdentifier: connector.SIRIPartner().IdentifierGenerator("subscription_identifier").NewMessageIdentifier(),
+		SubscriptionIdentifier: string(subscription.Id()),
 		InitialTerminationTime: connector.Clock().Now().Add(48 * time.Hour),
 	}
 	entry.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
@@ -101,7 +101,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
-		if subscription.Kind() != "GeneralMessage" {
+		if subscription.Kind() != "GeneralMessageCollect" {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			continue
 		}

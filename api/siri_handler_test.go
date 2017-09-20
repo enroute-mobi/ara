@@ -522,7 +522,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	server, referential := siriHandler_PrepareServer()
 	partner := referential.Partners().FindAll()[0]
 
-	partner.Subscriptions().FindOrCreateByKind("GeneralMessage")
+	partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 
 	siriHandler_Request(server, soapEnvelope, t)
 
