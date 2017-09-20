@@ -161,7 +161,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 func (smb *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
 	event := smb.connector.partner.NewLogStashEvent()
-	event["connector"] = "SIRIStopMonitoringSubscriptionCollector"
+	event["connector"] = "StopMonitoringSubscriptionCollector"
 	return event
 }
 
