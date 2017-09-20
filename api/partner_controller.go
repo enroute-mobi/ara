@@ -211,12 +211,11 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 func (controller *PartnerController) Save(response http.ResponseWriter) {
 	logger.Log.Debugf("Saving partners to database")
 
-	err := controller.referential.Partners().SaveToDatabase()
+	err, status := controller.referential.Partners().SaveToDatabase()
 
-	if len(err) != 0 {
-		response.WriteHeader(http.StatusInternalServerError)
-		jsonBytes, _ := json.Marshal(err)
+	if err != nil {
+		response.WriteHeader(status)
+		jsonBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
 		response.Write(jsonBytes)
 	}
-	return
 }

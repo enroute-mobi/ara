@@ -318,20 +318,20 @@ func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	errors := referentials.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Referentials: %v", errors)
+	refErr, status := referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
 
-	// Insert to times to check uniqueness constraints
+	// Insert two times to check uniqueness constraints
 	ref2 := referentials.New("slug2")
 	ref2.Settings = map[string]string{"setting": "value"}
 	ref2.Tokens = []string{"token"}
 	ref2.Save()
 
-	errors = referentials.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Referentials: %v", errors)
+	refErr, status = referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
 
 	// Check Referentials
@@ -381,9 +381,9 @@ func Test_MemoryReferentials_SaveToDatabase_CleanPartners(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	errors := referentials.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Referentials: %v", errors)
+	refErr, status := referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
 
 	// Check Partner
@@ -410,9 +410,9 @@ func Test_MemoryReferentials_SaveToDatabase_PartnerWithoutReferential(t *testing
 	partner := ref.partners.New("slug")
 	partner.Save()
 
-	errors := ref.partners.SaveToDatabase()
-	if len(errors) != 1 {
-		t.Fatalf("Partner save should return an error, got: %v", errors)
+	err, status := ref.partners.SaveToDatabase()
+	if status != 406 {
+		t.Fatalf("Partner save should return an error, got: %v", err)
 	}
 }
 
@@ -425,9 +425,9 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	errors := referentials.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Referentials: %v", errors)
+	refErr, status := referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
 
 	// Insert Partner in the test db
@@ -435,9 +435,9 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	partner := partners.New("slug")
 	partner.Save()
 
-	errors = partners.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Partners: %v", errors)
+	err, status := partners.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Partners: %v", err)
 	}
 
 	// Save data in the DB 2 times to check uniqueness constraints
@@ -446,14 +446,14 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	partner2.ConnectorTypes = []string{"connector"}
 	partner2.Save()
 
-	errors = partners.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Error while saving Partners: %v", errors)
+	err, status = partners.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Error while saving Partners: %v", err)
 	}
 
 	// Check Partners
 	partners2 := NewPartnerManager(ref)
-	err := partners2.Load()
+	err = partners2.Load()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -360,9 +360,9 @@ func Test_PartnerController_Save(t *testing.T) {
 	referential := referentials.New("default")
 	referential.Tokens = []string{"testToken"}
 	referential.Save()
-	errors := referentials.SaveToDatabase()
-	if len(errors) != 0 {
-		t.Fatalf("Cannot save referentials to Database: %v", errors)
+	refErr, status := referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Cannot save referentials to Database: %v", refErr)
 	}
 
 	// Initialize the partners manager

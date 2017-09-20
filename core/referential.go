@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -46,7 +47,7 @@ type Referentials interface {
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 	Load() error
-	SaveToDatabase() map[string]string
+	SaveToDatabase() (error, int)
 }
 
 var referentials = NewMemoryReferentials()
@@ -345,35 +346,48 @@ func (manager *MemoryReferentials) Load() error {
 	return nil
 }
 
-func (manager *MemoryReferentials) SaveToDatabase() map[string]string {
-	errors := make(map[string]string)
+func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
+	// Begin transaction
+	_, err := model.Database.Exec("BEGIN;")
+	if err != nil {
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+	}
 
 	// Truncate Table
-	_, err := model.Database.Exec("truncate referentials;")
+	_, err = model.Database.Exec("truncate referentials;")
 	if err != nil {
-		errors["internal"] = fmt.Sprintf("Internal error: %v", err)
-		return errors
+		model.Database.Exec("ROLLBACK;")
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Insert referentials
 	for _, referential := range manager.byId {
 		dbReferential, err := manager.newDbReferential(referential)
 		if err != nil {
-			errors[string(referential.id)] = fmt.Sprintf("Error while saving referential: %v", err)
+			model.Database.Exec("ROLLBACK;")
+			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
 		}
 		err = model.Database.Insert(dbReferential)
 		if err != nil {
-			errors[string(referential.id)] = fmt.Sprintf("Error while saving referential: %v", err)
+			model.Database.Exec("ROLLBACK;")
+			return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
 		}
 	}
 
 	// Delete partners
 	_, err = model.Database.Exec("delete from partners where referential_id not in (select referential_id from referentials);")
 	if err != nil {
-		errors["internal"] = fmt.Sprintf("Internal error: %v", err)
+		model.Database.Exec("ROLLBACK;")
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
 	}
 
-	return errors
+	// Commit transaction
+	_, err = model.Database.Exec("COMMIT;")
+	if err != nil {
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
 }
 
 func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*model.DatabaseReferential, error) {

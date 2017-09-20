@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"sort"
 	"strconv"
 	"strings"
@@ -43,7 +44,7 @@ type Partners interface {
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
-	SaveToDatabase() map[string]string
+	SaveToDatabase() (error, int)
 }
 
 type PartnerStatus struct {
@@ -651,44 +652,52 @@ func (manager *PartnerManager) Load() error {
 	return nil
 }
 
-func (manager *PartnerManager) SaveToDatabase() map[string]string {
-	errors := make(map[string]string)
+func (manager *PartnerManager) SaveToDatabase() (error, int) {
+	// Check presence of Referential
+	selectReferentials := []model.SelectReferential{}
+	sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
+	_, err := model.Database.Select(&selectReferentials, sqlQuery)
+	if err != nil {
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+	}
+	if len(selectReferentials) == 0 {
+		return errors.New("Can't save Partners without Referential in Database"), http.StatusNotAcceptable
+	}
+
+	// Begin transaction
+	_, err = model.Database.Exec("BEGIN;")
+	if err != nil {
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+	}
 
 	// Truncate Table
-	_, err := model.Database.Exec("truncate partners;")
+	_, err = model.Database.Exec("truncate partners;")
 	if err != nil {
-		errors["internal"] = fmt.Sprintf("Error while saving partner: %v", err)
-		return errors
+		model.Database.Exec("ROLLBACK;")
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Insert partners
 	for _, partner := range manager.byId {
-		// Check presence of Referential
-		selectReferentials := []model.SelectReferential{}
-		sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
-		_, err := model.Database.Select(&selectReferentials, sqlQuery)
-		if err != nil {
-			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
-			continue
-		}
-		if len(selectReferentials) == 0 {
-			errors[string(partner.id)] = fmt.Sprintf("Trying to save partner without referential in db")
-			continue
-		}
-		// Save partner
 		dbPartner, err := manager.newDbPartner(partner)
 		if err != nil {
-			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
-			continue
+			model.Database.Exec("ROLLBACK;")
+			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
 		}
 		err = model.Database.Insert(dbPartner)
 		if err != nil {
-			errors[string(partner.id)] = fmt.Sprintf("Error while saving partner: %v", err)
-			continue
+			model.Database.Exec("ROLLBACK;")
+			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
 		}
 	}
 
-	return errors
+	// Commit transaction
+	_, err = model.Database.Exec("COMMIT;")
+	if err != nil {
+		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
 }
 
 func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePartner, error) {
