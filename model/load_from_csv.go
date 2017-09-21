@@ -15,7 +15,7 @@ import (
 /* CSV Structure
 
 stop_area,Id,ReferentialId,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,NextCollectAt,CollectedAt,CollectedUntil,CollectedAlways,CollectChildren
-line,Id,ReferentialId,ModelName,Name,ObjectIDs,Attributes,References
+line,Id,ReferentialId,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages,CollectedAt
 vehicle_journey,Id,ReferentialId,ModelName,Name,ObjectIDs,LineId,Attributes,References
 stop_visit,Id,ReferentialId,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,CollectedAt,RecordedAt,Collected,VehicleAtStop,PassageOrder
 
@@ -167,21 +167,42 @@ func handleStopArea(record []string) error {
 }
 
 func handleLine(record []string) error {
-	if len(record) != 8 {
+	if len(record) != 10 {
 		return fmt.Errorf("Wrong number of entries")
 	}
 
-	line := DatabaseLine{
-		Id:            record[1],
-		ReferentialId: record[2],
-		ModelName:     record[3],
-		Name:          record[4],
-		ObjectIDs:     record[5],
-		Attributes:    record[6],
-		References:    record[7],
+	var err error
+	parseErrors := make(map[string]string)
+
+	var collectGeneralMessages bool
+	if record[8] != "" {
+		collectGeneralMessages, err = strconv.ParseBool(record[8])
+		if err != nil {
+			parseErrors["CollectGeneralMessages"] = err.Error()
+		}
 	}
 
-	err := Database.Insert(&line)
+	var collectedAt time.Time
+	if record[9] != "" {
+		collectedAt, err = time.Parse(time.RFC3339, record[9])
+		if err != nil {
+			parseErrors["CollectedAt"] = err.Error()
+		}
+	}
+
+	line := DatabaseLine{
+		Id:                     record[1],
+		ReferentialId:          record[2],
+		ModelName:              record[3],
+		Name:                   record[4],
+		ObjectIDs:              record[5],
+		Attributes:             record[6],
+		References:             record[7],
+		CollectGeneralMessages: collectGeneralMessages,
+		CollectedAt:            collectedAt,
+	}
+
+	err = Database.Insert(&line)
 	if err != nil {
 		return err
 	}

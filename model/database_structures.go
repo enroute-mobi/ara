@@ -72,23 +72,27 @@ type SelectStopArea struct {
 }
 
 type DatabaseLine struct {
-	Id            string `db:"id"`
-	ReferentialId string `db:"referential_id"`
-	ModelName     string `db:"model_name"`
-	Name          string `db:"name"`
-	ObjectIDs     string `db:"object_ids"`
-	Attributes    string `db:"attributes"`
-	References    string `db:"siri_references"`
+	Id                     string    `db:"id"`
+	ReferentialId          string    `db:"referential_id"`
+	ModelName              string    `db:"model_name"`
+	Name                   string    `db:"name"`
+	ObjectIDs              string    `db:"object_ids"`
+	Attributes             string    `db:"attributes"`
+	References             string    `db:"siri_references"`
+	CollectedAt            time.Time `db:"collected_at"`
+	CollectGeneralMessages bool      `db:"collect_general_messages"`
 }
 
 type SelectLine struct {
-	Id            string
-	ReferentialId string `db:"referential_id"`
-	ModelName     string `db:"model_name"`
-	Name          sql.NullString
-	ObjectIDs     sql.NullString `db:"object_ids"`
-	Attributes    sql.NullString
-	References    sql.NullString `db:"siri_references"`
+	Id                     string
+	ReferentialId          string `db:"referential_id"`
+	ModelName              string `db:"model_name"`
+	Name                   sql.NullString
+	ObjectIDs              sql.NullString `db:"object_ids"`
+	Attributes             sql.NullString
+	References             sql.NullString `db:"siri_references"`
+	CollectedAt            pq.NullTime    `db:"collected_at"`
+	CollectGeneralMessages sql.NullBool   `db:"collect_general_messages"`
 }
 
 type DatabaseVehicleJourney struct {

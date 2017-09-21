@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type LineId string
@@ -18,6 +19,9 @@ type Line struct {
 	model Model
 
 	id LineId
+
+	CollectGeneralMessages bool
+	collectedAt            time.Time
 
 	Name       string `json:",omitempty"`
 	Attributes Attributes
@@ -39,13 +43,22 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
+func (line *Line) CollectedAt() time.Time {
+	return line.collectedAt
+}
+
+func (line *Line) Updated(updateTime time.Time) {
+	line.collectedAt = updateTime
+}
+
 func (line *Line) MarshalJSON() ([]byte, error) {
 	type Alias Line
 	aux := struct {
-		Id         LineId
-		ObjectIDs  ObjectIDs  `json:",omitempty"`
-		Attributes Attributes `json:",omitempty"`
-		References References `json:",omitempty"`
+		Id          LineId
+		ObjectIDs   ObjectIDs  `json:",omitempty"`
+		CollectedAt *time.Time `json:",omitempty"`
+		Attributes  Attributes `json:",omitempty"`
+		References  References `json:",omitempty"`
 		*Alias
 	}{
 		Id:    line.id,
@@ -54,6 +67,9 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 
 	if !line.ObjectIDs().Empty() {
 		aux.ObjectIDs = line.ObjectIDs()
+	}
+	if !line.collectedAt.IsZero() {
+		aux.CollectedAt = &line.collectedAt
 	}
 	if !line.Attributes.IsEmpty() {
 		aux.Attributes = line.Attributes
@@ -218,6 +234,12 @@ func (manager *MemoryLines) Load(referentialId string) error {
 		line.id = LineId(sl.Id)
 		if sl.Name.Valid {
 			line.Name = sl.Name.String
+		}
+		if sl.CollectedAt.Valid {
+			line.collectedAt = sl.CollectedAt.Time
+		}
+		if sl.CollectGeneralMessages.Valid {
+			line.CollectGeneralMessages = sl.CollectGeneralMessages.Bool
 		}
 
 		if sl.Attributes.Valid && len(sl.Attributes.String) > 0 {
