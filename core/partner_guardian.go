@@ -81,7 +81,7 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 
 	for _, sub := range partner.Subscriptions().FindAll() {
 		for key, value := range sub.ResourcesByObjectID() {
-			if !value.SubscribedUntil.Before(guardian.Clock().Now()) && value.SubscribedUntil.IsZero() {
+			if !value.SubscribedUntil.Before(guardian.Clock().Now()) || value.SubscribedAt.IsZero() {
 				continue
 			}
 			sub.DeleteResource(key)

@@ -50,6 +50,9 @@ Then(/^a Situation "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([
 end
 
 Then(/^the Situation "([^"]*)" has the following attributes:$/) do |identifier, attributes|
+  # For tests
+  # puts RestClient.get situations_path, {Authorization: "Token token=#{$token}"}
+
   response = RestClient.get situation_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
   situationAttributes = api_attributes(response.body)
   expect(situationAttributes).to include(model_attributes(attributes))

@@ -195,7 +195,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent
 }
 
 func logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["Type"] = "EstimatedTimeTableSubscriptions"
+	logStashEvent["type"] = "EstimatedTimeTableSubscriptions"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -205,7 +205,7 @@ func logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent audit
 }
 
 func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
-	logStashEvent["Type"] = "EstimatedTimeTableSubscription"
+	logStashEvent["type"] = "EstimatedTimeTableSubscription"
 	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
 	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
 

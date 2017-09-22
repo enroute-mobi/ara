@@ -155,7 +155,7 @@ func (gmb *GMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyGeneralMessage) {
-	logStashEvent["Type"] = "NotifyGeneralMessage"
+	logStashEvent["type"] = "NotifyGeneralMessage"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier

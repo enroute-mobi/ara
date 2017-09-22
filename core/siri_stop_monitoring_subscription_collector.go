@@ -252,7 +252,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 }
 
 func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest) {
-	logStashEvent["Type"] = "DeleteStopMonitoringSubscription"
+	logStashEvent["type"] = "DeleteStopMonitoringSubscription"
 	logStashEvent["RequestTimestamp"] = request.RequestTimestamp.String()
 	logStashEvent["SubscriptionRef"] = request.SubscriptionRef
 	logStashEvent["RequestorRef"] = request.RequestorRef
@@ -267,7 +267,7 @@ func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
-	logStashEvent["Type"] = "NotifyStopMonitoringCollected"
+	logStashEvent["type"] = "NotifyStopMonitoringCollected"
 	logStashEvent["address"] = notify.Address()
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
@@ -297,7 +297,7 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 }
 
 func logXMLSubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent["Type"] = "StopMonitoringTerminatedSubscriptionCollected"
+	logStashEvent["type"] = "StopMonitoringTerminatedSubscriptionCollected"
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()

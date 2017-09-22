@@ -193,7 +193,7 @@ func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
-	logStashEvent["Type"] = "NotifyStopMonitoring"
+	logStashEvent["type"] = "NotifyStopMonitoring"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier

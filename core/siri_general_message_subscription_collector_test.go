@@ -18,7 +18,11 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 			t.Errorf("Request ContentLength should be zero")
 		}
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLSubscriptionRequestFromContent(body)
+		var err error
+		request, err = siri.NewXMLSubscriptionRequestFromContent(body)
+		if err != nil {
+			t.Fatalf("%v", err)
+		}
 	}))
 	defer ts.Close()
 
@@ -47,13 +51,16 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	situation.Save()
 
 	line := partners.Model().Lines().New()
-	lineObjectID := model.NewObjectID("test kind", "line value")
+	lineObjectID := model.NewObjectID("test_kind", "line value")
 	line.SetObjectID(lineObjectID)
 	partners.Model().Lines().Save(&line)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
+	connector.SetGeneralMessageSubscriber(NewFakeGeneralMessageSubscriber(connector))
 
-	connector.RequestSituationUpdate("line value")
+	situationUpdateEvent := NewSituationUpdateRequest(line.Id())
+	connector.RequestSituationUpdate(situationUpdateEvent)
+	connector.Start()
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)

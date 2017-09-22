@@ -147,7 +147,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() a
 }
 
 func logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["Type"] = "GeneralMessageSubscriptions"
+	logStashEvent["type"] = "GeneralMessageSubscriptions"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -157,7 +157,7 @@ func logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent audit.Log
 }
 
 func logSIRIGeneralMessageBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLGeneralMessageSubscriptionRequestEntry) {
-	logStashEvent["Type"] = "GeneralMessageSubscription"
+	logStashEvent["type"] = "GeneralMessageSubscription"
 	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
 	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
 

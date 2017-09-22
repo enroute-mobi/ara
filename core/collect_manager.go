@@ -165,8 +165,8 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		requestConnector := partner.GeneralMessageSubscriptionCollector()
-		subscriptionConnector := partner.GeneralMessageRequestCollector()
+		requestConnector := partner.GeneralMessageRequestCollector()
+		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
 
 		if requestConnector == nil && subscriptionConnector == nil {
 			continue
@@ -185,7 +185,7 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 
 		logger.Log.Debugf("RequestSituationUpdate %v", lineObjectID.Value())
 		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(lineObjectID.Value())
+			subscriptionConnector.RequestSituationUpdate(request)
 			return
 		}
 		requestConnector.RequestSituationUpdate(lineObjectID.Value())

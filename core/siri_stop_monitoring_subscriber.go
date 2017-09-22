@@ -120,8 +120,8 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 	}
 
-	logStashEvent["MonitoringRef"] = strings.Join(monitoringRefList, ", ")
-	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest, monitoringRefList)
+	logStashEvent["monitoringRef"] = strings.Join(monitoringRefList, ", ")
+	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	if err != nil {
@@ -129,7 +129,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		logStashEvent["status"] = "false"
 		logStashEvent["response"] = fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
 		for _, stopAreaObjectid := range stopAreasToRequest {
-			logger.Log.Debugf("%v", *stopAreaObjectid)
 			resource := subscription.Resource(*stopAreaObjectid)
 			resource.RetryCount++
 		}
@@ -165,8 +164,8 @@ func (smb *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest, monitorinRefList []string) {
-	logStashEvent["Type"] = "StopMonitoringSubscriptionRequest"
+func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
+	logStashEvent["type"] = "StopMonitoringSubscriptionRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

@@ -12,7 +12,7 @@ type XMLGeneralMessageSubscriptionResponse struct {
 	responseTimestamp  time.Time
 	serviceStartedTime time.Time
 
-	responseStatus XMLResponseStatus
+	responseStatus []*XMLResponseStatus
 }
 
 func (response *XMLGeneralMessageSubscriptionResponse) Address() string {
@@ -50,15 +50,17 @@ func (response *XMLGeneralMessageSubscriptionResponse) ResponseTimestamp() time.
 	return response.responseTimestamp
 }
 
-func (response *XMLGeneralMessageSubscriptionResponse) ResponseStatus() XMLResponseStatus {
-	if response.responseStatus == (XMLResponseStatus{}) {
-		node := response.findXMLNode("ResponseStatus")
-		if node == nil {
+func (response *XMLGeneralMessageSubscriptionResponse) ResponseStatus() []*XMLResponseStatus {
+	if len(response.responseStatus) == 0 {
+		nodes := response.findNodes("ResponseStatus")
+		if nodes == nil {
 			return response.responseStatus
 		}
-		xmlResponseStatus := XMLResponseStatus{}
-		xmlResponseStatus.node = node
-		response.responseStatus = xmlResponseStatus
+		for _, responseStatusNode := range nodes {
+			xmlResponseStatus := &XMLResponseStatus{}
+			xmlResponseStatus.node = responseStatusNode
+			response.responseStatus = append(response.responseStatus, xmlResponseStatus)
+		}
 	}
 	return response.responseStatus
 }

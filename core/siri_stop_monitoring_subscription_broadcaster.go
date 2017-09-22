@@ -226,7 +226,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() a
 }
 
 func logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["Type"] = "StopMonitoringSubscriptions"
+	logStashEvent["type"] = "StopMonitoringSubscriptions"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
@@ -236,7 +236,7 @@ func logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent audit.Log
 }
 
 func logSIRIStopMonitoringBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLStopMonitoringSubscriptionRequestEntry) {
-	logStashEvent["Type"] = "StopMonitoringSubscription"
+	logStashEvent["type"] = "StopMonitoringSubscription"
 	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
 	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
 
