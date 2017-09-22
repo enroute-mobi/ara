@@ -99,7 +99,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T20:30:06+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | References[0]           | LineRef:{"external":"NINOXE:Line:3:LOC"} |
+      | References[0]           | LineRef:{"external":"NINOXE:Line:3:LOC"}                                   |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -214,6 +214,10 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
       | remote_objectid_kind | internal              |
+    And a Line exists with the following attributes:
+      | Name                   | Test              |
+      | ObjectIDs              | "internal":"1234" |
+      | CollectGeneralMessages | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
@@ -284,6 +288,10 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
       | remote_objectid_kind | internal              |
+    And a Line exists with the following attributes:
+      | Name                   | Test              |
+      | ObjectIDs              | "internal":"1234" |
+      | CollectGeneralMessages | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
@@ -308,6 +316,10 @@ Feature: Support SIRI GeneralMessage for Situation
     And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
+    And a Line exists with the following attributes:
+      | Name                   | Test              |
+      | ObjectIDs              | "internal":"1234" |
+      | CollectGeneralMessages | true              |
     And a minute has passed
     And a minute has passed
     When I send this SIRI request
@@ -343,7 +355,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>

@@ -127,7 +127,7 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-      Then the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+      Then the StopVisit "6ba7b814-9dad-11d1-e-00c04fd430c8" has the following attributes:
       | Collected                       | true                                                                 |
       | PassageOrder                    | 4                                                                    |
       | VehicleAtStop                   | false                                                                |

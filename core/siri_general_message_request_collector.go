@@ -11,7 +11,7 @@ import (
 )
 
 type GeneralMessageRequestCollector interface {
-	RequestSituationUpdate(request *SituationUpdateRequest)
+	RequestSituationUpdate(lineRef string)
 }
 
 type SIRIGeneralMessageRequestCollectorFactory struct{}
@@ -34,7 +34,7 @@ func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessage
 	return siriGeneralMessageRequestCollector
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
+func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(lineRef string) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -45,6 +45,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(requ
 	}
 	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
+	siriGeneralMessageRequest.LineRef = []string{lineRef}
 
 	logSIRIGeneralMessageRequest(logStashEvent, siriGeneralMessageRequest)
 
@@ -101,6 +102,7 @@ func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *si
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+	logStashEvent["lineRef"] = request.LineRef[0]
 	xml, err := request.BuildXML()
 	if err != nil {
 		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)

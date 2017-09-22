@@ -52,13 +52,17 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	situation.SetObjectID(objectid)
 	partners.Model().Situations().Save(&situation)
 
+	line := partners.Model().Lines().New()
+	lineObjectID := model.NewObjectID("test kind", "line value")
+	line.SetObjectID(lineObjectID)
+	partners.Model().Lines().Save(&line)
+
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
 
 	fs := fakeSituationBroadcaster{}
 	siriGeneralMessageRequestCollector.SetSituationUpdateSubscriber(fs.FakeBroadcaster)
 	siriGeneralMessageRequestCollector.SetClock(model.NewFakeClock())
-	situationUpdateRequest := NewSituationUpdateRequest(SituationUpdateRequestId(situation.Id()))
-	siriGeneralMessageRequestCollector.RequestSituationUpdate(situationUpdateRequest)
+	siriGeneralMessageRequestCollector.RequestSituationUpdate("line value")
 
 	return fs.Events
 }

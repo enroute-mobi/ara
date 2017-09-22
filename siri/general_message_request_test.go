@@ -15,6 +15,11 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
 	<Request version="2.0:FR-IDF-2.4">
 		<siri:RequestTimestamp>2016-09-21T20:14:46.000Z</siri:RequestTimestamp>
 		<siri:MessageIdentifier>MessageId</siri:MessageIdentifier>
+		<siri:Extensions>
+			<sws:IDFGeneralMessageRequestFilter>
+				<sws:LineRef>lineRef</sws:LineRef>
+			</sws:IDFGeneralMessageRequestFilter>
+		</siri:Extensions>
 	</Request>
 	<RequestExtension/>
 </sw:GetGeneralMessage>`
@@ -26,6 +31,7 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
 	}
 	gmRequest.RequestTimestamp = requestTimestamp
 	gmRequest.MessageIdentifier = "MessageId"
+	gmRequest.LineRef = []string{"lineRef"}
 
 	xml, err := gmRequest.BuildXML()
 	if err != nil {

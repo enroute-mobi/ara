@@ -47,7 +47,6 @@ type SIRIGeneralMessageRequest struct {
 	// Filters are not used by Edwig for now, we always request all GM
 	InfoChannelRef []string
 
-	Filters           bool
 	LineRef           []string
 	StopPointRef      []string
 	JourneyPatternRef []string
@@ -70,7 +69,7 @@ const getGeneralMessageRequestTemplate = `<sw:GetGeneralMessage xmlns:sw="http:/
 
 const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>{{ range .InfoChannelRef }}
-		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}{{ if .Filters }}
+		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}
 		<siri:Extensions>
 			<sws:IDFGeneralMessageRequestFilter>{{ range .LineRef }}
 				<sws:LineRef>{{ . }}</sws:LineRef>{{ end }}{{ range .StopPointRef }}
@@ -80,7 +79,7 @@ const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimesta
 				<sws:RouteRef>{{ . }}</sws:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
 				<sws:GroupOfLinesRef>{{ . }}</sws:GroupOfLinesRef>{{ end }}
 			</sws:IDFGeneralMessageRequestFilter>
-		</siri:Extensions>{{ end }}`
+		</siri:Extensions>`
 
 func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
 	xmlGeneralMessageRequest := &XMLGetGeneralMessage{}

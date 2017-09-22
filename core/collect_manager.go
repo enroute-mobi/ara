@@ -90,7 +90,6 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 }
 
 func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
-
 	stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		return nil
@@ -145,40 +144,53 @@ func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *
 	partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 }
 
+func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
+	manager.SituationUpdateSubscribers = append(manager.SituationUpdateSubscribers, SituationUpdateSubscriber)
+}
+
 func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 	for _, SituationUpdateSubscriber := range manager.SituationUpdateSubscribers {
 		SituationUpdateSubscriber(event)
 	}
 }
 
-func (manager *CollectManager) requestSituationUpdate(partner *Partner, request *SituationUpdateRequest) {
-	logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
-
-	if collect := partner.GeneralMessageSubscriptionCollector(); collect != nil {
-		collect.RequestSituationUpdate(request)
+func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
+	line, ok := manager.referential.Model().Lines().Find(request.LineId())
+	if !ok {
+		logger.Log.Debugf("Can't find Line to request %v", request.LineId())
 		return
 	}
-	partner.GeneralMessageRequestCollector().RequestSituationUpdate(request)
-}
 
-func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
-	manager.SituationUpdateSubscribers = append(manager.SituationUpdateSubscribers, SituationUpdateSubscriber)
-}
-
-func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	for _, partner := range manager.referential.Partners().FindAll() {
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if connector := partner.GeneralMessageSubscriptionCollector(); connector != nil {
-			logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
-			connector.RequestSituationUpdate(request)
+		requestConnector := partner.GeneralMessageSubscriptionCollector()
+		subscriptionConnector := partner.GeneralMessageRequestCollector()
+
+		if requestConnector == nil && subscriptionConnector == nil {
 			continue
 		}
-		if connector := partner.GeneralMessageRequestCollector(); connector != nil {
-			logger.Log.Debugf("RequestSituationUpdate %v", request.Id())
-			connector.RequestSituationUpdate(request)
+
+		partnerKind := partner.Setting("remote_objectid_kind")
+
+		lineObjectID, ok := line.ObjectID(partnerKind)
+		if !ok {
 			continue
 		}
+
+		if !partner.CanCollectLine(lineObjectID) {
+			continue
+		}
+
+		logger.Log.Debugf("RequestSituationUpdate %v", lineObjectID.Value())
+		if subscriptionConnector != nil {
+			subscriptionConnector.RequestSituationUpdate(lineObjectID.Value())
+			return
+		}
+		requestConnector.RequestSituationUpdate(lineObjectID.Value())
+		return
 	}
+	logger.Log.Debugf("Can't find a partner for Line %v", request.LineId())
+	return
 }

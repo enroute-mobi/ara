@@ -12,7 +12,7 @@ import (
 )
 
 type GeneralMessageSubscriptionCollector interface {
-	RequestSituationUpdate(request *SituationUpdateRequest)
+	RequestSituationUpdate(lineRef string)
 	HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage)
 }
 
@@ -36,7 +36,7 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 	return siriGeneralMessageSubscriptionCollector
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(lineRef string) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -59,6 +59,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	}
 	entry.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	entry.RequestTimestamp = connector.Clock().Now()
+	entry.LineRef = []string{lineRef}
 
 	gmRequest.Entries = append(gmRequest.Entries, entry)
 

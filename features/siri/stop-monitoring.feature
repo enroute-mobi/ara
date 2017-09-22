@@ -119,7 +119,7 @@ Feature: Support SIRI StopMonitoring
         <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
         <siri:ProducerRef>RATPDev</siri:ProducerRef>
         <siri:Address>https://api.concerto.ratpdev.com/concerto/siri</siri:Address>
-        <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-f-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+        <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-e-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
         <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
@@ -355,7 +355,7 @@ Feature: Support SIRI StopMonitoring
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:04:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>RATPDev</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-14-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-13-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>

@@ -46,10 +46,14 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	situation.SetObjectID(objectid)
 	situation.Save()
 
+	line := partners.Model().Lines().New()
+	lineObjectID := model.NewObjectID("test kind", "line value")
+	line.SetObjectID(lineObjectID)
+	partners.Model().Lines().Save(&line)
+
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 
-	situationUpdateEvent := NewSituationUpdateRequest(SituationUpdateRequestId(situation.Id()))
-	connector.RequestSituationUpdate(situationUpdateEvent)
+	connector.RequestSituationUpdate("line value")
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)

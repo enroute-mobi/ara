@@ -12,9 +12,8 @@ type ModelGuardian struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
-	stop            chan struct{}
-	referential     *Referential
-	situationsTimer time.Time
+	stop        chan struct{}
+	referential *Referential
 }
 
 func NewModelGuardian(referential *Referential) *ModelGuardian {
@@ -36,7 +35,6 @@ func (guardian *ModelGuardian) Stop() {
 }
 
 func (guardian *ModelGuardian) Run() {
-	guardian.situationsTimer = guardian.Clock().Now()
 	c := guardian.Clock().After(10 * time.Second)
 
 	for {
@@ -103,13 +101,23 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 }
 
 func (guardian *ModelGuardian) requestSituations() {
-	if !guardian.Clock().Now().After(guardian.situationsTimer.Add(1 * time.Minute)) {
-		return
-	}
-	guardian.situationsTimer = guardian.Clock().Now().Add(1 * time.Minute)
+	tx := guardian.referential.NewTransaction()
+	defer tx.Close()
 
-	situationUpdateRequest := NewSituationUpdateRequest(SituationUpdateRequestId(guardian.NewUUID()))
-	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+	now := guardian.Clock().Now()
+
+	for _, line := range tx.Model().Lines().FindAll() {
+		if !line.CollectGeneralMessages || now.Before(line.CollectedAt().Add(1*time.Minute)) {
+			continue
+		}
+
+		situationUpdateRequest := &SituationUpdateRequest{
+			id:        SituationUpdateRequestId(guardian.NewUUID()),
+			lineId:    line.Id(),
+			createdAt: now,
+		}
+		guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+	}
 }
 
 func (guardian *ModelGuardian) simulateActualAttributes() {

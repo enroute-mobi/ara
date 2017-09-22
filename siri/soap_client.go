@@ -48,6 +48,8 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 	if err != nil {
 		return nil, err
 	}
+	// For tests
+	// logger.Log.Debugf("%v", xml)
 
 	soapEnvelope.WriteXML(xml)
 	// Create http request
