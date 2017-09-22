@@ -173,7 +173,7 @@ func (factory *SIRIServiceRequestBroadcasterFactory) CreateConnector(partner *Pa
 }
 
 func logXMLSiriServiceRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceRequest) {
-	logStashEvent["Connector"] = "SIRIServiceRequestBroadcaster"
+	logStashEvent["connector"] = "SIRIServiceRequestBroadcaster"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()

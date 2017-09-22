@@ -76,7 +76,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 		delivery.GeneralMessages = append(delivery.GeneralMessages, siriGeneralMessage)
 	}
 
-	logStashEvent["MessageIds"] = strings.Join(messageArray, ", ")
+	logStashEvent["messageIds"] = strings.Join(messageArray, ", ")
 
 	return delivery
 }

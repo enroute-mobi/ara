@@ -102,7 +102,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
 	}
 
-	logStashEvent["StopVisitIds"] = strings.Join(stopVisitArray, ", ")
+	logStashEvent["stopVisitIds"] = strings.Join(stopVisitArray, ", ")
 
 	return delivery
 }

@@ -134,5 +134,5 @@ func logSituationUpdateEvents(logStashEvent audit.LogStashEvent, situations []*m
 	for _, situationUpdateEvent := range situations {
 		updateEvents = append(updateEvents, situationUpdateEvent.SituationObjectID.Value())
 	}
-	logStashEvent["SituationUpdateEvents"] = strings.Join(updateEvents, ", ")
+	logStashEvent["situationUpdateEvents"] = strings.Join(updateEvents, ", ")
 }

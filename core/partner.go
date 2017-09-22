@@ -515,8 +515,8 @@ func (partner *Partner) CancelSubscriptions() {
 
 func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
 	logStashEvent := make(audit.LogStashEvent)
-	logStashEvent["Referential"] = string(partner.manager.Referential().Slug())
-	logStashEvent["Partner"] = string(partner.slug)
+	logStashEvent["referential"] = string(partner.manager.Referential().Slug())
+	logStashEvent["partner"] = string(partner.slug)
 	return logStashEvent
 }
 

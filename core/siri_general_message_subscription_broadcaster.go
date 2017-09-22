@@ -159,7 +159,7 @@ func logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent audit.Log
 func logSIRIGeneralMessageBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLGeneralMessageSubscriptionRequestEntry) {
 	logStashEvent["type"] = "GeneralMessageSubscription"
 	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
-	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
+	logStashEvent["subscriptionRef"] = gmEntries.SubscriptionIdentifier()
 
 	xml := gmEntries.RawXML()
 	logStashEvent["requestXML"] = xml

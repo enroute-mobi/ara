@@ -238,7 +238,7 @@ func logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent audit.Log
 func logSIRIStopMonitoringBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLStopMonitoringSubscriptionRequestEntry) {
 	logStashEvent["type"] = "StopMonitoringSubscription"
 	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
-	logStashEvent["SubscriptionRef"] = gmEntries.SubscriptionIdentifier()
+	logStashEvent["subscriptionRef"] = gmEntries.SubscriptionIdentifier()
 
 	xml := gmEntries.RawXML()
 	logStashEvent["requestXML"] = xml

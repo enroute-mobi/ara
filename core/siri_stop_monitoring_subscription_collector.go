@@ -253,10 +253,10 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 
 func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest) {
 	logStashEvent["type"] = "DeleteStopMonitoringSubscription"
-	logStashEvent["RequestTimestamp"] = request.RequestTimestamp.String()
-	logStashEvent["SubscriptionRef"] = request.SubscriptionRef
-	logStashEvent["RequestorRef"] = request.RequestorRef
-	logStashEvent["MessageIdentifier"] = request.MessageIdentifier
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+	logStashEvent["subscriptionRef"] = request.SubscriptionRef
+	logStashEvent["requestorRef"] = request.RequestorRef
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 
 	xml, err := request.BuildXML()
 	if err != nil {
@@ -293,7 +293,7 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 	for _, responseStatus := range response.ResponseStatus() {
 		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
 	}
-	logStashEvent["SubscriptionRefs"] = strings.Join(subscriptionIds, ", ")
+	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
 }
 
 func logXMLSubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
@@ -325,8 +325,8 @@ func logStopVisitUpdateEventsFromMap(logStashEvent audit.LogStashEvent, stopArea
 			cancelledIdArray = append(cancelledIdArray, stopVisitCancelledEvent.StopVisitObjectId.Value())
 		}
 	}
-	logStashEvent["StopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
-	logStashEvent["StopVisitCancelledEventIds"] = strings.Join(cancelledIdArray, ", ")
+	logStashEvent["stopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
+	logStashEvent["stopVisitCancelledEventIds"] = strings.Join(cancelledIdArray, ", ")
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
@@ -336,5 +336,5 @@ func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string
 		refSlice[i] = monitoringRef
 		i++
 	}
-	logStashEvent["MonitoringRefs"] = strings.Join(refSlice, ", ")
+	logStashEvent["monitoringRefs"] = strings.Join(refSlice, ", ")
 }

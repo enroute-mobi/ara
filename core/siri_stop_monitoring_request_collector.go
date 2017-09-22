@@ -203,10 +203,10 @@ func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateE
 	for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
 		updateEvents = append(updateEvents, stopVisitUpdateEvent.StopVisitObjectid.Value())
 	}
-	logStashEvent["StopVisitUpdateEvents"] = strings.Join(updateEvents, ", ")
+	logStashEvent["stopVisitUpdateEvents"] = strings.Join(updateEvents, ", ")
 	var notCollectedEvents []string
 	for _, stopVisitNotCollectedEvent := range stopAreaUpdateEvent.StopVisitNotCollectedEvents {
 		notCollectedEvents = append(notCollectedEvents, stopVisitNotCollectedEvent.StopVisitObjectId.Value())
 	}
-	logStashEvent["StopVisitNotCollectedEvents"] = strings.Join(notCollectedEvents, ", ")
+	logStashEvent["stopVisitNotCollectedEvents"] = strings.Join(notCollectedEvents, ", ")
 }

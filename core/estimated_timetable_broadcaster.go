@@ -254,9 +254,9 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 
 func logSIRINotifyEstimatedTimeTable(logStashEvent audit.LogStashEvent, notify *siri.SIRINotifyEstimatedTimeTable) {
 	logStashEvent["type"] = "NotifyEstimatedTimetable"
-	logStashEvent["ResponseTimestamp"] = notify.ResponseTimestamp.String()
-	logStashEvent["ProducerRef"] = notify.ProducerRef
-	logStashEvent["ResponseMessageIdentifier"] = notify.ResponseMessageIdentifier
+	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp.String()
+	logStashEvent["producerRef"] = notify.ProducerRef
+	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier
 
 	xml, err := notify.BuildXML()
 	if err != nil {
@@ -267,9 +267,9 @@ func logSIRINotifyEstimatedTimeTable(logStashEvent audit.LogStashEvent, notify *
 }
 
 func logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent audit.LogStashEvent, delivery *siri.SIRIEstimatedTimetableSubscriptionDelivery) {
-	logStashEvent["ResponseTimestamp"] = delivery.ResponseTimestamp.String()
-	logStashEvent["SubscriberRef"] = delivery.SubscriberRef
-	logStashEvent["SubscriptionIdentifier"] = delivery.SubscriptionIdentifier
+	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["subscriberRef"] = delivery.SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = delivery.SubscriptionIdentifier
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		logStashEvent["errorType"] = delivery.ErrorType
