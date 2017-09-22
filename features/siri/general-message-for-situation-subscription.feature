@@ -29,9 +29,9 @@ Feature: Support SIRI GeneralMessage by subscription
          xmlns:ns6="http://wsdl.siri.org.uk/siri">
          <ns5:ResponseStatus>
              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-             <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</ns5:RequestMessageRef>
+             <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns5:RequestMessageRef>
              <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns5:SubscriptionRef>
              <ns5:Status>true</ns5:Status>
              <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
          </ns5:ResponseStatus>
@@ -48,12 +48,13 @@ Feature: Support SIRI GeneralMessage by subscription
        | local_credential     | NINOXE:default        |
        | remote_objectid_kind | internal              |
       And 30 seconds have passed
+      And 30 seconds have passed
       And a Line exists with the following attributes:
        | Name                   | Test              |
        | ObjectIDs              | "internal":"1234" |
        | CollectGeneralMessages | true              |
-      And 15 seconds have passed
-      And 15 seconds have passed
+      And 10 seconds have passed
+      And 5 seconds have passed
       And a Situation exists with the following attributes:
        | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1" |
        | RecordedAt              | 2017-01-01T03:30:06+02:00                 |
@@ -79,7 +80,7 @@ Feature: Support SIRI GeneralMessage by subscription
             <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
             <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns5:SubscriptionRef>
             <ns3:Status>true</ns3:Status>
             <ns3:GeneralMessage>
                <ns3:RecordedAtTime>2017-03-29T03:30:06.000+01:00</ns3:RecordedAtTime>
@@ -108,7 +109,7 @@ Feature: Support SIRI GeneralMessage by subscription
    </S:Body>
    </S:Envelope>
       """
-    Then the Situation "6ba7b814-9dad-11d1-b-00c04fd430c8" has the following attributes:
+    Then the Situation "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
        | Channel | Commercial |
 
   Scenario: 3865 - Manage a InfoMessageCancellation
