@@ -35,10 +35,9 @@ func (a SIRIAnnotatedStopPointByStopPointRef) Less(i, j int) bool {
 }
 
 const stopDiscoveryResponseTemplate = `<sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<Answer version="2.0">
+	<Answer version="2.0:FR-IDF-2.4">
 		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>{{ if .Address }}
 		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
-		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>
 		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
 		<siri:Status>{{ .Status }}</siri:Status>{{ range .AnnotatedStopPoints }}

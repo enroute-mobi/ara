@@ -7,10 +7,9 @@ import (
 
 func Test_SIRIStopDiscoveryResponse_BuildXML(t *testing.T) {
 	expectedXML := `<sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<Answer version="2.0">
+	<Answer version="2.0:FR-IDF-2.4">
 		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
 		<siri:Address>address</siri:Address>
-		<siri:ProducerRef>producer</siri:ProducerRef>
 		<siri:RequestMessageRef>ref</siri:RequestMessageRef>
 		<siri:ResponseMessageIdentifier>identifier</siri:ResponseMessageIdentifier>
 		<siri:Status>true</siri:Status>
