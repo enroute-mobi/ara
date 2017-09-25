@@ -81,7 +81,11 @@ func (subscriber *GeneralMessageSubscriber) Stop() {
 }
 
 func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
-	subscription, _ := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
+	subscription, ok := subscriber.connector.partner.Subscriptions().FindByKind("GeneralMessageCollect")
+	if !ok {
+		logger.Log.Debugf("GeneralMessageSubscriber visit without a subscription")
+		return
+	}
 	lineRefList := []string{}
 
 	linesToRequest := make(map[string]*model.ObjectID)

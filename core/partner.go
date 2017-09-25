@@ -501,7 +501,7 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	if err != nil {
 		logger.Log.Printf("Error while checking status: %v", err)
 	}
-	logger.Log.Debugf("Partner status is %v", partner.PartnerStatus.OperationnalStatus)
+	logger.Log.Debugf("Partner status is %v", partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
 }
 

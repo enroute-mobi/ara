@@ -187,7 +187,7 @@ func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 }
 
 func (manager *MemorySubscriptions) New(kind string) *Subscription {
-	logger.Log.Debugf("creating subscription with kind %v", kind)
+	logger.Log.Debugf("Creating subscription with kind %v", kind)
 	subscription := &Subscription{
 		kind:                kind,
 		manager:             manager,

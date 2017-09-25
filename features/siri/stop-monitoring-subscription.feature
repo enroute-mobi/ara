@@ -54,7 +54,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a Subscription exist with the following attributes:
       | Kind                    | StopMonitoringCollect      |
-      | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
+      | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
     And a minute has passed
     When I send this SIRI request
       """
@@ -185,7 +185,7 @@ Feature: Support SIRI StopMonitoring by subscription
           | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
         And a Subscription exist with the following attributes:
           | Kind                    | StopMonitoringCollect      |
-          | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
+          | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
         And a Line exists with the following attributes:
           | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
           | Name      | Ligne 3 Metro                   |
@@ -296,8 +296,8 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a Subscription exist with the following attributes:
       | Kind                    | StopMonitoringCollect                               |
-      | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
-      | ReferenceArray1         | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC"  |
+      | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
+      | ReferenceArray[1]         | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC"  |
     When a minute has passed
     Then the SIRI server should have received a SubscriptionRequest request with 2 "StopMonitoringRequest"
 
@@ -352,7 +352,7 @@ Feature: Support SIRI StopMonitoring by subscription
         | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       And a Subscription exist with the following attributes:
         | Kind                    | StopMonitoringCollect                               |
-        | ReferenceArray0         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
+        | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC"  |
       And a Line exists with the following attributes:
         | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
         | Name      | Ligne 3 Metro                   |
@@ -457,7 +457,7 @@ Feature: Support SIRI StopMonitoring by subscription
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
       | Kind                      | StopMonitoringCollect                              |
-      | ReferenceArray0           | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ReferenceArray[0]           | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |

@@ -89,7 +89,7 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /ReferenceArray(\d+)/
+    if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2
 

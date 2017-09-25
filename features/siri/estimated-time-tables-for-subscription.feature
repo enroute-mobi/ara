@@ -91,7 +91,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
       | Kind                      | EstimatedTimetable                     |
-      | ReferenceArray0           | Line, "internal": "NINOXE:Line:3:LOC"  |
+      | ReferenceArray[0]           | Line, "internal": "NINOXE:Line:3:LOC"  |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
