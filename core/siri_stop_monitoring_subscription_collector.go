@@ -176,7 +176,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
-		RequestorRef:      connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER),
+		RequestorRef:      connector.partner.ProducerRef(),
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request)

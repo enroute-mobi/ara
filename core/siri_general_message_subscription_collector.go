@@ -135,7 +135,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp: connector.Clock().Now(),
 		SubscriptionRef:  subId,
-		RequestorRef:     connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER),
+		RequestorRef:     connector.partner.ProducerRef(),
 	}
 
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
