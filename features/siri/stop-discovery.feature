@@ -77,11 +77,6 @@ Feature: Support SIRI StopDiscovery
                   <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
                 </siri:Lines>
               </siri:AnnotatedStopPointRef>
-              <siri:AnnotatedStopPointRef>
-                <siri:StopPointRef>NINOXE:StopPoint:SP:16:LOC</siri:StopPointRef>
-                <siri:Monitored>true</siri:Monitored>
-                <siri:StopName>Test 2</siri:StopName>
-              </siri:AnnotatedStopPointRef>
             </Answer>
             <AnswerExtension/>
           </sw:StopPointsDiscoveryResponse>

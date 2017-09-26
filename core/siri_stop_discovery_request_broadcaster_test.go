@@ -24,6 +24,11 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	line.SetObjectID(lineObjectId)
 	line.Save()
 
+	line2 := referential.Model().Lines().New()
+	lineObjectId2 := model.NewObjectID("test", "5678")
+	line2.SetObjectID(lineObjectId2)
+	line2.Save()
+
 	firstStopArea := referential.Model().StopAreas().New()
 	firstObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetObjectID(firstObjectID)
@@ -35,6 +40,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	secondObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:2:LOC")
 	secondStopArea.SetObjectID(secondObjectID)
 	secondStopArea.Name = "Second"
+	secondStopArea.LineIds = []model.LineId{line2.Id()}
 	secondStopArea.Save()
 
 	file, err := os.Open("testdata/stoppointdiscovery-request-soap.xml")
@@ -64,7 +70,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
 	}
 	if len(response.AnnotatedStopPoints) != 2 {
-		t.Errorf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2", len(response.AnnotatedStopPoints))
+		t.Fatalf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2", len(response.AnnotatedStopPoints))
 	}
 
 	if response.AnnotatedStopPoints[0].StopName != "First" {

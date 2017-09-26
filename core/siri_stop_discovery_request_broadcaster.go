@@ -77,6 +77,9 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 				}
 			}
 		}
+		if len(annotedStopPoint.Lines) == 0 {
+			continue
+		}
 		annotedStopPointArray = append(annotedStopPointArray, annotedStopPoint.StopPointRef)
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
