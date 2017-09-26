@@ -75,7 +75,7 @@ const deleteSubscriptionResponseTemplate = `<sw:DeleteSubscriptionResponse xmlns
 				<siri:{{.ErrorType}}>{{ end }}
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
-			</siri:ErrorCondition>{{ else }}
+			</siri:ErrorCondition>{{ end }}
 		</siri:TerminationResponseStatus>{{ end }}
 	</Answer>
 	<AnswerExtension/>

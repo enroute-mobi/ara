@@ -11,8 +11,7 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
-//WIP
-type XMLStopMonitoringSubscriptionResponse struct {
+type XMLSubscriptionResponse struct {
 	XMLStructure
 
 	address           string
@@ -42,7 +41,7 @@ type XMLResponseStatus struct {
 	validUntil        time.Time
 }
 
-type SIRIStopMonitoringSubscriptionResponse struct {
+type SIRISubscriptionResponse struct {
 	Address           string
 	ResponderRef      string
 	RequestMessageRef string
@@ -67,7 +66,7 @@ type SIRIResponseStatus struct {
 	ValidUntil        time.Time
 }
 
-const stopMonitoringSubscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+const subscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
     <SubscriptionAnswerInfo>
         <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
         <siri:Address>{{.Address}}</siri:Address>
@@ -94,22 +93,22 @@ const stopMonitoringSubscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:
 		<AnswerExtension />
 </sw:SubscribeResponse>`
 
-func NewXMLStopMonitoringSubscriptionResponse(node xml.Node) *XMLStopMonitoringSubscriptionResponse {
-	xmlStopMonitoringSubscriptionResponse := &XMLStopMonitoringSubscriptionResponse{}
+func NewXMLSubscriptionResponse(node xml.Node) *XMLSubscriptionResponse {
+	xmlStopMonitoringSubscriptionResponse := &XMLSubscriptionResponse{}
 	xmlStopMonitoringSubscriptionResponse.node = NewXMLNode(node)
 	return xmlStopMonitoringSubscriptionResponse
 }
 
-func NewXMLStopMonitoringSubscriptionResponseFromContent(content []byte) (*XMLStopMonitoringSubscriptionResponse, error) {
+func NewXMLSubscriptionResponseFromContent(content []byte) (*XMLSubscriptionResponse, error) {
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
 	}
-	response := NewXMLStopMonitoringSubscriptionResponse(doc.Root().XmlNode)
+	response := NewXMLSubscriptionResponse(doc.Root().XmlNode)
 	return response, nil
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) ResponseStatus() []*XMLResponseStatus {
+func (response *XMLSubscriptionResponse) ResponseStatus() []*XMLResponseStatus {
 	if len(response.responseStatus) == 0 {
 		nodes := response.findNodes("ResponseStatus")
 		if nodes == nil {
@@ -124,35 +123,35 @@ func (response *XMLStopMonitoringSubscriptionResponse) ResponseStatus() []*XMLRe
 	return response.responseStatus
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) Address() string {
+func (response *XMLSubscriptionResponse) Address() string {
 	if response.address == "" {
 		response.address = response.findStringChildContent("Address")
 	}
 	return response.address
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) ResponderRef() string {
+func (response *XMLSubscriptionResponse) ResponderRef() string {
 	if response.responderRef == "" {
 		response.responderRef = response.findStringChildContent("ResponderRef")
 	}
 	return response.responderRef
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) RequestMessageRef() string {
+func (response *XMLSubscriptionResponse) RequestMessageRef() string {
 	if response.requestMessageRef == "" {
 		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
 	}
 	return response.requestMessageRef
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) ServiceStartedTime() time.Time {
+func (response *XMLSubscriptionResponse) ServiceStartedTime() time.Time {
 	if response.serviceStartedTime.IsZero() {
 		response.serviceStartedTime = response.findTimeChildContent("ServiceStartedTime")
 	}
 	return response.serviceStartedTime
 }
 
-func (response *XMLStopMonitoringSubscriptionResponse) ResponseTimestamp() time.Time {
+func (response *XMLSubscriptionResponse) ResponseTimestamp() time.Time {
 	if response.responseTimestamp.IsZero() {
 		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
 	}
@@ -246,9 +245,9 @@ func (response *XMLResponseStatus) ErrorDescription() string {
 	return response.errorDescription
 }
 
-func (response *SIRIStopMonitoringSubscriptionResponse) BuildXML() (string, error) {
+func (response *SIRISubscriptionResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriResponse = template.Must(template.New("SubscribeResponse").Parse(stopMonitoringSubscriptionResponseTemplate))
+	var siriResponse = template.Must(template.New("SubscribeResponse").Parse(subscriptionResponseTemplate))
 	if err := siriResponse.Execute(&buffer, response); err != nil {
 		return "", err
 	}

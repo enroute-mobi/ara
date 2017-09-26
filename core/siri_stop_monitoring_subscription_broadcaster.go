@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strconv"
 	"sync"
 
 	"github.com/af83/edwig/audit"
@@ -135,10 +136,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-
-	logStashEvent := connector.newLogStashEvent()
-	logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent, request)
-
 	sms := request.XMLSubscriptionSMEntries()
 
 	tx := connector.Partner().Referential().NewTransaction()
@@ -147,7 +144,9 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, sm := range sms {
-		logSIRIStopMonitoringBroadcasterEntries(logStashEvent, sm)
+		logStashEvent := connector.newLogStashEvent()
+		logXMLStopMonitoringSubscriptionEntry(logStashEvent, sm)
+
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: sm.MessageIdentifier(),
 			SubscriberRef:     sm.SubscriberRef(),
@@ -161,6 +160,10 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = "Stop Area not found"
 			resps = append(resps, rs)
+
+			logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
+			audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 			continue
 		}
 
@@ -185,8 +188,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		rs.ValidUntil = sm.InitialTerminationTime()
 		resps = append(resps, rs)
 
+		logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 		connector.AddStopAreaStopVisits(sa, sub, r)
 	}
+
 	return resps
 }
 
@@ -221,27 +228,35 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "SIRIStopMonitoringSubscriptionBroadcaster"
+	event["connector"] = "StopMonitoringSubscriptionBroadcaster"
 	return event
 }
 
-func logSIRIStopMonitoringBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["type"] = "StopMonitoringSubscriptions"
+func logXMLStopMonitoringSubscriptionEntry(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubscriptionRequestEntry) {
+	logStashEvent["type"] = "StopMonitoringSubscriptionEntry"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["monitoringRef"] = request.MonitoringRef()
+	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
+	logStashEvent["subscriberRef"] = request.SubscriberRef()
+	logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier()
+	logStashEvent["initialTerminationTime"] = request.InitialTerminationTime().String()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-
-	xml := request.RawXML()
-	logStashEvent["requestXML"] = xml
+	logStashEvent["requestXML"] = request.RawXML()
 }
 
-func logSIRIStopMonitoringBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLStopMonitoringSubscriptionRequestEntry) {
-	logStashEvent["type"] = "StopMonitoringSubscription"
-	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
-	logStashEvent["subscriptionRef"] = gmEntries.SubscriptionIdentifier()
-
-	xml := gmEntries.RawXML()
-	logStashEvent["requestXML"] = xml
+func logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, smEntry *siri.SIRIResponseStatus) {
+	logStashEvent["requestMessageRef"] = smEntry.RequestMessageRef
+	logStashEvent["subscriptionRef"] = smEntry.SubscriptionRef
+	logStashEvent["responseTimestamp"] = smEntry.ResponseTimestamp.String()
+	logStashEvent["validUntil"] = smEntry.ValidUntil.String()
+	logStashEvent["status"] = strconv.FormatBool(smEntry.Status)
+	if !smEntry.Status {
+		logStashEvent["errorType"] = smEntry.ErrorType
+		if smEntry.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(smEntry.ErrorNumber)
+		}
+		logStashEvent["errorText"] = smEntry.ErrorText
+	}
 }
 
 // START TEST

@@ -3,13 +3,14 @@ package core
 import (
 	"fmt"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
 
 type SubscriptionRequestDispatcher interface {
-	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error)
+	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRISubscriptionResponse, error)
 	CancelSubscription(*siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse
 }
 
@@ -42,8 +43,12 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 	return siriSubscriptionRequest
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) (*siri.SIRIStopMonitoringSubscriptionResponse, error) {
-	response := siri.SIRIStopMonitoringSubscriptionResponse{
+func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) (*siri.SIRISubscriptionResponse, error) {
+	logStashEvent := connector.newLogStashEvent()
+
+	logXMLSubscriptionRequest(logStashEvent, request)
+
+	response := siri.SIRISubscriptionResponse{
 		Address:           connector.Partner().Address(),
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
 		ResponseTimestamp: connector.Clock().Now(),
@@ -58,6 +63,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
 		}
+		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 
@@ -69,6 +76,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
+		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 
@@ -80,20 +89,30 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		for _, smr := range smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
+		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
-
 	}
 
 	return nil, fmt.Errorf("Subscription not supported")
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse {
+	logStashEvent := connector.newLogStashEvent()
+
+	logXMLCancelSubscriptionRequest(logStashEvent, r)
+
 	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
 		ResponderRef:      connector.SIRIPartner().RequestorRef(),
 		RequestMessageRef: r.MessageIdentifier(),
 		ResponseTimestamp: currentTime,
 	}
+
+	defer func() {
+		logSIRICancelSubscriptionResponse(logStashEvent, resp)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+	}()
 
 	if r.CancelAll() {
 		for _, subscription := range connector.Partner().Subscriptions().FindAll() {
@@ -130,4 +149,56 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 
 	sub.Delete()
 	return resp
+}
+
+func (connector *SIRISubscriptionRequestDispatcher) newLogStashEvent() audit.LogStashEvent {
+	return connector.partner.NewLogStashEvent()
+}
+
+func logXMLSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
+	logStashEvent["consumerAddress"] = request.ConsumerAddress()
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+	logStashEvent["requestXML"] = request.RawXML()
+}
+
+func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRISubscriptionResponse, connector string) {
+	logStashEvent["connector"] = connector
+	logStashEvent["type"] = "subscriptionRequest"
+	logStashEvent["address"] = response.Address
+	logStashEvent["responderRef"] = response.ResponderRef
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime.String()
+	xml, err := response.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["responseXML"] = xml
+}
+
+func logXMLCancelSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLDeleteSubscriptionRequest) {
+	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
+	logStashEvent["requestorRef"] = request.RequestorRef()
+	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
+	if request.CancelAll() {
+		logStashEvent["subscriptionToCancel"] = "All"
+	} else {
+		logStashEvent["subscriptionToCancel"] = request.SubscriptionRef()
+	}
+	logStashEvent["requestXML"] = request.RawXML()
+}
+
+func logSIRICancelSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIDeleteSubscriptionResponse) {
+	logStashEvent["responderRef"] = response.ResponderRef
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	xml, err := response.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
+	}
+	logStashEvent["responseXML"] = xml
 }

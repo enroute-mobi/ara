@@ -105,8 +105,9 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-
 	logStashEvent := connector.newLogStashEvent()
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 	logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent, request)
 
 	gms := request.XMLSubscriptionGMEntries()
@@ -142,7 +143,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "SIRIGeneralMessageSubscriptionBroadcaster"
+	event["connector"] = "GeneralMessageSubscriptionBroadcaster"
 	return event
 }
 

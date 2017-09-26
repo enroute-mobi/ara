@@ -55,8 +55,9 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-
 	logStashEvent := connector.newLogStashEvent()
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 	logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent, request)
 
 	ettEntries := request.XMLSubscriptionETTEntries()
@@ -190,7 +191,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "SIRIEstimatedTimeTableSubscriptionBroadcaster"
+	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
 	return event
 }
 

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func getXMLStopMonitoringSubscriptionResponse(t *testing.T) *XMLStopMonitoringSubscriptionResponse {
+func getXMLSubscriptionResponse(t *testing.T) *XMLSubscriptionResponse {
 	file, err := os.Open("../core/testdata/stopmonitoringsubscription-response-soap.xml")
 	defer file.Close()
 	if err != nil {
@@ -19,12 +19,12 @@ func getXMLStopMonitoringSubscriptionResponse(t *testing.T) *XMLStopMonitoringSu
 		t.Fatal(err)
 	}
 
-	response, _ := NewXMLStopMonitoringSubscriptionResponseFromContent(content)
+	response, _ := NewXMLSubscriptionResponseFromContent(content)
 	return response
 }
 
-func Test_XMLStopMonitoringSubscriptionResponse(t *testing.T) {
-	response := getXMLStopMonitoringSubscriptionResponse(t)
+func Test_XMLSubscriptionResponse(t *testing.T) {
+	response := getXMLSubscriptionResponse(t)
 	responseStatus := response.ResponseStatus()[0]
 
 	if expected := "28679112-9dad-11d1-2-00c04fd430c8"; response.RequestMessageRef() != expected {
