@@ -24,7 +24,7 @@ func NewOperatorController(referential *core.Referential) ControllerInterface {
 }
 
 func (controller *OperatorController) findOperator(tx *model.Transaction, identifier string) (model.Operator, bool) {
-	idRegexp := "([0-9a-zA-Z-]+)&([0-9a-zA-Z-]+)"
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {

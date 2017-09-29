@@ -24,7 +24,7 @@ func NewSituationController(referential *core.Referential) ControllerInterface {
 }
 
 func (controller *SituationController) findSituation(tx *model.Transaction, identifier string) (model.Situation, bool) {
-	idRegexp := "([0-9a-zA-Z-]+)&([0-9a-zA-Z-]+)"
+	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
