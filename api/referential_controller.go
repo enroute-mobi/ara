@@ -21,6 +21,14 @@ func NewReferentialController(server *Server) ControllerInterface {
 	}
 }
 
+func (controller *ReferentialController) findReferential(identifier string) *core.Referential {
+	referential := controller.server.CurrentReferentials().FindBySlug(core.ReferentialSlug(identifier))
+	if referential != nil {
+		return referential
+	}
+	return controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
+}
+
 func (controller *ReferentialController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Referentials Index")
 
@@ -29,7 +37,7 @@ func (controller *ReferentialController) Index(response http.ResponseWriter) {
 }
 
 func (controller *ReferentialController) Show(response http.ResponseWriter, identifier string) {
-	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
+	referential := controller.findReferential(identifier)
 	if referential == nil {
 		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
@@ -41,7 +49,7 @@ func (controller *ReferentialController) Show(response http.ResponseWriter, iden
 }
 
 func (controller *ReferentialController) Delete(response http.ResponseWriter, identifier string) {
-	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
+	referential := controller.findReferential(identifier)
 	if referential == nil {
 		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
@@ -55,7 +63,7 @@ func (controller *ReferentialController) Delete(response http.ResponseWriter, id
 }
 
 func (controller *ReferentialController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	referential := controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
+	referential := controller.findReferential(identifier)
 	if referential == nil {
 		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
 		return
