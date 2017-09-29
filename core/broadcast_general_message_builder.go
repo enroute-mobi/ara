@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -186,11 +185,8 @@ func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(reference *mod
 
 func (builder *BroadcastGeneralMessageBuilder) checkFilter(references []*siri.SIRIReference) bool {
 	if len(builder.lineRef) == 0 && len(builder.stopPointRef) == 0 {
-		logger.Log.Printf("In the return true à cause du lineRef et stopPointRef vide")
 		return true
 	}
-
-	logger.Log.Printf("After the return true à cause du lineRef et stopPointRef vide: %v et %v", builder.lineRef, builder.stopPointRef)
 
 	for _, reference := range references {
 		switch reference.Kind {
