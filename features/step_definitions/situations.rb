@@ -38,14 +38,17 @@ Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:
   expect(called_method).to be_truthy
 end
 
-Then(/^a Situation "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(situation_path("#{kind}:#{value}" ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"} ){|response, request, result| response }
+Then(/^a Situation "([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |identifier, condition, referential|
+  # For tests
+  # puts RestClient.get situations_path, {Authorization: "Token token=#{$token}"}
+
+  response = RestClient.get situation_path(identifier ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}{|response, request, result| response }
 
   if condition.nil?
     expect(response.code).to eq(200)
   else
     expect(response.code).to eq(404)
-    expect(response.body).to include("Situation not found: #{kind}:#{value}")
+    expect(response.body).to include("Situation not found: #{identifier}")
   end
 end
 

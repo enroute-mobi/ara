@@ -52,5 +52,8 @@ end
 
 When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, attributes|
   path = partners_path(referential: referential) + "/" + getFirstPartner() + "/subscriptions"
-  response = RestClient.post path,  model_attributes(attributes).to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+  RestClient.post path,  model_attributes(attributes).to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+
+  # Test
+  # puts RestClient.get path, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end

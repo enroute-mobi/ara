@@ -150,15 +150,14 @@ Feature: Support SIRI GeneralMessage by subscription
       </S:Body>
       </S:Envelope>
     """
-    And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector-monitoring-subscription-collector] and the following settings:
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
       | remote_objectid_kind | internal              |
     And 30 seconds have passed
-    And a minute has passed
     And a Subscription exist with the following attributes:
-      | Kind | GeneralMessage |
+      | Kind | GeneralMessageCollect |
     And a Situation exists with the following attributes:
       | ObjectIDs               | "internal" : "2"          |
       | RecordedAt              | 2017-01-01T03:30:06+02:00 |
@@ -169,6 +168,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | Messages[0]#MessageText | Les autres non            |
     When I send this SIRI request
     """
+    <?xml version='1.0' encoding='utf-8'?>
     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
       <soap:Body>
         <ns6:NotifyGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri"
@@ -188,11 +188,12 @@ Feature: Support SIRI GeneralMessage by subscription
               <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
               <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
               <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
-              <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
+              <ns2:SubscriptionRef>6ba7b814-9dad-11d1-3-00c04fd430c8</ns2:SubscriptionRef>
               <ns2:Status>true</ns2:Status>
               <ns2:GeneralMessageCancellation>
                 <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
                 <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
+                <ns2:InfoMessageIdentifier>2</ns2:InfoMessageIdentifier>
               </ns2:GeneralMessageCancellation>
             </ns2:GeneralMessageDelivery>
           </Notification>
@@ -201,4 +202,4 @@ Feature: Support SIRI GeneralMessage by subscription
       </soap:Body>
     </soap:Envelope>
     """
-    Then a Situation "internal":"2" should not exist in Referential "test"
+    Then a Situation "internal:2" should not exist in Referential "test"

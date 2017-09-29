@@ -21,7 +21,7 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) ConnectorType
 }
 
 func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
-	logger.Log.Debugf("NotifyGeneralMessage %s\n", handler.xmlRequest.ResponseMessageIdentifier())
+	logger.Log.Debugf("NotifyGeneralMessage: %s", handler.xmlRequest.ResponseMessageIdentifier())
 
 	connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
 

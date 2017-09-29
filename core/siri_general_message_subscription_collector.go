@@ -172,6 +172,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 			tx.Model().Situations().Delete(&situation)
 		}
 	}
+	tx.Commit()
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) SetGeneralMessageSubscriber(generalMessageSubscriber SIRIGeneralMessageSubscriber) {
