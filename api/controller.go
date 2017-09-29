@@ -62,9 +62,10 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 
 func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	// Check request body
-	if (requestData.Method == "POST" || requestData.Method == "PUT") && requestData.Id != "save" {
+	if requestData.Method == "PUT" || (requestData.Method == "POST" && requestData.Id != "save") {
 		requestData.Body = getRequestBody(response, request)
 		if requestData.Body == nil {
+			http.Error(response, "Invalid request", 400)
 			return
 		}
 	}
