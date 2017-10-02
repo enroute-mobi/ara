@@ -101,6 +101,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+	subscriptionErrors := make(map[string]string)
 
 	logXMLGeneralMessageDelivery(logStashEvent, notify)
 
@@ -112,17 +113,22 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 
 		if ok == false {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
 		if subscription.Kind() != "GeneralMessageCollect" {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
 		connector.cancelGeneralMessage(delivery)
 		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
 
 		logSituationUpdateEvents(logStashEvent, *situationUpdateEvents)
+		if len(subscriptionErrors) != 0 {
+			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
+		}
 
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}

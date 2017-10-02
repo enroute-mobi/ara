@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 	"github.com/jbowtie/gokogiri/xml"
@@ -296,5 +297,19 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 
 	if expected := "Subscription::6ba7b814-9dad-11d1-0-00c04fd430c8::LOC"; request.SubscriptionRef() != expected {
 		t.Errorf("Wrong SubscriptionRef want : %v  got %v :", expected, request.SubscriptionRef())
+	}
+}
+
+func Test_logSubscriptionErrorsFromMap(t *testing.T) {
+	logStashEvent := make(audit.LogStashEvent)
+	errors := make(map[string]string)
+	errors["1234"] = "Non existant subscription of id %s"
+	errors["5678"] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
+
+	logSubscriptionErrorsFromMap(logStashEvent, errors)
+
+	expected := "Non existant subscription of id 1234, Subscription of id 5678 is not a subscription of kind StopMonitoringCollect"
+	if logStashEvent["subscriptionErrors"] != expected {
+		t.Errorf("Wrong log of errors\n got: %v\n want: %v", logStashEvent["subscriptionErrors"], expected)
 	}
 }

@@ -134,6 +134,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	monitoringRefMap := make(map[string]struct{})
+	subscriptionErrors := make(map[string]string)
 
 	logXMLStopMonitoringDelivery(logStashEvent, notify)
 
@@ -146,11 +147,13 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			connector.cancelSubscription(delivery.SubscriptionRef())
 			continue
 		}
 		if subscription.Kind() != "StopMonitoringCollect" {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
 
@@ -163,6 +166,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
+	if len(subscriptionErrors) != 0 {
+		logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
+	}
 
 	for _, event := range stopAreaUpdateEvents {
 		connector.broadcastStopAreaUpdateEvent(event)
@@ -337,4 +343,14 @@ func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string
 		i++
 	}
 	logStashEvent["monitoringRefs"] = strings.Join(refSlice, ", ")
+}
+
+func logSubscriptionErrorsFromMap(logStashEvent audit.LogStashEvent, errors map[string]string) {
+	errSlice := make([]string, len(errors))
+	i := 0
+	for subId, err := range errors {
+		errSlice[i] = fmt.Sprintf(err, subId)
+		i++
+	}
+	logStashEvent["subscriptionErrors"] = strings.Join(errSlice, ", ")
 }
