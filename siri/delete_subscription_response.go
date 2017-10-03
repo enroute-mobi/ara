@@ -57,14 +57,14 @@ type SIRITerminationResponseStatus struct {
 
 const deleteSubscriptionResponseTemplate = `<sw:DeleteSubscriptionResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<DeleteSubscriptionAnswerInfo>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</DeleteSubscriptionAnswerInfo>
 	<Answer>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ns5:ResponseTimestamp>
+		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</ns5:RequestMessageRef>{{ range .ResponseStatus }}
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>{{ range .ResponseStatus }}
 		<siri:TerminationResponseStatus>
 			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 			<siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
