@@ -66,6 +66,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <Answer>
               <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
                 <siri:GeneralMessage formatRef="STIF-IDF">
                   <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
@@ -144,6 +145,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <Answer>
               <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
                 <siri:GeneralMessage formatRef="STIF-IDF">
                   <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
@@ -361,6 +363,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <Answer>
               <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
               </siri:GeneralMessageDelivery>
             </Answer>
