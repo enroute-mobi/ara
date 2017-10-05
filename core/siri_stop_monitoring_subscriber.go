@@ -143,6 +143,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
 			continue
 		}
+		delete(stopAreasToRequest, responseStatus.RequestMessageRef()) // See #4691
 		resource := subscription.Resource(*stopAreaObjectid)
 		if resource == nil { // Should never happen
 			logger.Log.Debugf("Response for unknown subscription resource %v", stopAreaObjectid.String())
@@ -155,6 +156,18 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
 		resource.RetryCount = 0
+	}
+	// Should not happen but see #4691
+	if len(stopAreasToRequest) == 0 {
+		return
+	}
+	for _, notInResponseObjectid := range stopAreasToRequest {
+		resource := subscription.Resource(*notInResponseObjectid)
+		if resource == nil { // Should never happen
+			logger.Log.Debugf("Can't increment RetryCount for unknown subscription resource %v", notInResponseObjectid.String())
+			continue
+		}
+		resource.RetryCount++
 	}
 }
 

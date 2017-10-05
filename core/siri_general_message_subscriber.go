@@ -147,6 +147,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
 			continue
 		}
+		delete(linesToRequest, responseStatus.RequestMessageRef()) // See #4691
 		resource := subscription.Resource(*lineObjectid)
 		if resource == nil { // Should never happen
 			logger.Log.Debugf("Response for unknown subscription resource %v", lineObjectid.String())
@@ -159,6 +160,18 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
 		resource.RetryCount = 0
+	}
+	// Should not happen but see #4691
+	if len(linesToRequest) == 0 {
+		return
+	}
+	for _, notInResponseObjectid := range linesToRequest {
+		resource := subscription.Resource(*notInResponseObjectid)
+		if resource == nil { // Should never happen
+			logger.Log.Debugf("Can't increment RetryCount for unknown subscription resource %v", notInResponseObjectid.String())
+			continue
+		}
+		resource.RetryCount++
 	}
 }
 
