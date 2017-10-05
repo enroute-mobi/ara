@@ -79,11 +79,13 @@ type SIRIGeneralMessageResponse struct {
 
 type SIRIGeneralMessageDelivery struct {
 	RequestMessageRef string
-	Status            bool
-	ErrorType         string
-	ErrorNumber       int
-	ErrorText         string
+
 	ResponseTimestamp time.Time
+
+	Status      bool
+	ErrorType   string
+	ErrorNumber int
+	ErrorText   string
 
 	GeneralMessages []*SIRIGeneralMessage
 }
@@ -136,6 +138,7 @@ const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="
 
 const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 			<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
 			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
 				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
