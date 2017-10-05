@@ -49,10 +49,11 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	logXMLSubscriptionRequest(logStashEvent, request)
 
 	response := siri.SIRISubscriptionResponse{
-		Address:           connector.Partner().Address(),
-		ResponderRef:      connector.SIRIPartner().RequestorRef(),
-		ResponseTimestamp: connector.Clock().Now(),
-		RequestMessageRef: request.MessageIdentifier(),
+		Address:            connector.Partner().Address(),
+		ResponderRef:       connector.SIRIPartner().RequestorRef(),
+		ResponseTimestamp:  connector.Clock().Now(),
+		RequestMessageRef:  request.MessageIdentifier(),
+		ServiceStartedTime: connector.Partner().Referential().StartedAt(),
 	}
 
 	if len(request.XMLSubscriptionGMEntries()) > 0 {
