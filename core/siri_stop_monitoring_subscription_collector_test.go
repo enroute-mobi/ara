@@ -300,15 +300,14 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	}
 }
 
-func Test_logSubscriptionErrorsFromMap(t *testing.T) {
+func Test_LogSubscriptionErrorsFromMap(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 	errors := make(map[string]string)
 	errors["1234"] = "Non existant subscription of id %s"
-	errors["5678"] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 
 	logSubscriptionErrorsFromMap(logStashEvent, errors)
 
-	expected := "Non existant subscription of id 1234, Subscription of id 5678 is not a subscription of kind StopMonitoringCollect"
+	expected := "Non existant subscription of id 1234"
 	if logStashEvent["subscriptionErrors"] != expected {
 		t.Errorf("Wrong log of errors\n got: %v\n want: %v", logStashEvent["subscriptionErrors"], expected)
 	}
