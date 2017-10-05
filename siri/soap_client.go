@@ -19,14 +19,23 @@ type Request interface {
 }
 
 type SOAPClient struct {
-	url string
+	url             string
+	subscriptionUrl string
 }
 
-func NewSOAPClient(url string) *SOAPClient {
-	return &SOAPClient{url: url}
+func NewSOAPClient(url, subscriptionUrl string) *SOAPClient {
+	return &SOAPClient{
+		url:             url,
+		subscriptionUrl: subscriptionUrl,
+	}
 }
+
 func (client *SOAPClient) URL() string {
 	return client.url
+}
+
+func (client *SOAPClient) SubscriptionURL() string {
+	return client.subscriptionUrl
 }
 
 func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string) io.Reader {

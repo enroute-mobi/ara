@@ -41,7 +41,7 @@ func Test_SOAPClient_CheckStatus(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(ts.URL)
+	client := NewSOAPClient(ts.URL, "")
 	request := &SIRICheckStatusRequest{
 		RequestorRef:      "Edwig",
 		RequestTimestamp:  time.Now(),
@@ -93,7 +93,7 @@ func Test_SOAPClient_CheckStatus_GzipResponse(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(ts.URL)
+	client := NewSOAPClient(ts.URL, "")
 	request := &SIRICheckStatusRequest{
 		RequestorRef:      "Edwig",
 		RequestTimestamp:  time.Now(),
@@ -116,7 +116,7 @@ func Test_SOAPClient_StopMonitoring(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(ts.URL)
+	client := NewSOAPClient(ts.URL, "")
 	request := &SIRIGetStopMonitoringRequest{
 		RequestorRef: "Edwig",
 	}

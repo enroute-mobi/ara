@@ -153,7 +153,7 @@ func main() {
 }
 
 func checkStatus(url string, requestorRef string) error {
-	client := siri.NewSOAPClient(url)
+	client := siri.NewSOAPClient(url, "")
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
 		RequestTimestamp:  model.DefaultClock().Now(),
