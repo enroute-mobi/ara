@@ -42,12 +42,12 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
 		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>
 	</SubscriptionRequestInfo>
-	<Request version="2.0:FR-IDF-2.4">{{ range .Entries }}
+	<Request>{{ range .Entries }}
 		<GeneralMessageSubscriptionRequest>
 			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
-			<siri:SubscriptionRef>{{.SubscriptionIdentifier}}</siri:SubscriptionRef>
+			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
 			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
-			<siri:GeneralMessageRequest>
+			<siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
 				{{ .BuildGeneralMessageRequestXML }}
 			</siri:GeneralMessageRequest>
 		</GeneralMessageSubscriptionRequest>{{ end }}
@@ -76,7 +76,7 @@ func (request *XMLGeneralMessageSubscriptionRequestEntry) SubscriberRef() string
 
 func (request *XMLGeneralMessageSubscriptionRequestEntry) SubscriptionIdentifier() string {
 	if request.subscriptionIdentifier == "" {
-		request.subscriptionIdentifier = request.findStringChildContent("SubscriptionRef")
+		request.subscriptionIdentifier = request.findStringChildContent("SubscriptionIdentifier")
 	}
 	return request.subscriptionIdentifier
 }
