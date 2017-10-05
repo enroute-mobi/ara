@@ -80,7 +80,6 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 
 		if stopArea.NextCollectAt.Before(now) {
 			stopAreaTx := guardian.referential.NewTransaction()
-			defer stopAreaTx.Close()
 
 			transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
 
@@ -89,6 +88,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			transactionnalStopArea.NextCollectAt = now.Add(randNb)
 			transactionnalStopArea.Save()
 			stopAreaTx.Commit()
+			stopAreaTx.Close()
 
 			stopAreaUpdateRequest := &StopAreaUpdateRequest{
 				id:         StopAreaUpdateRequestId(guardian.NewUUID()),
@@ -110,6 +110,15 @@ func (guardian *ModelGuardian) requestSituations() {
 		if !line.CollectGeneralMessages || now.Before(line.CollectedAt().Add(1*time.Minute)) {
 			continue
 		}
+
+		lineTx := guardian.referential.NewTransaction()
+
+		transactionnalLine, _ := lineTx.Model().Lines().Find(line.Id())
+
+		transactionnalLine.Updated(now)
+		transactionnalLine.Save()
+		lineTx.Commit()
+		lineTx.Close()
 
 		situationUpdateRequest := &SituationUpdateRequest{
 			id:        SituationUpdateRequestId(guardian.NewUUID()),
