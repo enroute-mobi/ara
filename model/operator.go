@@ -39,14 +39,39 @@ func (operator *Operator) MarshalJSON() ([]byte, error) {
 	type Alias Operator
 
 	aux := struct {
-		Id OperatorId
+		Id        OperatorId
+		ObjectIDs ObjectIDs `json:",omitempty"`
 		*Alias
 	}{
 		Id:    operator.id,
 		Alias: (*Alias)(operator),
 	}
 
+	if !operator.ObjectIDs().Empty() {
+		aux.ObjectIDs = operator.ObjectIDs()
+	}
+
 	return json.Marshal(&aux)
+}
+
+func (operator *Operator) UnmarshalJSON(data []byte) error {
+	type Alias Operator
+	aux := &struct {
+		ObjectIDs map[string]string
+		*Alias
+	}{
+		Alias: (*Alias)(operator),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.ObjectIDs != nil {
+		operator.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	}
+
+	return nil
 }
 
 type MemoryOperators struct {
