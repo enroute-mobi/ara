@@ -38,6 +38,12 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		return
 	}
 
+	if event.StopAreaMonitoredEvent != nil {
+		logger.Log.Debugf("StopArea %v monitored %v", event.StopAreaId, event.StopAreaMonitoredEvent.Monitored)
+		manager.UpdateNotMonitoredStopArea(event)
+		return
+	}
+
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
@@ -50,6 +56,30 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	for _, stopVisitNotCollectedEvent := range event.StopVisitNotCollectedEvents {
 		manager.UpdateNotCollectedStopVisit(stopVisitNotCollectedEvent)
 	}
+}
+
+func (manager *StopAreaUpdateManager) UpdateNotMonitoredStopArea(event *StopAreaUpdateEvent) {
+	// Should never happen, but don't want to ever have a go nil pointer exception
+	if event.StopAreaMonitoredEvent == nil {
+		return
+	}
+
+	tx := manager.transactionProvider.NewTransaction()
+	defer tx.Close()
+
+	stopAreas := tx.Model().StopAreas().FindFamily(event.StopAreaId)
+
+	for _, id := range stopAreas {
+		stopArea, ok := tx.Model().StopAreas().Find(id)
+		if !ok { // Should never happen
+			logger.Log.Debugf("Can't find StopArea %v in SAUpdateManager after a FindFamily", id)
+			continue
+		}
+		stopArea.Monitored = event.StopAreaMonitoredEvent.Monitored
+		stopArea.Save()
+	}
+
+	tx.Commit()
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {

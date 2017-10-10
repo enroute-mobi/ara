@@ -24,7 +24,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "internal"
 	partners.Save(partner)
 
-	foundPartner := collectManager.(*CollectManager).bestPartner(NewStopAreaUpdateRequest(stopArea.Id()))
+	foundPartner := collectManager.(*CollectManager).bestPartner(stopArea)
 
 	if foundPartner != partner {
 		t.Errorf("collectManager.bestPartner should return correct partner:\n got: %v\n want: %v", foundPartner, partner)
@@ -100,5 +100,44 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_ARRIVED {
 		t.Errorf("Wrong ArrivalStatus stopVisit should have been updated\n expected: %v\n got: %v", model.STOP_VISIT_ARRIVAL_ARRIVED, updatedStopVisit.ArrivalStatus)
+	}
+}
+
+func Test_CollectManager_StopAreaMonitored(t *testing.T) {
+	// logger.Log.Debug = true
+	// defer func() { logger.Log.Debug = false }()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	referentials.Save(referential)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Monitored = true
+	stopArea.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea.Save()
+
+	stopAreaUpdateRequest := &StopAreaUpdateRequest{
+		id:         StopAreaUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
+		stopAreaId: stopArea.Id(),
+		createdAt:  referential.Clock().Now(),
+	}
+	referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+
+	updatedStopArea, _ := referential.Model().StopAreas().Find(stopArea.Id())
+	if updatedStopArea.Monitored {
+		t.Errorf("StopArea Monitored should be false after CollectManager UpdateStopArea")
+	}
+
+	partner := referential.Partners().New("partner")
+	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
+	partner.RefreshConnectors()
+	partner.Settings["remote_objectid_kind"] = "test"
+	partner.PartnerStatus = PartnerStatus{OperationnalStatus: OPERATIONNAL_STATUS_UP}
+	referential.Partners().Save(partner)
+
+	referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+	updatedStopArea, _ = referential.Model().StopAreas().Find(stopArea.Id())
+	if !updatedStopArea.Monitored {
+		t.Errorf("StopArea Monitored should be true after CollectManager UpdateStopArea")
 	}
 }

@@ -19,6 +19,8 @@ type CollectManagerInterface interface {
 }
 
 type CollectManager struct {
+	model.UUIDConsumer
+
 	StopAreaUpdateSubscribers  []StopAreaUpdateSubscriber
 	SituationUpdateSubscribers []SituationUpdateSubscriber
 	referential                *Referential
@@ -81,20 +83,31 @@ func (manager *CollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAre
 }
 
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
-	partner := manager.bestPartner(request)
-	if partner == nil {
-		logger.Log.Debugf("Can't find a partner for StopArea %v", request.StopAreaId())
-		return
-	}
-	manager.requestStopAreaUpdate(partner, request)
-}
-
-func (manager *CollectManager) bestPartner(request *StopAreaUpdateRequest) *Partner {
 	stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
-		return nil
+		logger.Log.Debugf("Can't find StopArea %v in Collect Manager", request.StopAreaId())
+		return
 	}
+	partner := manager.bestPartner(stopArea)
+	if partner != nil {
+		// Check if StopArea is not monitored to send an event
+		if !stopArea.Monitored {
+			stopAreaUpdateEvent := model.NewStopAreaMonitoredEvent(manager.NewUUID(), stopArea.Id(), true)
+			manager.BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+		}
+		manager.requestStopAreaUpdate(partner, request)
+		return
+	}
+	logger.Log.Debugf("Can't find a partner for StopArea %v in Collect Manager", request.StopAreaId())
+	// Do nothing if StopArea is already not monitored
+	if !stopArea.Monitored {
+		return
+	}
+	stopAreaUpdateEvent := model.NewStopAreaMonitoredEvent(manager.NewUUID(), stopArea.Id(), false)
+	manager.BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
+}
 
+func (manager *CollectManager) bestPartner(stopArea model.StopArea) *Partner {
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue

@@ -27,6 +27,8 @@ type StopArea struct {
 	CollectedUntil  time.Time
 	CollectedAlways bool
 
+	Monitored bool
+
 	Name            string
 	LineIds         StopAreaLineIds `json:"Lines,omitempty"`
 	CollectChildren bool
@@ -100,6 +102,26 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
+func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
+	type Alias StopArea
+	aux := &struct {
+		ObjectIDs map[string]string
+		*Alias
+	}{
+		Alias: (*Alias)(stopArea),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.ObjectIDs != nil {
+		stopArea.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	}
+
+	return nil
+}
+
 func (stopArea *StopArea) Attribute(key string) (string, bool) {
 	value, present := stopArea.Attributes[key]
 	return value, present
@@ -122,26 +144,6 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 
 func (stopArea *StopArea) Parent() (StopArea, bool) {
 	return stopArea.model.StopAreas().Find(stopArea.ParentId)
-}
-
-func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
-	type Alias StopArea
-	aux := &struct {
-		ObjectIDs map[string]string
-		*Alias
-	}{
-		Alias: (*Alias)(stopArea),
-	}
-	err := json.Unmarshal(data, aux)
-	if err != nil {
-		return err
-	}
-
-	if aux.ObjectIDs != nil {
-		stopArea.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
-	}
-
-	return nil
 }
 
 func (stopArea *StopArea) Save() (ok bool) {
