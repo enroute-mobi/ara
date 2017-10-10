@@ -130,6 +130,7 @@ func (updater *StopVisitUpdater) Update() {
 
 	// Fill StopArea.LineIds
 	foundStopArea.LineIds.Add(foundLine.Id())
+	foundStopArea.Save()
 
 	foundVehicleJourney := updater.findOrCreateVehicleJourney(updater.event.Attributes.VehicleJourneyAttributes())
 

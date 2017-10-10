@@ -3,10 +3,9 @@ package model
 type StopAreaLineIds []LineId
 
 func (ids *StopAreaLineIds) Add(id LineId) {
-	if ids.Contains(id) {
-		return
+	if !ids.Contains(id) {
+		*ids = append(*ids, id)
 	}
-	*ids = append(*ids, id)
 }
 
 func (ids StopAreaLineIds) Contains(id LineId) bool {
