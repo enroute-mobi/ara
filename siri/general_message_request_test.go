@@ -17,7 +17,7 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
 		<siri:MessageIdentifier>MessageId</siri:MessageIdentifier>
 		<siri:Extensions>
 			<sws:IDFGeneralMessageRequestFilter>
-				<sws:LineRef>lineRef</sws:LineRef>
+				<siri:LineRef>lineRef</siri:LineRef>
 			</sws:IDFGeneralMessageRequestFilter>
 		</siri:Extensions>
 	</Request>

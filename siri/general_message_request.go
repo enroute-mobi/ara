@@ -72,12 +72,12 @@ const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimesta
 		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}
 		<siri:Extensions>
 			<sws:IDFGeneralMessageRequestFilter>{{ range .LineRef }}
-				<sws:LineRef>{{ . }}</sws:LineRef>{{ end }}{{ range .StopPointRef }}
-				<sws:StopPointRef>{{ . }}</sws:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
-				<sws:JourneyPatternRef>{{ . }}</sws:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
-				<sws:DestinationRef>{{ . }}</sws:DestinationRef>{{ end }}{{ range .RouteRef }}
-				<sws:RouteRef>{{ . }}</sws:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
-				<sws:GroupOfLinesRef>{{ . }}</sws:GroupOfLinesRef>{{ end }}
+				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .StopPointRef }}
+				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
+				<siri:JourneyPatternRef>{{ . }}</siri:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
+				<siri:DestinationRef>{{ . }}</siri:DestinationRef>{{ end }}{{ range .RouteRef }}
+				<siri:RouteRef>{{ . }}</siri:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
+				<siri:GroupOfLinesRef>{{ . }}</siri:GroupOfLinesRef>{{ end }}
 			</sws:IDFGeneralMessageRequestFilter>
 		</siri:Extensions>`
 
