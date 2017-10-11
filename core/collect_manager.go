@@ -92,6 +92,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	if partner != nil {
 		// Check if StopArea is not monitored to send an event
 		if !stopArea.Monitored {
+			logger.Log.Debugf("Found a partner for StopArea %v in Collect Manager", request.StopAreaId())
 			stopAreaUpdateEvent := model.NewStopAreaMonitoredEvent(manager.NewUUID(), stopArea.Id(), true)
 			manager.BroadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 		}

@@ -104,6 +104,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	objectid := model.NewObjectID("objectidKind", "boaarle")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(objectid)
+	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.model.Lines().New()

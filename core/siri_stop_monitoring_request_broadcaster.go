@@ -57,6 +57,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		ResponseTimestamp: connector.Clock().Now(),
 		MonitoringRef:     request.MonitoringRef(),
 	}
+	if !stopArea.Monitored {
+		delivery.Status = false
+		delivery.ErrorType = "OtherError"
+		delivery.ErrorNumber = 1
+		delivery.ErrorText = "Erreur [PRODUCER_UNAVAILABLE]"
+	}
 
 	// Prepare StopVisit Selectors
 	selectors := []model.StopVisitSelector{}

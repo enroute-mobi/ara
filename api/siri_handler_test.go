@@ -208,6 +208,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("objectidKind", "objectidValue")
 	stopArea.SetObjectID(objectid)
+	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.Model().Lines().New()
@@ -249,7 +250,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	}
 
 	if len(response.XMLMonitoredStopVisits()) != 2 {
-		t.Errorf("Past StopVisit should be ignored")
+		t.Fatalf("Past StopVisit should be ignored, got %v stopVisits", len(response.XMLMonitoredStopVisits()))
 	}
 
 	if !response.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(response.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {
@@ -297,6 +298,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("objectidKind", "stopArea1")
 	stopArea.SetObjectID(objectid)
+	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.Model().Lines().New()
@@ -332,6 +334,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	stopArea2 := referential.Model().StopAreas().New()
 	objectid2 := model.NewObjectID("objectidKind", "stopArea2")
 	stopArea2.SetObjectID(objectid2)
+	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line2 := referential.Model().Lines().New()

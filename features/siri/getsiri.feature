@@ -10,6 +10,7 @@ Feature: Support SIRI GetSIRI
     And a StopArea exists with the following attributes:
       | Name      | Test 1                |
       | ObjectIDs | "internal": "boaarle" |
+      | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 415                       |
       | ObjectIDs | "internal": "CdF:Line::415:LOC" |
@@ -35,6 +36,7 @@ Feature: Support SIRI GetSIRI
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
       | ObjectIDs | "internal": "cladebr" |
+      | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 475                       |
       | ObjectIDs | "internal": "CdF:Line::475:LOC" |
@@ -188,6 +190,7 @@ Feature: Support SIRI GetSIRI
     And a StopArea exists with the following attributes:
       | Name      | Test 1                |
       | ObjectIDs | "internal": "boaarle" |
+      | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 415                       |
       | ObjectIDs | "internal": "CdF:Line::415:LOC" |

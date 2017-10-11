@@ -11,6 +11,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -157,6 +158,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -281,6 +283,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -433,6 +436,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:4:LOC" |
       | Name      | Ligne 4 Metro                   |
@@ -565,6 +569,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -700,6 +705,7 @@ Feature: Support SIRI StopMonitoring by request
         And a StopArea exists with the following attributes:
           | Name      | Test                                     |
           | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+          | Monitored | true                                     |
         And a Line exists with the following attributes:
           | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
           | Name      | Ligne 3 Metro                   |

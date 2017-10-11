@@ -189,7 +189,7 @@ const stopMonitoringDeliveryTemplate = `<siri:StopMonitoringDelivery version="2.
 				<siri:{{.ErrorType}}>{{ end }}
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
-			</siri:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
+			</siri:ErrorCondition>{{ end }}{{ if or .Status (eq .ErrorType "OtherError") }}{{ range .MonitoredStopVisits }}
 			{{ .BuildMonitoredStopVisitXML }}{{ end }}{{ end }}
 		</siri:StopMonitoringDelivery>`
 
