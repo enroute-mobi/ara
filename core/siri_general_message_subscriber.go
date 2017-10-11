@@ -90,7 +90,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	linesToRequest := make(map[string]*model.ObjectID)
 	for _, resource := range subscription.ResourcesByObjectID() {
-		if resource.SubscribedAt.IsZero() {
+		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
 			messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 			linesToRequest[messageIdentifier] = resource.Reference.ObjectId
 		}
