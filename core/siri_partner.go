@@ -21,11 +21,14 @@ func NewSIRIPartner(partner *Partner) *SIRIPartner {
 }
 
 func (siriPartner *SIRIPartner) SOAPClient() *siri.SOAPClient {
-	if siriPartner.soapClient == nil || siriPartner.soapClient.URL() != siriPartner.partner.Setting("remote_url") || siriPartner.soapClient.SubscriptionURL() != siriPartner.partner.Setting("subscription.remote_url") {
-		siriUrl := siriPartner.partner.Setting("remote_url")
-		siriSubscriptionUrl := siriPartner.partner.Setting("subscription.remote_url")
-		logger.Log.Debugf("Create SIRI SOAPClient to %s", siriUrl)
-		siriPartner.soapClient = siri.NewSOAPClient(siriUrl, siriSubscriptionUrl)
+	urls := siri.SOAPClientUrls{
+		Url:              siriPartner.partner.Setting("remote_url"),
+		SubscriptionsUrl: siriPartner.partner.Setting("subscriptions.remote_url"),
+		NotificationsUrl: siriPartner.partner.Setting("notifications.remote_url"),
+	}
+	if siriPartner.soapClient == nil || siriPartner.soapClient.SOAPClientUrls != urls {
+		logger.Log.Debugf("Create SIRI SOAPClient to %s", urls.Url)
+		siriPartner.soapClient = siri.NewSOAPClient(urls)
 	}
 	return siriPartner.soapClient
 }

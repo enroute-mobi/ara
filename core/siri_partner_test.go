@@ -4,12 +4,25 @@ import "testing"
 
 func Test_SIRIPartner_SOAPClient(t *testing.T) {
 	partner := &Partner{
-		slug: "partner",
+		slug:     "partner",
+		Settings: make(map[string]string),
 	}
 	siriPartner := NewSIRIPartner(partner)
 	siriPartner.SOAPClient()
 	if siriPartner.soapClient == nil {
 		t.Error("siriPartner.SOAPClient() should set SIRIPartner soapClient")
+	}
+
+	partner.Settings["remote_url"] = "remote_url"
+	siriPartner.SOAPClient()
+	if siriPartner.soapClient.Url != "remote_url" {
+		t.Error("SIRIPartner should have created a new SoapClient when partner setting changes")
+	}
+
+	partner.Settings["subscriptions.remote_url"] = "sub_remote_url"
+	siriPartner.SOAPClient()
+	if siriPartner.soapClient.SubscriptionsUrl != "sub_remote_url" {
+		t.Error("SIRIPartner should have created a new SoapClient when partner setting changes")
 	}
 }
 

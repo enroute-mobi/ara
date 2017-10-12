@@ -14,28 +14,37 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
+type requestType int
+
+const (
+	DEFAULT requestType = iota
+	SUBSCRIPTION
+	NOTIFICATION
+)
+
 type Request interface {
 	BuildXML() (string, error)
 }
 
 type SOAPClient struct {
-	url             string
-	subscriptionUrl string
+	SOAPClientUrls
 }
 
-func NewSOAPClient(url, subscriptionUrl string) *SOAPClient {
-	return &SOAPClient{
-		url:             url,
-		subscriptionUrl: subscriptionUrl,
-	}
+type SOAPClientUrls struct {
+	Url              string
+	SubscriptionsUrl string
+	NotificationsUrl string
 }
 
-func (client *SOAPClient) URL() string {
-	return client.url
+type soapClientArguments struct {
+	request          Request
+	requestType      requestType
+	expectedResponse string
+	acceptGzip       bool
 }
 
-func (client *SOAPClient) SubscriptionURL() string {
-	return client.subscriptionUrl
+func NewSOAPClient(urls SOAPClientUrls) *SOAPClient {
+	return &SOAPClient{SOAPClientUrls: urls}
 }
 
 func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
@@ -50,10 +59,10 @@ func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string)
 	return body
 }
 
-func (client *SOAPClient) prepareAndSendRequest(request Request, resource string, acceptGzip bool) (xml.Node, error) {
+func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.Node, error) {
 	// Wrap the request XML
 	soapEnvelope := NewSOAPEnvelopeBuffer()
-	xml, err := request.BuildXML()
+	xml, err := args.request.BuildXML()
 	if err != nil {
 		return nil, err
 	}
@@ -62,11 +71,11 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 
 	soapEnvelope.WriteXML(xml)
 	// Create http request
-	httpRequest, err := http.NewRequest("POST", client.url, soapEnvelope)
+	httpRequest, err := http.NewRequest("POST", client.getURL(args.requestType), soapEnvelope)
 	if err != nil {
 		return nil, err
 	}
-	if acceptGzip {
+	if args.acceptGzip {
 		httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
@@ -80,6 +89,11 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 	}
 	defer response.Body.Close()
 
+	// Do nothing if request is a notification
+	if args.requestType == NOTIFICATION {
+		return nil, nil
+	}
+
 	// Check response status
 	if response.StatusCode != http.StatusOK {
 		return nil, NewSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
@@ -91,7 +105,7 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 
 	// Check if response is gzip
 	var responseReader io.Reader
-	if acceptGzip && response.Header.Get("Content-Encoding") == "gzip" {
+	if args.acceptGzip && response.Header.Get("Content-Encoding") == "gzip" {
 		gzipReader, err := gzip.NewReader(response.Body)
 		if err != nil {
 			return nil, err
@@ -107,14 +121,32 @@ func (client *SOAPClient) prepareAndSendRequest(request Request, resource string
 	if err != nil {
 		return nil, err
 	}
-	if envelope.BodyType() != resource {
+	if envelope.BodyType() != args.expectedResponse {
 		return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 	}
 	return envelope.Body(), nil
 }
 
+func (client *SOAPClient) getURL(requestType requestType) string {
+	switch requestType {
+	case SUBSCRIPTION:
+		if client.SubscriptionsUrl != "" {
+			return client.SubscriptionsUrl
+		}
+	case NOTIFICATION:
+		if client.NotificationsUrl != "" {
+			return client.NotificationsUrl
+		}
+	}
+	return client.Url
+}
+
 func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLCheckStatusResponse, error) {
-	node, err := client.prepareAndSendRequest(request, "CheckStatusResponse", true)
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		expectedResponse: "CheckStatusResponse",
+		acceptGzip:       true,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +156,10 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 }
 
 func (client *SOAPClient) StopMonitoring(request *SIRIGetStopMonitoringRequest) (*XMLStopMonitoringResponse, error) {
-	// WIP
-	node, err := client.prepareAndSendRequest(request, "GetStopMonitoringResponse", false)
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		expectedResponse: "GetStopMonitoringResponse",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -134,29 +168,11 @@ func (client *SOAPClient) StopMonitoring(request *SIRIGetStopMonitoringRequest) 
 	return stopMonitoring, nil
 }
 
-// WIP
-func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoringSubscriptionRequest) (*XMLSubscriptionResponse, error) {
-
-	node, err := client.prepareAndSendRequest(request, "SubscribeResponse", false)
-	if err != nil {
-		return nil, err
-	}
-	response := NewXMLSubscriptionResponse(node)
-	return response, nil
-}
-
-func (client *SOAPClient) GeneralMessageSubscription(request *SIRIGeneralMessageSubscriptionRequest) (*XMLSubscriptionResponse, error) {
-	node, err := client.prepareAndSendRequest(request, "SubscribeResponse", false)
-	if err != nil {
-		return nil, err
-	}
-	response := NewXMLSubscriptionResponse(node)
-	return response, nil
-}
-
 func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequest) (*XMLGeneralMessageResponse, error) {
-	// WIP
-	node, err := client.prepareAndSendRequest(request, "GetGeneralMessageResponse", false)
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		expectedResponse: "GetGeneralMessageResponse",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +181,38 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequ
 	return generalMessage, nil
 }
 
+func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoringSubscriptionRequest) (*XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		requestType:      SUBSCRIPTION,
+		expectedResponse: "SubscribeResponse",
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
+func (client *SOAPClient) GeneralMessageSubscription(request *SIRIGeneralMessageSubscriptionRequest) (*XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		requestType:      SUBSCRIPTION,
+		expectedResponse: "SubscribeResponse",
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
 func (client *SOAPClient) DeleteSubscription(request *SIRIDeleteSubscriptionRequest) (*XMLDeleteSubscriptionResponse, error) {
-	// WIP
-	node, err := client.prepareAndSendRequest(request, "DeleteSubscriptionResponse", false)
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		requestType:      SUBSCRIPTION,
+		expectedResponse: "DeleteSubscriptionResponse",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +222,10 @@ func (client *SOAPClient) DeleteSubscription(request *SIRIDeleteSubscriptionRequ
 }
 
 func (client *SOAPClient) NotifyStopMonitoring(request *SIRINotifyStopMonitoring) error {
-	_, err := client.prepareAndSendRequest(request, "NotifyStopMonitoring", false)
+	_, err := client.prepareAndSendRequest(soapClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
 	if err != nil {
 		return err
 	}
@@ -185,7 +233,10 @@ func (client *SOAPClient) NotifyStopMonitoring(request *SIRINotifyStopMonitoring
 }
 
 func (client *SOAPClient) NotifyGeneralMessage(request *SIRINotifyGeneralMessage) error {
-	_, err := client.prepareAndSendRequest(request, "NotifyGeneralMessage", false)
+	_, err := client.prepareAndSendRequest(soapClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
 	if err != nil {
 		return err
 	}
@@ -193,7 +244,10 @@ func (client *SOAPClient) NotifyGeneralMessage(request *SIRINotifyGeneralMessage
 }
 
 func (client *SOAPClient) NotifyEstimatedTimeTable(request *SIRINotifyEstimatedTimeTable) error {
-	_, err := client.prepareAndSendRequest(request, "NotifyEstimatedTimeTable", false)
+	_, err := client.prepareAndSendRequest(soapClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
 	if err != nil {
 		return err
 	}
