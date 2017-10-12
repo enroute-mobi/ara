@@ -32,6 +32,11 @@ type FakeStopMonitoringSubscriber struct {
 	SMSubscriber
 }
 
+type saToRequest struct {
+	subId SubscriptionId
+	saId  model.ObjectID
+}
+
 func NewFakeStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCollector) SIRIStopMonitoringSubscriber {
 	subscriber := &FakeStopMonitoringSubscriber{}
 	subscriber.connector = connector
@@ -81,14 +86,25 @@ func (subscriber *StopMonitoringSubscriber) Stop() {
 }
 
 func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
-	subscription, _ := subscriber.connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind("StopMonitoringCollect")
+	if len(subscriptions) == 0 {
+		logger.Log.Debugf("StopMonitoringSubscriber visit without StopMonitoringCollect subscriptions")
+		return
+	}
+
+	// MonitoringRef for Logstash
 	monitoringRefList := []string{}
 
-	stopAreasToRequest := make(map[string]*model.ObjectID)
-	for _, resource := range subscription.ResourcesByObjectID() {
-		if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-			messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
-			stopAreasToRequest[messageIdentifier] = resource.Reference.ObjectId
+	stopAreasToRequest := make(map[string]*saToRequest)
+	for _, subscription := range subscriptions {
+		for _, resource := range subscription.ResourcesByObjectID() {
+			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
+				messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+				stopAreasToRequest[messageIdentifier] = &saToRequest{
+					subId: subscription.id,
+					saId:  *(resource.Reference.ObjectId),
+				}
+			}
 		}
 	}
 
@@ -106,17 +122,17 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
-	for messageIdentifier, stopAreaObjectid := range stopAreasToRequest {
+	for messageIdentifier, requestedSa := range stopAreasToRequest {
 		entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
 			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
-			SubscriptionIdentifier: string(subscription.Id()),
+			SubscriptionIdentifier: string(requestedSa.subId),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
 		entry.MessageIdentifier = messageIdentifier
 		entry.RequestTimestamp = subscriber.Clock().Now()
-		entry.MonitoringRef = stopAreaObjectid.Value()
+		entry.MonitoringRef = requestedSa.saId.Value()
 
-		monitoringRefList = append(monitoringRefList, stopAreaObjectid.Value())
+		monitoringRefList = append(monitoringRefList, entry.MonitoringRef)
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 	}
 
@@ -128,29 +144,33 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		logStashEvent["status"] = "false"
 		logStashEvent["response"] = fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
-		for _, stopAreaObjectid := range stopAreasToRequest {
-			resource := subscription.Resource(*stopAreaObjectid)
-			resource.RetryCount++
-		}
+		subscriber.incrementRetryCountFromMap(stopAreasToRequest)
 		return
 	}
 
 	logStashEvent["response"] = response.RawXML()
 
 	for _, responseStatus := range response.ResponseStatus() {
-		stopAreaObjectid, ok := stopAreasToRequest[responseStatus.RequestMessageRef()]
+		requestedSa, ok := stopAreasToRequest[responseStatus.RequestMessageRef()]
 		if !ok {
 			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
 			continue
 		}
 		delete(stopAreasToRequest, responseStatus.RequestMessageRef()) // See #4691
-		resource := subscription.Resource(*stopAreaObjectid)
-		if resource == nil { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription resource %v", stopAreaObjectid.String())
+
+		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedSa.subId)
+		if !ok { // Should never happen
+			logger.Log.Debugf("Response for unknown subscription %v", requestedSa.subId)
 			continue
 		}
+		resource := subscription.Resource(requestedSa.saId)
+		if resource == nil { // Should never happen
+			logger.Log.Debugf("Response for unknown subscription resource %v", requestedSa.saId.String())
+			continue
+		}
+
 		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", stopAreaObjectid.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", requestedSa.saId.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
 			resource.RetryCount++
 			continue
 		}
@@ -161,18 +181,25 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	if len(stopAreasToRequest) == 0 {
 		return
 	}
-	for _, notInResponseObjectid := range stopAreasToRequest {
-		resource := subscription.Resource(*notInResponseObjectid)
+	subscriber.incrementRetryCountFromMap(stopAreasToRequest)
+}
+
+func (subscriber *SMSubscriber) incrementRetryCountFromMap(stopAreasToRequest map[string]*saToRequest) {
+	for _, requestedSa := range stopAreasToRequest {
+		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedSa.subId)
+		if !ok { // Should never happen
+			continue
+		}
+		resource := subscription.Resource(requestedSa.saId)
 		if resource == nil { // Should never happen
-			logger.Log.Debugf("Can't increment RetryCount for unknown subscription resource %v", notInResponseObjectid.String())
 			continue
 		}
 		resource.RetryCount++
 	}
 }
 
-func (smb *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
-	event := smb.connector.partner.NewLogStashEvent()
+func (subscriber *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
+	event := subscriber.connector.partner.NewLogStashEvent()
 	event["connector"] = "StopMonitoringSubscriptionCollector"
 	return event
 }

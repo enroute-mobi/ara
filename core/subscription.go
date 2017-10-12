@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"strconv"
 	"sync"
 	"time"
 
@@ -168,8 +169,9 @@ type Subscriptions interface {
 	New(kind string) *Subscription
 	Find(id SubscriptionId) (*Subscription, bool)
 	FindAll() []*Subscription
-	FindOrCreateByKind(string) (*Subscription, bool)
+	FindOrCreateByKind(string) *Subscription
 	FindByKind(string) (*Subscription, bool)
+	FindSubscriptionsByKind(string) []*Subscription
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
 	DeleteById(id SubscriptionId)
@@ -210,6 +212,18 @@ func (manager *MemorySubscriptions) FindByKind(kind string) (*Subscription, bool
 	return nil, false
 }
 
+func (manager *MemorySubscriptions) FindSubscriptionsByKind(kind string) (subscriptions []*Subscription) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, subscription := range manager.byIdentifier {
+		if subscription.Kind() == kind {
+			subscriptions = append(subscriptions, subscription)
+		}
+	}
+	return subscriptions
+}
+
 func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscription, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
@@ -228,27 +242,29 @@ func (manager *MemorySubscriptions) FindByRessourceId(id string) (*Subscription,
 
 	for _, subscription := range manager.byIdentifier {
 		_, ok := subscription.resourcesByObjectID[id]
-		if !ok {
-			continue
+		if ok {
+			return subscription, true
 		}
-		return subscription, true
 	}
 	return nil, false
 }
 
-func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) (*Subscription, bool) {
-	manager.mutex.RLock()
+func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
+	maxResource, _ := strconv.Atoi(manager.partner.Setting("subscriptions.maximum_resources"))
+	if maxResource == 1 {
+		return manager.New(kind)
+	}
 
+	manager.mutex.RLock()
 	for _, subscription := range manager.byIdentifier {
-		if subscription.Kind() == kind {
+		if subscription.Kind() == kind && (maxResource < 1 || len(subscription.resourcesByObjectID) < maxResource) {
 			manager.mutex.RUnlock()
-			return subscription, true
+			return subscription
 		}
 	}
 	manager.mutex.RUnlock()
 
-	subscription := manager.New(kind)
-	return subscription, false
+	return manager.New(kind)
 }
 
 func (manager *MemorySubscriptions) Find(id SubscriptionId) (*Subscription, bool) {

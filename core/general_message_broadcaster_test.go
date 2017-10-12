@@ -93,7 +93,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "Situation",
 	}
 
-	subscription, _ := partner.Subscriptions().FindOrCreateByKind("situation")
+	subscription := partner.Subscriptions().FindOrCreateByKind("situation")
 	subscription.CreateAddNewResource(reference)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...

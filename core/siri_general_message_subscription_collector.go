@@ -78,24 +78,29 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		return
 	}
 
-	subscription, _ := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
-
-	// Check if we find the resource
-	resource := subscription.Resource(lineObjectid)
-	if resource != nil {
+	// Try to find a Subscription with the resource
+	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String())
+	if ok {
+		// If we find the subscription, we add time to the resource SubscribedUntil if the subscription is active
+		resource := subscription.Resource(lineObjectid)
+		if resource == nil { // Should never happen
+			logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByRessourceId")
+			return
+		}
 		if !resource.SubscribedAt.IsZero() {
 			resource.SubscribedUntil = resource.SubscribedUntil.Add(1 * time.Minute)
 		}
 		return
 	}
 
-	// Else we create a new resource
+	// Else we find or create a subscription to add the resource
+	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 	ref := model.Reference{
 		ObjectId: &lineObjectid,
 		Type:     "Line",
 	}
 
-	subscription.CreateAddNewResource(ref)
+	newSubscription.CreateAddNewResource(ref)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {

@@ -82,7 +82,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 		Type: "StopArea",
 	}
 
-	subscription, _ := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.CreateAddNewResource(ref)
 	subscription.Save()
 
