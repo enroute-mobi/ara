@@ -76,6 +76,7 @@ func Test_SIRIStopMonitoringRequest_BuildXML(t *testing.T) {
 	request.MessageIdentifier = "test"
 	request.MonitoringRef = "test"
 	request.RequestTimestamp = date
+	request.StopVisitTypes = "all"
 
 	xml, err := request.BuildXML()
 	if err != nil {

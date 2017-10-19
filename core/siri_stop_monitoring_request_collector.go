@@ -86,6 +86,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
+	siriStopMonitoringRequest.StopVisitTypes = "all"
 
 	logSIRIStopMonitoringRequest(logStashEvent, siriStopMonitoringRequest)
 

@@ -40,6 +40,7 @@ type SIRIGetStopMonitoringRequest struct {
 type SIRIStopMonitoringRequest struct {
 	MessageIdentifier string
 	MonitoringRef     string
+	StopVisitTypes    string
 
 	RequestTimestamp time.Time
 }
@@ -58,8 +59,8 @@ const getStopMonitoringRequestTemplate = `<sw:GetStopMonitoring xmlns:sw="http:/
 
 const stopMonitoringRequestTemplate = `<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>
-		<siri:StopVisitTypes>all</siri:StopVisitTypes>`
+		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>{{ if .StopVisitTypes }}
+		<siri:StopVisitTypes>{{.StopVisitTypes}}</siri:StopVisitTypes>{{ end }}`
 
 func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {
 	xmlStopMonitoringRequest := &XMLGetStopMonitoring{}
