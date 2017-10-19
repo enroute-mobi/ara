@@ -513,6 +513,10 @@ func (partner *Partner) CancelSubscriptions() {
 	partner.subscriptionManager.CancelSubscriptions()
 }
 
+func (partner *Partner) CancelBroadcastSubscriptions() {
+	partner.subscriptionManager.CancelBroadcastSubscriptions()
+}
+
 func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
 	logStashEvent := make(audit.LogStashEvent)
 	logStashEvent["referential"] = string(partner.manager.Referential().Slug())

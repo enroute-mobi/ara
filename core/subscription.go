@@ -172,10 +172,12 @@ type Subscriptions interface {
 	FindOrCreateByKind(string) *Subscription
 	FindByKind(string) (*Subscription, bool)
 	FindSubscriptionsByKind(string) []*Subscription
+	FindBroadcastSubscriptions() []*Subscription
 	Save(Subscription *Subscription) bool
 	Delete(Subscription *Subscription) bool
 	DeleteById(id SubscriptionId)
 	CancelSubscriptions()
+	CancelBroadcastSubscriptions()
 	FindByRessourceId(id string) (*Subscription, bool)
 	FindByExternalId(externalId string) (*Subscription, bool)
 }
@@ -218,6 +220,18 @@ func (manager *MemorySubscriptions) FindSubscriptionsByKind(kind string) (subscr
 
 	for _, subscription := range manager.byIdentifier {
 		if subscription.Kind() == kind {
+			subscriptions = append(subscriptions, subscription)
+		}
+	}
+	return subscriptions
+}
+
+func (manager *MemorySubscriptions) FindBroadcastSubscriptions() (subscriptions []*Subscription) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, subscription := range manager.byIdentifier {
+		if subscription.externalId != "" {
 			subscriptions = append(subscriptions, subscription)
 		}
 	}
@@ -328,5 +342,16 @@ func (manager *MemorySubscriptions) CancelSubscriptions() {
 
 	for id := range manager.byIdentifier {
 		delete(manager.byIdentifier, id)
+	}
+}
+
+func (manager *MemorySubscriptions) CancelBroadcastSubscriptions() {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	for id, subscription := range manager.byIdentifier {
+		if subscription.externalId != "" {
+			delete(manager.byIdentifier, id)
+		}
 	}
 }

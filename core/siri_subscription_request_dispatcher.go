@@ -116,7 +116,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	}()
 
 	if r.CancelAll() {
-		for _, subscription := range connector.Partner().Subscriptions().FindAll() {
+		for _, subscription := range connector.Partner().Subscriptions().FindBroadcastSubscriptions() {
 			responseStatus := &siri.SIRITerminationResponseStatus{
 				SubscriberRef:     r.RequestorRef(),
 				SubscriptionRef:   subscription.ExternalId(),
@@ -125,7 +125,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 			}
 			resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
 		}
-		connector.Partner().CancelSubscriptions()
+		connector.Partner().CancelBroadcastSubscriptions()
 		return resp
 	}
 
