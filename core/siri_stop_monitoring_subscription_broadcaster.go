@@ -136,14 +136,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-	sms := request.XMLSubscriptionSMEntries()
-
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	resps := []siri.SIRIResponseStatus{}
 
-	for _, sm := range sms {
+	for _, sm := range request.XMLSubscriptionSMEntries() {
 		logStashEvent := connector.newLogStashEvent()
 		logXMLStopMonitoringSubscriptionEntry(logStashEvent, sm)
 
@@ -191,22 +189,17 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-		connector.AddStopAreaStopVisits(sa, sub, r)
+		connector.addStopAreaStopVisits(sa, sub, r)
 	}
 
 	return resps
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) AddStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	svs := tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id())
-	for _, sv := range svs {
-		_, ok := sv.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
-		if !ok {
-			continue
-		}
+	for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
 		smlc := &stopMonitoringLastChange{}
 		smlc.InitState(&sv, sub)
 		res.LastStates[string(sv.Id())] = smlc
