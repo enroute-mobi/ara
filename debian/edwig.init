@@ -38,7 +38,7 @@ start_daemon() {
 migrate() {
     if [ -n "$START" -a -n "$DAEMON_USER" -a -n "$MIGRATE_OPTS" ] ; then
         log_begin_msg "Migrate $DESC"
-        su $DAEMON_USER -c "$DAEMON $MIGRATE_OPTS"
+        su $DAEMON_USER -s /bin/sh -c "$DAEMON $MIGRATE_OPTS"
         if [ $? != 0 ]; then
             log_failure_msg "database migration failed"
         fi
