@@ -43,14 +43,14 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>
 	</SubscriptionRequestInfo>
 	<Request>{{ range .Entries }}
-		<GeneralMessageSubscriptionRequest>
+		<siri:GeneralMessageSubscriptionRequest>
 			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
 			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
 			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
 			<siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
 				{{ .BuildGeneralMessageRequestXML }}
 			</siri:GeneralMessageRequest>
-		</GeneralMessageSubscriptionRequest>{{ end }}
+		</siri:GeneralMessageSubscriptionRequest>{{ end }}
 	</Request>
 	<RequestExtension/>
 </sw:Subscribe>`
