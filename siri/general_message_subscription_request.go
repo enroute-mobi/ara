@@ -39,8 +39,8 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 	<SubscriptionRequestInfo>
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>
+		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
+		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
 	</SubscriptionRequestInfo>
 	<Request>{{ range .Entries }}
 		<siri:GeneralMessageSubscriptionRequest>
