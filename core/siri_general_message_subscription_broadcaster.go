@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strconv"
 	"strings"
 	"sync"
 
@@ -105,17 +106,11 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent, request)
-
-	gms := request.XMLSubscriptionGMEntries()
-
 	resps := []siri.SIRIResponseStatus{}
 
-	for _, gm := range gms {
-		logSIRIGeneralMessageBroadcasterEntries(logStashEvent, gm)
+	for _, gm := range request.XMLSubscriptionGMEntries() {
+		logStashEvent := connector.newLogStashEvent()
+		logXMLGeneralMessageSubscriptionEntry(logStashEvent, gm)
 
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: gm.MessageIdentifier(),
@@ -136,6 +131,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
 			sub.Save()
 		}
+
+		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+
 		resps = append(resps, rs)
 	}
 	return resps
@@ -147,23 +146,36 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() a
 	return event
 }
 
-func logSIRIGeneralMessageBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["type"] = "GeneralMessageSubscriptions"
+func logXMLGeneralMessageSubscriptionEntry(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageSubscriptionRequestEntry) {
+	logStashEvent["type"] = "GeneralMessageSubscriptionEntry"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-
-	xml := request.RawXML()
-	logStashEvent["requestXML"] = xml
+	logStashEvent["infoChannelRef"] = strings.Join(request.InfoChannelRef(), ", ")
+	logStashEvent["groupOfLinesRef"] = strings.Join(request.GroupOfLinesRef(), ", ")
+	logStashEvent["routeRef"] = strings.Join(request.RouteRef(), ", ")
+	logStashEvent["destinationRef"] = strings.Join(request.DestinationRef(), ", ")
+	logStashEvent["journeyPatternRef"] = strings.Join(request.JourneyPatternRef(), ", ")
+	logStashEvent["stopPointRef"] = strings.Join(request.StopPointRef(), ", ")
+	logStashEvent["lineRef"] = strings.Join(request.LineRef(), ", ")
+	logStashEvent["subscriberRef"] = request.SubscriberRef()
+	logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier()
+	logStashEvent["initialTerminationTime"] = request.InitialTerminationTime().String()
+	logStashEvent["requestXML"] = request.RawXML()
 }
 
-func logSIRIGeneralMessageBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLGeneralMessageSubscriptionRequestEntry) {
-	logStashEvent["type"] = "GeneralMessageSubscription"
-	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
-	logStashEvent["subscriptionRef"] = gmEntries.SubscriptionIdentifier()
-
-	xml := gmEntries.RawXML()
-	logStashEvent["requestXML"] = xml
+func logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, gmEntry *siri.SIRIResponseStatus) {
+	logStashEvent["requestMessageRef"] = gmEntry.RequestMessageRef
+	logStashEvent["subscriptionRef"] = gmEntry.SubscriptionRef
+	logStashEvent["responseTimestamp"] = gmEntry.ResponseTimestamp.String()
+	logStashEvent["validUntil"] = gmEntry.ValidUntil.String()
+	logStashEvent["status"] = strconv.FormatBool(gmEntry.Status)
+	if !gmEntry.Status {
+		logStashEvent["errorType"] = gmEntry.ErrorType
+		if gmEntry.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(gmEntry.ErrorNumber)
+		}
+		logStashEvent["errorText"] = gmEntry.ErrorText
+	}
 }
 
 // Start Test
