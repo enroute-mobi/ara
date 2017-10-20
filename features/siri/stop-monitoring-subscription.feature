@@ -460,6 +460,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Name                          | Passage 32                              |
       | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                        | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
+      | Monitored                     | true                                    |
       | Attribute[DirectionRef]       | Aller                                   |
       | Attribute[OriginName]         | Le début                                |
       | Attribute[DestinationName]    | La fin.                                 |
@@ -513,7 +514,8 @@ Feature: Support SIRI StopMonitoring by subscription
       					<siri:OriginName>Le début</siri:OriginName>
       					<siri:DestinationName>La fin.</siri:DestinationName>
       					<siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
-      					<siri:MonitoredCall>
+      					<siri:Monitored>true</siri:Monitored>
+                <siri:MonitoredCall>
       						<siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
       						<siri:Order>4</siri:Order>
       						<siri:StopPointName>Test</siri:StopPointName>

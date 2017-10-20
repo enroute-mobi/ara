@@ -19,6 +19,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -111,6 +112,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -133,6 +135,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -166,6 +169,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -259,6 +263,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -294,10 +299,12 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a VehicleJourney exists with the following attributes:
       | Name      | Le 15.                                  |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
       | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -390,6 +397,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -412,6 +420,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -444,6 +453,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Le 15.                                  |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
@@ -522,6 +532,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -544,6 +555,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -580,6 +592,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Le 15.                                  |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
       | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
@@ -658,6 +671,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -680,6 +694,7 @@ Feature: Support SIRI StopMonitoring by request
                     <siri:PublishedLineName>Ligne 4 Metro</siri:PublishedLineName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Le 15.</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                       <siri:Order>4</siri:Order>
@@ -713,6 +728,7 @@ Feature: Support SIRI StopMonitoring by request
           | Name      | Passage 32                              |
           | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
           | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+          | Monitored | true                                    |
         And a StopVisit exists with the following attributes:
           | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
           | PassageOrder                    | 4                                                                    |
@@ -805,6 +821,7 @@ Feature: Support SIRI StopMonitoring by request
                       <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                       <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                       <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                      <siri:Monitored>true</siri:Monitored>
                       <siri:MonitoredCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
@@ -827,6 +844,7 @@ Feature: Support SIRI StopMonitoring by request
                       <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                       <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                       <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                      <siri:Monitored>true</siri:Monitored>
                       <siri:MonitoredCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>

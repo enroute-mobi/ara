@@ -18,6 +18,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
@@ -43,10 +44,10 @@ Feature: Support SIRI GetSIRI
     And a VehicleJourney exists with the following attributes:
       | ObjectIDs                             | "internal": "5CAR621689196575"                |
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
+      | Monitored                             | true                                          |
       | Attribute[DestinationName]            | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | Attribute[DirectionRef]               | cladebr                                       |
-      | Attribute[Monitored]                  | true                                          |
       | Reference[JourneyPatternRef]#ObjectID | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#ObjectID    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
@@ -122,6 +123,7 @@ Feature: Support SIRI GetSIRI
                     </siri:FramedVehicleJourneyRef>
                     <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>boaarle</siri:StopPointRef>
                       <siri:Order>44</siri:Order>
@@ -198,6 +200,7 @@ Feature: Support SIRI GetSIRI
       | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
@@ -299,6 +302,7 @@ Feature: Support SIRI GetSIRI
                     </siri:FramedVehicleJourneyRef>
                     <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+                    <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
                       <siri:StopPointRef>boaarle</siri:StopPointRef>
                       <siri:Order>44</siri:Order>
