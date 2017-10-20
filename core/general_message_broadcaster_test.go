@@ -93,7 +93,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "Situation",
 	}
 
-	subscription := partner.Subscriptions().FindOrCreateByKind("situation")
+	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageBroadcast")
 	subscription.CreateAddNewResource(reference)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
@@ -101,7 +101,6 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
-	defer connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Stop()
 
 	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(response)
 	delivery := notify.GeneralMessagesDeliveries()

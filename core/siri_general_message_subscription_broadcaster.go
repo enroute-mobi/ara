@@ -87,17 +87,12 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	situation, ok := tx.Model().Situations().Find(sId)
+	_, ok := tx.Model().Situations().Find(sId)
 	if !ok {
 		return subId, false
 	}
 
-	_, ok = situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
-	if !ok {
-		return subId, false
-	}
-
-	sub, ok := connector.partner.Subscriptions().FindByKind("situation")
+	sub, ok := connector.partner.Subscriptions().FindByKind("GeneralMessageBroadcast")
 	if !ok {
 		return subId, false
 	}

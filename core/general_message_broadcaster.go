@@ -99,7 +99,6 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 
 	for subId, situationIds := range events {
 		logStashEvent := gmb.newLogStashEvent()
-		defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		sub, ok := gmb.connector.Partner().Subscriptions().Find(subId)
 		if !ok {
@@ -142,9 +141,11 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			messageArray = append(messageArray, siriGeneralMessage.InfoMessageIdentifier)
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
-
-		gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
-		logSIRIGeneralMessageNotify(logStashEvent, &notify)
+		if len(notify.GeneralMessages) != 0 {
+			gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
+			logSIRIGeneralMessageNotify(logStashEvent, &notify)
+			audit.CurrentLogStash().WriteEvent(logStashEvent)
+		}
 	}
 }
 

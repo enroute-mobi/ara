@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
 )
 
 type lastState interface {
@@ -19,19 +18,27 @@ type stopMonitoringLastChange struct {
 	schedulesHandler
 
 	subscription *Subscription
-	schedules    model.StopVisitSchedules
 
+	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
+}
+
+func (smlc *stopMonitoringLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
+	smlc.SetSubscription(sub)
+	smlc.UpdateState(sv)
 }
 
 func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
 	smlc.subscription = sub
 }
 
-func (smlc *stopMonitoringLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
-	smlc.subscription = sub
-	sv.Schedules.Copy()
+func (smlc *stopMonitoringLastChange) UpdateState(stopVisit *model.StopVisit) bool {
+	smlc.schedules = stopVisit.Schedules.Copy()
+	smlc.arrivalStatuts = stopVisit.ArrivalStatus
+	smlc.departureStatus = stopVisit.DepartureStatus
+
+	return true
 }
 
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
@@ -57,34 +64,32 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 	return false
 }
 
-func (smlc *stopMonitoringLastChange) UpdateState(stopVisit model.StopVisit) bool {
-	smlc.schedules = stopVisit.Schedules.Copy()
-	smlc.arrivalStatuts = stopVisit.ArrivalStatus
-	smlc.departureStatus = stopVisit.DepartureStatus
-
-	return true
-}
-
 type estimatedTimeTableLastChange struct {
 	optionParser
 	schedulesHandler
 
-	subscription    *Subscription
+	subscription *Subscription
+
 	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 	vehicleAtStop   bool
 }
 
+func (ettlc *estimatedTimeTableLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
+	ettlc.SetSubscription(sub)
+	ettlc.UpdateState(sv)
+}
+
 func (ettlc *estimatedTimeTableLastChange) SetSubscription(sub *Subscription) {
 	ettlc.subscription = sub
 }
 
-func (ettlc *estimatedTimeTableLastChange) InitState(sv *model.StopVisit, sub *Subscription) {
-	ettlc.subscription = sub
-	ettlc.schedules = sv.Schedules.Copy()
+func (ettlc *estimatedTimeTableLastChange) UpdateState(sv *model.StopVisit) {
 	ettlc.vehicleAtStop = sv.VehicleAtStop
+	ettlc.schedules = sv.Schedules.Copy()
 	ettlc.departureStatus = sv.DepartureStatus
+	ettlc.arrivalStatuts = sv.ArrivalStatus
 }
 
 func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
@@ -120,32 +125,28 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 	return false
 }
 
-func (ettlc *estimatedTimeTableLastChange) UpdateState(sv model.StopVisit) {
-	ettlc.vehicleAtStop = sv.VehicleAtStop
-	ettlc.schedules = sv.Schedules.Copy()
-	ettlc.departureStatus = sv.DepartureStatus
-	ettlc.arrivalStatuts = sv.ArrivalStatus
-}
-
 type generalMessageLastChange struct {
-	optionParser
-
-	lastChange siri.SIRIGeneralMessage
-
 	subscription *Subscription
+
+	version int
 }
 
-func (sglc *generalMessageLastChange) Haschanged(situation model.Situation) bool {
-	return true
-}
-
-func (sglc *generalMessageLastChange) UpdateState(sm siri.SIRIGeneralMessage) bool {
-	sglc.lastChange = sm
-	return true
+func (sglc *generalMessageLastChange) InitState(situation *model.Situation, sub *Subscription) {
+	sglc.SetSubscription(sub)
+	sglc.UpdateState(situation)
 }
 
 func (sglc *generalMessageLastChange) SetSubscription(sub *Subscription) {
 	sglc.subscription = sub
+}
+
+func (sglc *generalMessageLastChange) UpdateState(situation *model.Situation) bool {
+	sglc.version = situation.Version
+	return true
+}
+
+func (sglc *generalMessageLastChange) Haschanged(situation *model.Situation) bool {
+	return situation.Version == sglc.version
 }
 
 type schedulesHandler struct{}

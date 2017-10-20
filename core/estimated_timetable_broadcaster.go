@@ -216,7 +216,7 @@ func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, 
 				if !ok {
 					continue
 				}
-				lastState.UpdateState(stopVisit)
+				lastState.UpdateState(&stopVisit)
 			}
 			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 		}

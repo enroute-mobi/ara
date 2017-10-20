@@ -105,17 +105,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	_, ok = stopArea.ObjectID(connector.Partner().Setting("remote_objectid_kind"))
-
 	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String())
 	if !ok {
 		return subId, false
 	}
 
-	resources := sub.ResourcesByObjectID()
-
-	resource, ok := resources[obj.String()]
-
+	resource, ok := sub.ResourcesByObjectID()[obj.String()]
 	if !ok || resource.SubscribedUntil.Before(connector.Clock().Now()) {
 		return subId, false
 	}

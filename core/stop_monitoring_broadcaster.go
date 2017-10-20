@@ -170,7 +170,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			if !ok {
 				continue
 			}
-			lastState.UpdateState(stopVisit)
+			lastState.UpdateState(&stopVisit)
 		}
 		if len(delivery.MonitoredStopVisits) != 0 {
 			smb.sendDelivery(delivery)
