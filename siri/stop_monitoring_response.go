@@ -89,7 +89,7 @@ type XMLMonitoredStopVisit struct {
 	headwayService              string
 	journeyNote                 string
 	journeyPatternName          string
-	monitored                   string
+	monitored                   Bool
 	monitoringError             string
 	occupancy                   string
 	originAimedDepartureTime    string
@@ -145,6 +145,7 @@ type SIRIMonitoredStopVisit struct {
 	StopAreaObjectId       string
 
 	VehicleAtStop bool
+	Monitored     bool
 
 	Order int
 
@@ -227,8 +228,8 @@ const monitoredStopVisitTemplate = `<siri:MonitoredStopVisit>
 					<siri:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</siri:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}
 					<siri:OriginAimedDepartureTime>{{.Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}</siri:OriginAimedDepartureTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}
 					<siri:DestinationAimedArrivalTime>{{.Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}</siri:DestinationAimedArrivalTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}
-					<siri:FirstOrLastJourney>{{.Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}</siri:FirstOrLastJourney>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Monitored }}
-					<siri:Monitored>{{.Attributes.VehicleJourneyAttributes.Monitored}}</siri:Monitored>{{end}}{{ if .Attributes.VehicleJourneyAttributes.MonitoringError}}
+					<siri:FirstOrLastJourney>{{.Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}</siri:FirstOrLastJourney>{{end}}
+					<siri:Monitored>{{.Monitored}}</siri:Monitored>{{ if .Attributes.VehicleJourneyAttributes.MonitoringError}}
 					<siri:MonitoringError>{{.Attributes.VehicleJourneyAttributes.MonitoringError}}</siri:MonitoringError>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Occupancy }}
 					<siri:Occupancy>{{.Attributes.VehicleJourneyAttributes.Occupancy}}</siri:Occupancy>{{end}}{{if .Attributes.VehicleJourneyAttributes.Delay}}
 					<siri:Delay>{{.Attributes.VehicleJourneyAttributes.Delay}}</siri:Delay>{{end}}{{if .Attributes.VehicleJourneyAttributes.Bearing}}
@@ -647,11 +648,11 @@ func (visit *XMLMonitoredStopVisit) VehicleAtStop() bool {
 	return visit.vehicleAtStop.Value
 }
 
-func (visit *XMLMonitoredStopVisit) Monitored() string {
-	if visit.monitored == "" {
-		visit.monitored = visit.findStringChildContent("Monitored")
+func (visit *XMLMonitoredStopVisit) Monitored() bool {
+	if !visit.monitored.Defined {
+		visit.monitored.Parse(visit.findStringChildContent("Monitored"))
 	}
-	return visit.monitored
+	return visit.monitored.Value
 }
 
 func (visit *XMLMonitoredStopVisit) MonitoringError() string {

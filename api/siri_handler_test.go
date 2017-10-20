@@ -218,6 +218,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(objectid)
 	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Monitored = true
 	vehicleJourney.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
@@ -308,6 +309,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.SetObjectID(objectid)
 	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Monitored = true
 	vehicleJourney.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
@@ -344,6 +346,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	vehicleJourney2 := referential.Model().VehicleJourneys().New()
 	vehicleJourney2.SetObjectID(objectid2)
 	vehicleJourney2.LineId = line2.Id()
+	vehicleJourney2.Monitored = true
 	vehicleJourney2.Save()
 
 	stopVisit3 := referential.Model().StopVisits().New()
@@ -392,6 +395,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
 						<siri:DatedVehicleJourneyRef>stopArea1</siri:DatedVehicleJourneyRef>
 					</siri:FramedVehicleJourneyRef>
+					<siri:Monitored>true</siri:Monitored>
 					<siri:MonitoredCall>
 						<siri:StopPointRef>stopArea1</siri:StopPointRef>
 						<siri:VehicleAtStop>false</siri:VehicleAtStop>
@@ -409,6 +413,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
 						<siri:DatedVehicleJourneyRef>stopArea1</siri:DatedVehicleJourneyRef>
 					</siri:FramedVehicleJourneyRef>
+					<siri:Monitored>true</siri:Monitored>
 					<siri:MonitoredCall>
 						<siri:StopPointRef>stopArea1</siri:StopPointRef>
 						<siri:VehicleAtStop>false</siri:VehicleAtStop>
@@ -432,6 +437,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
 						<siri:DatedVehicleJourneyRef>stopArea2</siri:DatedVehicleJourneyRef>
 					</siri:FramedVehicleJourneyRef>
+					<siri:Monitored>true</siri:Monitored>
 					<siri:MonitoredCall>
 						<siri:StopPointRef>stopArea2</siri:StopPointRef>
 						<siri:VehicleAtStop>false</siri:VehicleAtStop>
@@ -449,6 +455,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 						<siri:DataFrameRef>RATPDev:DataFrame::1984-04-04:LOC</siri:DataFrameRef>
 						<siri:DatedVehicleJourneyRef>stopArea2</siri:DatedVehicleJourneyRef>
 					</siri:FramedVehicleJourneyRef>
+					<siri:Monitored>true</siri:Monitored>
 					<siri:MonitoredCall>
 						<siri:StopPointRef>stopArea2</siri:StopPointRef>
 						<siri:VehicleAtStop>false</siri:VehicleAtStop>

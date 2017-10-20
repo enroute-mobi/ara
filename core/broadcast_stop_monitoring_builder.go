@@ -95,6 +95,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		StopPointName:  stopPointRef.Name,
 
 		VehicleJourneyName:     vehicleJourney.Name,
+		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
@@ -107,10 +108,13 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		Attributes:             make(map[string]map[string]string),
 		References:             make(map[string]map[string]model.Reference),
 	}
+	if !stopPointRef.Monitored {
+		monitoredStopVisit.Monitored = false
+	}
 
 	if stopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_CANCELLED && builder.StopVisitTypes != "departures" {
 		monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
-		if stopPointRef.Monitored {
+		if monitoredStopVisit.Monitored {
 			monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
 			monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
 		}
@@ -118,7 +122,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 
 	if stopVisit.DepartureStatus != model.STOP_VISIT_DEPARTURE_CANCELLED && builder.StopVisitTypes != "arrivals" {
 		monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
-		if stopPointRef.Monitored {
+		if monitoredStopVisit.Monitored {
 			monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
 			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
 		}

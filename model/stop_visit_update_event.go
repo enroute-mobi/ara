@@ -45,5 +45,6 @@ type StopVisitUpdateEvent struct {
 	OriginRef              string
 	DestinationName        string
 	OriginName             string
+	Monitored              bool
 	Attributes             StopVisitUpdateAttributes
 }

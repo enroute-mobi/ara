@@ -64,7 +64,6 @@ func (attributes *SIRIStopVisitUpdateAttributes) FillVehicleJourneyAttributes() 
 	vehiculeJourneyAttributes.Set("HeadwayService", attributes.response.HeadwayService())
 	vehiculeJourneyAttributes.Set("JourneyNote", attributes.response.JourneyNote())
 	vehiculeJourneyAttributes.Set("JourneyPatternName", attributes.response.JourneyPatternName())
-	vehiculeJourneyAttributes.Set("Monitored", attributes.response.Monitored())
 	vehiculeJourneyAttributes.Set("MonitoringError", attributes.response.MonitoringError())
 	vehiculeJourneyAttributes.Set("Occupancy", attributes.response.Occupancy())
 	vehiculeJourneyAttributes.Set("OriginAimedDepartureTime", attributes.response.OriginAimedDepartureTime())
@@ -126,6 +125,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) VehicleJourneyAttributes() *mod
 	vehicleJourneyAttributes := &model.VehicleJourneyAttributes{
 		ObjectId:     objectid,
 		LineObjectId: lineObjectId,
+		Monitored:    attributes.response.Monitored(),
 	}
 
 	vehicleJourneyAttributes.Attributes = attributes.FillVehicleJourneyAttributes()

@@ -189,6 +189,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<siri:OperatorRef>OperatorRef</siri:OperatorRef>
 					<siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
 					<siri:VehicleJourneyName>NameOfVj</siri:VehicleJourneyName>
+					<siri:Monitored>true</siri:Monitored>
 					<siri:Delay>30</siri:Delay>
 					<siri:MonitoredCall>
 						<siri:StopPointRef>stopPointRef</siri:StopPointRef>
@@ -220,6 +221,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		VehicleJourneyName: "NameOfVj",
 		VehicleAtStop:      true,
 		Order:              1,
+		Monitored:          true,
 		RecordedAt:         time.Date(2015, time.September, 21, 20, 14, 46, 0, time.UTC),
 		DataFrameRef:       "2016-09-21",
 		AimedArrivalTime:   time.Date(2017, time.September, 21, 20, 14, 46, 0, time.UTC),

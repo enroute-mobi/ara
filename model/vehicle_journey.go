@@ -11,8 +11,10 @@ type VehicleJourneyId string
 type VehicleJourneyAttributes struct {
 	ObjectId     ObjectID
 	LineObjectId ObjectID
-	Attributes   Attributes
-	References   References
+	Monitored    bool
+
+	Attributes Attributes
+	References References
 }
 
 type VehicleJourney struct {
@@ -23,6 +25,8 @@ type VehicleJourney struct {
 
 	LineId LineId `json:",omitempty"`
 	Name   string `json:",omitempty"`
+
+	Monitored bool
 
 	Attributes Attributes
 	References References

@@ -141,6 +141,7 @@ func (updater *StopVisitUpdater) Update() {
 
 		foundVehicleJourney, ok := updater.tx.Model().VehicleJourneys().FindByObjectId(NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DatedVehicleJourneyRef))
 		if ok {
+			foundVehicleJourney.Monitored = updater.event.Monitored
 			foundVehicleJourney.References.SetObjectId("DestinationRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationRef))
 			foundVehicleJourney.References.SetObjectId("DestinationName", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.DestinationName))
 			foundVehicleJourney.References.SetObjectId("OriginRef", NewObjectID(updater.event.StopVisitObjectid.Kind(), updater.event.OriginRef))
@@ -235,7 +236,8 @@ func (updater *StopVisitUpdater) CreateVehicleJourney(vehicleJourneyAttributes *
 
 	vehicleJourney.Attributes = vehicleJourneyAttributes.Attributes
 	vehicleJourney.References = vehicleJourneyAttributes.References
-	vehicleJourney.Name = vehicleJourney.Attributes["VehicleJourneyName"]
+	vehicleJourney.Name = vehicleJourneyAttributes.Attributes["VehicleJourneyName"]
+	vehicleJourney.Monitored = vehicleJourneyAttributes.Monitored
 
 	vehicleJourney.Save()
 
