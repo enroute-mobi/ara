@@ -53,9 +53,9 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 	}
 
 	duration := smlc.getOptionDuration(option)
-	for key, _ := range stopVisit.Schedules {
-		ok = smlc.handleArrivalTime(stopVisit.Schedules[key], smlc.schedules[key], duration)
-		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules[key], smlc.schedules[key], duration)
+	for kind, _ := range stopVisit.Schedules {
+		ok = smlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
+		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
 		if ok {
 			return true
 		}
@@ -115,9 +115,9 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 		return true
 	}
 
-	for key, _ := range stopVisit.Schedules {
-		ok = ettlc.handleArrivalTime(stopVisit.Schedules[key], ettlc.schedules[key], duration)
-		ok = ok || ettlc.handleDepartedTime(stopVisit.Schedules[key], ettlc.schedules[key], duration)
+	for kind, _ := range stopVisit.Schedules {
+		ok = ettlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
+		ok = ok || ettlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
 		if ok {
 			return true
 		}
@@ -155,12 +155,18 @@ func (sh *schedulesHandler) handleArrivalTime(sc, lssc *model.StopVisitSchedule,
 	if sc.ArrivalTime().IsZero() {
 		return false
 	}
+	if lssc.ArrivalTime().IsZero() {
+		return true
+	}
 	return !(sc.ArrivalTime().Before(lssc.ArrivalTime().Add(duration)) && sc.ArrivalTime().After(lssc.ArrivalTime().Add(-duration)))
 }
 
 func (sh *schedulesHandler) handleDepartedTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
 	if sc.DepartureTime().IsZero() {
 		return false
+	}
+	if lssc.DepartureTime().IsZero() {
+		return true
 	}
 	return !(sc.DepartureTime().Before(lssc.DepartureTime().Add(duration)) && sc.DepartureTime().After(lssc.DepartureTime().Add(-duration)))
 }
