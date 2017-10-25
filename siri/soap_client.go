@@ -66,10 +66,12 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	if err != nil {
 		return nil, err
 	}
-	// For tests
-	// logger.Log.Debugf("%v", xml)
 
 	soapEnvelope.WriteXML(xml)
+
+	// For tests
+	// logger.Log.Debugf("%v", soapEnvelope.String())
+
 	// Create http request
 	httpRequest, err := http.NewRequest("POST", client.getURL(args.requestType), soapEnvelope)
 	if err != nil {
