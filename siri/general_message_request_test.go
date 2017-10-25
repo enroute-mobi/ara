@@ -6,7 +6,7 @@ import (
 )
 
 func Test_SIRIGeneralMessageRequest(t *testing.T) {
-	expectedXML := `<sw:GetGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	expectedXML := `<sw:GetGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
 	<ServiceRequestInfo>
 		<siri:RequestTimestamp>2016-09-21T20:14:46.000Z</siri:RequestTimestamp>
 		<siri:RequestorRef>ref</siri:RequestorRef>
@@ -16,9 +16,9 @@ func Test_SIRIGeneralMessageRequest(t *testing.T) {
 		<siri:RequestTimestamp>2016-09-21T20:14:46.000Z</siri:RequestTimestamp>
 		<siri:MessageIdentifier>MessageId</siri:MessageIdentifier>
 		<siri:Extensions>
-			<siri:IDFGeneralMessageRequestFilter>
+			<sws:IDFGeneralMessageRequestFilter>
 				<siri:LineRef>lineRef</siri:LineRef>
-			</siri:IDFGeneralMessageRequestFilter>
+			</sws:IDFGeneralMessageRequestFilter>
 		</siri:Extensions>
 	</Request>
 	<RequestExtension/>
