@@ -53,6 +53,10 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 	}
 
 	duration := smlc.getOptionDuration(option)
+	if duration == 0 {
+		duration = 1 * time.Minute
+	}
+
 	for kind, _ := range stopVisit.Schedules {
 		ok = smlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
 		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
@@ -112,7 +116,7 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 
 	duration := ettlc.getOptionDuration(option)
 	if duration == 0 {
-		return true
+		duration = 1 * time.Minute
 	}
 
 	for kind, _ := range stopVisit.Schedules {
