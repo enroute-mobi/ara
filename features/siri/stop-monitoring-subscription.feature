@@ -488,7 +488,7 @@ Feature: Support SIRI StopMonitoring by subscription
       <ServiceDeliveryInfo>
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
-      <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+      <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
       <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
