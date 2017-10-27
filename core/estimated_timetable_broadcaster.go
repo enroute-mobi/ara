@@ -86,144 +86,136 @@ func (ett *EstimatedTimeTableBroadcaster) Stop() {
 }
 
 func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
-	connector := ett.connector
+	ett.connector.mutex.Lock()
 
-	connector.mutex.Lock()
+	events := ett.connector.toBroadcast
+	ett.connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
 
-	events := connector.toBroadcast
-	connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
+	ett.connector.mutex.Unlock()
 
-	connector.mutex.Unlock()
-
-	logStashEvent := ett.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	tx := connector.Partner().Referential().NewTransaction()
+	tx := ett.connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	currentTime := connector.Clock().Now()
-
-	notify := &siri.SIRINotifyEstimatedTimeTable{
-		ResponseTimestamp:         currentTime,
-		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-	}
+	currentTime := ett.Clock().Now()
 
 	for subId, lines := range events {
-		sub, _ := connector.Partner().Subscriptions().Find(subId)
-
-		delivery := ett.getEstimatedTimetableDelivery(tx, lines, sub)
-		delivery.SubscriptionIdentifier = string(subId)
-		delivery.SubscriberRef = connector.SIRIPartner().RequestorRef()
-		delivery.RequestMessageRef = sub.SubscriptionOptions()["MessageIdentifier"]
-
-		logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent, &delivery)
-		notify.Deliveries = append(notify.Deliveries, &delivery)
-	}
-
-	logSIRINotifyEstimatedTimeTable(logStashEvent, notify)
-	connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(notify)
-}
-
-func (ett *ETTBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, lines []model.LineId, sub *Subscription) siri.SIRIEstimatedTimetableSubscriptionDelivery {
-	connector := ett.connector
-	currentTime := connector.Clock().Now()
-	sentlines := make(map[model.LineId]bool)
-
-	delivery := siri.SIRIEstimatedTimetableSubscriptionDelivery{
-		ResponseTimestamp: currentTime,
-		Status:            true,
-	}
-
-	for _, lineId := range lines {
-		if _, ok := sentlines[lineId]; ok {
-			continue
-		}
-
-		sentlines[lineId] = true
-		line, ok := tx.Model().Lines().Find(lineId)
+		sub, ok := ett.connector.Partner().Subscriptions().Find(subId)
 		if !ok {
 			continue
 		}
 
-		lineObjectId, ok := line.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
-		if !ok {
-			continue
+		processedLines := make(map[model.LineId]struct{}) //Making sure not to send 2 times the same Line
+
+		delivery := &siri.SIRINotifyEstimatedTimeTable{
+			Address:                   ett.connector.Partner().Address(),
+			ProducerRef:               ett.connector.Partner().ProducerRef(),
+			ResponseMessageIdentifier: ett.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			SubscriberRef:             ett.connector.SIRIPartner().RequestorRef(),
+			SubscriptionIdentifier:    sub.ExternalId(),
+			ResponseTimestamp:         ett.connector.Clock().Now(),
+			Status:                    true,
+			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 		}
 
-		journeyFrame := &siri.SIRIEstimatedJourneyVersionFrame{
-			RecordedAtTime: currentTime,
+		for _, lineId := range lines {
+			// Check if resource is already in the map
+			if _, ok := processedLines[lineId]; ok {
+				continue
+			}
+
+			// Find the Line
+			line, ok := tx.Model().Lines().Find(lineId)
+			if !ok {
+				continue
+			}
+
+			// Find the Resource ObjectId
+			lineObjectId, ok := line.ObjectID(ett.connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+			if !ok {
+				continue
+			}
+
+			// Find the Resource
+			resource := sub.Resource(lineObjectId)
+			if resource == nil {
+				continue
+			}
+
+			// Get the EstimatedJourneyVersionFrame
+			journeyFrame := &siri.SIRIEstimatedJourneyVersionFrame{
+				RecordedAtTime: currentTime,
+			}
+
+			// SIRIEstimatedVehicleJourney
+			for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(lineId) {
+				// Handle vehicleJourney Objectid
+				vehicleJourneyId, ok := vehicleJourney.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+				var datedVehicleJourneyRef string
+				if ok {
+					datedVehicleJourneyRef = vehicleJourneyId.Value()
+				} else {
+					defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+					if !ok {
+						continue
+					}
+					referenceGenerator := ett.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
+				}
+
+				estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
+					LineRef:                lineObjectId.Value(),
+					DatedVehicleJourneyRef: datedVehicleJourneyRef,
+					Attributes:             make(map[string]string),
+					References:             make(map[string]model.Reference),
+				}
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
+				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
+
+				// SIRIEstimatedCall
+				for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
+					// Handle StopPointRef
+					stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+					if !ok {
+						continue
+					}
+					stopAreaId, ok := stopArea.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+					if !ok {
+						continue
+					}
+
+					estimatedCall := &siri.SIRIEstimatedCall{
+						ArrivalStatus:         string(stopVisit.ArrivalStatus),
+						DepartureStatus:       string(stopVisit.DepartureStatus),
+						AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+						ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+						AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+						ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+						Order:              stopVisit.PassageOrder,
+						StopPointRef:       stopAreaId.Value(),
+						StopPointName:      stopArea.Name,
+						DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
+						VehicleAtStop:      stopVisit.VehicleAtStop,
+					}
+
+					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+
+					lastStateInterface, _ := resource.LastStates[string(stopVisit.Id())]
+					lastState, ok := lastStateInterface.(*estimatedTimeTableLastChange)
+					if !ok {
+						continue
+					}
+					lastState.UpdateState(&stopVisit)
+				}
+				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+			}
+			processedLines[lineId] = struct{}{}
+			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 		}
-
-		// SIRIEstimatedVehicleJourney
-		for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(line.Id()) {
-			// Handle vehicleJourney Objectid
-
-			vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
-			var datedVehicleJourneyRef string
-			if ok {
-				datedVehicleJourneyRef = vehicleJourneyId.Value()
-			} else {
-				defaultObjectID, ok := vehicleJourney.ObjectID("_default")
-				if !ok {
-					continue
-				}
-
-				referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
-			}
-
-			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
-				LineRef:                lineObjectId.Value(),
-				DatedVehicleJourneyRef: datedVehicleJourneyRef,
-				Attributes:             make(map[string]string),
-				References:             make(map[string]model.Reference),
-			}
-			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
-			estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
-
-			// SIRIEstimatedCall
-			for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
-				// Handle StopPointRef
-				stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
-				if !ok {
-					continue
-				}
-				stopAreaId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
-				if !ok {
-					continue
-				}
-
-				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:         string(stopVisit.ArrivalStatus),
-					DepartureStatus:       string(stopVisit.DepartureStatus),
-					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-					Order:              stopVisit.PassageOrder,
-					StopPointRef:       stopAreaId.Value(),
-					StopPointName:      stopArea.Name,
-					DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
-					VehicleAtStop:      stopVisit.VehicleAtStop,
-				}
-
-				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
-
-				resource := sub.Resource(lineObjectId)
-				lastStateInterface, _ := resource.LastStates[string(stopVisit.Id())]
-				lastState, ok := lastStateInterface.(*estimatedTimeTableLastChange)
-				if !ok {
-					continue
-				}
-				lastState.UpdateState(&stopVisit)
-			}
-			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
-		}
-		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
+		logStashEvent := ett.newLogStashEvent()
+		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+		ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
 	}
-
-	return delivery
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) (references map[string]model.Reference) {
@@ -252,30 +244,24 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRINotifyEstimatedTimeTable(logStashEvent audit.LogStashEvent, notify *siri.SIRINotifyEstimatedTimeTable) {
+func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable) {
 	logStashEvent["type"] = "NotifyEstimatedTimetable"
-	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp.String()
-	logStashEvent["producerRef"] = notify.ProducerRef
-	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier
-
-	xml, err := notify.BuildXML()
+	logStashEvent["producerRef"] = response.ProducerRef
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef
+	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["subscriberRef"] = response.SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
+	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	if !response.Status {
+		logStashEvent["errorType"] = response.ErrorType
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		logStashEvent["errorText"] = response.ErrorText
+	}
+	xml, err := response.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
 		return
 	}
 	logStashEvent["responseXML"] = xml
-}
-
-func logSIRIEstimatedTimetableSubscriptionDelivery(logStashEvent audit.LogStashEvent, delivery *siri.SIRIEstimatedTimetableSubscriptionDelivery) {
-	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
-	logStashEvent["subscriberRef"] = delivery.SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = delivery.SubscriptionIdentifier
-	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
-	if !delivery.Status {
-		logStashEvent["errorType"] = delivery.ErrorType
-		if delivery.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
-		}
-		logStashEvent["errorText"] = delivery.ErrorText
-	}
 }

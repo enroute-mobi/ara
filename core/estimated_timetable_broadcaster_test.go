@@ -102,16 +102,17 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 		<siri:ProducerRef>external</siri:ProducerRef>
 		<siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Notification>
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
 			<siri:SubscriberRef>external</siri:SubscriberRef>
-			<siri:SubscriptionRef>6ba7b814-9dad-11d1-1-00c04fd430c8</siri:SubscriptionRef>
+			<siri:SubscriptionRef>externalId</siri:SubscriptionRef>
 			<siri:Status>true</siri:Status>
 			<siri:EstimatedJourneyVersionFrame>
-				<siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
+				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
 					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
@@ -132,6 +133,6 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 </S:Envelope>`
 
 	if string(response) != expected {
-		t.Errorf("Got diffrent xml than expected, got: %v want :%v", string(response), expected)
+		t.Errorf("Got diffrent xml than expected, got: %v\nwant :%v", string(response), expected)
 	}
 }

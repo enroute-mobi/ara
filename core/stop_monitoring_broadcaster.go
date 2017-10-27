@@ -97,7 +97,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 	defer tx.Close()
 
 	for key, stopVisits := range events {
-
 		sub, ok := smb.connector.Partner().Subscriptions().Find(key)
 		if !ok {
 			continue
@@ -128,7 +127,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 
 			// Find the StopVisit
-			stopVisit, ok := tx.Model().StopVisits().Find(model.StopVisitId(stopVisitId))
+			stopVisit, ok := tx.Model().StopVisits().Find(stopVisitId)
 			if !ok {
 				continue
 			}
@@ -198,6 +197,8 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *si
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["subscriberRef"] = response.SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType

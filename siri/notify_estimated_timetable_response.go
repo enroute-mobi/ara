@@ -2,27 +2,23 @@ package siri
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"time"
 )
 
 type SIRINotifyEstimatedTimeTable struct {
+	Address                   string
+	RequestMessageRef         string
 	ProducerRef               string
 	ResponseMessageIdentifier string
-	ResponseTimestamp         time.Time
-	Deliveries                []*SIRIEstimatedTimetableSubscriptionDelivery
-}
+	SubscriberRef             string
+	SubscriptionIdentifier    string
 
-type SIRIEstimatedTimetableSubscriptionDelivery struct {
-	ResponseTimestamp      time.Time
-	SubscriberRef          string
-	SubscriptionIdentifier string
-	RequestMessageRef      string
-
-	Status      bool
-	ErrorType   string
-	ErrorNumber int
-	ErrorText   string
+	ResponseTimestamp time.Time
+	Status            bool
+	ErrorType         string
+	ErrorNumber       int
+	ErrorText         string
 
 	EstimatedJourneyVersionFrames []*SIRIEstimatedJourneyVersionFrame
 }
@@ -30,48 +26,26 @@ type SIRIEstimatedTimetableSubscriptionDelivery struct {
 const estimatedTimeTablenotifyTemplate = `<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ResponseTimestamp>
-		<siri:ProducerRef>{{.ProducerRef}}</siri:ProducerRef>
+		<siri:ProducerRef>{{.ProducerRef}}</siri:ProducerRef>{{ if .Address }}
+		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
 		<siri:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
-	<Notification>{{range .Deliveries}}
+	<Notification>
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>{{.RequestMessageRef}}</siri:RequestMessageRef>
 			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
 			<siri:SubscriptionRef>{{.SubscriptionIdentifier}}</siri:SubscriptionRef>
 			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
-						<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-							<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
-							<siri:{{.ErrorType}}>{{ end }}
-								<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
-							</siri:{{.ErrorType}}>
-						</siri:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
-			<siri:EstimatedJourneyVersionFrame>
-				<siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
-				<siri:EstimatedVehicleJourney>
-					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
-					<siri:DirectionRef>{{ .Attributes.DirectionRef }}</siri:DirectionRef>{{ end }}
-					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
-					<siri:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
-					<siri:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{ end }}
-					<siri:EstimatedCalls>{{ range .EstimatedCalls }}
-						<siri:EstimatedCall>
-							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
-							<siri:Order>{{ .Order }}</siri:Order>{{ if .StopPointName }}
-							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}
-							<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{ if .DestinationDisplay }}
-							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
-							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
-							<siri:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
-							<siri:ArrivalStatus>{{ .ArrivalStatus }}</siri:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
-							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
-							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
-							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{ end }}
-						</siri:EstimatedCall>{{ end }}
-					</siri:EstimatedCalls>
-				</siri:EstimatedVehicleJourney>{{ end }}
-			</siri:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
-		</siri:EstimatedTimetableDelivery>{{end}}
+			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
+				<siri:{{.ErrorType}}>{{ end }}
+					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
+				</siri:{{.ErrorType}}>
+			</siri:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
+			{{ .BuildEstimatedJourneyVersionFrameXML }}{{ end }}{{ end }}
+		</siri:EstimatedTimetableDelivery>
 	</Notification>
 	<NotificationExtension/>
 </sw:NotifyEstimatedTimetable>`

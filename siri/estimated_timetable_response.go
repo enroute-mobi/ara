@@ -87,7 +87,10 @@ const estimatedTimetableDeliveryTemplate = `<siri:EstimatedTimetableDelivery ver
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
 			</siri:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
-			<siri:EstimatedJourneyVersionFrame>
+			{{ .BuildEstimatedJourneyVersionFrameXML }}{{ end }}{{ end }}
+		</siri:EstimatedTimetableDelivery>`
+
+const estimatedJourneyVersionFrameTemplate = `<siri:EstimatedJourneyVersionFrame>
 				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
@@ -111,8 +114,7 @@ const estimatedTimetableDeliveryTemplate = `<siri:EstimatedTimetableDelivery ver
 						</siri:EstimatedCall>{{ end }}
 					</siri:EstimatedCalls>
 				</siri:EstimatedVehicleJourney>{{ end }}
-			</siri:EstimatedJourneyVersionFrame>{{ end }}{{ end }}
-		</siri:EstimatedTimetableDelivery>`
+			</siri:EstimatedJourneyVersionFrame>`
 
 func (response *SIRIEstimatedTimeTableResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
@@ -127,6 +129,15 @@ func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryX
 	var buffer bytes.Buffer
 	var estimatedTimetableDelivery = template.Must(template.New("estimatedTimetableDelivery").Parse(estimatedTimetableDeliveryTemplate))
 	if err := estimatedTimetableDelivery.Execute(&buffer, delivery); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXML() (string, error) {
+	var buffer bytes.Buffer
+	var estimatedJourneyVersionFrame = template.Must(template.New("estimatedJourneyVersionFrame").Parse(estimatedJourneyVersionFrameTemplate))
+	if err := estimatedJourneyVersionFrame.Execute(&buffer, frame); err != nil {
 		return "", err
 	}
 	return buffer.String(), nil

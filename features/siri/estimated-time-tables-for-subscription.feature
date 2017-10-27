@@ -91,6 +91,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
       | Kind                      | EstimatedTimetable                     |
+      | ExternalId | externalId |
       | ReferenceArray[0]           | Line, "internal": "NINOXE:Line:3:LOC"  |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -130,16 +131,17 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 		<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
 		<siri:ProducerRef>test</siri:ProducerRef>
 		<siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:RequestMessageRef></siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Notification>
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef></siri:RequestMessageRef>
 			<siri:SubscriberRef>test</siri:SubscriberRef>
-			<siri:SubscriptionRef>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:SubscriptionRef>
+			<siri:SubscriptionRef></siri:SubscriptionRef>
 			<siri:Status>true</siri:Status>
 			<siri:EstimatedJourneyVersionFrame>
-				<siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
+				<siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
 					<siri:DirectionRef>Aller</siri:DirectionRef>
