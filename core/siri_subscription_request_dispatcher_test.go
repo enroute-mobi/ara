@@ -28,6 +28,8 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	line := referential.Model().Lines().New()
+	objectid := model.NewObjectID("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
+	line.SetObjectID(objectid)
 	line.Save()
 
 	file, _ := os.Open("testdata/estimatedtimetable-request-soap.xml")

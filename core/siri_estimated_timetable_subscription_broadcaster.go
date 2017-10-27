@@ -86,7 +86,9 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		for _, lineId := range ett.Lines() {
 			logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent, ett)
 
-			_, ok := connector.Partner().Model().Lines().Find(model.LineId(lineId))
+			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
+			_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
+
 			if !ok {
 				rs.Status = false
 				rs.ErrorType = "InvalidDataReferencesError"
@@ -96,7 +98,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 				logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line with id : %v", lineId)
 				continue
 			}
-			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
+
 			ref := model.Reference{
 				ObjectId: &lineObjectId,
 				Type:     "line",
