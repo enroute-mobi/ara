@@ -127,6 +127,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Start() {
 func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *siri.XMLSubscriptionRequest) {
 	so := s.SubscriptionOptions()
 	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
+	so["MessageIdentifier"] = request.MessageIdentifier()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
