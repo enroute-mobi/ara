@@ -169,7 +169,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	sub, ok := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String())
+	sub, ok := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
 	if !ok {
 		return
 	}

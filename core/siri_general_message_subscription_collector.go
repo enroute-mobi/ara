@@ -79,7 +79,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	}
 
 	// Try to find a Subscription with the resource
-	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String())
+	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String(), "GeneralMessageCollect")
 	if ok {
 		// If we find the subscription, we add time to the resource SubscribedUntil if the subscription is active
 		resource := subscription.Resource(lineObjectid)

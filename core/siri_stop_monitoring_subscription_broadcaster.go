@@ -105,7 +105,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subId, false
 	}
 
-	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String())
+	sub, ok := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "StopMonitoringBroadcast")
 	if !ok {
 		return subId, false
 	}

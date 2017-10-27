@@ -178,7 +178,7 @@ type Subscriptions interface {
 	DeleteById(id SubscriptionId)
 	CancelSubscriptions()
 	CancelBroadcastSubscriptions()
-	FindByRessourceId(id string) (*Subscription, bool)
+	FindByRessourceId(id, kind string) (*Subscription, bool)
 	FindByExternalId(externalId string) (*Subscription, bool)
 }
 
@@ -250,13 +250,13 @@ func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscr
 	return nil, false
 }
 
-func (manager *MemorySubscriptions) FindByRessourceId(id string) (*Subscription, bool) {
+func (manager *MemorySubscriptions) FindByRessourceId(id, kind string) (*Subscription, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	for _, subscription := range manager.byIdentifier {
 		_, ok := subscription.resourcesByObjectID[id]
-		if ok {
+		if ok && subscription.kind == kind {
 			return subscription, true
 		}
 	}

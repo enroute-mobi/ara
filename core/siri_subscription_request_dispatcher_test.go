@@ -89,7 +89,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 		t.Errorf("Wrong first ResponseStatus status want true got : %v", response.ResponseStatus[0].Status)
 	}
 
-	sub, ok := partner.Subscriptions().FindByRessourceId(objectid.String())
+	sub, ok := partner.Subscriptions().FindByRessourceId(objectid.String(), "StopMonitoringBroadcast")
 	if !ok {
 		t.Errorf("Should have been able to find the stopArea ressource : %v", objectid.String())
 	}

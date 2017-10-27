@@ -102,7 +102,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "StopArea",
 	}
 
-	subscription := partner.Subscriptions().New("sub")
+	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
 	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"

@@ -81,7 +81,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	// Try to find a Subscription with the resource
-	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(stopAreaObjectid.String())
+	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(stopAreaObjectid.String(), "StopMonitoringCollect")
 	if ok {
 		// If we find the subscription, we add time to the resource SubscribedUntil if the subscription is active
 		resource := subscription.Resource(stopAreaObjectid)
