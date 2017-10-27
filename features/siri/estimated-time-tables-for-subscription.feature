@@ -42,7 +42,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </S:Envelope>
       """
     Then a Subscription exist with the following attributes:
-      | Kind                      | EstimatedTimetable          |
+      | Kind | EstimatedTimetable |
 
 
   Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
@@ -90,9 +90,9 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | local_credential     | NINOXE:default        |
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind                      | EstimatedTimetable                     |
-      | ExternalId | externalId |
-      | ReferenceArray[0]           | Line, "internal": "NINOXE:Line:3:LOC"  |
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | externalId                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -100,12 +100,12 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name                          | Passage 32                              |
-      | ObjectIDs                     | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                        | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]       | Aller                                   |
-      | Attribute[OriginName]         | Le début                                |
-      | Attribute[DestinationName]    | La fin.                                 |
+      | Name                       | Passage 32                              |
+      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                     | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Attribute[DirectionRef]    | Aller                                   |
+      | Attribute[OriginName]      | Le début                                |
+      | Attribute[DestinationName] | La fin.                                 |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -118,8 +118,8 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | ArrivalStatus                   | onTime                                                               |
     And 10 seconds have passed
     When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
-      | Schedule[expected]#Arrival      | 2017-01-01T15:01:01.000Z                                             |
-      | ArrivalStatus                   | Delayed                                                              |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus              | Delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -127,40 +127,40 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 <S:Body>
 <sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<ServiceDeliveryInfo>
-		<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-		<siri:ProducerRef>test</siri:ProducerRef>
-		<siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+  <ServiceDeliveryInfo>
+    <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+    <siri:ProducerRef>test</siri:ProducerRef>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
-	</ServiceDeliveryInfo>
-	<Notification>
-		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-			<siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-			<siri:RequestMessageRef></siri:RequestMessageRef>
-			<siri:SubscriberRef>test</siri:SubscriberRef>
-			<siri:SubscriptionRef></siri:SubscriptionRef>
-			<siri:Status>true</siri:Status>
-			<siri:EstimatedJourneyVersionFrame>
-				<siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
-				<siri:EstimatedVehicleJourney>
-					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-					<siri:DirectionRef>Aller</siri:DirectionRef>
-					<siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
-					<siri:EstimatedCalls>
-						<siri:EstimatedCall>
-							<siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
-							<siri:Order>4</siri:Order>
-							<siri:StopPointName>Test</siri:StopPointName>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
-							<siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-							<siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
-						</siri:EstimatedCall>
-					</siri:EstimatedCalls>
-				</siri:EstimatedVehicleJourney>
-			</siri:EstimatedJourneyVersionFrame>
-		</siri:EstimatedTimetableDelivery>
-	</Notification>
-	<NotificationExtension/>
+  </ServiceDeliveryInfo>
+  <Notification>
+    <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+      <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+      <siri:RequestMessageRef></siri:RequestMessageRef>
+      <siri:SubscriberRef>test</siri:SubscriberRef>
+      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:Status>true</siri:Status>
+      <siri:EstimatedJourneyVersionFrame>
+        <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
+        <siri:EstimatedVehicleJourney>
+          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+          <siri:DirectionRef>Aller</siri:DirectionRef>
+          <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:EstimatedCalls>
+            <siri:EstimatedCall>
+              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+              <siri:Order>4</siri:Order>
+              <siri:StopPointName>Test</siri:StopPointName>
+              <siri:VehicleAtStop>false</siri:VehicleAtStop>
+              <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
+              <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            </siri:EstimatedCall>
+          </siri:EstimatedCalls>
+        </siri:EstimatedVehicleJourney>
+      </siri:EstimatedJourneyVersionFrame>
+    </siri:EstimatedTimetableDelivery>
+  </Notification>
+  <NotificationExtension/>
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>
