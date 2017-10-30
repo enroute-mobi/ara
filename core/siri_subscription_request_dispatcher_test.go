@@ -89,10 +89,13 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 		t.Errorf("Wrong first ResponseStatus status want true got : %v", response.ResponseStatus[0].Status)
 	}
 
-	sub, ok := partner.Subscriptions().FindByRessourceId(objectid.String(), "StopMonitoringBroadcast")
-	if !ok {
+	subs := partner.Subscriptions().FindByRessourceId(objectid.String(), "StopMonitoringBroadcast")
+
+	if len(subs) == 0 {
 		t.Errorf("Should have been able to find the stopArea ressource : %v", objectid.String())
 	}
+
+	sub := subs[0]
 	externalId := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"
 	if sub.ExternalId() != externalId {
 		t.Errorf("Wrong ExternalId value want: %v got: %v", externalId, sub.ExternalId())

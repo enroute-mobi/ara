@@ -169,27 +169,26 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	sub, ok := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
-	if !ok {
-		return
-	}
+	subs := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
 
-	r := sub.Resource(lineObj)
-	if r == nil {
-		return
-	}
+	for _, sub := range subs {
+		r := sub.Resource(lineObj)
+		if r == nil {
+			continue
+		}
 
-	lastState, ok := r.LastStates[string(sv.Id())]
+		lastState, ok := r.LastStates[string(sv.Id())]
+		if !ok {
+			r.LastStates[string(sv.Id())] = &estimatedTimeTableLastChange{}
+			lastState, _ = r.LastStates[string(sv.Id())]
+			lastState.(*estimatedTimeTableLastChange).InitState(&sv, sub)
+		}
 
-	if !ok {
-		r.LastStates[string(sv.Id())] = &estimatedTimeTableLastChange{}
-		lastState, _ = r.LastStates[string(sv.Id())]
-		lastState.(*estimatedTimeTableLastChange).InitState(&sv, sub)
+		if ok = lastState.(*estimatedTimeTableLastChange).Haschanged(&sv); !ok {
+			continue
+		}
+		connector.addLine(sub.Id(), line.Id())
 	}
-	if ok = lastState.(*estimatedTimeTableLastChange).Haschanged(&sv); !ok {
-		return
-	}
-	connector.addLine(sub.Id(), line.Id())
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {

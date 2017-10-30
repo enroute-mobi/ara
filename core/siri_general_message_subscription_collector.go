@@ -79,16 +79,17 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	}
 
 	// Try to find a Subscription with the resource
-	subscription, ok := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String(), "GeneralMessageCollect")
-	if ok {
-		// If we find the subscription, we add time to the resource SubscribedUntil if the subscription is active
-		resource := subscription.Resource(lineObjectid)
-		if resource == nil { // Should never happen
-			logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByRessourceId")
-			return
-		}
-		if !resource.SubscribedAt.IsZero() {
-			resource.SubscribedUntil = resource.SubscribedUntil.Add(1 * time.Minute)
+	subscriptions := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String(), "GeneralMessageCollect")
+	if len(subscriptions) > 0 {
+		for _, subscription := range subscriptions {
+			resource := subscription.Resource(lineObjectid)
+			if resource == nil { // Should never happen
+				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByRessourceId")
+				return
+			}
+			if !resource.SubscribedAt.IsZero() {
+				resource.SubscribedUntil = resource.SubscribedUntil.Add(1 * time.Minute)
+			}
 		}
 		return
 	}

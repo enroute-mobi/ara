@@ -447,8 +447,8 @@ Feature: Support SIRI StopMonitoring by subscription
        | remote_objectid_kind | internal              |
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
-      | Kind              | StopMonitoringBroadcast                            |
-      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Kind                      | StopMonitoringBroadcast                              |
+      | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |

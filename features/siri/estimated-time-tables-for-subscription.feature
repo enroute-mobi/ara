@@ -90,9 +90,9 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | local_credential     | NINOXE:default        |
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
-      | ExternalId        | externalId                            |
-      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+      | Kind                      | EstimatedTimeTableBroadcast                     |
+      | ExternalId | externalId |
+      | ReferenceArray[0]           | Line, "internal": "NINOXE:Line:3:LOC"  |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
