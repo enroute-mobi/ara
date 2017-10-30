@@ -126,7 +126,11 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Start() {
 
 func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *siri.XMLSubscriptionRequest) {
 	so := s.SubscriptionOptions()
-	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
+	changeBeforeUpdates := request.ChangeBeforeUpdates()
+	if changeBeforeUpdates == "" {
+		changeBeforeUpdates = "PT1M"
+	}
+	so["ChangeBeforeUpdates"] = changeBeforeUpdates
 	so["MessageIdentifier"] = request.MessageIdentifier()
 }
 

@@ -205,12 +205,16 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
 	ro := r.ResourcesOptions()
 	ro["StopVisitTypes"] = sm.StopVisitTypes()
+	changeBeforeUpdates := request.ChangeBeforeUpdates()
+	if changeBeforeUpdates == "" {
+		changeBeforeUpdates = "PT1M"
+	}
 
 	so := s.SubscriptionOptions()
 
 	so["IncrementalUpdates"] = request.IncrementalUpdates()
 	so["MaximumStopVisits"] = request.MaximumStopVisits()
-	so["ChangeBeforeUpdates"] = request.ChangeBeforeUpdates()
+	so["ChangeBeforeUpdates"] = changeBeforeUpdates
 	so["MessageIdentifier"] = request.MessageIdentifier()
 }
 
