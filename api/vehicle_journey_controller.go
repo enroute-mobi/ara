@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/af83/edwig/core"
@@ -34,7 +35,7 @@ func (controller *VehicleJourneyController) findVehicleJourney(tx *model.Transac
 	return tx.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 }
 
-func (controller *VehicleJourneyController) Index(response http.ResponseWriter) {
+func (controller *VehicleJourneyController) Index(response http.ResponseWriter, filters url.Values) {
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 

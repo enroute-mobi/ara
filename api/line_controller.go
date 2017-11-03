@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/af83/edwig/core"
@@ -34,7 +35,7 @@ func (controller *LineController) findLine(tx *model.Transaction, identifier str
 	return tx.Model().Lines().Find(model.LineId(identifier))
 }
 
-func (controller *LineController) Index(response http.ResponseWriter) {
+func (controller *LineController) Index(response http.ResponseWriter, filters url.Values) {
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 

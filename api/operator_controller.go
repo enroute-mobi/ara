@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/af83/edwig/core"
@@ -34,7 +35,7 @@ func (controller *OperatorController) findOperator(tx *model.Transaction, identi
 	return tx.Model().Operators().Find(model.OperatorId(identifier))
 }
 
-func (controller *OperatorController) Index(response http.ResponseWriter) {
+func (controller *OperatorController) Index(response http.ResponseWriter, filters url.Values) {
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 

@@ -2,7 +2,9 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -24,6 +26,7 @@ type Server struct {
 }
 
 type RequestData struct {
+	Filters     url.Values
 	Body        []byte
 	Method      string
 	Referential string
@@ -34,12 +37,13 @@ type RequestData struct {
 }
 
 func NewRequestDataFromContent(params []string) *RequestData {
-	requestFiller := make([]string, 5)
+	requestFiller := make([]string, 15)
 
 	for i, param := range params {
 		requestFiller[i] = param
 	}
 
+	fmt.Println(params)
 	return &RequestData{
 		Referential: requestFiller[1],
 		Ressource:   requestFiller[2],
@@ -76,7 +80,8 @@ func (server *Server) handleControllers(response http.ResponseWriter, request *h
 }
 
 func (server *Server) parse(response http.ResponseWriter, request *http.Request) (*RequestData, error) {
-	path := request.URL.Path
+	path := request.URL.RequestURI()
+
 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?/?([0-9a-zA-Z-_]+)?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(path)
@@ -88,6 +93,7 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 	requestData := NewRequestDataFromContent(foundStrings)
 	requestData.Method = request.Method
 	requestData.Url = request.URL.Path
+	requestData.Filters = request.URL.Query()
 
 	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Server", version.ApplicationName())

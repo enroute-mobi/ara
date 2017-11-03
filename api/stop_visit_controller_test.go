@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/model"
@@ -23,7 +24,7 @@ func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t
 	}
 }
 
-func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopVisit model.StopVisit, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopVisit *model.StopVisit, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -35,11 +36,23 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 	// Set the fake UUID generator
 	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
 	// Save a new stopVisit
-	stopVisit = referential.Model().StopVisits().New()
-	referential.Model().StopVisits().Save(&stopVisit)
+	timeLayout := "2006/01/02-15:04:05"
+	stopVisit = model.NewStopVisit(referential.Model())
 
-	// Create a request
-	address := []byte("/default/stop_visits")
+	svTime, _ := time.Parse(timeLayout, "2007/01/02-15:04:05")
+	stopVisit.Schedules.SetArrivalTime("actual", svTime)
+	referential.Model().StopVisits().Save(stopVisit)
+
+	stopVisit2 := model.NewStopVisit(referential.Model())
+	svTime, _ = time.Parse(timeLayout, "2005/01/02-15:04:05")
+	stopVisit2.Schedules.SetArrivalTime("actual", svTime)
+	referential.Model().StopVisits().Save(stopVisit2)
+
+	url := "/default/stop_visits"
+	if method == "GET" && !sendIdentifier {
+		url = url + "?After=2006/01/02-15:04:05"
+	}
+	address := []byte(url)
 	if sendIdentifier {
 		address = append(address, fmt.Sprintf("/%s", stopVisit.Id())...)
 	}
@@ -118,8 +131,8 @@ func Test_StopVisitController_Create(t *testing.T) {
 
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
-	// stopVisit should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	stopVisit, ok := referential.Model().StopVisits().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	// stopVisit should be 6ba7b814-9dad-11d1-2-00c04fd430c8
+	stopVisit, ok := referential.Model().StopVisits().Find("6ba7b814-9dad-11d1-2-00c04fd430c8")
 	if !ok {
 		t.Errorf("StopVisit should be found after POST request")
 	}
@@ -137,7 +150,7 @@ func Test_StopVisitController_Index(t *testing.T) {
 
 	//Test Results
 
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"VehicleAtStop":false}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"Schedules":[{"ArrivalTime":"2007-01-02T15:04:05Z","Kind":"actual"}],"VehicleAtStop":false}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

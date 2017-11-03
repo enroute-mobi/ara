@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -29,7 +30,7 @@ func (controller *ReferentialController) findReferential(identifier string) *cor
 	return controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 }
 
-func (controller *ReferentialController) Index(response http.ResponseWriter) {
+func (controller *ReferentialController) Index(response http.ResponseWriter, filters url.Values) {
 	logger.Log.Debugf("Referentials Index")
 
 	jsonBytes, _ := json.Marshal(controller.server.CurrentReferentials().FindAll())

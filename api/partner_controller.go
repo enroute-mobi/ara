@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/af83/edwig/core"
@@ -110,7 +111,7 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(core.PartnerId(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter) {
+func (controller *PartnerController) Index(response http.ResponseWriter, filters url.Values) {
 	logger.Log.Debugf("Partners Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())

@@ -13,6 +13,33 @@ func StopVisitSelectorByTime(startTime, endTime time.Time) StopVisitSelector {
 	}
 }
 
+func StopVisitSelectorAfterTime(startTime time.Time) StopVisitSelector {
+	return func(stopVisit StopVisit) bool {
+		if stopVisit.ReferenceTime().IsZero() || stopVisit.ReferenceTime().Before(startTime) {
+			return false
+		}
+		return true
+	}
+}
+
+func StopVisitSelectorBeforeTime(endTime time.Time) StopVisitSelector {
+	return func(stopVisit StopVisit) bool {
+		if stopVisit.ReferenceTime().IsZero() || stopVisit.ReferenceTime().After(endTime) {
+			return false
+		}
+		return true
+	}
+}
+
+func StopVisitSelectByStopAreaId(stopAreaId StopAreaId) StopVisitSelector {
+	return func(stopVisit StopVisit) bool {
+		if stopVisit.StopAreaId != stopAreaId {
+			return false
+		}
+		return true
+	}
+}
+
 func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
 	return func(stopVisit StopVisit) bool {
 		vehicleJourney := stopVisit.VehicleJourney()

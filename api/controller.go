@@ -3,6 +3,7 @@ package api
 import (
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/af83/edwig/core"
 )
@@ -24,7 +25,7 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Contro
 }
 
 type RestfulRessource interface {
-	Index(response http.ResponseWriter)
+	Index(response http.ResponseWriter, filters url.Values)
 	Show(response http.ResponseWriter, identifier string)
 	Delete(response http.ResponseWriter, identifier string)
 	Update(response http.ResponseWriter, identifier string, body []byte)
@@ -86,7 +87,7 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 	switch requestData.Method {
 	case "GET":
 		if requestData.Id == "" {
-			controller.restfulRessource.Index(response)
+			controller.restfulRessource.Index(response, requestData.Filters)
 			return
 		}
 		controller.restfulRessource.Show(response, requestData.Id)

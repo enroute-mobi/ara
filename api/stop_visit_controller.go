@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -34,13 +36,51 @@ func (controller *StopVisitController) findStopVisit(tx *model.Transaction, iden
 	return tx.Model().StopVisits().Find(model.StopVisitId(identifier))
 }
 
-func (controller *StopVisitController) Index(response http.ResponseWriter) {
+func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopVisit, filters url.Values) []model.StopVisit {
+	selectors := []model.StopVisitSelector{}
+	filteredStopVisits := []model.StopVisit{}
+
+	for key, value := range filters {
+		switch key {
+		case "After":
+			layout := "2006/01/02-15:04:05"
+			startTime, err := time.Parse(layout, value[0])
+			if err != nil {
+				continue
+			}
+			selectors = append(selectors, model.StopVisitSelectorAfterTime(startTime))
+		case "Before":
+			layout := "2006/01/02-15:04:05"
+			endTime, err := time.Parse(layout, value[0])
+			if err != nil {
+				continue
+			}
+			selectors = append(selectors, model.StopVisitSelectorAfterTime(endTime))
+		case "StopArea":
+			selectors = append(selectors, model.StopVisitSelectByStopAreaId(model.StopAreaId(value[0])))
+		}
+	}
+
+	selector := model.CompositeStopVisitSelector(selectors)
+	for _, sv := range stopVisits {
+		if !selector(sv) {
+			continue
+		}
+		filteredStopVisits = append(filteredStopVisits, sv)
+	}
+
+	return filteredStopVisits
+}
+
+func (controller *StopVisitController) Index(response http.ResponseWriter, filters url.Values) {
 	tx := controller.referential.NewTransaction()
 	defer tx.Close()
 
-	logger.Log.Debugf("StopVisits Index")
+	stopVisits := tx.Model().StopVisits().FindAll()
+	filteredStopVisits := controller.filterStopVisits(stopVisits, filters)
 
-	jsonBytes, _ := json.Marshal(tx.Model().StopVisits().FindAll())
+	logger.Log.Debugf("StopVisits Index")
+	jsonBytes, _ := json.Marshal(filteredStopVisits)
 	response.Write(jsonBytes)
 }
 
