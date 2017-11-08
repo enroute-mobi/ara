@@ -116,18 +116,19 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			ValidUntil:        gm.InitialTerminationTime(),
 		}
 
-		_, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
+		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
-			sub := connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
+			sub = connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
 			sub.SetExternalId(gm.SubscriptionIdentifier())
-			sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
-			sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
-			sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
-			sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
-			sub.Save()
-
-			connector.addSituations(sub.Id())
 		}
+
+		sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
+		sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
+		sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
+		sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
+		sub.Save()
+
+		connector.addSituations(sub.Id())
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		resps = append(resps, rs)
