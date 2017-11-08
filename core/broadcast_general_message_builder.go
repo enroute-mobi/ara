@@ -56,6 +56,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	}
 
 	// InfoChannelRef filter
+
 	if !builder.checkInfoChannelRef(builder.InfoChannelRef, situation.Channel) {
 		return nil
 	}
@@ -125,6 +126,7 @@ func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChanne
 			return true
 		}
 	}
+
 	return false
 }
 

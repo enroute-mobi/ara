@@ -296,8 +296,6 @@ func Test_ReceiveStateSM(t *testing.T) {
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
-	sv1.Save()
-	sv2.Save()
 
 	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
 	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
@@ -313,4 +311,114 @@ func Test_ReceiveStateSM(t *testing.T) {
 	if len(delivery[0].XMLMonitoredStopVisits()) != 2 {
 		t.Errorf("Should have received 2 Monitored stop visit but got %v", len(delivery[0].XMLMonitoredStopVisits()))
 	}
+}
+
+func Test_ReceiveStateGM(t *testing.T) {
+	fakeClock := model.NewFakeClock()
+	model.SetDefaultClock(fakeClock)
+
+	// Create a test http server
+
+	response := []byte{}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response, _ = ioutil.ReadAll(r.Body)
+		w.Header().Add("Content-Type", "text/xml")
+	}))
+	defer ts.Close()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.model = model.NewMemoryModel()
+
+	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "_internal"
+	partner.Settings["remote_credential"] = "external"
+	partner.Settings["remote_url"] = ts.URL
+	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
+	connector2, _ := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+
+	connector2.(*SIRIGeneralMessageSubscriptionBroadcaster).SetClock(fakeClock)
+	connector2.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster = NewFakeGeneralMessageBroadcaster(connector2.(*SIRIGeneralMessageSubscriptionBroadcaster))
+	situation := referential.Model().Situations().New()
+
+	line := referential.Model().Lines().New()
+	objectid0 := model.NewObjectID("_internal", "line1")
+	line.SetObjectID(objectid0)
+	line.Save()
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+	objectid1 := model.NewObjectID("_internal", "coicogn1")
+
+	situation.References = append(situation.References, &model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
+
+	stopArea.SetObjectID(objectid1)
+	stopArea.Save()
+
+	stopArea = referential.Model().StopAreas().New()
+	stopArea.Save()
+	objectid2 := model.NewObjectID("_internal", "coicogn2")
+
+	situation.References = append(situation.References, &model.Reference{ObjectId: &objectid2, Type: "StopPointRef"})
+
+	stopArea.SetObjectID(objectid2)
+	stopArea.Save()
+
+	objectid3 := model.NewObjectID("_internal", string(situation.Id()))
+	situation.Channel = "Mondial"
+	situation.ValidUntil = fakeClock.Now().Add(10 * time.Minute)
+	message := &model.Message{
+		Content:             "Le content",
+		Type:                "Le Type",
+		NumberOfLines:       1,
+		NumberOfCharPerLine: 10,
+	}
+	situation.Messages = append(situation.Messages, message)
+	situation.SetObjectID(objectid3)
+
+	lineSectionReferences := model.NewReferences()
+	lineSectionReferences["FirstStop"] = model.Reference{ObjectId: &objectid2, Type: "StopPointRef"}
+	lineSectionReferences["LastStop"] = model.Reference{ObjectId: &objectid1, Type: "StopPointRef"}
+	lineSectionReferences["LinesRef"] = model.Reference{ObjectId: &objectid0, Type: "LineRef"}
+
+	situation.LineSections = append(situation.LineSections, &lineSectionReferences)
+	situation.Save()
+
+	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
+	body, _ := ioutil.ReadAll(file)
+	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	time.Sleep(10 * time.Millisecond)
+
+	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	connector2.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
+	time.Sleep(10 * time.Millisecond)
+
+	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(response)
+	delivery := notify.GeneralMessagesDeliveries()
+
+	if len(delivery) != 1 {
+		t.Errorf("Should have received 1 delivery but got == %v", len(delivery))
+	}
+
+	gms := delivery[0].XMLGeneralMessages()
+	if len(gms) != 1 {
+		t.Errorf("Should have received 1 GeneralMessage but got == %v", len(gms))
+	}
+
+	content := gms[0].Content().(siri.IDFGeneralMessageStructure)
+
+	messages := content.Messages()
+
+	if len(messages) != 1 {
+		t.Errorf("Should have received 1 messages but got == %v", len(messages))
+	}
+
 }

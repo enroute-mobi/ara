@@ -125,14 +125,20 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
 			sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
 			sub.Save()
-		}
 
+			connector.addSituations(sub.Id())
+		}
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 		resps = append(resps, rs)
 	}
 	return resps
+}
+
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(subId SubscriptionId) {
+	for _, situation := range connector.partner.Model().Situations().FindAll() {
+		connector.addSituation(subId, situation.Id())
+	}
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {

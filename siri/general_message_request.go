@@ -126,7 +126,7 @@ func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
 			}
 		}
 	}
-	return request.groupOfLinesRef
+	return request.infoChannelRef
 }
 
 func (request *XMLGeneralMessageRequest) GroupOfLinesRef() []string {
