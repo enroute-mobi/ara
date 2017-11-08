@@ -70,10 +70,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Start() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
-	subId, ok := connector.checkEvent(event.SituationId)
-	if ok {
-		connector.addSituation(subId, event.SituationId)
-	}
+	connector.checkEvent(event.SituationId)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituation(subId SubscriptionId, svId model.SituationId) {
@@ -82,22 +79,18 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituation(subId S
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model.SituationId) (SubscriptionId, bool) {
-	subId := SubscriptionId(0) //just to return a correct type for errors
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model.SituationId) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	_, ok := tx.Model().Situations().Find(sId)
 	if !ok {
-		return subId, false
+		return
 	}
-
-	sub, ok := connector.partner.Subscriptions().FindByKind("GeneralMessageBroadcast")
-	if !ok {
-		return subId, false
+	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
+	for _, sub := range subs {
+		connector.addSituation(sub.Id(), sId)
 	}
-
-	return sub.Id(), true
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
