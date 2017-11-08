@@ -195,6 +195,9 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	defer tx.Close()
 
 	for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
+		if _, ok := res.LastStates[string(sv.Id())]; ok {
+			continue
+		}
 		smlc := &stopMonitoringLastChange{}
 		smlc.InitState(&sv, sub)
 		res.LastStates[string(sv.Id())] = smlc
