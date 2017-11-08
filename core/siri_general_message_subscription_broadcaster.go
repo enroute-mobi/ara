@@ -83,12 +83,31 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	_, ok := tx.Model().Situations().Find(sId)
+	situation, ok := tx.Model().Situations().Find(sId)
 	if !ok {
 		return
 	}
+
+	obj, _ := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
 	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
+
 	for _, sub := range subs {
+		resource, ok := sub.ResourcesByObjectID()[obj.String()]
+		if !ok || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+			continue
+		}
+
+		lastState, ok := resource.LastStates[string(situation.Id())]
+
+		if ok && !lastState.(*generalMessageLastChange).Haschanged(&situation) {
+			continue
+		}
+
+		if !ok {
+			gmlc := &generalMessageLastChange{}
+			gmlc.InitState(&situation, sub)
+			resource.LastStates[string(situation.Id())] = gmlc
+		}
 		connector.addSituation(sub.Id(), sId)
 	}
 }
@@ -119,9 +138,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
 		sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
 		sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
+
 		sub.Save()
 
-		connector.addSituations(sub.Id())
+		connector.addSituations(sub, gm)
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		resps = append(resps, rs)
@@ -129,9 +149,25 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 	return resps
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(subId SubscriptionId) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *Subscription, gm *siri.XMLGeneralMessageSubscriptionRequestEntry) {
 	for _, situation := range connector.partner.Model().Situations().FindAll() {
-		connector.addSituation(subId, situation.Id())
+		objectid, _ := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
+		r := sub.Resource(objectid)
+		if r != nil {
+			continue
+		}
+		ref := model.Reference{
+			ObjectId: &objectid,
+			Type:     "Situation",
+		}
+		r = sub.CreateAddNewResource(ref)
+		r.SubscribedAt = connector.Clock().Now()
+		r.SubscribedUntil = gm.InitialTerminationTime()
+
+		gmlc := &generalMessageLastChange{}
+		gmlc.InitState(&situation, sub)
+		r.LastStates[string(situation.Id())] = gmlc
+		connector.addSituation(sub.Id(), situation.Id())
 	}
 }
 

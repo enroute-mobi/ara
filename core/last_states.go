@@ -150,7 +150,7 @@ func (sglc *generalMessageLastChange) UpdateState(situation *model.Situation) bo
 }
 
 func (sglc *generalMessageLastChange) Haschanged(situation *model.Situation) bool {
-	return situation.Version == sglc.version
+	return !(situation.Version == sglc.version)
 }
 
 type schedulesHandler struct{}
