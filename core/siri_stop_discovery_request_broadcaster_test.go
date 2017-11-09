@@ -29,6 +29,11 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	line2.SetObjectID(lineObjectId2)
 	line2.Save()
 
+	line3 := referential.Model().Lines().New()
+	lineObjectId3 := model.NewObjectID("_default", "5678")
+	line3.SetObjectID(lineObjectId3)
+	line3.Save()
+
 	firstStopArea := referential.Model().StopAreas().New()
 	firstObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetObjectID(firstObjectID)
