@@ -68,14 +68,10 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		}
 		for _, line := range stopArea.Lines() {
 			objectid, ok := line.ObjectID(objectIDKind)
-			if ok {
-				annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
-			} else {
-				defaultObjectID, ok := line.ObjectID("_default")
-				if ok {
-					annotedStopPoint.Lines = append(annotedStopPoint.Lines, defaultObjectID.Value())
-				}
+			if !ok {
+				continue
 			}
+			annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
 		}
 		if len(annotedStopPoint.Lines) == 0 {
 			continue
