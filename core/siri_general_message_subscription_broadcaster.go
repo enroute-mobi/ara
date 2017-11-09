@@ -88,7 +88,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return
 	}
 
-	obj, _ := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
+	obj := model.NewObjectID("SituationRessource", "Situation")
 	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
 
 	for _, sub := range subs {
@@ -139,9 +139,21 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
 		sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
 
+		obj := model.NewObjectID("SituationRessource", "Situation")
+		r := sub.Resource(obj)
+		if r == nil {
+			ref := model.Reference{
+				ObjectId: &obj,
+				Type:     "Situation",
+			}
+			r = sub.CreateAddNewResource(ref)
+			r.SubscribedAt = connector.Clock().Now()
+			r.SubscribedUntil = gm.InitialTerminationTime()
+		}
+
 		sub.Save()
 
-		connector.addSituations(sub, gm)
+		connector.addSituations(sub, r)
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		resps = append(resps, rs)
@@ -149,20 +161,11 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 	return resps
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *Subscription, gm *siri.XMLGeneralMessageSubscriptionRequestEntry) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *Subscription, r *SubscribedResource) {
 	for _, situation := range connector.partner.Model().Situations().FindAll() {
-		objectid, _ := situation.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER))
-		r := sub.Resource(objectid)
-		if r != nil {
+		if situation.ValidUntil.Before(connector.Clock().Now()) {
 			continue
 		}
-		ref := model.Reference{
-			ObjectId: &objectid,
-			Type:     "Situation",
-		}
-		r = sub.CreateAddNewResource(ref)
-		r.SubscribedAt = connector.Clock().Now()
-		r.SubscribedUntil = gm.InitialTerminationTime()
 
 		gmlc := &generalMessageLastChange{}
 		gmlc.InitState(&situation, sub)
