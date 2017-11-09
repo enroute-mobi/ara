@@ -162,6 +162,8 @@ func Test_PartnerController_Update(t *testing.T) {
 	rdata := &RequestTestData{}
 	server, referential := createReferential()
 	partner := createPartner(referential)
+	sub := partner.Subscriptions().New("Test")
+	sub.Save()
 
 	rdata.Body = []byte(`{ "Slug": "Yet another test" }`)
 	rdata.Method = "PUT"
@@ -184,6 +186,9 @@ func Test_PartnerController_Update(t *testing.T) {
 	}
 	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
+	}
+	if len(partner.Subscriptions().FindAll()) > 0 {
+		t.Errorf("All subscription should be deleted after a partenr Edit")
 	}
 }
 

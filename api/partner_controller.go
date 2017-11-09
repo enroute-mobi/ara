@@ -175,6 +175,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 	}
 
 	partner.SetDefinition(apiPartner)
+	partner.CancelSubscriptions()
 	partner.Save()
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
