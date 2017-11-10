@@ -1,7 +1,9 @@
 package core
 
 import (
+	"strconv"
 	"sync"
+	"time"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
@@ -68,13 +70,56 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	resps := []siri.SIRIResponseStatus{}
 
 	for _, ett := range ettEntries {
+		logStashEvent := connector.newLogStashEvent()
+		logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent, ett)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+		resources := []SubscribedResource{}
 		rs := siri.SIRIResponseStatus{
+			Status:            true,
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
 			SubscriptionRef:   ett.SubscriptionIdentifier(),
 			ResponseTimestamp: connector.Clock().Now(),
-			Status:            true,
+			ValidUntil:        ett.InitialTerminationTime(),
+		}
+
+		for _, lineId := range ett.Lines() {
+			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
+			_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
+
+			if !ok {
+				rs.Status = false
+				rs.ErrorType = "InvalidDataReferencesError"
+				rs.ErrorText = "Could not find Line"
+				rs.ValidUntil = time.Time{}
+
+				resources = []SubscribedResource{}
+
+				logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
+				audit.CurrentLogStash().WriteEvent(logStashEvent)
+				logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line with id : %v", lineId)
+
+				break
+			}
+
+			ref := model.Reference{
+				ObjectId: &lineObjectId,
+				Type:     "Line",
+			}
+
+			r := NewResource(ref)
+			r.SubscribedAt = connector.Clock().Now()
+			r.SubscribedUntil = ett.InitialTerminationTime()
+			resources = append(resources, r)
+		}
+		resps = append(resps, rs)
+
+		logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+		if !rs.Status {
+			continue
 		}
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
@@ -83,35 +128,16 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			sub.SetExternalId(ett.SubscriptionIdentifier())
 		}
 
-		for _, lineId := range ett.Lines() {
-			logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent, ett)
+		for _, r := range resources {
+			line, _ := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			connector.addLine(sub.Id(), line.Id())
 
-			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
-			_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
-
-			if !ok {
-				rs.Status = false
-				rs.ErrorType = "InvalidDataReferencesError"
-				rs.ErrorText = "Could not find line"
-
-				resps = append(resps, rs)
-				logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line with id : %v", lineId)
-				continue
-			}
-
-			ref := model.Reference{
-				ObjectId: &lineObjectId,
-				Type:     "line",
-			}
-
-			r := sub.CreateAddNewResource(ref)
-			r.SubscribedAt = connector.Clock().Now()
-			r.SubscribedUntil = ett.InitialTerminationTime()
+			sub.AddNewResource(r)
+			resources = []SubscribedResource{}
 			connector.fillOptions(sub, request)
-
-			rs.ValidUntil = ett.InitialTerminationTime()
 		}
-		resps = append(resps, rs)
+
+		sub.Save()
 	}
 	return resps
 }
@@ -211,12 +237,27 @@ func logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent audit
 	logStashEvent["requestXML"] = xml
 }
 
-func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEvent, gmEntries *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
-	logStashEvent["type"] = "EstimatedTimeTableSubscription"
-	logStashEvent["subscriberRef"] = gmEntries.SubscriberRef()
-	logStashEvent["subscriptionRef"] = gmEntries.SubscriptionIdentifier()
+func logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent audit.LogStashEvent, response siri.SIRIResponseStatus) {
+	logStashEvent["requestMessageRef"] = response.RequestMessageRef
+	logStashEvent["subscriptionRef"] = response.SubscriptionRef
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["validUntil"] = response.ValidUntil.String()
+	logStashEvent["status"] = strconv.FormatBool(response.Status)
+	if !response.Status {
+		logStashEvent["errorType"] = response.ErrorType
+		if response.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		}
+		logStashEvent["errorText"] = response.ErrorText
+	}
+}
 
-	xml := gmEntries.RawXML()
+func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEvent, ettEntries *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
+	logStashEvent["type"] = "EstimatedTimeTableSubscription"
+	logStashEvent["subscriberRef"] = ettEntries.SubscriberRef()
+	logStashEvent["subscriptionRef"] = ettEntries.SubscriptionIdentifier()
+
+	xml := ettEntries.RawXML()
 	logStashEvent["requestXML"] = xml
 }
 
