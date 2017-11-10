@@ -127,11 +127,16 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
 			sub.SetExternalId(ett.SubscriptionIdentifier())
 		}
+
 		for _, r := range resources {
+			line, _ := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			connector.addLine(sub.Id(), line.Id())
+
 			sub.AddNewResource(r)
 			resources = []SubscribedResource{}
 			connector.fillOptions(sub, request)
 		}
+
 		sub.Save()
 	}
 	return resps
