@@ -221,10 +221,10 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	return true
 }
 
-func (manager *MemoryLines) Load(referentialId string) error {
+func (manager *MemoryLines) Load(referentialSlug string) error {
 	var selectLines []SelectLine
 	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from lines where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from lines where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
 	_, err := Database.Select(&selectLines, sqlQuery)
 	if err != nil {
 		return err

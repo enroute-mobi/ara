@@ -200,13 +200,13 @@ func Test_MemoryLines_Load(t *testing.T) {
 
 	// Insert Data in the test db
 	databaseLine := DatabaseLine{
-		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ModelName:     "2017-01-01",
-		Name:          "line",
-		ObjectIDs:     `{"internal":"value"}`,
-		Attributes:    "{}",
-		References:    "{}",
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "2017-01-01",
+		Name:            "line",
+		ObjectIDs:       `{"internal":"value"}`,
+		Attributes:      "{}",
+		References:      "{}",
 	}
 
 	Database.AddTableWithName(databaseLine, "lines")
@@ -223,7 +223,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 		Day:   1,
 	}
 	lines := model.Lines().(*MemoryLines)
-	err = lines.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	err = lines.Load("referential")
 	if err != nil {
 		t.Fatal(err)
 	}

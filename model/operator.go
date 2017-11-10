@@ -147,14 +147,14 @@ func (manager *MemoryOperators) Delete(operator *Operator) bool {
 	return true
 }
 
-func (manager *MemoryOperators) Load(referentialId string) error {
+func (manager *MemoryOperators) Load(referentialSlug string) error {
 	var selectOperators []struct {
-		Id            string
-		ReferentialId string `db:"referential_id"`
-		Name          sql.NullString
-		ObjectIDs     sql.NullString `db:"object_ids"`
+		Id              string
+		ReferentialSlug string `db:"referential_slug"`
+		Name            sql.NullString
+		ObjectIDs       sql.NullString `db:"object_ids"`
 	}
-	sqlQuery := fmt.Sprintf("select * from operators where referential_id = '%s'", referentialId)
+	sqlQuery := fmt.Sprintf("select * from operators where referential_slug = '%s'", referentialSlug)
 
 	_, err := Database.Select(&selectOperators, sqlQuery)
 	if err != nil {

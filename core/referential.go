@@ -227,7 +227,7 @@ func (referential *Referential) setNextReloadAt() {
 
 func (referential *Referential) Load() {
 	referential.Partners().Load()
-	referential.model.Load(string(referential.id))
+	referential.model.Load(string(referential.slug))
 }
 
 type MemoryReferentials struct {

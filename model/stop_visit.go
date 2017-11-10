@@ -384,11 +384,11 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	return true
 }
 
-func (manager *MemoryStopVisits) Load(referentialId string) error {
+func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 	var selectStopVisits []SelectStopVisit
 	modelName := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
 	_, err := Database.Select(&selectStopVisits, sqlQuery)
 	if err != nil {
 		return err

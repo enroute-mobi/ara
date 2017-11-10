@@ -216,14 +216,14 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 
 	// Insert Data in the test db
 	databaseVehicleJourney := DatabaseVehicleJourney{
-		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ModelName:     "2017-01-01",
-		Name:          "vehicleJourney",
-		ObjectIDs:     `{"internal":"value"}`,
-		LineId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Attributes:    "{}",
-		References:    "{}",
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "2017-01-01",
+		Name:            "vehicleJourney",
+		ObjectIDs:       `{"internal":"value"}`,
+		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Attributes:      "{}",
+		References:      "{}",
 	}
 
 	Database.AddTableWithName(databaseVehicleJourney, "vehicle_journeys")
@@ -240,7 +240,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		Day:   1,
 	}
 	vehicleJourneys := model.VehicleJourneys().(*MemoryVehicleJourneys)
-	err = vehicleJourneys.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	err = vehicleJourneys.Load("referential")
 	if err != nil {
 		t.Fatal(err)
 	}

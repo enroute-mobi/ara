@@ -180,15 +180,15 @@ func Test_MemoryOperators_Load(t *testing.T) {
 
 	// Insert Data in the test db
 	var databaseOperator = struct {
-		Id            string `db:"id"`
-		ReferentialId string `db:"referential_id"`
-		Name          string `db:"name"`
-		ObjectIDs     string `db:"object_ids"`
+		Id              string `db:"id"`
+		ReferentialSlug string `db:"referential_slug"`
+		Name            string `db:"name"`
+		ObjectIDs       string `db:"object_ids"`
 	}{
-		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ReferentialId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Name:          "operator",
-		ObjectIDs:     `{"internal":"value"}`,
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		Name:            "operator",
+		ObjectIDs:       `{"internal":"value"}`,
 	}
 
 	Database.AddTableWithName(databaseOperator, "operators")
@@ -199,7 +199,7 @@ func Test_MemoryOperators_Load(t *testing.T) {
 
 	// Fetch data from the db
 	operators := NewMemoryOperators()
-	err = operators.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	err = operators.Load("referential")
 	if err != nil {
 		t.Fatal(err)
 	}

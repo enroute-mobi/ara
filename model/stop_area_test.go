@@ -269,7 +269,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	// Insert Data in the test db
 	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ReferentialId:   "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
 		ParentId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
@@ -298,7 +298,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		Day:   1,
 	}
 	stopAreas := model.StopAreas().(*MemoryStopAreas)
-	err = stopAreas.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	err = stopAreas.Load("referential")
 	if err != nil {
 		t.Fatal(err)
 	}

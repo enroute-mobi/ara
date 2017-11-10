@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -14,10 +15,10 @@ import (
 
 /* CSV Structure
 
-stop_area,Id,ReferentialId,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,NextCollectAt,CollectedAt,CollectedUntil,CollectedAlways,CollectChildren
-line,Id,ReferentialId,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages,CollectedAt
-vehicle_journey,Id,ReferentialId,ModelName,Name,ObjectIDs,LineId,Attributes,References
-stop_visit,Id,ReferentialId,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,CollectedAt,RecordedAt,Collected,VehicleAtStop,PassageOrder
+stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,NextCollectAt,CollectedAt,CollectedUntil,CollectedAlways,CollectChildren
+line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages,CollectedAt
+vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,Attributes,References
+stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,CollectedAt,RecordedAt,Collected,VehicleAtStop,PassageOrder
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -25,7 +26,7 @@ Separators are ',' leading spaces are trimed
 Escape quotes with another quote ex: "[""1234"",""5678""]"
 */
 
-func LoadFromCSV(filePath string) error {
+func LoadFromCSV(filePath string, referentialSlug string) error {
 	prepareDatabase()
 
 	file, err := os.Open(filePath)
@@ -54,22 +55,22 @@ func LoadFromCSV(filePath string) error {
 
 		switch record[0] {
 		case "stop_area":
-			err := handleStopArea(record)
+			err := handleStopArea(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 			}
 		case "line":
-			err := handleLine(record)
+			err := handleLine(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 			}
 		case "vehicle_journey":
-			err := handleVehicleJourney(record)
+			err := handleVehicleJourney(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 			}
 		case "stop_visit":
-			err := handleStopVisit(record)
+			err := handleStopVisit(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 			}
@@ -88,49 +89,56 @@ func prepareDatabase() {
 	Database.AddTableWithName(DatabaseStopVisit{}, "stop_visits")
 }
 
-func handleStopArea(record []string) error {
-	if len(record) != 15 {
+func handleStopArea(record []string, referentialSlug string) error {
+	if len(record) != 14 {
 		return fmt.Errorf("Wrong number of entries")
 	}
 
 	var err error
 	parseErrors := make(map[string]string)
+	var parent sql.NullString
+	if record[2] != "" {
+		parent = sql.NullString{
+			String: record[2],
+			Valid:  true,
+		}
+	}
 
 	var nextCollectAt time.Time
-	if record[10] != "" {
-		nextCollectAt, err = time.Parse(time.RFC3339, record[10])
+	if record[9] != "" {
+		nextCollectAt, err = time.Parse(time.RFC3339, record[9])
 		if err != nil {
 			parseErrors["NextCollectAt"] = err.Error()
 		}
 	}
 
 	var collectedAt time.Time
-	if record[11] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[11])
+	if record[10] != "" {
+		collectedAt, err = time.Parse(time.RFC3339, record[10])
 		if err != nil {
 			parseErrors["CollectedAt"] = err.Error()
 		}
 	}
 
 	var collectedUntil time.Time
-	if record[12] != "" {
-		collectedUntil, err = time.Parse(time.RFC3339, record[12])
+	if record[11] != "" {
+		collectedUntil, err = time.Parse(time.RFC3339, record[11])
 		if err != nil {
 			parseErrors["CollectedUntil"] = err.Error()
 		}
 	}
 
 	var collectedAlways bool
-	if record[13] != "" {
-		collectedAlways, err = strconv.ParseBool(record[13])
+	if record[12] != "" {
+		collectedAlways, err = strconv.ParseBool(record[12])
 		if err != nil {
 			parseErrors["CollectedAlways"] = err.Error()
 		}
 	}
 
 	var collectChildren bool
-	if record[14] != "" {
-		collectChildren, err = strconv.ParseBool(record[14])
+	if record[13] != "" {
+		collectChildren, err = strconv.ParseBool(record[13])
 		if err != nil {
 			parseErrors["CollectChildren"] = err.Error()
 		}
@@ -143,14 +151,14 @@ func handleStopArea(record []string) error {
 
 	stopArea := DatabaseStopArea{
 		Id:              record[1],
-		ReferentialId:   record[2],
-		ParentId:        record[3],
-		ModelName:       record[4],
-		Name:            record[5],
-		ObjectIDs:       record[6],
-		LineIds:         record[7],
-		Attributes:      record[8],
-		References:      record[9],
+		ReferentialSlug: referentialSlug,
+		ParentId:        parent,
+		ModelName:       record[3],
+		Name:            record[4],
+		ObjectIDs:       record[5],
+		LineIds:         record[6],
+		Attributes:      record[7],
+		References:      record[8],
 		NextCollectAt:   nextCollectAt,
 		CollectedAt:     collectedAt,
 		CollectedUntil:  collectedUntil,
@@ -166,8 +174,8 @@ func handleStopArea(record []string) error {
 	return nil
 }
 
-func handleLine(record []string) error {
-	if len(record) != 10 {
+func handleLine(record []string, referentialSlug string) error {
+	if len(record) != 9 {
 		return fmt.Errorf("Wrong number of entries")
 	}
 
@@ -175,16 +183,16 @@ func handleLine(record []string) error {
 	parseErrors := make(map[string]string)
 
 	var collectGeneralMessages bool
-	if record[8] != "" {
-		collectGeneralMessages, err = strconv.ParseBool(record[8])
+	if record[7] != "" {
+		collectGeneralMessages, err = strconv.ParseBool(record[7])
 		if err != nil {
 			parseErrors["CollectGeneralMessages"] = err.Error()
 		}
 	}
 
 	var collectedAt time.Time
-	if record[9] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[9])
+	if record[8] != "" {
+		collectedAt, err = time.Parse(time.RFC3339, record[8])
 		if err != nil {
 			parseErrors["CollectedAt"] = err.Error()
 		}
@@ -192,12 +200,12 @@ func handleLine(record []string) error {
 
 	line := DatabaseLine{
 		Id:                     record[1],
-		ReferentialId:          record[2],
-		ModelName:              record[3],
-		Name:                   record[4],
-		ObjectIDs:              record[5],
-		Attributes:             record[6],
-		References:             record[7],
+		ReferentialSlug:        referentialSlug,
+		ModelName:              record[2],
+		Name:                   record[3],
+		ObjectIDs:              record[4],
+		Attributes:             record[5],
+		References:             record[6],
 		CollectGeneralMessages: collectGeneralMessages,
 		CollectedAt:            collectedAt,
 	}
@@ -210,20 +218,20 @@ func handleLine(record []string) error {
 	return nil
 }
 
-func handleVehicleJourney(record []string) error {
-	if len(record) != 9 {
+func handleVehicleJourney(record []string, referentialSlug string) error {
+	if len(record) != 8 {
 		return fmt.Errorf("Wrong number of entries")
 	}
 
 	vehicleJourney := DatabaseVehicleJourney{
-		Id:            record[1],
-		ReferentialId: record[2],
-		ModelName:     record[3],
-		Name:          record[4],
-		ObjectIDs:     record[5],
-		LineId:        record[6],
-		Attributes:    record[7],
-		References:    record[8],
+		Id:              record[1],
+		ReferentialSlug: referentialSlug,
+		ModelName:       record[2],
+		Name:            record[3],
+		ObjectIDs:       record[4],
+		LineId:          record[5],
+		Attributes:      record[6],
+		References:      record[7],
 	}
 
 	err := Database.Insert(&vehicleJourney)
@@ -234,8 +242,8 @@ func handleVehicleJourney(record []string) error {
 	return nil
 }
 
-func handleStopVisit(record []string) error {
-	if len(record) != 17 {
+func handleStopVisit(record []string, referentialSlug string) error {
+	if len(record) != 16 {
 		return fmt.Errorf("Wrong number of entries")
 	}
 
@@ -243,40 +251,40 @@ func handleStopVisit(record []string) error {
 	parseErrors := make(map[string]string)
 
 	var collectedAt time.Time
-	if record[12] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[12])
+	if record[11] != "" {
+		collectedAt, err = time.Parse(time.RFC3339, record[11])
 		if err != nil {
 			parseErrors["CollectedAt"] = err.Error()
 		}
 	}
 
 	var recordedAt time.Time
-	if record[13] != "" {
-		recordedAt, err = time.Parse(time.RFC3339, record[13])
+	if record[12] != "" {
+		recordedAt, err = time.Parse(time.RFC3339, record[12])
 		if err != nil {
 			parseErrors["RecordedAt"] = err.Error()
 		}
 	}
 
 	var collected bool
-	if record[14] != "" {
-		collected, err = strconv.ParseBool(record[14])
+	if record[13] != "" {
+		collected, err = strconv.ParseBool(record[13])
 		if err != nil {
 			parseErrors["Collected"] = err.Error()
 		}
 	}
 
 	var vehicleAtStop bool
-	if record[15] != "" {
-		vehicleAtStop, err = strconv.ParseBool(record[15])
+	if record[14] != "" {
+		vehicleAtStop, err = strconv.ParseBool(record[14])
 		if err != nil {
 			parseErrors["VehicleAtStop"] = err.Error()
 		}
 	}
 
 	var passageOrder int
-	if record[16] != "" {
-		passageOrder, err = strconv.Atoi(record[16])
+	if record[15] != "" {
+		passageOrder, err = strconv.Atoi(record[15])
 		if err != nil {
 			parseErrors["PassageOrder"] = err.Error()
 		}
@@ -289,16 +297,16 @@ func handleStopVisit(record []string) error {
 
 	stopVisit := DatabaseStopVisit{
 		Id:               record[1],
-		ReferentialId:    record[2],
-		ModelName:        record[3],
-		ObjectIDs:        record[4],
-		StopAreaId:       record[5],
-		VehicleJourneyId: record[6],
-		ArrivalStatus:    record[7],
-		DepartureStatus:  record[8],
-		Schedules:        record[9],
-		Attributes:       record[10],
-		References:       record[11],
+		ReferentialSlug:  referentialSlug,
+		ModelName:        record[2],
+		ObjectIDs:        record[3],
+		StopAreaId:       record[4],
+		VehicleJourneyId: record[5],
+		ArrivalStatus:    record[6],
+		DepartureStatus:  record[7],
+		Schedules:        record[8],
+		Attributes:       record[9],
+		References:       record[10],
 		CollectedAt:      collectedAt,
 		RecordedAt:       recordedAt,
 		Collected:        collected,

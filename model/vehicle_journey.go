@@ -230,10 +230,10 @@ func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) boo
 	return true
 }
 
-func (manager *MemoryVehicleJourneys) Load(referentialId string) error {
+func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 	var selectVehicleJourneys []SelectVehicleJourney
 	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
 	_, err := Database.Select(&selectVehicleJourneys, sqlQuery)
 	if err != nil {
 		return err

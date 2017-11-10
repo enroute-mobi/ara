@@ -38,25 +38,25 @@ type SelectPartner struct {
 }
 
 type DatabaseStopArea struct {
-	Id              string    `db:"id"`
-	ReferentialId   string    `db:"referential_id"`
-	ParentId        string    `db:"parent_id"`
-	ModelName       string    `db:"model_name"`
-	Name            string    `db:"name"`
-	ObjectIDs       string    `db:"object_ids"`
-	LineIds         string    `db:"line_ids"`
-	Attributes      string    `db:"attributes"`
-	References      string    `db:"siri_references"`
-	NextCollectAt   time.Time `db:"next_collect_at"`
-	CollectedAt     time.Time `db:"collected_at"`
-	CollectedUntil  time.Time `db:"collected_until"`
-	CollectedAlways bool      `db:"collected_always"`
-	CollectChildren bool      `db:"collect_children"`
+	Id              string         `db:"id"`
+	ReferentialSlug string         `db:"referential_slug"`
+	ParentId        sql.NullString `db:"parent_id"`
+	ModelName       string         `db:"model_name"`
+	Name            string         `db:"name"`
+	ObjectIDs       string         `db:"object_ids"`
+	LineIds         string         `db:"line_ids"`
+	Attributes      string         `db:"attributes"`
+	References      string         `db:"siri_references"`
+	NextCollectAt   time.Time      `db:"next_collect_at"`
+	CollectedAt     time.Time      `db:"collected_at"`
+	CollectedUntil  time.Time      `db:"collected_until"`
+	CollectedAlways bool           `db:"collected_always"`
+	CollectChildren bool           `db:"collect_children"`
 }
 
 type SelectStopArea struct {
 	Id              string
-	ReferentialId   string `db:"referential_id"`
+	ReferentialSlug string `db:"referential_slug"`
 	ModelName       string `db:"model_name"`
 	Name            sql.NullString
 	ObjectIDs       sql.NullString `db:"object_ids"`
@@ -73,7 +73,7 @@ type SelectStopArea struct {
 
 type DatabaseLine struct {
 	Id                     string    `db:"id"`
-	ReferentialId          string    `db:"referential_id"`
+	ReferentialSlug        string    `db:"referential_slug"`
 	ModelName              string    `db:"model_name"`
 	Name                   string    `db:"name"`
 	ObjectIDs              string    `db:"object_ids"`
@@ -85,7 +85,7 @@ type DatabaseLine struct {
 
 type SelectLine struct {
 	Id                     string
-	ReferentialId          string `db:"referential_id"`
+	ReferentialSlug        string `db:"referential_slug"`
 	ModelName              string `db:"model_name"`
 	Name                   sql.NullString
 	ObjectIDs              sql.NullString `db:"object_ids"`
@@ -96,30 +96,30 @@ type SelectLine struct {
 }
 
 type DatabaseVehicleJourney struct {
-	Id            string `db:"id"`
-	ReferentialId string `db:"referential_id"`
-	ModelName     string `db:"model_name"`
-	Name          string `db:"name"`
-	ObjectIDs     string `db:"object_ids"`
-	LineId        string `db:"line_id"`
-	Attributes    string `db:"attributes"`
-	References    string `db:"siri_references"`
+	Id              string `db:"id"`
+	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
+	Name            string `db:"name"`
+	ObjectIDs       string `db:"object_ids"`
+	LineId          string `db:"line_id"`
+	Attributes      string `db:"attributes"`
+	References      string `db:"siri_references"`
 }
 
 type SelectVehicleJourney struct {
-	Id            string
-	ReferentialId string `db:"referential_id"`
-	ModelName     string `db:"model_name"`
-	Name          sql.NullString
-	ObjectIDs     sql.NullString `db:"object_ids"`
-	LineId        sql.NullString `db:"line_id"`
-	Attributes    sql.NullString
-	References    sql.NullString `db:"siri_references"`
+	Id              string
+	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
+	Name            sql.NullString
+	ObjectIDs       sql.NullString `db:"object_ids"`
+	LineId          sql.NullString `db:"line_id"`
+	Attributes      sql.NullString
+	References      sql.NullString `db:"siri_references"`
 }
 
 type DatabaseStopVisit struct {
 	Id               string
-	ReferentialId    string    `db:"referential_id"`
+	ReferentialSlug  string    `db:"referential_slug"`
 	ModelName        string    `db:"model_name"`
 	ObjectIDs        string    `db:"object_ids"`
 	StopAreaId       string    `db:"stop_area_id"`
@@ -138,7 +138,7 @@ type DatabaseStopVisit struct {
 
 type SelectStopVisit struct {
 	Id               string
-	ReferentialId    string         `db:"referential_id"`
+	ReferentialSlug  string         `db:"referential_slug"`
 	ModelName        string         `db:"model_name"`
 	ObjectIDs        sql.NullString `db:"object_ids"`
 	StopAreaId       sql.NullString `db:"stop_area_id"`

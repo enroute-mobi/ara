@@ -38,6 +38,7 @@ func main() {
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi [-listen=<url>]")
 		fmt.Println("\tmigrate [-path=<path>] <up|down>")
+		fmt.Println("\tload <file path> <referential_slug>")
 		os.Exit(1)
 	}
 
@@ -100,7 +101,7 @@ func main() {
 		requestorRefPtr := checkFlags.String("requestor-ref", "Edwig", "Specify requestorRef")
 		checkFlags.Parse(flag.Args()[1:])
 
-		err = checkStatus(checkFlags.Args()[0], *requestorRefPtr)
+		err = checkStatus(checkFlags.Arg(0), *requestorRefPtr)
 	case "api":
 		apiFlags := flag.NewFlagSet("api", flag.ExitOnError)
 		serverAddressPtr := apiFlags.String("listen", "localhost:8080", "Specify server port")
@@ -133,11 +134,16 @@ func main() {
 		loadFlags := flag.NewFlagSet("load", flag.ExitOnError)
 		loadFlags.Parse(flag.Args()[1:])
 
+		if loadFlags.NArg() < 2 {
+			logger.Log.Printf("Incorrect use of command load: not enough aguments")
+			os.Exit(2)
+		}
+
 		// Init Database
 		model.Database = model.InitDB(config.Config.DB)
 		defer model.CloseDB(model.Database)
 
-		err = model.LoadFromCSV(loadFlags.Arg(0))
+		err = model.LoadFromCSV(loadFlags.Arg(0), loadFlags.Arg(1))
 	}
 
 	if err != nil {

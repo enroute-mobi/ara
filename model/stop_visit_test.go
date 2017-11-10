@@ -220,7 +220,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	// Insert Data in the test db
 	databaseStopVisit := DatabaseStopVisit{
 		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ReferentialId:    "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug:  "referential",
 		ModelName:        "2017-01-01",
 		ObjectIDs:        `{"internal":"value"}`,
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
@@ -251,7 +251,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		Day:   1,
 	}
 	stopVisits := model.StopVisits().(*MemoryStopVisits)
-	err = stopVisits.Load("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	err = stopVisits.Load("referential")
 	if err != nil {
 		t.Fatal(err)
 	}

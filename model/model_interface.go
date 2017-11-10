@@ -124,24 +124,24 @@ func (model *MemoryModel) NewTransaction() *Transaction {
 }
 
 // TEMP: See what to do with errors
-func (model *MemoryModel) Load(referentialId string) error {
-	err := model.stopAreas.Load(referentialId)
+func (model *MemoryModel) Load(referentialSlug string) error {
+	err := model.stopAreas.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreas: %v", err)
 	}
-	err = model.lines.Load(referentialId)
+	err = model.lines.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Lines: %v", err)
 	}
-	err = model.vehicleJourneys.Load(referentialId)
+	err = model.vehicleJourneys.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading VehicleJourneys: %v", err)
 	}
-	err = model.stopVisits.Load(referentialId)
+	err = model.stopVisits.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopVisits: %v", err)
 	}
-	err = model.operators.Load(referentialId)
+	err = model.operators.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Operators: %v", err)
 	}

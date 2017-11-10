@@ -269,11 +269,11 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 	return stopAreaIds
 }
 
-func (manager *MemoryStopAreas) Load(referentialId string) error {
+func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 	var selectStopAreas []SelectStopArea
 	modelName := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_id = '%s' and model_name = '%s'", referentialId, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
 	_, err := Database.Select(&selectStopAreas, sqlQuery)
 	if err != nil {
 		return err
