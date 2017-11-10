@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 	"reflect"
 	"testing"
@@ -270,7 +271,10 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ParentId:        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ParentId: sql.NullString{
+			String: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+			Valid:  true,
+		},
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
 		ObjectIDs:       `{"internal":"value"}`,
