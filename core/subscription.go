@@ -33,6 +33,16 @@ type SubscribedResource struct {
 	resourcesOptions map[string]string
 }
 
+func NewResource(ref model.Reference) SubscribedResource {
+	ressource := SubscribedResource{
+		Reference:        ref,
+		LastStates:       make(map[string]lastState),
+		resourcesOptions: make(map[string]string),
+	}
+
+	return ressource
+}
+
 func (sr *SubscribedResource) ResourcesOptions() map[string]string {
 	return sr.resourcesOptions
 }
@@ -128,17 +138,21 @@ func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource
 	return ressources
 }
 
+func (subscription *Subscription) AddNewResource(resource SubscribedResource) {
+	subscription.resourcesByObjectID[resource.Reference.ObjectId.String()] = &resource
+}
+
 func (subscription *Subscription) CreateAddNewResource(reference model.Reference) *SubscribedResource {
 	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
 
-	ressource := SubscribedResource{
+	resource := SubscribedResource{
 		Reference:        reference,
 		SubscribedUntil:  subscription.Clock().Now().Add(1 * time.Minute),
 		LastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
-	subscription.resourcesByObjectID[reference.ObjectId.String()] = &ressource
-	return &ressource
+	subscription.resourcesByObjectID[reference.ObjectId.String()] = &resource
+	return &resource
 }
 
 func (subscription *Subscription) DeleteResource(key string) {
