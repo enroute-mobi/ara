@@ -122,7 +122,7 @@ type SIRIMessage struct {
 	NumberOfCharPerLine int
 }
 
-const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns9="http://wsdl.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}

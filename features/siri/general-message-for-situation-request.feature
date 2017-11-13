@@ -56,7 +56,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns9='http://wsdl.siri.org.uk/siri'>
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
@@ -135,7 +135,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri"  xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
@@ -353,7 +353,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri"  xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
