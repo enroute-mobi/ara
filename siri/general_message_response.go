@@ -122,7 +122,7 @@ type SIRIMessage struct {
 	NumberOfCharPerLine int
 }
 
-const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns9="http://wsdl.siri.org.uk/siri">
+const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
@@ -156,8 +156,7 @@ const generalMessageTemplate = `{{ if .FormatRef }}<siri:GeneralMessage formatRe
 				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
 				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
 				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
-				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:type="ns9:IDFLineSectionStructure">{{range .References }}
+				<siri:Content>{{range .References }}
 					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
 					<siri:LineSection>{{ if .FirstStop }}
 						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}

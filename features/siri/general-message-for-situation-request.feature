@@ -56,7 +56,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns9='http://wsdl.siri.org.uk/siri'>
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
@@ -75,7 +75,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbations</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFLineSectionStructure'>
+                  <siri:Content>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:Message>
                       <siri:MessageType>longMessage</siri:MessageType>
@@ -135,7 +135,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri"  xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
@@ -154,7 +154,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
+                  <siri:Content>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:Message>
                       <siri:MessageType>longMessage</siri:MessageType>
@@ -264,7 +264,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-07T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFLineSectionStructure">
+                  <siri:Content>
                     <Message>
                       <MessageType>longMessage</MessageType>
                       <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
@@ -353,7 +353,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri"  xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
