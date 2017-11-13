@@ -2,6 +2,7 @@ package core
 
 import (
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -256,6 +257,7 @@ func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEve
 	logStashEvent["type"] = "EstimatedTimeTableSubscription"
 	logStashEvent["subscriberRef"] = ettEntries.SubscriberRef()
 	logStashEvent["subscriptionRef"] = ettEntries.SubscriptionIdentifier()
+	logStashEvent["LineRef"] = strings.Join(ettEntries.Lines(), ",")
 
 	xml := ettEntries.RawXML()
 	logStashEvent["requestXML"] = xml

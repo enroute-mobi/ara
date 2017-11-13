@@ -118,6 +118,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 	for _, gm := range request.XMLSubscriptionGMEntries() {
 		logStashEvent := connector.newLogStashEvent()
 		logXMLGeneralMessageSubscriptionEntry(logStashEvent, gm)
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: gm.MessageIdentifier(),
@@ -154,9 +155,11 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.Save()
 
 		connector.addSituations(sub, r)
+		resps = append(resps, rs)
+
+		logStashEvent = connector.newLogStashEvent()
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
-		resps = append(resps, rs)
 	}
 	return resps
 }
