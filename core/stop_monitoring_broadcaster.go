@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -159,7 +160,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			// Refresh delivery
 			if maximumStopVisits != 0 && len(delivery.MonitoredStopVisits) >= maximumStopVisits {
 				smb.sendDelivery(delivery)
-
 				delivery.MonitoredStopVisits = []*siri.SIRIMonitoredStopVisit{}
 			}
 
@@ -192,6 +192,12 @@ func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
+	monitoringRefs := []string{}
+
+	for _, sv := range response.MonitoredStopVisits {
+		monitoringRefs = append(monitoringRefs, sv.MonitoringRef)
+	}
+
 	logStashEvent["type"] = "NotifyStopMonitoring"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
@@ -199,6 +205,7 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *si
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
+	logStashEvent["monitoringRef"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType
