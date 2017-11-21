@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/af83/edwig/model"
@@ -68,5 +69,47 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 
 	if len(request.XMLSubscriptionGMEntries()) != 1 {
 		t.Errorf("Wrong XMLSubscriptionEntries:\n got: %v\nwant: 1", len(request.XMLSubscriptionGMEntries()))
+	}
+}
+
+func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
+	request := &siri.XMLDeleteSubscriptionRequest{}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		request, _ = siri.NewXMLDeleteSubscriptionRequestFromContent(body)
+	}))
+	defer ts.Close()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+	partners := NewPartnerManager(referential)
+
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"local_url":                          "http://example.com/test/siri",
+			"remote_url":                         ts.URL,
+			"remote_objectid_kind":               "test_kind",
+			"generators.subscription_identifier": "Subscription::%{id}::LOC",
+		},
+		manager: partners,
+	}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	file, _ := os.Open("../siri/testdata/notify-general-message.xml")
+	content, _ := ioutil.ReadAll(file)
+
+	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
+
+	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(content)
+
+	connector.HandleNotifyGeneralMessage(notify)
+
+	if expected := "6ba7b814-9dad-11d1-0-00c04fd430c8"; request.SubscriptionRef() != expected {
+		t.Errorf("Wrong SubscriptionRef want : %v  got %v :", expected, request.SubscriptionRef())
 	}
 }

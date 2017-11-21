@@ -145,9 +145,10 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	request := &siri.SIRIDeleteSubscriptionRequest{
-		RequestTimestamp: connector.Clock().Now(),
-		SubscriptionRef:  subId,
-		RequestorRef:     connector.partner.ProducerRef(),
+		RequestTimestamp:  connector.Clock().Now(),
+		SubscriptionRef:   subId,
+		RequestorRef:      connector.partner.ProducerRef(),
+		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
