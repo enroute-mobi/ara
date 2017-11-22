@@ -201,6 +201,7 @@ func logXMLGeneralMessageSubscriptionEntry(logStashEvent audit.LogStashEvent, re
 }
 
 func logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, gmEntry *siri.SIRIResponseStatus) {
+	logStashEvent["type"] = "GeneralMessageSubscriptionResponseEntry"
 	logStashEvent["requestMessageRef"] = gmEntry.RequestMessageRef
 	logStashEvent["subscriptionRef"] = gmEntry.SubscriptionRef
 	logStashEvent["responseTimestamp"] = gmEntry.ResponseTimestamp.String()
