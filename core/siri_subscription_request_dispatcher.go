@@ -166,7 +166,7 @@ func logXMLSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.
 
 func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRISubscriptionResponse, connector string) {
 	logStashEvent["connector"] = connector
-	logStashEvent["type"] = "subscriptionRequest"
+	logStashEvent["type"] = "subscriptionResponse"
 	logStashEvent["address"] = response.Address
 	logStashEvent["responderRef"] = response.ResponderRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
