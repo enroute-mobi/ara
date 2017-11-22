@@ -151,6 +151,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 
+	logSIRIDeleteSubscriptionRequest(logStashEvent, request)
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
 
 	if err != nil {
