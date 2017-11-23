@@ -289,6 +289,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	sv2.StopAreaId = stopArea.Id()
 	sv2.VehicleJourneyId = vehicleJourney.Id()
 	sv2.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
+	sv2.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
 	sv2.Save()
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
@@ -308,8 +309,12 @@ func Test_ReceiveStateSM(t *testing.T) {
 		t.Errorf("Should have received 1 delivery but got == %v", len(delivery))
 	}
 
-	if len(delivery[0].XMLMonitoredStopVisits()) != 2 {
-		t.Errorf("Should have received 2 Monitored stop visit but got %v", len(delivery[0].XMLMonitoredStopVisits()))
+	if len(delivery[0].XMLMonitoredStopVisits()) != 1 {
+		t.Errorf("Should have received 1 Monitored stop visit but got %v", len(delivery[0].XMLMonitoredStopVisits()))
+	}
+
+	if len(delivery[0].XMLMonitoredStopVisitCancellations()) != 1 {
+		t.Errorf("Should have received 1 Cancelled stop visit but got %v", len(delivery[0].XMLMonitoredStopVisitCancellations()))
 	}
 }
 
