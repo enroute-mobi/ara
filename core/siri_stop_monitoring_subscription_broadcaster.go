@@ -25,7 +25,8 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 	toBroadcast               map[SubscriptionId][]model.StopVisitId
-	mutex                     *sync.Mutex //protect the map
+
+	mutex *sync.Mutex //protect the map
 }
 
 type SIRIStopMonitoringSubscriptionBroadcasterFactory struct{}

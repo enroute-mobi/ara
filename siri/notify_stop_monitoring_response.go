@@ -21,6 +21,7 @@ type SIRINotifyStopMonitoring struct {
 	ErrorText         string
 
 	MonitoredStopVisits []*SIRIMonitoredStopVisit
+	CancelledStopVisits []*SIRICancelledStopVisit
 }
 
 const stopMonitoringNotifyTemplate = `<sw:NotifyStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -44,7 +45,8 @@ const stopMonitoringNotifyTemplate = `<sw:NotifyStopMonitoring xmlns:sw="http://
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
 			</siri:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
-			{{ .BuildMonitoredStopVisitXML }}{{ end }}{{ end }}
+			{{ .BuildMonitoredStopVisitXML }}{{ end }}{{ range .CancelledStopVisits }}
+			{{ .BuildCancelledStopVisitXML }}{{ end }}{{ end }}
 		</siri:StopMonitoringDelivery>
 	</Notification>
 	<NotificationExtension />
@@ -56,5 +58,15 @@ func (notify *SIRINotifyStopMonitoring) BuildXML() (string, error) {
 	if err := notifyDelivery.Execute(&buffer, notify); err != nil {
 		return "", err
 	}
+	return buffer.String(), nil
+}
+
+func (stopVisit *SIRICancelledStopVisit) BuildCancelledStopVisitXML() (string, error) {
+	var buffer bytes.Buffer
+	var stopMonitoringDelivery = template.Must(template.New("cancelledStopVisit").Parse(cancelledStopVisitTemplate))
+	if err := stopMonitoringDelivery.Execute(&buffer, stopVisit); err != nil {
+		return "", err
+	}
+
 	return buffer.String(), nil
 }
