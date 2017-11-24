@@ -48,6 +48,14 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 		return true
 	}
 
+	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && smlc.arrivalStatuts == stopVisit.ArrivalStatus {
+		return false
+	}
+
+	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && smlc.departureStatus == stopVisit.DepartureStatus {
+		return false
+	}
+
 	if smlc.handleArrivalStatus(stopVisit.ArrivalStatus, smlc.arrivalStatuts) || smlc.handleDepartureStatus(stopVisit.DepartureStatus, smlc.departureStatus) {
 		return true
 	}
