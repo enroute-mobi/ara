@@ -203,6 +203,14 @@ func (updater *StopVisitUpdater) findOrCreateStopArea(stopAreaAttributes *StopAr
 	stopArea.Updated(updater.Clock().Now())
 	stopArea.CollectedAlways = false
 	stopArea.NextCollectAt = updater.Clock().Now().Add(1 * time.Minute)
+
+	if stopAreaAttributes.ParentObjectId.Value() != "" {
+		parent, ok := updater.tx.Model().StopAreas().FindByObjectId(stopAreaAttributes.ParentObjectId)
+		if ok {
+			stopArea.ParentId = parent.Id()
+		}
+	}
+
 	stopArea.Save()
 	return &stopArea
 }

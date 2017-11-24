@@ -11,6 +11,7 @@ type StopAreaId string
 
 type StopAreaAttributes struct {
 	ObjectId        ObjectID
+	ParentObjectId  ObjectID
 	Name            string
 	CollectedAlways bool
 }
