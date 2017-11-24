@@ -41,6 +41,11 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 	reader.LazyQuotes = true
 	reader.TrimLeadingSpace = true
 
+	importedStopAreas := 0
+	importedLines := 0
+	importedVehicleJourneys := 0
+	importedStopVisits := 0
+
 	var i int
 	for {
 		i++
@@ -58,27 +63,42 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			err := handleStopArea(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
+			} else {
+				importedStopAreas++
 			}
 		case "line":
 			err := handleLine(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
+			} else {
+				importedLines++
 			}
 		case "vehicle_journey":
 			err := handleVehicleJourney(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
+			} else {
+				importedVehicleJourneys++
 			}
 		case "stop_visit":
 			err := handleStopVisit(record, referentialSlug)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
+			} else {
+				importedStopVisits++
 			}
 		default:
 			logger.Log.Debugf("Unknown record type: %v", record[0])
 			continue
 		}
 	}
+
+	logger.Log.Debugf("Import successful")
+	logger.Log.Debugf("  %v StopAreas", importedStopAreas)
+	logger.Log.Debugf("  %v Lines", importedLines)
+	logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
+	logger.Log.Debugf("  %v StopVisits", importedStopVisits)
+
 	return nil
 }
 
