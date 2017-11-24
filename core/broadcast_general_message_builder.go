@@ -31,7 +31,7 @@ func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, siriPartner *SIRIP
 }
 
 func (builder *BroadcastGeneralMessageBuilder) SetLineRef(lineRef []string) {
-	if len(lineRef) == 0 {
+	if (len(lineRef) == 0) || (len(lineRef) == 1 && lineRef[0] == "") {
 		return
 	}
 
@@ -41,7 +41,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetLineRef(lineRef []string) {
 }
 
 func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []string) {
-	if len(stopPointRef) == 0 {
+	if (len(stopPointRef) == 0) || (len(stopPointRef) == 1 && stopPointRef[0] == "") {
 		return
 	}
 
@@ -117,7 +117,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 }
 
 func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChannels []string, channel string) bool {
-	if len(requestChannels) == 0 {
+	if (len(requestChannels) == 1 && requestChannels[0] == "") || len(requestChannels) == 0 {
 		return true
 	}
 
