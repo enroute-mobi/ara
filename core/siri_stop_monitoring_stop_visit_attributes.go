@@ -151,6 +151,9 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopAreaAttributes() *model.Sto
 		ObjectId: objectid,
 		Name:     attributes.response.StopPointName(),
 	}
+	if attributes.response.StopPointRef() != attributes.response.MonitoringRef() {
+		stopAreaAttributes.ParentObjectId = model.NewObjectID(attributes.objectid_kind, attributes.response.MonitoringRef())
+	}
 
 	return stopAreaAttributes
 }

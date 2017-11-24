@@ -46,6 +46,7 @@ type XMLMonitoredStopVisit struct {
 	// parent *XMLStopMonitoringResponse
 
 	itemIdentifier         string
+	monitoringRef          string
 	stopPointRef           string
 	stopPointName          string
 	datedVehicleJourneyRef string
@@ -393,6 +394,13 @@ func (visit *XMLMonitoredStopVisit) ItemIdentifier() string {
 		visit.itemIdentifier = visit.findStringChildContent("ItemIdentifier")
 	}
 	return visit.itemIdentifier
+}
+
+func (visit *XMLMonitoredStopVisit) MonitoringRef() string {
+	if visit.monitoringRef == "" {
+		visit.monitoringRef = visit.findStringChildContent("MonitoringRef")
+	}
+	return visit.monitoringRef
 }
 
 func (visit *XMLMonitoredStopVisit) StopPointRef() string {
