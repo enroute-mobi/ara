@@ -75,7 +75,8 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbations</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content>
+                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          				xsi:type="ns9:IDFGeneralMessageStructure">
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:Message>
                       <siri:MessageType>longMessage</siri:MessageType>
@@ -154,7 +155,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content>
+                  <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='ns9:IDFGeneralMessageStructure'>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:Message>
                       <siri:MessageType>longMessage</siri:MessageType>
