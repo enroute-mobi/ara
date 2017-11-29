@@ -282,15 +282,15 @@ const monitoredStopVisitTemplate = `<siri:MonitoredStopVisit>
 			</siri:MonitoredStopVisit>`
 
 const cancelledStopVisitTemplate = `<siri:MonitoredStopVisitCancellation>
-	<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
-	<siri:ItemRef>{{ .ItemRef }}</siri:ItemRef>
-	<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>
-	<siri:LineRef>{{ .LineRef }}</siri:LineRef>
-	<siri:VehicleJourneyRef>
-	  <siri:DataFrameRef>{{.DataFrameRef}}</siri:DataFrameRef>
-	  <siri:DatedVehicleJourneyRef>{{.DatedVehicleJourneyRef}}</siri:DatedVehicleJourneyRef>
-  </siri:VehicleJourneyRef>
-</siri:MonitoredStopVisitCancellation>`
+			<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
+			<siri:ItemRef>{{ .ItemRef }}</siri:ItemRef>
+			<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>
+			<siri:LineRef>{{ .LineRef }}</siri:LineRef>
+			<siri:VehicleJourneyRef>
+			  <siri:DataFrameRef>{{.DataFrameRef}}</siri:DataFrameRef>
+			  <siri:DatedVehicleJourneyRef>{{.DatedVehicleJourneyRef}}</siri:DatedVehicleJourneyRef>
+			</siri:VehicleJourneyRef>
+		</siri:MonitoredStopVisitCancellation>`
 
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {
 	xmlStopMonitoringResponse := &XMLStopMonitoringResponse{}
