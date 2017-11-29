@@ -214,7 +214,13 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		logStashEvent := ett.newLogStashEvent()
 		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
-		ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+
+		err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+		if err != nil {
+			event := ett.newLogStashEvent()
+			logSIRINotifyError(err.Error(), event)
+			audit.CurrentLogStash().WriteEvent(event)
+		}
 	}
 }
 

@@ -211,7 +211,12 @@ func (smb *SMBroadcaster) sendDelivery(delivery *siri.SIRINotifyStopMonitoring) 
 	logSIRIStopMonitoringNotify(logStashEvent, delivery)
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
+	err := smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
+	if err != nil {
+		event := smb.newLogStashEvent()
+		logSIRINotifyError(err.Error(), event)
+		audit.CurrentLogStash().WriteEvent(event)
+	}
 }
 
 func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
