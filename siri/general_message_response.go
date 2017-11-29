@@ -156,7 +156,7 @@ const generalMessageTemplate = `{{ if .FormatRef }}<siri:GeneralMessage formatRe
 				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
 				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
 				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
-				<siri:Content>{{range .References }}
+				<siri:Content xsi:type="siri:IDFGeneralMessageStructure">{{range .References }}
 					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
 					<siri:LineSection>{{ if .FirstStop }}
 						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
