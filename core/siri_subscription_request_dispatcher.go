@@ -102,6 +102,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	logStashEvent := connector.newLogStashEvent()
 
 	logXMLCancelSubscriptionRequest(logStashEvent, r)
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
@@ -111,6 +112,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	}
 
 	defer func() {
+		logStashEvent := connector.newLogStashEvent()
 		logSIRICancelSubscriptionResponse(logStashEvent, resp)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 	}()
@@ -181,6 +183,7 @@ func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *si
 }
 
 func logXMLCancelSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLDeleteSubscriptionRequest) {
+	logStashEvent["type"] = "DeleteSubscription"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
