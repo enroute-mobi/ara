@@ -140,6 +140,7 @@ type SIRICancelledStopVisit struct {
 	LineRef                string
 	DataFrameRef           string
 	DatedVehicleJourneyRef string
+	PublishedLineName      string
 }
 
 type SIRIMonitoredStopVisit struct {
@@ -286,6 +287,7 @@ const cancelledStopVisitTemplate = `<siri:MonitoredStopVisitCancellation>
 			<siri:ItemRef>{{ .ItemRef }}</siri:ItemRef>
 			<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>
 			<siri:LineRef>{{ .LineRef }}</siri:LineRef>
+			<siri:PublishedLineName>{{.PublishedLineName}}</siri:PublishedLineName>
 			<siri:VehicleJourneyRef>
 			  <siri:DataFrameRef>{{.DataFrameRef}}</siri:DataFrameRef>
 			  <siri:DatedVehicleJourneyRef>{{.DatedVehicleJourneyRef}}</siri:DatedVehicleJourneyRef>

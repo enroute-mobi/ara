@@ -68,6 +68,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
+		PublishedLineName:      line.Name,
 	}
 
 	return cancelledStopVisit

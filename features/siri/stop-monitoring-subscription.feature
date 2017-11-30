@@ -546,6 +546,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
         <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
         <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
         <siri:VehicleJourneyRef>
           <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
