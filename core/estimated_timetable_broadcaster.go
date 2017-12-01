@@ -101,6 +101,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	for subId, lines := range events {
 		sub, ok := ett.connector.Partner().Subscriptions().Find(subId)
 		if !ok {
+			logger.Log.Debugf("ETT subscriptionBroadcast Could not find sub with id : %v", subId)
 			continue
 		}
 
@@ -199,12 +200,15 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 
-					lastStateInterface, _ := resource.LastStates[string(stopVisit.Id())]
-					lastState, ok := lastStateInterface.(*estimatedTimeTableLastChange)
+					lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
 					if !ok {
-						continue
+						ettlc := &estimatedTimeTableLastChange{}
+						ettlc.InitState(&stopVisit, sub)
+						resource.LastStates[string(stopVisit.Id())] = ettlc
+					} else {
+						lastState := lastStateInterface.(*estimatedTimeTableLastChange)
+						lastState.UpdateState(&stopVisit)
 					}
-					lastState.UpdateState(&stopVisit)
 				}
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 			}

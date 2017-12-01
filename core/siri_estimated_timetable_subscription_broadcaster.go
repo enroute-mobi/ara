@@ -92,10 +92,11 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			if !ok {
 				rs.Status = false
 				rs.ErrorType = "InvalidDataReferencesError"
-				rs.ErrorText = "Could not find Line"
+				rs.ErrorText = "Could not find Line " + lineId
 				rs.ValidUntil = time.Time{}
 
 				resources = []SubscribedResource{}
+				resps = append(resps, rs)
 
 				logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
 				audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -119,10 +120,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-		if !rs.Status {
-			continue
-		}
-
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
@@ -134,10 +131,10 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			connector.addLine(sub.Id(), line.Id())
 
 			sub.AddNewResource(r)
-			resources = []SubscribedResource{}
 			connector.fillOptions(sub, request)
 		}
 
+		resources = []SubscribedResource{}
 		sub.Save()
 	}
 	return resps
