@@ -1,11 +1,6 @@
 package model
 
-import (
-	"database/sql"
-	"time"
-
-	"github.com/lib/pq"
-)
+import "database/sql"
 
 type DatabaseReferential struct {
 	ReferentialId string `db:"referential_id"`
@@ -47,9 +42,6 @@ type DatabaseStopArea struct {
 	LineIds         string         `db:"line_ids"`
 	Attributes      string         `db:"attributes"`
 	References      string         `db:"siri_references"`
-	NextCollectAt   time.Time      `db:"next_collect_at"`
-	CollectedAt     time.Time      `db:"collected_at"`
-	CollectedUntil  time.Time      `db:"collected_until"`
 	CollectedAlways bool           `db:"collected_always"`
 	CollectChildren bool           `db:"collect_children"`
 }
@@ -64,23 +56,19 @@ type SelectStopArea struct {
 	Attributes      sql.NullString
 	References      sql.NullString `db:"siri_references"`
 	LineIds         sql.NullString `db:"line_ids"`
-	NextCollectAt   pq.NullTime    `db:"next_collect_at"`
-	CollectedAt     pq.NullTime    `db:"collected_at"`
-	CollectedUntil  pq.NullTime    `db:"collected_until"`
 	CollectedAlways sql.NullBool   `db:"collected_always"`
 	CollectChildren sql.NullBool   `db:"collect_children"`
 }
 
 type DatabaseLine struct {
-	Id                     string    `db:"id"`
-	ReferentialSlug        string    `db:"referential_slug"`
-	ModelName              string    `db:"model_name"`
-	Name                   string    `db:"name"`
-	ObjectIDs              string    `db:"object_ids"`
-	Attributes             string    `db:"attributes"`
-	References             string    `db:"siri_references"`
-	CollectedAt            time.Time `db:"collected_at"`
-	CollectGeneralMessages bool      `db:"collect_general_messages"`
+	Id                     string `db:"id"`
+	ReferentialSlug        string `db:"referential_slug"`
+	ModelName              string `db:"model_name"`
+	Name                   string `db:"name"`
+	ObjectIDs              string `db:"object_ids"`
+	Attributes             string `db:"attributes"`
+	References             string `db:"siri_references"`
+	CollectGeneralMessages bool   `db:"collect_general_messages"`
 }
 
 type SelectLine struct {
@@ -91,7 +79,6 @@ type SelectLine struct {
 	ObjectIDs              sql.NullString `db:"object_ids"`
 	Attributes             sql.NullString
 	References             sql.NullString `db:"siri_references"`
-	CollectedAt            pq.NullTime    `db:"collected_at"`
 	CollectGeneralMessages sql.NullBool   `db:"collect_general_messages"`
 }
 
@@ -119,21 +106,19 @@ type SelectVehicleJourney struct {
 
 type DatabaseStopVisit struct {
 	Id               string
-	ReferentialSlug  string    `db:"referential_slug"`
-	ModelName        string    `db:"model_name"`
-	ObjectIDs        string    `db:"object_ids"`
-	StopAreaId       string    `db:"stop_area_id"`
-	VehicleJourneyId string    `db:"vehicle_journey_id"`
-	ArrivalStatus    string    `db:"arrival_status"`
-	DepartureStatus  string    `db:"departure_status"`
-	Schedules        string    `db:"schedules"`
-	Attributes       string    `db:"attributes"`
-	References       string    `db:"siri_references"`
-	Collected        bool      `db:"collected"`
-	VehicleAtStop    bool      `db:"vehicle_at_stop"`
-	CollectedAt      time.Time `db:"collected_at"`
-	RecordedAt       time.Time `db:"recorded_at"`
-	PassageOrder     int       `db:"passage_order"`
+	ReferentialSlug  string `db:"referential_slug"`
+	ModelName        string `db:"model_name"`
+	ObjectIDs        string `db:"object_ids"`
+	StopAreaId       string `db:"stop_area_id"`
+	VehicleJourneyId string `db:"vehicle_journey_id"`
+	ArrivalStatus    string `db:"arrival_status"`
+	DepartureStatus  string `db:"departure_status"`
+	Schedules        string `db:"schedules"`
+	Attributes       string `db:"attributes"`
+	References       string `db:"siri_references"`
+	Collected        bool   `db:"collected"`
+	VehicleAtStop    bool   `db:"vehicle_at_stop"`
+	PassageOrder     int    `db:"passage_order"`
 }
 
 type SelectStopVisit struct {
@@ -148,8 +133,6 @@ type SelectStopVisit struct {
 	Schedules        sql.NullString `db:"schedules"`
 	Attributes       sql.NullString `db:"attributes"`
 	References       sql.NullString `db:"siri_references"`
-	CollectedAt      pq.NullTime    `db:"collected_at"`
-	RecordedAt       pq.NullTime    `db:"recorded_at"`
 	Collected        sql.NullBool   `db:"collected"`
 	VehicleAtStop    sql.NullBool   `db:"vehicle_at_stop"`
 	PassageOrder     sql.NullInt64  `db:"passage_order"`

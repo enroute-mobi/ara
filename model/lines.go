@@ -235,9 +235,6 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 		if sl.Name.Valid {
 			line.Name = sl.Name.String
 		}
-		if sl.CollectedAt.Valid {
-			line.collectedAt = sl.CollectedAt.Time
-		}
 		if sl.CollectGeneralMessages.Valid {
 			line.CollectGeneralMessages = sl.CollectGeneralMessages.Bool
 		}

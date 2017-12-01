@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/af83/edwig/logger"
 )
@@ -16,9 +15,9 @@ import (
 /* CSV Structure
 
 stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,NextCollectAt,CollectedAt,CollectedUntil,CollectedAlways,CollectChildren
-line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages,CollectedAt
+line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,Attributes,References
-stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,CollectedAt,RecordedAt,Collected,VehicleAtStop,PassageOrder
+stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,Collected,VehicleAtStop,PassageOrder
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -110,8 +109,8 @@ func prepareDatabase() {
 }
 
 func handleStopArea(record []string, referentialSlug string) error {
-	if len(record) != 14 {
-		return fmt.Errorf("Wrong number of entries")
+	if len(record) != 11 {
+		return fmt.Errorf("Wrong number of entries, expected 11 got %v", len(record))
 	}
 
 	var err error
@@ -124,41 +123,17 @@ func handleStopArea(record []string, referentialSlug string) error {
 		}
 	}
 
-	var nextCollectAt time.Time
-	if record[9] != "" {
-		nextCollectAt, err = time.Parse(time.RFC3339, record[9])
-		if err != nil {
-			parseErrors["NextCollectAt"] = err.Error()
-		}
-	}
-
-	var collectedAt time.Time
-	if record[10] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[10])
-		if err != nil {
-			parseErrors["CollectedAt"] = err.Error()
-		}
-	}
-
-	var collectedUntil time.Time
-	if record[11] != "" {
-		collectedUntil, err = time.Parse(time.RFC3339, record[11])
-		if err != nil {
-			parseErrors["CollectedUntil"] = err.Error()
-		}
-	}
-
 	var collectedAlways bool
-	if record[12] != "" {
-		collectedAlways, err = strconv.ParseBool(record[12])
+	if record[9] != "" {
+		collectedAlways, err = strconv.ParseBool(record[9])
 		if err != nil {
 			parseErrors["CollectedAlways"] = err.Error()
 		}
 	}
 
 	var collectChildren bool
-	if record[13] != "" {
-		collectChildren, err = strconv.ParseBool(record[13])
+	if record[10] != "" {
+		collectChildren, err = strconv.ParseBool(record[10])
 		if err != nil {
 			parseErrors["CollectChildren"] = err.Error()
 		}
@@ -179,9 +154,6 @@ func handleStopArea(record []string, referentialSlug string) error {
 		LineIds:         record[6],
 		Attributes:      record[7],
 		References:      record[8],
-		NextCollectAt:   nextCollectAt,
-		CollectedAt:     collectedAt,
-		CollectedUntil:  collectedUntil,
 		CollectedAlways: collectedAlways,
 		CollectChildren: collectChildren,
 	}
@@ -195,8 +167,8 @@ func handleStopArea(record []string, referentialSlug string) error {
 }
 
 func handleLine(record []string, referentialSlug string) error {
-	if len(record) != 9 {
-		return fmt.Errorf("Wrong number of entries")
+	if len(record) != 8 {
+		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
 	}
 
 	var err error
@@ -210,14 +182,6 @@ func handleLine(record []string, referentialSlug string) error {
 		}
 	}
 
-	var collectedAt time.Time
-	if record[8] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[8])
-		if err != nil {
-			parseErrors["CollectedAt"] = err.Error()
-		}
-	}
-
 	line := DatabaseLine{
 		Id:                     record[1],
 		ReferentialSlug:        referentialSlug,
@@ -227,7 +191,6 @@ func handleLine(record []string, referentialSlug string) error {
 		Attributes:             record[5],
 		References:             record[6],
 		CollectGeneralMessages: collectGeneralMessages,
-		CollectedAt:            collectedAt,
 	}
 
 	err = Database.Insert(&line)
@@ -240,7 +203,7 @@ func handleLine(record []string, referentialSlug string) error {
 
 func handleVehicleJourney(record []string, referentialSlug string) error {
 	if len(record) != 8 {
-		return fmt.Errorf("Wrong number of entries")
+		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
 	}
 
 	vehicleJourney := DatabaseVehicleJourney{
@@ -263,48 +226,32 @@ func handleVehicleJourney(record []string, referentialSlug string) error {
 }
 
 func handleStopVisit(record []string, referentialSlug string) error {
-	if len(record) != 16 {
-		return fmt.Errorf("Wrong number of entries")
+	if len(record) != 14 {
+		return fmt.Errorf("Wrong number of entries, expected 14 got %v", len(record))
 	}
 
 	var err error
 	parseErrors := make(map[string]string)
 
-	var collectedAt time.Time
-	if record[11] != "" {
-		collectedAt, err = time.Parse(time.RFC3339, record[11])
-		if err != nil {
-			parseErrors["CollectedAt"] = err.Error()
-		}
-	}
-
-	var recordedAt time.Time
-	if record[12] != "" {
-		recordedAt, err = time.Parse(time.RFC3339, record[12])
-		if err != nil {
-			parseErrors["RecordedAt"] = err.Error()
-		}
-	}
-
 	var collected bool
-	if record[13] != "" {
-		collected, err = strconv.ParseBool(record[13])
+	if record[11] != "" {
+		collected, err = strconv.ParseBool(record[11])
 		if err != nil {
 			parseErrors["Collected"] = err.Error()
 		}
 	}
 
 	var vehicleAtStop bool
-	if record[14] != "" {
-		vehicleAtStop, err = strconv.ParseBool(record[14])
+	if record[12] != "" {
+		vehicleAtStop, err = strconv.ParseBool(record[12])
 		if err != nil {
 			parseErrors["VehicleAtStop"] = err.Error()
 		}
 	}
 
 	var passageOrder int
-	if record[15] != "" {
-		passageOrder, err = strconv.Atoi(record[15])
+	if record[13] != "" {
+		passageOrder, err = strconv.Atoi(record[13])
 		if err != nil {
 			parseErrors["PassageOrder"] = err.Error()
 		}
@@ -327,8 +274,6 @@ func handleStopVisit(record []string, referentialSlug string) error {
 		Schedules:        record[8],
 		Attributes:       record[9],
 		References:       record[10],
-		CollectedAt:      collectedAt,
-		RecordedAt:       recordedAt,
 		Collected:        collected,
 		VehicleAtStop:    vehicleAtStop,
 		PassageOrder:     passageOrder,

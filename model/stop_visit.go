@@ -414,12 +414,6 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 		if sv.VehicleAtStop.Valid {
 			stopVisit.VehicleAtStop = sv.VehicleAtStop.Bool
 		}
-		if sv.CollectedAt.Valid {
-			stopVisit.collectedAt = sv.CollectedAt.Time
-		}
-		if sv.RecordedAt.Valid {
-			stopVisit.RecordedAt = sv.RecordedAt.Time
-		}
 		if sv.PassageOrder.Valid {
 			stopVisit.PassageOrder = int(sv.PassageOrder.Int64)
 		}

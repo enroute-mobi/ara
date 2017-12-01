@@ -230,8 +230,6 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		Schedules:        `[{"Kind":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
 		Collected:        true,
 		VehicleAtStop:    true,
-		CollectedAt:      testTime,
-		RecordedAt:       testTime,
 		PassageOrder:     1,
 		Attributes:       "{}",
 		References:       "{}",

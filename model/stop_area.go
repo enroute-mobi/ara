@@ -289,15 +289,6 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		if sa.ParentId.Valid {
 			stopArea.ParentId = StopAreaId(sa.ParentId.String)
 		}
-		if sa.NextCollectAt.Valid {
-			stopArea.NextCollectAt = sa.NextCollectAt.Time
-		}
-		if sa.CollectedAt.Valid {
-			stopArea.collectedAt = sa.CollectedAt.Time
-		}
-		if sa.CollectedUntil.Valid {
-			stopArea.CollectedUntil = sa.CollectedUntil.Time
-		}
 		if sa.CollectedAlways.Valid {
 			stopArea.CollectedAlways = sa.CollectedAlways.Bool
 		}

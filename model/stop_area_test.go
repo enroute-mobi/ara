@@ -266,7 +266,6 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
-	testTime := time.Now()
 	// Insert Data in the test db
 	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
@@ -281,9 +280,6 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
 		References:      "{}",
-		NextCollectAt:   testTime,
-		CollectedAt:     testTime,
-		CollectedUntil:  testTime,
 		CollectedAlways: true,
 		CollectChildren: true,
 	}
@@ -330,15 +326,6 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 	if !stopArea.CollectChildren {
 		t.Errorf("Wrong CollectChildren:\n got: %v\n expected: true", stopArea.CollectChildren)
-	}
-	if stopArea.NextCollectAt.Equal(testTime) {
-		t.Errorf("Wrong NextCollectAt:\n got: %v\n expected: %v", stopArea.NextCollectAt, testTime)
-	}
-	if stopArea.collectedAt.Equal(testTime) {
-		t.Errorf("Wrong collectedAt:\n got: %v\n expected: %v", stopArea.collectedAt, testTime)
-	}
-	if stopArea.CollectedUntil.Equal(testTime) {
-		t.Errorf("Wrong CollectedUntil:\n got: %v\n expected: %v", stopArea.CollectedUntil, testTime)
 	}
 	if len(stopArea.LineIds) != 2 {
 		t.Fatalf("StopArea should have 2 LineIds, got: %v", len(stopArea.LineIds))
