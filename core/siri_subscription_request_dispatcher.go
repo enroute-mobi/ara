@@ -47,6 +47,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	logStashEvent := connector.newLogStashEvent()
 
 	logXMLSubscriptionRequest(logStashEvent, request)
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	response := siri.SIRISubscriptionResponse{
 		Address:            connector.Partner().Address(),
@@ -57,6 +58,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	}
 
 	if len(request.XMLSubscriptionGMEntries()) > 0 {
+		logStashEvent := connector.newLogStashEvent()
+
 		gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
 			return nil, fmt.Errorf("No GeneralMessageSubscriptionBroadcaster Connector")
@@ -70,6 +73,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	}
 
 	if len(request.XMLSubscriptionSMEntries()) > 0 {
+		logStashEvent := connector.newLogStashEvent()
+
 		smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		if !ok {
 			return nil, fmt.Errorf("No StopMonitoringSubscriptionBroadcaster Connector")
@@ -83,6 +88,8 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	}
 
 	if len(request.XMLSubscriptionETTEntries()) > 0 {
+		logStashEvent := connector.newLogStashEvent()
+
 		smbc, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
 			return nil, fmt.Errorf("No EstimatedTimeTableSubscriptionBroadcaster Connector")
