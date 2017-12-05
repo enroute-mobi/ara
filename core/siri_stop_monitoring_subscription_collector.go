@@ -264,7 +264,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 }
 
 func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest) {
-	logStashEvent["type"] = "DeleteStopMonitoringSubscription"
+	logStashEvent["type"] = "DeleteSubscription" // This function is also used on GM delete subscription
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
 	logStashEvent["subscriptionRef"] = request.SubscriptionRef
 	logStashEvent["requestorRef"] = request.RequestorRef
