@@ -102,10 +102,23 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "StopArea",
 	}
 
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.Save()
+
+	objectid2 := model.NewObjectID("internal", string(stopArea2.Id()))
+	stopArea2.SetObjectID(objectid2)
+
+	reference2 := model.Reference{
+		ObjectId: &objectid2,
+		Type:     "StopArea",
+	}
+
 	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
+	subscription.CreateAddNewResource(reference2)
 	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
+	subscription.subscriptionOptions["MaximumStopVisits"] = "1"
 	subscription.Save()
 
 	line := referential.Model().Lines().New()
@@ -123,8 +136,16 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea.Id()
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.SetObjectID(model.NewObjectID("internal", string(stopArea.Id())))
+	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 	stopVisit.Save()
+	time.Sleep(10 * time.Millisecond)
+	stopVisit2.Save()
 
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()

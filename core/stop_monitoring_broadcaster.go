@@ -107,7 +107,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.SIRIPartner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOptions()["StopVisitTypes"]
 
-		maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOptions()["MaximumStopVisit"])
+		maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOptions()["MaximumStopVisits"])
 		monitoredStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
 
 		delivery := &siri.SIRINotifyStopMonitoring{

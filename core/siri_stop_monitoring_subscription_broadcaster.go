@@ -125,6 +125,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 			smlc.InitState(&sv, sub)
 			resource.LastStates[string(sv.Id())] = smlc
 		}
+
 		subscriptionIds = append(subscriptionIds, sub.Id())
 	}
 
