@@ -99,11 +99,11 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		Id          StopVisitId
 		ObjectIDs   ObjectIDs `json:",omitempty"`
 		Collected   bool
-		CollectedAt *time.Time          `json:",omitempty"`
-		RecordedAt  *time.Time          `json:",omitempty"`
-		Attributes  Attributes          `json:",omitempty"`
-		References  References          `json:",omitempty"`
-		Schedules   []StopVisitSchedule `json:",omitempty"`
+		CollectedAt *time.Time           `json:",omitempty"`
+		RecordedAt  *time.Time           `json:",omitempty"`
+		Attributes  Attributes           `json:",omitempty"`
+		References  map[string]Reference `json:",omitempty"`
+		Schedules   []StopVisitSchedule  `json:",omitempty"`
 		*Alias
 	}{
 		Id:        stopVisit.id,
@@ -118,7 +118,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		aux.Attributes = stopVisit.Attributes
 	}
 	if !stopVisit.References.IsEmpty() {
-		aux.References = stopVisit.References
+		aux.References = stopVisit.References.GetReferences()
 	}
 	if !stopVisit.RecordedAt.IsZero() {
 		aux.RecordedAt = &stopVisit.RecordedAt
@@ -142,6 +142,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	type Alias StopVisit
 	aux := &struct {
 		ObjectIDs   map[string]string
+		References  map[string]Reference
 		CollectedAt time.Time
 		Schedules   []StopVisitSchedule
 		*Alias
@@ -156,6 +157,10 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 
 	if aux.ObjectIDs != nil {
 		stopVisit.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	}
+
+	if aux.References != nil {
+		stopVisit.References.SetReferences(aux.References)
 	}
 
 	if aux.Schedules != nil {

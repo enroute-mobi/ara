@@ -55,10 +55,10 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	type Alias Line
 	aux := struct {
 		Id          LineId
-		ObjectIDs   ObjectIDs  `json:",omitempty"`
-		CollectedAt *time.Time `json:",omitempty"`
-		Attributes  Attributes `json:",omitempty"`
-		References  References `json:",omitempty"`
+		ObjectIDs   ObjectIDs            `json:",omitempty"`
+		CollectedAt *time.Time           `json:",omitempty"`
+		Attributes  Attributes           `json:",omitempty"`
+		References  map[string]Reference `json:",omitempty"`
 		*Alias
 	}{
 		Id:    line.id,
@@ -74,8 +74,9 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	if !line.Attributes.IsEmpty() {
 		aux.Attributes = line.Attributes
 	}
+
 	if !line.References.IsEmpty() {
-		aux.References = line.References
+		aux.References = line.References.GetReferences()
 	}
 
 	return json.Marshal(&aux)
@@ -85,7 +86,8 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	type Alias Line
 
 	aux := &struct {
-		ObjectIDs map[string]string
+		ObjectIDs  map[string]string
+		References map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(line),
@@ -100,6 +102,9 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 		line.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 
+	if aux.References != nil {
+		line.References.SetReferences(aux.References)
+	}
 	return nil
 }
 

@@ -58,10 +58,10 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
 	aux := struct {
 		Id         VehicleJourneyId
-		ObjectIDs  ObjectIDs     `json:",omitempty"`
-		StopVisits []StopVisitId `json:",omitempty"`
-		Attributes Attributes    `json:",omitempty"`
-		References References    `json:",omitempty"`
+		ObjectIDs  ObjectIDs            `json:",omitempty"`
+		StopVisits []StopVisitId        `json:",omitempty"`
+		Attributes Attributes           `json:",omitempty"`
+		References map[string]Reference `json:",omitempty"`
 		*Alias
 	}{
 		Id:    vehicleJourney.id,
@@ -75,7 +75,7 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		aux.Attributes = vehicleJourney.Attributes
 	}
 	if !vehicleJourney.References.IsEmpty() {
-		aux.References = vehicleJourney.References
+		aux.References = vehicleJourney.References.GetReferences()
 	}
 
 	stopVisitIds := []StopVisitId{}
@@ -106,7 +106,8 @@ func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	type Alias VehicleJourney
 	aux := &struct {
-		ObjectIDs map[string]string
+		ObjectIDs  map[string]string
+		References map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(vehicleJourney),
@@ -115,9 +116,15 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+
 	if aux.ObjectIDs != nil {
 		vehicleJourney.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
+
+	if aux.References != nil {
+		vehicleJourney.References.SetReferences(aux.References)
+	}
+
 	return nil
 }
 

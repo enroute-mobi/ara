@@ -134,7 +134,7 @@ func (builder *BroadcastGeneralMessageBuilder) handleLineSection(lineSection mod
 	siriLineSection := &siri.SIRILineSection{}
 	lineSectionMap := make(map[string]string)
 
-	for kind, reference := range lineSection {
+	for kind, reference := range lineSection.GetReferences() {
 		ref, ok := builder.resolveReference(&reference)
 		if !ok {
 			return nil, false

@@ -69,13 +69,13 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 		t.Fatalf("Wrong number of LineSections, expected: 2, got: %v", len(event.SituationAttributes.LineSections))
 	}
 	firstLineSection := *event.SituationAttributes.LineSections[0]
-	if firstLineSection["FirstStop"].ObjectId.Value() != "firstStop1" {
-		t.Errorf("Wrong first LineSection FirstStop: %v", firstLineSection["FirstStop"])
+	if ref, _ := firstLineSection.Get("FirstStop"); ref.ObjectId.Value() != "firstStop1" {
+		t.Errorf("Wrong first LineSection FirstStop: %v", ref)
 	}
-	if firstLineSection["LastStop"].ObjectId.Value() != "lastStop1" {
-		t.Errorf("Wrong first LineSection LastStop: %v", firstLineSection["LastStop"])
+	if ref, _ := firstLineSection.Get("LastStop"); ref.ObjectId.Value() != "lastStop1" {
+		t.Errorf("Wrong first LineSection LastStop: %v", ref)
 	}
-	if firstLineSection["LineRef"].ObjectId.Value() != "lineSectionRef1" {
-		t.Errorf("Wrong first LineSection LineRef: %v", firstLineSection["LineRef"])
+	if ref, _ := firstLineSection.Get("LineRef"); ref.ObjectId.Value() != "lineSectionRef1" {
+		t.Errorf("Wrong first LineSection LineRef: %v", ref)
 	}
 }

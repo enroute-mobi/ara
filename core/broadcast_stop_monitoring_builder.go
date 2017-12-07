@@ -163,10 +163,10 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	builder.resolveOperator(stopVisitRefCopy)
 
 	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy
+	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy.GetReferences()
 
 	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy
+	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetReferences()
 
 	return monitoredStopVisit
 }
@@ -205,7 +205,7 @@ func (builder *BroadcastStopMonitoringBuilder) dataVehicleJourneyRef(vehicleJour
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.References) {
-	operatorRef, ok := references["OperatorRef"]
+	operatorRef, ok := references.Get("OperatorRef")
 	if !ok {
 		return
 	}
@@ -217,19 +217,20 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 	if !ok {
 		return
 	}
-	references["OperatorRef"].ObjectId.SetValue(obj.Value())
+	ref, _ := references.Get("OperatorRef")
+	ref.ObjectId.SetValue(obj.Value())
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References) {
 	for _, refType := range []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"} {
-		reference, ok := references[refType]
+		reference, ok := references.Get(refType)
 		if !ok {
 			continue
 		}
 		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: refType[:len(refType)-3], Default: reference.GetSha1()}))
 	}
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
-		reference, ok := references[refType]
+		reference, ok := references.Get(refType)
 		if !ok || reference.ObjectId == nil {
 			continue
 		}

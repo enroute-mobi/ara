@@ -390,9 +390,9 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.SetObjectID(objectid3)
 
 	lineSectionReferences := model.NewReferences()
-	lineSectionReferences["FirstStop"] = model.Reference{ObjectId: &objectid2, Type: "StopPointRef"}
-	lineSectionReferences["LastStop"] = model.Reference{ObjectId: &objectid1, Type: "StopPointRef"}
-	lineSectionReferences["LinesRef"] = model.Reference{ObjectId: &objectid0, Type: "LineRef"}
+	lineSectionReferences.SetReference("FirstStop", model.Reference{ObjectId: &objectid2, Type: "StopPointRef"})
+	lineSectionReferences.SetReference("LastStop", model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
+	lineSectionReferences.SetReference("LinesRef", model.Reference{ObjectId: &objectid0, Type: "LineRef"})
 
 	situation.LineSections = append(situation.LineSections, &lineSectionReferences)
 	situation.Save()

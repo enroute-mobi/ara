@@ -69,12 +69,12 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	type Alias StopArea
 	aux := struct {
 		Id             StopAreaId
-		ObjectIDs      ObjectIDs  `json:",omitempty"`
-		NextCollectAt  *time.Time `json:",omitempty"`
-		CollectedAt    *time.Time `json:",omitempty"`
-		CollectedUntil *time.Time `json:",omitempty"`
-		Attributes     Attributes `json:",omitempty"`
-		References     References `json:",omitempty"`
+		ObjectIDs      ObjectIDs            `json:",omitempty"`
+		NextCollectAt  *time.Time           `json:",omitempty"`
+		CollectedAt    *time.Time           `json:",omitempty"`
+		CollectedUntil *time.Time           `json:",omitempty"`
+		Attributes     Attributes           `json:",omitempty"`
+		References     map[string]Reference `json:",omitempty"`
 		*Alias
 	}{
 		Id:    stopArea.id,
@@ -88,7 +88,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		aux.Attributes = stopArea.Attributes
 	}
 	if !stopArea.References.IsEmpty() {
-		aux.References = stopArea.References
+		aux.References = stopArea.References.GetReferences()
 	}
 	if !stopArea.NextCollectAt.IsZero() {
 		aux.NextCollectAt = &stopArea.NextCollectAt
@@ -106,7 +106,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
-		ObjectIDs map[string]string
+		ObjectIDs  map[string]string
+		References map[string]Reference
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),
@@ -118,6 +119,10 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 
 	if aux.ObjectIDs != nil {
 		stopArea.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	}
+
+	if aux.References != nil {
+		stopArea.References.SetReferences(aux.References)
 	}
 
 	return nil

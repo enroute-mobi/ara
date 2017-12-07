@@ -14,7 +14,22 @@ func NewReferences() References {
 	}
 }
 
-func (references References) Get(key string) (Reference, bool) {
+func (references *References) GetReferences() map[string]Reference {
+	return references.ref
+}
+
+func (references *References) SetReference(key string, r Reference) {
+	references.mutex.Lock()
+	defer references.mutex.Unlock()
+
+	references.ref[key] = r
+}
+
+func (references *References) SetReferences(r map[string]Reference) {
+	references.ref = r
+}
+
+func (references *References) Get(key string) (Reference, bool) {
 	references.mutex.RLock()
 	defer references.mutex.RUnlock()
 
@@ -22,7 +37,7 @@ func (references References) Get(key string) (Reference, bool) {
 	return ref, ok
 }
 
-func (references References) Set(key string, value Reference) {
+func (references *References) Set(key string, value Reference) {
 	references.mutex.Lock()
 	defer references.mutex.Unlock()
 
@@ -36,7 +51,7 @@ func (references References) Set(key string, value Reference) {
 	references.ref[key] = value
 }
 
-func (references References) SetObjectId(key string, obj ObjectID) {
+func (references *References) SetObjectId(key string, obj ObjectID) {
 	references.mutex.Lock()
 	defer references.mutex.Unlock()
 
@@ -46,11 +61,11 @@ func (references References) SetObjectId(key string, obj ObjectID) {
 	references.ref[key] = Reference{ObjectId: &obj}
 }
 
-func (references References) IsEmpty() bool {
+func (references *References) IsEmpty() bool {
 	return len(references.ref) == 0
 }
 
-func (references References) Copy() References {
+func (references *References) Copy() References {
 	references.mutex.Lock()
 	defer references.mutex.Unlock()
 
