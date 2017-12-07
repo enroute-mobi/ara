@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 )
@@ -148,13 +147,10 @@ func (manager *MemoryOperators) Delete(operator *Operator) bool {
 }
 
 func (manager *MemoryOperators) Load(referentialSlug string) error {
-	var selectOperators []struct {
-		Id              string
-		ReferentialSlug string `db:"referential_slug"`
-		Name            sql.NullString
-		ObjectIDs       sql.NullString `db:"object_ids"`
-	}
-	sqlQuery := fmt.Sprintf("select * from operators where referential_slug = '%s'", referentialSlug)
+	var selectOperators []SelectOperator
+	modelName := manager.model.Date()
+
+	sqlQuery := fmt.Sprintf("select * from operators where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
 
 	_, err := Database.Select(&selectOperators, sqlQuery)
 	if err != nil {

@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func Test_Operator_Id(t *testing.T) {
@@ -184,11 +185,13 @@ func Test_MemoryOperators_Load(t *testing.T) {
 		ReferentialSlug string `db:"referential_slug"`
 		Name            string `db:"name"`
 		ObjectIDs       string `db:"object_ids"`
+		ModelName       string `db:"model_name"`
 	}{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		Name:            "operator",
 		ObjectIDs:       `{"internal":"value"}`,
+		ModelName:       "2017-01-01",
 	}
 
 	Database.AddTableWithName(databaseOperator, "operators")
@@ -196,9 +199,16 @@ func Test_MemoryOperators_Load(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+
+	operators := model.Operators().(*MemoryOperators)
 
 	// Fetch data from the db
-	operators := NewMemoryOperators()
 	err = operators.Load("referential")
 	if err != nil {
 		t.Fatal(err)
@@ -207,7 +217,7 @@ func Test_MemoryOperators_Load(t *testing.T) {
 	operatorId := OperatorId(databaseOperator.Id)
 	operator, ok := operators.Find(operatorId)
 	if !ok {
-		t.Fatal("Loaded Liness should be found")
+		t.Fatal("Loaded Operator should be found")
 	}
 
 	if operator.id != operatorId {
