@@ -182,7 +182,7 @@ func (stopVisit *StopVisit) Save() (ok bool) {
 }
 
 func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
-	value, present := stopVisit.References[key]
+	value, present := stopVisit.References.Get(key)
 	return value, present
 }
 

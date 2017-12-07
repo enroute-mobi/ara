@@ -6,7 +6,7 @@ func Test_NewReferences(t *testing.T) {
 
 	references := NewReferences()
 
-	if len(references) != 0 {
+	if len(references.ref) != 0 {
 		t.Errorf("New references should be empty")
 	}
 
@@ -19,11 +19,11 @@ func Test_References_Set(t *testing.T) {
 	reference := Reference{ObjectId: &obj}
 	references.Set("key", reference)
 
-	if len(references) != 1 {
+	if len(references.ref) != 1 {
 		t.Errorf("references should have one entry")
 	}
 
-	if references["key"] != reference {
+	if ref, _ := references.Get("key"); ref != reference {
 		t.Errorf("'key' should be associated to 'reference'")
 	}
 }
@@ -34,7 +34,7 @@ func Test_References_Set_IgnoreEmptyValues(t *testing.T) {
 
 	references.Set("key", Reference{})
 
-	if _, ok := references["key"]; ok {
+	if _, ok := references.Get("key"); ok {
 		t.Errorf("'key' should not be associated")
 	}
 

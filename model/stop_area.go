@@ -129,7 +129,7 @@ func (stopArea *StopArea) Attribute(key string) (string, bool) {
 }
 
 func (stopArea *StopArea) Reference(key string) (Reference, bool) {
-	value, present := stopArea.References[key]
+	value, present := stopArea.References.Get(key)
 	return value, present
 }
 

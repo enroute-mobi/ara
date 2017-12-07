@@ -99,7 +99,7 @@ func (vehicleJourney *VehicleJourney) Attribute(key string) (string, bool) {
 }
 
 func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
-	value, present := vehicleJourney.References[key]
+	value, present := vehicleJourney.References.Get(key)
 	return value, present
 }
 

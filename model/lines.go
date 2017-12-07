@@ -109,7 +109,7 @@ func (line *Line) Attribute(key string) (string, bool) {
 }
 
 func (line *Line) Reference(key string) (Reference, bool) {
-	value, present := line.References[key]
+	value, present := line.References.Get(key)
 	return value, present
 }
 
