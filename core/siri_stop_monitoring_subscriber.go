@@ -175,6 +175,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			continue
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
+		resource.SubscribedUntil = subscriber.Clock().Now()
 		resource.RetryCount = 0
 	}
 	// Should not happen but see #4691

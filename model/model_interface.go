@@ -83,6 +83,15 @@ func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
 	}
 }
 
+func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
+	model = NewMemoryModel()
+	model.date = NewDate(DefaultClock().Now())
+	model.stopAreas.Load(referentialSlug)
+	model.lines.Load(referentialSlug)
+	model.operators.Load(referentialSlug)
+	return model
+}
+
 func (model *MemoryModel) Clone() *MemoryModel {
 	clone := NewMemoryModel()
 	clone.stopAreas = model.stopAreas.Clone(clone)

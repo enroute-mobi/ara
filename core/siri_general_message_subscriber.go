@@ -175,6 +175,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			continue
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
+		resource.SubscribedAt = subscriber.Clock().Now().Add(48 * time.Hour)
 		resource.RetryCount = 0
 	}
 	// Should not happen but see #4691

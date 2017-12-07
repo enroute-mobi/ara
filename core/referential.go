@@ -201,7 +201,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model")
-	referential.model = referential.model.Clone()
+	referential.model = referential.model.Reload(string(referential.Slug()))
 	referential.partners.CancelSubscriptions()
 	referential.setNextReloadAt()
 }

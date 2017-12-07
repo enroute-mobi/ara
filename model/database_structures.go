@@ -32,6 +32,22 @@ type SelectPartner struct {
 	ConnectorTypes sql.NullString `db:"connector_types"`
 }
 
+type DatabaseOperator struct {
+	Id              string         `db:"id"`
+	ReferentialSlug string         `db:"referential_slug"`
+	Name            sql.NullString `db:"name"`
+	ObjectIDs       sql.NullString `db:"object_ids"`
+	ModelName       string         `db:"model_name"`
+}
+
+type SelectOperator struct {
+	Id              string
+	ReferentialSlug string `db:"referential_slug"`
+	Name            sql.NullString
+	ObjectIDs       sql.NullString `db:"object_ids"`
+	ModelName       string         `db:"model_name"`
+}
+
 type DatabaseStopArea struct {
 	Id              string         `db:"id"`
 	ReferentialSlug string         `db:"referential_slug"`
