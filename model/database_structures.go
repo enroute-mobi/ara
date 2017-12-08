@@ -33,11 +33,11 @@ type SelectPartner struct {
 }
 
 type DatabaseOperator struct {
-	Id              string         `db:"id"`
-	ReferentialSlug string         `db:"referential_slug"`
-	Name            sql.NullString `db:"name"`
-	ObjectIDs       sql.NullString `db:"object_ids"`
-	ModelName       string         `db:"model_name"`
+	Id              string `db:"id"`
+	ReferentialSlug string `db:"referential_slug"`
+	Name            string `db:"name"`
+	ObjectIDs       string `db:"object_ids"`
+	ModelName       string `db:"model_name"`
 }
 
 type SelectOperator struct {

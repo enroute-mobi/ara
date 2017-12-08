@@ -44,6 +44,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 	importedLines := 0
 	importedVehicleJourneys := 0
 	importedStopVisits := 0
+	importedOperators := 0
 
 	var i int
 	for {
@@ -86,6 +87,13 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			} else {
 				importedStopVisits++
 			}
+		case "operator":
+			err := handleOperator(record, referentialSlug)
+			if err != nil {
+				logger.Log.Debugf("Error on line %d: %v", i, err)
+			} else {
+				importedOperators++
+			}
 		default:
 			logger.Log.Debugf("Unknown record type: %v", record[0])
 			continue
@@ -97,6 +105,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 	logger.Log.Debugf("  %v Lines", importedLines)
 	logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
 	logger.Log.Debugf("  %v StopVisits", importedStopVisits)
+	logger.Log.Debugf("  %v Operators", importedOperators)
 
 	return nil
 }
@@ -106,6 +115,7 @@ func prepareDatabase() {
 	Database.AddTableWithName(DatabaseLine{}, "lines")
 	Database.AddTableWithName(DatabaseVehicleJourney{}, "vehicle_journeys")
 	Database.AddTableWithName(DatabaseStopVisit{}, "stop_visits")
+	Database.AddTableWithName(DatabaseOperator{}, "operators")
 }
 
 func handleStopArea(record []string, referentialSlug string) error {
@@ -159,6 +169,27 @@ func handleStopArea(record []string, referentialSlug string) error {
 	}
 
 	err = Database.Insert(&stopArea)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func handleOperator(record []string, referentialSlug string) error {
+	if len(record) != 5 {
+		return fmt.Errorf("Wrong number of entries, expected 5 got %v", len(record))
+	}
+
+	operator := DatabaseOperator{
+		Id:              record[1],
+		ReferentialSlug: referentialSlug,
+		ModelName:       record[2],
+		Name:            record[3],
+		ObjectIDs:       record[4],
+	}
+
+	err := Database.Insert(&operator)
 	if err != nil {
 		return err
 	}

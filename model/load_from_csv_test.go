@@ -37,4 +37,8 @@ func Test_LoadFromCSV(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find StopVisit: %v", model.StopVisits().FindAll())
 	}
+	_, ok = model.Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if !ok {
+		t.Errorf("Can't find Operator: %v", model.Operators().FindAll())
+	}
 }
