@@ -21,6 +21,9 @@ type XMLEstimatedTimetableRequest struct {
 
 	requestTimestamp time.Time
 
+	previewInterval time.Duration
+	startTime       time.Time
+
 	lines []string
 }
 
@@ -70,4 +73,18 @@ func (request *XMLEstimatedTimetableRequest) RequestTimestamp() time.Time {
 		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
 	}
 	return request.requestTimestamp
+}
+
+func (request *XMLEstimatedTimetableRequest) PreviewInterval() time.Duration {
+	if request.previewInterval == 0 {
+		request.previewInterval = request.findDurationChildContent("PreviewInterval")
+	}
+	return request.previewInterval
+}
+
+func (request *XMLEstimatedTimetableRequest) StartTime() time.Time {
+	if request.startTime.IsZero() {
+		request.startTime = request.findTimeChildContent("StartTime")
+	}
+	return request.startTime
 }

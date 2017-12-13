@@ -61,6 +61,18 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		Status:            true,
 	}
 
+	selectors := []model.StopVisitSelector{}
+
+	if request.PreviewInterval() != 0 {
+		duration := request.PreviewInterval()
+		now := connector.Clock().Now()
+		if !request.StartTime().IsZero() {
+			now = request.StartTime()
+		}
+		selectors = append(selectors, model.StopVisitSelectorByTime(now, now.Add(duration)))
+	}
+	selector := model.CompositeStopVisitSelector(selectors)
+
 	// SIRIEstimatedJourneyVersionFrame
 	for _, lineId := range request.Lines() {
 		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), lineId)
@@ -100,11 +112,16 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 			// SIRIEstimatedCall
 			for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
+				if !selector(stopVisit) {
+					continue
+				}
+
 				// Handle StopPointRef
 				stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
 				if !ok {
 					continue
 				}
+
 				stopAreaId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 				if !ok {
 					continue
