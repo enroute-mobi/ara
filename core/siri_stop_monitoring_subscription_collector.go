@@ -141,6 +141,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	monitoringRefMap := make(map[string]struct{})
 	subscriptionErrors := make(map[string]string)
+	subToDelete := make(map[string]struct{})
 
 	logXMLStopMonitoringDelivery(logStashEvent, notify)
 
@@ -154,7 +155,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
-			connector.cancelSubscription(delivery.SubscriptionRef())
+			subToDelete[delivery.SubscriptionRef()] = struct{}{}
 			continue
 		}
 		if subscription.Kind() != "StopMonitoringCollect" {
@@ -174,6 +175,10 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
 	if len(subscriptionErrors) != 0 {
 		logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
+	}
+
+	for subId, _ := range subToDelete {
+		connector.cancelSubscription(subId)
 	}
 
 	for _, event := range stopAreaUpdateEvents {

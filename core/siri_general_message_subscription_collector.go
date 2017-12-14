@@ -108,6 +108,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	subscriptionErrors := make(map[string]string)
+	subToDelete := make(map[string]struct{})
 
 	logXMLGeneralMessageDelivery(logStashEvent, notify)
 
@@ -120,7 +121,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		if ok == false {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
-			connector.cancelSubscription(delivery.SubscriptionRef())
+			subToDelete[delivery.SubscriptionRef()] = struct{}{}
 			continue
 		}
 		if subscription.Kind() != "GeneralMessageCollect" {
@@ -134,6 +135,10 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		logSituationUpdateEvents(logStashEvent, *situationUpdateEvents)
 		if len(subscriptionErrors) != 0 {
 			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
+		}
+
+		for subId, _ := range subToDelete {
+			connector.cancelSubscription(subId)
 		}
 
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
