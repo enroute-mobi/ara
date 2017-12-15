@@ -329,6 +329,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 		generator := manager.partner.Generator("subscription_identifier")
 		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
+
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
 

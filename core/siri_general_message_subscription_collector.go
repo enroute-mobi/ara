@@ -126,6 +126,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		}
 		if subscription.Kind() != "GeneralMessageCollect" {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			fmt.Println("really")
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
@@ -136,12 +137,11 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		if len(subscriptionErrors) != 0 {
 			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
 		}
-
-		for subId, _ := range subToDelete {
-			connector.cancelSubscription(subId)
-		}
-
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
+	}
+
+	for subId, _ := range subToDelete {
+		connector.cancelSubscription(subId)
 	}
 }
 
