@@ -196,7 +196,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestorRef:      connector.partner.ProducerRef(),
 		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
-	logSIRIDeleteSubscriptionRequest(logStashEvent, request)
+	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "StopMonitoringSubscriptionCollector")
 
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
 	if err != nil {
@@ -268,8 +268,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 	return event
 }
 
-func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest) {
+func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
 	logStashEvent["type"] = "DeleteSubscription" // This function is also used on GM delete subscription
+	logStashEvent["DeletedSubscriptionType"] = subType
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
 	logStashEvent["subscriptionRef"] = request.SubscriptionRef
 	logStashEvent["requestorRef"] = request.RequestorRef
