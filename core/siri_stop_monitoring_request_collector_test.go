@@ -66,7 +66,15 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 
 	time.Sleep(42 * time.Millisecond)
-	return fs.Events[0]
+	event := &model.StopAreaUpdateEvent{}
+
+	for _, event = range fs.Events {
+		if event.StopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
+			break
+		}
+	}
+
+	return event
 }
 
 func testStopMonitoringLogStash(t *testing.T) {
@@ -85,8 +93,8 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if stopAreaUpdateEvent == nil {
 		t.Error("RequestStopAreaUpdate should not return nil")
 	}
-	if len(stopAreaUpdateEvent.StopVisitUpdateEvents) != 2 {
-		t.Errorf("RequestStopAreaUpdate should have 2 StopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.StopVisitUpdateEvents))
+	if len(stopAreaUpdateEvent.StopVisitUpdateEvents) != 1 {
+		t.Errorf("RequestStopAreaUpdate should have 1 StopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.StopVisitUpdateEvents))
 	}
 	stopVisitEvent := stopAreaUpdateEvent.StopVisitUpdateEvents[0]
 

@@ -16,7 +16,7 @@ func newStopVisitUpdateEventBuilder(partner *Partner) StopVisitUpdateEventBuilde
 	return StopVisitUpdateEventBuilder{partner: partner}
 }
 
-func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(event *model.StopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
+func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.StopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
 	stopVisitEvent := &model.StopVisitUpdateEvent{
 		Id:                     builder.NewUUID(),
 		Created_at:             builder.Clock().Now(),
@@ -45,16 +45,20 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(event *mod
 	if !xmlStopVisitEvent.ActualDepartureTime().IsZero() || !xmlStopVisitEvent.ActualArrivalTime().IsZero() {
 		stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
 	}
+
+	event, ok := events[stopVisitEvent.StopAreaObjectId.String()]
+	if !ok {
+		event = &model.StopAreaUpdateEvent{}
+		event.StopAreaAttributes.Name = xmlStopVisitEvent.StopPointName()
+		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
+		event.StopAreaAttributes.CollectedAlways = false
+		events[stopVisitEvent.StopAreaObjectId.String()] = event
+	}
 	event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
 }
 
-func (builder *StopVisitUpdateEventBuilder) setStopVisitUpdateEvents(event *model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringResponse) {
-	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
-	if len(xmlStopVisitEvents) == 0 {
-		return
-	}
-
-	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
-		builder.buildStopVisitUpdateEvent(event, xmlStopVisitEvent)
+func (builder *StopVisitUpdateEventBuilder) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, stopVisits []*siri.XMLMonitoredStopVisit) {
+	for _, xmlStopVisitEvent := range stopVisits {
+		builder.buildStopVisitUpdateEvent(events, xmlStopVisitEvent)
 	}
 }

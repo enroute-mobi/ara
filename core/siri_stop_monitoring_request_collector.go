@@ -105,25 +105,41 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	// WIP
-	stopAreaUpdateEvent := model.NewStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
+	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
 	builder := newStopVisitUpdateEventBuilder(connector.partner)
-	builder.setStopVisitUpdateEvents(stopAreaUpdateEvent, xmlStopMonitoringResponse)
+	builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, xmlStopMonitoringResponse.XMLMonitoredStopVisits())
 
-	collectedStopVisitObjectIDs := []model.ObjectID{}
-	for _, stopVisit := range tx.Model().StopVisits().FindByStopAreaId(stopArea.Id()) {
-		if stopVisit.IsCollected() {
-			objectId, ok := stopVisit.ObjectID(objectidKind)
-			if ok {
-				collectedStopVisitObjectIDs = append(collectedStopVisitObjectIDs, objectId)
+	for stopAreaObjectidString, event := range stopAreaUpdateEvents {
+		event.SetId(connector.NewUUID())
+		monitoredStopVisits := []model.ObjectID{}
+
+		obj, _ := stopArea.ObjectID(objectidKind)
+		if stopAreaObjectidString != obj.String() {
+			event.StopAreaAttributes.ParentObjectId, _ = stopArea.ObjectID(objectidKind)
+		}
+
+		collectedStopArea, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ObjectId)
+		event.StopAreaId = collectedStopArea.Id()
+
+		if !ok {
+			logStopVisitUpdateEvents(logStashEvent, event)
+			connector.broadcastStopAreaUpdateEvent(event)
+			continue
+		}
+
+		for _, sv := range tx.Model().StopVisits().FindByStopAreaId(collectedStopArea.Id()) {
+			if sv.IsCollected() {
+				objectid, ok := sv.ObjectID(objectidKind)
+				if ok {
+					monitoredStopVisits = append(monitoredStopVisits, objectid)
+				}
 			}
 		}
+		connector.findAndSetStopVisitNotCollectedEvent(event, monitoredStopVisits)
+		logStopVisitUpdateEvents(logStashEvent, event)
+		connector.broadcastStopAreaUpdateEvent(event)
 	}
-
-	connector.findAndSetStopVisitNotCollectedEvent(stopAreaUpdateEvent, collectedStopVisitObjectIDs)
-	logStopVisitUpdateEvents(logStashEvent, stopAreaUpdateEvent)
-
-	connector.broadcastStopAreaUpdateEvent(stopAreaUpdateEvent)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {

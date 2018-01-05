@@ -215,22 +215,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	}
 
 	builder := newStopVisitUpdateEventBuilder(connector.partner)
+	builder.setStopVisitUpdateEvents(events, xmlStopVisitEvents)
 
-	for _, xmlStopVisitEvent := range xmlStopVisitEvents {
-		monitoringRefMap[xmlStopVisitEvent.MonitoringRef()] = struct{}{}
-		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitEvent.MonitoringRef())
-		stopArea, ok := tx.Model().StopAreas().FindByObjectId(stopAreaObjectId)
-		if !ok {
-			logger.Log.Debugf("StopVisitUpdateEvent for unknown StopArea %v", stopAreaObjectId.Value())
-			continue
-		}
-
-		stopAreaUpdateEvent, ok := events[xmlStopVisitEvent.MonitoringRef()]
-		if !ok {
-			stopAreaUpdateEvent = model.NewStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
-			events[xmlStopVisitEvent.MonitoringRef()] = stopAreaUpdateEvent
-		}
-		builder.buildStopVisitUpdateEvent(stopAreaUpdateEvent, xmlStopVisitEvent)
+	for _, update := range events {
+		update.SetId(connector.NewUUID())
+		sa, _ := tx.Model().StopAreas().FindByObjectId(update.StopAreaAttributes.ObjectId)
+		update.StopAreaId = sa.Id()
 	}
 }
 

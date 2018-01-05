@@ -35,7 +35,17 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
 		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea %v", event.StopAreaId)
-		return
+
+		stopArea = tx.Model().StopAreas().New()
+		parentSA, _ := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ParentObjectId)
+
+		stopArea.SetObjectID(event.StopAreaAttributes.ObjectId)
+		stopArea.ParentId = parentSA.Id()
+		stopArea.Name = event.StopAreaAttributes.Name
+		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
+		stopArea.Save()
+
+		event.StopAreaId = stopArea.Id()
 	}
 
 	if event.StopAreaMonitoredEvent != nil {

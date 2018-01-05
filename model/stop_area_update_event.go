@@ -3,6 +3,7 @@ package model
 type StopAreaUpdateEvent struct {
 	id                          string
 	StopAreaId                  StopAreaId
+	StopAreaAttributes          StopAreaAttributes
 	StopAreaMonitoredEvent      *StopAreaMonitoredEvent
 	StopVisitUpdateEvents       []*StopVisitUpdateEvent
 	StopVisitNotCollectedEvents []*StopVisitNotCollectedEvent
@@ -18,6 +19,10 @@ type StopVisitNotCollectedEvent struct {
 
 func NewStopAreaUpdateEvent(id string, stopAreaId StopAreaId) *StopAreaUpdateEvent {
 	return &StopAreaUpdateEvent{id: id, StopAreaId: stopAreaId}
+}
+
+func (update *StopAreaUpdateEvent) SetId(id string) {
+	update.id = id
 }
 
 func NewStopAreaMonitoredEvent(id string, stopAreaId StopAreaId, monitored bool) *StopAreaUpdateEvent {
