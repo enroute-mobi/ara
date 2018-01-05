@@ -120,6 +120,19 @@ func main() {
 		core.CurrentReferentials().Start()
 
 		err = api.NewServer(*serverAddressPtr).ListenAndServe()
+	case "purge":
+		logger.Log.Debug = true
+
+		purgeFlags := flag.NewFlagSet("purge", flag.ExitOnError)
+		purgeDaysPtr := purgeFlags.Int("days", 1, "Specify number of days to set the purge date")
+		purgeFlags.Parse(flag.Args()[1:])
+
+		// Init Database
+		model.Database = model.InitDB(config.Config.DB)
+		defer model.CloseDB(model.Database)
+
+		purifier := model.NewPurifier(*purgeDaysPtr)
+		err = purifier.Purge()
 	case "migrate":
 		logger.Log.Debug = true
 
