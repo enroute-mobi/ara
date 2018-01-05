@@ -52,7 +52,6 @@ const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http:
 			<siri:StopMonitoringRequest version="2.0:FR-IDF-2.4">
 				{{ .BuildStopMonitoringRequestXML }}
 			</siri:StopMonitoringRequest>
-			<siri:MaximumStopVisits>10</siri:MaximumStopVisits>
 			<siri:IncrementalUpdates>true</siri:IncrementalUpdates>
 			<siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
 		</siri:StopMonitoringSubscriptionRequest>{{end}}
