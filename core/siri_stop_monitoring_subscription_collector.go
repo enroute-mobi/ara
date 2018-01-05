@@ -218,6 +218,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	builder.setStopVisitUpdateEvents(events, xmlStopVisitEvents)
 
 	for _, update := range events {
+		monitoringRefMap[update.StopAreaAttributes.ObjectId.Value()] = struct{}{}
 		update.SetId(connector.NewUUID())
 		sa, _ := tx.Model().StopAreas().FindByObjectId(update.StopAreaAttributes.ObjectId)
 		update.StopAreaId = sa.Id()
