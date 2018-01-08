@@ -111,6 +111,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 			Status:                    true,
+			ResponseTimestamp:         gmb.Clock().Now(),
 		}
 
 		// Prepare Id Array
