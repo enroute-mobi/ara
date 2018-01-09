@@ -47,6 +47,16 @@ func (situation *Situation) Id() SituationId {
 	return situation.id
 }
 
+func (situation *Situation) FindReferenceByObjectId(obj *ObjectID) (*Reference, bool) {
+	for _, ref := range situation.References {
+		if ref.ObjectId.String() == obj.String() {
+			return ref, true
+		}
+	}
+
+	return &Reference{}, false
+}
+
 func (situation *Situation) Save() (ok bool) {
 	ok = situation.model.Situations().Save(situation)
 	return
