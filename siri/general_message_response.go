@@ -263,6 +263,9 @@ func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
 func (visit *XMLGeneralMessage) InfoMessageVersion() int {
 	if visit.infoMessageVersion == 0 {
 		visit.infoMessageVersion = visit.findIntChildContent("InfoMessageVersion")
+		if visit.infoMessageVersion == 0 {
+			visit.infoMessageVersion = 1
+		}
 	}
 	return visit.infoMessageVersion
 }
