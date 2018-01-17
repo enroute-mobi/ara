@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -43,7 +42,6 @@ func NewRequestDataFromContent(params []string) *RequestData {
 		requestFiller[i] = param
 	}
 
-	fmt.Println(params)
 	return &RequestData{
 		Referential: requestFiller[1],
 		Ressource:   requestFiller[2],
