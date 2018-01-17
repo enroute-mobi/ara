@@ -136,7 +136,7 @@ const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="
 	<AnswerExtension/>
 </sw:GetGeneralMessageResponse>`
 
-const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
 			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 			<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
@@ -157,19 +157,19 @@ const generalMessageTemplate = `{{ if .FormatRef }}<siri:GeneralMessage formatRe
 				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
 				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
 				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:type="siri:IDFGeneralMessageStructure">{{range .References }}
+				xsi:type="stif:IDFGeneralMessageStructure">{{range .References }}
 					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
 					<siri:LineSection>{{ if .FirstStop }}
 						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
 						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
 						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
 					</siri:LineSection>{{end}}{{range .Messages}}
-					<siri:Message>{{if .Type}}
-						<siri:MessageType>{{ .Type }}</siri:MessageType>{{end}}{{if .Content }}
-						<siri:MessageText>{{ .Content }}</siri:MessageText>{{end}}{{if .NumberOfLines }}
-						<siri:NumberOfLines>{{ .NumberOfLines }}</siri:NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
-						<siri:NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</siri:NumberOfCharPerLine>{{end}}
-					</siri:Message>{{end}}
+					<Message>{{if .Type}}
+						<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
+						<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines }}
+						<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
+						<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
+					</Message>{{end}}
 				</siri:Content>
 			</siri:GeneralMessage>`
 
