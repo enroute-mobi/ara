@@ -296,8 +296,8 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_UNIQUE {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
 	}
-	if len(apiPartner.Errors["Settings[\"local_credential\"]"]) != 1 || apiPartner.Errors["Settings[\"local_credential\"]"][0] != ERROR_UNIQUE {
-		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors)
+	if len(apiPartner.Errors["Settings[\"local_credential\"]"]) != 1 || apiPartner.Errors["Settings[\"local_credential\"]"][0] != "Partners with the same credentials should have different connectors" {
+		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors["Settings[\"local_credential\"]"][0])
 	}
 
 	// Check ok
@@ -371,16 +371,18 @@ func Test_PartnerManager_Find(t *testing.T) {
 }
 
 func Test_PartnerManager_FindByCredential(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	existingPartner := partners.New("partner")
+	existingPartner := partnerManager.New("partner")
 	existingPartner.Settings["local_credential"] = "cred"
-	partners.Save(existingPartner)
+	partnerManager.Save(existingPartner)
 
-	partner, ok := partners.FindByLocalCredential("cred")
+	partners, ok := partnerManager.FindByLocalCredential("cred")
 	if !ok {
 		t.Fatal("FindByLocalCredential should return true when Partner is found")
 	}
+
+	partner := partners[0]
 	if partner.Id() != existingPartner.Id() {
 		t.Errorf("FindByLocalCredential should return a Partner with the given local_credential")
 	}

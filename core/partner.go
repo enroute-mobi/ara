@@ -33,7 +33,7 @@ type Partners interface {
 
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
-	FindByLocalCredential(credential string) (*Partner, bool)
+	FindByLocalCredential(credential string) ([]*Partner, bool)
 	FindBySlug(slug PartnerSlug) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
@@ -123,12 +123,26 @@ func (partner *APIPartner) Validate() bool {
 				partner.Errors.Add("Slug", ERROR_UNIQUE)
 			}
 			if ok && credentials == existingPartner.Settings["local_credential"] {
-				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
+				ok := partner.checkConnectors(existingPartner)
+				if ok {
+					partner.Errors.Add("Settings[\"local_credential\"]", "Partners with the same credentials should have different connectors")
+				}
 			}
 		}
 	}
 
 	return len(partner.Errors) == 0
+}
+
+// If 2 partners have the same local_credential they shoulo have strictly different connectors !
+func (partner *APIPartner) checkConnectors(existingPartner *Partner) bool {
+	for _, connector := range partner.ConnectorTypes {
+		_, ok := existingPartner.Connector(connector)
+		if ok {
+			return false
+		}
+	}
+	return true
 }
 
 func (partner *APIPartner) setFactories() {
@@ -580,13 +594,17 @@ func (manager *PartnerManager) Find(id PartnerId) *Partner {
 	return partner
 }
 
-func (manager *PartnerManager) FindByLocalCredential(credential string) (*Partner, bool) {
+func (manager *PartnerManager) FindByLocalCredential(credential string) ([]*Partner, bool) {
+	found := false
+	partners := []*Partner{}
+
 	for _, partner := range manager.byId {
 		if partner.Setting("local_credential") == credential {
-			return partner, true
+			found = true
+			partners = append(partners, partner)
 		}
 	}
-	return nil, false
+	return partners, found
 }
 
 func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {

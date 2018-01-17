@@ -114,16 +114,26 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	partner, ok := handler.referential.Partners().FindByLocalCredential(requestHandler.RequestorRef())
+	partners, ok := handler.referential.Partners().FindByLocalCredential(requestHandler.RequestorRef())
 	if !ok {
 		siriErrorWithRequest("UnknownCredential", "RequestorRef Unknown", envelope.Body().String(), response)
 		return
 	}
-	connector, ok := partner.Connector(requestHandler.ConnectorType())
-	if !ok {
-		siriErrorWithRequest("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), envelope.Body().String(), response)
-		return
+
+	found := false
+
+	for _, partner := range partners {
+		connector, ok := partner.Connector(requestHandler.ConnectorType())
+		if !ok {
+			continue
+		}
+
+		requestHandler.Respond(connector, response)
+		found = true
+		break
 	}
 
-	requestHandler.Respond(connector, response)
+	if !found {
+		siriErrorWithRequest("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), envelope.Body().String(), response)
+	}
 }
