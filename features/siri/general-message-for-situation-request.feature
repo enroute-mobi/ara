@@ -64,7 +64,7 @@ Feature: Support SIRI GeneralMessage for Situation
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -76,12 +76,12 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoChannelRef>Perturbations</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          				xsi:type="siri:IDFGeneralMessageStructure">
+          				xsi:type="stif:IDFGeneralMessageStructure">
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-                    <siri:Message>
-                      <siri:MessageType>longMessage</siri:MessageType>
-                      <siri:MessageText>Les autres non</siri:MessageText>
-                    </siri:Message>
+                    <Message>
+                      <MessageType>longMessage</MessageType>
+                      <MessageText>Les autres non</MessageText>
+                    </Message>
                   </siri:Content>
                 </siri:GeneralMessage>
               </siri:GeneralMessageDelivery>
@@ -144,7 +144,7 @@ Feature: Support SIRI GeneralMessage for Situation
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -155,12 +155,12 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:IDFGeneralMessageStructure'>
+                  <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='stif:IDFGeneralMessageStructure'>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-                    <siri:Message>
-                      <siri:MessageType>longMessage</siri:MessageType>
-                      <siri:MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</siri:MessageText>
-                    </siri:Message>
+                    <Message>
+                      <MessageType>longMessage</MessageType>
+                      <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
+                    </Message>
                   </siri:Content>
                 </siri:GeneralMessage>
               </siri:GeneralMessageDelivery>
@@ -362,7 +362,7 @@ Feature: Support SIRI GeneralMessage for Situation
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
                 <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
