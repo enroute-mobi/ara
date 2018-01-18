@@ -72,9 +72,6 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 
 	logger.Log.Debugf("Update referential %s: %s", identifier, string(body))
 
-	referential.Stop()
-	defer referential.Start()
-
 	apiReferential := referential.Definition()
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
@@ -89,8 +86,11 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 		return
 	}
 
+	referential.Stop()
 	referential.SetDefinition(apiReferential)
 	referential.Save()
+	referential.Start()
+
 	jsonBytes, _ := referential.MarshalJSON()
 	response.Write(jsonBytes)
 }

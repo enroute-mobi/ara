@@ -153,9 +153,6 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 
 	logger.Log.Debugf("Update partner %s: %s", identifier, string(body))
 
-	partner.Stop()
-	defer partner.Start()
-
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
@@ -174,9 +171,11 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 		return
 	}
 
+	partner.Stop()
 	partner.SetDefinition(apiPartner)
-	partner.CancelSubscriptions()
 	partner.Save()
+	partner.Start()
+
 	jsonBytes, _ := partner.MarshalJSON()
 	response.Write(jsonBytes)
 }

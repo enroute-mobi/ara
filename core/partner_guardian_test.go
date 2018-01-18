@@ -13,6 +13,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 		ConnectorTypes: []string{"test-check-status-client"},
 		connectors:     make(map[string]Connector),
 	}
+	partner.subscriptionManager = NewMemorySubscriptions(&partner)
 	partner.RefreshConnectors()
 	partners.Save(&partner)
 

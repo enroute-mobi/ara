@@ -297,6 +297,7 @@ func (partner *Partner) Stop() {
 			c.Stop()
 		}
 	}
+	partner.CancelSubscriptions()
 }
 
 func (partner *Partner) Start() {
