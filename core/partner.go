@@ -138,7 +138,7 @@ func (partner *APIPartner) Validate() bool {
 func (partner *APIPartner) checkConnectors(existingPartner *Partner) bool {
 	for _, connector := range partner.ConnectorTypes {
 		_, ok := existingPartner.Connector(connector)
-		if ok {
+		if ok && connector != SIRI_CHECK_STATUS_SERVER_TYPE && connector != SIRI_CHECK_STATUS_CLIENT_TYPE {
 			return false
 		}
 	}
