@@ -124,7 +124,7 @@ func (partner *APIPartner) Validate() bool {
 			}
 			if ok && credentials == existingPartner.Settings["local_credential"] {
 				ok := partner.checkConnectors(existingPartner)
-				if ok {
+				if !ok {
 					partner.Errors.Add("Settings[\"local_credential\"]", "Partners with the same credentials should have different connectors (check status connectors are allowed)")
 				}
 			}
