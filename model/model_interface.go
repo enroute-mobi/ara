@@ -71,7 +71,7 @@ func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	select {
 	case model.SMEventsChan <- event:
 	default:
-		logger.Log.Debugf("Cannot send StopMonitoringBroadcastEvent to BrocasterManager")
+		logger.Log.Debugf("BrocasterManager StopMonitoringBroadcastEvent queue is full")
 	}
 }
 
@@ -79,7 +79,7 @@ func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
 	select {
 	case model.GMEventsChan <- event:
 	default:
-		logger.Log.Debugf("Cannot send GeneralMessageBroadcastEvent to BrocasterManager")
+		logger.Log.Debugf("BrocasterManager GeneralMessageBroadcastEvent queue is full")
 	}
 }
 
