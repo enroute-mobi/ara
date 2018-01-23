@@ -23,15 +23,18 @@ func NewPartnerController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *PartnerController) getActionId(action, url string) string {
+func (controller *PartnerController) getActionId(action, url string) (string, error) {
 	index := strings.LastIndex(url, action) + len(action) + 1
+	if index >= len(url)-1 {
+		return "", fmt.Errorf("No id")
+	}
 	id := url[index:len(url)]
 
 	sz := len(id)
 	if sz > 0 && id[sz-1] == '/' {
 		id = id[:sz-1]
 	}
-	return id
+	return id, nil
 }
 
 func (controller *PartnerController) subscriptionsIndex(response http.ResponseWriter, requestData *RequestData) {
@@ -55,7 +58,11 @@ func (controller *PartnerController) subscriptionsDelete(response http.ResponseW
 	}
 	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
 
-	id := controller.getActionId(requestData.Action, requestData.Url)
+	id, err := controller.getActionId(requestData.Action, requestData.Url)
+	if err != nil {
+		http.Error(response, "Invalid request, id can't be nil", 400)
+		return
+	}
 	partner.Subscriptions().DeleteById(core.SubscriptionId(id))
 }
 
