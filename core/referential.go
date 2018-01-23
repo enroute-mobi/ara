@@ -132,6 +132,7 @@ func (referential *Referential) Start() {
 func (referential *Referential) Stop() {
 	referential.partners.Stop()
 	referential.modelGuardian.Stop()
+	referential.broacasterManager.Stop()
 }
 
 func (referential *Referential) Save() (ok bool) {
