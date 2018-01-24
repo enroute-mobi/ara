@@ -1,10 +1,10 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
@@ -58,68 +58,43 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	return siriEstimatedTimeTableSubscriptionBroadcaster
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent, request)
-
-	ettEntries := request.XMLSubscriptionETTEntries()
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) (resps []siri.SIRIResponseStatus) {
+	mainLogStashEvent := connector.newLogStashEvent()
+	logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(mainLogStashEvent, request)
+	audit.CurrentLogStash().WriteEvent(mainLogStashEvent)
 
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	resps := []siri.SIRIResponseStatus{}
-
-	for _, ett := range ettEntries {
+	for _, ett := range request.XMLSubscriptionETTEntries() {
 		logStashEvent := connector.newLogStashEvent()
-		logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent, ett)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
+		logSIRIEstimatedTimeTableBroadcasterEntry(logStashEvent, ett)
 
-		resources := []SubscribedResource{}
 		rs := siri.SIRIResponseStatus{
-			Status:            true,
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
 			SubscriptionRef:   ett.SubscriptionIdentifier(),
 			ResponseTimestamp: connector.Clock().Now(),
-			ValidUntil:        ett.InitialTerminationTime(),
 		}
 
-		for _, lineId := range ett.Lines() {
-			lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
-			_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
-
-			if !ok {
-				rs.Status = false
-				rs.ErrorType = "InvalidDataReferencesError"
-				rs.ErrorText = "Could not find Line " + lineId
-				rs.ValidUntil = time.Time{}
-
-				resources = []SubscribedResource{}
-				resps = append(resps, rs)
-
-				logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
-				audit.CurrentLogStash().WriteEvent(logStashEvent)
-				logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line with id : %v", lineId)
-
-				break
-			}
-
-			ref := model.Reference{
-				ObjectId: &lineObjectId,
-				Type:     "Line",
-			}
-
-			r := NewResource(ref)
-			r.SubscribedAt = connector.Clock().Now()
-			r.SubscribedUntil = ett.InitialTerminationTime()
-			resources = append(resources, r)
+		resources, lineIds := connector.checkLines(ett)
+		if len(lineIds) != 0 {
+			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(lineIds, ","))
+			rs.ErrorType = "InvalidDataReferencesError"
+			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(lineIds, ","))
+		} else {
+			rs.Status = true
+			rs.ValidUntil = ett.InitialTerminationTime()
 		}
+
 		resps = append(resps, rs)
 
 		logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+		if len(lineIds) != 0 {
+			continue
+		}
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
@@ -128,17 +103,41 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		}
 
 		for _, r := range resources {
-			line, _ := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			if !ok {
+				continue
+			}
 			connector.addLine(sub.Id(), line.Id())
 
 			sub.AddNewResource(r)
 			connector.fillOptions(sub, request)
 		}
-
-		resources = []SubscribedResource{}
 		sub.Save()
 	}
 	return resps
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []SubscribedResource, lineIds []string) {
+	for _, lineId := range ett.Lines() {
+		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
+		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
+
+		if !ok {
+			lineIds = append(lineIds, lineId)
+			continue
+		}
+
+		ref := model.Reference{
+			ObjectId: &lineObjectId,
+			Type:     "Line",
+		}
+
+		r := NewResource(ref)
+		r.SubscribedAt = connector.Clock().Now()
+		r.SubscribedUntil = ett.InitialTerminationTime()
+		resources = append(resources, r)
+	}
+	return resources, lineIds
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {
@@ -251,13 +250,13 @@ func logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent audi
 	}
 }
 
-func logSIRIEstimatedTimeTableBroadcasterEntries(logStashEvent audit.LogStashEvent, ettEntries *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
+func logSIRIEstimatedTimeTableBroadcasterEntry(logStashEvent audit.LogStashEvent, ettEntry *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
 	logStashEvent["type"] = "EstimatedTimeTableSubscription"
-	logStashEvent["subscriberRef"] = ettEntries.SubscriberRef()
-	logStashEvent["subscriptionRef"] = ettEntries.SubscriptionIdentifier()
-	logStashEvent["LineRef"] = strings.Join(ettEntries.Lines(), ",")
+	logStashEvent["subscriberRef"] = ettEntry.SubscriberRef()
+	logStashEvent["subscriptionRef"] = ettEntry.SubscriptionIdentifier()
+	logStashEvent["LineRef"] = strings.Join(ettEntry.Lines(), ",")
 
-	xml := ettEntries.RawXML()
+	xml := ettEntry.RawXML()
 	logStashEvent["requestXML"] = xml
 }
 
