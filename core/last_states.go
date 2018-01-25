@@ -113,11 +113,11 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 		return false
 	}
 
-	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && smlc.arrivalStatuts == stopVisit.ArrivalStatus {
+	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && ettlc.arrivalStatuts == stopVisit.ArrivalStatus {
 		return false
 	}
 
-	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && smlc.departureStatus == stopVisit.DepartureStatus {
+	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && ettlc.departureStatus == stopVisit.DepartureStatus {
 		return false
 	}
 
