@@ -116,7 +116,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		}
 
 		lastState, ok := resource.LastStates[string(sv.Id())]
-
 		if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
 			continue
 		}

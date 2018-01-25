@@ -100,6 +100,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
 			sub.SetExternalId(ett.SubscriptionIdentifier())
+			connector.fillOptions(sub, request)
 		}
 
 		for _, r := range resources {
@@ -107,10 +108,9 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			if !ok {
 				continue
 			}
-			connector.addLine(sub.Id(), line.Id())
 
 			sub.AddNewResource(r)
-			connector.fillOptions(sub, request)
+			connector.addLine(sub.Id(), line.Id())
 		}
 		sub.Save()
 	}
@@ -177,7 +177,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLine(subId Su
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId, tx *model.Transaction) {
 	sv, ok := connector.Partner().Model().StopVisits().Find(svId)
-
 	if !ok {
 		return
 	}
@@ -201,20 +200,21 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 
 	for _, sub := range subs {
 		r := sub.Resource(lineObj)
-		if r == nil {
+		if r == nil || r.SubscribedUntil.Before(connector.Clock().Now()) {
 			continue
 		}
 
 		lastState, ok := r.LastStates[string(sv.Id())]
-		if !ok {
-			r.LastStates[string(sv.Id())] = &estimatedTimeTableLastChange{}
-			lastState, _ = r.LastStates[string(sv.Id())]
-			lastState.(*estimatedTimeTableLastChange).InitState(&sv, sub)
-		}
-
-		if ok = lastState.(*estimatedTimeTableLastChange).Haschanged(&sv); !ok {
+		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(&sv) {
 			continue
 		}
+
+		if !ok {
+			ettlc := &estimatedTimeTableLastChange{}
+			ettlc.InitState(&sv, sub)
+			r.LastStates[string(sv.Id())] = ettlc
+		}
+
 		connector.addLine(sub.Id(), line.Id())
 	}
 }

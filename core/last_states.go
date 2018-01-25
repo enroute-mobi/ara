@@ -42,7 +42,6 @@ func (smlc *stopMonitoringLastChange) UpdateState(stopVisit *model.StopVisit) bo
 }
 
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
-
 	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
 	if !ok {
 		return true
@@ -105,20 +104,28 @@ func (ettlc *estimatedTimeTableLastChange) UpdateState(sv *model.StopVisit) {
 }
 
 func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
+	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
+	if !ok {
+		return true
+	}
+
 	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return false
 	}
 
-	if stopVisit.VehicleAtStop == true {
+	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && smlc.arrivalStatuts == stopVisit.ArrivalStatus {
+		return false
+	}
+
+	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && smlc.departureStatus == stopVisit.DepartureStatus {
+		return false
+	}
+
+	if ettlc.vehicleAtStop != stopVisit.VehicleAtStop {
 		return true
 	}
 
 	if ettlc.handleArrivalStatus(stopVisit.ArrivalStatus, ettlc.arrivalStatuts) || ettlc.handleDepartureStatus(stopVisit.DepartureStatus, ettlc.departureStatus) {
-		return true
-	}
-
-	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if !ok {
 		return true
 	}
 
