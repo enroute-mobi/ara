@@ -88,5 +88,8 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 			sub.DeleteResource(key)
 			logger.Log.Printf("Deleting ressource %v from subscription with id %v", key, sub.Id())
 		}
+		if len(sub.ResourcesByObjectID()) == 0 {
+			sub.Delete()
+		}
 	}
 }

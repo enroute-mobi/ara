@@ -90,7 +90,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 				return
 			}
 			if !resource.SubscribedAt.IsZero() {
-				resource.SubscribedUntil = resource.SubscribedUntil.Add(1 * time.Minute)
+				resource.SubscribedUntil = resource.SubscribedUntil.Add(2 * time.Minute)
 			}
 		}
 		return
