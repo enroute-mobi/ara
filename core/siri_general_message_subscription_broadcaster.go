@@ -85,7 +85,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	defer tx.Close()
 
 	situation, ok := tx.Model().Situations().Find(sId)
-	if !ok {
+	if !ok || situation.Origin == string(connector.partner.Slug()) {
 		return
 	}
 

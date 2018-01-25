@@ -124,7 +124,7 @@ func Test_SituationController_Create(t *testing.T) {
 		t.Errorf("Situation should be found after POST request")
 	}
 	situationMarshal, _ := situation.MarshalJSON()
-	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":[{"ObjectId":{"lol":"lel"},"Type":"StopArea"}]}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":[{"ObjectId":{"lol":"lel"},"Type":"StopArea"}],"Origin":""}`
 	if responseRecorder.Body.String() != string(expected) && string(situationMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
@@ -138,7 +138,7 @@ func Test_SituationController_Index(t *testing.T) {
 	checkSituationResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Origin":""}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

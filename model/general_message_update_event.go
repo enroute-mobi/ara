@@ -5,6 +5,7 @@ import "time"
 type SituationUpdateRequestId string
 
 type SituationUpdateEvent struct {
+	Origin              string
 	id                  SituationUpdateRequestId
 	CreatedAt           time.Time
 	RecordedAt          time.Time

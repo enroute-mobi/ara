@@ -10,7 +10,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-func Test_SIRIGeneralMessageRequestBroadcaster_RequestStopArea(t *testing.T) {
+func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -62,6 +62,49 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestStopArea(t *testing.T) {
 	}
 	if len(response.GeneralMessages) != 1 {
 		t.Errorf("Response should have 1 GeneralMessage, got: %v", len(response.GeneralMessages))
+	}
+}
+
+func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+
+	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	situation := referential.Model().Situations().New()
+	situation.Origin = "partner"
+	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	situation.SetObjectID(objectid)
+	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
+	routeReference.Type = "RouteRef"
+	situation.References = append(situation.References, routeReference)
+	situation.Save()
+
+	file, err := os.Open("testdata/generalmessage-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLGetGeneralMessageFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := connector.Situations(request)
+
+	if len(response.GeneralMessages) != 0 {
+		t.Errorf("Response should have 0 GeneralMessage, got: %v", len(response.GeneralMessages))
 	}
 }
 

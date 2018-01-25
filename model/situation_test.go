@@ -18,10 +18,11 @@ func Test_Situation_Id(t *testing.T) {
 
 func Test_Situation_MarshalJSON(t *testing.T) {
 	situation := Situation{
-		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		id:     "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		Origin: "test",
 	}
 	situation.Messages = append(situation.Messages, &Message{Content: "Joyeux Noel", Type: "Un Type"})
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}]}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}],"Origin":"test"}`
 	jsonBytes, err := situation.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

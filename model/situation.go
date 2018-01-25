@@ -18,7 +18,8 @@ type Message struct {
 type Situation struct {
 	ObjectIDConsumer
 
-	model Model
+	model  Model
+	Origin string
 
 	id SituationId
 

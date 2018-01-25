@@ -51,7 +51,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 }
 
 func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
-	if situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
+	if situation.Origin == string(builder.siriPartner.Partner().Slug()) || situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
 		return nil
 	}
 

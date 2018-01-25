@@ -44,6 +44,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	}
 
 	situationEvent := &model.SituationUpdateEvent{
+		Origin:            string(builder.partner.Slug()),
 		CreatedAt:         builder.Clock().Now(),
 		RecordedAt:        xmlGeneralMessageEvent.RecordedAtTime(),
 		SituationObjectID: model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlGeneralMessageEvent.InfoMessageIdentifier()),
