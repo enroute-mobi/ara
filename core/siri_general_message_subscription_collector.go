@@ -117,13 +117,13 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
-
-		if ok == false {
+		if !ok {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			subToDelete[delivery.SubscriptionRef()] = struct{}{}
 			continue
 		}
+
 		if subscription.Kind() != "GeneralMessageCollect" {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"

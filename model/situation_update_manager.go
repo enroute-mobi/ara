@@ -49,6 +49,7 @@ func (updater *SituationUpdater) Update() {
 		situation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
 		if ok && situation.Version == event.Version {
 			updater.checkSituationReferences(&situation, event)
+			situation.Save()
 			return
 		}
 
