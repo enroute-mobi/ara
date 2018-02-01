@@ -126,7 +126,13 @@ func (referential *Referential) Start() {
 
 	referential.partners.Start()
 	referential.modelGuardian.Start()
+
+	referential.broacasterManager = NewBroadcastManager(referential)
+	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
+
 	referential.broacasterManager.Start()
+
 }
 
 func (referential *Referential) Stop() {

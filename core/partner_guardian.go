@@ -66,6 +66,12 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN || partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus
+
+		if partner.Setting("subscription.persistent") == "true" {
+			partner.Subscriptions().CancelCollectSubscriptions()
+			return false
+		}
+
 		partner.CancelSubscriptions()
 
 		return false

@@ -192,6 +192,7 @@ type Subscriptions interface {
 	DeleteById(id SubscriptionId)
 	CancelSubscriptions()
 	CancelBroadcastSubscriptions()
+	CancelCollectSubscriptions()
 	FindByRessourceId(id, kind string) []*Subscription
 	FindByExternalId(externalId string) (*Subscription, bool)
 }
@@ -366,6 +367,17 @@ func (manager *MemorySubscriptions) CancelBroadcastSubscriptions() {
 
 	for id, subscription := range manager.byIdentifier {
 		if subscription.externalId != "" {
+			delete(manager.byIdentifier, id)
+		}
+	}
+}
+
+func (manager *MemorySubscriptions) CancelCollectSubscriptions() {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	for id, subscription := range manager.byIdentifier {
+		if subscription.externalId == "" {
 			delete(manager.byIdentifier, id)
 		}
 	}
