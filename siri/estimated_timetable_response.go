@@ -98,7 +98,7 @@ const estimatedJourneyVersionFrameTemplate = `<siri:EstimatedJourneyVersionFrame
 					<siri:DirectionRef/>{{ end }}
 					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
 					<siri:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
-					<siri:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{ end }}
+					<siri:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
 					<siri:EstimatedCalls>{{ range .EstimatedCalls }}
 						<siri:EstimatedCall>
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
@@ -113,7 +113,7 @@ const estimatedJourneyVersionFrameTemplate = `<siri:EstimatedJourneyVersionFrame
 							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
 							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
 						</siri:EstimatedCall>{{ end }}
-					</siri:EstimatedCalls>
+					</siri:EstimatedCalls>{{ end }}
 				</siri:EstimatedVehicleJourney>{{ end }}
 			</siri:EstimatedJourneyVersionFrame>`
 

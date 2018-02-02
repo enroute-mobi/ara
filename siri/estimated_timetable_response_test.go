@@ -200,3 +200,72 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
 	}
 }
+
+func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
+	expectedXML := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<ServiceDeliveryInfo>
+		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+		<siri:ProducerRef>producer</siri:ProducerRef>
+		<siri:Address>address</siri:Address>
+		<siri:ResponseMessageIdentifier>response</siri:ResponseMessageIdentifier>
+		<siri:RequestMessageRef>request</siri:RequestMessageRef>
+	</ServiceDeliveryInfo>
+	<Answer>
+		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+			<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
+			<siri:RequestMessageRef>request</siri:RequestMessageRef>
+			<siri:Status>true</siri:Status>
+			<siri:EstimatedJourneyVersionFrame>
+				<siri:RecordedAtTime>2016-09-21T20:14:46.000Z</siri:RecordedAtTime>
+				<siri:EstimatedVehicleJourney>
+					<siri:LineRef>line1</siri:LineRef>
+					<siri:DirectionRef>direction1</siri:DirectionRef>
+					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
+					<siri:OriginRef>origin1</siri:OriginRef>
+					<siri:DestinationRef>destination1</siri:DestinationRef>
+				</siri:EstimatedVehicleJourney>
+			</siri:EstimatedJourneyVersionFrame>
+		</siri:EstimatedTimetableDelivery>
+	</Answer>
+	<AnswerExtension/>
+</sw:GetEstimatedTimetableResponse>`
+
+	testTime := time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC)
+
+	vehicleJourney1 := &SIRIEstimatedVehicleJourney{
+		LineRef:                "line1",
+		DatedVehicleJourneyRef: "dvjref1",
+		Attributes: map[string]string{
+			"DirectionRef":    "direction1",
+			"OriginName":      "origin 1",
+			"DestinationName": "destination 1",
+		},
+		References: map[string]model.Reference{
+			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
+			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
+		},
+	}
+
+	journeyVersion1 := &SIRIEstimatedJourneyVersionFrame{
+		RecordedAtTime:           testTime,
+		EstimatedVehicleJourneys: []*SIRIEstimatedVehicleJourney{vehicleJourney1},
+	}
+
+	response := &SIRIEstimatedTimeTableResponse{
+		Address:                   "address",
+		ProducerRef:               "producer",
+		ResponseMessageIdentifier: "response",
+	}
+	response.RequestMessageRef = "request"
+	response.Status = true
+	response.ResponseTimestamp = testTime
+	response.EstimatedJourneyVersionFrames = []*SIRIEstimatedJourneyVersionFrame{journeyVersion1}
+
+	xml, err := response.BuildXML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if expectedXML != xml {
+		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
+	}
+}
