@@ -79,14 +79,14 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	}
 }
 
-func Test_SituationUpdateManager_SameVersion(t *testing.T) {
+func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	testTime := time.Now()
 
 	model := NewMemoryModel()
 	situation := model.Situations().New()
 	situation.SetObjectID(objectid)
-	situation.Version = 1
+	situation.RecordedAt = testTime
 	situation.Channel = "SituationChannel"
 	model.Situations().Save(&situation)
 

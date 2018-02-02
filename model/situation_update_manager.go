@@ -47,7 +47,7 @@ func (updater *SituationUpdater) checkSituationReferences(situation *Situation, 
 func (updater *SituationUpdater) Update() {
 	for _, event := range updater.events {
 		situation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
-		if ok && situation.Version == event.Version {
+		if ok && situation.RecordedAt == event.RecordedAt {
 			updater.checkSituationReferences(&situation, event)
 			situation.Save()
 			return

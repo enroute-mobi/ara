@@ -147,7 +147,7 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 type generalMessageLastChange struct {
 	subscription *Subscription
 
-	version int
+	recordedAt time.Time
 }
 
 func (sglc *generalMessageLastChange) InitState(situation *model.Situation, sub *Subscription) {
@@ -160,12 +160,12 @@ func (sglc *generalMessageLastChange) SetSubscription(sub *Subscription) {
 }
 
 func (sglc *generalMessageLastChange) UpdateState(situation *model.Situation) bool {
-	sglc.version = situation.Version
+	sglc.recordedAt = situation.RecordedAt
 	return true
 }
 
 func (sglc *generalMessageLastChange) Haschanged(situation *model.Situation) bool {
-	return !(situation.Version == sglc.version)
+	return !situation.RecordedAt.Equal(sglc.recordedAt)
 }
 
 type schedulesHandler struct{}
