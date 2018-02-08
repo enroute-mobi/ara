@@ -40,12 +40,16 @@ func (guardian *ModelGuardian) Run() {
 	for {
 		select {
 		case <-guardian.stop:
+			logger.Log.Debugf("Model guardian stop")
 			return
 		case <-c:
 			logger.Log.Debugf("Model guardian visit")
 
+			if guardian.checkReloadModel() {
+				return
+			}
+
 			guardian.refreshStopAreas()
-			guardian.checkReloadModel()
 			guardian.simulateActualAttributes()
 			guardian.requestSituations()
 
@@ -54,10 +58,12 @@ func (guardian *ModelGuardian) Run() {
 	}
 }
 
-func (guardian *ModelGuardian) checkReloadModel() {
+func (guardian *ModelGuardian) checkReloadModel() bool {
 	if guardian.Clock().Now().After(guardian.referential.NextReloadAt()) {
 		guardian.referential.ReloadModel()
+		return true
 	}
+	return false
 }
 
 func (guardian *ModelGuardian) refreshStopAreas() {
