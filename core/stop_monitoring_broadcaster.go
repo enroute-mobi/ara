@@ -227,9 +227,13 @@ func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 
 func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
 	monitoringRefs := []string{}
-
 	for _, sv := range response.MonitoredStopVisits {
 		monitoringRefs = append(monitoringRefs, sv.MonitoringRef)
+	}
+
+	cancelledMonitoringRefs := []string{}
+	for _, sv := range response.CancelledStopVisits {
+		cancelledMonitoringRefs = append(cancelledMonitoringRefs, sv.MonitoringRef)
 	}
 
 	logStashEvent["type"] = "NotifyStopMonitoring"
@@ -240,6 +244,7 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *si
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
 	logStashEvent["monitoringRef"] = strings.Join(monitoringRefs, ",")
+	logStashEvent["cancelledMonitoringRef"] = strings.Join(cancelledMonitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType
