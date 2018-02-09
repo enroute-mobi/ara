@@ -46,6 +46,9 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(line
 	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 	siriGeneralMessageRequest.LineRef = []string{lineRef}
+	if b, _ := strconv.ParseBool(connector.partner.Setting("generalMessageRequest.version2.2")); b {
+		siriGeneralMessageRequest.XsdInWsdl = true
+	}
 
 	logSIRIGeneralMessageRequest(logStashEvent, siriGeneralMessageRequest)
 

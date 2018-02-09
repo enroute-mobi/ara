@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -131,6 +132,9 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		entry.MessageIdentifier = messageIdentifier
 		entry.RequestTimestamp = subscriber.Clock().Now()
 		entry.LineRef = []string{requestedLine.lineId.Value()}
+		if b, _ := strconv.ParseBool(subscriber.connector.partner.Setting("generalMessageRequest.version2.2")); b {
+			entry.XsdInWsdl = true
+		}
 
 		lineRefList = append(lineRefList, requestedLine.lineId.Value())
 		gmRequest.Entries = append(gmRequest.Entries, entry)
