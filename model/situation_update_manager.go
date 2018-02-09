@@ -35,21 +35,10 @@ func NewSituationUpdater(tx *Transaction, events []*SituationUpdateEvent) *Situa
 	return &SituationUpdater{tx: tx, events: events}
 }
 
-//We check if we need to add a reference to the situation, a situation can involve multiple lines or stop areas
-func (updater *SituationUpdater) checkSituationReferences(situation *Situation, event *SituationUpdateEvent) {
-	for _, ref := range event.SituationAttributes.References {
-		if _, ok := situation.FindReferenceByObjectId(ref.ObjectId); !ok {
-			situation.References = append(situation.References, ref)
-		}
-	}
-}
-
 func (updater *SituationUpdater) Update() {
 	for _, event := range updater.events {
 		situation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
 		if ok && situation.RecordedAt == event.RecordedAt {
-			updater.checkSituationReferences(&situation, event)
-			situation.Save()
 			return
 		}
 
@@ -64,7 +53,7 @@ func (updater *SituationUpdater) Update() {
 		situation.Version = event.Version
 		situation.ProducerRef = event.ProducerRef
 
-		updater.checkSituationReferences(&situation, event)
+		situation.References = event.SituationAttributes.References
 		situation.LineSections = event.SituationAttributes.LineSections
 		situation.Messages = event.SituationAttributes.Messages
 		situation.ValidUntil = event.SituationAttributes.ValidUntil
