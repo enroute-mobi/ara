@@ -27,6 +27,7 @@ Escape quotes with another quote ex: "[""1234"",""5678""]"
 
 func LoadFromCSV(filePath string, referentialSlug string) error {
 	prepareDatabase()
+	var errors int
 
 	file, err := os.Open(filePath)
 	defer file.Close()
@@ -56,6 +57,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 		if err != nil {
 			logger.Log.Debugf("Error while reading %v", err)
 			fmt.Errorf("Error while reading %v", err)
+			errors++
 			continue
 		}
 
@@ -65,6 +67,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
+				errors++
 			} else {
 				importedStopAreas++
 			}
@@ -73,6 +76,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
+				errors++
 			} else {
 				importedLines++
 			}
@@ -81,6 +85,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
+				errors++
 			} else {
 				importedVehicleJourneys++
 			}
@@ -89,6 +94,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
+				errors++
 			} else {
 				importedStopVisits++
 			}
@@ -97,29 +103,36 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
+				errors++
 			} else {
 				importedOperators++
 			}
 		default:
 			logger.Log.Debugf("Unknown record type: %v", record[0])
 			fmt.Errorf("Unknown record type: %v", record[0])
+			errors++
 			continue
 		}
 	}
 
-	logger.Log.Debugf("Import successful")
-	logger.Log.Debugf("  %v StopAreas", importedStopAreas)
-	logger.Log.Debugf("  %v Lines", importedLines)
-	logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
-	logger.Log.Debugf("  %v StopVisits", importedStopVisits)
-	logger.Log.Debugf("  %v Operators", importedOperators)
+	if (importedStopAreas + importedLines + importedVehicleJourneys + importedStopVisits + importedOperators) == 0 {
+		logger.Log.Debugf("Nothing imported, import raised %v errors", errors)
+		fmt.Printf("Nothing imported, import raised %v errors\n", errors)
+	} else {
+		logger.Log.Debugf("Import successful, import raised %v errors", errors)
+		logger.Log.Debugf("  %v StopAreas", importedStopAreas)
+		logger.Log.Debugf("  %v Lines", importedLines)
+		logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
+		logger.Log.Debugf("  %v StopVisits", importedStopVisits)
+		logger.Log.Debugf("  %v Operators", importedOperators)
 
-	fmt.Println("Import successful")
-	fmt.Printf("  %v StopAreas", importedStopAreas)
-	fmt.Printf("  %v Lines", importedLines)
-	fmt.Printf("  %v VehicleJourneys", importedVehicleJourneys)
-	fmt.Printf("  %v StopVisits", importedStopVisits)
-	fmt.Printf("  %v Operators", importedOperators)
+		fmt.Printf("Import successful, import raised %v errors\n", errors)
+		fmt.Printf("  %v StopAreas\n", importedStopAreas)
+		fmt.Printf("  %v Lines\n", importedLines)
+		fmt.Printf("  %v VehicleJourneys\n", importedVehicleJourneys)
+		fmt.Printf("  %v StopVisits\n", importedStopVisits)
+		fmt.Printf("  %v Operators\n", importedOperators)
+	}
 
 	return nil
 }
