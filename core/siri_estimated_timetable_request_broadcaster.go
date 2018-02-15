@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/af83/edwig/audit"
+	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
 )
@@ -44,16 +45,16 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
 
-	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest)
+	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest, logStashEvent)
 
-	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery)
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
 	return response
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, request *siri.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, request *siri.XMLEstimatedTimetableRequest, logStashEvent audit.LogStashEvent) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
+	monitoringRefs := []string{}
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
@@ -78,6 +79,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), lineId)
 		line, ok := tx.Model().Lines().FindByObjectId(lineObjectId)
 		if !ok {
+			logger.Log.Debugf("Cannot find requested line Estimated Time Table with id %v at %v", lineObjectId.String(), connector.Clock().Now())
 			continue
 		}
 
@@ -95,6 +97,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 			} else {
 				defaultObjectID, ok := vehicleJourney.ObjectID("_default")
 				if !ok {
+					logger.Log.Debugf("Vehicle journey with id %v does not have a proper objectid at %v", vehicleJourneyId, connector.Clock().Now())
 					continue
 				}
 				referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
@@ -119,14 +122,17 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				// Handle StopPointRef
 				stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
 				if !ok {
+					logger.Log.Debugf("Cant find stopArea with id %v for stopVisit %v at %v", stopVisit.StopAreaId, stopVisit.Id(), connector.Clock().Now())
 					continue
 				}
 
 				stopAreaId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 				if !ok {
+					logger.Log.Debugf("Stop Area with id %v does not have a proper objectid at %v", stopArea.Id(), connector.Clock().Now())
 					continue
 				}
 
+				monitoringRefs = append(monitoringRefs, stopAreaId.Value())
 				estimatedCall := &siri.SIRIEstimatedCall{
 					ArrivalStatus:         string(stopVisit.ArrivalStatus),
 					DepartureStatus:       string(stopVisit.DepartureStatus),
@@ -149,6 +155,9 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
+
+	logSIRIEstimatedTimetableDelivery(logStashEvent, delivery, monitoringRefs)
+
 	return delivery
 }
 
@@ -197,7 +206,9 @@ func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request 
 	logStashEvent["requestXML"] = request.RawXML()
 }
 
-func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery) {
+func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery, monitoringRefs []string) {
+
+	logStashEvent["requestMessageRef"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)

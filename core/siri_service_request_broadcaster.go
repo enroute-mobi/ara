@@ -138,14 +138,13 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 				ErrorText:         "Can't find a SIRIEstimatedTimetableBroadcaster connector",
 			}
 		} else {
-			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(tx, estimatedTimetableRequest)
+			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(tx, estimatedTimetableRequest, ETTLogStashEvent)
 		}
 
 		if !delivery.Status {
 			response.Status = false
 		}
 
-		logSIRIEstimatedTimetableDelivery(ETTLogStashEvent, delivery)
 		audit.CurrentLogStash().WriteEvent(ETTLogStashEvent)
 
 		response.EstimatedTimetableDeliveries = append(response.EstimatedTimetableDeliveries, &delivery)
