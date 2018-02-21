@@ -274,7 +274,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	dbRef := model.DatabaseReferential{
 		ReferentialId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Slug:          "ratp",
-		Settings:      "{ \"test.key\": \"test-value\" }",
+		Settings:      "{ \"test.key\": \"test-value\", \"model.reload_at\": \"01:00\" }",
 		Tokens:        "[\"apiToken\"]",
 	}
 	err := model.Database.Insert(&dbRef)
@@ -298,7 +298,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	if referential.Id() != referentialId {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", referential.Id(), referentialId)
 	}
-	if expected := map[string]string{"test.key": "test-value"}; !reflect.DeepEqual(referential.Settings, expected) {
+	if expected := map[string]string{"test.key": "test-value", "model.reload_at": "01:00"}; !reflect.DeepEqual(referential.Settings, expected) {
 		t.Errorf("Wrong Settings:\n got: %#v\n expected: %#v", referential.Settings, expected)
 	}
 	if expected := "ratp"; referential.Slug() != ReferentialSlug(expected) {
@@ -306,6 +306,11 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	}
 	if expected := "apiToken"; len(referential.Tokens) != 1 || referential.Tokens[0] != expected {
 		t.Errorf("Wrong Tokens:\n got: %v\n expected: %v", referential.Tokens, expected)
+	}
+	now := referential.Clock().Now()
+	reloadTime := time.Date(now.Year(), now.Month(), now.Day(), 1, 0, 0, 0, now.Location())
+	if !referential.nextReloadAt.Equal(reloadTime) {
+		t.Errorf("Wrong Reload time:\n got: %v\n expected: %v", referential.nextReloadAt, reloadTime)
 	}
 }
 

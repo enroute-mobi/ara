@@ -346,6 +346,7 @@ func (manager *MemoryReferentials) Load() error {
 			}
 		}
 
+		referential.setNextReloadAt()
 		manager.Save(referential)
 		referential.Load()
 	}
