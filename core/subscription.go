@@ -29,7 +29,7 @@ type SubscribedResource struct {
 	RetryCount       int
 	SubscribedAt     time.Time
 	SubscribedUntil  time.Time
-	LastStates       map[string]lastState `json:",omitempty"`
+	LastStates       map[string]lastState `json:"-"`
 	resourcesOptions map[string]string
 }
 
