@@ -49,31 +49,33 @@ type SelectOperator struct {
 }
 
 type DatabaseStopArea struct {
-	Id              string         `db:"id"`
-	ReferentialSlug string         `db:"referential_slug"`
-	ParentId        sql.NullString `db:"parent_id"`
-	ModelName       string         `db:"model_name"`
-	Name            string         `db:"name"`
-	ObjectIDs       string         `db:"object_ids"`
-	LineIds         string         `db:"line_ids"`
-	Attributes      string         `db:"attributes"`
-	References      string         `db:"siri_references"`
-	CollectedAlways bool           `db:"collected_always"`
-	CollectChildren bool           `db:"collect_children"`
+	Id                     string         `db:"id"`
+	ReferentialSlug        string         `db:"referential_slug"`
+	ParentId               sql.NullString `db:"parent_id"`
+	ModelName              string         `db:"model_name"`
+	Name                   string         `db:"name"`
+	ObjectIDs              string         `db:"object_ids"`
+	LineIds                string         `db:"line_ids"`
+	Attributes             string         `db:"attributes"`
+	References             string         `db:"siri_references"`
+	CollectedAlways        bool           `db:"collected_always"`
+	CollectChildren        bool           `db:"collect_children"`
+	CollectGeneralMessages bool           `db:"collect_general_messages"`
 }
 
 type SelectStopArea struct {
-	Id              string
-	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
-	Name            sql.NullString
-	ObjectIDs       sql.NullString `db:"object_ids"`
-	ParentId        sql.NullString `db:"parent_id"`
-	Attributes      sql.NullString
-	References      sql.NullString `db:"siri_references"`
-	LineIds         sql.NullString `db:"line_ids"`
-	CollectedAlways sql.NullBool   `db:"collected_always"`
-	CollectChildren sql.NullBool   `db:"collect_children"`
+	Id                     string
+	ReferentialSlug        string `db:"referential_slug"`
+	ModelName              string `db:"model_name"`
+	Name                   sql.NullString
+	ObjectIDs              sql.NullString `db:"object_ids"`
+	ParentId               sql.NullString `db:"parent_id"`
+	Attributes             sql.NullString
+	References             sql.NullString `db:"siri_references"`
+	LineIds                sql.NullString `db:"line_ids"`
+	CollectedAlways        sql.NullBool   `db:"collected_always"`
+	CollectChildren        sql.NullBool   `db:"collect_children"`
+	CollectGeneralMessages sql.NullBool   `db:"collect_general_messages"`
 }
 
 type DatabaseLine struct {

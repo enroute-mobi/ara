@@ -14,7 +14,7 @@ import (
 
 /* CSV Structure
 
-stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,NextCollectAt,CollectedAt,CollectedUntil,CollectedAlways,CollectChildren
+stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,Attributes,References
 stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,Collected,VehicleAtStop,PassageOrder
@@ -146,12 +146,13 @@ func prepareDatabase() {
 }
 
 func handleStopArea(record []string, referentialSlug string) error {
-	if len(record) != 11 {
+	if len(record) != 12 {
 		return fmt.Errorf("Wrong number of entries, expected 11 got %v", len(record))
 	}
 
 	var err error
 	parseErrors := make(map[string]string)
+
 	var parent sql.NullString
 	if record[2] != "" {
 		parent = sql.NullString{
@@ -176,23 +177,32 @@ func handleStopArea(record []string, referentialSlug string) error {
 		}
 	}
 
+	var collectGeneralMessages bool
+	if record[11] != "" {
+		collectGeneralMessages, err = strconv.ParseBool(record[11])
+		if err != nil {
+			parseErrors["CollectGeneralMessages"] = err.Error()
+		}
+	}
+
 	if len(parseErrors) != 0 {
 		json, _ := json.Marshal(parseErrors)
 		return fmt.Errorf(string(json))
 	}
 
 	stopArea := DatabaseStopArea{
-		Id:              record[1],
-		ReferentialSlug: referentialSlug,
-		ParentId:        parent,
-		ModelName:       record[3],
-		Name:            record[4],
-		ObjectIDs:       record[5],
-		LineIds:         record[6],
-		Attributes:      record[7],
-		References:      record[8],
-		CollectedAlways: collectedAlways,
-		CollectChildren: collectChildren,
+		Id:                     record[1],
+		ReferentialSlug:        referentialSlug,
+		ParentId:               parent,
+		ModelName:              record[3],
+		Name:                   record[4],
+		ObjectIDs:              record[5],
+		LineIds:                record[6],
+		Attributes:             record[7],
+		References:             record[8],
+		CollectedAlways:        collectedAlways,
+		CollectChildren:        collectChildren,
+		CollectGeneralMessages: collectGeneralMessages,
 	}
 
 	err = Database.Insert(&stopArea)
@@ -238,6 +248,11 @@ func handleLine(record []string, referentialSlug string) error {
 		if err != nil {
 			parseErrors["CollectGeneralMessages"] = err.Error()
 		}
+	}
+
+	if len(parseErrors) != 0 {
+		json, _ := json.Marshal(parseErrors)
+		return fmt.Errorf(string(json))
 	}
 
 	line := DatabaseLine{

@@ -21,6 +21,7 @@ type Line struct {
 	id LineId
 
 	CollectGeneralMessages bool
+	NextCollectAt          time.Time
 	collectedAt            time.Time
 
 	Name       string `json:",omitempty"`
@@ -43,6 +44,10 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
+func (line *Line) NextCollect(collectTime time.Time) {
+	line.NextCollectAt = collectTime
+}
+
 func (line *Line) CollectedAt() time.Time {
 	return line.collectedAt
 }
@@ -54,11 +59,12 @@ func (line *Line) Updated(updateTime time.Time) {
 func (line *Line) MarshalJSON() ([]byte, error) {
 	type Alias Line
 	aux := struct {
-		Id          LineId
-		ObjectIDs   ObjectIDs            `json:",omitempty"`
-		CollectedAt *time.Time           `json:",omitempty"`
-		Attributes  Attributes           `json:",omitempty"`
-		References  map[string]Reference `json:",omitempty"`
+		Id            LineId
+		ObjectIDs     ObjectIDs            `json:",omitempty"`
+		NextCollectAt *time.Time           `json:",omitempty"`
+		CollectedAt   *time.Time           `json:",omitempty"`
+		Attributes    Attributes           `json:",omitempty"`
+		References    map[string]Reference `json:",omitempty"`
 		*Alias
 	}{
 		Id:    line.id,
@@ -67,6 +73,9 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 
 	if !line.ObjectIDs().Empty() {
 		aux.ObjectIDs = line.ObjectIDs()
+	}
+	if !line.NextCollectAt.IsZero() {
+		aux.NextCollectAt = &line.NextCollectAt
 	}
 	if !line.collectedAt.IsZero() {
 		aux.CollectedAt = &line.collectedAt

@@ -46,7 +46,6 @@ type SIRIGeneralMessageRequest struct {
 
 	RequestTimestamp time.Time
 
-	// Filters are not used by Edwig for now, we always request all GM
 	InfoChannelRef []string
 
 	LineRef           []string

@@ -23,10 +23,11 @@ type StopArea struct {
 	id       StopAreaId
 	ParentId StopAreaId `json:",omitempty"`
 
-	NextCollectAt   time.Time
-	collectedAt     time.Time
-	CollectedUntil  time.Time
-	CollectedAlways bool
+	NextCollectAt          time.Time
+	collectedAt            time.Time
+	CollectedUntil         time.Time
+	CollectedAlways        bool
+	CollectGeneralMessages bool
 
 	Monitored bool
 
@@ -299,6 +300,9 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 		if sa.CollectChildren.Valid {
 			stopArea.CollectChildren = sa.CollectChildren.Bool
+		}
+		if sa.CollectGeneralMessages.Valid {
+			stopArea.CollectGeneralMessages = sa.CollectGeneralMessages.Bool
 		}
 
 		if sa.LineIds.Valid && len(sa.LineIds.String) > 0 {
