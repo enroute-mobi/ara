@@ -236,7 +236,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 	response.ResponseTimestamp = time
 	response.Status = true
 
-	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery, nil)
+	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery, nil, nil)
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
 	if logStashEvent["address"] != "edwig.edwig" {

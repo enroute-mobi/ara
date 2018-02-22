@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -90,6 +91,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 	events := ett.connector.toBroadcast
 	ett.connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
+	lineRef := []string{}
 
 	ett.connector.mutex.Unlock()
 
@@ -169,6 +171,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]model.Reference),
 				}
+				lineRef = append(lineRef, estimatedVehicleJourney.LineRef)
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
@@ -216,7 +219,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 		}
 		logStashEvent := ett.newLogStashEvent()
-		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery)
+		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery, lineRef)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
@@ -256,7 +259,7 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable) {
+func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable, lineRef []string) {
 	logStashEvent["type"] = "NotifyEstimatedTimetable"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
@@ -264,6 +267,7 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
+	logStashEvent["lineRef"] = strings.Join(lineRef, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType

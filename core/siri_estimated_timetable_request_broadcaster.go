@@ -55,6 +55,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, request *siri.XMLEstimatedTimetableRequest, logStashEvent audit.LogStashEvent) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
 	monitoringRefs := []string{}
+	lineRefs := []string{}
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
@@ -110,6 +111,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				Attributes:             make(map[string]string),
 				References:             make(map[string]model.Reference),
 			}
+			lineRefs = append(lineRefs, estimatedVehicleJourney.LineRef)
 			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
 			estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
@@ -156,7 +158,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 	}
 
-	logSIRIEstimatedTimetableDelivery(logStashEvent, delivery, monitoringRefs)
+	logSIRIEstimatedTimetableDelivery(logStashEvent, delivery, monitoringRefs, lineRefs)
 
 	return delivery
 }
@@ -206,11 +208,13 @@ func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request 
 	logStashEvent["requestXML"] = request.RawXML()
 }
 
-func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery, monitoringRefs []string) {
+func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery, monitoringRefs, lineRefs []string) {
 
 	logStashEvent["requestMessageRef"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
+	logStashEvent["lineRef"] = strings.Join(lineRefs, ",")
+	logStashEvent["monitoringRef"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		logStashEvent["errorType"] = delivery.ErrorType
