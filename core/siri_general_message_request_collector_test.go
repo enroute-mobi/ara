@@ -62,7 +62,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	fs := fakeSituationBroadcaster{}
 	siriGeneralMessageRequestCollector.SetSituationUpdateSubscriber(fs.FakeBroadcaster)
 	siriGeneralMessageRequestCollector.SetClock(model.NewFakeClock())
-	siriGeneralMessageRequestCollector.RequestSituationUpdate("line value")
+	siriGeneralMessageRequestCollector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, "line value")
 
 	return fs.Events
 }

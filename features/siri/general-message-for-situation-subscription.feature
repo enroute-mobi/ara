@@ -43,10 +43,11 @@ Feature: Support SIRI GeneralMessage by subscription
    </S:Envelope>
    """
       And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-general-message-subscription-collector] and the following settings:
-        | remote_url           | http://localhost:8090 |
-        | remote_credential    | test                  |
-        | local_credential     | NINOXE:default        |
-        | remote_objectid_kind | internal              |
+        | remote_url                      | http://localhost:8090 |
+        | remote_credential               | test                  |
+        | local_credential                | NINOXE:default        |
+        | remote_objectid_kind            | internal              |
+        | collect.filter_general_messages | true                  |
       And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name                   | Test              |
@@ -203,3 +204,150 @@ Feature: Support SIRI GeneralMessage by subscription
     </soap:Envelope>
     """
     Then a Situation "internal:2" should not exist in Referential "test"
+
+  Scenario: Manage a Subscription without filter
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+    """
+    """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+    And 30 seconds have passed
+    And 30 seconds have passed
+    And 5 seconds have passed
+    And the SIRI server has received a Subscribe request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <SubscriptionRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </SubscriptionRequestInfo>
+    <Request>
+      <siri:GeneralMessageSubscriptionRequest>
+        <siri:SubscriberRef>test</siri:SubscriberRef>
+        <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:SubscriptionIdentifier>
+        <siri:InitialTerminationTime>2017-01-03T12:01:05.000Z</siri:InitialTerminationTime>
+        <siri:GeneralMessageRequest version='2.0:FR-IDF-2.4'>
+          <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>
+          <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+            <siri:Extensions>
+              <sws:IDFGeneralMessageRequestFilter>
+              </sws:IDFGeneralMessageRequestFilter>
+            </siri:Extensions>
+        </siri:GeneralMessageRequest>
+      </siri:GeneralMessageSubscriptionRequest>
+    </Request>
+    <RequestExtension/>
+  </sw:Subscribe>
+</S:Body>
+</S:Envelope>
+      """
+
+  Scenario: Manage a Subscription with a Line filter
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+    """
+    """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector] and the following settings:
+        | remote_url                      | http://localhost:8090 |
+        | remote_credential               | test                  |
+        | local_credential                | NINOXE:default        |
+        | remote_objectid_kind            | internal              |
+        | collect.filter_general_messages | true                  |
+      And 30 seconds have passed
+      And a Line exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+      And 10 seconds have passed
+      And 5 seconds have passed
+      And the SIRI server has received a Subscribe request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <SubscriptionRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </SubscriptionRequestInfo>
+    <Request>
+      <siri:GeneralMessageSubscriptionRequest>
+        <siri:SubscriberRef>test</siri:SubscriberRef>
+        <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:SubscriptionIdentifier>
+        <siri:InitialTerminationTime>2017-01-03T12:00:45.000Z</siri:InitialTerminationTime>
+        <siri:GeneralMessageRequest version='2.0:FR-IDF-2.4'>
+          <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+          <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+            <siri:Extensions>
+              <sws:IDFGeneralMessageRequestFilter>
+                <siri:LineRef>1234</siri:LineRef>
+              </sws:IDFGeneralMessageRequestFilter>
+            </siri:Extensions>
+        </siri:GeneralMessageRequest>
+      </siri:GeneralMessageSubscriptionRequest>
+    </Request>
+    <RequestExtension/>
+  </sw:Subscribe>
+</S:Body>
+</S:Envelope>
+      """
+
+  Scenario: Manage a Subscription with a StopArea filter
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+    """
+    """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector] and the following settings:
+        | remote_url                      | http://localhost:8090 |
+        | remote_credential               | test                  |
+        | local_credential                | NINOXE:default        |
+        | remote_objectid_kind            | internal              |
+        | collect.filter_general_messages | true                  |
+      And 30 seconds have passed
+      And a StopArea exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+      And 10 seconds have passed
+      And 5 seconds have passed
+      And the SIRI server has received a Subscribe request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <SubscriptionRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </SubscriptionRequestInfo>
+    <Request>
+      <siri:GeneralMessageSubscriptionRequest>
+        <siri:SubscriberRef>test</siri:SubscriberRef>
+        <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:SubscriptionIdentifier>
+        <siri:InitialTerminationTime>2017-01-03T12:00:45.000Z</siri:InitialTerminationTime>
+        <siri:GeneralMessageRequest version='2.0:FR-IDF-2.4'>
+          <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+          <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:MessageIdentifier>
+            <siri:Extensions>
+              <sws:IDFGeneralMessageRequestFilter>
+                <siri:StopPointRef>1234</siri:StopPointRef>
+              </sws:IDFGeneralMessageRequestFilter>
+            </siri:Extensions>
+        </siri:GeneralMessageRequest>
+      </siri:GeneralMessageSubscriptionRequest>
+    </Request>
+    <RequestExtension/>
+  </sw:Subscribe>
+</S:Body>
+</S:Envelope>
+      """
