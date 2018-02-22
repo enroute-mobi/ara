@@ -15,7 +15,8 @@ type GeneralMessageSubscriptionCollector interface {
 	model.Stopable
 	model.Startable
 
-	RequestSituationUpdate(request *SituationUpdateRequest)
+	RequestAllSituationsUpdate()
+	RequestSituationUpdate(kind string, requestedId model.ObjectID)
 	HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage)
 }
 
@@ -61,28 +62,25 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
 	connector.generalMessageSubscriber.Start()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(request *SituationUpdateRequest) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	line, ok := tx.Model().Lines().Find(request.LineId())
+func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUpdate() {
+	// Try to find a GeneralMessageCollect Subscription or create one without any References
+	_, ok := connector.partner.Subscriptions().FindByKind("GeneralMessageCollect")
 	if !ok {
-		logger.Log.Debugf("SituationUpdateRequest in GeneralMessageSubscriptionCollector for unknown Line %v", request.LineId())
-		return
+		newSubscription := connector.partner.Subscriptions().New("GeneralMessageCollect")
+		obj := model.NewObjectID("generalMessageCollect", "all")
+		ref := model.Reference{
+			ObjectId: &obj,
+		}
+		newSubscription.CreateAddNewResource(ref)
 	}
+}
 
-	objectidKind := connector.Partner().Setting("remote_objectid_kind")
-	lineObjectid, ok := line.ObjectID(objectidKind)
-	if !ok {
-		logger.Log.Debugf("Requested line %v doesn't have and objectId of kind %v", request.LineId(), objectidKind)
-		return
-	}
-
+func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedObjectId model.ObjectID) {
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByRessourceId(lineObjectid.String(), "GeneralMessageCollect")
+	subscriptions := connector.partner.Subscriptions().FindByRessourceId(requestedObjectId.String(), "GeneralMessageCollect")
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
-			resource := subscription.Resource(lineObjectid)
+			resource := subscription.Resource(requestedObjectId)
 			if resource == nil { // Should never happen
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByRessourceId")
 				return
@@ -97,8 +95,13 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	// Else we find or create a subscription to add the resource
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 	ref := model.Reference{
-		ObjectId: &lineObjectid,
-		Type:     "Line",
+		ObjectId: &requestedObjectId,
+	}
+	switch kind {
+	case SITUATION_UPDATE_REQUEST_LINE:
+		ref.Type = "Line"
+	case SITUATION_UPDATE_REQUEST_STOP_AREA:
+		ref.Type = "StopArea"
 	}
 
 	newSubscription.CreateAddNewResource(ref)

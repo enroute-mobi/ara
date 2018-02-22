@@ -12,6 +12,7 @@ type ModelGuardian struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
+	gmTimer     time.Time
 	stop        chan struct{}
 	referential *Referential
 }
@@ -36,6 +37,7 @@ func (guardian *ModelGuardian) Stop() {
 
 func (guardian *ModelGuardian) Run() {
 	c := guardian.Clock().After(10 * time.Second)
+	guardian.gmTimer = guardian.Clock().Now()
 
 	for {
 		select {
@@ -50,6 +52,7 @@ func (guardian *ModelGuardian) Run() {
 			}
 
 			guardian.refreshStopAreas()
+			guardian.refreshLines()
 			guardian.simulateActualAttributes()
 			guardian.requestSituations()
 
@@ -67,7 +70,6 @@ func (guardian *ModelGuardian) checkReloadModel() bool {
 }
 
 func (guardian *ModelGuardian) refreshStopAreas() {
-	// Open a new transaction
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
@@ -84,36 +86,47 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			continue
 		}
 
-		if stopArea.NextCollectAt.Before(now) {
-			stopAreaTx := guardian.referential.NewTransaction()
+		if !stopArea.NextCollectAt.Before(now) {
+			continue
+		}
 
-			transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
+		stopAreaTx := guardian.referential.NewTransaction()
 
-			randNb := time.Duration(rand.Intn(20)+40) * time.Second
+		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
 
-			transactionnalStopArea.NextCollectAt = now.Add(randNb)
-			transactionnalStopArea.Save()
-			stopAreaTx.Commit()
-			stopAreaTx.Close()
+		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
-			stopAreaUpdateRequest := &StopAreaUpdateRequest{
-				id:         StopAreaUpdateRequestId(guardian.NewUUID()),
-				stopAreaId: transactionnalStopArea.Id(),
-				createdAt:  now,
-			}
-			guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+		transactionnalStopArea.NextCollectAt = now.Add(randNb)
+		transactionnalStopArea.Save()
+		stopAreaTx.Commit()
+		stopAreaTx.Close()
+
+		stopAreaUpdateRequest := &StopAreaUpdateRequest{
+			id:         StopAreaUpdateRequestId(guardian.NewUUID()),
+			stopAreaId: transactionnalStopArea.Id(),
+			createdAt:  now,
+		}
+		guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+
+		if stopArea.CollectGeneralMessages {
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(transactionnalStopArea.Id()))
+			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 	}
 }
 
-func (guardian *ModelGuardian) requestSituations() {
+func (guardian *ModelGuardian) refreshLines() {
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
 	now := guardian.Clock().Now()
 
 	for _, line := range tx.Model().Lines().FindAll() {
-		if !line.CollectGeneralMessages || now.Before(line.CollectedAt().Add(1*time.Minute)) {
+		if !line.CollectGeneralMessages {
+			continue
+		}
+
+		if !line.NextCollectAt.Before(now) {
 			continue
 		}
 
@@ -121,18 +134,31 @@ func (guardian *ModelGuardian) requestSituations() {
 
 		transactionnalLine, _ := lineTx.Model().Lines().Find(line.Id())
 
-		transactionnalLine.Updated(now)
+		randNb := time.Duration(rand.Intn(20)+40) * time.Second
+
+		transactionnalLine.NextCollectAt = now.Add(randNb)
 		transactionnalLine.Save()
 		lineTx.Commit()
 		lineTx.Close()
 
-		situationUpdateRequest := &SituationUpdateRequest{
-			id:        SituationUpdateRequestId(guardian.NewUUID()),
-			lineId:    line.Id(),
-			createdAt: now,
-		}
+		situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(transactionnalLine.Id()))
 		guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 	}
+}
+
+func (guardian *ModelGuardian) requestSituations() {
+	if guardian.Clock().Now().Before(guardian.gmTimer.Add(1 * time.Minute)) {
+		return
+	}
+
+	guardian.gmTimer = guardian.gmTimer.Add(1 * time.Minute)
+
+	situationUpdateRequest := &SituationUpdateRequest{
+		id:        SituationUpdateRequestId(guardian.NewUUID()),
+		kind:      SITUATION_UPDATE_REQUEST_ALL,
+		createdAt: guardian.Clock().Now(),
+	}
+	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 }
 
 func (guardian *ModelGuardian) simulateActualAttributes() {
@@ -143,9 +169,6 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 		if stopVisit.IsCollected() {
 			continue
 		}
-
-		// too verbse
-		// logger.Log.Debugf("Simulate actual attributes on StopVisit %v", stopVisit.Id())
 
 		stopVisitTx := guardian.referential.NewTransaction()
 		defer stopVisitTx.Close()

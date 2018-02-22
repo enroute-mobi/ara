@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strconv"
+
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 )
@@ -169,9 +171,46 @@ func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.Situ
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	line, ok := manager.referential.Model().Lines().Find(request.LineId())
+	switch request.Kind() {
+	case SITUATION_UPDATE_REQUEST_ALL:
+		manager.requestAllSituations()
+	case SITUATION_UPDATE_REQUEST_LINE:
+		manager.requestLineFilteredSituation(request.RequestedId())
+	case SITUATION_UPDATE_REQUEST_STOP_AREA:
+		manager.requestStopAreaFilteredSituation(request.RequestedId())
+	default:
+		logger.Log.Debugf("SituationUpdateRequest of unknown kind")
+	}
+}
+
+func (manager *CollectManager) requestAllSituations() {
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); b {
+			continue
+		}
+
+		requestConnector := partner.GeneralMessageRequestCollector()
+		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		if requestConnector == nil && subscriptionConnector == nil {
+			continue
+		}
+
+		logger.Log.Debugf("RequestAllSituationsUpdate for Partner %v", partner.Slug())
+		if subscriptionConnector != nil {
+			subscriptionConnector.RequestAllSituationsUpdate()
+			continue
+		}
+		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
+	}
+}
+
+func (manager *CollectManager) requestLineFilteredSituation(requestedId string) {
+	line, ok := manager.referential.Model().Lines().Find(model.LineId(requestedId))
 	if !ok {
-		logger.Log.Debugf("Can't find Line to request %v", request.LineId())
+		logger.Log.Debugf("Can't find Line to request %v", requestedId)
 		return
 	}
 
@@ -179,6 +218,10 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
+		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); !b {
+			continue
+		}
+
 		requestConnector := partner.GeneralMessageRequestCollector()
 		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
 
@@ -197,14 +240,70 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 			continue
 		}
 
-		logger.Log.Debugf("RequestSituationUpdate %v", lineObjectID.Value())
+		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", lineObjectID.Value(), partner.Slug())
 		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(request)
+			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID)
 			return
 		}
-		requestConnector.RequestSituationUpdate(lineObjectID.Value())
+		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID.Value())
 		return
 	}
-	logger.Log.Debugf("Can't find a partner for Line %v", request.LineId())
-	return
+	logger.Log.Debugf("Can't find a partner to request filtered Situations for Line %v", requestedId)
+}
+
+func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId string) {
+	stopArea, ok := manager.referential.Model().StopAreas().Find(model.StopAreaId(requestedId))
+	if !ok {
+		logger.Log.Debugf("Can't find StopArea to request %v", requestedId)
+		return
+	}
+
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); !b {
+			continue
+		}
+
+		requestConnector := partner.GeneralMessageRequestCollector()
+		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+
+		if requestConnector == nil && subscriptionConnector == nil {
+			continue
+		}
+
+		partnerKind := partner.Setting("remote_objectid_kind")
+
+		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
+		if !ok {
+			continue
+		}
+
+		lineIds := make(map[string]struct{})
+		for _, lineId := range stopArea.LineIds {
+			line, ok := manager.referential.Model().Lines().Find(lineId)
+			if !ok {
+				continue
+			}
+			lineObjectID, ok := line.ObjectID(partnerKind)
+			if !ok {
+				continue
+			}
+			lineIds[lineObjectID.Value()] = struct{}{}
+		}
+
+		if !partner.CanCollect(stopAreaObjectID, lineIds) {
+			continue
+		}
+
+		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", stopAreaObjectID.Value(), partner.Slug())
+		if subscriptionConnector != nil {
+			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaObjectID)
+			return
+		}
+		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaObjectID.Value())
+		return
+	}
+	logger.Log.Debugf("Can't find a partner to request filtered Situations for StopArea %v", requestedId)
 }

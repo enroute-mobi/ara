@@ -59,8 +59,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.SetGeneralMessageSubscriber(NewFakeGeneralMessageSubscriber(connector))
 
-	situationUpdateEvent := NewSituationUpdateRequest(line.Id())
-	connector.RequestSituationUpdate(situationUpdateEvent)
+	connector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID)
 	connector.Start()
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {

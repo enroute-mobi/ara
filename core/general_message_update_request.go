@@ -8,17 +8,25 @@ import (
 
 type SituationUpdateRequestId string
 
+const (
+	SITUATION_UPDATE_REQUEST_ALL       = "requestAll"
+	SITUATION_UPDATE_REQUEST_LINE      = "requestLine"
+	SITUATION_UPDATE_REQUEST_STOP_AREA = "requestStopArea"
+)
+
 type SituationUpdateRequest struct {
-	id        SituationUpdateRequestId
-	lineId    model.LineId
-	createdAt time.Time
+	id          SituationUpdateRequestId
+	kind        string
+	requestedId string
+	createdAt   time.Time
 }
 
-func NewSituationUpdateRequest(lineId model.LineId) *SituationUpdateRequest {
+func NewSituationUpdateRequest(kind, requestedId string) *SituationUpdateRequest {
 	return &SituationUpdateRequest{
-		id:        SituationUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
-		lineId:    lineId,
-		createdAt: model.DefaultClock().Now(),
+		id:          SituationUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
+		kind:        kind,
+		requestedId: requestedId,
+		createdAt:   model.DefaultClock().Now(),
 	}
 }
 
@@ -26,8 +34,12 @@ func (situationUpdateRequest *SituationUpdateRequest) Id() SituationUpdateReques
 	return situationUpdateRequest.id
 }
 
-func (situationUpdateRequest *SituationUpdateRequest) LineId() model.LineId {
-	return situationUpdateRequest.lineId
+func (situationUpdateRequest *SituationUpdateRequest) Kind() string {
+	return situationUpdateRequest.kind
+}
+
+func (situationUpdateRequest *SituationUpdateRequest) RequestedId() string {
+	return situationUpdateRequest.requestedId
 }
 
 func (situationUpdateRequest *SituationUpdateRequest) CreatedAt() time.Time {

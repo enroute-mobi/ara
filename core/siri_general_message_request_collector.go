@@ -11,7 +11,7 @@ import (
 )
 
 type GeneralMessageRequestCollector interface {
-	RequestSituationUpdate(lineRef string)
+	RequestSituationUpdate(kind, requestedId string)
 }
 
 type SIRIGeneralMessageRequestCollectorFactory struct{}
@@ -34,7 +34,9 @@ func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessage
 	return siriGeneralMessageRequestCollector
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(lineRef string) {
+func (connector *SIRIGeneralMessageRequestCollector) RequestAllSituationsUpdate() {}
+
+func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind, requestedId string) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -45,7 +47,18 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(line
 	}
 	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
-	siriGeneralMessageRequest.LineRef = []string{lineRef}
+
+	// Check the request filter
+	switch kind {
+	case SITUATION_UPDATE_REQUEST_LINE:
+		siriGeneralMessageRequest.LineRef = []string{requestedId}
+		logStashEvent["lineRef"] = requestedId
+	case SITUATION_UPDATE_REQUEST_STOP_AREA:
+		siriGeneralMessageRequest.StopPointRef = []string{requestedId}
+		logStashEvent["stopPointRef"] = requestedId
+	}
+
+	// Check the request version
 	if b, _ := strconv.ParseBool(connector.partner.Setting("generalMessageRequest.version2.2")); b {
 		siriGeneralMessageRequest.XsdInWsdl = true
 	}
@@ -105,7 +118,6 @@ func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *si
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	logStashEvent["lineRef"] = request.LineRef[0]
 	xml, err := request.BuildXML()
 	if err != nil {
 		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)

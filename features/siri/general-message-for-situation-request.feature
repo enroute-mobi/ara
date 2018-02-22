@@ -358,7 +358,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Edwig</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -372,4 +372,127 @@ Feature: Support SIRI GeneralMessage for Situation
           </sw:GetGeneralMessageResponse>
         </S:Body>
       </S:Envelope>
+      """
+
+  Scenario: Manage a Request without filter
+    Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
+    """
+    """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+    And 30 seconds have passed
+    And 30 seconds have passed
+    And the SIRI server has received a GetGeneralMessage request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:GetGeneralMessage xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <ServiceRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </ServiceRequestInfo>
+    <Request version='2.0:FR-IDF-2.4'>
+      <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:Extensions>
+        <sws:IDFGeneralMessageRequestFilter>
+        </sws:IDFGeneralMessageRequestFilter>
+      </siri:Extensions>
+    </Request>
+    <RequestExtension/>
+  </sw:GetGeneralMessage>
+</S:Body>
+</S:Envelope>
+      """
+
+  Scenario: Manage a Request with a Line filter
+    Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
+    """
+    """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+        | remote_url                      | http://localhost:8090 |
+        | remote_credential               | test                  |
+        | local_credential                | NINOXE:default        |
+        | remote_objectid_kind            | internal              |
+        | collect.filter_general_messages | true                  |
+      And 30 seconds have passed
+      And a Line exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+      And 10 seconds have passed
+      And the SIRI server has received a GetGeneralMessage request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:GetGeneralMessage xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <ServiceRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </ServiceRequestInfo>
+    <Request version='2.0:FR-IDF-2.4'>
+      <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:Extensions>
+        <sws:IDFGeneralMessageRequestFilter>
+          <siri:LineRef>1234</siri:LineRef>
+        </sws:IDFGeneralMessageRequestFilter>
+      </siri:Extensions>
+    </Request>
+    <RequestExtension/>
+  </sw:GetGeneralMessage>
+</S:Body>
+</S:Envelope>
+      """
+
+  Scenario: Manage a Request with a StopArea filter
+    Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
+    """
+    """
+      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+        | remote_url                      | http://localhost:8090 |
+        | remote_credential               | test                  |
+        | local_credential                | NINOXE:default        |
+        | remote_objectid_kind            | internal              |
+        | collect.filter_general_messages | true                  |
+      And 30 seconds have passed
+      And a StopArea exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+      And 10 seconds have passed
+      And the SIRI server has received a GetGeneralMessage request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:GetGeneralMessage xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <ServiceRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+    </ServiceRequestInfo>
+    <Request version='2.0:FR-IDF-2.4'>
+      <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:Extensions>
+        <sws:IDFGeneralMessageRequestFilter>
+          <siri:StopPointRef>1234</siri:StopPointRef>
+        </sws:IDFGeneralMessageRequestFilter>
+      </siri:Extensions>
+    </Request>
+    <RequestExtension/>
+  </sw:GetGeneralMessage>
+</S:Body>
+</S:Envelope>
       """

@@ -800,7 +800,7 @@ Feature: Support SIRI StopMonitoring by request
       And a StopArea exists with the following attributes:
         | Name      | Test 1                                   |
         | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-        | ParentId  | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
+        | ParentId  | 6ba7b814-9dad-11d1-5-00c04fd430c8        |
       And a StopArea exists with the following attributes:
         | Name            | Test 2                                   |
         | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:25:LOC" |
