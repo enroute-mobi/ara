@@ -88,7 +88,7 @@ func Test_Equal_StopAreas(t *testing.T) {
 	sa1 := &StopArea{
 		model:           model,
 		id:              "1234",
-		NextCollectAt:   testTime,
+		nextCollectAt:   testTime,
 		collectedAt:     testTime,
 		CollectedUntil:  testTime,
 		CollectedAlways: true,
@@ -100,7 +100,7 @@ func Test_Equal_StopAreas(t *testing.T) {
 	sa2 := &StopArea{
 		model:           model,
 		id:              "1234",
-		NextCollectAt:   testTime,
+		nextCollectAt:   testTime,
 		collectedAt:     testTime,
 		CollectedUntil:  testTime,
 		CollectedAlways: true,
