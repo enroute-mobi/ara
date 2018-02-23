@@ -90,7 +90,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	ett.connector.mutex.Lock()
 
 	events := ett.connector.toBroadcast
-	ett.connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
+	ett.connector.toBroadcast = make(map[SubscriptionId]map[model.LineId][]model.StopVisitId)
 	lineRef := []string{}
 
 	ett.connector.mutex.Unlock()
@@ -107,8 +107,6 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			continue
 		}
 
-		processedLines := make(map[model.LineId]struct{}) //Making sure not to send 2 times the same Line
-
 		delivery := &siri.SIRINotifyEstimatedTimeTable{
 			Address:                   ett.connector.Partner().Address(),
 			ProducerRef:               ett.connector.Partner().ProducerRef(),
@@ -120,13 +118,9 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 		}
 
-		for _, lineId := range lines {
-			// Check if resource is already in the map
-			if _, ok := processedLines[lineId]; ok {
-				continue
-			}
+		for lineId, stopVisits := range lines {
+			svList := make(map[model.StopVisitId]struct{})
 
-			// Find the Line
 			line, ok := tx.Model().Lines().Find(lineId)
 			if !ok {
 				continue
@@ -149,9 +143,15 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 				RecordedAtTime: currentTime,
 			}
 
-			// SIRIEstimatedVehicleJourney
-			for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(lineId) {
-				// Handle vehicleJourney Objectid
+			for _, stopVisitId := range stopVisits {
+				if _, ok := svList[stopVisitId]; ok {
+					continue
+				}
+
+				fmt.Println(stopVisitId)
+				stopVisit, _ := ett.connector.Partner().Model().StopVisits().Find(stopVisitId)
+				vehicleJourney, _ := ett.connector.Partner().Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+
 				vehicleJourneyId, ok := vehicleJourney.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 				var datedVehicleJourneyRef string
 				if ok {
@@ -171,53 +171,47 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]model.Reference),
 				}
+
 				lineRef = append(lineRef, estimatedVehicleJourney.LineRef)
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
-				// SIRIEstimatedCall
-				for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
-					// Handle StopPointRef
-					stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
-					if !ok {
-						continue
-					}
-					stopAreaId, ok := stopArea.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
-					if !ok {
-						continue
-					}
+				stopArea, _ := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+				stopAreaId, ok := stopArea.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+				if !ok {
+					continue
+				}
 
-					estimatedCall := &siri.SIRIEstimatedCall{
-						ArrivalStatus:         string(stopVisit.ArrivalStatus),
-						DepartureStatus:       string(stopVisit.DepartureStatus),
-						AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-						ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-						AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-						ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-						Order:              stopVisit.PassageOrder,
-						StopPointRef:       stopAreaId.Value(),
-						StopPointName:      stopArea.Name,
-						DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
-						VehicleAtStop:      stopVisit.VehicleAtStop,
-					}
+				estimatedCall := &siri.SIRIEstimatedCall{
+					ArrivalStatus:         string(stopVisit.ArrivalStatus),
+					DepartureStatus:       string(stopVisit.DepartureStatus),
+					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+					Order:              stopVisit.PassageOrder,
+					StopPointRef:       stopAreaId.Value(),
+					StopPointName:      stopArea.Name,
+					DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
+					VehicleAtStop:      stopVisit.VehicleAtStop,
+				}
 
-					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 
-					lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
-					if !ok {
-						ettlc := &estimatedTimeTableLastChange{}
-						ettlc.InitState(&stopVisit, sub)
-						resource.LastStates[string(stopVisit.Id())] = ettlc
-					} else {
-						lastState := lastStateInterface.(*estimatedTimeTableLastChange)
-						lastState.UpdateState(&stopVisit)
-					}
+				lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
+				if !ok {
+					ettlc := &estimatedTimeTableLastChange{}
+					ettlc.InitState(&stopVisit, sub)
+					resource.LastStates[string(stopVisit.Id())] = ettlc
+				} else {
+					lastState := lastStateInterface.(*estimatedTimeTableLastChange)
+					lastState.UpdateState(&stopVisit)
 				}
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 			}
-			processedLines[lineId] = struct{}{}
 			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 		}
+
 		logStashEvent := ett.newLogStashEvent()
 		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery, lineRef)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
