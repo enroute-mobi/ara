@@ -147,7 +147,7 @@ func prepareDatabase() {
 
 func handleStopArea(record []string, referentialSlug string) error {
 	if len(record) != 12 {
-		return fmt.Errorf("Wrong number of entries, expected 11 got %v", len(record))
+		return fmt.Errorf("Wrong number of entries, expected 12 got %v", len(record))
 	}
 
 	var err error
