@@ -86,7 +86,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			continue
 		}
 
-		if !stopArea.NextCollectAt.Before(now) {
+		if !stopArea.NextCollectAt().Before(now) {
 			continue
 		}
 
@@ -96,7 +96,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
-		transactionnalStopArea.NextCollectAt = now.Add(randNb)
+		transactionnalStopArea.NextCollect(now.Add(randNb))
 		transactionnalStopArea.Save()
 		stopAreaTx.Commit()
 		stopAreaTx.Close()
@@ -126,7 +126,7 @@ func (guardian *ModelGuardian) refreshLines() {
 			continue
 		}
 
-		if !line.NextCollectAt.Before(now) {
+		if !line.NextCollectAt().Before(now) {
 			continue
 		}
 
@@ -136,7 +136,7 @@ func (guardian *ModelGuardian) refreshLines() {
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
-		transactionnalLine.NextCollectAt = now.Add(randNb)
+		transactionnalLine.NextCollect(now.Add(randNb))
 		transactionnalLine.Save()
 		lineTx.Commit()
 		lineTx.Close()

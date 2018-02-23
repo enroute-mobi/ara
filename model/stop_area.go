@@ -23,7 +23,7 @@ type StopArea struct {
 	id       StopAreaId
 	ParentId StopAreaId `json:",omitempty"`
 
-	NextCollectAt          time.Time
+	nextCollectAt          time.Time
 	collectedAt            time.Time
 	CollectedUntil         time.Time
 	CollectedAlways        bool
@@ -54,8 +54,12 @@ func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
 }
 
+func (stopArea *StopArea) NextCollectAt() time.Time {
+	return stopArea.nextCollectAt
+}
+
 func (stopArea *StopArea) NextCollect(collectTime time.Time) {
-	stopArea.NextCollectAt = collectTime
+	stopArea.nextCollectAt = collectTime
 }
 
 func (stopArea *StopArea) CollectedAt() time.Time {
@@ -91,8 +95,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	if !stopArea.References.IsEmpty() {
 		aux.References = stopArea.References.GetReferences()
 	}
-	if !stopArea.NextCollectAt.IsZero() {
-		aux.NextCollectAt = &stopArea.NextCollectAt
+	if !stopArea.nextCollectAt.IsZero() {
+		aux.NextCollectAt = &stopArea.nextCollectAt
 	}
 	if !stopArea.collectedAt.IsZero() {
 		aux.CollectedAt = &stopArea.collectedAt

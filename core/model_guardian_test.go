@@ -30,7 +30,7 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 		t.Fatal("StopArea should still be found after guardian work")
 	}
 
-	if updatedStopArea.NextCollectAt.Before(fakeClock.Now()) {
+	if updatedStopArea.NextCollectAt().Before(fakeClock.Now()) {
 		t.Errorf("StopArea should have NextCollectAt before fakeClock %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
 	}
 }
@@ -48,7 +48,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.CollectedAlways = false
 	stopArea.CollectedUntil = fakeClock.Now().Add(15 * time.Minute)
-	stopArea.NextCollectAt = fakeClock.Now()
+	stopArea.NextCollect(fakeClock.Now())
 	referential.Model().StopAreas().Save(&stopArea)
 
 	referential.modelGuardian.refreshStopAreas()
@@ -58,11 +58,11 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 		t.Fatal("StopArea not found after guardian work")
 	}
 
-	if updatedStopArea.NextCollectAt.Before(fakeClock.Now()) {
-		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
+	if updatedStopArea.NextCollectAt().Before(fakeClock.Now()) {
+		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt())
 	}
 
-	nextCollectAt := updatedStopArea.NextCollectAt
+	nextCollectAt := updatedStopArea.NextCollectAt()
 
 	fakeClock.Advance(15*time.Minute + time.Second)
 
@@ -72,8 +72,8 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	if !ok {
 		t.Error("StopArea should still be found after guardian work")
 	}
-	if updatedStopArea.NextCollectAt.After(nextCollectAt) {
-		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
+	if updatedStopArea.NextCollectAt().After(nextCollectAt) {
+		t.Errorf("StopArea should have NextCollectAt set at %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt())
 	}
 }
 

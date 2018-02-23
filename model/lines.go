@@ -21,7 +21,7 @@ type Line struct {
 	id LineId
 
 	CollectGeneralMessages bool
-	NextCollectAt          time.Time
+	nextCollectAt          time.Time
 	collectedAt            time.Time
 
 	Name       string `json:",omitempty"`
@@ -44,8 +44,12 @@ func (line *Line) Id() LineId {
 	return line.id
 }
 
+func (line *Line) NextCollectAt() time.Time {
+	return line.nextCollectAt
+}
+
 func (line *Line) NextCollect(collectTime time.Time) {
-	line.NextCollectAt = collectTime
+	line.nextCollectAt = collectTime
 }
 
 func (line *Line) CollectedAt() time.Time {
@@ -74,8 +78,8 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	if !line.ObjectIDs().Empty() {
 		aux.ObjectIDs = line.ObjectIDs()
 	}
-	if !line.NextCollectAt.IsZero() {
-		aux.NextCollectAt = &line.NextCollectAt
+	if !line.nextCollectAt.IsZero() {
+		aux.NextCollectAt = &line.nextCollectAt
 	}
 	if !line.collectedAt.IsZero() {
 		aux.CollectedAt = &line.collectedAt
