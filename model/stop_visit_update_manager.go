@@ -178,6 +178,7 @@ func (updater *StopVisitUpdater) Update() {
 	stopVisitAttributes := updater.event.Attributes.StopVisitAttributes()
 
 	stopVisit := updater.tx.Model().StopVisits().New()
+	stopVisit.Origin = updater.event.Origin
 
 	stopVisit.StopAreaId = foundStopArea.Id()
 	stopVisit.VehicleJourneyId = foundVehicleJourney.Id()

@@ -97,6 +97,10 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subsIds
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) []SubscriptionId {
 	subscriptionIds := []SubscriptionId{}
 
+	if sv.Origin == string(connector.Partner().Slug()) {
+		return subscriptionIds
+	}
+
 	stopArea, ok := tx.Model().StopAreas().Find(sv.StopAreaId)
 	if !ok {
 		return subscriptionIds

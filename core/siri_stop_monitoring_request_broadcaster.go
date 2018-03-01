@@ -93,6 +93,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {
+		if stopVisit.Origin == string(connector.Partner().Slug()) {
+			continue
+		}
 		if request.MaximumStopVisits() > 0 && len(stopVisitArray) >= request.MaximumStopVisits() {
 			break
 		}

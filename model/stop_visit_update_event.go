@@ -30,6 +30,7 @@ const (
 
 type StopVisitUpdateEvent struct {
 	Id                string
+	Origin            string
 	Created_at        time.Time
 	RecordedAt        time.Time
 	StopVisitObjectid ObjectID
@@ -46,5 +47,7 @@ type StopVisitUpdateEvent struct {
 	DestinationName        string
 	OriginName             string
 	Monitored              bool
-	Attributes             StopVisitUpdateAttributes
+
+	// Attributes
+	Attributes StopVisitUpdateAttributes
 }

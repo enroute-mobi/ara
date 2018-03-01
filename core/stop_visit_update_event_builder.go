@@ -19,6 +19,7 @@ func newStopVisitUpdateEventBuilder(partner *Partner) StopVisitUpdateEventBuilde
 func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.StopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
 	stopVisitEvent := &model.StopVisitUpdateEvent{
 		Id:                     builder.NewUUID(),
+		Origin:                 string(builder.partner.Slug()),
 		Created_at:             builder.Clock().Now(),
 		RecordedAt:             xmlStopVisitEvent.RecordedAt(),
 		VehicleAtStop:          xmlStopVisitEvent.VehicleAtStop(),

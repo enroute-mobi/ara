@@ -29,7 +29,9 @@ type StopVisitAttributes struct {
 
 type StopVisit struct {
 	ObjectIDConsumer
-	model Model
+
+	model  Model
+	Origin string
 
 	id          StopVisitId
 	collected   bool

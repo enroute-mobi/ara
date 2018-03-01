@@ -21,7 +21,7 @@ func Test_StopVisit_MarshalJSON(t *testing.T) {
 	stopVisit := StopVisit{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"VehicleAtStop":false}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"Origin":"","VehicleAtStop":false}`
 	jsonBytes, err := stopVisit.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
