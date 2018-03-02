@@ -42,6 +42,7 @@ func NewMemoryModel() *MemoryModel {
 	stopAreas := NewMemoryStopAreas()
 	stopAreas.model = model
 	model.stopAreas = stopAreas
+	model.stopAreas.broadcastEvent = model.broadcastSMEvent
 
 	stopVisits := NewMemoryStopVisits()
 	stopVisits.model = model

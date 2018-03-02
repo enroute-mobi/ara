@@ -13,6 +13,30 @@ type lastState interface {
 	SetSubscription(*Subscription)
 }
 
+type stopAreaLastChange struct {
+	subscription *Subscription
+
+	monitored bool
+}
+
+func (salc *stopAreaLastChange) InitState(sa *model.StopArea, sub *Subscription) {
+	salc.monitored = sa.Monitored
+}
+
+func (salc *stopAreaLastChange) SetSubscription(sub *Subscription) {
+	salc.subscription = sub
+}
+
+func (salc *stopAreaLastChange) UpdateState(stopArea *model.StopArea) bool {
+	salc.monitored = stopArea.Monitored
+
+	return true
+}
+
+func (salc *stopAreaLastChange) Haschanged(stopArea model.StopArea) bool {
+	return salc.monitored == stopArea.Monitored
+}
+
 type stopMonitoringLastChange struct {
 	optionParser
 	schedulesHandler

@@ -74,6 +74,7 @@ func (ett *EstimatedTimeTableBroadcaster) run() {
 			logger.Log.Debugf("SIRIEstimatedTimeTableBroadcaster visit")
 
 			ett.prepareSIRIEstimatedTimeTable()
+			ett.prepareNotMonitored()
 
 			c = ett.Clock().After(5 * time.Second)
 		}
@@ -83,6 +84,40 @@ func (ett *EstimatedTimeTableBroadcaster) run() {
 func (ett *EstimatedTimeTableBroadcaster) Stop() {
 	if ett.stop != nil {
 		close(ett.stop)
+	}
+}
+
+func (ett *ETTBroadcaster) prepareNotMonitored() {
+	ett.connector.mutex.Lock()
+
+	notMonitored := ett.connector.notMonitored
+	ett.connector.notMonitored = make(map[SubscriptionId]map[string]struct{})
+
+	ett.connector.mutex.Unlock()
+
+	for subId, producers := range notMonitored {
+		sub, ok := ett.connector.Partner().Subscriptions().Find(subId)
+		if !ok {
+			continue
+		}
+
+		for producer := range producers {
+			delivery := &siri.SIRINotifyEstimatedTimeTable{
+				Address:                   ett.connector.Partner().Address(),
+				ProducerRef:               ett.connector.Partner().ProducerRef(),
+				ResponseMessageIdentifier: ett.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				SubscriberRef:             ett.connector.SIRIPartner().RequestorRef(),
+				SubscriptionIdentifier:    sub.ExternalId(),
+				ResponseTimestamp:         ett.connector.Clock().Now(),
+				Status:                    false,
+				ErrorType:                 "OtherError",
+				ErrorNumber:               1,
+				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
+				RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+			}
+
+			ett.sendDelivery(delivery)
+		}
 	}
 }
 
@@ -218,16 +253,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			processedLines[lineId] = struct{}{}
 			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 		}
-		logStashEvent := ett.newLogStashEvent()
-		logSIRIEstimatedTimeTableNotify(logStashEvent, delivery, lineRef)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-		err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
-		if err != nil {
-			event := ett.newLogStashEvent()
-			logSIRINotifyError(err.Error(), event)
-			audit.CurrentLogStash().WriteEvent(event)
-		}
+		ett.sendDelivery(delivery)
 	}
 }
 
@@ -253,13 +279,33 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 	return references
 }
 
+func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {
+	logStashEvent := ett.newLogStashEvent()
+	logSIRIEstimatedTimeTableNotify(logStashEvent, delivery)
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+	if err != nil {
+		event := ett.newLogStashEvent()
+		logSIRINotifyError(err.Error(), event)
+		audit.CurrentLogStash().WriteEvent(event)
+	}
+}
+
 func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := smb.connector.partner.NewLogStashEvent()
 	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
 	return event
 }
 
-func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable, lineRef []string) {
+func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable) {
+	lineRefs := []string{}
+	for _, vjvf := range response.EstimatedJourneyVersionFrames {
+		for _, vj := range vjvf.EstimatedVehicleJourneys {
+			lineRefs = append(lineRefs, vj.LineRef)
+		}
+	}
+
 	logStashEvent["type"] = "NotifyEstimatedTimetable"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
@@ -267,7 +313,7 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
-	logStashEvent["lineRef"] = strings.Join(lineRef, ",")
+	logStashEvent["lineRef"] = strings.Join(lineRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType

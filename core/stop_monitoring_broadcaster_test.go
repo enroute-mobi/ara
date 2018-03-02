@@ -53,8 +53,8 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	stopVisit.Save()
 
 	time.Sleep(5 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
-	if len(connector.(*TestStopMonitoringSubscriptionBroadcaster).events) != 1 {
-		t.Error("1 event should have been generated got: ", len(connector.(*TestStopMonitoringSubscriptionBroadcaster).events))
+	if len(connector.(*TestStopMonitoringSubscriptionBroadcaster).events) != 2 {
+		t.Error("2 events should have been generated got: ", len(connector.(*TestStopMonitoringSubscriptionBroadcaster).events))
 	}
 }
 

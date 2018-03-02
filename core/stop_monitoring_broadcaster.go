@@ -74,6 +74,7 @@ func (smb *StopMonitoringBroadcaster) run() {
 			logger.Log.Debugf("SIRIStopMonitoringBroadcaster visit")
 
 			smb.prepareSIRIStopMonitoringNotify()
+			smb.prepareNotMonitored()
 
 			c = smb.Clock().After(5 * time.Second)
 		}
@@ -83,6 +84,40 @@ func (smb *StopMonitoringBroadcaster) run() {
 func (smb *StopMonitoringBroadcaster) Stop() {
 	if smb.stop != nil {
 		close(smb.stop)
+	}
+}
+
+func (smb *SMBroadcaster) prepareNotMonitored() {
+	smb.connector.mutex.Lock()
+
+	notMonitored := smb.connector.notMonitored
+	smb.connector.notMonitored = make(map[SubscriptionId]map[string]struct{})
+
+	smb.connector.mutex.Unlock()
+
+	for subId, producers := range notMonitored {
+		sub, ok := smb.connector.Partner().Subscriptions().Find(subId)
+		if !ok {
+			continue
+		}
+
+		for producer := range producers {
+			delivery := &siri.SIRINotifyStopMonitoring{
+				Address:                   smb.connector.Partner().Address(),
+				ProducerRef:               smb.connector.Partner().ProducerRef(),
+				ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				SubscriberRef:             smb.connector.SIRIPartner().RequestorRef(),
+				SubscriptionIdentifier:    sub.ExternalId(),
+				ResponseTimestamp:         smb.connector.Clock().Now(),
+				Status:                    false,
+				ErrorType:                 "OtherError",
+				ErrorNumber:               1,
+				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
+				RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+			}
+
+			smb.sendDelivery(delivery)
+		}
 	}
 }
 

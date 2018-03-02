@@ -28,7 +28,9 @@ type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 
 	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.LineId
-	mutex                         *sync.Mutex //protect the map
+	notMonitored                  map[SubscriptionId]map[string]struct{}
+
+	mutex *sync.Mutex //protect the map
 }
 
 type SIRIEstimatedTimetableSubscriptionBroadcasterFactory struct{}
@@ -158,15 +160,37 @@ func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscr
 	so["MessageIdentifier"] = request.MessageIdentifier()
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	if event.ModelType != "StopVisit" {
+	switch event.ModelType {
+	case "StopVisit":
+		connector.checkEvent(model.StopVisitId(event.ModelId), tx)
+	case "StopArea":
+		sa, ok := tx.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
+		if ok {
+			subsIds := connector.checkStopAreaEvent(sa, tx)
+			if len(subsIds) != 0 {
+				connector.addProducerUnavailable(subsIds, sa.Origin)
+			}
+		}
+	default:
 		return
 	}
+}
 
-	connector.checkEvent(model.StopVisitId(event.ModelId), tx)
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addProducerUnavailable(subsIds []SubscriptionId, producer string) {
+	connector.mutex.Lock()
+	for _, subId := range subsIds {
+		nm, ok := connector.notMonitored[SubscriptionId(subId)]
+		if !ok {
+			nm = make(map[string]struct{})
+			connector.notMonitored[SubscriptionId(subId)] = nm
+		}
+		nm[producer] = struct{}{}
+	}
+	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLine(subId SubscriptionId, lineId model.LineId) {
@@ -217,6 +241,40 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 
 		connector.addLine(sub.Id(), line.Id())
 	}
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea model.StopArea, tx *model.Transaction) []SubscriptionId {
+	subscriptionIds := []SubscriptionId{}
+
+	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+	if !ok {
+		return subscriptionIds
+	}
+
+	subs := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "EstimatedTimeTableBroadcast")
+
+	for _, sub := range subs {
+		resource, ok := sub.ResourcesByObjectID()[obj.String()]
+		if !ok || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+			continue
+		}
+
+		lastState, ok := resource.LastStates[string(stopArea.Id())]
+		if ok {
+			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored {
+				subscriptionIds = append(subscriptionIds, sub.Id())
+			}
+			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
+		}
+
+		if !ok {
+			salc := &stopAreaLastChange{}
+			salc.InitState(&stopArea, sub)
+			resource.LastStates[string(stopArea.Id())] = salc
+		}
+	}
+
+	return subscriptionIds
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
@@ -275,7 +333,7 @@ func NewTestETTSubscriptionBroadcaster() *TestETTSubscriptionBroadcaster {
 	return connector
 }
 
-func (connector *TestETTSubscriptionBroadcaster) HandleStopVisitBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *TestETTSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 

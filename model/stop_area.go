@@ -169,8 +169,9 @@ type MemoryStopAreas struct {
 
 	model *MemoryModel
 
-	mutex        *sync.RWMutex
-	byIdentifier map[StopAreaId]*StopArea
+	mutex          *sync.RWMutex
+	byIdentifier   map[StopAreaId]*StopArea
+	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
 
 type StopAreas interface {
@@ -258,6 +259,16 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
+
+	event := StopMonitoringBroadcastEvent{
+		ModelId:   string(stopArea.id),
+		ModelType: "StopArea",
+	}
+
+	if manager.broadcastEvent != nil {
+		manager.broadcastEvent(event)
+	}
+
 	return true
 }
 

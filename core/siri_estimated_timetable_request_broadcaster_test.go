@@ -24,10 +24,12 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.SetObjectID(model.NewObjectID("objectidKind", "stopArea2"))
+	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.model.Lines().New()

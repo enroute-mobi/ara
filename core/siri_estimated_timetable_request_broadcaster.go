@@ -136,12 +136,10 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 				monitoringRefs = append(monitoringRefs, stopAreaId.Value())
 				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:         string(stopVisit.ArrivalStatus),
-					DepartureStatus:       string(stopVisit.DepartureStatus),
-					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+					ArrivalStatus:      string(stopVisit.ArrivalStatus),
+					DepartureStatus:    string(stopVisit.DepartureStatus),
+					AimedArrivalTime:   stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					AimedDepartureTime: stopVisit.Schedules.Schedule("aimed").DepartureTime(),
 					Order:              stopVisit.PassageOrder,
 					StopPointRef:       stopAreaId.Value(),
 					StopPointName:      stopArea.Name,
@@ -149,13 +147,25 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					VehicleAtStop:      stopVisit.VehicleAtStop,
 				}
 
+				if stopArea.Monitored {
+					estimatedCall.ExpectedArrivalTime = stopVisit.Schedules.Schedule("expected").ArrivalTime()
+					estimatedCall.ExpectedDepartureTime = stopVisit.Schedules.Schedule("expected").DepartureTime()
+				} else {
+					delivery.Status = false
+					delivery.ErrorType = "OtherError"
+					delivery.ErrorNumber = 1
+					delivery.ErrorText = "Erreur [PRODUCER_UNAVAILABLE]"
+				}
+
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 			}
-
-			journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+			if len(estimatedVehicleJourney.EstimatedCalls) != 0 {
+				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+			}
 		}
-
-		delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
+		if len(journeyFrame.EstimatedVehicleJourneys) != 0 {
+			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
+		}
 	}
 
 	logSIRIEstimatedTimetableDelivery(logStashEvent, delivery, monitoringRefs, lineRefs)
