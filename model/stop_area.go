@@ -180,6 +180,7 @@ type StopAreas interface {
 	New() StopArea
 	Find(id StopAreaId) (StopArea, bool)
 	FindByObjectId(objectid ObjectID) (StopArea, bool)
+	FindByLineId(id LineId) []StopArea
 	FindAll() []StopArea
 	FindFamily(stopAreaId StopAreaId) []StopAreaId
 	Save(stopArea *StopArea) bool
@@ -234,6 +235,18 @@ func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, boo
 		}
 	}
 	return StopArea{}, false
+}
+
+func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []StopArea) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, stopArea := range manager.byIdentifier {
+		if stopArea.LineIds.Contains(id) {
+			stopAreas = append(stopAreas, *stopArea)
+		}
+	}
+	return
 }
 
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {

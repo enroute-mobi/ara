@@ -42,6 +42,25 @@ func (manager *TransactionalStopAreas) FindByObjectId(objectid ObjectID) (StopAr
 	return manager.model.StopAreas().FindByObjectId(objectid)
 }
 
+// Temp
+func (manager *TransactionalStopAreas) FindByLineId(id LineId) (stopAreas []StopArea) {
+	// Check saved StopAreas
+	for _, stopArea := range manager.saved {
+		if stopArea.LineIds.Contains(id) {
+			stopAreas = append(stopAreas, *stopArea)
+		}
+	}
+
+	// Check model StopAreas
+	for _, modelStopArea := range manager.model.StopAreas().FindByLineId(id) {
+		_, ok := manager.saved[modelStopArea.Id()]
+		if !ok {
+			stopAreas = append(stopAreas, modelStopArea)
+		}
+	}
+	return
+}
+
 func (manager *TransactionalStopAreas) FindAll() []StopArea {
 	stopAreas := []StopArea{}
 	for _, savedStopArea := range manager.saved {

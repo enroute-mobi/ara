@@ -125,7 +125,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	ett.connector.mutex.Lock()
 
 	events := ett.connector.toBroadcast
-	ett.connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
+	ett.connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
 	ett.connector.mutex.Unlock()
 
@@ -134,14 +134,16 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 	currentTime := ett.Clock().Now()
 
-	for subId, lines := range events {
+	for subId, stopVisits := range events {
 		sub, ok := ett.connector.Partner().Subscriptions().Find(subId)
 		if !ok {
 			logger.Log.Debugf("ETT subscriptionBroadcast Could not find sub with id : %v", subId)
 			continue
 		}
 
-		processedLines := make(map[model.LineId]struct{}) //Making sure not to send 2 times the same Line
+		processedStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
+		lines := make(map[model.LineId]*siri.SIRIEstimatedJourneyVersionFrame)
+		vehicleJourneys := make(map[model.VehicleJourneyId]*siri.SIRIEstimatedVehicleJourney)
 
 		delivery := &siri.SIRINotifyEstimatedTimeTable{
 			Address:                   ett.connector.Partner().Address(),
@@ -154,19 +156,39 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
 		}
 
-		for _, lineId := range lines {
+		for _, stopVisitId := range stopVisits {
 			// Check if resource is already in the map
-			if _, ok := processedLines[lineId]; ok {
+			if _, ok := processedStopVisits[stopVisitId]; ok {
 				continue
 			}
 
-			// Find the Line
-			line, ok := tx.Model().Lines().Find(lineId)
+			// Find the StopVisit
+			stopVisit, ok := tx.Model().StopVisits().Find(stopVisitId)
 			if !ok {
 				continue
 			}
 
-			// Find the Resource ObjectId
+			// Handle StopPointRef
+			stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+			if !ok {
+				continue
+			}
+			stopAreaId, ok := stopArea.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+			if !ok {
+				continue
+			}
+
+			// Find the VehicleJourney
+			vehicleJourney, ok := tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+			if !ok {
+				return
+			}
+
+			// Find the Line
+			line, ok := tx.Model().Lines().Find(vehicleJourney.LineId)
+			if !ok {
+				continue
+			}
 			lineObjectId, ok := line.ObjectID(ett.connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 			if !ok {
 				continue
@@ -179,12 +201,19 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			}
 
 			// Get the EstimatedJourneyVersionFrame
-			journeyFrame := &siri.SIRIEstimatedJourneyVersionFrame{
-				RecordedAtTime: currentTime,
+			journeyFrame, ok := lines[line.Id()]
+			if !ok {
+				journeyFrame = &siri.SIRIEstimatedJourneyVersionFrame{
+					RecordedAtTime: currentTime,
+				}
+
+				delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
+				lines[line.Id()] = journeyFrame
 			}
 
-			// SIRIEstimatedVehicleJourney
-			for _, vehicleJourney := range tx.Model().VehicleJourneys().FindByLineId(lineId) {
+			// Get the EstiatedVehicleJourney
+			estimatedVehicleJourney, ok := vehicleJourneys[vehicleJourney.Id()]
+			if !ok {
 				// Handle vehicleJourney Objectid
 				vehicleJourneyId, ok := vehicleJourney.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 				var datedVehicleJourneyRef string
@@ -199,7 +228,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
 				}
 
-				estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
+				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
 					LineRef:                lineObjectId.Value(),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					Attributes:             make(map[string]string),
@@ -208,48 +237,38 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
-				// SIRIEstimatedCall
-				for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
-					// Handle StopPointRef
-					stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
-					if !ok {
-						continue
-					}
-					stopAreaId, ok := stopArea.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
-					if !ok {
-						continue
-					}
-
-					estimatedCall := &siri.SIRIEstimatedCall{
-						ArrivalStatus:         string(stopVisit.ArrivalStatus),
-						DepartureStatus:       string(stopVisit.DepartureStatus),
-						AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-						ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-						AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-						ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-						Order:              stopVisit.PassageOrder,
-						StopPointRef:       stopAreaId.Value(),
-						StopPointName:      stopArea.Name,
-						DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
-						VehicleAtStop:      stopVisit.VehicleAtStop,
-					}
-
-					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
-
-					lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
-					if !ok {
-						ettlc := &estimatedTimeTableLastChange{}
-						ettlc.InitState(&stopVisit, sub)
-						resource.LastStates[string(stopVisit.Id())] = ettlc
-					} else {
-						lastState := lastStateInterface.(*estimatedTimeTableLastChange)
-						lastState.UpdateState(&stopVisit)
-					}
-				}
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+				vehicleJourneys[vehicleJourney.Id()] = estimatedVehicleJourney
 			}
-			processedLines[lineId] = struct{}{}
-			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
+
+			// EstimatedCall
+			estimatedCall := &siri.SIRIEstimatedCall{
+				ArrivalStatus:         string(stopVisit.ArrivalStatus),
+				DepartureStatus:       string(stopVisit.DepartureStatus),
+				AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+				ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+				AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+				ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+				Order:              stopVisit.PassageOrder,
+				StopPointRef:       stopAreaId.Value(),
+				StopPointName:      stopArea.Name,
+				DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
+				VehicleAtStop:      stopVisit.VehicleAtStop,
+			}
+
+			estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+
+			processedStopVisits[stopVisitId] = struct{}{}
+
+			lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
+			if !ok {
+				ettlc := &estimatedTimeTableLastChange{}
+				ettlc.InitState(&stopVisit, sub)
+				resource.LastStates[string(stopVisit.Id())] = ettlc
+			} else {
+				lastState := lastStateInterface.(*estimatedTimeTableLastChange)
+				lastState.UpdateState(&stopVisit)
+			}
 		}
 		ett.sendDelivery(delivery)
 	}
