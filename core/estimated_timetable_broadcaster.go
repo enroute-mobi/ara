@@ -126,7 +126,6 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 	events := ett.connector.toBroadcast
 	ett.connector.toBroadcast = make(map[SubscriptionId][]model.LineId)
-	lineRef := []string{}
 
 	ett.connector.mutex.Unlock()
 
@@ -206,7 +205,6 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]model.Reference),
 				}
-				lineRef = append(lineRef, estimatedVehicleJourney.LineRef)
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 

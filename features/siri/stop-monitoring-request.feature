@@ -920,6 +920,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Origin    | partner1                                 |
       | Monitored | false                                    |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
@@ -990,7 +991,7 @@ Feature: Support SIRI StopMonitoring by request
           <siri:Status>false</siri:Status>
           <siri:ErrorCondition>
             <siri:OtherError number="1">
-              <siri:ErrorText>Erreur [PRODUCER_UNAVAILABLE]</siri:ErrorText>
+              <siri:ErrorText>Erreur [PRODUCER_UNAVAILABLE] : partner1 indisponible</siri:ErrorText>
             </siri:OtherError>
           </siri:ErrorCondition>
           <siri:MonitoredStopVisit>

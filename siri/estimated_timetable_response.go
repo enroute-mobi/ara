@@ -86,7 +86,7 @@ const estimatedTimetableDeliveryTemplate = `<siri:EstimatedTimetableDelivery ver
 				<siri:{{.ErrorType}}>{{ end }}
 					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
 				</siri:{{.ErrorType}}>
-			</siri:ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
+			</siri:ErrorCondition>{{ end }}{{ if or .Status (eq .ErrorType "OtherError") }}{{ range .EstimatedJourneyVersionFrames }}
 			{{ .BuildEstimatedJourneyVersionFrameXML }}{{ end }}{{ end }}
 		</siri:EstimatedTimetableDelivery>`
 
