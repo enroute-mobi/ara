@@ -55,6 +55,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
+	stopArea.Origin = event.Origin
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
 

@@ -50,6 +50,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 	event, ok := events[stopVisitEvent.StopAreaObjectId.String()]
 	if !ok {
 		event = &model.StopAreaUpdateEvent{}
+		event.Origin = string(builder.partner.Slug())
 		event.StopAreaAttributes.Name = xmlStopVisitEvent.StopPointName()
 		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
 		event.StopAreaAttributes.CollectedAlways = false

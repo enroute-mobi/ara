@@ -2,6 +2,7 @@ package model
 
 type StopAreaUpdateEvent struct {
 	id                          string
+	Origin                      string
 	StopAreaId                  StopAreaId
 	StopAreaAttributes          StopAreaAttributes
 	StopAreaMonitoredEvent      *StopAreaMonitoredEvent

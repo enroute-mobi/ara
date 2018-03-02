@@ -18,7 +18,9 @@ type StopAreaAttributes struct {
 
 type StopArea struct {
 	ObjectIDConsumer
-	model Model
+
+	model  Model
+	Origin string
 
 	id       StopAreaId
 	ParentId StopAreaId `json:",omitempty"`
