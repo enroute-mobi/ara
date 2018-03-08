@@ -145,6 +145,7 @@ func main() {
 		err = model.ApplyMigrations(migrateFlags.Arg(0), *migrationFilesPtr, database.Db)
 	case "load":
 		loadFlags := flag.NewFlagSet("load", flag.ExitOnError)
+		forcePtr := loadFlags.Bool("force", false, "Overwrite records in Database")
 		loadFlags.Parse(flag.Args()[1:])
 
 		if loadFlags.NArg() < 2 {
@@ -156,7 +157,7 @@ func main() {
 		model.Database = model.InitDB(config.Config.DB)
 		defer model.CloseDB(model.Database)
 
-		err = model.LoadFromCSV(loadFlags.Arg(0), loadFlags.Arg(1))
+		err = model.LoadFromCSV(loadFlags.Arg(0), loadFlags.Arg(1), *forcePtr)
 	}
 
 	if err != nil {

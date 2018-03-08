@@ -24,12 +24,29 @@ Separators are ',' leading spaces are trimed
 
 Escape quotes with another quote ex: "[""1234"",""5678""]"
 */
+type Loader struct {
+	filePath        string
+	referentialSlug string
+	force           bool
+}
 
-func LoadFromCSV(filePath string, referentialSlug string) error {
+func LoadFromCSV(filePath string, referentialSlug string, force bool) error {
+	return newLoader(filePath, referentialSlug, force).load()
+}
+
+func newLoader(filePath string, referentialSlug string, force bool) *Loader {
+	return &Loader{
+		filePath:        filePath,
+		referentialSlug: referentialSlug,
+		force:           force,
+	}
+}
+
+func (loader Loader) load() error {
 	prepareDatabase()
 	var errors int
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(loader.filePath)
 	defer file.Close()
 	if err != nil {
 		return fmt.Errorf("Error while opening file: %v", err)
@@ -63,7 +80,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 
 		switch record[0] {
 		case "stop_area":
-			err := handleStopArea(record, referentialSlug)
+			err := loader.handleStopArea(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
@@ -72,7 +89,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 				importedStopAreas++
 			}
 		case "line":
-			err := handleLine(record, referentialSlug)
+			err := loader.handleLine(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
@@ -81,7 +98,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 				importedLines++
 			}
 		case "vehicle_journey":
-			err := handleVehicleJourney(record, referentialSlug)
+			err := loader.handleVehicleJourney(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
@@ -90,7 +107,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 				importedVehicleJourneys++
 			}
 		case "stop_visit":
-			err := handleStopVisit(record, referentialSlug)
+			err := loader.handleStopVisit(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
@@ -99,7 +116,7 @@ func LoadFromCSV(filePath string, referentialSlug string) error {
 				importedStopVisits++
 			}
 		case "operator":
-			err := handleOperator(record, referentialSlug)
+			err := loader.handleOperator(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Errorf("Error on line %d: %v", i, err)
@@ -145,7 +162,7 @@ func prepareDatabase() {
 	Database.AddTableWithName(DatabaseOperator{}, "operators")
 }
 
-func handleStopArea(record []string, referentialSlug string) error {
+func (loader Loader) handleStopArea(record []string) error {
 	if len(record) != 12 {
 		return fmt.Errorf("Wrong number of entries, expected 12 got %v", len(record))
 	}
@@ -192,7 +209,7 @@ func handleStopArea(record []string, referentialSlug string) error {
 
 	stopArea := DatabaseStopArea{
 		Id:                     record[1],
-		ReferentialSlug:        referentialSlug,
+		ReferentialSlug:        loader.referentialSlug,
 		ParentId:               parent,
 		ModelName:              record[3],
 		Name:                   record[4],
@@ -205,6 +222,14 @@ func handleStopArea(record []string, referentialSlug string) error {
 		CollectGeneralMessages: collectGeneralMessages,
 	}
 
+	if loader.force {
+		query := fmt.Sprintf("delete from stop_areas where id='%v' and model_name='%v'", stopArea.Id, stopArea.ModelName)
+		_, err := Database.Exec(query)
+		if err != nil {
+			return err
+		}
+	}
+
 	err = Database.Insert(&stopArea)
 	if err != nil {
 		return err
@@ -213,17 +238,25 @@ func handleStopArea(record []string, referentialSlug string) error {
 	return nil
 }
 
-func handleOperator(record []string, referentialSlug string) error {
+func (loader Loader) handleOperator(record []string) error {
 	if len(record) != 5 {
 		return fmt.Errorf("Wrong number of entries, expected 5 got %v", len(record))
 	}
 
 	operator := DatabaseOperator{
 		Id:              record[1],
-		ReferentialSlug: referentialSlug,
+		ReferentialSlug: loader.referentialSlug,
 		ModelName:       record[2],
 		Name:            record[3],
 		ObjectIDs:       record[4],
+	}
+
+	if loader.force {
+		query := fmt.Sprintf("delete from operators where id='%v' and model_name='%v'", operator.Id, operator.ModelName)
+		_, err := Database.Exec(query)
+		if err != nil {
+			return err
+		}
 	}
 
 	err := Database.Insert(&operator)
@@ -234,7 +267,7 @@ func handleOperator(record []string, referentialSlug string) error {
 	return nil
 }
 
-func handleLine(record []string, referentialSlug string) error {
+func (loader Loader) handleLine(record []string) error {
 	if len(record) != 8 {
 		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
 	}
@@ -257,13 +290,21 @@ func handleLine(record []string, referentialSlug string) error {
 
 	line := DatabaseLine{
 		Id:                     record[1],
-		ReferentialSlug:        referentialSlug,
+		ReferentialSlug:        loader.referentialSlug,
 		ModelName:              record[2],
 		Name:                   record[3],
 		ObjectIDs:              record[4],
 		Attributes:             record[5],
 		References:             record[6],
 		CollectGeneralMessages: collectGeneralMessages,
+	}
+
+	if loader.force {
+		query := fmt.Sprintf("delete from lines where id='%v' and model_name='%v'", line.Id, line.ModelName)
+		_, err := Database.Exec(query)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = Database.Insert(&line)
@@ -274,20 +315,28 @@ func handleLine(record []string, referentialSlug string) error {
 	return nil
 }
 
-func handleVehicleJourney(record []string, referentialSlug string) error {
+func (loader Loader) handleVehicleJourney(record []string) error {
 	if len(record) != 8 {
 		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
 	}
 
 	vehicleJourney := DatabaseVehicleJourney{
 		Id:              record[1],
-		ReferentialSlug: referentialSlug,
+		ReferentialSlug: loader.referentialSlug,
 		ModelName:       record[2],
 		Name:            record[3],
 		ObjectIDs:       record[4],
 		LineId:          record[5],
 		Attributes:      record[6],
 		References:      record[7],
+	}
+
+	if loader.force {
+		query := fmt.Sprintf("delete from vehicle_journeys where id='%v' and model_name='%v'", vehicleJourney.Id, vehicleJourney.ModelName)
+		_, err := Database.Exec(query)
+		if err != nil {
+			return err
+		}
 	}
 
 	err := Database.Insert(&vehicleJourney)
@@ -298,7 +347,7 @@ func handleVehicleJourney(record []string, referentialSlug string) error {
 	return nil
 }
 
-func handleStopVisit(record []string, referentialSlug string) error {
+func (loader Loader) handleStopVisit(record []string) error {
 	if len(record) != 14 {
 		return fmt.Errorf("Wrong number of entries, expected 14 got %v", len(record))
 	}
@@ -337,7 +386,7 @@ func handleStopVisit(record []string, referentialSlug string) error {
 
 	stopVisit := DatabaseStopVisit{
 		Id:               record[1],
-		ReferentialSlug:  referentialSlug,
+		ReferentialSlug:  loader.referentialSlug,
 		ModelName:        record[2],
 		ObjectIDs:        record[3],
 		StopAreaId:       record[4],
@@ -350,6 +399,14 @@ func handleStopVisit(record []string, referentialSlug string) error {
 		Collected:        collected,
 		VehicleAtStop:    vehicleAtStop,
 		PassageOrder:     passageOrder,
+	}
+
+	if loader.force {
+		query := fmt.Sprintf("delete from stop_visits where id='%v' and model_name='%v'", stopVisit.Id, stopVisit.ModelName)
+		_, err := Database.Exec(query)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = Database.Insert(&stopVisit)
