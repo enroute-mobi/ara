@@ -215,7 +215,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoring, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 
-	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
+	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return smb.handleCancelledStopVisit(stopVisit, delivery, stopMonitoringBuilder)
 	} else {
 		return smb.handleMonitoredStopVisit(stopVisit, delivery, stopMonitoringBuilder)
