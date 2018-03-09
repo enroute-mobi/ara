@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -218,7 +219,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		sa, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 		if !ok {
 			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = "Stop Area not found"
+			rs.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
 			resps = append(resps, rs)
 
 			logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)

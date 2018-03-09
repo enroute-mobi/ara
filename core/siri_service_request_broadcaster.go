@@ -72,8 +72,8 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx 
 				RequestMessageRef: stopMonitoringRequest.MessageIdentifier(),
 				Status:            false,
 				ResponseTimestamp: connector.Clock().Now(),
-				ErrorType:         "NotFound",
-				ErrorText:         "Can't find a SIRIStopMonitoringRequestBroadcaster connector",
+				ErrorType:         "CapabilityNotSupportedError",
+				ErrorText:         "Can't find a StopMonitoringRequestBroadcaster connector",
 			}
 		} else {
 			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
@@ -103,8 +103,8 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx 
 				RequestMessageRef: generalMessageRequest.MessageIdentifier(),
 				Status:            false,
 				ResponseTimestamp: connector.Clock().Now(),
-				ErrorType:         "NotFound",
-				ErrorText:         "Can't find a SIRIGeneralMessageRequestBroadcaster connector",
+				ErrorType:         "CapabilityNotSupportedError",
+				ErrorText:         "Can't find a GeneralMessageRequestBroadcaster connector",
 			}
 		} else {
 			delivery = generalMessageConnector.(*SIRIGeneralMessageRequestBroadcaster).getGeneralMessageDelivery(tx, GMLogStashEvent, generalMessageRequest)
@@ -134,8 +134,8 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 				RequestMessageRef: estimatedTimetableRequest.MessageIdentifier(),
 				Status:            false,
 				ResponseTimestamp: connector.Clock().Now(),
-				ErrorType:         "NotFound",
-				ErrorText:         "Can't find a SIRIEstimatedTimetableBroadcaster connector",
+				ErrorType:         "CapabilityNotSupportedError",
+				ErrorText:         "Can't find a EstimatedTimetableBroadcaster connector",
 			}
 		} else {
 			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(tx, estimatedTimetableRequest, ETTLogStashEvent)
