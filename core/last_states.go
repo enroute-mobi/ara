@@ -66,20 +66,18 @@ func (smlc *stopMonitoringLastChange) UpdateState(stopVisit *model.StopVisit) bo
 }
 
 func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
-	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if !ok {
+	// Don't send info on cancelled or departed SV
+	if smlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED || smlc.departureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || smlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_CANCELLED {
+		return false
+	}
+
+	// Check Arrival and Departure status
+	if smlc.handleArrivalStatus(stopVisit.ArrivalStatus, smlc.arrivalStatuts) || smlc.handleDepartureStatus(stopVisit.DepartureStatus, smlc.departureStatus) {
 		return true
 	}
 
-	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && smlc.arrivalStatuts == stopVisit.ArrivalStatus {
-		return false
-	}
-
-	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && smlc.departureStatus == stopVisit.DepartureStatus {
-		return false
-	}
-
-	if smlc.handleArrivalStatus(stopVisit.ArrivalStatus, smlc.arrivalStatuts) || smlc.handleDepartureStatus(stopVisit.DepartureStatus, smlc.departureStatus) {
+	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
+	if !ok {
 		return true
 	}
 
@@ -128,28 +126,24 @@ func (ettlc *estimatedTimeTableLastChange) UpdateState(sv *model.StopVisit) {
 }
 
 func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
+	// Don't send info on cancelled or departed SV
+	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED || ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || ettlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_CANCELLED {
+		return false
+	}
+
+	// Check Departure Status
+	if ettlc.handleArrivalStatus(stopVisit.ArrivalStatus, ettlc.arrivalStatuts) || ettlc.handleDepartureStatus(stopVisit.DepartureStatus, ettlc.departureStatus) {
+		return true
+	}
+
+	// Check VehicleAtStop
+	if ettlc.vehicleAtStop != stopVisit.VehicleAtStop && stopVisit.VehicleAtStop {
+		return true
+	}
+
+	// Check Schedules
 	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
 	if !ok {
-		return true
-	}
-
-	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
-		return false
-	}
-
-	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED && ettlc.arrivalStatuts == stopVisit.ArrivalStatus {
-		return false
-	}
-
-	if stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED && ettlc.departureStatus == stopVisit.DepartureStatus {
-		return false
-	}
-
-	if ettlc.vehicleAtStop != stopVisit.VehicleAtStop {
-		return true
-	}
-
-	if ettlc.handleArrivalStatus(stopVisit.ArrivalStatus, ettlc.arrivalStatuts) || ettlc.handleDepartureStatus(stopVisit.DepartureStatus, ettlc.departureStatus) {
 		return true
 	}
 
@@ -231,7 +225,7 @@ func (sh *schedulesHandler) handleDepartureStatus(svDs model.StopVisitDepartureS
 		return false
 	}
 
-	if svDs == model.STOP_VISIT_DEPARTURE_NOREPORT || svDs == model.STOP_VISIT_DEPARTURE_CANCELLED {
+	if svDs == model.STOP_VISIT_DEPARTURE_NOREPORT || svDs == model.STOP_VISIT_DEPARTURE_CANCELLED || svDs == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return true
 	}
 
