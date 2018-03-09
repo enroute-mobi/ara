@@ -52,10 +52,10 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	if response.StopMonitoringDeliveries[0].Status {
 		t.Error("Response status should be false, got true")
 	}
-	if response.StopMonitoringDeliveries[0].ErrorType != "NotFound" {
-		t.Errorf("Response Errortype should be Notfound, got: %v", response.StopMonitoringDeliveries[0].ErrorType)
+	if response.StopMonitoringDeliveries[0].ErrorType != "CapabilityNotSupportedError" {
+		t.Errorf("Response Errortype should be CapabilityNotSupportedError, got: %v", response.StopMonitoringDeliveries[0].ErrorType)
 	}
-	expected := "Can't find a SIRIStopMonitoringRequestBroadcaster connector"
+	expected := "Can't find a StopMonitoringRequestBroadcaster connector"
 	if response.StopMonitoringDeliveries[0].ErrorText != expected {
 		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.StopMonitoringDeliveries[0].ErrorText, expected)
 	}
@@ -63,10 +63,10 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	if response.GeneralMessageDeliveries[0].Status {
 		t.Error("Response status should be false, got true")
 	}
-	if response.GeneralMessageDeliveries[0].ErrorType != "NotFound" {
-		t.Errorf("Response Errortype should be Notfound, got: %v", response.GeneralMessageDeliveries[0].ErrorType)
+	if response.GeneralMessageDeliveries[0].ErrorType != "CapabilityNotSupportedError" {
+		t.Errorf("Response Errortype should be CapabilityNotSupportedError, got: %v", response.GeneralMessageDeliveries[0].ErrorType)
 	}
-	expected = "Can't find a SIRIGeneralMessageRequestBroadcaster connector"
+	expected = "Can't find a GeneralMessageRequestBroadcaster connector"
 	if response.GeneralMessageDeliveries[0].ErrorText != expected {
 		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.GeneralMessageDeliveries[0].ErrorText, expected)
 	}
@@ -74,10 +74,10 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	if response.EstimatedTimetableDeliveries[0].Status {
 		t.Error("Response status should be false, got true")
 	}
-	if response.EstimatedTimetableDeliveries[0].ErrorType != "NotFound" {
-		t.Errorf("Response Errortype should be Notfound, got: %v", response.EstimatedTimetableDeliveries[0].ErrorType)
+	if response.EstimatedTimetableDeliveries[0].ErrorType != "CapabilityNotSupportedError" {
+		t.Errorf("Response Errortype should be CapabilityNotSupportedError, got: %v", response.EstimatedTimetableDeliveries[0].ErrorType)
 	}
-	expected = "Can't find a SIRIEstimatedTimetableBroadcaster connector"
+	expected = "Can't find a EstimatedTimetableBroadcaster connector"
 	if response.EstimatedTimetableDeliveries[0].ErrorText != expected {
 		t.Errorf("Wrong response Errortype:\n got: %v\n want: %v", response.EstimatedTimetableDeliveries[0].ErrorText, expected)
 	}
