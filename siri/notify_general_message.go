@@ -51,7 +51,7 @@ const generalMessageNotifyTemplate = `<sw:NotifyGeneralMessage xmlns:sw="http://
 		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
 		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
-	<Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+	<Notification>
 		<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
 			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
