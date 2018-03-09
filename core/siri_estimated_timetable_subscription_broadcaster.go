@@ -61,16 +61,12 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) (resps []siri.SIRIResponseStatus) {
-	mainLogStashEvent := connector.newLogStashEvent()
-	logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(mainLogStashEvent, request)
-	audit.CurrentLogStash().WriteEvent(mainLogStashEvent)
-
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
 		logStashEvent := connector.newLogStashEvent()
-		logSIRIEstimatedTimeTableBroadcasterEntry(logStashEvent, ett)
+		logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent, ett)
 
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ett.MessageIdentifier(),
@@ -91,7 +87,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 		resps = append(resps, rs)
 
-		logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent, rs)
+		logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		if len(lineIds) != 0 {
@@ -294,17 +290,18 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent
 	return event
 }
 
-func logSIRIEstimatedTimeTableBroadcasterSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["type"] = "EstimatedTimeTableSubscriptions"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-
-	xml := request.RawXML()
-	logStashEvent["requestXML"] = xml
+func logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent audit.LogStashEvent, ettEntry *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
+	logStashEvent["type"] = "EstimatedTimeTableSubscriptionEntry"
+	logStashEvent["LineRef"] = strings.Join(ettEntry.Lines(), ",")
+	logStashEvent["messageIdentifier"] = ettEntry.MessageIdentifier()
+	logStashEvent["subscriberRef"] = ettEntry.SubscriberRef()
+	logStashEvent["subscriptionIdentifier"] = ettEntry.SubscriptionIdentifier()
+	logStashEvent["initialTerminationTime"] = ettEntry.InitialTerminationTime().String()
+	logStashEvent["requestTimestamp"] = ettEntry.RequestTimestamp().String()
+	logStashEvent["requestXML"] = ettEntry.RawXML()
 }
 
-func logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent audit.LogStashEvent, response siri.SIRIResponseStatus) {
+func logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, response *siri.SIRIResponseStatus) {
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["subscriptionRef"] = response.SubscriptionRef
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
@@ -317,16 +314,6 @@ func logSIRIEstimatedTimeTableBroadcasterSubscriptionResponse(logStashEvent audi
 		}
 		logStashEvent["errorText"] = response.ErrorText
 	}
-}
-
-func logSIRIEstimatedTimeTableBroadcasterEntry(logStashEvent audit.LogStashEvent, ettEntry *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
-	logStashEvent["type"] = "EstimatedTimeTableSubscription"
-	logStashEvent["subscriberRef"] = ettEntry.SubscriberRef()
-	logStashEvent["subscriptionRef"] = ettEntry.SubscriptionIdentifier()
-	logStashEvent["LineRef"] = strings.Join(ettEntry.Lines(), ",")
-
-	xml := ettEntry.RawXML()
-	logStashEvent["requestXML"] = xml
 }
 
 // START TEST

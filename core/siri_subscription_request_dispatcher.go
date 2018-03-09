@@ -65,6 +65,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
+		logStashEvent["type"] = "GeneralMessageSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -78,6 +79,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
+		logStashEvent["type"] = "StopMonitoringSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -91,6 +93,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
+		logStashEvent["type"] = "EstimatedTimetableSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -168,7 +171,6 @@ func logXMLSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.
 
 func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRISubscriptionResponse, connector string) {
 	logStashEvent["connector"] = connector
-	logStashEvent["type"] = "subscriptionRequest"
 	logStashEvent["address"] = response.Address
 	logStashEvent["responderRef"] = response.ResponderRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
