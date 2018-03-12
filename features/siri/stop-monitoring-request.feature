@@ -297,7 +297,7 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored                              | true                                            |
       | Attribute[Bearing]                     | N                                               |
       | Attribute[Delay]                       | 30                                              |
-      | Attribute[DestinationName]             | Cimetière des Sauvages                          |
+      | DestinationName                        | Cimetière des Sauvages                          |
       | Attribute[DirectionName]               | Mago-Cime OMNI                                  |
       | Attribute[DirectionRef]                | Aller                                           |
       | Attribute[FirstOrLastJourney]          | first                                           |
@@ -310,7 +310,7 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[Occupancy]                   | seatsAvailable                                  |
       | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:54:52.977Z                        |
       | Attribute[DestinationAimedArrivalTime] | 2016-09-22T09:54:52.977Z                        |
-      | Attribute[OriginName]                  | Magicien Noir                                   |
+      | OriginName                             | Magicien Noir                                   |
       | Attribute[ProductCategoryRef]          | 0                                               |
       | Attribute[ServiceFeatureRef]           | bus scolaire                                    |
       | Attribute[TrainNumberRef]              | 12345                                           |

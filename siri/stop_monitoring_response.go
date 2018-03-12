@@ -154,7 +154,10 @@ type SIRIMonitoredStopVisit struct {
 	DepartureStatus        string
 	ArrivalStatus          string
 	VehicleJourneyName     string
+	OriginName             string
+	DestinationName        string
 	StopAreaObjectId       string
+	DataFrameRef           string
 
 	VehicleAtStop bool
 	Monitored     bool
@@ -165,7 +168,6 @@ type SIRIMonitoredStopVisit struct {
 	ExpectedArrivalTime time.Time
 	ActualArrivalTime   time.Time
 
-	DataFrameRef          string
 	RecordedAt            time.Time
 	AimedDepartureTime    time.Time
 	ExpectedDepartureTime time.Time
@@ -227,14 +229,14 @@ const monitoredStopVisitTemplate = `<siri:MonitoredStopVisit>
 					<siri:ProductCategoryRef>{{.Attributes.VehicleJourneyAttributes.ProductCategoryRef}}</siri:ProductCategoryRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}
 					<siri:ServiceFeatureRef>{{.Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}</siri:ServiceFeatureRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}
 					<siri:VehicleFeatureRef>{{.Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}</siri:VehicleFeatureRef>{{end}}{{ if .References.VehicleJourney.OriginRef.ObjectId.Value}}
-					<siri:OriginRef>{{ .References.VehicleJourney.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.OriginName }}
-					<siri:OriginName>{{ .Attributes.VehicleJourneyAttributes.OriginName }}</siri:OriginName>{{ end }}{{ if or .Attributes.VehicleJourneyAttributes.ViaPlaceName .References.VehicleJourney.PlaceRef }}
+					<siri:OriginRef>{{ .References.VehicleJourney.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .OriginName }}
+					<siri:OriginName>{{ .OriginName }}</siri:OriginName>{{ end }}{{ if or .Attributes.VehicleJourneyAttributes.ViaPlaceName .References.VehicleJourney.PlaceRef }}
 					<siri:Via>{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
 						<siri:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</siri:PlaceName>{{end}}{{ if .References.VehicleJourney.PlaceRef}}
 					  <siri:PlaceRef>{{.References.VehicleJourney.PlaceRef.ObjectId.Value}}</siri:PlaceRef>{{ end }}
 					</siri:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef.ObjectId.Value }}
-					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationName}}
-					<siri:DestinationName>{{ .Attributes.VehicleJourneyAttributes.DestinationName }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
+					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{end}}{{ if .DestinationName}}
+					<siri:DestinationName>{{ .DestinationName }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
 					<siri:VehicleJourneyName>{{ .VehicleJourneyName }}</siri:VehicleJourneyName>{{end}}{{ if .Attributes.VehicleJourneyAttributes.JourneyNote}}
 					<siri:JourneyNote>{{.Attributes.VehicleJourneyAttributes.JourneyNote}}</siri:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}
 					<siri:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</siri:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}

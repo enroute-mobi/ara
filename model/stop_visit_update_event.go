@@ -37,7 +37,7 @@ type StopVisitUpdateEvent struct {
 	StopAreaObjectId  ObjectID
 	Schedules         StopVisitSchedules
 	DepartureStatus   StopVisitDepartureStatus
-	ArrivalStatuts    StopVisitArrivalStatus
+	ArrivalStatus     StopVisitArrivalStatus
 	VehicleAtStop     bool
 
 	// Vehicle Journey

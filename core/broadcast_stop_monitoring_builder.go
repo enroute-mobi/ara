@@ -116,12 +116,13 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	modelDate := builder.tx.Model().Date()
 
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
-		ItemIdentifier: itemIdentifier,
-		MonitoringRef:  builder.MonitoringRef,
-		StopPointRef:   stopPointRefObjectId.Value(),
-		StopPointName:  stopPointRef.Name,
-
+		ItemIdentifier:         itemIdentifier,
+		MonitoringRef:          builder.MonitoringRef,
+		StopPointRef:           stopPointRefObjectId.Value(),
+		StopPointName:          stopPointRef.Name,
 		VehicleJourneyName:     vehicleJourney.Name,
+		OriginName:             vehicleJourney.OriginName,
+		DestinationName:        vehicleJourney.DestinationName,
 		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,

@@ -447,8 +447,8 @@ Feature: Support SIRI StopMonitoring by subscription
        | remote_objectid_kind | internal              |
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
-      | Kind                      | StopMonitoringBroadcast                              |
-      | ReferenceArray[0]         | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Kind              | StopMonitoringBroadcast                            |
+      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -457,13 +457,13 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name                       | Passage 32                              |
-      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                     | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
-      | Monitored                  | true                                    |
-      | Attribute[DirectionRef]    | Aller                                   |
-      | Attribute[OriginName]      | Le début                                |
-      | Attribute[DestinationName] | La fin.                                 |
+      | Name                    | Passage 32                              |
+      | ObjectIDs               | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                  | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
+      | Monitored               | true                                    |
+      | Attribute[DirectionRef] | Aller                                   |
+      | OriginName              | Le début                                |
+      | DestinationName         | La fin.                                 |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -490,7 +490,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ArrivalStatus              | Delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | cancelled                  |
+      | ArrivalStatus              | cancelled                |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """

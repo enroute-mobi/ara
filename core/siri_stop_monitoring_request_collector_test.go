@@ -105,8 +105,8 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:56:53+02:00"); !stopVisitEvent.RecordedAt.Equal(expected) {
 		t.Errorf("Wrong RecorderAt for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.RecordedAt)
 	}
-	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisitEvent.ArrivalStatuts != expected {
-		t.Errorf("Wrong ArrivalStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.ArrivalStatuts)
+	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisitEvent.ArrivalStatus != expected {
+		t.Errorf("Wrong ArrivalStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.ArrivalStatus)
 	}
 	if expected := model.STOP_VISIT_DEPARTURE_UNDEFINED; stopVisitEvent.DepartureStatus != expected {
 		t.Errorf("Wrong DepartureStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.DepartureStatus)

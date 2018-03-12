@@ -45,7 +45,7 @@ Feature: Support SIRI GetSIRI
       | ObjectIDs                             | "internal": "5CAR621689196575"                |
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                             | true                                          |
-      | Attribute[DestinationName]            | PARIS - Porte d'Orléans                       |
+      | DestinationName                       | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | Attribute[DirectionRef]               | cladebr                                       |
       | Reference[JourneyPatternRef]#ObjectID | "internal": "CdF:JourneyPattern::L475P53:LOC" |

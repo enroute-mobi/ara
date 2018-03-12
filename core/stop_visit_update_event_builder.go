@@ -27,7 +27,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 		StopAreaObjectId:       model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
 		Schedules:              make(model.StopVisitSchedules),
 		DepartureStatus:        model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
-		ArrivalStatuts:         model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
+		ArrivalStatus:          model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
 		DatedVehicleJourneyRef: xmlStopVisitEvent.DatedVehicleJourneyRef(),
 		DestinationRef:         xmlStopVisitEvent.DestinationRef(),
 		OriginRef:              xmlStopVisitEvent.OriginRef(),
