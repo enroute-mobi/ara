@@ -16,8 +16,8 @@ import (
 
 stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
-vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,Attributes,References
-stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,ArrivalStatus,DepartureStatus,Schedules,Attributes,References,Collected,VehicleAtStop,PassageOrder
+vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References
+stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -316,8 +316,8 @@ func (loader Loader) handleLine(record []string) error {
 }
 
 func (loader Loader) handleVehicleJourney(record []string) error {
-	if len(record) != 8 {
-		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
+	if len(record) != 10 {
+		return fmt.Errorf("Wrong number of entries, expected 10 got %v", len(record))
 	}
 
 	vehicleJourney := DatabaseVehicleJourney{
@@ -327,8 +327,10 @@ func (loader Loader) handleVehicleJourney(record []string) error {
 		Name:            record[3],
 		ObjectIDs:       record[4],
 		LineId:          record[5],
-		Attributes:      record[6],
-		References:      record[7],
+		OriginName:      record[6],
+		DestinationName: record[7],
+		Attributes:      record[8],
+		References:      record[9],
 	}
 
 	if loader.force {
@@ -348,32 +350,16 @@ func (loader Loader) handleVehicleJourney(record []string) error {
 }
 
 func (loader Loader) handleStopVisit(record []string) error {
-	if len(record) != 14 {
-		return fmt.Errorf("Wrong number of entries, expected 14 got %v", len(record))
+	if len(record) != 10 {
+		return fmt.Errorf("Wrong number of entries, expected 10 got %v", len(record))
 	}
 
 	var err error
 	parseErrors := make(map[string]string)
 
-	var collected bool
-	if record[11] != "" {
-		collected, err = strconv.ParseBool(record[11])
-		if err != nil {
-			parseErrors["Collected"] = err.Error()
-		}
-	}
-
-	var vehicleAtStop bool
-	if record[12] != "" {
-		vehicleAtStop, err = strconv.ParseBool(record[12])
-		if err != nil {
-			parseErrors["VehicleAtStop"] = err.Error()
-		}
-	}
-
 	var passageOrder int
-	if record[13] != "" {
-		passageOrder, err = strconv.Atoi(record[13])
+	if record[6] != "" {
+		passageOrder, err = strconv.Atoi(record[6])
 		if err != nil {
 			parseErrors["PassageOrder"] = err.Error()
 		}
@@ -391,14 +377,10 @@ func (loader Loader) handleStopVisit(record []string) error {
 		ObjectIDs:        record[3],
 		StopAreaId:       record[4],
 		VehicleJourneyId: record[5],
-		ArrivalStatus:    record[6],
-		DepartureStatus:  record[7],
-		Schedules:        record[8],
-		Attributes:       record[9],
-		References:       record[10],
-		Collected:        collected,
-		VehicleAtStop:    vehicleAtStop,
 		PassageOrder:     passageOrder,
+		Schedules:        record[7],
+		Attributes:       record[8],
+		References:       record[9],
 	}
 
 	if loader.force {

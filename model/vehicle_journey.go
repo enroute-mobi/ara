@@ -256,6 +256,12 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 		if vj.LineId.Valid {
 			vehicleJourney.LineId = LineId(vj.LineId.String)
 		}
+		if vj.OriginName.Valid {
+			vehicleJourney.OriginName = vj.OriginName.String
+		}
+		if vj.DestinationName.Valid {
+			vehicleJourney.DestinationName = vj.DestinationName.String
+		}
 
 		if vj.Attributes.Valid && len(vj.Attributes.String) > 0 {
 			if err = json.Unmarshal([]byte(vj.Attributes.String), &vehicleJourney.Attributes); err != nil {

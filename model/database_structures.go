@@ -107,6 +107,8 @@ type DatabaseVehicleJourney struct {
 	Name            string `db:"name"`
 	ObjectIDs       string `db:"object_ids"`
 	LineId          string `db:"line_id"`
+	OriginName      string `db:"origin_name"`
+	DestinationName string `db:"destination_name"`
 	Attributes      string `db:"attributes"`
 	References      string `db:"siri_references"`
 }
@@ -118,6 +120,8 @@ type SelectVehicleJourney struct {
 	Name            sql.NullString
 	ObjectIDs       sql.NullString `db:"object_ids"`
 	LineId          sql.NullString `db:"line_id"`
+	OriginName      sql.NullString `db:"origin_name"`
+	DestinationName sql.NullString `db:"destination_name"`
 	Attributes      sql.NullString
 	References      sql.NullString `db:"siri_references"`
 }
@@ -129,13 +133,9 @@ type DatabaseStopVisit struct {
 	ObjectIDs        string `db:"object_ids"`
 	StopAreaId       string `db:"stop_area_id"`
 	VehicleJourneyId string `db:"vehicle_journey_id"`
-	ArrivalStatus    string `db:"arrival_status"`
-	DepartureStatus  string `db:"departure_status"`
 	Schedules        string `db:"schedules"`
 	Attributes       string `db:"attributes"`
 	References       string `db:"siri_references"`
-	Collected        bool   `db:"collected"`
-	VehicleAtStop    bool   `db:"vehicle_at_stop"`
 	PassageOrder     int    `db:"passage_order"`
 }
 
@@ -146,12 +146,8 @@ type SelectStopVisit struct {
 	ObjectIDs        sql.NullString `db:"object_ids"`
 	StopAreaId       sql.NullString `db:"stop_area_id"`
 	VehicleJourneyId sql.NullString `db:"vehicle_journey_id"`
-	ArrivalStatus    sql.NullString `db:"arrival_status"`
-	DepartureStatus  sql.NullString `db:"departure_status"`
 	Schedules        sql.NullString `db:"schedules"`
 	Attributes       sql.NullString `db:"attributes"`
 	References       sql.NullString `db:"siri_references"`
-	Collected        sql.NullBool   `db:"collected"`
-	VehicleAtStop    sql.NullBool   `db:"vehicle_at_stop"`
 	PassageOrder     sql.NullInt64  `db:"passage_order"`
 }

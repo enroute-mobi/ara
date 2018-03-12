@@ -84,8 +84,8 @@ func Test_LoadFromCSV_Force(t *testing.T) {
 	sa := []string{"stop_area", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "2017-01-01", "", "", "", "", "", "", "", ""}
 	o := []string{"operator", "03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", ""}
 	l := []string{"line", "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "", "", ""}
-	vj := []string{"vehicle_journey", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", ""}
-	sv := []string{"stop_visit", "02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", "", "", "", "", ""}
+	vj := []string{"vehicle_journey", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", ""}
+	sv := []string{"stop_visit", "02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", ""}
 
 	err := forceBuilder.handleStopArea(sa)
 	if err != nil {

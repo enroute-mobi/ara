@@ -409,18 +409,6 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 		if sv.VehicleJourneyId.Valid {
 			stopVisit.VehicleJourneyId = VehicleJourneyId(sv.VehicleJourneyId.String)
 		}
-		if sv.ArrivalStatus.Valid {
-			stopVisit.ArrivalStatus = StopVisitArrivalStatus(sv.ArrivalStatus.String)
-		}
-		if sv.DepartureStatus.Valid {
-			stopVisit.DepartureStatus = StopVisitDepartureStatus(sv.DepartureStatus.String)
-		}
-		if sv.Collected.Valid {
-			stopVisit.collected = sv.Collected.Bool
-		}
-		if sv.VehicleAtStop.Valid {
-			stopVisit.VehicleAtStop = sv.VehicleAtStop.Bool
-		}
 		if sv.PassageOrder.Valid {
 			stopVisit.PassageOrder = int(sv.PassageOrder.Int64)
 		}

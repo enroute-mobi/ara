@@ -2,9 +2,9 @@ stop_area,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,c0eebc99-9c0b-4ef8-bb6d-6bb9bd380
 stop_area,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"stopAreaObjectid"},"[""d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"",""e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]",{},{},true,true,true
 line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"lineObjectid"},{},{},true
 line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"lineObjectid"},{},{},true
-vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyObjectid"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,{},{}
-vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"vehicleJourneyObjectid"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,{},{}
-stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitObjectid"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,Arrived,Departed,[],{},{},true,true,1
-stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,{"internal":"stopVisitObjectid"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,Arrived,Departed,[],{},{},true,true,1
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyObjectid"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},{}
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"vehicleJourneyObjectid"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},{}
+stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitObjectid"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},{}
+stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,{"internal":"stopVisitObjectid"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},{}
 operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"operatorObjectid"}
 operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"operatorObjectid"}
