@@ -91,7 +91,7 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Schedules = make(model.StopVisitSchedules)
+	stopVisit.Schedules = model.NewStopVisitSchedules()
 
 	stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_ONTIME
 	stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ONTIME

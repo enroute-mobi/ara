@@ -129,10 +129,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		aux.CollectedAt = &stopVisit.collectedAt
 	}
 
-	scheduleSlice := []StopVisitSchedule{}
-	for _, schedule := range stopVisit.Schedules {
-		scheduleSlice = append(scheduleSlice, *schedule)
-	}
+	scheduleSlice := stopVisit.Schedules.ToSlice()
 	if len(scheduleSlice) != 0 {
 		aux.Schedules = scheduleSlice
 	}
@@ -196,19 +193,15 @@ func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
 func (stopVisit *StopVisit) ReferenceTime() time.Time {
 	orderMap := []StopVisitScheduleType{"actual", "expected", "aimed"}
 
-	for _, value := range orderMap {
-		if stopVisit.Schedules[value] != nil {
-			if !stopVisit.Schedules[value].ArrivalTime().IsZero() {
-				return stopVisit.Schedules[value].ArrivalTime()
-			}
+	for _, kind := range orderMap {
+		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.ArrivalTime().IsZero() {
+			return schedule.ArrivalTime()
 		}
 	}
 
-	for _, value := range orderMap {
-		if stopVisit.Schedules[value] != nil {
-			if !stopVisit.Schedules[value].DepartureTime().IsZero() {
-				return stopVisit.Schedules[value].DepartureTime()
-			}
+	for _, kind := range orderMap {
+		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.DepartureTime().IsZero() {
+			return schedule.DepartureTime()
 		}
 	}
 

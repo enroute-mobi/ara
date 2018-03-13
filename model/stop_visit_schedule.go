@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"sync"
 	"time"
 )
 
@@ -74,64 +75,75 @@ func (schedule *StopVisitSchedule) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type StopVisitSchedules map[StopVisitScheduleType]*StopVisitSchedule
+type StopVisitSchedules struct {
+	sync.RWMutex
+
+	byType map[StopVisitScheduleType]*StopVisitSchedule
+}
 
 func NewStopVisitSchedules() StopVisitSchedules {
-	schedules := make(StopVisitSchedules)
-	return schedules
+	return StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
 }
 
 func (schedules StopVisitSchedules) Copy() StopVisitSchedules {
 	cpy := NewStopVisitSchedules()
 
-	for key, value := range schedules {
+	schedules.RLock()
+	for key, value := range schedules.byType {
 		svc := StopVisitSchedule{
 			kind:          value.Kind(),
 			arrivalTime:   value.ArrivalTime(),
 			departureTime: value.DepartureTime(),
 		}
 
-		cpy[key] = &svc
+		cpy.byType[key] = &svc
 	}
+	schedules.RUnlock()
 	return cpy
 }
 
 func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
-	for key, value := range newSchedules {
-		(*schedules)[key] = value
+	schedules.Lock()
+	for key, value := range newSchedules.byType {
+		schedules.byType[key] = value
 	}
+	schedules.Unlock()
 }
 
-func (schedules StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
-	_, ok := schedules[kind]
+func (schedules *StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
+	schedules.Lock()
+	_, ok := schedules.byType[kind]
 	if !ok {
-		schedules[kind] = &StopVisitSchedule{kind: kind}
+		schedules.byType[kind] = &StopVisitSchedule{kind: kind}
 	}
-	schedules[kind].SetDepartureTime(departureTime)
+	schedules.byType[kind].SetDepartureTime(departureTime)
+	schedules.Unlock()
 }
 
-func (schedules StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, arrivalTime time.Time) {
-	_, ok := schedules[kind]
+func (schedules *StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, arrivalTime time.Time) {
+	schedules.Lock()
+	_, ok := schedules.byType[kind]
 	if !ok {
-		schedules[kind] = &StopVisitSchedule{kind: kind}
+		schedules.byType[kind] = &StopVisitSchedule{kind: kind}
 	}
-	schedules[kind].SetArrivalTime(arrivalTime)
+	schedules.byType[kind].SetArrivalTime(arrivalTime)
+	schedules.Unlock()
 }
 
-func (schedules StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
-	_, ok := schedules[kind]
-	if !ok {
-		schedules[kind] = &StopVisitSchedule{kind: kind}
-	}
-	schedules[kind] = &StopVisitSchedule{
+func (schedules *StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {
+	schedules.Lock()
+	schedules.byType[kind] = &StopVisitSchedule{
 		kind:          kind,
 		departureTime: departureTime,
 		arrivalTime:   arrivalTime,
 	}
+	schedules.Unlock()
 }
 
 func (schedules StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVisitSchedule {
-	schedule, ok := schedules[kind]
+	schedules.RLock()
+	schedule, ok := schedules.byType[kind]
+	schedules.RUnlock()
 	if !ok {
 		return &StopVisitSchedule{}
 	}
@@ -142,11 +154,14 @@ func (schedules StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitSchedul
 	if kinds == nil {
 		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
 	}
+	schedules.RLock()
 	for _, kind := range kinds {
-		if value, ok := schedules[kind]; ok {
+		if value, ok := schedules.byType[kind]; ok {
+			schedules.RUnlock()
 			return value.ArrivalTime()
 		}
 	}
+	schedules.RUnlock()
 	return time.Time{}
 }
 
@@ -154,10 +169,22 @@ func (schedules StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitSched
 	if kinds == nil {
 		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
 	}
+	schedules.RLock()
 	for _, kind := range kinds {
-		if value, ok := schedules[kind]; ok {
+		if value, ok := schedules.byType[kind]; ok {
+			schedules.RUnlock()
 			return value.DepartureTime()
 		}
 	}
+	schedules.RUnlock()
 	return time.Time{}
+}
+
+func (schedules StopVisitSchedules) ToSlice() (scheduleSlice []StopVisitSchedule) {
+	schedules.RLock()
+	for _, schedule := range schedules.byType {
+		scheduleSlice = append(scheduleSlice, *schedule)
+	}
+	schedules.RUnlock()
+	return
 }

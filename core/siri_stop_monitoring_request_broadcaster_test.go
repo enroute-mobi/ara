@@ -43,10 +43,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit.References.Set("OperatorRef", stopVisitRef)
 	stopVisit.StopAreaId = stopArea.Id()
 
-	sVSchedule := model.StopVisitSchedule{}
-
-	sVSchedule.SetArrivalTime(connector.Clock().Now().Add(10 * time.Minute))
-	stopVisit.Schedules["actual"] = &sVSchedule
+	stopVisit.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
@@ -72,10 +69,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit2.References.Set("OperatorRef", stopVisitRef)
 	stopVisit2.StopAreaId = stopArea.Id()
 
-	sVSchedule2 := model.StopVisitSchedule{}
-
-	sVSchedule2.SetArrivalTime(connector.Clock().Now().Add(10 * time.Minute))
-	stopVisit2.Schedules["actual"] = &sVSchedule2
+	stopVisit2.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit2.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
@@ -167,9 +161,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	stopVisit.SetObjectID(obj)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	sVSchedule := model.StopVisitSchedule{}
-	sVSchedule.SetArrivalTime(connector.Clock().Now().Add(10 * time.Minute))
-	stopVisit.Schedules["actual"] = &sVSchedule
+	stopVisit.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.Save()
 
 	line2 := referential.model.Lines().New()
@@ -188,9 +180,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	stopVisit2.SetObjectID(obj)
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney2.Id()
-	sVSchedule2 := model.StopVisitSchedule{}
-	sVSchedule2.SetArrivalTime(connector.Clock().Now().Add(15 * time.Minute))
-	stopVisit.Schedules["actual"] = &sVSchedule2
+	stopVisit2.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(15*time.Minute))
 	stopVisit2.Save()
 
 	file, err := os.Open("testdata/stopmonitoring-request-line-selector-soap.xml")
@@ -248,9 +238,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	stopVisit.SetObjectID(obj)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	sVSchedule := model.StopVisitSchedule{}
-	sVSchedule.SetArrivalTime(startTime.Add(2 * time.Minute))
-	stopVisit.Schedules["actual"] = &sVSchedule
+	stopVisit.Schedules.SetArrivalTime("actual", startTime.Add(2*time.Minute))
 	stopVisit.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
@@ -258,9 +246,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	stopVisit2.SetObjectID(obj)
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
-	sVSchedule2 := model.StopVisitSchedule{}
-	sVSchedule2.SetArrivalTime(startTime.Add(10 * time.Minute))
-	stopVisit.Schedules["actual"] = &sVSchedule2
+	stopVisit2.Schedules.SetArrivalTime("actual", startTime.Add(10*time.Minute))
 	stopVisit2.Save()
 
 	file, err := os.Open("testdata/stopmonitoring-request-time-selector-soap.xml")
