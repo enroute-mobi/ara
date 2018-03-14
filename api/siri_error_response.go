@@ -41,9 +41,11 @@ func (siriError SiriErrorResponse) sendSiriError() {
   </S:Fault>`, siriError.errCode, siriError.errDescription))
 
 	logStashEvent := make(audit.LogStashEvent)
-	logStashEvent["siriError"] = soapEnvelope.String()
+	logStashEvent["status"] = "false"
+	logStashEvent["siriType"] = "siriError"
+	logStashEvent["responseXML"] = soapEnvelope.String()
 	if siriError.request != "" {
-		logStashEvent["request"] = siriError.request
+		logStashEvent["requestXML"] = siriError.request
 	}
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 

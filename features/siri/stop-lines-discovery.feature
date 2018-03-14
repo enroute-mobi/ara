@@ -46,21 +46,21 @@ Feature: Support SIRI StopLinesDiscovery
             <Answer version="2.0">
             <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
             <siri:Status>true</siri:Status>
-              <siri:AnnotatedLineStructure>
+              <siri:AnnotatedLineRef>
                 <siri:LineRef>STIF:Line::C00272:</siri:LineRef>
                 <siri:LineName>Line 1</siri:LineName>
                 <siri:Monitored>true</siri:Monitored>
-              </siri:AnnotatedLineStructure>
-              <siri:AnnotatedLineStructure>
+              </siri:AnnotatedLineRef>
+              <siri:AnnotatedLineRef>
                 <siri:LineRef>STIF:Line::C00273:</siri:LineRef>
                 <siri:LineName>Line 2</siri:LineName>
                 <siri:Monitored>true</siri:Monitored>
-              </siri:AnnotatedLineStructure>
-              <siri:AnnotatedLineStructure>
+              </siri:AnnotatedLineRef>
+              <siri:AnnotatedLineRef>
                 <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
                 <siri:LineName>Line 3</siri:LineName>
                 <siri:Monitored>true</siri:Monitored>
-              </siri:AnnotatedLineStructure>
+              </siri:AnnotatedLineRef>
             </Answer>
             <AnswerExtension />
           </sw:LinesDiscoveryResponse>

@@ -323,18 +323,20 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 		}
 	}
 
-	logStashEvent["type"] = "NotifyEstimatedTimetable"
+	logStashEvent["siriType"] = "NotifyEstimatedTimetable"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
-	logStashEvent["lineRef"] = strings.Join(lineRefs, ",")
+	logStashEvent["lineRefs"] = strings.Join(lineRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		if response.ErrorType == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
+		}
 		logStashEvent["errorText"] = response.ErrorText
 	}
 	xml, err := response.BuildXML()

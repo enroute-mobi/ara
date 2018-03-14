@@ -80,7 +80,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during CheckStatus: %v", err)
+		logStashEvent["errorDescription"] = fmt.Sprintf("Error during CheckStatus: %v", err)
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 		return partnerStatus, err
 	}
@@ -114,6 +114,7 @@ func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) C
 }
 
 func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRICheckStatusRequest) {
+	logStashEvent["siriType"] = "CheckStatusRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()

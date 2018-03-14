@@ -53,7 +53,7 @@ func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
 	if len(events) != 1 {
 		t.Errorf("Logstash should have recieved an event, got: %v", events)
 	}
-	if len(events[0]) != 16 {
+	if len(events[0]) != 17 {
 		t.Errorf("LogstashEvent should have 16 values, got %v:\n%v", len(events[0]), events[0])
 	}
 }
@@ -67,7 +67,7 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 	if len(events) != 1 {
 		t.Errorf("Logstash should have recieved an event, got: %v", events)
 	}
-	if len(events[0]) != 19 {
+	if len(events[0]) != 20 {
 		t.Errorf("LogstashEvent should have 19 values, got %v:\n%v", len(events[0]), events[0])
 	}
 }

@@ -212,6 +212,7 @@ func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner
 }
 
 func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request *siri.XMLEstimatedTimetableRequest) {
+	logStashEvent["siriType"] = "EstimatedTimetableResponse"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestedLines"] = strings.Join(request.Lines(), ",")
@@ -219,12 +220,9 @@ func logXMLEstimatedTimetableRequest(logStashEvent audit.LogStashEvent, request 
 }
 
 func logSIRIEstimatedTimetableDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIEstimatedTimetableDelivery, monitoringRefs, lineRefs []string) {
-
-	logStashEvent["requestMessageRef"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
-	logStashEvent["lineRef"] = strings.Join(lineRefs, ",")
-	logStashEvent["monitoringRef"] = strings.Join(monitoringRefs, ",")
+	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		logStashEvent["errorType"] = delivery.ErrorType

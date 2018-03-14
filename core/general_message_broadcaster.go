@@ -163,16 +163,19 @@ func (gmb *GMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRINotifyError(err string, logStashEvent audit.LogStashEvent) {
-	logStashEvent["type"] = "NotifyError"
-	logStashEvent["Error"] = err
+	logStashEvent["siriType"] = "NotifyError"
+	logStashEvent["errorDescription"] = err
+	logStashEvent["status"] = "false"
 }
 
 func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyGeneralMessage) {
-	logStashEvent["type"] = "NotifyGeneralMessage"
+	logStashEvent["siriType"] = "NotifyGeneralMessage"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
+	logStashEvent["subscriberRef"] = response.SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType
