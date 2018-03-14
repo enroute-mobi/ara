@@ -39,9 +39,6 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	logXMLStopPointDiscoveryRequest(logStashEvent, request)
 
 	response := &siri.SIRIStopPointsDiscoveryResponse{
-		ProducerRef:               connector.Partner().ProducerRef(),
-		RequestMessageRef:         request.MessageIdentifier(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
 	}
@@ -111,9 +108,6 @@ func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request 
 }
 
 func logSIRIStopPointDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIStopPointsDiscoveryResponse) {
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	xml, err := response.BuildXML()

@@ -39,10 +39,6 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 	logXMLLineDiscoveryRequest(logStashEvent, request)
 
 	response := &siri.SIRILinesDiscoveryResponse{
-		Address:                   connector.Partner().Address(),
-		ProducerRef:               connector.Partner().ProducerRef(),
-		RequestMessageRef:         request.MessageIdentifier(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
 	}
@@ -101,10 +97,6 @@ func logXMLLineDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri
 }
 
 func logSIRILineDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.SIRILinesDiscoveryResponse) {
-	logStashEvent["address"] = response.Address
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	xml, err := response.BuildXML()

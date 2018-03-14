@@ -747,21 +747,17 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	expectedResponseBody := `<sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<Answer version="2.0">
 		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
-		<siri:Address>http://edwig</siri:Address>
-		<siri:ProducerRef>Edwig</siri:ProducerRef>
-		<siri:RequestMessageRef>STIF:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
-		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
 		<siri:Status>true</siri:Status>
-		<siri:AnnotatedLineStructure>
+		<siri:AnnotatedLineRef>
 			<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
 			<siri:LineName>lineName</siri:LineName>
 			<siri:Monitored>true</siri:Monitored>
-		</siri:AnnotatedLineStructure>
-		<siri:AnnotatedLineStructure>
+		</siri:AnnotatedLineRef>
+		<siri:AnnotatedLineRef>
 			<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
 			<siri:LineName>lineName2</siri:LineName>
 			<siri:Monitored>true</siri:Monitored>
-		</siri:AnnotatedLineStructure>
+		</siri:AnnotatedLineRef>
 	</Answer>
 	<AnswerExtension/>
 </sw:LinesDiscoveryResponse>`
