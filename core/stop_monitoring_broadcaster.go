@@ -271,15 +271,15 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *si
 		cancelledMonitoringRefs = append(cancelledMonitoringRefs, sv.MonitoringRef)
 	}
 
-	logStashEvent["type"] = "NotifyStopMonitoring"
+	logStashEvent["siriType"] = "NotifyStopMonitoring"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
-	logStashEvent["monitoringRef"] = strings.Join(monitoringRefs, ",")
-	logStashEvent["cancelledMonitoringRef"] = strings.Join(cancelledMonitoringRefs, ",")
+	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
+	logStashEvent["cancelledMonitoringRefs"] = strings.Join(cancelledMonitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType

@@ -183,16 +183,12 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) newLogStashEvent() a
 }
 
 func logXMLGeneralMessageSubscriptionEntry(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageSubscriptionRequestEntry) {
-	logStashEvent["type"] = "GeneralMessageSubscriptionEntry"
+	logStashEvent["siriType"] = "GeneralMessageSubscriptionEntry"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["infoChannelRef"] = strings.Join(request.InfoChannelRef(), ", ")
-	logStashEvent["groupOfLinesRef"] = strings.Join(request.GroupOfLinesRef(), ", ")
-	logStashEvent["routeRef"] = strings.Join(request.RouteRef(), ", ")
-	logStashEvent["destinationRef"] = strings.Join(request.DestinationRef(), ", ")
-	logStashEvent["journeyPatternRef"] = strings.Join(request.JourneyPatternRef(), ", ")
-	logStashEvent["stopPointRef"] = strings.Join(request.StopPointRef(), ", ")
-	logStashEvent["lineRef"] = strings.Join(request.LineRef(), ", ")
+	logStashEvent["infoChannelRefs"] = strings.Join(request.InfoChannelRef(), ", ")
+	logStashEvent["stopPointRefs"] = strings.Join(request.StopPointRef(), ", ")
+	logStashEvent["lineRefs"] = strings.Join(request.LineRef(), ", ")
 	logStashEvent["subscriberRef"] = request.SubscriberRef()
 	logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier()
 	logStashEvent["initialTerminationTime"] = request.InitialTerminationTime().String()

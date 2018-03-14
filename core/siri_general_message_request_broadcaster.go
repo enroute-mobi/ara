@@ -98,6 +98,7 @@ func (factory *SIRIGeneralMessageRequestBroadcasterFactory) CreateConnector(part
 }
 
 func logXMLGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) {
+	logStashEvent["siriType"] = "GeneralMessageResponse"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
 	logStashEvent["requestXML"] = request.RawXML()

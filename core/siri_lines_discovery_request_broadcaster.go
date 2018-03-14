@@ -90,6 +90,7 @@ func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) CreateConnector(part
 }
 
 func logXMLLineDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLLinesDiscoveryRequest) {
+	logStashEvent["siriType"] = "LinesDiscoveryResponse"
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()

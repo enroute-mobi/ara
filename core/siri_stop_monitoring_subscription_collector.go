@@ -124,7 +124,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotifi
 	logStashEvent := make(audit.LogStashEvent)
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	logXMLSubscriptionTerminatedResponse(logStashEvent, response)
+	logXMLSubscriptionTerminatedNotification(logStashEvent, response)
 
 	subscriptionTerminated := response.XMLSubscriptionTerminateds()
 	connector.setSubscriptionTerminatedEvents(subscriptionTerminated)
@@ -171,7 +171,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap)
 	}
 
-	logStopVisitUpdateEventsFromMap(logStashEvent, stopAreaUpdateEvents)
 	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
 	if len(subscriptionErrors) != 0 {
 		logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
@@ -198,11 +197,13 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	}
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "StopMonitoringSubscriptionCollector")
 
+	startTime := connector.Clock().Now()
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
+	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
+		logStashEvent["errorDescription"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
 		return
 	}
 	logXMLDeleteSubscriptionResponse(logStashEvent, response)
@@ -260,8 +261,8 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 }
 
 func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
-	logStashEvent["type"] = "DeleteSubscription" // This function is also used on GM delete subscription
-	logStashEvent["DeletedSubscriptionType"] = subType
+	logStashEvent["siriType"] = "DeleteSubscriptionRequest" // This function is also used on GM delete subscription
+	logStashEvent["connector"] = subType
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
 	logStashEvent["subscriptionRef"] = request.SubscriptionRef
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -276,8 +277,7 @@ func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request
 }
 
 func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
-	logStashEvent["type"] = "NotifyStopMonitoringCollected"
-	logStashEvent["address"] = notify.Address()
+	logStashEvent["siriType"] = "CollectedNotifyStopMonitoring"
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
 	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
@@ -286,7 +286,9 @@ func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	logStashEvent["status"] = strconv.FormatBool(notify.Status())
 	if !notify.Status() {
 		logStashEvent["errorType"] = notify.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+		if notify.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+		}
 		logStashEvent["errorText"] = notify.ErrorText()
 		logStashEvent["errorDescription"] = notify.ErrorDescription()
 	}
@@ -305,9 +307,8 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
 }
 
-func logXMLSubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent["type"] = "StopMonitoringTerminatedSubscriptionCollected"
-	logStashEvent["address"] = response.Address()
+func logXMLSubscriptionTerminatedNotification(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
+	logStashEvent["siriType"] = "TerminatedSubscriptionNotification"
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
@@ -317,25 +318,12 @@ func logXMLSubscriptionTerminatedResponse(logStashEvent audit.LogStashEvent, res
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 	if !response.Status() {
 		logStashEvent["errorType"] = response.ErrorType()
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		if response.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+		}
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
 	}
-}
-
-func logStopVisitUpdateEventsFromMap(logStashEvent audit.LogStashEvent, stopAreaUpdateEvents map[string]*model.StopAreaUpdateEvent) {
-	var idArray []string
-	var cancelledIdArray []string
-	for _, stopAreaUpdateEvent := range stopAreaUpdateEvents {
-		for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
-			idArray = append(idArray, stopVisitUpdateEvent.Id)
-		}
-		for _, stopVisitCancelledEvent := range stopAreaUpdateEvent.StopVisitNotCollectedEvents {
-			cancelledIdArray = append(cancelledIdArray, stopVisitCancelledEvent.StopVisitObjectId.Value())
-		}
-	}
-	logStashEvent["stopVisitUpdateEventIds"] = strings.Join(idArray, ", ")
-	logStashEvent["stopVisitCancelledEventIds"] = strings.Join(cancelledIdArray, ", ")
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
@@ -355,5 +343,5 @@ func logSubscriptionErrorsFromMap(logStashEvent audit.LogStashEvent, errors map[
 		errSlice[i] = fmt.Sprintf(err, subId)
 		i++
 	}
-	logStashEvent["subscriptionErrors"] = strings.Join(errSlice, ", ")
+	logStashEvent["notificationErrors"] = strings.Join(errSlice, ", ")
 }

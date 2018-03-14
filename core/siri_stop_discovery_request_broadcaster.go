@@ -101,6 +101,7 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector
 }
 
 func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {
+	logStashEvent["siriType"] = "StopPointsDiscoveryResponse"
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()

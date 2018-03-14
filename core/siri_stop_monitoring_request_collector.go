@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
@@ -94,7 +93,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during StopMonitoring request: %v", err)
+		logStashEvent["errorDescription"] = fmt.Sprintf("Error during StopMonitoring request: %v", err)
 		return
 	}
 
@@ -123,7 +122,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		event.StopAreaId = collectedStopArea.Id()
 
 		if !ok {
-			logStopVisitUpdateEvents(logStashEvent, event)
 			connector.broadcastStopAreaUpdateEvent(event)
 			continue
 		}
@@ -137,7 +135,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 			}
 		}
 		connector.findAndSetStopVisitNotCollectedEvent(event, monitoredStopVisits)
-		logStopVisitUpdateEvents(logStashEvent, event)
 		connector.broadcastStopAreaUpdateEvent(event)
 	}
 }
@@ -185,6 +182,7 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 }
 
 func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetStopMonitoringRequest) {
+	logStashEvent["siriType"] = "StopMonitoringRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["monitoringRef"] = request.MonitoringRef
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -213,17 +211,4 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
 	}
-}
-
-func logStopVisitUpdateEvents(logStashEvent audit.LogStashEvent, stopAreaUpdateEvent *model.StopAreaUpdateEvent) {
-	var updateEvents []string
-	for _, stopVisitUpdateEvent := range stopAreaUpdateEvent.StopVisitUpdateEvents {
-		updateEvents = append(updateEvents, stopVisitUpdateEvent.StopVisitObjectid.Value())
-	}
-	logStashEvent["stopVisitUpdateEvents"] = strings.Join(updateEvents, ", ")
-	var notCollectedEvents []string
-	for _, stopVisitNotCollectedEvent := range stopAreaUpdateEvent.StopVisitNotCollectedEvents {
-		notCollectedEvents = append(notCollectedEvents, stopVisitNotCollectedEvent.StopVisitObjectId.Value())
-	}
-	logStashEvent["stopVisitNotCollectedEvents"] = strings.Join(notCollectedEvents, ", ")
 }

@@ -63,6 +63,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx 
 	for _, stopMonitoringRequest := range requests {
 		SMLogStashEvent := connector.newLogStashEvent("StopMonitoringRequestBroadcaster")
 		logXMLStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
+		SMLogStashEvent["siriType"] = "StopMonitoringDelivery for GetSiriServiceResponse"
 
 		var delivery siri.SIRIStopMonitoringDelivery
 
@@ -94,6 +95,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx 
 	for _, generalMessageRequest := range requests {
 		GMLogStashEvent := connector.newLogStashEvent("GeneralMessageRequestBroadcaster")
 		logXMLGeneralMessageRequest(GMLogStashEvent, generalMessageRequest)
+		GMLogStashEvent["siriType"] = "GeneralMessageDelivery for GetSiriServiceResponse"
 
 		var delivery siri.SIRIGeneralMessageDelivery
 
@@ -125,6 +127,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 	for _, estimatedTimetableRequest := range requests {
 		ETTLogStashEvent := connector.newLogStashEvent("EstimatedTimetableRequestBroadcaster")
 		logXMLEstimatedTimetableRequest(ETTLogStashEvent, estimatedTimetableRequest)
+		ETTLogStashEvent["siriType"] = "EstimatedTimetableDelivery for GetSiriServiceResponse"
 
 		var delivery siri.SIRIEstimatedTimetableDelivery
 
@@ -172,7 +175,7 @@ func (factory *SIRIServiceRequestBroadcasterFactory) CreateConnector(partner *Pa
 }
 
 func logXMLSiriServiceRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceRequest) {
-	logStashEvent["connector"] = "SIRIServiceRequestBroadcaster"
+	logStashEvent["siriType"] = "GetSIRIServiceResponse"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()

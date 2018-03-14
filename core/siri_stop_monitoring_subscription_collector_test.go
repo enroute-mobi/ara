@@ -308,7 +308,7 @@ func Test_LogSubscriptionErrorsFromMap(t *testing.T) {
 	logSubscriptionErrorsFromMap(logStashEvent, errors)
 
 	expected := "Non existant subscription of id 1234"
-	if logStashEvent["subscriptionErrors"] != expected {
-		t.Errorf("Wrong log of errors\n got: %v\n want: %v", logStashEvent["subscriptionErrors"], expected)
+	if logStashEvent["notificationErrors"] != expected {
+		t.Errorf("Wrong log of errors\n got: %v\n want: %v", logStashEvent["notificationErrors"], expected)
 	}
 }

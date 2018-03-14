@@ -157,6 +157,7 @@ func (factory *SIRIStopMonitoringRequestBroadcasterFactory) CreateConnector(part
 }
 
 func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) {
+	logStashEvent["siriType"] = "StopMonitoringResponse"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
 	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
@@ -171,7 +172,6 @@ func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *sir
 func logSIRIStopMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIStopMonitoringDelivery) {
 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
-	logStashEvent["monitoringRef"] = delivery.MonitoringRef
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		logStashEvent["errorType"] = delivery.ErrorType

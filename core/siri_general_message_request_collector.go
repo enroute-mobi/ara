@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/model"
@@ -69,15 +68,13 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during GetGeneralMessage: %v", err)
+		logStashEvent["errorDescription"] = fmt.Sprintf("Error during GetGeneralMessage: %v", err)
 		return
 	}
 
 	logXMLGeneralMessageResponse(logStashEvent, xmlGeneralMessageResponse)
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
 	connector.setSituationUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
-
-	logSituationUpdateEvents(logStashEvent, situationUpdateEvents)
 
 	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
 }
@@ -115,6 +112,7 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 }
 
 func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetGeneralMessageRequest) {
+	logStashEvent["siriType"] = "GeneralMessageRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
@@ -142,12 +140,4 @@ func logXMLGeneralMessageResponse(logStashEvent audit.LogStashEvent, response *s
 		logStashEvent["errorDescription"] = response.ErrorDescription()
 	}
 	logStashEvent["responseXML"] = response.RawXML()
-}
-
-func logSituationUpdateEvents(logStashEvent audit.LogStashEvent, situations []*model.SituationUpdateEvent) {
-	var updateEvents []string
-	for _, situationUpdateEvent := range situations {
-		updateEvents = append(updateEvents, situationUpdateEvent.SituationObjectID.Value())
-	}
-	logStashEvent["situationUpdateEvents"] = strings.Join(updateEvents, ", ")
 }

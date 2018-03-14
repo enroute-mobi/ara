@@ -121,21 +121,20 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		subscriptionId := delivery.SubscriptionRef()
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
-			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			subToDelete[delivery.SubscriptionRef()] = struct{}{}
 			continue
 		}
 
 		if subscription.Kind() != "GeneralMessageCollect" {
-			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
 		connector.cancelGeneralMessage(delivery)
 		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
 
-		logSituationUpdateEvents(logStashEvent, *situationUpdateEvents)
 		if len(subscriptionErrors) != 0 {
 			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
 		}
@@ -159,8 +158,9 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	}
 
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "GeneralMessageSubscriptionCollector")
+	startTime := connector.Clock().Now()
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
-
+	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
 		logStashEvent["status"] = "false"
@@ -168,7 +168,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		return
 	}
 
-	logXMLDeleteSubscriptionResponse(logStashEvent, response) //siri_stop_monitoring_subscription_collector
+	logXMLDeleteSubscriptionResponse(logStashEvent, response)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -217,7 +217,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) newLogStashEvent() aud
 }
 
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent["type"] = "NotifyGeneralMessageCollected"
+	logStashEvent["siriType"] = "CollectedNotifyGeneralMessage"
 	logStashEvent["address"] = notify.Address()
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()

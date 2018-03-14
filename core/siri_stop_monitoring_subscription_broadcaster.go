@@ -296,7 +296,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() a
 }
 
 func logXMLStopMonitoringSubscriptionEntry(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubscriptionRequestEntry) {
-	logStashEvent["type"] = "StopMonitoringSubscriptionEntry"
+	logStashEvent["siriType"] = "StopMonitoringSubscriptionEntry"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["monitoringRef"] = request.MonitoringRef()
 	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()

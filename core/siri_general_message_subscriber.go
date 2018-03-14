@@ -155,16 +155,18 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	logStashEvent["stopPointRefs"] = strings.Join(stopPointRefList, ", ")
 	logSIRIGeneralMessageSubscriptionRequest(logStashEvent, gmRequest)
 
+	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
+	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
+		logStashEvent["errorDescription"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		subscriber.incrementRetryCountFromMap(resourcesToRequest)
 		return
 	}
 
-	logStashEvent["response"] = response.RawXML()
+	logStashEvent["responseXML"] = response.RawXML()
 
 	for _, responseStatus := range response.ResponseStatus() {
 		requestedResource, ok := resourcesToRequest[responseStatus.RequestMessageRef()]
@@ -221,7 +223,7 @@ func (smb *GMSubscriber) newLogStashEvent() audit.LogStashEvent {
 }
 
 func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
-	logStashEvent["type"] = "GeneralMessageSubscriptionRequest"
+	logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
 	logStashEvent["consumerAddress"] = request.ConsumerAddress
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef

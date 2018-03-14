@@ -65,7 +65,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
-		logStashEvent["type"] = "GeneralMessageSubscriptionRequest"
+		logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -79,7 +79,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
-		logStashEvent["type"] = "StopMonitoringSubscriptionRequest"
+		logStashEvent["siriType"] = "StopMonitoringSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -93,7 +93,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			response.ResponseStatus = append(response.ResponseStatus, smr)
 		}
 		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
-		logStashEvent["type"] = "EstimatedTimetableSubscriptionRequest"
+		logStashEvent["siriType"] = "EstimatedTimetableSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
@@ -105,7 +105,6 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	logStashEvent := connector.newLogStashEvent()
 
 	logXMLCancelSubscriptionRequest(logStashEvent, r)
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
@@ -115,7 +114,6 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	}
 
 	defer func() {
-		logStashEvent := connector.newLogStashEvent()
 		logSIRICancelSubscriptionResponse(logStashEvent, resp)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 	}()
@@ -185,7 +183,7 @@ func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *si
 }
 
 func logXMLCancelSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLDeleteSubscriptionRequest) {
-	logStashEvent["type"] = "DeleteSubscription"
+	logStashEvent["siriType"] = "DeleteSubscriptionResponse"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
 	logStashEvent["requestorRef"] = request.RequestorRef()
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
