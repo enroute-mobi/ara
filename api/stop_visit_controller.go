@@ -143,7 +143,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	for _, obj := range stopVisit.ObjectIDs() {
 		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
-		if ok && sv.Id() != model.StopVisitId(identifier) {
+		if ok && sv.Id() != stopVisit.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), 400)
 			return
 		}

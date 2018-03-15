@@ -104,7 +104,7 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 
 	for _, obj := range operator.ObjectIDs() {
 		o, ok := tx.Model().Operators().FindByObjectId(obj)
-		if ok && o.Id() != model.OperatorId(identifier) {
+		if ok && o.Id() != operator.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), 400)
 			return
 		}

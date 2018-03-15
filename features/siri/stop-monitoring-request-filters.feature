@@ -738,7 +738,7 @@ Feature: Support SIRI StopMonitoring by request
           | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
           | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000+02:00                                        |
         And a StopVisit exists with the following attributes:
-          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4" |
           | PassageOrder                    | 4                                                                    |
           | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
           | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -746,7 +746,7 @@ Feature: Support SIRI StopMonitoring by request
           | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
           | Schedule[aimed]#Arrival         | 2017-01-01T16:30:00.000+02:00                                        |
         And a StopVisit exists with the following attributes:
-          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-5" |
           | PassageOrder                    | 4                                                                    |
           | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
           | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -754,7 +754,7 @@ Feature: Support SIRI StopMonitoring by request
           | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
           | Schedule[aimed]#Arrival         | 2017-01-01T17:00:00.000+02:00                                        |
         And a StopVisit exists with the following attributes:
-          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+          | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-6" |
           | PassageOrder                    | 4                                                                    |
           | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
           | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
@@ -833,7 +833,7 @@ Feature: Support SIRI StopMonitoring by request
                   </siri:MonitoredStopVisit>
                   <siri:MonitoredStopVisit>
                     <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
-                    <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                    <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
                     <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                     <siri:MonitoredVehicleJourney>
                       <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>

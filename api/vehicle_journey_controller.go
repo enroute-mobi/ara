@@ -104,7 +104,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	for _, obj := range vehicleJourney.ObjectIDs() {
 		vj, ok := tx.Model().VehicleJourneys().FindByObjectId(obj)
-		if ok && vj.Id() != model.VehicleJourneyId(identifier) {
+		if ok && vj.Id() != vehicleJourney.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), 400)
 			return
 		}

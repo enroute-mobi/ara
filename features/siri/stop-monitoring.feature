@@ -168,24 +168,6 @@ Feature: Support SIRI StopMonitoring
 </S:Envelope>
       """
 
-  Scenario: Handles invalid GetStopMonitoring response
-    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
-      """
-        <html><title>Error</title></body>Error 500</body></html>
-      """
-    And a Partner "invalid" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | remote_objectid_kind | internal              |
-    And a minute has passed
-    And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "dummy" |
-    When a minute has passed
-    And the SIRI server has received a GetStopMonitoring request
-    Then a StopArea exists with the following attributes:
-      | ObjectIDs   | "internal": "dummy" |
-      | CollectedAt | -                   |
-
   Scenario: Handle a SIRI StopMonitoring response after SM cancellation from a SIRI server
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
  """

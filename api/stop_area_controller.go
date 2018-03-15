@@ -104,7 +104,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 
 	for _, obj := range stopArea.ObjectIDs() {
 		sa, ok := tx.Model().StopAreas().FindByObjectId(obj)
-		if ok && sa.Id() != model.StopAreaId(identifier) {
+		if ok && sa.Id() != stopArea.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), 400)
 			return
 		}

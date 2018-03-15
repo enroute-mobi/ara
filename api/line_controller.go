@@ -104,7 +104,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	for _, obj := range line.ObjectIDs() {
 		l, ok := tx.Model().Lines().FindByObjectId(obj)
-		if ok && l.Id() != model.LineId(identifier) {
+		if ok && l.Id() != line.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), 400)
 			return
 		}
