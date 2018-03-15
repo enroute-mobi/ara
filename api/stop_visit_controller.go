@@ -141,6 +141,14 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 		return
 	}
 
+	for _, obj := range stopVisit.ObjectIDs() {
+		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
+		if ok && sv.Id() != model.StopVisitId(identifier) {
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), 400)
+			return
+		}
+	}
+
 	tx.Model().StopVisits().Save(&stopVisit)
 	err = tx.Commit()
 	if err != nil {
@@ -168,9 +176,18 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
+
 	if stopVisit.Id() != "" {
 		http.Error(response, "Invalid request", 400)
 		return
+	}
+
+	for _, obj := range stopVisit.ObjectIDs() {
+		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
+		if ok {
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), 400)
+			return
+		}
 	}
 
 	tx.Model().StopVisits().Save(&stopVisit)

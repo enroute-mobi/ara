@@ -102,6 +102,14 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		return
 	}
 
+	for _, obj := range stopArea.ObjectIDs() {
+		sa, ok := tx.Model().StopAreas().FindByObjectId(obj)
+		if ok && sa.Id() != model.StopAreaId(identifier) {
+			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), 400)
+			return
+		}
+	}
+
 	tx.Model().StopAreas().Save(&stopArea)
 	err = tx.Commit()
 	if err != nil {
@@ -127,9 +135,18 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
+
 	if stopArea.Id() != "" {
 		http.Error(response, "Invalid request", 400)
 		return
+	}
+
+	for _, obj := range stopArea.ObjectIDs() {
+		sa, ok := tx.Model().StopAreas().FindByObjectId(obj)
+		if ok {
+			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), 400)
+			return
+		}
 	}
 
 	tx.Model().StopAreas().Save(&stopArea)

@@ -102,6 +102,14 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 		return
 	}
 
+	for _, obj := range line.ObjectIDs() {
+		l, ok := tx.Model().Lines().FindByObjectId(obj)
+		if ok && l.Id() != model.LineId(identifier) {
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), 400)
+			return
+		}
+	}
+
 	tx.Model().Lines().Save(&line)
 	err = tx.Commit()
 	if err != nil {
@@ -131,6 +139,14 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 	if line.Id() != "" {
 		http.Error(response, "Invalid request", 400)
 		return
+	}
+
+	for _, obj := range line.ObjectIDs() {
+		l, ok := tx.Model().Lines().FindByObjectId(obj)
+		if ok {
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), 400)
+			return
+		}
 	}
 
 	tx.Model().Lines().Save(&line)

@@ -102,6 +102,14 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 		return
 	}
 
+	for _, obj := range vehicleJourney.ObjectIDs() {
+		vj, ok := tx.Model().VehicleJourneys().FindByObjectId(obj)
+		if ok && vj.Id() != model.VehicleJourneyId(identifier) {
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), 400)
+			return
+		}
+	}
+
 	tx.Model().VehicleJourneys().Save(&vehicleJourney)
 	err = tx.Commit()
 	if err != nil {
@@ -127,9 +135,18 @@ func (controller *VehicleJourneyController) Create(response http.ResponseWriter,
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
 		return
 	}
+
 	if vehicleJourney.Id() != "" {
 		http.Error(response, "Invalid request", 400)
 		return
+	}
+
+	for _, obj := range vehicleJourney.ObjectIDs() {
+		vj, ok := tx.Model().VehicleJourneys().FindByObjectId(obj)
+		if ok {
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), 400)
+			return
+		}
 	}
 
 	tx.Model().VehicleJourneys().Save(&vehicleJourney)
