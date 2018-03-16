@@ -136,6 +136,7 @@ Feature: Support SIRI EstimatedTimeTable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>

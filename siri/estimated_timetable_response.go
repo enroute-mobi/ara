@@ -95,7 +95,9 @@ const estimatedJourneyVersionFrameTemplate = `<siri:EstimatedJourneyVersionFrame
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
 					<siri:DirectionRef>{{ .Attributes.DirectionRef }}</siri:DirectionRef>{{ else }}
-					<siri:DirectionRef/>{{ end }}
+					<siri:DirectionRef/>{{ end }}{{ if .References.OperatorRef }}
+					<siri:OperatorRef>{{ .References.OperatorRef.ObjectId.Value }}</siri:OperatorRef>{{ else }}
+					<siri:OperatorRef/>{{ end }}
 					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
 					<siri:OriginRef>{{ .References.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
 					<siri:DestinationRef>{{ .References.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}

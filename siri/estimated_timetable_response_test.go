@@ -26,6 +26,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
+					<siri:OperatorRef>operator1</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
 					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
@@ -56,6 +57,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line2</siri:LineRef>
 					<siri:DirectionRef>direction2</siri:DirectionRef>
+					<siri:OperatorRef>operator2</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref2</siri:DatedVehicleJourneyRef>
 					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:DestinationRef>destination2</siri:DestinationRef>
@@ -74,6 +76,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line3</siri:LineRef>
 					<siri:DirectionRef>direction3</siri:DirectionRef>
+					<siri:OperatorRef>operator3</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref3</siri:DatedVehicleJourneyRef>
 					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:DestinationRef>destination3</siri:DestinationRef>
@@ -141,6 +144,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		References: map[string]model.Reference{
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
+			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator1")),
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call1, call2},
 	}
@@ -155,6 +159,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		References: map[string]model.Reference{
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin2")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination2")),
+			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator2")),
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call3},
 	}
@@ -169,6 +174,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		References: map[string]model.Reference{
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin3")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination3")),
+			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator3")),
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call4},
 	}
@@ -220,6 +226,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
+					<siri:OperatorRef>operator1</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
 					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
@@ -243,6 +250,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
 		References: map[string]model.Reference{
 			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
 			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
+			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator1")),
 		},
 	}
 

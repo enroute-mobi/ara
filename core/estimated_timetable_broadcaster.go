@@ -234,7 +234,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]model.Reference),
 				}
-				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
@@ -274,7 +274,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) map[string]model.Reference {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, stopVisit model.StopVisit, tx *model.Transaction) map[string]model.Reference {
 	references := make(map[string]model.Reference)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -293,6 +293,23 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
 		references[refType] = *model.NewReference(defaultObjectID)
 	}
+
+	// Handle OperatorRef
+	operatorRef, ok := stopVisit.Reference("OperatorRef")
+	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
+		return references
+	}
+	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	if !ok {
+		references["OperatorRef"] = *model.NewReference(*operatorRef.ObjectId)
+		return references
+	}
+	obj, ok := operator.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+	if !ok {
+		references["OperatorRef"] = *model.NewReference(*operatorRef.ObjectId)
+		return references
+	}
+	references["OperatorRef"] = *model.NewReference(obj)
 	return references
 }
 

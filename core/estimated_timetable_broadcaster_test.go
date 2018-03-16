@@ -11,6 +11,8 @@ import (
 )
 
 func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
+	// logger.Log.Debug = true
+
 	fakeClock := model.NewFakeClock()
 	model.SetDefaultClock(fakeClock)
 	uuidGenerator := model.NewFakeUUIDGenerator()
@@ -72,6 +74,12 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	stopArea.SetObjectID(objectid)
 	stopArea.Save()
 
+	operatorObjectid := model.NewObjectID("test", "1234")
+	operatorRef := model.Reference{
+		ObjectId: &operatorObjectid,
+		Type:     "OperatorRef",
+	}
+
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.SetObjectID(objectid)
@@ -81,7 +89,13 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+	stopVisit.References.SetReference("OperatorRef", operatorRef)
 	stopVisit.StopAreaId = stopArea.Id()
+
+	operator := referential.Model().Operators().New()
+	operator.SetObjectID(operatorObjectid)
+	operator.SetObjectID(model.NewObjectID("internal", "123456789"))
+	operator.Save()
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 	stopVisit.Save()
@@ -116,6 +130,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
 					<siri:DirectionRef/>
+					<siri:OperatorRef>123456789</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
