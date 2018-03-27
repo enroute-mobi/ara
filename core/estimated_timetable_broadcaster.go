@@ -234,7 +234,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]model.Reference),
 				}
-				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit, tx)
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(&vehicleJourney, &stopVisit, tx)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
@@ -260,11 +260,11 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 			processedStopVisits[stopVisitId] = struct{}{}
 
-			lastStateInterface, ok := resource.LastStates[string(stopVisit.Id())]
+			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
 				ettlc := &estimatedTimeTableLastChange{}
 				ettlc.InitState(&stopVisit, sub)
-				resource.LastStates[string(stopVisit.Id())] = ettlc
+				resource.SetLastState(string(stopVisit.Id()), ettlc)
 			} else {
 				lastState := lastStateInterface.(*estimatedTimeTableLastChange)
 				lastState.UpdateState(&stopVisit)
@@ -274,7 +274,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, stopVisit model.StopVisit, tx *model.Transaction) map[string]model.Reference {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit, tx *model.Transaction) map[string]model.Reference {
 	references := make(map[string]model.Reference)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {

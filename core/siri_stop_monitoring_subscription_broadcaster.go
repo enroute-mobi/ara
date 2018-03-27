@@ -147,7 +147,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 			continue
 		}
 
-		lastState, ok := resource.LastStates[string(sv.Id())]
+		lastState, ok := resource.LastState(string(sv.Id()))
 		if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
 			continue
 		}
@@ -155,7 +155,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		if !ok {
 			smlc := &stopMonitoringLastChange{}
 			smlc.InitState(&sv, sub)
-			resource.LastStates[string(sv.Id())] = smlc
+			resource.SetLastState(string(sv.Id()), smlc)
 		}
 
 		subscriptionIds = append(subscriptionIds, sub.Id())
@@ -180,7 +180,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 			continue
 		}
 
-		lastState, ok := resource.LastStates[string(stopArea.Id())]
+		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
 			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored {
 				subscriptionIds = append(subscriptionIds, sub.Id())
@@ -191,7 +191,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 		if !ok {
 			salc := &stopAreaLastChange{}
 			salc.InitState(&stopArea, sub)
-			resource.LastStates[string(stopArea.Id())] = salc
+			resource.SetLastState(string(stopArea.Id()), salc)
 		}
 	}
 
@@ -263,12 +263,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	defer tx.Close()
 
 	for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
-		if _, ok := res.LastStates[string(sv.Id())]; ok {
+		if _, ok := res.LastState(string(sv.Id())); ok {
 			continue
 		}
 		smlc := &stopMonitoringLastChange{}
 		smlc.InitState(&sv, sub)
-		res.LastStates[string(sv.Id())] = smlc
+		res.SetLastState(string(sv.Id()), smlc)
 		connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
 	}
 }
@@ -276,6 +276,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
 	ro := r.ResourcesOptions()
 	ro["StopVisitTypes"] = sm.StopVisitTypes()
+
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"

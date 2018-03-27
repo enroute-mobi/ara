@@ -14,6 +14,7 @@ type SubscriptionId string
 
 type Subscription struct {
 	model.ClockConsumer
+
 	manager Subscriptions
 
 	id         SubscriptionId
@@ -25,18 +26,20 @@ type Subscription struct {
 }
 
 type SubscribedResource struct {
+	sync.RWMutex
+
 	Reference        model.Reference
 	RetryCount       int
 	SubscribedAt     time.Time
 	SubscribedUntil  time.Time
-	LastStates       map[string]lastState `json:"-"`
+	lastStates       map[string]lastState
 	resourcesOptions map[string]string
 }
 
 func NewResource(ref model.Reference) SubscribedResource {
 	ressource := SubscribedResource{
 		Reference:        ref,
-		LastStates:       make(map[string]lastState),
+		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
 
@@ -45,6 +48,19 @@ func NewResource(ref model.Reference) SubscribedResource {
 
 func (sr *SubscribedResource) ResourcesOptions() map[string]string {
 	return sr.resourcesOptions
+}
+
+func (sr *SubscribedResource) LastState(state string) (l lastState, ok bool) {
+	sr.RLock()
+	l, ok = sr.lastStates[state]
+	sr.RUnlock()
+	return
+}
+
+func (sr *SubscribedResource) SetLastState(s string, l lastState) {
+	sr.Lock()
+	sr.lastStates[s] = l
+	sr.Unlock()
 }
 
 type APISubscription struct {
@@ -148,7 +164,7 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 	resource := SubscribedResource{
 		Reference:        reference,
 		SubscribedUntil:  subscription.Clock().Now().Add(1 * time.Minute),
-		LastStates:       make(map[string]lastState),
+		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &resource

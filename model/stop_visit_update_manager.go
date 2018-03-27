@@ -51,7 +51,9 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
-	stopArea.Origin = event.Origin
+	if event.Origin != "" {
+		stopArea.Origin = event.Origin
+	}
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
 
@@ -179,7 +181,7 @@ func (updater *StopVisitUpdater) Update() {
 		stopVisit.References = stopVisitAttributes.References
 	}
 
-	stopVisit.Schedules.Merge(updater.event.Schedules)
+	stopVisit.Schedules.Merge(&updater.event.Schedules)
 	stopVisit.DepartureStatus = updater.event.DepartureStatus
 	stopVisit.ArrivalStatus = updater.event.ArrivalStatus
 	stopVisit.RecordedAt = updater.event.RecordedAt

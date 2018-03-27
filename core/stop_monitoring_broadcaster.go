@@ -97,7 +97,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 
 	for subId, producers := range notMonitored {
 		sub, ok := smb.connector.Partner().Subscriptions().Find(subId)
-		if !ok {
+		if !ok || len(producers) == 0 {
 			continue
 		}
 
@@ -200,7 +200,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 
 			// Get the Resource lastState for the StopVisit
-			lastStateInterface, _ := resource.LastStates[string(stopVisitId)]
+			lastStateInterface, _ := resource.LastState(string(stopVisitId))
 			lastState, ok := lastStateInterface.(*stopMonitoringLastChange)
 			if !ok {
 				continue

@@ -85,7 +85,7 @@ func NewStopVisitSchedules() StopVisitSchedules {
 	return StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
 }
 
-func (schedules StopVisitSchedules) Copy() StopVisitSchedules {
+func (schedules *StopVisitSchedules) Copy() StopVisitSchedules {
 	cpy := NewStopVisitSchedules()
 
 	schedules.RLock()
@@ -102,12 +102,14 @@ func (schedules StopVisitSchedules) Copy() StopVisitSchedules {
 	return cpy
 }
 
-func (schedules *StopVisitSchedules) Merge(newSchedules StopVisitSchedules) {
+func (schedules *StopVisitSchedules) Merge(newSchedules *StopVisitSchedules) {
 	schedules.Lock()
+	newSchedules.RLock()
 	for key, value := range newSchedules.byType {
 		schedules.byType[key] = value
 	}
 	schedules.Unlock()
+	newSchedules.RUnlock()
 }
 
 func (schedules *StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
@@ -140,7 +142,7 @@ func (schedules *StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, dep
 	schedules.Unlock()
 }
 
-func (schedules StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVisitSchedule {
+func (schedules *StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVisitSchedule {
 	schedules.RLock()
 	schedule, ok := schedules.byType[kind]
 	schedules.RUnlock()
@@ -150,7 +152,7 @@ func (schedules StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVi
 	return schedule
 }
 
-func (schedules StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitScheduleType) time.Time {
+func (schedules *StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitScheduleType) time.Time {
 	if kinds == nil {
 		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
 	}
@@ -165,7 +167,7 @@ func (schedules StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitSchedul
 	return time.Time{}
 }
 
-func (schedules StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitScheduleType) time.Time {
+func (schedules *StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitScheduleType) time.Time {
 	if kinds == nil {
 		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
 	}
@@ -180,7 +182,7 @@ func (schedules StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitSched
 	return time.Time{}
 }
 
-func (schedules StopVisitSchedules) ToSlice() (scheduleSlice []StopVisitSchedule) {
+func (schedules *StopVisitSchedules) ToSlice() (scheduleSlice []StopVisitSchedule) {
 	schedules.RLock()
 	for _, schedule := range schedules.byType {
 		scheduleSlice = append(scheduleSlice, *schedule)

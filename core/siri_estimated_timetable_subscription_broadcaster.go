@@ -229,7 +229,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 			continue
 		}
 
-		lastState, ok := r.LastStates[string(svId)]
+		lastState, ok := r.LastState(string(svId))
 		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(&sv) {
 			continue
 		}
@@ -237,7 +237,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		if !ok {
 			ettlc := &estimatedTimeTableLastChange{}
 			ettlc.InitState(&sv, sub)
-			r.LastStates[string(sv.Id())] = ettlc
+			r.SetLastState(string(sv.Id()), ettlc)
 		}
 
 		connector.addStopVisit(sub.Id(), svId)
@@ -266,7 +266,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 			continue
 		}
 
-		lastState, ok := resource.LastStates[string(stopArea.Id())]
+		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
 			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored {
 				subscriptionIds = append(subscriptionIds, sub.Id())
@@ -277,7 +277,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 		if !ok {
 			salc := &stopAreaLastChange{}
 			salc.InitState(&stopArea, sub)
-			resource.LastStates[string(stopArea.Id())] = salc
+			resource.SetLastState(string(stopArea.Id()), salc)
 		}
 	}
 
