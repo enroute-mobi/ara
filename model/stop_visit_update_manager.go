@@ -39,6 +39,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		stopArea.ParentId = parentSA.Id()
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
+		stopArea.Monitored = true
 		stopArea.Save()
 
 		event.StopAreaId = stopArea.Id()
