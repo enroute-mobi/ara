@@ -139,7 +139,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subscriptionIds
 	}
 
-	subs := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "StopMonitoringBroadcast")
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
 
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
@@ -172,7 +172,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 		return subscriptionIds
 	}
 
-	subs := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "StopMonitoringBroadcast")
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
 
 	for _, sub := range subs {
 		resource := sub.Resource(obj)

@@ -18,7 +18,7 @@ type OperatorController struct {
 
 func NewOperatorController(referential *core.Referential) ControllerInterface {
 	return &Controller{
-		restfulRessource: &OperatorController{
+		restfulResource: &OperatorController{
 			referential: referential,
 		},
 	}

@@ -18,7 +18,7 @@ type SituationController struct {
 
 func NewSituationController(referential *core.Referential) ControllerInterface {
 	return &Controller{
-		restfulRessource: &SituationController{
+		restfulResource: &SituationController{
 			referential: referential,
 		},
 	}

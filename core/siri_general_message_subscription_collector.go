@@ -77,12 +77,12 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUp
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedObjectId model.ObjectID) {
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByRessourceId(requestedObjectId.String(), "GeneralMessageCollect")
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(requestedObjectId.String(), "GeneralMessageCollect")
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
 			resource := subscription.Resource(requestedObjectId)
 			if resource == nil { // Should never happen
-				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByRessourceId")
+				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
 			}
 			if !resource.SubscribedAt.IsZero() {

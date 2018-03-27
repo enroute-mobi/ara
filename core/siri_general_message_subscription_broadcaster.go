@@ -89,7 +89,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return
 	}
 
-	obj := model.NewObjectID("SituationRessource", "Situation")
+	obj := model.NewObjectID("SituationResource", "Situation")
 	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
 
 	for _, sub := range subs {
@@ -140,7 +140,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.SetSubscriptionOption("StopPointRef", strings.Join(gm.StopPointRef(), ","))
 		sub.SetSubscriptionOption("MessageIdentifier", gm.MessageIdentifier())
 
-		obj := model.NewObjectID("SituationRessource", "Situation")
+		obj := model.NewObjectID("SituationResource", "Situation")
 		r := sub.Resource(obj)
 		if r == nil {
 			ref := model.Reference{

@@ -79,7 +79,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	}
 }
 
-func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) {
+func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 
 	response, err := os.Open("testdata/stopmonitoringsubscription-response-soap.xml")
 	if err != nil {

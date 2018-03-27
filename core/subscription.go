@@ -245,7 +245,7 @@ type Subscriptions interface {
 	CancelSubscriptions()
 	CancelBroadcastSubscriptions()
 	CancelCollectSubscriptions()
-	FindByRessourceId(id, kind string) []*Subscription
+	FindByResourceId(id, kind string) []*Subscription
 	FindByExternalId(externalId string) (*Subscription, bool)
 }
 
@@ -317,7 +317,7 @@ func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscr
 	return nil, false
 }
 
-func (manager *MemorySubscriptions) FindByRessourceId(id, kind string) []*Subscription {
+func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscription {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 	subscriptions := []*Subscription{}

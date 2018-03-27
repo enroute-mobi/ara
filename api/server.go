@@ -29,7 +29,7 @@ type RequestData struct {
 	Body        []byte
 	Method      string
 	Referential string
-	Ressource   string
+	Resource    string
 	Id          string
 	Action      string
 	Url         string
@@ -44,7 +44,7 @@ func NewRequestDataFromContent(params []string) *RequestData {
 
 	return &RequestData{
 		Referential: requestFiller[1],
-		Ressource:   requestFiller[2],
+		Resource:    requestFiller[2],
 		Id:          requestFiller[3],
 		Action:      requestFiller[4],
 	}
@@ -71,7 +71,7 @@ func (server *Server) handleControllers(response http.ResponseWriter, request *h
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", requestData.Ressource, request)
+	logger.Log.Debugf("%s controller request: %s", requestData.Resource, request)
 
 	controller := newController(server)
 	controller.serve(response, request, requestData)
@@ -133,7 +133,7 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 }
 
 func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-	if requestData.Ressource == "siri" {
+	if requestData.Resource == "siri" {
 		server.handleSIRI(response, request, requestData)
 	} else if strings.HasPrefix(requestData.Referential, "_") {
 		if !server.isAdmin(request) {
@@ -142,7 +142,7 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 			return
 		}
 		if requestData.Referential == "_referentials" {
-			requestData.Id = requestData.Ressource
+			requestData.Id = requestData.Resource
 		}
 		server.handleControllers(response, request, requestData)
 	} else {
@@ -171,13 +171,13 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 		http.Error(response, "Unauthorized request", 401)
 		return
 	}
-	newController, ok := newWithReferentialControllerMap[requestData.Ressource]
+	newController, ok := newWithReferentialControllerMap[requestData.Resource]
 	if !ok {
 		http.Error(response, "Invalid ressource", 500)
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", requestData.Ressource, request)
+	logger.Log.Debugf("%s controller request: %s", requestData.Resource, request)
 
 	controller := newController(foundReferential)
 	controller.serve(response, request, requestData)

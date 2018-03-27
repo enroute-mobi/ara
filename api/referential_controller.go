@@ -16,7 +16,7 @@ type ReferentialController struct {
 
 func NewReferentialController(server *Server) ControllerInterface {
 	return &Controller{
-		restfulRessource: &ReferentialController{
+		restfulResource: &ReferentialController{
 			server: server,
 		},
 	}

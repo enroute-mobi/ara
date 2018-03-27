@@ -18,7 +18,7 @@ type LineController struct {
 
 func NewLineController(referential *core.Referential) ControllerInterface {
 	return &Controller{
-		restfulRessource: &LineController{
+		restfulResource: &LineController{
 			referential: referential,
 		},
 	}

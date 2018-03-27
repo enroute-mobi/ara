@@ -220,7 +220,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	subs := connector.Partner().Subscriptions().FindByRessourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
+	subs := connector.Partner().Subscriptions().FindByResourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
 
 	for _, sub := range subs {
 		r := sub.Resource(lineObj)
@@ -257,7 +257,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 		return subscriptionIds
 	}
 
-	subs := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "EstimatedTimeTableBroadcast")
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "EstimatedTimeTableBroadcast")
 
 	for _, sub := range subs {
 		resource := sub.Resource(obj)

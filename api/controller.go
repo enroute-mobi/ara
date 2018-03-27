@@ -24,7 +24,7 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Contro
 	"operators":        NewOperatorController,
 }
 
-type RestfulRessource interface {
+type RestfulResource interface {
 	Index(response http.ResponseWriter, filters url.Values)
 	Show(response http.ResponseWriter, identifier string)
 	Delete(response http.ResponseWriter, identifier string)
@@ -45,7 +45,7 @@ type ControllerInterface interface {
 }
 
 type Controller struct {
-	restfulRessource RestfulRessource
+	restfulResource RestfulResource
 }
 
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {
@@ -78,7 +78,7 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 	}
 
 	if requestData.Action != "" {
-		if actionResource, ok := controller.restfulRessource.(ActionResource); ok {
+		if actionResource, ok := controller.restfulResource.(ActionResource); ok {
 			actionResource.Action(response, requestData)
 			return
 		}
@@ -87,17 +87,17 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 	switch requestData.Method {
 	case "GET":
 		if requestData.Id == "" {
-			controller.restfulRessource.Index(response, requestData.Filters)
+			controller.restfulResource.Index(response, requestData.Filters)
 			return
 		}
-		controller.restfulRessource.Show(response, requestData.Id)
+		controller.restfulResource.Show(response, requestData.Id)
 	case "DELETE":
-		controller.restfulRessource.Delete(response, requestData.Id)
+		controller.restfulResource.Delete(response, requestData.Id)
 	case "PUT":
-		controller.restfulRessource.Update(response, requestData.Id, requestData.Body)
+		controller.restfulResource.Update(response, requestData.Id, requestData.Body)
 	case "POST":
 		if requestData.Id == "save" {
-			if savableResource, ok := controller.restfulRessource.(Savable); ok {
+			if savableResource, ok := controller.restfulResource.(Savable); ok {
 				savableResource.Save(response)
 				return
 			}
@@ -106,6 +106,6 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 			http.Error(response, "Invalid request", 400)
 			return
 		}
-		controller.restfulRessource.Create(response, requestData.Body)
+		controller.restfulResource.Create(response, requestData.Body)
 	}
 }

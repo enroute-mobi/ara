@@ -108,7 +108,7 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 
 	existingSubscription.CreateAddNewResource(reference)
 
-	subs := subscriptions.FindByRessourceId(obj.String(), "kind")
+	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 
 	if len(subs) == 0 {
 		t.Errorf("Should have found the subscription")

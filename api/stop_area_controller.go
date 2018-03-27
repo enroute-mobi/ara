@@ -18,7 +18,7 @@ type StopAreaController struct {
 
 func NewStopAreaController(referential *core.Referential) ControllerInterface {
 	return &Controller{
-		restfulRessource: &StopAreaController{
+		restfulResource: &StopAreaController{
 			referential: referential,
 		},
 	}
