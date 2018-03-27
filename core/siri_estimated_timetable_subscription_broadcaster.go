@@ -260,8 +260,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 	subs := connector.partner.Subscriptions().FindByRessourceId(obj.String(), "EstimatedTimeTableBroadcast")
 
 	for _, sub := range subs {
-		resource, ok := sub.ResourcesByObjectID()[obj.String()]
-		if !ok || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+		resource := sub.Resource(obj)
+		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
 			continue
 		}
 

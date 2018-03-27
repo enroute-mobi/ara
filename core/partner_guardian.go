@@ -88,14 +88,14 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 	}
 
 	for _, sub := range partner.Subscriptions().FindAll() {
-		for key, value := range sub.ResourcesByObjectID() {
+		for key, value := range sub.ResourcesByObjectIDCopy() {
 			if !value.SubscribedUntil.Before(guardian.Clock().Now()) || value.SubscribedAt.IsZero() {
 				continue
 			}
 			sub.DeleteResource(key)
 			logger.Log.Printf("Deleting ressource %v from subscription with id %v", key, sub.Id())
 		}
-		if len(sub.ResourcesByObjectID()) == 0 {
+		if sub.ResourcesLen() == 0 {
 			sub.Delete()
 		}
 	}

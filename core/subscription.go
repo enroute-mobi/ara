@@ -121,15 +121,24 @@ func (subscription *Subscription) Delete() (ok bool) {
 	return
 }
 
-func (subscription *Subscription) ResourcesByObjectID() map[string]*SubscribedResource {
-	return subscription.resourcesByObjectID
+func (subscription *Subscription) ResourcesByObjectIDCopy() map[string]*SubscribedResource {
+	m := make(map[string]*SubscribedResource)
+	subscription.RLock()
+	for k, v := range subscription.resourcesByObjectID {
+		m[k] = v
+	}
+	subscription.RUnlock()
+	return m
 }
 
 func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	resources := make([]*SubscribedResource, 0)
+
+	subscription.RLock()
 	for _, resource := range subscription.resourcesByObjectID {
 		resources = append(resources, resource)
 	}
+	subscription.RUnlock()
 
 	aux := struct {
 		Id         SubscriptionId        `json:"SubscriptionRef,omitempty"`
@@ -146,7 +155,9 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 }
 
 func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
+	subscription.RLock()
 	sub, present := subscription.resourcesByObjectID[obj.String()]
+	subscription.RUnlock()
 	if !present {
 		return nil
 	}
@@ -156,16 +167,20 @@ func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResour
 func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource {
 	ressources := []*SubscribedResource{}
 
+	subscription.RLock()
 	for _, ressource := range subscription.resourcesByObjectID {
 		if ressource.SubscribedUntil.After(subscription.Clock().Now()) {
 			ressources = append(ressources, ressource)
 		}
 	}
+	subscription.RUnlock()
 	return ressources
 }
 
 func (subscription *Subscription) AddNewResource(resource SubscribedResource) {
+	subscription.Lock()
 	subscription.resourcesByObjectID[resource.Reference.ObjectId.String()] = &resource
+	subscription.Unlock()
 }
 
 func (subscription *Subscription) CreateAddNewResource(reference model.Reference) *SubscribedResource {
@@ -177,12 +192,23 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
+	subscription.Lock()
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &resource
+	subscription.Unlock()
 	return &resource
 }
 
 func (subscription *Subscription) DeleteResource(key string) {
+	subscription.Lock()
 	delete(subscription.resourcesByObjectID, key)
+	subscription.Unlock()
+}
+
+func (subscription *Subscription) ResourcesLen() (i int) {
+	subscription.RLock()
+	i = len(subscription.resourcesByObjectID)
+	subscription.RUnlock()
+	return
 }
 
 type MemorySubscriptions struct {
@@ -297,7 +323,9 @@ func (manager *MemorySubscriptions) FindByRessourceId(id, kind string) []*Subscr
 	subscriptions := []*Subscription{}
 
 	for _, subscription := range manager.byIdentifier {
+		subscription.RLock()
 		_, ok := subscription.resourcesByObjectID[id]
+		subscription.RUnlock()
 		if ok && subscription.kind == kind {
 			subscriptions = append(subscriptions, subscription)
 		}
@@ -313,7 +341,7 @@ func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscriptio
 
 	manager.mutex.RLock()
 	for _, subscription := range manager.byIdentifier {
-		if subscription.Kind() == kind && (maxResource < 1 || len(subscription.resourcesByObjectID) < maxResource) {
+		if subscription.Kind() == kind && (maxResource < 1 || subscription.ResourcesLen() < maxResource) {
 			manager.mutex.RUnlock()
 			return subscription
 		}

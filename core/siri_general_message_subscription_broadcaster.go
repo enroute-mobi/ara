@@ -93,8 +93,8 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
 
 	for _, sub := range subs {
-		resource, ok := sub.ResourcesByObjectID()[obj.String()]
-		if !ok || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+		resource := sub.Resource(obj)
+		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
 			continue
 		}
 

@@ -100,7 +100,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	resourcesToRequest := make(map[string]*resourceToRequest)
 	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByObjectID() {
+		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)

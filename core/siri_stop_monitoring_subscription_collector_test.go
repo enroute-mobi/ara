@@ -123,8 +123,8 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoRessource(t *testing.T) 
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 
-	if len(subscription.ResourcesByObjectID()) != 1 {
-		t.Errorf("Response should have 1 ressource but got %v\n", len(subscription.ResourcesByObjectID()))
+	if subscription.ResourcesLen() != 1 {
+		t.Errorf("Response should have 1 ressource but got %v\n", subscription.ResourcesLen())
 	}
 }
 
