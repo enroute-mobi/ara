@@ -63,16 +63,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUpdate() {
-	// Try to find a GeneralMessageCollect Subscription or create one without any References
-	_, ok := connector.partner.Subscriptions().FindByKind("GeneralMessageCollect")
-	if !ok {
-		newSubscription := connector.partner.Subscriptions().New("GeneralMessageCollect")
-		obj := model.NewObjectID("generalMessageCollect", "all")
-		ref := model.Reference{
-			ObjectId: &obj,
-		}
-		newSubscription.CreateAddNewResource(ref)
-	}
+	obj := model.NewObjectID("generalMessageCollect", "all")
+	connector.RequestSituationUpdate("all", obj)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedObjectId model.ObjectID) {
