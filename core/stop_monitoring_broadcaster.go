@@ -113,7 +113,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 				ErrorType:                 "OtherError",
 				ErrorNumber:               1,
 				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
-				RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 			}
 
 			smb.sendDelivery(delivery)
@@ -140,9 +140,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 		// Initialize builder
 		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.SIRIPartner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
-		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOptions()["StopVisitTypes"]
+		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOption("StopVisitTypes")
 
-		maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOptions()["MaximumStopVisits"])
+		maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
 		monitoredStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
 
 		delivery := &siri.SIRINotifyStopMonitoring{
@@ -153,7 +153,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 			Status:                    true,
-			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 		}
 
 		for _, stopVisitId := range stopVisits {

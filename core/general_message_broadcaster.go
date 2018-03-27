@@ -109,7 +109,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			ResponseMessageIdentifier: gmb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             gmb.connector.SIRIPartner().RequestorRef(),
 			SubscriptionIdentifier:    sub.ExternalId(),
-			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 			Status:                    true,
 			ResponseTimestamp:         gmb.Clock().Now(),
 		}
@@ -118,12 +118,12 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		var messageArray []string
 
 		builder := NewBroadcastGeneralMessageBuilder(tx, gmb.connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
-		builder.InfoChannelRef = strings.Split(sub.SubscriptionOptions()["InfoChannelRef"], ",")
-		if sub.SubscriptionOptions()["LineRef"] != "" {
-			builder.SetLineRef(strings.Split(sub.SubscriptionOptions()["LineRef"], ","))
+		builder.InfoChannelRef = strings.Split(sub.SubscriptionOption("InfoChannelRef"), ",")
+		if sub.SubscriptionOption("LineRef") != "" {
+			builder.SetLineRef(strings.Split(sub.SubscriptionOption("LineRef"), ","))
 		}
-		if sub.SubscriptionOptions()["StopPointRef"] != "" {
-			builder.SetStopPointRef(strings.Split(sub.SubscriptionOptions()["StopPointRef"], ","))
+		if sub.SubscriptionOption("StopPointRef") != "" {
+			builder.SetStopPointRef(strings.Split(sub.SubscriptionOption("StopPointRef"), ","))
 		}
 
 		for _, situationId := range situationIds {

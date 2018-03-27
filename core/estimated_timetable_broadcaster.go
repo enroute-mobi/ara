@@ -113,7 +113,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 				ErrorType:                 "OtherError",
 				ErrorNumber:               1,
 				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
-				RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 			}
 
 			ett.sendDelivery(delivery)
@@ -153,7 +153,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         ett.connector.Clock().Now(),
 			Status:                    true,
-			RequestMessageRef:         sub.SubscriptionOptions()["MessageIdentifier"],
+			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 		}
 
 		for _, stopVisitId := range stopVisits {

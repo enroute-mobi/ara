@@ -135,10 +135,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			sub.SetExternalId(gm.SubscriptionIdentifier())
 		}
 
-		sub.SubscriptionOptions()["InfoChannelRef"] = strings.Join(gm.InfoChannelRef(), ",")
-		sub.SubscriptionOptions()["LineRef"] = strings.Join(gm.LineRef(), ",")
-		sub.SubscriptionOptions()["StopPointRef"] = strings.Join(gm.StopPointRef(), ",")
-		sub.SubscriptionOptions()["MessageIdentifier"] = gm.MessageIdentifier()
+		sub.SetSubscriptionOption("InfoChannelRef", strings.Join(gm.InfoChannelRef(), ","))
+		sub.SetSubscriptionOption("LineRef", strings.Join(gm.LineRef(), ","))
+		sub.SetSubscriptionOption("StopPointRef", strings.Join(gm.StopPointRef(), ","))
+		sub.SetSubscriptionOption("MessageIdentifier", gm.MessageIdentifier())
 
 		obj := model.NewObjectID("SituationRessource", "Situation")
 		r := sub.Resource(obj)

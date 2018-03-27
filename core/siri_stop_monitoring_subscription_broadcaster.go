@@ -273,21 +273,18 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	}
 }
 
+// WIP Need to do something about this method Refs #6338
 func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
-	ro := r.ResourcesOptions()
-	ro["StopVisitTypes"] = sm.StopVisitTypes()
-
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"
 	}
 
-	so := s.SubscriptionOptions()
-
-	so["IncrementalUpdates"] = request.IncrementalUpdates()
-	so["MaximumStopVisits"] = request.MaximumStopVisits()
-	so["ChangeBeforeUpdates"] = changeBeforeUpdates
-	so["MessageIdentifier"] = request.MessageIdentifier()
+	s.SetSubscriptionOption("StopVisitTypes", sm.StopVisitTypes())
+	s.SetSubscriptionOption("IncrementalUpdates", request.IncrementalUpdates())
+	s.SetSubscriptionOption("MaximumStopVisits", request.MaximumStopVisits())
+	s.SetSubscriptionOption("ChangeBeforeUpdates", changeBeforeUpdates)
+	s.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {

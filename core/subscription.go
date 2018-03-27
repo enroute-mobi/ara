@@ -13,6 +13,7 @@ import (
 type SubscriptionId string
 
 type Subscription struct {
+	sync.RWMutex
 	model.ClockConsumer
 
 	manager Subscriptions
@@ -89,8 +90,17 @@ func (subscription *Subscription) ExternalId() string {
 	return subscription.externalId
 }
 
-func (subscription *Subscription) SubscriptionOptions() map[string]string {
-	return subscription.subscriptionOptions
+func (subscription *Subscription) SubscriptionOption(key string) (o string) {
+	subscription.RLock()
+	o = subscription.subscriptionOptions[key]
+	subscription.RUnlock()
+	return
+}
+
+func (subscription *Subscription) SetSubscriptionOption(key, value string) {
+	subscription.Lock()
+	subscription.subscriptionOptions[key] = value
+	subscription.Unlock()
 }
 
 func (subscription *Subscription) SetKind(kind string) {

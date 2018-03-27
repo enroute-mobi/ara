@@ -76,8 +76,8 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 		return true
 	}
 
-	option, ok := smlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if !ok {
+	option := smlc.subscription.SubscriptionOption("ChangeBeforeUpdates")
+	if option == "" {
 		return true
 	}
 
@@ -88,7 +88,7 @@ func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool
 
 	orderMap := []model.StopVisitScheduleType{"actual", "expected", "aimed"}
 	for _, kind := range orderMap {
-		ok = smlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
+		ok := smlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
 		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
 		if ok {
 			return true
@@ -143,8 +143,8 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 	}
 
 	// Check Schedules
-	option, ok := ettlc.subscription.subscriptionOptions["ChangeBeforeUpdates"]
-	if !ok {
+	option := ettlc.subscription.SubscriptionOption("ChangeBeforeUpdates")
+	if option == "" {
 		return true
 	}
 
@@ -155,7 +155,7 @@ func (ettlc *estimatedTimeTableLastChange) Haschanged(stopVisit *model.StopVisit
 
 	orderMap := []model.StopVisitScheduleType{"actual", "expected", "aimed"}
 	for _, kind := range orderMap {
-		ok = ettlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
+		ok := ettlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
 		ok = ok || ettlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
 		if ok {
 			return true
