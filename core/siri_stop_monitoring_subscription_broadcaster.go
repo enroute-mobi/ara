@@ -186,9 +186,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 				subscriptionIds = append(subscriptionIds, sub.Id())
 			}
 			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
-		}
-
-		if !ok {
+		} else { // Should not happen
 			salc := &stopAreaLastChange{}
 			salc.InitState(&stopArea, sub)
 			resource.SetLastState(string(stopArea.Id()), salc)
@@ -252,6 +250,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+		// Init SA LastChange
+		salc := &stopAreaLastChange{}
+		salc.InitState(&sa, sub)
+		r.SetLastState(string(sa.Id()), salc)
+		// Init StopVisits LastChange
 		connector.addStopAreaStopVisits(sa, sub, r)
 	}
 

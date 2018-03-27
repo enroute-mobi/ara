@@ -107,21 +107,27 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 				continue
 			}
 
+			// Init StopVisits LastChange
+			connector.addLineStopVisits(sub, &r, line.Id())
+
 			sub.AddNewResource(r)
-			connector.addLineStopVisits(sub.Id(), line.Id())
 		}
 		sub.Save()
 	}
 	return resps
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisits(subId SubscriptionId, lineId model.LineId) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
 	for _, sa := range tx.Model().StopAreas().FindByLineId(lineId) {
+		// Init SA LastChange
+		salc := &stopAreaLastChange{}
+		salc.InitState(&sa, sub)
+		res.SetLastState(string(sa.Id()), salc)
 		for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
-			connector.addStopVisit(subId, sv.Id())
+			connector.addStopVisit(sub.Id(), sv.Id())
 		}
 	}
 }
@@ -271,9 +277,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 				subscriptionIds = append(subscriptionIds, sub.Id())
 			}
 			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
-		}
-
-		if !ok {
+		} else { // Should not happen
 			salc := &stopAreaLastChange{}
 			salc.InitState(&stopArea, sub)
 			resource.SetLastState(string(stopArea.Id()), salc)

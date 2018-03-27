@@ -25,6 +25,12 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
+	if event.StopAreaMonitoredEvent != nil {
+		logger.Log.Debugf("StopArea %v monitored %v", event.StopAreaId, event.StopAreaMonitoredEvent.Monitored)
+		manager.UpdateNotMonitoredStopArea(event)
+		return
+	}
+
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
@@ -43,12 +49,6 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		stopArea.Save()
 
 		event.StopAreaId = stopArea.Id()
-	}
-
-	if event.StopAreaMonitoredEvent != nil {
-		logger.Log.Debugf("StopArea %v monitored %v", event.StopAreaId, event.StopAreaMonitoredEvent.Monitored)
-		manager.UpdateNotMonitoredStopArea(event)
-		return
 	}
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())

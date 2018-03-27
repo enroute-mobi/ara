@@ -101,6 +101,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		manager.requestStopAreaUpdate(partner, request)
 		return
 	}
+
 	logger.Log.Debugf("Can't find a partner for StopArea %v in Collect Manager", request.StopAreaId())
 	// Do nothing if StopArea is already not monitored
 	if !stopArea.Monitored {
