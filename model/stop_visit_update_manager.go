@@ -43,6 +43,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 
 		stopArea.SetObjectID(event.StopAreaAttributes.ObjectId)
 		stopArea.ParentId = parentSA.Id()
+		stopArea.Origin = event.Origin
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
 		stopArea.Monitored = true
