@@ -34,7 +34,7 @@ func (salc *stopAreaLastChange) UpdateState(stopArea *model.StopArea) bool {
 }
 
 func (salc *stopAreaLastChange) Haschanged(stopArea model.StopArea) bool {
-	return salc.monitored == stopArea.Monitored
+	return salc.monitored != stopArea.Monitored
 }
 
 type stopMonitoringLastChange struct {

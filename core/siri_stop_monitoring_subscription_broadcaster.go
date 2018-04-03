@@ -182,7 +182,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 
 		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
-			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored {
+			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored && stopArea.Origin != "" {
 				subscriptionIds = append(subscriptionIds, sub.Id())
 			}
 			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
