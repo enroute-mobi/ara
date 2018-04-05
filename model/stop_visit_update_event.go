@@ -35,7 +35,7 @@ type StopVisitUpdateEvent struct {
 	RecordedAt        time.Time
 	StopVisitObjectid ObjectID
 	StopAreaObjectId  ObjectID
-	Schedules         StopVisitSchedules
+	Schedules         *StopVisitSchedules
 	DepartureStatus   StopVisitDepartureStatus
 	ArrivalStatus     StopVisitArrivalStatus
 	VehicleAtStop     bool

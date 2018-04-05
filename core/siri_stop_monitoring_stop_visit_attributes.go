@@ -26,6 +26,7 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 	stopVisitAttributes := &model.StopVisitAttributes{
 		ObjectId:         objectid,
 		StopAreaObjectId: stopAreaObjectid,
+		Schedules:        model.NewStopVisitSchedules(),
 
 		VehicleJourneyObjectId: vehicleJourneyObjectId,
 		PassageOrder:           attributes.response.Order(),
@@ -34,8 +35,6 @@ func (attributes *SIRIStopVisitUpdateAttributes) StopVisitAttributes() *model.St
 		DepartureStatus: model.StopVisitDepartureStatus(attributes.response.DepartureStatus()),
 		ArrivalStatus:   model.StopVisitArrivalStatus(attributes.response.ArrivalStatus()),
 	}
-
-	stopVisitAttributes.Schedules = model.NewStopVisitSchedules()
 
 	if !attributes.response.AimedDepartureTime().IsZero() || !attributes.response.AimedArrivalTime().IsZero() {
 		stopVisitAttributes.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, attributes.response.AimedDepartureTime(), attributes.response.AimedArrivalTime())

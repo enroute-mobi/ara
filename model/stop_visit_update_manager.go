@@ -183,7 +183,7 @@ func (updater *StopVisitUpdater) Update() {
 		stopVisit.References = stopVisitAttributes.References
 	}
 
-	stopVisit.Schedules.Merge(&updater.event.Schedules)
+	stopVisit.Schedules.Merge(updater.event.Schedules)
 	stopVisit.DepartureStatus = updater.event.DepartureStatus
 	stopVisit.ArrivalStatus = updater.event.ArrivalStatus
 	stopVisit.RecordedAt = updater.event.RecordedAt

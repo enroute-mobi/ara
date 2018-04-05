@@ -20,7 +20,7 @@ type StopVisitAttributes struct {
 	ArrivalStatus   StopVisitArrivalStatus
 	DepartureStatus StopVisitDepartureStatus
 	RecordedAt      time.Time
-	Schedules       StopVisitSchedules
+	Schedules       *StopVisitSchedules
 	VehicleAtStop   bool
 
 	Attributes Attributes
@@ -45,7 +45,7 @@ type StopVisit struct {
 	ArrivalStatus   StopVisitArrivalStatus   `json:",omitempty"`
 	DepartureStatus StopVisitDepartureStatus `json:",omitempty"`
 	RecordedAt      time.Time
-	Schedules       StopVisitSchedules
+	Schedules       *StopVisitSchedules
 	VehicleAtStop   bool
 	PassageOrder    int `json:",omitempty"`
 }

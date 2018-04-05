@@ -21,6 +21,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 		DepartureStatus:   STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:     STOP_VISIT_ARRIVAL_ONTIME,
 		Attributes:        &TestStopVisitUpdateAttributes{},
+		Schedules:         NewStopVisitSchedules(),
 	}
 
 	manager.UpdateStopVisit(event)
@@ -51,6 +52,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 		StopVisitObjectid: objectid,
 		DepartureStatus:   STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:     STOP_VISIT_ARRIVAL_CANCELLED,
+		Schedules:         NewStopVisitSchedules(),
 	}
 
 	manager.UpdateStopVisit(event)
