@@ -36,7 +36,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 		Monitored:              xmlStopVisitEvent.Monitored(),
 		Attributes:             NewSIRIStopVisitUpdateAttributes(xmlStopVisitEvent, builder.partner.Setting("remote_objectid_kind")),
 	}
-	stopVisitEvent.Schedules = model.NewStopVisitSchedules()
+
 	if !xmlStopVisitEvent.AimedDepartureTime().IsZero() || !xmlStopVisitEvent.AimedArrivalTime().IsZero() {
 		stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
 	}

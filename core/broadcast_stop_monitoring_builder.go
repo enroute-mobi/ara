@@ -106,8 +106,6 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	schedules := stopVisit.Schedules
-
 	dataVehicleJourneyRef, ok := builder.dataVehicleJourneyRef(vehicleJourney)
 	if !ok {
 		return nil
@@ -141,18 +139,18 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	}
 
 	if stopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_CANCELLED && builder.StopVisitTypes != "departures" {
-		monitoredStopVisit.AimedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
-		monitoredStopVisit.ExpectedArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
+		monitoredStopVisit.AimedArrivalTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).ArrivalTime()
+		monitoredStopVisit.ExpectedArrivalTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).ArrivalTime()
 		if monitoredStopVisit.Monitored {
-			monitoredStopVisit.ActualArrivalTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
+			monitoredStopVisit.ActualArrivalTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime()
 		}
 	}
 
 	if stopVisit.DepartureStatus != model.STOP_VISIT_DEPARTURE_CANCELLED && builder.StopVisitTypes != "arrivals" {
-		monitoredStopVisit.AimedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
-		monitoredStopVisit.ExpectedDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
+		monitoredStopVisit.AimedDepartureTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED).DepartureTime()
+		monitoredStopVisit.ExpectedDepartureTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED).DepartureTime()
 		if monitoredStopVisit.Monitored {
-			monitoredStopVisit.ActualDepartureTime = schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
+			monitoredStopVisit.ActualDepartureTime = stopVisit.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime()
 		}
 	}
 

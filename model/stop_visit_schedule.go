@@ -85,28 +85,30 @@ func NewStopVisitSchedules() StopVisitSchedules {
 	return StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
 }
 
-func (schedules *StopVisitSchedules) Copy() StopVisitSchedules {
+func (schedules *StopVisitSchedules) Copy() *StopVisitSchedules {
 	cpy := NewStopVisitSchedules()
 
 	schedules.RLock()
 	for key, value := range schedules.byType {
-		svc := StopVisitSchedule{
+		cpy.byType[key] = &StopVisitSchedule{
 			kind:          value.Kind(),
 			arrivalTime:   value.ArrivalTime(),
 			departureTime: value.DepartureTime(),
 		}
-
-		cpy.byType[key] = &svc
 	}
 	schedules.RUnlock()
-	return cpy
+	return &cpy
 }
 
 func (schedules *StopVisitSchedules) Merge(newSchedules *StopVisitSchedules) {
 	schedules.Lock()
 	newSchedules.RLock()
 	for key, value := range newSchedules.byType {
-		schedules.byType[key] = value
+		schedules.byType[key] = &StopVisitSchedule{
+			kind:          value.Kind(),
+			arrivalTime:   value.ArrivalTime(),
+			departureTime: value.DepartureTime(),
+		}
 	}
 	schedules.Unlock()
 	newSchedules.RUnlock()
