@@ -43,7 +43,7 @@ type stopMonitoringLastChange struct {
 
 	subscription *Subscription
 
-	schedules       *model.StopVisitSchedules
+	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 }
@@ -58,7 +58,7 @@ func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
 }
 
 func (smlc *stopMonitoringLastChange) UpdateState(stopVisit *model.StopVisit) bool {
-	smlc.schedules = stopVisit.Schedules.Copy()
+	smlc.schedules = *(stopVisit.Schedules.Copy())
 	smlc.arrivalStatuts = stopVisit.ArrivalStatus
 	smlc.departureStatus = stopVisit.DepartureStatus
 
@@ -104,7 +104,7 @@ type estimatedTimeTableLastChange struct {
 
 	subscription *Subscription
 
-	schedules       *model.StopVisitSchedules
+	schedules       model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 	vehicleAtStop   bool
@@ -121,7 +121,7 @@ func (ettlc *estimatedTimeTableLastChange) SetSubscription(sub *Subscription) {
 
 func (ettlc *estimatedTimeTableLastChange) UpdateState(sv *model.StopVisit) {
 	ettlc.vehicleAtStop = sv.VehicleAtStop
-	ettlc.schedules = sv.Schedules.Copy()
+	ettlc.schedules = *(sv.Schedules.Copy())
 	ettlc.departureStatus = sv.DepartureStatus
 	ettlc.arrivalStatuts = sv.ArrivalStatus
 }

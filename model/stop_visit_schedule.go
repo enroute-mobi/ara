@@ -81,8 +81,8 @@ type StopVisitSchedules struct {
 	byType map[StopVisitScheduleType]*StopVisitSchedule
 }
 
-func NewStopVisitSchedules() *StopVisitSchedules {
-	return &StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
+func NewStopVisitSchedules() StopVisitSchedules {
+	return StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
 }
 
 func (schedules *StopVisitSchedules) Copy() *StopVisitSchedules {
@@ -97,7 +97,7 @@ func (schedules *StopVisitSchedules) Copy() *StopVisitSchedules {
 		}
 	}
 	schedules.RUnlock()
-	return cpy
+	return &cpy
 }
 
 func (schedules *StopVisitSchedules) Merge(newSchedules *StopVisitSchedules) {
