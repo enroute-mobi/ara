@@ -28,7 +28,7 @@ func Test_StopArea_Lines(t *testing.T) {
 	}
 
 	if len(stopArea.Lines()) != 1 || stopArea.Lines()[0].Id() != line.Id() {
-		t.Errorf("StopArea.Lines() returns wrong values, got: %s, required: [%s]", stopArea.Lines(), line.Id())
+		t.Errorf("StopArea.Lines() returns wrong values, got: %v, required: [%s]", stopArea.Lines(), line.Id())
 	}
 }
 

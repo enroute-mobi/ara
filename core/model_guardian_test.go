@@ -31,7 +31,7 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 	}
 
 	if updatedStopArea.NextCollectAt().Before(fakeClock.Now()) {
-		t.Errorf("StopArea should have NextCollectAt before fakeClock %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt)
+		t.Errorf("StopArea should have NextCollectAt before fakeClock %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt())
 	}
 }
 
