@@ -22,8 +22,9 @@ type StopArea struct {
 	model  Model
 	Origin string
 
-	id       StopAreaId
-	ParentId StopAreaId `json:",omitempty"`
+	id         StopAreaId
+	ParentId   StopAreaId `json:",omitempty"`
+	ReferentId StopAreaId `json:",omitempty"`
 
 	nextCollectAt          time.Time
 	collectedAt            time.Time
@@ -157,6 +158,10 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 
 func (stopArea *StopArea) Parent() (StopArea, bool) {
 	return stopArea.model.StopAreas().Find(stopArea.ParentId)
+}
+
+func (stopArea *StopArea) Referent() (StopArea, bool) {
+	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
 }
 
 func (stopArea *StopArea) Save() (ok bool) {
@@ -324,6 +329,9 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 		if sa.ParentId.Valid {
 			stopArea.ParentId = StopAreaId(sa.ParentId.String)
+		}
+		if sa.ReferentId.Valid {
+			stopArea.ReferentId = StopAreaId(sa.ReferentId.String)
 		}
 		if sa.CollectedAlways.Valid {
 			stopArea.CollectedAlways = sa.CollectedAlways.Bool

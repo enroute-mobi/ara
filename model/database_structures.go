@@ -52,6 +52,7 @@ type DatabaseStopArea struct {
 	Id                     string         `db:"id"`
 	ReferentialSlug        string         `db:"referential_slug"`
 	ParentId               sql.NullString `db:"parent_id"`
+	ReferentId             sql.NullString `db:"referent_id"`
 	ModelName              string         `db:"model_name"`
 	Name                   string         `db:"name"`
 	ObjectIDs              string         `db:"object_ids"`
@@ -70,6 +71,7 @@ type SelectStopArea struct {
 	Name                   sql.NullString
 	ObjectIDs              sql.NullString `db:"object_ids"`
 	ParentId               sql.NullString `db:"parent_id"`
+	ReferentId             sql.NullString `db:"referent_id"`
 	Attributes             sql.NullString
 	References             sql.NullString `db:"siri_references"`
 	LineIds                sql.NullString `db:"line_ids"`
