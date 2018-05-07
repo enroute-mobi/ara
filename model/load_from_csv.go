@@ -14,7 +14,7 @@ import (
 
 /* CSV Structure
 
-stop_area,Id,ParentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
+stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References
 stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
@@ -163,8 +163,8 @@ func prepareDatabase() {
 }
 
 func (loader Loader) handleStopArea(record []string) error {
-	if len(record) != 12 {
-		return fmt.Errorf("Wrong number of entries, expected 12 got %v", len(record))
+	if len(record) != 13 {
+		return fmt.Errorf("Wrong number of entries, expected 13 got %v", len(record))
 	}
 
 	var err error
@@ -178,25 +178,33 @@ func (loader Loader) handleStopArea(record []string) error {
 		}
 	}
 
+	var referent sql.NullString
+	if record[3] != "" {
+		referent = sql.NullString{
+			String: record[3],
+			Valid:  true,
+		}
+	}
+
 	var collectedAlways bool
-	if record[9] != "" {
-		collectedAlways, err = strconv.ParseBool(record[9])
+	if record[10] != "" {
+		collectedAlways, err = strconv.ParseBool(record[10])
 		if err != nil {
 			parseErrors["CollectedAlways"] = err.Error()
 		}
 	}
 
 	var collectChildren bool
-	if record[10] != "" {
-		collectChildren, err = strconv.ParseBool(record[10])
+	if record[11] != "" {
+		collectChildren, err = strconv.ParseBool(record[11])
 		if err != nil {
 			parseErrors["CollectChildren"] = err.Error()
 		}
 	}
 
 	var collectGeneralMessages bool
-	if record[11] != "" {
-		collectGeneralMessages, err = strconv.ParseBool(record[11])
+	if record[12] != "" {
+		collectGeneralMessages, err = strconv.ParseBool(record[12])
 		if err != nil {
 			parseErrors["CollectGeneralMessages"] = err.Error()
 		}
@@ -211,12 +219,13 @@ func (loader Loader) handleStopArea(record []string) error {
 		Id:                     record[1],
 		ReferentialSlug:        loader.referentialSlug,
 		ParentId:               parent,
-		ModelName:              record[3],
-		Name:                   record[4],
-		ObjectIDs:              record[5],
-		LineIds:                record[6],
-		Attributes:             record[7],
-		References:             record[8],
+		ReferentId:             referent,
+		ModelName:              record[4],
+		Name:                   record[5],
+		ObjectIDs:              record[6],
+		LineIds:                record[7],
+		Attributes:             record[8],
+		References:             record[9],
 		CollectedAlways:        collectedAlways,
 		CollectChildren:        collectChildren,
 		CollectGeneralMessages: collectGeneralMessages,
