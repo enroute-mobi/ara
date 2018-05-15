@@ -43,7 +43,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		ResponseTimestamp: connector.Clock().Now(),
 	}
 
-	var annotedStopPointArray []string
+	annotedStopPointMap := make(map[string]struct{})
 
 	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
@@ -51,14 +51,19 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			continue
 		}
 
-		objectID, ok := stopArea.ObjectID(objectIDKind)
+		objectID, ok := stopArea.ReferentOrSelfObjectId(objectIDKind)
 		if !ok {
 			continue
 		}
+		_, ok = annotedStopPointMap[objectID]
+		if ok {
+			continue
+		}
+		annotedStopPointMap[objectID] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
 			StopName:     stopArea.Name,
-			StopPointRef: objectID.Value(),
+			StopPointRef: objectID,
 			Monitored:    true,
 			TimingPoint:  true,
 		}
@@ -72,13 +77,12 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		if len(annotedStopPoint.Lines) == 0 {
 			continue
 		}
-		annotedStopPointArray = append(annotedStopPointArray, annotedStopPoint.StopPointRef)
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 	}
 
 	sort.Sort(siri.SIRIAnnotatedStopPointByStopPointRef(response.AnnotatedStopPoints))
 
-	logStashEvent["annotedStopPoints"] = strings.Join(annotedStopPointArray, ", ")
+	logAnnotatedStopPoints(annotedStopPointMap, logStashEvent)
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 
 	return response, nil
@@ -98,6 +102,17 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPar
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
+}
+
+func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEvent audit.LogStashEvent) {
+	keys := make([]string, len(annotedStopPointMap))
+	i := 0
+	for key := range annotedStopPointMap {
+		keys[i] = key
+		i++
+	}
+
+	logStashEvent["annotedStopPoints"] = strings.Join(keys, ", ")
 }
 
 func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {

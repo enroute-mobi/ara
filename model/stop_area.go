@@ -157,11 +157,32 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 }
 
 func (stopArea *StopArea) Parent() (StopArea, bool) {
+	if stopArea.ParentId == "" {
+		return StopArea{}, false
+	}
 	return stopArea.model.StopAreas().Find(stopArea.ParentId)
 }
 
 func (stopArea *StopArea) Referent() (StopArea, bool) {
+	if stopArea.ReferentId == "" {
+		return StopArea{}, false
+	}
 	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
+}
+
+func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (string, bool) {
+	ref, ok := stopArea.Referent()
+	if ok {
+		objectID, ok := ref.ObjectID(objectIDKind)
+		if ok {
+			return objectID.Value(), true
+		}
+	}
+	objectID, ok := stopArea.ObjectID(objectIDKind)
+	if ok {
+		return objectID.Value(), true
+	}
+	return "", false
 }
 
 func (stopArea *StopArea) Save() (ok bool) {
