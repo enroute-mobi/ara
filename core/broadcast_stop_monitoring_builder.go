@@ -255,7 +255,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *model.Reference) {
 	stopArea, ok := builder.tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if ok {
-		obj, ok := stopArea.ObjectID(builder.remoteObjectidKind)
+		obj, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
 		if ok {
 			reference.ObjectId.SetValue(obj.Value())
 			return
