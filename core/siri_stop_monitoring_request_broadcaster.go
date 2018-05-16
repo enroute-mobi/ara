@@ -90,6 +90,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 
 	// Find Descendants
 	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
+	logger.Log.Debugf("Find Family has returned %v StopAreas", len(stopAreas))
 
 	// Fill StopVisits
 	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {

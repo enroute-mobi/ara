@@ -75,16 +75,12 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 }
 
 func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit model.StopVisit) *siri.SIRIMonitoredStopVisit {
-	stopPointRef, ok := builder.tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+	stopPointRef, stopPointRefObjectId, ok := builder.stopPointRef(stopVisit.StopAreaId)
 	if !ok {
-		logger.Log.Printf("Ignore StopVisit %s without StopArea", stopVisit.Id())
+		logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
 		return nil
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(builder.remoteObjectidKind)
-	if !ok {
-		logger.Log.Printf("Ignore StopVisit %s with StopArea without correct ObjectID", stopVisit.Id())
-		return nil
-	}
+
 	vehicleJourney, ok := builder.tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 	if !ok {
 		logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
@@ -116,7 +112,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 		ItemIdentifier:         itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
-		StopPointRef:           stopPointRefObjectId.Value(),
+		StopPointRef:           stopPointRefObjectId,
 		StopPointName:          stopPointRef.Name,
 		VehicleJourneyName:     vehicleJourney.Name,
 		OriginName:             vehicleJourney.OriginName,
@@ -168,6 +164,25 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetReferences()
 
 	return monitoredStopVisit
+}
+
+func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+	stopPointRef, ok := builder.tx.Model().StopAreas().Find(stopAreaId)
+	if !ok {
+		return model.StopArea{}, "", false
+	}
+	stopPointRefObjectId, ok := stopPointRef.ObjectID(builder.remoteObjectidKind)
+	if ok {
+		return stopPointRef, stopPointRefObjectId.Value(), true
+	}
+	referent, ok := stopPointRef.Referent()
+	if ok {
+		referentObjectId, ok := referent.ObjectID(builder.remoteObjectidKind)
+		if ok {
+			return referent, referentObjectId.Value(), true
+		}
+	}
+	return model.StopArea{}, "", false
 }
 
 func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit model.StopVisit) (string, bool) {

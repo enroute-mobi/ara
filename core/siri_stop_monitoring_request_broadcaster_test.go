@@ -129,6 +129,102 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 }
 
+func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	objectid2 := model.NewObjectID("wrongObjectidKind", "NINOXE:StopPoint:SP:20:LOC")
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.ReferentId = stopArea.Id()
+	stopArea2.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	stopVisitRef := model.Reference{}
+	obj1 := model.NewObjectID("objectidKind", "modelOperatorRef")
+	stopVisitRef.ObjectId = &obj1
+
+	stopVisit.SetObjectID(obj1)
+	stopVisit.References.Set("OperatorRef", stopVisitRef)
+	stopVisit.StopAreaId = stopArea.Id()
+
+	stopVisit.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	obj := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:26:LOC")
+	vehicleJourney.SetObjectID(obj)
+	vehicleJourney.Save()
+
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+
+	line := referential.model.Lines().New()
+	obj = model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:27:LOC")
+	line.SetObjectID(obj)
+	line.Save()
+
+	vehicleJourney.LineId = line.Id()
+
+	stopVisit2 := referential.model.StopVisits().New()
+	obj2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:28:LOC")
+	stopVisit2.SetObjectID(obj2)
+	stopVisit2.References.Set("OperatorRef", stopVisitRef)
+	stopVisit2.StopAreaId = stopArea2.Id()
+
+	stopVisit2.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit2.Save()
+
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+
+	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := connector.RequestStopArea(request)
+
+	if response.Address != "http://edwig" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	}
+	if response.ProducerRef != "Edwig" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	}
+	if response.RequestMessageRef != "StopMonitoring:Test:0" {
+		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
+	}
+	time := connector.Clock().Now()
+	if !response.ResponseTimestamp.Equal(time) {
+		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
+	}
+
+	if len(response.MonitoredStopVisits) != 2 {
+		t.Fatalf("Response.MonitoredStopVisits should be 2 is %v", len(response.MonitoredStopVisits))
+	}
+	if response.MonitoredStopVisits[0].StopPointRef != objectid.Value() || response.MonitoredStopVisits[1].StopPointRef != objectid.Value() {
+		t.Errorf("Both MonitoredStopVisits should have the same StopPointRef, got %v and %v", response.MonitoredStopVisits[0].StopPointRef, response.MonitoredStopVisits[1].StopPointRef)
+	}
+}
+
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")

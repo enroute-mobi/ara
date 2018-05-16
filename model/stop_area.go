@@ -325,7 +325,7 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 
 	stopAreaIds = []StopAreaId{stopAreaId}
 	for _, stopArea := range manager.byIdentifier {
-		if stopArea.ParentId == stopAreaId {
+		if stopArea.ParentId == stopAreaId || stopArea.ReferentId == stopAreaId {
 			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
 		}
 	}
