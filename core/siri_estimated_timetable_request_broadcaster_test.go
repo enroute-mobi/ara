@@ -172,6 +172,127 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	}
 }
 
+func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.Monitored = true
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(model.NewObjectID("wrongObjectidKind", "stopArea2"))
+	stopArea2.ReferentId = stopArea.Id()
+	stopArea2.Monitored = true
+	stopArea2.Save()
+
+	line := referential.model.Lines().New()
+	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.Name = "lineName"
+	line.Save()
+
+	line2 := referential.model.Lines().New()
+	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.Name = "lineName2"
+	line2.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	vehicleJourney2 := referential.model.VehicleJourneys().New()
+	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
+	vehicleJourney2.LineId = line2.Id()
+	vehicleJourney2.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.PassageOrder = 1
+	stopVisit.ArrivalStatus = "onTime"
+	stopVisit.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit.Save()
+
+	stopVisit3 := referential.model.StopVisits().New()
+	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "stopVisit3"))
+	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
+	stopVisit3.StopAreaId = stopArea2.Id()
+	stopVisit3.PassageOrder = 1
+	stopVisit3.ArrivalStatus = "onTime"
+	stopVisit3.Schedules.SetArrivalTime("aimed", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Schedules.SetArrivalTime("expected", connector.Clock().Now().Add(1*time.Minute))
+	stopVisit3.Save()
+
+	file, err := os.Open("testdata/estimated_timetable_request.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLGetEstimatedTimetableFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := connector.RequestLine(request)
+
+	if len(response.EstimatedJourneyVersionFrames) != 2 {
+		t.Fatalf("Response should have 2 EstimatedJourneyVersionFrames, got: %v", len(response.EstimatedJourneyVersionFrames))
+	}
+
+	firstLine := response.EstimatedJourneyVersionFrames[0]
+	if len(firstLine.EstimatedVehicleJourneys) != 1 {
+		t.Fatalf("First EstimatedJourneyVersionFrame should have 1 EstimatedVehicleJourneys, got: %v", len(firstLine.EstimatedVehicleJourneys))
+	}
+	firstVJ := firstLine.EstimatedVehicleJourneys[0]
+	if firstVJ.LineRef != "NINOXE:Line:2:LOC" {
+		t.Errorf("Wrong LineRef for first EstimatedVehicleJourney:\n got: %v\n want: NINOXE:Line:2:LOC", firstVJ.LineRef)
+	}
+	if firstVJ.DatedVehicleJourneyRef != "vehicleJourney" {
+		t.Errorf("Wrong DatedVehicleJourneyRef for first EstimatedVehicleJourney:\n got: %v\n want: vehicleJourney", firstVJ.DatedVehicleJourneyRef)
+	}
+	if len(firstVJ.EstimatedCalls) != 1 {
+		t.Fatalf("First EstimatedVehicleJourney should have 1 EstimatedCalls, got: %v", len(firstVJ.EstimatedCalls))
+	}
+	firstEC := firstVJ.EstimatedCalls[0]
+	if firstEC.StopPointRef != "stopArea1" {
+		t.Errorf("Wrong StopPointRef for first EstimatedCall:\n got: %v\n want: stopArea1", firstEC.StopPointRef)
+	}
+
+	secondLine := response.EstimatedJourneyVersionFrames[1]
+	if len(secondLine.EstimatedVehicleJourneys) != 1 {
+		t.Fatalf("Second EstimatedJourneyVersionFrame should have 1 EstimatedVehicleJourneys, got: %v", len(secondLine.EstimatedVehicleJourneys))
+	}
+	secondVJ := secondLine.EstimatedVehicleJourneys[0]
+	if secondVJ.LineRef != "NINOXE:Line:3:LOC" {
+		t.Errorf("Wrong LineRef for second EstimatedVehicleJourney:\n got: %v\n want: NINOXE:Line:3:LOC", secondVJ.LineRef)
+	}
+	if secondVJ.DatedVehicleJourneyRef != "vehicleJourney2" {
+		t.Errorf("Wrong DatedVehicleJourneyRef for second EstimatedVehicleJourney:\n got: %v\n want: vehicleJourney", secondVJ.DatedVehicleJourneyRef)
+	}
+	if len(secondVJ.EstimatedCalls) != 1 {
+		t.Fatalf("Second EstimatedVehicleJourney should have 1 EstimatedCalls, got: %v", len(secondVJ.EstimatedCalls))
+	}
+	secondEC := secondVJ.EstimatedCalls[0]
+	if secondEC.StopPointRef != "stopArea1" {
+		t.Errorf("Wrong StopPointRef for second EstimatedCall:\n got: %v\n want: stopArea1", secondEC.StopPointRef)
+	}
+}
+
 func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
 		slug:           "partner",

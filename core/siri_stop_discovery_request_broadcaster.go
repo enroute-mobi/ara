@@ -55,15 +55,15 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		if !ok {
 			continue
 		}
-		_, ok = annotedStopPointMap[objectID]
+		_, ok = annotedStopPointMap[objectID.Value()]
 		if ok {
 			continue
 		}
-		annotedStopPointMap[objectID] = struct{}{}
+		annotedStopPointMap[objectID.Value()] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
 			StopName:     stopArea.Name,
-			StopPointRef: objectID,
+			StopPointRef: objectID.Value(),
 			Monitored:    true,
 			TimingPoint:  true,
 		}

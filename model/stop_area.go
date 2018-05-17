@@ -170,19 +170,19 @@ func (stopArea *StopArea) Referent() (StopArea, bool) {
 	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
 }
 
-func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (string, bool) {
+func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (ObjectID, bool) {
 	ref, ok := stopArea.Referent()
 	if ok {
 		objectID, ok := ref.ObjectID(objectIDKind)
 		if ok {
-			return objectID.Value(), true
+			return objectID, true
 		}
 	}
 	objectID, ok := stopArea.ObjectID(objectIDKind)
 	if ok {
-		return objectID.Value(), true
+		return objectID, true
 	}
-	return "", false
+	return ObjectID{}, false
 }
 
 func (stopArea *StopArea) Save() (ok bool) {
