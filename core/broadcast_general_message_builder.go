@@ -178,7 +178,7 @@ func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(reference *mod
 	if !ok {
 		return "", false
 	}
-	stopAreaObjectId, ok := stopArea.ObjectID(builder.remoteObjectidKind)
+	stopAreaObjectId, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
 	if !ok {
 		return "", false
 	}
