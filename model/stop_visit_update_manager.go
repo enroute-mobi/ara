@@ -46,6 +46,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		stopArea.Origin = event.Origin
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
+		stopArea.CollectGeneralMessages = true
 		stopArea.Monitored = true
 		stopArea.Save()
 
@@ -137,8 +138,12 @@ func (updater *StopVisitUpdater) Update() {
 	line := updater.findOrCreateLine()
 
 	// Update StopArea
-	stopArea.Updated(updater.Clock().Now())
 	stopArea.LineIds.Add(line.Id())
+	referent, ok := updater.tx.Model().StopAreas().Find(stopArea.ReferentId)
+	if ok {
+		referent.LineIds.Add(line.Id())
+		referent.Save()
+	}
 	stopArea.Save()
 
 	// Create or update VJ
@@ -206,6 +211,7 @@ func (updater *StopVisitUpdater) findOrCreateLine() *Line {
 	line.SetObjectID(lineAttributes.ObjectId)
 	line.SetObjectID(NewObjectID("_default", lineAttributes.ObjectId.HashValue()))
 	line.Name = lineAttributes.Name
+	line.CollectGeneralMessages = true
 
 	line.Save()
 
