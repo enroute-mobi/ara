@@ -12,8 +12,9 @@ import (
 func createTestPartnerManager() *PartnerManager {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
+	referential.collectManager = NewTestCollectManager()
 	referentials.Save(referential)
-	return NewPartnerManager(referential)
+	return (referential.partners).(*PartnerManager)
 }
 
 func Test_Partner_Id(t *testing.T) {

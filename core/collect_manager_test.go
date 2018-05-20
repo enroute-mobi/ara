@@ -112,32 +112,70 @@ func Test_CollectManager_StopAreaMonitored(t *testing.T) {
 	referentials.Save(referential)
 
 	stopArea := referential.Model().StopAreas().New()
+	stopArea.Origins.NewOrigin("partner")
 	stopArea.Monitored = true
 	stopArea.SetObjectID(model.NewObjectID("test", "value"))
 	stopArea.Save()
 
-	stopAreaUpdateRequest := &StopAreaUpdateRequest{
-		id:         StopAreaUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
-		stopAreaId: stopArea.Id(),
-		createdAt:  referential.Clock().Now(),
-	}
-	referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
+	referential.CollectManager().HandlePartnerStatusChange("partner", false)
 
 	updatedStopArea, _ := referential.Model().StopAreas().Find(stopArea.Id())
 	if updatedStopArea.Monitored {
 		t.Errorf("StopArea Monitored should be false after CollectManager UpdateStopArea")
 	}
+	if status, ok := updatedStopArea.Origins.Origin("partner"); !ok || status {
+		t.Errorf("StopArea should have an Origin partner:false, got: %v", updatedStopArea.Origins.AllOrigin())
+	}
 
-	partner := referential.Partners().New("partner")
-	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
-	partner.RefreshConnectors()
-	partner.Settings["remote_objectid_kind"] = "test"
-	partner.PartnerStatus = PartnerStatus{OperationnalStatus: OPERATIONNAL_STATUS_UP}
-	referential.Partners().Save(partner)
+	referential.CollectManager().HandlePartnerStatusChange("partner", true)
 
-	referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 	updatedStopArea, _ = referential.Model().StopAreas().Find(stopArea.Id())
 	if !updatedStopArea.Monitored {
 		t.Errorf("StopArea Monitored should be true after CollectManager UpdateStopArea")
+	}
+	if status, ok := updatedStopArea.Origins.Origin("partner"); !ok || !status {
+		t.Errorf("StopArea should have an Origin partner:false, got: %v", updatedStopArea.Origins.AllOrigin())
+	}
+}
+
+func Test_CollectManager_StopAreaMonitoredWithReferent(t *testing.T) {
+	// logger.Log.Debug = true
+	// defer func() { logger.Log.Debug = false }()
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	referentials.Save(referential)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Origins.NewOrigin("partner")
+	stopArea.Monitored = true
+	stopArea.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.Origins.NewOrigin("partner2")
+	stopArea2.ReferentId = stopArea.Id()
+	stopArea2.Monitored = true
+	stopArea2.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea2.Save()
+
+	referential.CollectManager().HandlePartnerStatusChange("partner2", false)
+
+	updatedStopArea, _ := referential.Model().StopAreas().Find(stopArea.Id())
+	if updatedStopArea.Monitored {
+		t.Errorf("StopArea Monitored should be false after CollectManager UpdateStopArea")
+	}
+	if status, ok := updatedStopArea.Origins.Origin("partner2"); !ok || status {
+		t.Errorf("StopArea should have an Origin partner:false, got: %v", updatedStopArea.Origins.AllOrigin())
+	}
+
+	referential.CollectManager().HandlePartnerStatusChange("partner2", true)
+
+	updatedStopArea, _ = referential.Model().StopAreas().Find(stopArea.Id())
+	if !updatedStopArea.Monitored {
+		t.Errorf("StopArea Monitored should be true after CollectManager UpdateStopArea")
+	}
+	if status, ok := updatedStopArea.Origins.Origin("partner2"); !ok || !status {
+		t.Errorf("StopArea should have an Origin partner:false, got: %v", updatedStopArea.Origins.AllOrigin())
 	}
 }

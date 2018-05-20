@@ -530,7 +530,7 @@ func NewPartnerManager(referential *Referential) *PartnerManager {
 		byId:        make(map[PartnerId]*Partner),
 		referential: referential,
 	}
-	manager.guardian = NewPartnersGuardian(manager)
+	manager.guardian = NewPartnersGuardian(referential)
 	return manager
 }
 

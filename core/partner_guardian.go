@@ -11,12 +11,12 @@ import (
 type PartnersGuardian struct {
 	model.ClockConsumer
 
-	stop     chan struct{}
-	partners Partners
+	stop        chan struct{}
+	referential *Referential
 }
 
-func NewPartnersGuardian(partners Partners) *PartnersGuardian {
-	return &PartnersGuardian{partners: partners}
+func NewPartnersGuardian(referential *Referential) *PartnersGuardian {
+	return &PartnersGuardian{referential: referential}
 }
 
 func (guardian *PartnersGuardian) Start() {
@@ -40,7 +40,7 @@ func (guardian *PartnersGuardian) Run() {
 			return
 		case <-guardian.Clock().After(30 * time.Second):
 			logger.Log.Debugf("Check partners status")
-			for _, partner := range guardian.partners.FindAll() {
+			for _, partner := range guardian.referential.Partners().FindAll() {
 				go guardian.routineWork(partner)
 			}
 		}
@@ -64,6 +64,14 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	}()
 
 	partnerStatus, _ := partner.CheckStatus()
+
+	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus {
+		var status bool
+		if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP {
+			status = true
+		}
+		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), status)
+	}
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN || partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus

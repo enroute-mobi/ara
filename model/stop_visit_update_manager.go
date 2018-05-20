@@ -26,7 +26,6 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
 	if event.StopAreaMonitoredEvent != nil {
-		logger.Log.Debugf("StopArea %v monitored %v", event.StopAreaId, event.StopAreaMonitoredEvent.Monitored)
 		manager.UpdateNotMonitoredStopArea(event)
 		return
 	}
@@ -43,7 +42,6 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 
 		stopArea.SetObjectID(event.StopAreaAttributes.ObjectId)
 		stopArea.ParentId = parentSA.Id()
-		stopArea.Origin = event.Origin
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
 		stopArea.CollectGeneralMessages = true
@@ -55,7 +53,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
 	if event.Origin != "" {
-		stopArea.Origin = event.Origin
+		stopArea.Origins.NewOrigin(event.Origin)
 	}
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
@@ -75,22 +73,21 @@ func (manager *StopAreaUpdateManager) UpdateNotMonitoredStopArea(event *StopArea
 	if event.StopAreaMonitoredEvent == nil {
 		return
 	}
-
+	logger.Log.Debugf("StopArea %v: partner %v status %v", event.StopAreaId, event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
-	stopAreas := tx.Model().StopAreas().FindFamily(event.StopAreaId)
-
-	for _, id := range stopAreas {
-		stopArea, ok := tx.Model().StopAreas().Find(id)
+	// On change ça en FindAscendants()
+	for _, stopAreaId := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
+		stopArea, ok := tx.Model().StopAreas().Find(stopAreaId)
 		if !ok { // Should never happen
-			logger.Log.Debugf("Can't find StopArea %v in SAUpdateManager after a FindFamily", id)
+			logger.Log.Debugf("Can't update Monitored for unknown StopArea %v ", stopAreaId)
 			continue
 		}
-		stopArea.Monitored = event.StopAreaMonitoredEvent.Monitored
+		stopArea.Origins.SetPartnerStatus(event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
+		stopArea.Monitored = stopArea.Origins.Monitored()
 		stopArea.Save()
 	}
-
 	tx.Commit()
 }
 

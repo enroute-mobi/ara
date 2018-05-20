@@ -16,11 +16,12 @@ type lastState interface {
 type stopAreaLastChange struct {
 	subscription *Subscription
 
-	monitored bool
+	origins model.StopAreaOrigins
 }
 
 func (salc *stopAreaLastChange) InitState(sa *model.StopArea, sub *Subscription) {
-	salc.monitored = sa.Monitored
+	salc.SetSubscription(sub)
+	salc.UpdateState(sa)
 }
 
 func (salc *stopAreaLastChange) SetSubscription(sub *Subscription) {
@@ -28,13 +29,13 @@ func (salc *stopAreaLastChange) SetSubscription(sub *Subscription) {
 }
 
 func (salc *stopAreaLastChange) UpdateState(stopArea *model.StopArea) bool {
-	salc.monitored = stopArea.Monitored
+	salc.origins = *(stopArea.Origins.Copy())
 
 	return true
 }
 
-func (salc *stopAreaLastChange) Haschanged(stopArea model.StopArea) bool {
-	return salc.monitored != stopArea.Monitored
+func (salc *stopAreaLastChange) Haschanged(stopArea *model.StopArea) ([]string, bool) {
+	return salc.origins.PartnersLost(&(stopArea.Origins))
 }
 
 type stopMonitoringLastChange struct {
