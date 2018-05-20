@@ -58,6 +58,55 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	}
 }
 
+func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t *testing.T) {
+	model.SetDefaultClock(model.NewFakeClock())
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.Save()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("internal", string(stopArea.Id()))
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.ReferentId = stopArea.Id()
+	stopArea2.Save()
+
+	reference := model.Reference{
+		ObjectId: &objectid,
+		Type:     "StopArea",
+	}
+
+	subs := partner.Subscriptions().New("StopMonitoringBroadcast")
+	subs.CreateAddNewResource(reference)
+	subs.SetExternalId("externalId")
+	subs.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea2.Id()
+	stopVisit.Save()
+
+	event := &model.StopMonitoringBroadcastEvent{
+		ModelId:   string(stopVisit.Id()),
+		ModelType: "StopVisit",
+	}
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(event)
+	if len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast) != 1 {
+		t.Error("1 events should have been generated got: ", len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast))
+	}
+}
+
 func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	fakeClock := model.NewFakeClock()
 	model.SetDefaultClock(fakeClock)

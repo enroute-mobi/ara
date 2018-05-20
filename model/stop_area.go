@@ -218,6 +218,7 @@ type StopAreas interface {
 	FindAll() []StopArea
 	FindFamily(id StopAreaId) []StopAreaId
 	FindAscendants(id StopAreaId) (stopAreaIds []StopAreaId)
+	FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaIds []ObjectID)
 	Save(stopArea *StopArea) bool
 	Delete(stopArea *StopArea) bool
 }
@@ -368,6 +369,31 @@ func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreaI
 	if sa.ReferentId != "" {
 		stopAreaIds = append(stopAreaIds, manager.FindAscendants(sa.ReferentId)...)
 	}
+
+	return
+}
+
+func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	sa, ok := manager.Find(stopAreaId)
+	if !ok {
+		return
+	}
+
+	if sa.ParentId != "" {
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ParentId, kind)...)
+	}
+	if sa.ReferentId != "" {
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
+	}
+
+	id, ok := sa.ObjectID(kind)
+	if !ok {
+		return
+	}
+	stopAreaObjectIds = []ObjectID{id}
 
 	return
 }

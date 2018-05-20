@@ -106,6 +106,24 @@ func (manager *TransactionalStopAreas) FindAscendants(stopAreaId StopAreaId) (st
 	return
 }
 
+func (manager *TransactionalStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+	for _, stopAreaObjectId := range manager.model.StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, kind) {
+		if !manager.findByObjectIdInDeleted(stopAreaObjectId) {
+			stopAreaObjectIds = append(stopAreaObjectIds, stopAreaObjectId)
+		}
+	}
+	return
+}
+
+func (manager *TransactionalStopAreas) findByObjectIdInDeleted(objectid ObjectID) bool {
+	for _, sa := range manager.deleted {
+		if id, ok := sa.ObjectID(objectid.Kind()); ok && id.Value() == objectid.Value() {
+			return true
+		}
+	}
+	return false
+}
+
 func (manager *TransactionalStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())

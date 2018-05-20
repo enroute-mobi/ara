@@ -113,36 +113,28 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subscriptionIds
 	}
 
-	stopArea, ok := tx.Model().StopAreas().Find(sv.StopAreaId)
-	if !ok {
-		return subscriptionIds
-	}
+	for _, stopAreaObjectId := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)) {
+		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), "StopMonitoringBroadcast")
 
-	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
-	if !ok {
-		return subscriptionIds
-	}
+		for _, sub := range subs {
+			resource := sub.Resource(stopAreaObjectId)
+			if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+				continue
+			}
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
+			lastState, ok := resource.LastState(string(sv.Id()))
+			if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
+				continue
+			}
 
-	for _, sub := range subs {
-		resource := sub.Resource(obj)
-		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
-			continue
+			if !ok {
+				smlc := &stopMonitoringLastChange{}
+				smlc.InitState(&sv, sub)
+				resource.SetLastState(string(sv.Id()), smlc)
+			}
+
+			subscriptionIds = append(subscriptionIds, sub.Id())
 		}
-
-		lastState, ok := resource.LastState(string(sv.Id()))
-		if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
-			continue
-		}
-
-		if !ok {
-			smlc := &stopMonitoringLastChange{}
-			smlc.InitState(&sv, sub)
-			resource.SetLastState(string(sv.Id()), smlc)
-		}
-
-		subscriptionIds = append(subscriptionIds, sub.Id())
 	}
 
 	return subscriptionIds
@@ -256,14 +248,16 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
-		if _, ok := res.LastState(string(sv.Id())); ok {
-			continue
+	for _, saId := range tx.Model().StopAreas().FindFamily(sa.Id()) {
+		for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(saId) {
+			if _, ok := res.LastState(string(sv.Id())); ok {
+				continue
+			}
+			smlc := &stopMonitoringLastChange{}
+			smlc.InitState(&sv, sub)
+			res.SetLastState(string(sv.Id()), smlc)
+			connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
 		}
-		smlc := &stopMonitoringLastChange{}
-		smlc.InitState(&sv, sub)
-		res.SetLastState(string(sv.Id()), smlc)
-		connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
 	}
 }
 

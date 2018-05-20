@@ -168,24 +168,14 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				continue
 			}
 
-			// Find the Resource ObjectId
-			stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
-			if !ok {
-				continue
-			}
-			objectid, ok := stopArea.ObjectID(smb.connector.Partner().RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
-			if !ok {
-				continue
-			}
-
 			// Find the Resource
-			resource := sub.Resource(objectid)
-			if resource == nil {
+			monitoringRef, resource, ok := smb.findResource(stopVisit.StopAreaId, sub, tx)
+			if !ok {
 				continue
 			}
 
 			// Get the monitoredStopVisit
-			stopMonitoringBuilder.MonitoringRef = objectid.Value()
+			stopMonitoringBuilder.MonitoringRef = monitoringRef
 			if !smb.handledStopVisitAppend(stopVisit, delivery, stopMonitoringBuilder) {
 				continue
 			}
@@ -211,6 +201,16 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			smb.sendDelivery(delivery)
 		}
 	}
+}
+
+func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription, tx *model.Transaction) (string, *SubscribedResource, bool) {
+	for _, objectid := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.Partner().RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)) {
+		resource := sub.Resource(objectid)
+		if resource != nil {
+			return objectid.Value(), resource, true
+		}
+	}
+	return "", nil, false
 }
 
 func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoring, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
