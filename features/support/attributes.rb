@@ -38,6 +38,21 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Transform
+    #  | Origin[partner]  | true  |
+    #  | Origin[partner2] | false |
+    # into
+    # "Origins" => {"partner"=>true, "partner2"=>false}
+    if key =~ /Origin\[([^\]]+)\]/
+      partner = $1
+
+      attributes["Origins"] ||= {}
+
+      attributes["Origins"][$1] = value == "true" unless attributes["Origins"].key?($1)
+
+      attributes.delete key
+    end
+
     if key =~ /Messages\[(\d+)\]#(\S+)/
       message_number = $1.to_i
       attribute = $2

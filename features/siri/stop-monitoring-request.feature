@@ -918,10 +918,10 @@ Feature: Support SIRI StopMonitoring by request
       | local_credential     | test     |
       | remote_objectid_kind | external |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
-      | Origin    | partner1                                 |
-      | Monitored | false                                    |
+      | Name             | Test                                     |
+      | ObjectIDs        | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Origin[partner1] | false                                    |
+      | Monitored        | false                                    |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |

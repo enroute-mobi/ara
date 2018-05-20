@@ -27,6 +27,15 @@ func (origins *StopAreaOrigins) MarshalJSON() ([]byte, error) {
 	return json.Marshal(aux)
 }
 
+func (origins *StopAreaOrigins) SetOriginsFromMap(originMap map[string]bool) {
+	origins.Lock()
+	origins.partners = make(map[string]bool)
+	for partner, status := range originMap {
+		origins.partners[partner] = status
+	}
+	origins.Unlock()
+}
+
 func (origins *StopAreaOrigins) Copy() *StopAreaOrigins {
 	cpy := NewStopAreaOrigins()
 

@@ -4,6 +4,7 @@ import "github.com/af83/edwig/logger"
 
 type StopAreaUpdateManager struct {
 	ClockConsumer
+	UUIDConsumer
 
 	transactionProvider TransactionProvider
 }
@@ -25,13 +26,14 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
-	if event.StopAreaMonitoredEvent != nil {
-		manager.UpdateNotMonitoredStopArea(event)
-		return
-	}
-
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
+
+	if event.StopAreaMonitoredEvent != nil {
+		manager.UpdateMonitoredStopArea(event, tx)
+		tx.Commit()
+		return
+	}
 
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
@@ -52,11 +54,14 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
-	if event.Origin != "" {
-		stopArea.Origins.NewOrigin(event.Origin)
-	}
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
+	if event.Origin != "" {
+		status, ok := stopArea.Origins.Origin(event.Origin)
+		if !status || !ok {
+			manager.UpdateMonitoredStopArea(NewStopAreaMonitoredEvent(manager.NewUUID(), event.StopAreaId, event.Origin, true), tx)
+		}
+	}
 
 	tx.Commit()
 
@@ -68,16 +73,12 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 }
 
-func (manager *StopAreaUpdateManager) UpdateNotMonitoredStopArea(event *StopAreaUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpdateEvent, tx *Transaction) {
 	// Should never happen, but don't want to ever have a go nil pointer exception
 	if event.StopAreaMonitoredEvent == nil {
 		return
 	}
-	logger.Log.Debugf("StopArea %v: partner %v status %v", event.StopAreaId, event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
-	tx := manager.transactionProvider.NewTransaction()
-	defer tx.Close()
 
-	// On change ça en FindAscendants()
 	for _, stopAreaId := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
 		stopArea, ok := tx.Model().StopAreas().Find(stopAreaId)
 		if !ok { // Should never happen
@@ -88,7 +89,6 @@ func (manager *StopAreaUpdateManager) UpdateNotMonitoredStopArea(event *StopArea
 		stopArea.Monitored = stopArea.Origins.Monitored()
 		stopArea.Save()
 	}
-	tx.Commit()
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {

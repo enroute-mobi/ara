@@ -123,6 +123,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		ObjectIDs  map[string]string
 		References map[string]Reference
+		Origins    map[string]bool
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),
@@ -138,6 +139,10 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 
 	if aux.References != nil {
 		stopArea.References.SetReferences(aux.References)
+	}
+
+	if aux.Origins != nil {
+		stopArea.Origins.SetOriginsFromMap(aux.Origins)
 	}
 
 	return nil
