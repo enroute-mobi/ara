@@ -19,11 +19,11 @@ type StopAreaAttributes struct {
 type StopArea struct {
 	ObjectIDConsumer
 
-	model  Model
-	Origin string
+	model Model
 
-	id       StopAreaId
-	ParentId StopAreaId `json:",omitempty"`
+	id         StopAreaId
+	ParentId   StopAreaId `json:",omitempty"`
+	ReferentId StopAreaId `json:",omitempty"`
 
 	nextCollectAt          time.Time
 	collectedAt            time.Time
@@ -32,6 +32,7 @@ type StopArea struct {
 	CollectGeneralMessages bool
 
 	Monitored bool
+	Origins   StopAreaOrigins
 
 	Name            string
 	LineIds         StopAreaLineIds `json:"Lines,omitempty"`
@@ -44,12 +45,19 @@ type StopArea struct {
 func NewStopArea(model Model) *StopArea {
 	stopArea := &StopArea{
 		model:           model,
+		Origins:         NewStopAreaOrigins(),
 		Attributes:      NewAttributes(),
 		References:      NewReferences(),
 		CollectedAlways: true,
 	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
+}
+
+func (stopArea *StopArea) copy() *StopArea {
+	s := *stopArea
+	s.Origins = *(stopArea.Origins.Copy())
+	return &s
 }
 
 func (stopArea *StopArea) Id() StopAreaId {
@@ -115,6 +123,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		ObjectIDs  map[string]string
 		References map[string]Reference
+		Origins    map[string]bool
 		*Alias
 	}{
 		Alias: (*Alias)(stopArea),
@@ -130,6 +139,10 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 
 	if aux.References != nil {
 		stopArea.References.SetReferences(aux.References)
+	}
+
+	if aux.Origins != nil {
+		stopArea.Origins.SetOriginsFromMap(aux.Origins)
 	}
 
 	return nil
@@ -156,7 +169,32 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 }
 
 func (stopArea *StopArea) Parent() (StopArea, bool) {
+	if stopArea.ParentId == "" {
+		return StopArea{}, false
+	}
 	return stopArea.model.StopAreas().Find(stopArea.ParentId)
+}
+
+func (stopArea *StopArea) Referent() (StopArea, bool) {
+	if stopArea.ReferentId == "" {
+		return StopArea{}, false
+	}
+	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
+}
+
+func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (ObjectID, bool) {
+	ref, ok := stopArea.Referent()
+	if ok {
+		objectID, ok := ref.ObjectID(objectIDKind)
+		if ok {
+			return objectID, true
+		}
+	}
+	objectID, ok := stopArea.ObjectID(objectIDKind)
+	if ok {
+		return objectID, true
+	}
+	return ObjectID{}, false
 }
 
 func (stopArea *StopArea) Save() (ok bool) {
@@ -181,8 +219,11 @@ type StopAreas interface {
 	Find(id StopAreaId) (StopArea, bool)
 	FindByObjectId(objectid ObjectID) (StopArea, bool)
 	FindByLineId(id LineId) []StopArea
+	FindByOrigin(origin string) []StopAreaId
 	FindAll() []StopArea
-	FindFamily(stopAreaId StopAreaId) []StopAreaId
+	FindFamily(id StopAreaId) []StopAreaId
+	FindAscendants(id StopAreaId) (stopAreaIds []StopAreaId)
+	FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaIds []ObjectID)
 	Save(stopArea *StopArea) bool
 	Delete(stopArea *StopArea) bool
 }
@@ -218,7 +259,7 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 
 	stopArea, ok := manager.byIdentifier[id]
 	if ok {
-		return *stopArea, true
+		return *(stopArea.copy()), true
 	} else {
 		return StopArea{}, false
 	}
@@ -231,7 +272,7 @@ func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, boo
 	for _, stopArea := range manager.byIdentifier {
 		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
 		if stopAreaObjectId.Value() == objectid.Value() {
-			return *stopArea, true
+			return *(stopArea.copy()), true
 		}
 	}
 	return StopArea{}, false
@@ -243,7 +284,19 @@ func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []StopArea) {
 
 	for _, stopArea := range manager.byIdentifier {
 		if stopArea.LineIds.Contains(id) {
-			stopAreas = append(stopAreas, *stopArea)
+			stopAreas = append(stopAreas, *(stopArea.copy()))
+		}
+	}
+	return
+}
+
+func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAreaId) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, stopArea := range manager.byIdentifier {
+		if _, ok := stopArea.Origins.Origin(origin); ok {
+			stopAreas = append(stopAreas, stopArea.Id())
 		}
 	}
 	return
@@ -257,7 +310,7 @@ func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
 		return []StopArea{}
 	}
 	for _, stopArea := range manager.byIdentifier {
-		stopAreas = append(stopAreas, *stopArea)
+		stopAreas = append(stopAreas, *(stopArea.copy()))
 	}
 	return
 }
@@ -299,11 +352,55 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 
 	stopAreaIds = []StopAreaId{stopAreaId}
 	for _, stopArea := range manager.byIdentifier {
-		if stopArea.ParentId == stopAreaId {
+		if stopArea.ParentId == stopAreaId || stopArea.ReferentId == stopAreaId {
 			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
 		}
 	}
-	return stopAreaIds
+	return
+}
+
+func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	sa, ok := manager.Find(stopAreaId)
+	if !ok {
+		return
+	}
+	stopAreaIds = []StopAreaId{stopAreaId}
+	if sa.ParentId != "" {
+		stopAreaIds = append(stopAreaIds, manager.FindAscendants(sa.ParentId)...)
+	}
+	if sa.ReferentId != "" {
+		stopAreaIds = append(stopAreaIds, manager.FindAscendants(sa.ReferentId)...)
+	}
+
+	return
+}
+
+func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	sa, ok := manager.Find(stopAreaId)
+	if !ok {
+		return
+	}
+
+	if sa.ParentId != "" {
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ParentId, kind)...)
+	}
+	if sa.ReferentId != "" {
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
+	}
+
+	id, ok := sa.ObjectID(kind)
+	if !ok {
+		return
+	}
+	stopAreaObjectIds = []ObjectID{id}
+
+	return
 }
 
 func (manager *MemoryStopAreas) Load(referentialSlug string) error {
@@ -324,6 +421,9 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 		if sa.ParentId.Valid {
 			stopArea.ParentId = StopAreaId(sa.ParentId.String)
+		}
+		if sa.ReferentId.Valid {
+			stopArea.ReferentId = StopAreaId(sa.ReferentId.String)
 		}
 		if sa.CollectedAlways.Valid {
 			stopArea.CollectedAlways = sa.CollectedAlways.Bool

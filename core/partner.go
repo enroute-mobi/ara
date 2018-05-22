@@ -502,7 +502,7 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	if err != nil {
 		logger.Log.Printf("Error while checking status: %v", err)
 	}
-	logger.Log.Debugf("Partner status is %v", partnerStatus.OperationnalStatus)
+	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
 }
 
@@ -530,7 +530,7 @@ func NewPartnerManager(referential *Referential) *PartnerManager {
 		byId:        make(map[PartnerId]*Partner),
 		referential: referential,
 	}
-	manager.guardian = NewPartnersGuardian(manager)
+	manager.guardian = NewPartnersGuardian(referential)
 	return manager
 }
 

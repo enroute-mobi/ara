@@ -182,27 +182,11 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastE
 	case "StopArea":
 		sa, ok := tx.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			subsIds := connector.checkStopAreaEvent(sa, tx)
-			if len(subsIds) != 0 {
-				connector.addProducerUnavailable(subsIds, sa.Origin)
-			}
+			connector.checkStopAreaEvent(&sa, tx)
 		}
 	default:
 		return
 	}
-}
-
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addProducerUnavailable(subsIds []SubscriptionId, producer string) {
-	connector.mutex.Lock()
-	for _, subId := range subsIds {
-		nm, ok := connector.notMonitored[SubscriptionId(subId)]
-		if !ok {
-			nm = make(map[string]struct{})
-			connector.notMonitored[SubscriptionId(subId)] = nm
-		}
-		nm[producer] = struct{}{}
-	}
-	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId, tx *model.Transaction) {
@@ -255,16 +239,15 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(sub
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea model.StopArea, tx *model.Transaction) []SubscriptionId {
-	subscriptionIds := []SubscriptionId{}
-
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {
 	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 	if !ok {
-		return subscriptionIds
+		return
 	}
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "EstimatedTimeTableBroadcast")
+	connector.mutex.Lock()
 
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "EstimatedTimeTableBroadcast")
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
 		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
@@ -273,18 +256,26 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 
 		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
-			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored && stopArea.Origin != "" {
-				subscriptionIds = append(subscriptionIds, sub.Id())
+			partners, ok := lastState.(*stopAreaLastChange).Haschanged(stopArea)
+			if ok {
+				nm, ok := connector.notMonitored[sub.Id()]
+				if !ok {
+					nm = make(map[string]struct{})
+					connector.notMonitored[sub.Id()] = nm
+				}
+				for _, partner := range partners {
+					nm[partner] = struct{}{}
+				}
 			}
-			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
+			lastState.(*stopAreaLastChange).UpdateState(stopArea)
 		} else { // Should not happen
 			salc := &stopAreaLastChange{}
-			salc.InitState(&stopArea, sub)
+			salc.InitState(stopArea, sub)
 			resource.SetLastState(string(stopArea.Id()), salc)
 		}
 	}
 
-	return subscriptionIds
+	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {

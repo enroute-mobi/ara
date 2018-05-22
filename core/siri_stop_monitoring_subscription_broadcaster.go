@@ -91,27 +91,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 	case "StopArea":
 		sa, ok := tx.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			subsIds := connector.checkStopAreaEvent(sa, tx)
-			if len(subsIds) != 0 {
-				connector.addProducerUnavailable(subsIds, sa.Origin)
-			}
+			connector.checkStopAreaEvent(&sa, tx)
 		}
 	default:
 		return
 	}
-}
-
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addProducerUnavailable(subsIds []SubscriptionId, producer string) {
-	connector.mutex.Lock()
-	for _, subId := range subsIds {
-		nm, ok := connector.notMonitored[SubscriptionId(subId)]
-		if !ok {
-			nm = make(map[string]struct{})
-			connector.notMonitored[SubscriptionId(subId)] = nm
-		}
-		nm[producer] = struct{}{}
-	}
-	connector.mutex.Unlock()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subsIds []SubscriptionId, svId model.StopVisitId) {
@@ -129,51 +113,42 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subscriptionIds
 	}
 
-	stopArea, ok := tx.Model().StopAreas().Find(sv.StopAreaId)
-	if !ok {
-		return subscriptionIds
-	}
+	for _, stopAreaObjectId := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)) {
+		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), "StopMonitoringBroadcast")
 
-	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
-	if !ok {
-		return subscriptionIds
-	}
+		for _, sub := range subs {
+			resource := sub.Resource(stopAreaObjectId)
+			if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+				continue
+			}
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
+			lastState, ok := resource.LastState(string(sv.Id()))
+			if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
+				continue
+			}
 
-	for _, sub := range subs {
-		resource := sub.Resource(obj)
-		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
-			continue
+			if !ok {
+				smlc := &stopMonitoringLastChange{}
+				smlc.InitState(&sv, sub)
+				resource.SetLastState(string(sv.Id()), smlc)
+			}
+
+			subscriptionIds = append(subscriptionIds, sub.Id())
 		}
-
-		lastState, ok := resource.LastState(string(sv.Id()))
-		if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
-			continue
-		}
-
-		if !ok {
-			smlc := &stopMonitoringLastChange{}
-			smlc.InitState(&sv, sub)
-			resource.SetLastState(string(sv.Id()), smlc)
-		}
-
-		subscriptionIds = append(subscriptionIds, sub.Id())
 	}
 
 	return subscriptionIds
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea model.StopArea, tx *model.Transaction) []SubscriptionId {
-	subscriptionIds := []SubscriptionId{}
-
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {
 	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER))
 	if !ok {
-		return subscriptionIds
+		return
 	}
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
+	connector.mutex.Lock()
 
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
 		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
@@ -182,18 +157,26 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 
 		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
-			if lastState.(*stopAreaLastChange).Haschanged(stopArea) && !stopArea.Monitored && stopArea.Origin != "" {
-				subscriptionIds = append(subscriptionIds, sub.Id())
+			partners, ok := lastState.(*stopAreaLastChange).Haschanged(stopArea)
+			if ok {
+				nm, ok := connector.notMonitored[sub.Id()]
+				if !ok {
+					nm = make(map[string]struct{})
+					connector.notMonitored[sub.Id()] = nm
+				}
+				for _, partner := range partners {
+					nm[partner] = struct{}{}
+				}
 			}
-			lastState.(*stopAreaLastChange).UpdateState(&stopArea)
+			lastState.(*stopAreaLastChange).UpdateState(stopArea)
 		} else { // Should not happen
 			salc := &stopAreaLastChange{}
-			salc.InitState(&stopArea, sub)
+			salc.InitState(stopArea, sub)
 			resource.SetLastState(string(stopArea.Id()), salc)
 		}
 	}
 
-	return subscriptionIds
+	connector.mutex.Unlock()
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
@@ -265,14 +248,16 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
-		if _, ok := res.LastState(string(sv.Id())); ok {
-			continue
+	for _, saId := range tx.Model().StopAreas().FindFamily(sa.Id()) {
+		for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(saId) {
+			if _, ok := res.LastState(string(sv.Id())); ok {
+				continue
+			}
+			smlc := &stopMonitoringLastChange{}
+			smlc.InitState(&sv, sub)
+			res.SetLastState(string(sv.Id()), smlc)
+			connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
 		}
-		smlc := &stopMonitoringLastChange{}
-		smlc.InitState(&sv, sub)
-		res.SetLastState(string(sv.Id()), smlc)
-		connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
 	}
 }
 

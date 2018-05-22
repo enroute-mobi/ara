@@ -26,7 +26,7 @@ func (manager *TransactionalStopAreas) New() StopArea {
 func (manager *TransactionalStopAreas) Find(id StopAreaId) (StopArea, bool) {
 	stopArea, ok := manager.saved[id]
 	if ok {
-		return *stopArea, ok
+		return *(stopArea.copy()), ok
 	}
 
 	return manager.model.StopAreas().Find(id)
@@ -36,7 +36,7 @@ func (manager *TransactionalStopAreas) FindByObjectId(objectid ObjectID) (StopAr
 	for _, stopArea := range manager.saved {
 		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
 		if stopAreaObjectId.Value() == objectid.Value() {
-			return *stopArea, true
+			return *(stopArea.copy()), true
 		}
 	}
 	return manager.model.StopAreas().FindByObjectId(objectid)
@@ -47,7 +47,7 @@ func (manager *TransactionalStopAreas) FindByLineId(id LineId) (stopAreas []Stop
 	// Check saved StopAreas
 	for _, stopArea := range manager.saved {
 		if stopArea.LineIds.Contains(id) {
-			stopAreas = append(stopAreas, *stopArea)
+			stopAreas = append(stopAreas, *(stopArea.copy()))
 		}
 	}
 
@@ -64,7 +64,7 @@ func (manager *TransactionalStopAreas) FindByLineId(id LineId) (stopAreas []Stop
 func (manager *TransactionalStopAreas) FindAll() []StopArea {
 	stopAreas := []StopArea{}
 	for _, savedStopArea := range manager.saved {
-		stopAreas = append(stopAreas, *savedStopArea)
+		stopAreas = append(stopAreas, *(savedStopArea.copy()))
 	}
 	modelStopAreas := manager.model.StopAreas().FindAll()
 	for _, stopArea := range modelStopAreas {
@@ -76,26 +76,52 @@ func (manager *TransactionalStopAreas) FindAll() []StopArea {
 	return stopAreas
 }
 
-func (manager *TransactionalStopAreas) FindFamily(stopAreaId StopAreaId) []StopAreaId {
-	stopAreaIds := manager.findSavedFamily(stopAreaId)
-	// Ignore first stopAreaId from the model as it's the original stopAreaId
-	for _, stopAreaId := range manager.model.StopAreas().FindFamily(stopAreaId)[1:] {
-		_, ok := manager.saved[stopAreaId]
+func (manager *TransactionalStopAreas) FindByOrigin(origin string) (stopAreaIds []StopAreaId) {
+	for _, stopAreaId := range manager.model.StopAreas().FindByOrigin(origin) {
+		_, ok := manager.deleted[stopAreaId]
 		if !ok {
 			stopAreaIds = append(stopAreaIds, stopAreaId)
 		}
 	}
-	return stopAreaIds
+	return
 }
 
-func (manager *TransactionalStopAreas) findSavedFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
-	stopAreaIds = []StopAreaId{stopAreaId}
-	for _, stopArea := range manager.saved {
-		if stopArea.ParentId == stopAreaId {
-			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
+func (manager *TransactionalStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	for _, stopAreaId := range manager.model.StopAreas().FindFamily(stopAreaId) {
+		_, ok := manager.deleted[stopAreaId]
+		if !ok {
+			stopAreaIds = append(stopAreaIds, stopAreaId)
 		}
 	}
-	return stopAreaIds
+	return
+}
+
+func (manager *TransactionalStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+	for _, stopAreaId := range manager.model.StopAreas().FindAscendants(stopAreaId) {
+		_, ok := manager.deleted[stopAreaId]
+		if !ok {
+			stopAreaIds = append(stopAreaIds, stopAreaId)
+		}
+	}
+	return
+}
+
+func (manager *TransactionalStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+	for _, stopAreaObjectId := range manager.model.StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, kind) {
+		if !manager.findByObjectIdInDeleted(stopAreaObjectId) {
+			stopAreaObjectIds = append(stopAreaObjectIds, stopAreaObjectId)
+		}
+	}
+	return
+}
+
+func (manager *TransactionalStopAreas) findByObjectIdInDeleted(objectid ObjectID) bool {
+	for _, sa := range manager.deleted {
+		if id, ok := sa.ObjectID(objectid.Kind()); ok && id.Value() == objectid.Value() {
+			return true
+		}
+	}
+	return false
 }
 
 func (manager *TransactionalStopAreas) Save(stopArea *StopArea) bool {

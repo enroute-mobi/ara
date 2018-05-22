@@ -29,7 +29,7 @@ func (manager *TransactionalStopVisits) New() StopVisit {
 func (manager *TransactionalStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 	stopVisit, ok := manager.saved[id]
 	if ok {
-		return *stopVisit, ok
+		return *(stopVisit.copy()), ok
 	}
 
 	return manager.model.StopVisits().Find(id)
@@ -39,7 +39,7 @@ func (manager *TransactionalStopVisits) FindByObjectId(objectid ObjectID) (StopV
 	for _, stopVisit := range manager.saved {
 		stopVisitObjectId, _ := stopVisit.ObjectID(objectid.Kind())
 		if stopVisitObjectId.Value() == objectid.Value() {
-			return *stopVisit, true
+			return *(stopVisit.copy()), true
 		}
 	}
 	return manager.model.StopVisits().FindByObjectId(objectid)
@@ -49,7 +49,7 @@ func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourney
 	// Check saved StopVisits
 	for _, stopVisit := range manager.saved {
 		if stopVisit.VehicleJourneyId == id {
-			stopVisits = append(stopVisits, *stopVisit)
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
 		}
 	}
 
@@ -66,7 +66,7 @@ func (manager *TransactionalStopVisits) FindByVehicleJourneyId(id VehicleJourney
 func (manager *TransactionalStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.saved {
 		if stopVisit.VehicleJourneyId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *stopVisit)
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
 		}
 	}
 	for _, modelStopVisit := range manager.model.StopVisits().FindFollowingByVehicleJourneyId(id) {
@@ -84,7 +84,7 @@ func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVis
 	// Check saved StopVisits
 	for _, stopVisit := range manager.saved {
 		if stopVisit.StopAreaId == id {
-			stopVisits = append(stopVisits, *stopVisit)
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
 		}
 	}
 
@@ -101,7 +101,7 @@ func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVis
 func (manager *TransactionalStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.saved {
 		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *stopVisit)
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
 		}
 	}
 	for _, modelStopVisit := range manager.model.StopVisits().FindFollowingByStopAreaId(id) {
@@ -125,7 +125,7 @@ func (manager *TransactionalStopVisits) FindFollowingByStopAreaIds(stopAreaIds [
 func (manager *TransactionalStopVisits) FindAll() []StopVisit {
 	stopVisits := []StopVisit{}
 	for _, stopVisit := range manager.saved {
-		stopVisits = append(stopVisits, *stopVisit)
+		stopVisits = append(stopVisits, *(stopVisit.copy()))
 	}
 	savedStopVisits := manager.model.StopVisits().FindAll()
 	for _, stopVisit := range savedStopVisits {

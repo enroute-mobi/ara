@@ -61,7 +61,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		delivery.Status = false
 		delivery.ErrorType = "OtherError"
 		delivery.ErrorNumber = 1
-		delivery.ErrorText = fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", stopArea.Origin)
+		delivery.ErrorText = fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", strings.Join(stopArea.Origins.PartnersKO(), ", "))
 	}
 
 	// Prepare StopVisit Selectors

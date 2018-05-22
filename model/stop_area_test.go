@@ -34,10 +34,12 @@ func Test_StopArea_Lines(t *testing.T) {
 
 func Test_StopArea_MarshalJSON(t *testing.T) {
 	stopArea := StopArea{
-		id:   "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		Name: "Test",
+		id:      "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		Name:    "Test",
+		Origins: NewStopAreaOrigins(),
 	}
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Origin":"","CollectedAlways":false,"CollectGeneralMessages":false,"Monitored":false,"Name":"Test","CollectChildren":false}`
+	stopArea.Origins.NewOrigin("partnerTest")
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","CollectedAlways":false,"CollectGeneralMessages":false,"Monitored":false,"Origins":{"partnerTest":true},"Name":"Test","CollectChildren":false}`
 	jsonBytes, err := stopArea.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -274,6 +276,10 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 			String: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			Valid:  true,
 		},
+		ReferentId: sql.NullString{
+			String: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+			Valid:  true,
+		},
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
 		ObjectIDs:       `{"internal":"value"}`,
@@ -314,6 +320,9 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 	if stopArea.ParentId != StopAreaId("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") {
 		t.Errorf("Wrong ParentId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", stopArea.ParentId)
+	}
+	if stopArea.ReferentId != StopAreaId("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11") {
+		t.Errorf("Wrong ReferentId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", stopArea.ReferentId)
 	}
 	if stopArea.Name != "stopArea" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: stopArea", stopArea.Name)

@@ -122,28 +122,22 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				}
 
 				// Handle StopPointRef
-				stopArea, ok := tx.Model().StopAreas().Find(stopVisit.StopAreaId)
+				stopArea, stopAreaId, ok := connector.stopPointRef(stopVisit.StopAreaId, tx)
 				if !ok {
-					logger.Log.Debugf("Cant find stopArea with id %v for stopVisit %v at %v", stopVisit.StopAreaId, stopVisit.Id(), connector.Clock().Now())
-					continue
-				}
-
-				stopAreaId, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
-				if !ok {
-					logger.Log.Debugf("Stop Area with id %v does not have a proper objectid at %v", stopArea.Id(), connector.Clock().Now())
+					logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
 					continue
 				}
 
 				connector.resolveOperatorRef(estimatedVehicleJourney.References, stopVisit, tx)
 
-				monitoringRefs = append(monitoringRefs, stopAreaId.Value())
+				monitoringRefs = append(monitoringRefs, stopAreaId)
 				estimatedCall := &siri.SIRIEstimatedCall{
 					ArrivalStatus:      string(stopVisit.ArrivalStatus),
 					DepartureStatus:    string(stopVisit.DepartureStatus),
 					AimedArrivalTime:   stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
 					AimedDepartureTime: stopVisit.Schedules.Schedule("aimed").DepartureTime(),
 					Order:              stopVisit.PassageOrder,
-					StopPointRef:       stopAreaId.Value(),
+					StopPointRef:       stopAreaId,
 					StopPointName:      stopArea.Name,
 					DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
 					VehicleAtStop:      stopVisit.VehicleAtStop,
@@ -175,6 +169,25 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 	return delivery
 }
 
+func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId, tx *model.Transaction) (model.StopArea, string, bool) {
+	stopPointRef, ok := tx.Model().StopAreas().Find(stopAreaId)
+	if !ok {
+		return model.StopArea{}, "", false
+	}
+	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+	if ok {
+		return stopPointRef, stopPointRefObjectId.Value(), true
+	}
+	referent, ok := stopPointRef.Referent()
+	if ok {
+		referentObjectId, ok := referent.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+		if ok {
+			return referent, referentObjectId.Value(), true
+		}
+	}
+	return model.StopArea{}, "", false
+}
+
 func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) map[string]model.Reference {
 	references := make(map[string]model.Reference)
 
@@ -184,7 +197,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 			continue
 		}
 		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
-			obj, ok := foundStopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			if ok {
 				references[refType] = *model.NewReference(obj)
 				continue

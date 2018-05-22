@@ -4,6 +4,7 @@ import "github.com/af83/edwig/logger"
 
 type StopAreaUpdateManager struct {
 	ClockConsumer
+	UUIDConsumer
 
 	transactionProvider TransactionProvider
 }
@@ -25,14 +26,14 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
-	if event.StopAreaMonitoredEvent != nil {
-		logger.Log.Debugf("StopArea %v monitored %v", event.StopAreaId, event.StopAreaMonitoredEvent.Monitored)
-		manager.UpdateNotMonitoredStopArea(event)
-		return
-	}
-
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
+
+	if event.StopAreaMonitoredEvent != nil {
+		manager.UpdateMonitoredStopArea(event, tx)
+		tx.Commit()
+		return
+	}
 
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
@@ -43,9 +44,9 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 
 		stopArea.SetObjectID(event.StopAreaAttributes.ObjectId)
 		stopArea.ParentId = parentSA.Id()
-		stopArea.Origin = event.Origin
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
+		stopArea.CollectGeneralMessages = true
 		stopArea.Monitored = true
 		stopArea.Save()
 
@@ -53,11 +54,14 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 
 	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
-	if event.Origin != "" {
-		stopArea.Origin = event.Origin
-	}
 	stopArea.Updated(manager.Clock().Now())
 	stopArea.Save()
+	if event.Origin != "" {
+		status, ok := stopArea.Origins.Origin(event.Origin)
+		if !status || !ok {
+			manager.UpdateMonitoredStopArea(NewStopAreaMonitoredEvent(manager.NewUUID(), event.StopAreaId, event.Origin, true), tx)
+		}
+	}
 
 	tx.Commit()
 
@@ -69,28 +73,22 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 }
 
-func (manager *StopAreaUpdateManager) UpdateNotMonitoredStopArea(event *StopAreaUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpdateEvent, tx *Transaction) {
 	// Should never happen, but don't want to ever have a go nil pointer exception
 	if event.StopAreaMonitoredEvent == nil {
 		return
 	}
 
-	tx := manager.transactionProvider.NewTransaction()
-	defer tx.Close()
-
-	stopAreas := tx.Model().StopAreas().FindFamily(event.StopAreaId)
-
-	for _, id := range stopAreas {
-		stopArea, ok := tx.Model().StopAreas().Find(id)
+	for _, stopAreaId := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
+		stopArea, ok := tx.Model().StopAreas().Find(stopAreaId)
 		if !ok { // Should never happen
-			logger.Log.Debugf("Can't find StopArea %v in SAUpdateManager after a FindFamily", id)
+			logger.Log.Debugf("Can't update Monitored for unknown StopArea %v ", stopAreaId)
 			continue
 		}
-		stopArea.Monitored = event.StopAreaMonitoredEvent.Monitored
+		stopArea.Origins.SetPartnerStatus(event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
+		stopArea.Monitored = stopArea.Origins.Monitored()
 		stopArea.Save()
 	}
-
-	tx.Commit()
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
@@ -137,8 +135,12 @@ func (updater *StopVisitUpdater) Update() {
 	line := updater.findOrCreateLine()
 
 	// Update StopArea
-	stopArea.Updated(updater.Clock().Now())
 	stopArea.LineIds.Add(line.Id())
+	referent, ok := updater.tx.Model().StopAreas().Find(stopArea.ReferentId)
+	if ok {
+		referent.LineIds.Add(line.Id())
+		referent.Save()
+	}
 	stopArea.Save()
 
 	// Create or update VJ
@@ -206,6 +208,7 @@ func (updater *StopVisitUpdater) findOrCreateLine() *Line {
 	line.SetObjectID(lineAttributes.ObjectId)
 	line.SetObjectID(NewObjectID("_default", lineAttributes.ObjectId.HashValue()))
 	line.Name = lineAttributes.Name
+	line.CollectGeneralMessages = true
 
 	line.Save()
 

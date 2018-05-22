@@ -101,3 +101,82 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[1].StopPointRef, secondObjectID.Value())
 	}
 }
+
+func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["remote_objectid_kind"] = "test"
+	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
+	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
+	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	line := referential.Model().Lines().New()
+	lineObjectId := model.NewObjectID("test", "1234")
+	line.SetObjectID(lineObjectId)
+	line.Save()
+
+	firstStopArea := referential.Model().StopAreas().New()
+	firstObjectID := model.NewObjectID("test_incorrect", "NINOXE:StopPoint:SP:1:LOC")
+	firstStopArea.SetObjectID(firstObjectID)
+	firstStopArea.Name = "First"
+	firstStopArea.LineIds = []model.LineId{line.Id()}
+	firstStopArea.Save()
+
+	secondStopArea := referential.Model().StopAreas().New()
+	secondObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:2:LOC")
+	secondStopArea.SetObjectID(secondObjectID)
+	secondStopArea.Name = "Second"
+	secondStopArea.LineIds = []model.LineId{line.Id()}
+	secondStopArea.Save()
+
+	thirdStopArea := referential.Model().StopAreas().New()
+	thirdObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:3:LOC")
+	thirdStopArea.SetObjectID(thirdObjectID)
+	thirdStopArea.ReferentId = secondStopArea.Id()
+	thirdStopArea.Name = "Third"
+	thirdStopArea.LineIds = []model.LineId{line.Id()}
+	thirdStopArea.Save()
+
+	fourthStopArea := referential.Model().StopAreas().New()
+	fourthObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:4:LOC")
+	fourthStopArea.SetObjectID(fourthObjectID)
+	fourthStopArea.ReferentId = firstStopArea.Id()
+	fourthStopArea.Name = "Fourth"
+	fourthStopArea.LineIds = []model.LineId{line.Id()}
+	fourthStopArea.Save()
+
+	file, err := os.Open("testdata/stoppointdiscovery-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := siri.NewXMLStopPointsDiscoveryRequestFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, err := connector.StopAreas(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if response.Status != true {
+		t.Errorf("Response status wrong:\n got: %v\n want: true", response.Status)
+	}
+	if len(response.AnnotatedStopPoints) != 2 {
+		t.Fatalf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2\n%v", len(response.AnnotatedStopPoints), response.AnnotatedStopPoints)
+	}
+
+	if response.AnnotatedStopPoints[0].StopPointRef != secondObjectID.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
+	}
+	if response.AnnotatedStopPoints[1].StopPointRef != fourthObjectID.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef 2 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[1].StopPointRef, secondObjectID.Value())
+	}
+}
