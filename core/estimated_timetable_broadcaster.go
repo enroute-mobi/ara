@@ -350,10 +350,18 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 
 func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable) {
 	lineRefs := []string{}
+	mr := make(map[string]struct{})
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {
 		for _, vj := range vjvf.EstimatedVehicleJourneys {
 			lineRefs = append(lineRefs, vj.LineRef)
+			for _, ec := range vj.EstimatedCalls {
+				mr[ec.StopPointRef] = struct{}{}
+			}
 		}
+	}
+	monitoringRefs := []string{}
+	for k := range mr {
+		monitoringRefs = append(monitoringRefs, k)
 	}
 
 	logStashEvent["siriType"] = "NotifyEstimatedTimetable"
@@ -364,6 +372,7 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 	logStashEvent["subscriberRef"] = response.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
 	logStashEvent["lineRefs"] = strings.Join(lineRefs, ",")
+	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		logStashEvent["errorType"] = response.ErrorType
