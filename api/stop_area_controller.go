@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/logger"
@@ -41,7 +42,12 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, filter
 
 	logger.Log.Debugf("StopAreas Index")
 
-	jsonBytes, _ := json.Marshal(tx.Model().StopAreas().FindAll())
+	stime := controller.referential.Clock().Now()
+	sas := tx.Model().StopAreas().FindAll()
+	logger.Log.Debugf("StopAreaController FindAll time : %v", time.Since(stime))
+	stime = controller.referential.Clock().Now()
+	jsonBytes, _ := json.Marshal(sas)
+	logger.Log.Debugf("StopAreaController Json Marshal time : %v ", time.Since(stime))
 	response.Write(jsonBytes)
 }
 

@@ -17,13 +17,11 @@ func NewStopAreaOrigins() StopAreaOrigins {
 
 func (origins *StopAreaOrigins) MarshalJSON() ([]byte, error) {
 	origins.RLock()
-
 	aux := make(map[string]bool)
-
 	for partner, status := range origins.partners {
 		aux[partner] = status
 	}
-
+	origins.RUnlock()
 	return json.Marshal(aux)
 }
 
