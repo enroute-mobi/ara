@@ -66,7 +66,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	partnerStatus, _ := partner.CheckStatus()
 
 	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus && partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-		logger.Log.Debugf("Partner status changed after a CheckStatus: was %v, now is %v", partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
+		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
 		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), false)
 	}
 
