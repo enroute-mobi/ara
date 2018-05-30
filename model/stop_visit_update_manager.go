@@ -114,7 +114,7 @@ func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVis
 
 	stopVisit.Save()
 
-	logger.Log.Printf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.StopVisitObjectId)
+	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.StopVisitObjectId)
 
 	tx.Commit()
 }
