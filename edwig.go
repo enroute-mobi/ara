@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"runtime/pprof"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/af83/edwig/api"
@@ -94,17 +95,16 @@ func main() {
 	}
 
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGHUP)
 	go func() {
 		for sig := range c {
-			logger.Log.Debugf("Receive interrupt signal: %v", sig)
+			logger.Log.Debugf("Receive sighup signal: %v", sig)
 			file, err := os.Create("/tmp/stack")
 			if err != nil {
 				logger.Log.Panicf("%v", err)
 			}
 			defer file.Close()
 			pprof.Lookup("goroutine").WriteTo(file, 1)
-			os.Exit(0)
 		}
 	}()
 
