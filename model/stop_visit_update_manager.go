@@ -26,14 +26,12 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
-	tx := manager.transactionProvider.NewTransaction()
-	defer tx.Close()
-
 	if event.StopAreaMonitoredEvent != nil {
-		manager.UpdateMonitoredStopArea(event, tx)
-		tx.Commit()
+		manager.UpdateMonitoredStopArea(event)
 		return
 	}
+
+	tx := manager.transactionProvider.NewTransaction()
 
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
@@ -48,22 +46,22 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
 		stopArea.CollectGeneralMessages = true
 		stopArea.Monitored = true
-		stopArea.Save()
+		stopArea.id = StopAreaId(manager.NewUUID())
 
-		event.StopAreaId = stopArea.Id()
+		event.StopAreaId = stopArea.id
 	}
 
-	logger.Log.Debugf("Update StopArea %v", stopArea.Id())
 	stopArea.Updated(manager.Clock().Now())
-	stopArea.Save()
+	tx.Model().StopAreas().Save(&stopArea)
+	tx.Commit()
+	tx.Close()
+
 	if event.Origin != "" {
 		status, ok := stopArea.Origins.Origin(event.Origin)
 		if !status || !ok {
-			manager.UpdateMonitoredStopArea(NewStopAreaMonitoredEvent(manager.NewUUID(), event.StopAreaId, event.Origin, true), tx)
+			manager.UpdateMonitoredStopArea(NewStopAreaMonitoredEvent(manager.NewUUID(), event.StopAreaId, event.Origin, true))
 		}
 	}
-
-	tx.Commit()
 
 	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
 		manager.UpdateStopVisit(stopVisitUpdateEvent)
@@ -73,17 +71,22 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 }
 
-func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpdateEvent, tx *Transaction) {
+func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpdateEvent) {
 	// Should never happen, but don't want to ever have a go nil pointer exception
 	if event.StopAreaMonitoredEvent == nil {
 		return
 	}
 
+	tx := manager.transactionProvider.NewTransaction()
+
 	for _, stopArea := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
 		stopArea.Origins.SetPartnerStatus(event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
 		stopArea.Monitored = stopArea.Origins.Monitored()
-		stopArea.Save()
+		tx.Model().StopAreas().Save(&stopArea)
 	}
+
+	tx.Commit()
+	tx.Close()
 }
 
 func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
@@ -123,6 +126,7 @@ func NewStopVisitUpdater(tx *Transaction, event *StopVisitUpdateEvent) *StopVisi
 func (updater *StopVisitUpdater) Update() {
 	stopArea, ok := updater.tx.Model().StopAreas().FindByObjectId(updater.event.StopAreaObjectId)
 	if !ok { // Should never happen
+		logger.Log.Debugf("can't find SA: %v", updater.event.StopAreaObjectId)
 		return
 	}
 

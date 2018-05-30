@@ -31,6 +31,7 @@ Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, 
 end
 
 Then(/^one StopVisit has the following attributes:$/) do |attributes|
+  # puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response = RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = JSON.parse(response.body)
 
