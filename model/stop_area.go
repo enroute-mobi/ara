@@ -169,16 +169,10 @@ func (stopArea *StopArea) Lines() (lines []Line) {
 }
 
 func (stopArea *StopArea) Parent() (StopArea, bool) {
-	if stopArea.ParentId == "" {
-		return StopArea{}, false
-	}
 	return stopArea.model.StopAreas().Find(stopArea.ParentId)
 }
 
 func (stopArea *StopArea) Referent() (StopArea, bool) {
-	if stopArea.ReferentId == "" {
-		return StopArea{}, false
-	}
 	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
 }
 
@@ -222,7 +216,7 @@ type StopAreas interface {
 	FindByOrigin(origin string) []StopAreaId
 	FindAll() []StopArea
 	FindFamily(id StopAreaId) []StopAreaId
-	FindAscendants(id StopAreaId) (stopAreaIds []StopAreaId)
+	FindAscendants(id StopAreaId) (stopAreas []StopArea)
 	FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaIds []ObjectID)
 	Save(stopArea *StopArea) bool
 	Delete(stopArea *StopArea) bool
@@ -254,6 +248,10 @@ func (manager *MemoryStopAreas) New() StopArea {
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
+	if id == "" {
+		return StopArea{}, false
+	}
+
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -359,20 +357,20 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 	return
 }
 
-func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []StopArea) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	sa, ok := manager.Find(stopAreaId)
+	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}
-	stopAreaIds = []StopAreaId{stopAreaId}
+	stopAreas = []StopArea{*(sa.copy())}
 	if sa.ParentId != "" {
-		stopAreaIds = append(stopAreaIds, manager.FindAscendants(sa.ParentId)...)
+		stopAreas = append(stopAreas, manager.FindAscendants(sa.ParentId)...)
 	}
 	if sa.ReferentId != "" {
-		stopAreaIds = append(stopAreaIds, manager.FindAscendants(sa.ReferentId)...)
+		stopAreas = append(stopAreas, manager.FindAscendants(sa.ReferentId)...)
 	}
 
 	return
@@ -382,7 +380,7 @@ func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAr
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	sa, ok := manager.Find(stopAreaId)
+	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}

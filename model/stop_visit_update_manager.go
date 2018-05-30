@@ -79,12 +79,7 @@ func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpd
 		return
 	}
 
-	for _, stopAreaId := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
-		stopArea, ok := tx.Model().StopAreas().Find(stopAreaId)
-		if !ok { // Should never happen
-			logger.Log.Debugf("Can't update Monitored for unknown StopArea %v ", stopAreaId)
-			continue
-		}
+	for _, stopArea := range tx.Model().StopAreas().FindAscendants(event.StopAreaId) {
 		stopArea.Origins.SetPartnerStatus(event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
 		stopArea.Monitored = stopArea.Origins.Monitored()
 		stopArea.Save()

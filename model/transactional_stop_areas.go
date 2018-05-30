@@ -96,12 +96,19 @@ func (manager *TransactionalStopAreas) FindFamily(stopAreaId StopAreaId) (stopAr
 	return
 }
 
-func (manager *TransactionalStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
-	for _, stopAreaId := range manager.model.StopAreas().FindAscendants(stopAreaId) {
-		_, ok := manager.deleted[stopAreaId]
-		if !ok {
-			stopAreaIds = append(stopAreaIds, stopAreaId)
+func (manager *TransactionalStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []StopArea) {
+	for _, stopArea := range manager.model.StopAreas().FindAscendants(stopAreaId) {
+		_, deleted := manager.deleted[stopArea.Id()]
+		if deleted {
+			continue
 		}
+		savedStopArea, saved := manager.saved[stopArea.Id()]
+		if saved {
+			stopAreas = append(stopAreas, *(savedStopArea.copy()))
+		} else {
+			stopAreas = append(stopAreas, stopArea)
+		}
+
 	}
 	return
 }
