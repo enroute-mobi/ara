@@ -93,6 +93,21 @@ func main() {
 		}
 	}
 
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			logger.Log.Debugf("Receive interrupt signal: %v", sig)
+			file, err := os.Create("/tmp/stack")
+			if err != nil {
+				logger.Log.Panicf("%v", err)
+			}
+			defer file.Close()
+			pprof.Lookup("goroutine").WriteTo(file, 1)
+			os.Exit(0)
+		}
+	}()
+
 	command := flag.Args()[0]
 
 	switch command {
