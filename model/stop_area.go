@@ -346,12 +346,19 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 
 func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
+	stopAreaIds = manager.findFamily(stopAreaId)
+
+	manager.mutex.RUnlock()
+
+	return
+}
+
+func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	stopAreaIds = []StopAreaId{stopAreaId}
 	for _, stopArea := range manager.byIdentifier {
 		if stopArea.ParentId == stopAreaId || stopArea.ReferentId == stopAreaId {
-			stopAreaIds = append(stopAreaIds, manager.FindFamily(stopArea.id)...)
+			stopAreaIds = append(stopAreaIds, manager.findFamily(stopArea.id)...)
 		}
 	}
 	return
@@ -359,18 +366,25 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 
 func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []StopArea) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
+	stopAreas = manager.findAscendants(stopAreaId)
+
+	manager.mutex.RUnlock()
+
+	return
+}
+
+func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId) (stopAreas []StopArea) {
 	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}
 	stopAreas = []StopArea{*(sa.copy())}
 	if sa.ParentId != "" {
-		stopAreas = append(stopAreas, manager.FindAscendants(sa.ParentId)...)
+		stopAreas = append(stopAreas, manager.findAscendants(sa.ParentId)...)
 	}
 	if sa.ReferentId != "" {
-		stopAreas = append(stopAreas, manager.FindAscendants(sa.ReferentId)...)
+		stopAreas = append(stopAreas, manager.findAscendants(sa.ReferentId)...)
 	}
 
 	return
@@ -378,18 +392,25 @@ func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas
 
 func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
+	stopAreaObjectIds = manager.findAscendantsWithObjectIdKind(stopAreaId, kind)
+
+	manager.mutex.RUnlock()
+
+	return
+}
+
+func (manager *MemoryStopAreas) findAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
 	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}
 
 	if sa.ParentId != "" {
-		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ParentId, kind)...)
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ParentId, kind)...)
 	}
 	if sa.ReferentId != "" {
-		stopAreaObjectIds = append(stopAreaObjectIds, manager.FindAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
+		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
 	}
 
 	id, ok := sa.ObjectID(kind)
