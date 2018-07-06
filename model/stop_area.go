@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/af83/edwig/logger"
 )
 
 type StopAreaId string
@@ -265,14 +267,22 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 
 func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
+	// Test Log
+	uid := NewRealUUIDGenerator().NewUUID()
+	logger.Log.Debugf("FindByObjectId Mutex %v Locked", uid)
 
 	for _, stopArea := range manager.byIdentifier {
 		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
 		if stopAreaObjectId.Value() == objectid.Value() {
+			manager.mutex.RUnlock()
+			// Test Log
+			logger.Log.Debugf("FindByObjectId Mutex %v Unlocked", uid)
 			return *(stopArea.copy()), true
 		}
 	}
+	manager.mutex.RUnlock()
+	// Test Log
+	logger.Log.Debugf("FindByObjectId Mutex %v Unlocked", uid)
 	return StopArea{}, false
 }
 
@@ -302,27 +312,41 @@ func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAre
 
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
+	// Test Log
+	uid := NewRealUUIDGenerator().NewUUID()
+	logger.Log.Debugf("FindAll Mutex %v Locked", uid)
 
 	if len(manager.byIdentifier) == 0 {
+		manager.mutex.RUnlock()
+		// Test Log
+		logger.Log.Debugf("FindAll Mutex %v Unlocked", uid)
 		return []StopArea{}
 	}
 	for _, stopArea := range manager.byIdentifier {
 		stopAreas = append(stopAreas, *(stopArea.copy()))
 	}
+	manager.mutex.RUnlock()
+	// Test Log
+	logger.Log.Debugf("FindAll Mutex %v Unlocked", uid)
 	return
 }
 
 func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
-	manager.mutex.Lock()
-	defer manager.mutex.Unlock()
-
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
 
+	manager.mutex.Lock()
+	// Test Log
+	uid := NewRealUUIDGenerator().NewUUID()
+	logger.Log.Debugf("Save Mutex %v Locked", uid)
+
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
+
+	manager.mutex.Unlock()
+	// Test Log
+	logger.Log.Debugf("Save Mutex %v Unlocked", uid)
 
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopArea.id),
@@ -392,10 +416,15 @@ func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId) (stopAreas
 
 func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
 	manager.mutex.RLock()
+	// Test Log
+	uid := NewRealUUIDGenerator().NewUUID()
+	logger.Log.Debugf("FindAscendantsWithObjectIdKind Mutex %v Locked", uid)
 
 	stopAreaObjectIds = manager.findAscendantsWithObjectIdKind(stopAreaId, kind)
 
 	manager.mutex.RUnlock()
+	// Test Log
+	logger.Log.Debugf("FindAscendantsWithObjectIdKind Mutex %v Unlocked", uid)
 
 	return
 }
