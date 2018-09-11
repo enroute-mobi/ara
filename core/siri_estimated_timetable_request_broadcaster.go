@@ -150,7 +150,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					delivery.Status = false
 					delivery.ErrorType = "OtherError"
 					delivery.ErrorNumber = 1
-					delivery.ErrorText = "Erreur [PRODUCER_UNAVAILABLE]"
+					delivery.ErrorText = fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", strings.Join(stopArea.Origins.PartnersKO(), ", "))
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
