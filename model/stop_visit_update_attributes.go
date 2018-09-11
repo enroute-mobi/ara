@@ -6,7 +6,6 @@ type StopVisitUpdateAttributes interface {
 	StopVisitAttributes() *StopVisitAttributes
 	VehicleJourneyAttributes() *VehicleJourneyAttributes
 	LineAttributes() *LineAttributes
-	StopAreaAttributes() *StopAreaAttributes
 }
 
 type TestStopVisitUpdateAttributes struct{}
@@ -38,13 +37,5 @@ func (t *TestStopVisitUpdateAttributes) LineAttributes() *LineAttributes {
 	return &LineAttributes{
 		ObjectId: objectid,
 		Name:     "line",
-	}
-}
-
-func (t *TestStopVisitUpdateAttributes) StopAreaAttributes() *StopAreaAttributes {
-	objectid := NewObjectID("kind", "value")
-	return &StopAreaAttributes{
-		ObjectId: objectid,
-		Name:     "StopArea",
 	}
 }

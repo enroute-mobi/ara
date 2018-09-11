@@ -106,17 +106,12 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	// WIP
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 
-	builder := newStopVisitUpdateEventBuilder(connector.partner)
+	builder := newStopVisitUpdateEventBuilder(connector.partner, objectid)
 	builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, xmlStopMonitoringResponse.XMLMonitoredStopVisits())
 
-	for stopAreaObjectidString, event := range stopAreaUpdateEvents {
+	for _, event := range stopAreaUpdateEvents {
 		event.SetId(connector.NewUUID())
 		monitoredStopVisits := []model.ObjectID{}
-
-		obj, _ := stopArea.ObjectID(objectidKind)
-		if stopAreaObjectidString != obj.String() {
-			event.StopAreaAttributes.ParentObjectId, _ = stopArea.ObjectID(objectidKind)
-		}
 
 		collectedStopArea, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ObjectId)
 		event.StopAreaId = collectedStopArea.Id()

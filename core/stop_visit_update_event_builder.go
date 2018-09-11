@@ -9,11 +9,15 @@ type StopVisitUpdateEventBuilder struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
-	partner *Partner
+	originStopAreaObjectId model.ObjectID
+	partner                *Partner
 }
 
-func newStopVisitUpdateEventBuilder(partner *Partner) StopVisitUpdateEventBuilder {
-	return StopVisitUpdateEventBuilder{partner: partner}
+func newStopVisitUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) StopVisitUpdateEventBuilder {
+	return StopVisitUpdateEventBuilder{
+		partner:                partner,
+		originStopAreaObjectId: originStopAreaObjectId,
+	}
 }
 
 func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.StopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
@@ -47,7 +51,8 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 		stopVisitEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
 	}
 
-	event, ok := events[stopVisitEvent.StopAreaObjectId.String()]
+	stopAreaObjectidString := stopVisitEvent.StopAreaObjectId.String()
+	event, ok := events[stopAreaObjectidString]
 	if !ok {
 		event = &model.StopAreaUpdateEvent{}
 		event.Origin = string(builder.partner.Slug())
@@ -55,6 +60,9 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
 		event.StopAreaAttributes.CollectedAlways = false
 		events[stopVisitEvent.StopAreaObjectId.String()] = event
+		if builder.originStopAreaObjectId.Value() != "" && stopAreaObjectidString != builder.originStopAreaObjectId.String() {
+			event.StopAreaAttributes.ParentObjectId = builder.originStopAreaObjectId
+		}
 	}
 	event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
 }

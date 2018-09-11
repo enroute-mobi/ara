@@ -38,13 +38,11 @@ type SubscribedResource struct {
 }
 
 func NewResource(ref model.Reference) SubscribedResource {
-	ressource := SubscribedResource{
+	return SubscribedResource{
 		Reference:        ref,
 		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
-
-	return ressource
 }
 
 func (sr *SubscribedResource) ResourcesOptions() map[string]string {
@@ -164,9 +162,22 @@ func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResour
 	return sub
 }
 
-func (subscription *Subscription) Resources(now time.Time) []*SubscribedResource {
-	ressources := []*SubscribedResource{}
+func (subscription *Subscription) UniqueResource() (r *SubscribedResource) {
+	subscription.RLock()
+	if len(subscription.resourcesByObjectID) != 1 {
+		subscription.RUnlock()
+		return
+	}
 
+	for _, ressource := range subscription.resourcesByObjectID {
+		r = ressource
+	}
+
+	subscription.RUnlock()
+	return
+}
+
+func (subscription *Subscription) Resources(now time.Time) (ressources []*SubscribedResource) {
 	subscription.RLock()
 	for _, ressource := range subscription.resourcesByObjectID {
 		if ressource.SubscribedUntil.After(subscription.Clock().Now()) {

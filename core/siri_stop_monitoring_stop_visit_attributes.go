@@ -143,17 +143,3 @@ func (attributes *SIRIStopVisitUpdateAttributes) LineAttributes() *model.LineAtt
 
 	return lineAttributes
 }
-
-func (attributes *SIRIStopVisitUpdateAttributes) StopAreaAttributes() *model.StopAreaAttributes {
-	objectid := model.NewObjectID(attributes.objectid_kind, attributes.response.StopPointRef())
-
-	stopAreaAttributes := &model.StopAreaAttributes{
-		ObjectId: objectid,
-		Name:     attributes.response.StopPointName(),
-	}
-	if attributes.response.StopPointRef() != attributes.response.MonitoringRef() {
-		stopAreaAttributes.ParentObjectId = model.NewObjectID(attributes.objectid_kind, attributes.response.MonitoringRef())
-	}
-
-	return stopAreaAttributes
-}

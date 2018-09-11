@@ -89,17 +89,3 @@ func Test_SIRIStopVisitUpdateAttributes_LineAttributes(t *testing.T) {
 		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, lineAttributes.Name)
 	}
 }
-
-func Test_SIRIStopVisitUpdateAttributes_StopAreaAttributes(t *testing.T) {
-	xmlStopVisit := getMonitoredStopVisit(t)
-	stopVisitUpdateAttributes := NewSIRIStopVisitUpdateAttributes(xmlStopVisit, "objectidKind")
-	stopAreaAttributes := stopVisitUpdateAttributes.StopAreaAttributes()
-
-	expected := map[string]string{"kind": "objectidKind", "value": "NINOXE:StopPoint:Q:50:LOC"}
-	if stopAreaAttributes.ObjectId.Kind() != expected["kind"] || stopAreaAttributes.ObjectId.Value() != expected["value"] {
-		t.Errorf("Wrong ObjectId:\n expected: kind: %v value: %v\n got: kind: %v value: %v", expected["kind"], expected["value"], stopAreaAttributes.ObjectId.Kind(), stopAreaAttributes.ObjectId.Value())
-	}
-	if expected := "Elf Sylvain - Métro (R)"; stopAreaAttributes.Name != expected {
-		t.Errorf("Wrong Name:\n expected: %v\n got: %v", expected, stopAreaAttributes.Name)
-	}
-}

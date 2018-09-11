@@ -164,10 +164,16 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			continue
 		}
 
+		originStopAreaObjectId := model.ObjectID{}
+		resource := subscription.UniqueResource()
+		if resource != nil {
+			originStopAreaObjectId = *resource.Reference.ObjectId
+		}
+
 		tx := connector.Partner().Referential().NewTransaction()
 		defer tx.Close()
 
-		connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap)
+		connector.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap, originStopAreaObjectId)
 		connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap)
 	}
 
@@ -209,13 +215,13 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(logStashEvent, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}, originStopAreaObjectId model.ObjectID) {
 	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
 	if len(xmlStopVisitEvents) == 0 {
 		return
 	}
 
-	builder := newStopVisitUpdateEventBuilder(connector.partner)
+	builder := newStopVisitUpdateEventBuilder(connector.partner, originStopAreaObjectId)
 	builder.setStopVisitUpdateEvents(events, xmlStopVisitEvents)
 
 	for _, update := range events {
