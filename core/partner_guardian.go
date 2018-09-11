@@ -67,7 +67,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus {
 		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
-		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), guardian.partnerStatus == OPERATIONNAL_STATUS_UP)
+		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP)
 	}
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN || partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
