@@ -16,7 +16,13 @@ import (
 var Database *gorp.DbMap
 
 func InitDB(config config.DatabaseConfig) *gorp.DbMap {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+	if config.Host == "" {
+		config.Host = "localhost"
+	}
+
+	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.Host,
+		config.Port,
 		config.User,
 		config.Password,
 		config.Name,

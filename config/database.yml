@@ -2,10 +2,10 @@ development:
   name: edwig
   user: edwig
   password: edwig
-  port: 8080
+  port: 5432
 
 test:
   name: edwig_test
   user: edwig
   password: edwig
-  port: 8080
+  port: 5432
