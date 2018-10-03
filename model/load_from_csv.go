@@ -72,8 +72,8 @@ func (loader Loader) load() error {
 			break
 		}
 		if err != nil {
-			logger.Log.Debugf("Error while reading %v", err)
-			fmt.Errorf("Error while reading %v", err)
+			logger.Log.Debugf("Error while reading: %v", err)
+			fmt.Printf("Error while reading: %v\n", err)
 			errors++
 			continue
 		}
@@ -83,7 +83,7 @@ func (loader Loader) load() error {
 			err := loader.handleStopArea(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Errorf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
 				errors++
 			} else {
 				importedStopAreas++
@@ -92,7 +92,7 @@ func (loader Loader) load() error {
 			err := loader.handleLine(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Errorf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
 				errors++
 			} else {
 				importedLines++
@@ -101,7 +101,7 @@ func (loader Loader) load() error {
 			err := loader.handleVehicleJourney(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Errorf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
 				errors++
 			} else {
 				importedVehicleJourneys++
@@ -110,7 +110,7 @@ func (loader Loader) load() error {
 			err := loader.handleStopVisit(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Errorf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
 				errors++
 			} else {
 				importedStopVisits++
@@ -119,14 +119,14 @@ func (loader Loader) load() error {
 			err := loader.handleOperator(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Errorf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
 				errors++
 			} else {
 				importedOperators++
 			}
 		default:
 			logger.Log.Debugf("Unknown record type: %v", record[0])
-			fmt.Errorf("Unknown record type: %v", record[0])
+			fmt.Printf("Unknown record type: %v\n", record[0])
 			errors++
 			continue
 		}
