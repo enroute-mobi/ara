@@ -232,7 +232,7 @@ func (loader Loader) handleStopArea(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from stop_areas where id='%v' and model_name='%v'", stopArea.Id, stopArea.ModelName)
+		query := fmt.Sprintf("delete from stop_areas where model_name='%v'", stopArea.ModelName)
 		_, err := Database.Exec(query)
 		if err != nil {
 			return err
@@ -261,7 +261,7 @@ func (loader Loader) handleOperator(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from operators where id='%v' and model_name='%v'", operator.Id, operator.ModelName)
+		query := fmt.Sprintf("delete from operators where model_name='%v'", operator.ModelName)
 		_, err := Database.Exec(query)
 		if err != nil {
 			return err
@@ -309,7 +309,7 @@ func (loader Loader) handleLine(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from lines where id='%v' and model_name='%v'", line.Id, line.ModelName)
+		query := fmt.Sprintf("delete from lines where model_name='%v'", line.ModelName)
 		_, err := Database.Exec(query)
 		if err != nil {
 			return err
@@ -343,7 +343,7 @@ func (loader Loader) handleVehicleJourney(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from vehicle_journeys where id='%v' and model_name='%v'", vehicleJourney.Id, vehicleJourney.ModelName)
+		query := fmt.Sprintf("delete from vehicle_journeys where model_name='%v'", vehicleJourney.ModelName)
 		_, err := Database.Exec(query)
 		if err != nil {
 			return err
@@ -393,7 +393,7 @@ func (loader Loader) handleStopVisit(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from stop_visits where id='%v' and model_name='%v'", stopVisit.Id, stopVisit.ModelName)
+		query := fmt.Sprintf("delete from stop_visits where model_name='%v'", stopVisit.ModelName)
 		_, err := Database.Exec(query)
 		if err != nil {
 			return err
