@@ -38,10 +38,8 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea %v", event.StopAreaId)
 
 		stopArea = tx.Model().StopAreas().New()
-		parentSA, _ := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ParentObjectId)
 
 		stopArea.SetObjectID(event.StopAreaAttributes.ObjectId)
-		stopArea.ParentId = parentSA.Id()
 		stopArea.Name = event.StopAreaAttributes.Name
 		stopArea.CollectedAlways = event.StopAreaAttributes.CollectedAlways
 		stopArea.CollectGeneralMessages = true
@@ -49,6 +47,11 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 		stopArea.id = StopAreaId(manager.NewUUID())
 
 		event.StopAreaId = stopArea.id
+	}
+
+	if stopArea.ParentId == "" && event.StopAreaAttributes.ParentObjectId.Value() != "" {
+		parentSA, _ := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ParentObjectId)
+		stopArea.ParentId = parentSA.Id()
 	}
 
 	stopArea.Updated(manager.Clock().Now())
