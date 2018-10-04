@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/af83/edwig/version"
 	"github.com/jbowtie/gokogiri/xml"
@@ -85,7 +86,8 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
-	response, err := http.DefaultClient.Do(httpRequest)
+	httpClient := &http.Client{Timeout: time.Second * 5}
+	response, err := httpClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
