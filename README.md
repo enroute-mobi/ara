@@ -1,4 +1,5 @@
 # Edwig
+<a href="https://codeclimate.com/github/af83/edwig/maintainability"><img src="https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability" /></a>
 
 ## Installation
 
