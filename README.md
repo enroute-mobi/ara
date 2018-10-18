@@ -2,7 +2,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability)](https://codeclimate.com/github/af83/edwig/maintainability)
 
-## An innovative and modular solution
+## An innovative and modular solution
 
 * Modular architecture organized in Collection, Model & Broadcast
 * Multi-protocol connectors: SIRI, SIRI Lite (GTFS-RT soon)
@@ -25,7 +25,7 @@ In broadcast only:
 * StopPointDiscovery
 * LineDiscovery
 
-## Versatile and multilingual
+## Versatile and multilingual
 
 * Transcodification of data with use and correspondence between different types of identifiers on the same objects
 * Management and configuration of identifier formats to adapt in real time the identifiers used with an exchange partner
