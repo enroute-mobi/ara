@@ -1,4 +1,5 @@
 [![Edwig logo](https://github.com/af83/edwig/wiki/images/edwig_logo.png)](https://enroute.mobi/produits/edwig/)
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability)](https://codeclimate.com/github/af83/edwig/maintainability)
 
 ## An innovative and modular solution
@@ -44,9 +45,9 @@ Some technical articles are available [on the wiki](../../wiki) too.
 
 Related projects :
 
-* ![Documentation](https://github.com/af83/edwig-docs)
-* ![Administration interface](https://github.com/af83/edwig-admin)
-* ![Ruby SDK](https://github.com/af83/edwig)
+* [Documentation](https://github.com/af83/edwig-docs)
+* [Administration interface](https://github.com/af83/edwig-admin)
+* [Ruby SDK](https://github.com/af83/edwig)
 
 ## License
 
