@@ -1,80 +1,57 @@
-# Edwig
-<a href="https://codeclimate.com/github/af83/edwig/maintainability"><img src="https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability" /></a>
+[![Edwig logo](https://github.com/af83/edwig/wiki/images/edwig_logo.png)](https://enroute.mobi/produits/edwig/)
+[![Maintainability](https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability)](https://codeclimate.com/github/af83/edwig/maintainability)
 
-## Installation
+## An innovative and modular solution
 
-### Application
+* Modular architecture organized in Collection, Model & Broadcast
+* Multi-protocol connectors: SIRI, SIRI Lite (GTFS-RT soon)
+* Real time Visualization / management of data by API
+* Loading theoretical offer and / or network structure into a database
+* Real time and parameterizable logging
+* Managing multiple independent referentials in the same server
+* Real time administration: exchange partners, referentials
 
-```
-git clone git@github.com:af83/edwig.git
-cd edwig
-```
+## SIRI connectors
 
-### Postgres
+In collection and broadcast (both subscription and request)
 
-```
-psql
-postgres=# CREATE USER "edwig" SUPERUSER PASSWORD 'edwig';
-CREATE ROLE
-postgres=# CREATE DATABASE edwig;
-CREATE DATABASE
-postgres=# CREATE DATABASE edwig_test;
-CREATE DATABASE
-```
-Database configuration can be defined in `config/database.yml`
+* StopMonitoring
+* EstimatedTimeTable
+* Situational Management
 
-#### Apply migrations
-```
-edwig migrate up
-EDWIG_ENV=test edwig migrate up
-```
+In broadcast only:
 
-#### Rollback migrations
-```
-edwig migrate down
-EDWIG_ENV=test edwig migrate down
-```
+* StopPointDiscovery
+* LineDiscovery
 
-Migration folder can be specified with
-```
-edwig migrate -path=path/to/migrate/files [...]
-```
-#### Populate
-```
-psql -U edwig -d edwig -a -f model/populate.sql
-```
+## Versatile and multilingual
 
-## Run Edwig
+* Transcodification of data with use and correspondence between different types of identifiers on the same objects
+* Management and configuration of identifier formats to adapt in real time the identifiers used with an exchange partner
+* Modular import supply by a new product "Referentials"
 
-### Server
-```
-edwig api
-```
+## Real-time logging
 
-### Checkstatus
-```
-edwig check http://url.to.check
-```
+Outsource, process and store in real time all exchanges managed by Edwig :
 
-### Configuration
+* Send real time exchange data to LogStash processing
+* High performance storage for consultation and statistics via ElasticSearch
+* Visualization of historical data via Kibana
 
-To run Edwig in a specific environment
-```
-EDWIG_ENV=development edwig [...]
-```
-default environment is `development`
+## More Information
 
-To load a custom configuration directory
-```
-edwig -config=config/directory/path [...]
-```
-You need to specify 3 files : `config.yml`, `database.yml`, `<environment>.yml`
+Some technical articles are available [on the wiki](../../wiki) too.
 
-Configuration try the given path if it exists, then the environment variable EDWIG_CONFIG, then `/config`
+Related projects :
 
-### Run Tests
-```
-go test github.com/af83/edwig/...
-cucumber -t ~@wip
-```
+* ![Documentation](https://github.com/af83/edwig-docs)
+* ![Administration interface](https://github.com/af83/edwig-admin)
+* ![Ruby SDK](https://github.com/af83/edwig)
 
+## License
+
+This project is licensed under the Apache2 license, a copy of which can be found in the [LICENSE](./LICENSE.md) file.
+
+## Support
+
+Contact [af83 Edwig team](mailto:edwig-dev@af83.com) to know how to contribute to the Edwig project
