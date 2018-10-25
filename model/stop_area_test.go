@@ -268,6 +268,9 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
+	SetDefaultClock(NewFakeClock())
+	defer SetDefaultClock(NewRealClock())
+
 	// Insert Data in the test db
 	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
@@ -332,6 +335,10 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
+	}
+	now := DefaultClock().Now()
+	if stopArea.nextCollectAt.Before(now) || stopArea.nextCollectAt.After(now.Add(30*time.Second)) {
+		t.Errorf("Wrong nextCollectAt:\n got: %v\n expected: between %v and %v", stopArea.nextCollectAt, now, now.Add(30*time.Second))
 	}
 	if !stopArea.CollectChildren {
 		t.Errorf("Wrong CollectChildren:\n got: %v\n expected: true", stopArea.CollectChildren)

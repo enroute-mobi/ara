@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -450,6 +451,10 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 		if sa.CollectedAlways.Valid {
 			stopArea.CollectedAlways = sa.CollectedAlways.Bool
+		}
+		if stopArea.CollectedAlways { // To prevent too much spam when initializing
+			rand_duration := time.Duration(rand.Intn(30)) * time.Second
+			stopArea.NextCollect(DefaultClock().Now().Add(rand_duration))
 		}
 		if sa.CollectChildren.Valid {
 			stopArea.CollectChildren = sa.CollectChildren.Bool
