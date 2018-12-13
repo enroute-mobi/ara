@@ -221,6 +221,25 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	}
 }
 
+func Test_MemoryStopAreas_FindAscendants(t *testing.T) {
+	stopAreas := NewMemoryStopAreas()
+	stopArea := stopAreas.New()
+	stopAreas.Save(&stopArea)
+
+	stopArea1 := stopAreas.New()
+	stopArea1.ParentId = stopArea.id
+	stopAreas.Save(&stopArea1)
+
+	stopArea2 := stopAreas.New()
+	stopArea2.ParentId = stopArea1.id
+	stopAreas.Save(&stopArea2)
+
+	foundStopAreas := stopAreas.FindAscendants(stopArea2.Id())
+	if len(foundStopAreas) != 3 {
+		t.Errorf("FindAscendants should return 3, got %v", len(foundStopAreas))
+	}
+}
+
 func Test_MemoryStopAreas_FindFamily(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	stopArea := stopAreas.New()

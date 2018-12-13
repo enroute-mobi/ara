@@ -85,3 +85,40 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 		t.Errorf("StopArea should have %v in LineIds, got: %v", lineId, lineIds)
 	}
 }
+
+func Test_StopVisitUpdateManager_UpdateMonitoredStopArea(t *testing.T) {
+	model := NewMemoryModel()
+	manager := newStopAreaUpdateManager(model)
+
+	sa := model.StopAreas().New()
+	sa.Name = "Parent"
+	sa.Save()
+
+	sa2 := model.StopAreas().New()
+	sa2.Name = "Son"
+	sa2.ParentId = sa.id
+	sa2.Save()
+
+	sa3 := model.StopAreas().New()
+	sa3.Name = "Grandson"
+	sa3.ParentId = sa2.id
+	sa3.Save()
+
+	event := NewStopAreaMonitoredEvent(manager.NewUUID(), sa3.Id(), "test_origin", true)
+	manager.UpdateMonitoredStopArea(event)
+
+	stopArea, _ := model.StopAreas().Find(sa.Id())
+	if status, ok := stopArea.Origins.Origin("test_origin"); !ok || !status {
+		t.Errorf("Parent StopArea status should have been updated, got found origin: %v and status: %v", ok, status)
+	}
+
+	stopArea2, _ := model.StopAreas().Find(sa2.Id())
+	if status, ok := stopArea2.Origins.Origin("test_origin"); !ok || !status {
+		t.Errorf("StopArea status should have been updated, got found origin: %v and status: %v", ok, status)
+	}
+
+	stopArea3, _ := model.StopAreas().Find(sa3.Id())
+	if status, ok := stopArea3.Origins.Origin("test_origin"); !ok || !status {
+		t.Errorf("StopArea status should have been updated, got found origin: %v and status: %v", ok, status)
+	}
+}
