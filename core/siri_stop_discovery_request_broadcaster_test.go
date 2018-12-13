@@ -34,11 +34,17 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	line3.SetObjectID(lineObjectId3)
 	line3.Save()
 
+	line4 := referential.Model().Lines().New()
+	lineObjectId4 := model.NewObjectID("test", "91011")
+	line4.SetObjectID(lineObjectId4)
+	line4.SetOrigin("partner")
+	line4.Save()
+
 	firstStopArea := referential.Model().StopAreas().New()
 	firstObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetObjectID(firstObjectID)
 	firstStopArea.Name = "First"
-	firstStopArea.LineIds = []model.LineId{line.Id()}
+	firstStopArea.LineIds = []model.LineId{line.Id(), line3.Id(), line4.Id()}
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()

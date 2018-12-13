@@ -68,6 +68,9 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			TimingPoint:  true,
 		}
 		for _, line := range stopArea.Lines() {
+			if line.Origin() == string(connector.partner.Slug()) {
+				continue
+			}
 			objectid, ok := line.ObjectID(objectIDKind)
 			if !ok {
 				continue

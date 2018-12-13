@@ -211,6 +211,7 @@ func (updater *StopVisitUpdater) findOrCreateLine() *Line {
 	line.SetObjectID(NewObjectID("_default", lineAttributes.ObjectId.HashValue()))
 	line.Name = lineAttributes.Name
 	line.CollectGeneralMessages = true
+	line.SetOrigin(updater.event.Origin)
 
 	line.Save()
 

@@ -16,7 +16,8 @@ type LineAttributes struct {
 
 type Line struct {
 	ObjectIDConsumer
-	model Model
+	model  Model
+	origin string
 
 	id LineId
 
@@ -58,6 +59,14 @@ func (line *Line) CollectedAt() time.Time {
 
 func (line *Line) Updated(updateTime time.Time) {
 	line.collectedAt = updateTime
+}
+
+func (line *Line) Origin() string {
+	return line.origin
+}
+
+func (line *Line) SetOrigin(origin string) {
+	line.origin = origin
 }
 
 func (line *Line) MarshalJSON() ([]byte, error) {
