@@ -161,7 +161,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </siri:EstimatedJourneyVersionFrame>
     </siri:EstimatedTimetableDelivery>
   </Notification>
-  <NotificationExtension/>
+  <NotifyExtension />
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>
