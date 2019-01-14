@@ -28,7 +28,7 @@ def start_edwig
   end
 end
 
-Before('~@database') do
+Before('not @database') do
   start_edwig()
 end
 
