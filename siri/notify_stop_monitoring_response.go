@@ -49,7 +49,7 @@ const stopMonitoringNotifyTemplate = `<sw:NotifyStopMonitoring xmlns:sw="http://
 			{{ .BuildCancelledStopVisitXML }}{{ end }}{{ end }}
 		</siri:StopMonitoringDelivery>
 	</Notification>
-	<NotificationExtension />
+	<NotifyExtension />
 </sw:NotifyStopMonitoring>`
 
 func (notify *SIRINotifyStopMonitoring) BuildXML() (string, error) {

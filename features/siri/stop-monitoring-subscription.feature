@@ -554,7 +554,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisitCancellation>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotificationExtension />
+  <NotifyExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>
