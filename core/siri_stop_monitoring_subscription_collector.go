@@ -207,7 +207,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	if err != nil {
-		logger.Log.Debugf("Error while terminating subcription with id : %v error : ", subId, err.Error())
+		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
 		logStashEvent["status"] = "false"
 		logStashEvent["errorDescription"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
 		return

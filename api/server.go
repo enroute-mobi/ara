@@ -71,7 +71,7 @@ func (server *Server) handleControllers(response http.ResponseWriter, request *h
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", requestData.Resource, request)
+	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
 
 	controller := newController(server)
 	controller.serve(response, request, requestData)
@@ -138,7 +138,7 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 	} else if strings.HasPrefix(requestData.Referential, "_") {
 		if !server.isAdmin(request) {
 			http.Error(response, "Unauthorized request", 401)
-			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%s", request)
+			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%v", request)
 			return
 		}
 		if requestData.Referential == "_referentials" {
@@ -177,7 +177,7 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %s", requestData.Resource, request)
+	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
 
 	controller := newController(foundReferential)
 	controller.serve(response, request, requestData)
@@ -186,7 +186,7 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 
-	logger.Log.Debugf("SIRI request: %s", request)
+	logger.Log.Debugf("SIRI request: %v", request)
 
 	siriHandler := NewSIRIHandler(foundReferential)
 	siriHandler.serve(response, request)
