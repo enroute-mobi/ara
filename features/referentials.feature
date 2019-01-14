@@ -9,10 +9,12 @@ Feature: Manager Referentials
     When the Referential "test" is destroyed
     Then a Referential "test" should not exist
 
+  @database
   Scenario: 2698 - Referential reloads Model at configured time
     Given the table "stop_areas" has the following data:
     | id                                     | referential_slug     | object_ids               | model_name |
     | '6ba7b814-9dad-11d1-0011-00c04fd430c8' | 'test'               | '{"internal":"value"}'   |'2017-01-02'|
+    When I start Edwig
     Given a Referential "test" exists with the following settings:
         | model.reload_at | 01:00 |
     And a StopArea exists with the following attributes:
