@@ -86,7 +86,7 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
-	httpClient := &http.Client{Timeout: time.Second * 5}
+	httpClient := &http.Client{Timeout: getTimeOut(args.requestType)}
 	response, err := httpClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
@@ -143,6 +143,13 @@ func (client *SOAPClient) getURL(requestType requestType) string {
 		}
 	}
 	return client.Url
+}
+
+func getTimeOut(rt requestType) time.Duration {
+	if rt == SUBSCRIPTION {
+		return 30 * time.Second
+	}
+	return 5 * time.Second
 }
 
 func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLCheckStatusResponse, error) {
