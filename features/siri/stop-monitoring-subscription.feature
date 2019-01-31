@@ -457,13 +457,14 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name                    | Passage 32                              |
-      | ObjectIDs               | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                  | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
-      | Monitored               | true                                    |
-      | Attribute[DirectionRef] | Aller                                   |
-      | OriginName              | Le début                                |
-      | DestinationName         | La fin.                                 |
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
+      | Monitored                          | true                                    |
+      | Attribute[DirectionRef]            | Aller                                   |
+      | OriginName                         | Le début                                |
+      | DestinationName                    | La fin.                                 |
+      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -528,6 +529,170 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:OriginName>Le début</siri:OriginName>
+          <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
+          <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+          <siri:Monitored>true</siri:Monitored>
+          <siri:MonitoredCall>
+            <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+            <siri:Order>4</siri:Order>
+            <siri:StopPointName>Test</siri:StopPointName>
+            <siri:VehicleAtStop>false</siri:VehicleAtStop>
+            <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
+            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+          </siri:MonitoredCall>
+        </siri:MonitoredVehicleJourney>
+      </siri:MonitoredStopVisit>
+      <siri:MonitoredStopVisitCancellation>
+        <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+        <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
+        <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+        <siri:VehicleJourneyRef>
+          <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+          <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+        </siri:VehicleJourneyRef>
+      </siri:MonitoredStopVisitCancellation>
+    </siri:StopMonitoringDelivery>
+  </Notification>
+  <NotifyExtension />
+</sw:NotifyStopMonitoring>
+</S:Body>
+</S:Envelope>
+"""
+
+  Scenario: 4448 - Manage a SM Notify after modification of a StopVisit with the no rewrite setting
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+         <SubscriptionAnswerInfo
+           xmlns:ns2="http://www.ifopt.org.uk/acsb"
+           xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+           xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+           xmlns:ns5="http://www.siri.org.uk/siri"
+           xmlns:ns6="http://wsdl.siri.org.uk/siri">
+           <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+           <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+           <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+           <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">Subscription:Test:0</ns5:RequestMessageRef>
+         </SubscriptionAnswerInfo>
+         <Answer
+           xmlns:ns2="http://www.ifopt.org.uk/acsb"
+           xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+           xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+           xmlns:ns5="http://www.siri.org.uk/siri"
+           xmlns:ns6="http://wsdl.siri.org.uk/siri">
+           <ns5:ResponseStatus>
+               <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+               <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
+               <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
+               <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
+               <ns5:Status>true</ns5:Status>
+               <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
+           </ns5:ResponseStatus>
+           <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
+         </Answer>
+         <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+       </ns1:SubscribeResponse>
+      </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url                                 | http://localhost:8090 |
+       | remote_credential                          | test                  |
+       | local_credential                           | NINOXE:default        |
+       | remote_objectid_kind                       | internal              |
+       | broadcast.no_destinationref_rewriting_from | NoRewriteOrigin       |
+    And 30 seconds have passed
+    And a Subscription exist with the following attributes:
+      | Kind              | StopMonitoringBroadcast                            |
+      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Origin                             | NoRewriteOrigin                         |
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
+      | Monitored                          | true                                    |
+      | Attribute[DirectionRef]            | Aller                                   |
+      | OriginName                         | Le début                                |
+      | DestinationName                    | La fin.                                 |
+      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And 10 seconds have passed
+    When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus              | Delayed                  |
+    When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus              | cancelled                |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope
+xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<sw:NotifyStopMonitoring
+  xmlns:sw="http://wsdl.siri.org.uk"
+  xmlns:siri="http://www.siri.org.uk/siri">
+  <ServiceDeliveryInfo>
+    <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
+    <siri:ProducerRef>test</siri:ProducerRef>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:RequestMessageRef></siri:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Notification>
+    <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+      <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
+      <siri:RequestMessageRef></siri:RequestMessageRef>
+      <siri:SubscriberRef>test</siri:SubscriberRef>
+      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:Status>true</siri:Status>
+      <siri:MonitoredStopVisit>
+        <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+        <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
+        <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:MonitoredVehicleJourney>
+          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+          <siri:DirectionRef>Aller</siri:DirectionRef>
+          <siri:FramedVehicleJourneyRef>
+            <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+            <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          </siri:FramedVehicleJourneyRef>
+          <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+          <siri:OriginName>Le début</siri:OriginName>
+          <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
           <siri:Monitored>true</siri:Monitored>

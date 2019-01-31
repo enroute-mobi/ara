@@ -246,11 +246,11 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 				ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
 				AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
 				ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-				Order:              stopVisit.PassageOrder,
-				StopPointRef:       stopAreaId,
-				StopPointName:      stopArea.Name,
-				DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
-				VehicleAtStop:      stopVisit.VehicleAtStop,
+				Order:                 stopVisit.PassageOrder,
+				StopPointRef:          stopAreaId,
+				StopPointName:         stopArea.Name,
+				DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
+				VehicleAtStop:         stopVisit.VehicleAtStop,
 			}
 
 			estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
@@ -298,6 +298,10 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 		if !ok || ref == (model.Reference{}) || ref.ObjectId == nil {
 			continue
 		}
+		if refType == "DestinationRef" && connector.noDestinationRefRewrite(vehicleJourney.Origin) {
+			references[refType] = ref
+			continue
+		}
 		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
 			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			if ok {
@@ -327,6 +331,15 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 	}
 	references["OperatorRef"] = *model.NewReference(obj)
 	return references
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
+	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
+		if origin == strings.TrimSpace(o) {
+			return true
+		}
+	}
+	return false
 }
 
 func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {

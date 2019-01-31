@@ -156,6 +156,8 @@ func (updater *StopVisitUpdater) Update() {
 		vehicleJourney.SetObjectID(vehicleJourneyAttributes.ObjectId)
 		vehicleJourney.SetObjectID(NewObjectID("_default", vehicleJourneyAttributes.ObjectId.HashValue()))
 
+		vehicleJourney.Origin = updater.event.Origin
+
 		vehicleJourney.LineId = line.Id()
 		vehicleJourney.Name = vehicleJourneyAttributes.Attributes["VehicleJourneyName"]
 

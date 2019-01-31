@@ -360,6 +360,13 @@ func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
 	return false
 }
 
+func (partner *Partner) NoDestinationRefRewritingFrom() []string {
+	if partner.Setting("broadcast.no_destinationref_rewriting_from") == "" {
+		return []string{}
+	}
+	return strings.Split(partner.Settings["broadcast.no_destinationref_rewriting_from"], ",")
+}
+
 // APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id

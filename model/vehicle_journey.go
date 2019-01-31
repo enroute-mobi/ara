@@ -19,7 +19,9 @@ type VehicleJourneyAttributes struct {
 
 type VehicleJourney struct {
 	ObjectIDConsumer
-	model Model
+
+	model  Model
+	Origin string `json:",omitempty"`
 
 	id VehicleJourneyId
 

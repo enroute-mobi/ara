@@ -112,7 +112,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				References:             make(map[string]model.Reference),
 			}
 			lineRefs = append(lineRefs, estimatedVehicleJourney.LineRef)
-			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx)
+			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx, vehicleJourney.Origin)
 			estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 			// SIRIEstimatedCall
@@ -188,12 +188,16 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 	return model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction) map[string]model.Reference {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction, origin string) map[string]model.Reference {
 	references := make(map[string]model.Reference)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
 		ref, ok := vehicleJourney.Reference(refType)
 		if !ok || ref == (model.Reference{}) || ref.ObjectId == nil {
+			continue
+		}
+		if refType == "DestinationRef" && connector.noDestinationRefRewrite(origin) {
+			references[refType] = ref
 			continue
 		}
 		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
@@ -209,6 +213,15 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 	}
 
 	return references
+}
+
+func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(origin string) bool {
+	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
+		if origin == strings.TrimSpace(o) {
+			return true
+		}
+	}
+	return false
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]model.Reference, stopVisit model.StopVisit, tx *model.Transaction) {

@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strings"
+
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
 	"github.com/af83/edwig/siri"
@@ -13,22 +15,24 @@ type BroadcastStopMonitoringBuilder struct {
 	StopVisitTypes string
 	MonitoringRef  string
 
-	tx                         *model.Transaction
-	siriPartner                *SIRIPartner
-	referenceGenerator         *IdentifierGenerator
-	stopAreareferenceGenerator *IdentifierGenerator
-	dataFrameGenerator         *IdentifierGenerator
-	remoteObjectidKind         string
+	tx                            *model.Transaction
+	siriPartner                   *SIRIPartner
+	referenceGenerator            *IdentifierGenerator
+	stopAreareferenceGenerator    *IdentifierGenerator
+	dataFrameGenerator            *IdentifierGenerator
+	remoteObjectidKind            string
+	noDestinationRefRewritingFrom []string
 }
 
 func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
-		tx:                         tx,
-		siriPartner:                siriPartner,
-		referenceGenerator:         siriPartner.IdentifierGenerator("reference_identifier"),
-		stopAreareferenceGenerator: siriPartner.IdentifierGenerator("reference_stop_area_identifier"),
-		dataFrameGenerator:         siriPartner.IdentifierGenerator("data_frame_identifier"),
-		remoteObjectidKind:         siriPartner.Partner().RemoteObjectIDKind(connector),
+		tx:                            tx,
+		siriPartner:                   siriPartner,
+		referenceGenerator:            siriPartner.IdentifierGenerator("reference_identifier"),
+		stopAreareferenceGenerator:    siriPartner.IdentifierGenerator("reference_stop_area_identifier"),
+		dataFrameGenerator:            siriPartner.IdentifierGenerator("data_frame_identifier"),
+		remoteObjectidKind:            siriPartner.Partner().RemoteObjectIDKind(connector),
+		noDestinationRefRewritingFrom: siriPartner.Partner().NoDestinationRefRewritingFrom(),
 	}
 }
 
@@ -49,7 +53,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		return nil
 	}
 
-	itemIdentifier, ok := builder.getItemIdentifier(stopVisit)
+	itemIdentifier, ok := builder.getItemIdentifier(&stopVisit)
 	if !ok {
 		return nil
 	}
@@ -97,7 +101,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	itemIdentifier, ok := builder.getItemIdentifier(stopVisit)
+	itemIdentifier, ok := builder.getItemIdentifier(&stopVisit)
 	if !ok {
 		return nil
 	}
@@ -153,7 +157,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	vehicleJourneyRefCopy := vehicleJourney.References.Copy()
 	stopVisitRefCopy := stopVisit.References.Copy()
 
-	builder.resolveVJReferences(vehicleJourneyRefCopy)
+	builder.resolveVJReferences(vehicleJourneyRefCopy, vehicleJourney.Origin)
 
 	builder.resolveOperator(stopVisitRefCopy)
 
@@ -185,7 +189,7 @@ func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.Sto
 	return model.StopArea{}, "", false
 }
 
-func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit model.StopVisit) (string, bool) {
+func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *model.StopVisit) (string, bool) {
 	var itemIdentifier string
 
 	stopVisitId, ok := stopVisit.ObjectID(builder.remoteObjectidKind)
@@ -235,7 +239,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 	ref.ObjectId.SetValue(obj.Value())
 }
 
-func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References) {
+func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References, origin string) {
 	for _, refType := range []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"} {
 		reference, ok := references.Get(refType)
 		if !ok {
@@ -245,7 +249,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 	}
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
 		reference, ok := references.Get(refType)
-		if !ok || reference.ObjectId == nil {
+		if !ok || reference.ObjectId == nil || (refType == "DestinationRef" && builder.noDestinationRefRewrite(origin)) {
 			continue
 		}
 		builder.resolveStopAreaRef(&reference)
@@ -262,4 +266,13 @@ func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *mod
 		}
 	}
 	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(IdentifierAttributes{Default: reference.GetSha1()}))
+}
+
+func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin string) bool {
+	for _, o := range builder.noDestinationRefRewritingFrom {
+		if origin == strings.TrimSpace(o) {
+			return true
+		}
+	}
+	return false
 }
