@@ -37,6 +37,10 @@ func (siriPartner *SIRIPartner) RequestorRef() string {
 	return siriPartner.partner.ProducerRef()
 }
 
+func (siriPartner *SIRIPartner) SubscriberRef() string {
+	return siriPartner.partner.Setting("local_credential")
+}
+
 func (siriPartner *SIRIPartner) Partner() *Partner {
 	return siriPartner.partner
 }

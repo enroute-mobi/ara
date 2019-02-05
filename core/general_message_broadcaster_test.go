@@ -69,7 +69,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
-	partner.Settings["remote_credential"] = "external"
+	partner.Settings["local_credential"] = "external"
 	partner.Settings["remote_url"] = ts.URL
 
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}

@@ -35,6 +35,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	partner.Settings["remote_objectid_kind"] = "internal"
 	partner.Settings["remote_credential"] = "external"
+	partner.Settings["local_credential"] = "local"
 	partner.Settings["remote_url"] = ts.URL
 
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
@@ -122,7 +123,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
-			<siri:SubscriberRef>external</siri:SubscriberRef>
+			<siri:SubscriberRef>local</siri:SubscriberRef>
 			<siri:SubscriptionRef>externalId</siri:SubscriptionRef>
 			<siri:Status>true</siri:Status>
 			<siri:EstimatedJourneyVersionFrame>

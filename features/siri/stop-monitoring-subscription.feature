@@ -512,7 +512,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>test</siri:SubscriberRef>
+      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
@@ -675,7 +675,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>test</siri:SubscriberRef>
+      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
