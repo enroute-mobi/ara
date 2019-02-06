@@ -113,12 +113,18 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		return subscriptionIds
 	}
 
+	vj, _ := tx.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
+
 	for _, stopAreaObjectId := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)) {
 		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), "StopMonitoringBroadcast")
 
 		for _, sub := range subs {
 			resource := sub.Resource(stopAreaObjectId)
 			if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
+				continue
+			}
+
+			if lineRef := sub.SubscriptionOption("LineRef"); lineRef != "" && lineRef != string(vj.LineId) {
 				continue
 			}
 
@@ -209,6 +215,23 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			continue
 		}
 
+		lineRef := ""
+		if sm.LineRef() != "" {
+			line_objectid := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER), sm.LineRef())
+			line, ok := tx.Model().Lines().FindByObjectId(line_objectid)
+			if !ok {
+				rs.ErrorType = "InvalidDataReferencesError"
+				rs.ErrorText = fmt.Sprintf("Line not found: '%s'", line_objectid.Value())
+				resps = append(resps, rs)
+
+				logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
+				audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+				continue
+			}
+			lineRef = string(line.Id())
+		}
+
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("StopMonitoringBroadcast")
@@ -225,6 +248,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
 		connector.fillOptions(sub, r, request, sm)
+		sub.SetSubscriptionOption("LineRef", lineRef)
 
 		rs.Status = true
 		rs.ValidUntil = sm.InitialTerminationTime()

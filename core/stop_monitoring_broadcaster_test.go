@@ -107,6 +107,70 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	}
 }
 
+func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilter(t *testing.T) {
+	model.SetDefaultClock(model.NewFakeClock())
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.Save()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	stopArea := referential.Model().StopAreas().New()
+	objectid := model.NewObjectID("internal", string(stopArea.Id()))
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	reference := model.Reference{
+		ObjectId: &objectid,
+		Type:     "StopArea",
+	}
+
+	sub := partner.Subscriptions().New("StopMonitoringBroadcast")
+	sub.CreateAddNewResource(reference)
+	sub.SetExternalId("externalId")
+	sub.SetSubscriptionOption("LineRef", "not the line ref")
+	sub.Save()
+
+	line := referential.Model().Lines().New()
+	line_objectid := model.NewObjectID("internal", "line")
+	line.SetObjectID(line_objectid)
+	line.Save()
+
+	vj := referential.Model().VehicleJourneys().New()
+	vj.LineId = line.Id()
+	vj.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.VehicleJourneyId = vj.Id()
+	stopVisit.Save()
+
+	event := &model.StopMonitoringBroadcastEvent{
+		ModelId:   string(stopVisit.Id()),
+		ModelType: "StopVisit",
+	}
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(event)
+	if len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast) != 0 {
+		t.Error("0 events should have been generated got: ", len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast))
+	}
+
+	sub.SetSubscriptionOption("LineRef", string(line.Id()))
+	sub.Save()
+
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(event)
+	if len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast) != 1 {
+		t.Error("1 events should have been generated got: ", len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast))
+	}
+}
+
 func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	fakeClock := model.NewFakeClock()
 	model.SetDefaultClock(fakeClock)

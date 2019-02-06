@@ -9,6 +9,7 @@ import (
 type XMLStopMonitoringSubscriptionRequestEntry struct {
 	XMLStructure
 
+	lineRef                string
 	maximumStopVisits      string
 	messageIdentifier      string
 	monitoringRef          string
@@ -85,6 +86,13 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) InitialTerminationTime
 		request.initialTerminationTime = request.findTimeChildContent("InitialTerminationTime")
 	}
 	return request.initialTerminationTime
+}
+
+func (request *XMLStopMonitoringSubscriptionRequestEntry) LineRef() string {
+	if request.lineRef == "" {
+		request.lineRef = request.findStringChildContent("LineRef")
+	}
+	return request.maximumStopVisits
 }
 
 func (request *XMLStopMonitoringSubscriptionRequestEntry) MaximumStopVisits() string {
