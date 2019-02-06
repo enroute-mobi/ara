@@ -11,7 +11,6 @@ type XMLSubscriptionRequest struct {
 	consumerAddress string
 
 	changeBeforeUpdates string
-	maximumStopVisits   string
 	incrementalUpdates  string
 
 	smEntries  []*XMLStopMonitoringSubscriptionRequestEntry
@@ -78,13 +77,6 @@ func (request *XMLSubscriptionRequest) ConsumerAddress() string {
 		request.consumerAddress = request.findStringChildContent("ConsumerAddress")
 	}
 	return request.consumerAddress
-}
-
-func (request *XMLSubscriptionRequest) MaximumStopVisits() string {
-	if request.maximumStopVisits == "" {
-		request.maximumStopVisits = request.findStringChildContent("MaximumStopVisits")
-	}
-	return request.maximumStopVisits
 }
 
 func (request *XMLSubscriptionRequest) ChangeBeforeUpdates() string {

@@ -270,7 +270,7 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 
 	s.SetSubscriptionOption("StopVisitTypes", sm.StopVisitTypes())
 	s.SetSubscriptionOption("IncrementalUpdates", request.IncrementalUpdates())
-	s.SetSubscriptionOption("MaximumStopVisits", request.MaximumStopVisits())
+	s.SetSubscriptionOption("MaximumStopVisits", sm.MaximumStopVisits())
 	s.SetSubscriptionOption("ChangeBeforeUpdates", changeBeforeUpdates)
 	s.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
 }
