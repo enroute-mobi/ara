@@ -31,6 +31,7 @@ const (
 type StopVisitUpdateEvent struct {
 	Id                string
 	Origin            string
+	DataFrameRef      string
 	Created_at        time.Time
 	RecordedAt        time.Time
 	StopVisitObjectid ObjectID

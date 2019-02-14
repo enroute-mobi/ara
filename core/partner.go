@@ -367,6 +367,13 @@ func (partner *Partner) NoDestinationRefRewritingFrom() []string {
 	return strings.Split(partner.Settings["broadcast.no_destinationref_rewriting_from"], ",")
 }
 
+func (partner *Partner) NoDataFrameRefRewritingFrom() []string {
+	if partner.Setting("broadcast.no_dataframeref_rewriting_from") == "" {
+		return []string{}
+	}
+	return strings.Split(partner.Settings["broadcast.no_dataframeref_rewriting_from"], ",")
+}
+
 // APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id

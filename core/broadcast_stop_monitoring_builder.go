@@ -22,6 +22,7 @@ type BroadcastStopMonitoringBuilder struct {
 	dataFrameGenerator            *IdentifierGenerator
 	remoteObjectidKind            string
 	noDestinationRefRewritingFrom []string
+	noDataFrameRefRewritingFrom   []string
 }
 
 func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastStopMonitoringBuilder {
@@ -33,6 +34,7 @@ func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIP
 		dataFrameGenerator:            siriPartner.IdentifierGenerator("data_frame_identifier"),
 		remoteObjectidKind:            siriPartner.Partner().RemoteObjectIDKind(connector),
 		noDestinationRefRewritingFrom: siriPartner.Partner().NoDestinationRefRewritingFrom(),
+		noDataFrameRefRewritingFrom:   siriPartner.Partner().NoDataFrameRefRewritingFrom(),
 	}
 }
 
@@ -63,15 +65,13 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		return nil
 	}
 
-	modelDate := builder.tx.Model().Date()
-
 	cancelledStopVisit := &siri.SIRICancelledStopVisit{
 		RecordedAtTime:         stopVisit.RecordedAt,
 		ItemRef:                itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,
-		DataFrameRef:           builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
+		DataFrameRef:           builder.dataFrameRef(&stopVisit, vehicleJourney.Origin),
 		PublishedLineName:      line.Name,
 	}
 
@@ -111,8 +111,6 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	modelDate := builder.tx.Model().Date()
-
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 		ItemIdentifier:         itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
@@ -124,7 +122,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: dataVehicleJourneyRef,
-		DataFrameRef:           builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()}),
+		DataFrameRef:           builder.dataFrameRef(&stopVisit, vehicleJourney.Origin),
 		RecordedAt:             stopVisit.RecordedAt,
 		PublishedLineName:      line.Name,
 		DepartureStatus:        string(stopVisit.DepartureStatus),
@@ -275,4 +273,21 @@ func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin st
 		}
 	}
 	return false
+}
+
+func (builder *BroadcastStopMonitoringBuilder) noDataFrameRefRewrite(origin string) bool {
+	for _, o := range builder.noDataFrameRefRewritingFrom {
+		if origin == strings.TrimSpace(o) {
+			return true
+		}
+	}
+	return false
+}
+
+func (builder *BroadcastStopMonitoringBuilder) dataFrameRef(sv *model.StopVisit, origin string) string {
+	if sv.DataFrameRef != "" && builder.noDataFrameRefRewrite(origin) {
+		return sv.DataFrameRef
+	}
+	modelDate := builder.tx.Model().Date()
+	return builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()})
 }

@@ -21,6 +21,7 @@ end
 
 When(/^the StopVisit "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
   RestClient.put stop_visit_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  # puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
 
 Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, attributes|

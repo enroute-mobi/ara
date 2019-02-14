@@ -186,6 +186,7 @@ func (updater *StopVisitUpdater) Update() {
 		stopVisit.StopAreaId = stopArea.Id()
 		stopVisit.VehicleJourneyId = vehicleJourney.Id()
 		stopVisit.PassageOrder = stopVisitAttributes.PassageOrder
+		stopVisit.DataFrameRef = updater.event.DataFrameRef
 
 		stopVisit.Attributes = stopVisitAttributes.Attributes
 		stopVisit.References = stopVisitAttributes.References

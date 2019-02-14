@@ -24,6 +24,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 	stopVisitEvent := &model.StopVisitUpdateEvent{
 		Id:                     builder.NewUUID(),
 		Origin:                 string(builder.partner.Slug()),
+		DataFrameRef:           xmlStopVisitEvent.DataFrameRef(),
 		Created_at:             builder.Clock().Now(),
 		RecordedAt:             xmlStopVisitEvent.RecordedAt(),
 		VehicleAtStop:          xmlStopVisitEvent.VehicleAtStop(),

@@ -55,6 +55,7 @@ type XMLMonitoredStopVisit struct {
 	publishedLineName      string
 	departureStatus        string
 	arrivalStatus          string
+	dataFrameRef           string
 	recordedAt             time.Time
 	order                  int
 
@@ -426,6 +427,13 @@ func (visit *XMLMonitoredStopVisit) DatedVehicleJourneyRef() string {
 		visit.datedVehicleJourneyRef = visit.findStringChildContent("DatedVehicleJourneyRef")
 	}
 	return visit.datedVehicleJourneyRef
+}
+
+func (visit *XMLMonitoredStopVisit) DataFrameRef() string {
+	if visit.dataFrameRef == "" {
+		visit.dataFrameRef = visit.findStringChildContent("DataFrameRef")
+	}
+	return visit.dataFrameRef
 }
 
 func (visit *XMLMonitoredStopVisit) LineRef() string {

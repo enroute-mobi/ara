@@ -44,6 +44,7 @@ type StopVisit struct {
 
 	ArrivalStatus   StopVisitArrivalStatus   `json:",omitempty"`
 	DepartureStatus StopVisitDepartureStatus `json:",omitempty"`
+	DataFrameRef    string                   `json:",omitempty"`
 	RecordedAt      time.Time
 	Schedules       StopVisitSchedules
 	VehicleAtStop   bool
