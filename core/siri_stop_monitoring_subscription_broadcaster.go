@@ -275,6 +275,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 			if _, ok := res.LastState(string(sv.Id())); ok {
 				continue
 			}
+			// Handle LineRef filter
+			vj, _ := tx.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
+			if lineRef := sub.SubscriptionOption("LineRef"); lineRef != "" && lineRef != string(vj.LineId) {
+				continue
+			}
+
 			smlc := &stopMonitoringLastChange{}
 			smlc.InitState(&sv, sub)
 			res.SetLastState(string(sv.Id()), smlc)
