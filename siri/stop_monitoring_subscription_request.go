@@ -92,7 +92,7 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) LineRef() string {
 	if request.lineRef == "" {
 		request.lineRef = request.findStringChildContent("LineRef")
 	}
-	return request.maximumStopVisits
+	return request.lineRef
 }
 
 func (request *XMLStopMonitoringSubscriptionRequestEntry) MaximumStopVisits() string {

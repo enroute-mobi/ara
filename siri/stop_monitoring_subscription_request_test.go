@@ -8,7 +8,7 @@ import (
 )
 
 func getXMLStopMonitoringSubscriptionRequest(t *testing.T) *XMLSubscriptionRequest {
-	file, err := os.Open("../core/testdata/stopmonitoringsubscription-request-soap.xml")
+	file, err := os.Open("../core/testdata/stopmonitoringsubscription-request-with-lineref-soap.xml")
 	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -48,6 +48,10 @@ func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 
 	if expected := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC); entry.InitialTerminationTime() != expected {
 		t.Errorf("Wrong InitialTerminationTime:\n got: %v\nwant: %v", entry.InitialTerminationTime(), expected)
+	}
+
+	if expected := "STIF:Line::C00064:"; entry.LineRef() != expected {
+		t.Errorf("Wrong LineRef:\n got: %v\nwant: %v", entry.LineRef(), expected)
 	}
 }
 

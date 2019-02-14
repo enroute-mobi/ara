@@ -106,11 +106,9 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subsIds
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) []SubscriptionId {
-	subscriptionIds := []SubscriptionId{}
-
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) (subscriptionIds []SubscriptionId) {
 	if sv.Origin == string(connector.Partner().Slug()) {
-		return subscriptionIds
+		return
 	}
 
 	vj, _ := tx.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
@@ -143,7 +141,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 		}
 	}
 
-	return subscriptionIds
+	return
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {

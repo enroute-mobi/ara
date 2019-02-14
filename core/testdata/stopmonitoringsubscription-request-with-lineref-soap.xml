@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <SOAP-ENV:Header />
+  <SOAP-ENV:Body>
+    <ws:Subscribe>
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>RATPDEV:Concerto</siri:RequestorRef>
+        <siri:MessageIdentifier>Edwig:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:MessageIdentifier>
+        <siri:ConsumerAddress>https://edwig-staging.af83.io/test/siri</siri:ConsumerAddress>
+      </SubscriptionRequestInfo>
+      <Request>
+        <StopMonitoringSubscriptionRequest>
+          <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
+          <SubscriptionIdentifier>Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</SubscriptionIdentifier>
+          <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
+          <StopMonitoringRequest>
+            <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
+            <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
+            <MonitoringRef>coicogn2</MonitoringRef>
+            <StopVisitTypes>all</StopVisitTypes>
+            <siri:LineRef>STIF:Line::C00064:</siri:LineRef>
+          </StopMonitoringRequest>
+          <IncrementalUpdates>true</IncrementalUpdates>
+          <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
+        </StopMonitoringSubscriptionRequest>
+      </Request>
+      <RequestExtension />
+    </ws:Subscribe>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
