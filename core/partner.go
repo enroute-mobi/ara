@@ -374,6 +374,11 @@ func (partner *Partner) NoDataFrameRefRewritingFrom() []string {
 	return strings.Split(partner.Settings["broadcast.no_dataframeref_rewriting_from"], ",")
 }
 
+func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
+	r, _ = strconv.ParseBool(partner.Settings["broadcast.rewrite_journey_pattern_ref"])
+	return
+}
+
 // APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id

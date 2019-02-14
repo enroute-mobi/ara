@@ -23,6 +23,7 @@ type BroadcastStopMonitoringBuilder struct {
 	remoteObjectidKind            string
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
+	rewriteJourneyPatternRef      bool
 }
 
 func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastStopMonitoringBuilder {
@@ -35,6 +36,7 @@ func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIP
 		remoteObjectidKind:            siriPartner.Partner().RemoteObjectIDKind(connector),
 		noDestinationRefRewritingFrom: siriPartner.Partner().NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   siriPartner.Partner().NoDataFrameRefRewritingFrom(),
+		rewriteJourneyPatternRef:      siriPartner.Partner().RewriteJourneyPatternRef(),
 	}
 }
 
@@ -239,6 +241,9 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 
 func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References, origin string) {
 	for _, refType := range []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"} {
+		if refType == "JourneyPatternRef" && !builder.rewriteJourneyPatternRef {
+			continue
+		}
 		reference, ok := references.Get(refType)
 		if !ok {
 			continue

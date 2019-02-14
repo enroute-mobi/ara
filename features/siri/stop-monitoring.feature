@@ -138,7 +138,7 @@ Feature: Support SIRI StopMonitoring
                 <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
                 <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
               </siri:FramedVehicleJourneyRef>
-              <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+              <siri:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</siri:JourneyPatternRef>
               <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
               <siri:DirectionName>Aller</siri:DirectionName>
               <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
@@ -300,7 +300,7 @@ Feature: Support SIRI StopMonitoring
                 <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
                 <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
               </siri:FramedVehicleJourneyRef>
-              <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+              <siri:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</siri:JourneyPatternRef>
               <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
               <siri:DirectionName>Aller</siri:DirectionName>
               <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
@@ -462,7 +462,7 @@ Feature: Support SIRI StopMonitoring
                 <siri:DataFrameRef>SQYBUS:Version:1.0:LOC</siri:DataFrameRef>
                 <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
               </siri:FramedVehicleJourneyRef>
-              <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+              <siri:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</siri:JourneyPatternRef>
               <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
               <siri:DirectionName>Aller</siri:DirectionName>
               <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
@@ -680,7 +680,7 @@ Feature: Support SIRI StopMonitoring
                       <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
                       <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::760857fec357472a48012c5ca776d940f8c49681:LOC</siri:DatedVehicleJourneyRef>
                     </siri:FramedVehicleJourneyRef>
-                    <siri:JourneyPatternRef>RATPDev:JourneyPattern::983a5c43233dc44a0ed956117ee55d257fea06eb:LOC</siri:JourneyPatternRef>
+                    <siri:JourneyPatternRef>CdF:JourneyPattern::L415P289:LOC</siri:JourneyPatternRef>
                     <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
                     <siri:DirectionName>Aller</siri:DirectionName>
                     <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>

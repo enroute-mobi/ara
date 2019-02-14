@@ -156,7 +156,7 @@ Feature: Support SIRI GetSIRI
                       <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
                       <siri:DatedVehicleJourneyRef>5CAR621689196575</siri:DatedVehicleJourneyRef>
                     </siri:FramedVehicleJourneyRef>
-                    <siri:JourneyPatternRef>RATPDev:JourneyPattern::3eb50093508f11b474950daa6b0b8632660a32a6:LOC</siri:JourneyPatternRef>
+                    <siri:JourneyPatternRef>CdF:JourneyPattern::L475P53:LOC</siri:JourneyPatternRef>
                     <siri:PublishedLineName>Ligne 475</siri:PublishedLineName>
                     <siri:DirectionName>Aller</siri:DirectionName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:9dd925e2cd515383ad6d975e761cea71ea1a79e7:LOC</siri:DestinationRef>
