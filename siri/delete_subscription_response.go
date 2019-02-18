@@ -144,10 +144,10 @@ func (response *XMLTerminationResponseStatus) SubscriptionRef() string {
 }
 
 func (response *XMLTerminationResponseStatus) SubscriberRef() string {
-	if response.subscriptionRef == "" {
-		response.subscriptionRef = response.findStringChildContent("SubscriberRef")
+	if response.subscriberRef == "" {
+		response.subscriberRef = response.findStringChildContent("SubscriberRef")
 	}
-	return response.subscriptionRef
+	return response.subscriberRef
 }
 
 func (response *XMLTerminationResponseStatus) ResponseTimestamp() time.Time {
