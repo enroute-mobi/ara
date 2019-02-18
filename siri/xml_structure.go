@@ -104,21 +104,21 @@ func (xmlStruct *XMLStructure) findNodeWithNamespace(localName string) xml.Node 
 	return nodes[0]
 }
 
-func (xmlStruct *XMLStructure) findXMLNode(localName string) XMLNode {
-	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
-	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
-	if err != nil {
-		return nil
-	}
-	if len(nodes) == 0 {
-		return nil
-	}
+// func (xmlStruct *XMLStructure) findXMLNode(localName string) XMLNode {
+// 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
+// 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
+// 	if err != nil {
+// 		return nil
+// 	}
+// 	if len(nodes) == 0 {
+// 		return nil
+// 	}
 
-	subNode := NewSubXMLNode(nodes[0])
-	subNode.parent = xmlStruct.node
+// 	subNode := NewSubXMLNode(nodes[0])
+// 	subNode.parent = xmlStruct.node
 
-	return subNode
-}
+// 	return subNode
+// }
 
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//%s", localName)
