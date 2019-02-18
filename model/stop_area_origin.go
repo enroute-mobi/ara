@@ -103,7 +103,7 @@ func (origins *StopAreaOrigins) PartnersLost(comparedOrigins *StopAreaOrigins) (
 	origins.RLock()
 	comparedOrigins.RLock()
 	for partner, status := range origins.partners {
-		comparedStatus, _ := comparedOrigins.partners[partner]
+		comparedStatus := comparedOrigins.partners[partner]
 		if status && !comparedStatus {
 			partnersLost = append(partnersLost, partner)
 			r = true

@@ -83,7 +83,7 @@ func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpd
 	tx := manager.transactionProvider.NewTransaction()
 
 	ascendants := tx.Model().StopAreas().FindAscendants(event.StopAreaId)
-	for i, _ := range ascendants {
+	for i := range ascendants {
 		stopArea := ascendants[i]
 		stopArea.Origins.SetPartnerStatus(event.StopAreaMonitoredEvent.Partner, event.StopAreaMonitoredEvent.Status)
 		stopArea.Monitored = stopArea.Origins.Monitored()
