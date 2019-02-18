@@ -228,7 +228,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		Schedules:        `[{"Kind":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
 		PassageOrder:     1,
 		Attributes:       "{}",
-		References:       "{}",
+		References:       `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseStopVisit, "stop_visits")
@@ -264,6 +264,9 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 	if stopVisit.PassageOrder != 1 {
 		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", stopVisit.PassageOrder)
+	}
+	if ref, ok := stopVisit.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
 	}
 	svs := stopVisit.Schedules.Schedule("expected")
 	if svs == nil {

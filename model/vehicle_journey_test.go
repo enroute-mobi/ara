@@ -223,7 +223,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		ObjectIDs:       `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Attributes:      "{}",
-		References:      "{}",
+		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseVehicleJourney, "vehicle_journeys")
@@ -262,5 +262,8 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 	}
 	if vehicleJourney.LineId != "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" {
 		t.Errorf("Wrong LineId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", vehicleJourney.LineId)
+	}
+	if ref, ok := vehicleJourney.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
 	}
 }

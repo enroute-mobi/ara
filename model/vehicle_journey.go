@@ -272,9 +272,11 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 		}
 
 		if vj.References.Valid && len(vj.References.String) > 0 {
-			if err = json.Unmarshal([]byte(vj.References.String), &vehicleJourney.References); err != nil {
+			references := make(map[string]Reference)
+			if err = json.Unmarshal([]byte(vj.References.String), &references); err != nil {
 				return err
 			}
+			vehicleJourney.References.SetReferences(references)
 		}
 
 		if vj.ObjectIDs.Valid && len(vj.ObjectIDs.String) > 0 {

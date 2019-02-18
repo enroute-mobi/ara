@@ -420,9 +420,11 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 		}
 
 		if sv.References.Valid && len(sv.References.String) > 0 {
-			if err = json.Unmarshal([]byte(sv.References.String), &stopVisit.References); err != nil {
+			references := make(map[string]Reference)
+			if err = json.Unmarshal([]byte(sv.References.String), &references); err != nil {
 				return err
 			}
+			stopVisit.References.SetReferences(references)
 		}
 
 		if sv.ObjectIDs.Valid && len(sv.ObjectIDs.String) > 0 {
