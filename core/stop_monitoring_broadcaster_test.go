@@ -133,7 +133,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 	sub := partner.Subscriptions().New("StopMonitoringBroadcast")
 	sub.CreateAddNewResource(reference)
 	sub.SetExternalId("externalId")
-	sub.SetSubscriptionOption("LineRef", "not the line ref")
+	sub.SetSubscriptionOption("LineRef", "incorrect:lineRef")
 	sub.Save()
 
 	line := referential.Model().Lines().New()
@@ -162,7 +162,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 		t.Error("0 events should have been generated got: ", len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast))
 	}
 
-	sub.SetSubscriptionOption("LineRef", string(line.Id()))
+	sub.SetSubscriptionOption("LineRef", "internal:line")
 	sub.Save()
 
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(event)
