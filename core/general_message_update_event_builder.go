@@ -80,42 +80,42 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 	remoteObjectidKind := builder.partner.Setting("remote_objectid_kind")
 
 	if lineRefs := content.LineRef(); len(lineRefs) != 0 {
-		for i, _ := range lineRefs {
+		for i := range lineRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, lineRefs[i]))
 			ref.Type = "LineRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 		}
 	}
 	if stopPointRefs := content.StopPointRef(); len(stopPointRefs) != 0 {
-		for i, _ := range stopPointRefs {
+		for i := range stopPointRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, stopPointRefs[i]))
 			ref.Type = "StopPointRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 		}
 	}
 	if journeyPatternRefs := content.JourneyPatternRef(); len(journeyPatternRefs) != 0 {
-		for i, _ := range journeyPatternRefs {
+		for i := range journeyPatternRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, journeyPatternRefs[i]))
 			ref.Type = "JourneyPatternRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 		}
 	}
 	if destinationRefs := content.DestinationRef(); len(destinationRefs) != 0 {
-		for i, _ := range destinationRefs {
+		for i := range destinationRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, destinationRefs[i]))
 			ref.Type = "DestinationRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 		}
 	}
 	if routeRefs := content.RouteRef(); len(routeRefs) != 0 {
-		for i, _ := range routeRefs {
+		for i := range routeRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, routeRefs[i]))
 			ref.Type = "RouteRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 		}
 	}
 	if groupOfLinesRefs := content.GroupOfLinesRef(); len(groupOfLinesRefs) != 0 {
-		for i, _ := range groupOfLinesRefs {
+		for i := range groupOfLinesRefs {
 			ref := model.NewReference(model.NewObjectID(remoteObjectidKind, groupOfLinesRefs[i]))
 			ref.Type = "GroupOfLinesRef"
 			event.SituationAttributes.References = append(event.SituationAttributes.References, ref)

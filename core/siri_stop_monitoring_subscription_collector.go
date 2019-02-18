@@ -182,7 +182,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
 	}
 
-	for subId, _ := range subToDelete {
+	for subId := range subToDelete {
 		connector.cancelSubscription(subId)
 	}
 

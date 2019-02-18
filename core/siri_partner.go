@@ -48,7 +48,7 @@ func (siriPartner *SIRIPartner) Partner() *Partner {
 func (siriPartner *SIRIPartner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
 	formatString := siriPartner.partner.Setting(fmt.Sprintf("generators.%v", generatorName))
 	if formatString == "" {
-		formatString, _ = defaultIdentifierGenerators[generatorName]
+		formatString = defaultIdentifierGenerators[generatorName]
 	}
 	return NewIdentifierGeneratorWithUUID(formatString, siriPartner.UUIDConsumer)
 }

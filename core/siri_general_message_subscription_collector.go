@@ -133,7 +133,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
 
-	for subId, _ := range subToDelete {
+	for subId := range subToDelete {
 		connector.cancelSubscription(subId)
 	}
 }
