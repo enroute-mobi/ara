@@ -9,10 +9,10 @@ import (
 
 func getXMLStopPointsDiscoveryRequest(t *testing.T) *XMLStopPointsDiscoveryRequest {
 	file, err := os.Open("testdata/stopdiscovery-request.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)

@@ -8,10 +8,10 @@ import (
 
 func getXMLStopMonitoringSubscriptionTerminatedNotification(t *testing.T) *XMLStopMonitoringSubscriptionTerminatedResponse {
 	file, err := os.Open("testdata/subscription_terminated_notification-soap.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 
 	content, err := ioutil.ReadAll(file)
 	if err != nil {

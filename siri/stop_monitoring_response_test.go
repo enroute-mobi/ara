@@ -11,10 +11,10 @@ import (
 
 func getXMLStopMonitoringResponse(t *testing.T) *XMLStopMonitoringResponse {
 	file, err := os.Open("testdata/stopmonitoring-response-soap.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)

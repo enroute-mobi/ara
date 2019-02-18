@@ -9,10 +9,10 @@ import (
 
 func getXMLLinesDiscoveryRequest(t *testing.T) *XMLLinesDiscoveryRequest {
 	file, err := os.Open("testdata/lines-discovery-request.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)

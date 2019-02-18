@@ -9,10 +9,10 @@ import (
 
 func getXMLGeneralMessageSubscriptionRequest(t *testing.T) *XMLSubscriptionRequest {
 	file, err := os.Open("../core/testdata/generalmessagesubscription-request-soap.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)

@@ -8,10 +8,10 @@ import (
 
 func getXMLNotifyStopMonitoring(t *testing.T) *XMLNotifyStopMonitoring {
 	file, err := os.Open("testdata/notify_stop_monitoring.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)

@@ -9,10 +9,10 @@ import (
 
 func getXMLSubscriptionResponse(t *testing.T) *XMLSubscriptionResponse {
 	file, err := os.Open("../core/testdata/stopmonitoringsubscription-response-soap.xml")
-	defer file.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer file.Close()
 
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
