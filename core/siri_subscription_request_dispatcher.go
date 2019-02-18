@@ -21,8 +21,6 @@ type SIRISubscriptionRequestDispatcher struct {
 	model.UUIDConsumer
 
 	siriConnector
-
-	xmlRequest siri.XMLSubscriptionRequest
 }
 
 func (factory *SIRISubscriptionRequestDispatcherFactory) Validate(apiPartner *APIPartner) bool {
@@ -61,9 +59,9 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		if !ok {
 			return nil, fmt.Errorf("no GeneralMessageSubscriptionBroadcaster Connector")
 		}
-		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
-			response.ResponseStatus = append(response.ResponseStatus, sgm)
-		}
+
+		response.ResponseStatus = append(response.ResponseStatus, gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+
 		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -75,9 +73,9 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		if !ok {
 			return nil, fmt.Errorf("no StopMonitoringSubscriptionBroadcaster Connector")
 		}
-		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
-			response.ResponseStatus = append(response.ResponseStatus, smr)
-		}
+
+		response.ResponseStatus = append(response.ResponseStatus, smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+
 		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "StopMonitoringSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
@@ -89,9 +87,9 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		if !ok {
 			return nil, fmt.Errorf("no EstimatedTimeTableSubscriptionBroadcaster Connector")
 		}
-		for _, smr := range smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
-			response.ResponseStatus = append(response.ResponseStatus, smr)
-		}
+
+		response.ResponseStatus = append(response.ResponseStatus, smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+
 		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "EstimatedTimetableSubscriptionRequest"
 		audit.CurrentLogStash().WriteEvent(logStashEvent)

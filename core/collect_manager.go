@@ -50,9 +50,7 @@ func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest
 }
 
 func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.StopAreaUpdateEvent) {
-	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
-		manager.StopVisitEvents = append(manager.StopVisitEvents, stopVisitUpdateEvent)
-	}
+	manager.StopVisitEvents = append(manager.StopVisitEvents, event.StopVisitUpdateEvents...)
 }
 
 func (manager *TestCollectManager) HandlePartnerStatusChange(partner string, status bool) {}
