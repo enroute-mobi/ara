@@ -69,11 +69,11 @@ func Test_ObjectIDIndex_Change(t *testing.T) {
 	stopVisit.SetObjectID(objectid2)
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 
-	foundStopVisit, ok := index.Find(objectid)
+	_, ok := index.Find(objectid)
 	if ok {
 		t.Error("Can find StopVisit after changing index: ", index)
 	}
-	foundStopVisit, ok = index.Find(objectid2)
+	foundStopVisit, ok := index.Find(objectid2)
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
