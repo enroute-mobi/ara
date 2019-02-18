@@ -53,11 +53,11 @@ func Test_Index_Change(t *testing.T) {
 	stopVisit.VehicleJourneyId = "dummy2"
 	index.Index(ModelId(stopVisit.Id()), stopVisit)
 
-	foundStopVisits, ok := index.Find(ModelId("dummy"))
+	_, ok := index.Find(ModelId("dummy"))
 	if ok {
 		t.Error("Can find StopVisit after changing index: ", index)
 	}
-	foundStopVisits, ok = index.Find(ModelId("dummy2"))
+	foundStopVisits, ok := index.Find(ModelId("dummy2"))
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
