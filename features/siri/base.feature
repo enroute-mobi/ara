@@ -13,7 +13,7 @@ Feature: Support SIRI request
   <S:Body>
     <S:Fault>
       <faultcode>S:Client</faultcode>
-      <faultstring>Invalid Request: Empty body</faultstring>
+      <faultstring>Invalid Request: empty body</faultstring>
     </S:Fault>
   </S:Body>
 </S:Envelope>
