@@ -77,16 +77,6 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	return event
 }
 
-func testStopMonitoringLogStash(t *testing.T) {
-	events := audit.CurrentLogStash().(*audit.FakeLogStash).Events()
-	if len(events) != 1 {
-		t.Errorf("Logstash should have recieved an event, got: %v", events)
-	}
-	if len(events[0]) != 12 {
-		t.Errorf("LogstashEvent should have 12 values, got: %v", events[0])
-	}
-}
-
 // WIP
 func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T) {
 	stopAreaUpdateEvent := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
