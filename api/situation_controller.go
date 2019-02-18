@@ -51,7 +51,7 @@ func (controller *SituationController) Show(response http.ResponseWriter, identi
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get situation %s", identifier)
@@ -67,7 +67,7 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete situation %s", identifier)
@@ -77,7 +77,7 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 	err := tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	response.Write(jsonBytes)
@@ -90,7 +90,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 
 	situation, ok := controller.findSituation(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 
 	err := json.Unmarshal(body, &situation)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&situation)
@@ -124,12 +124,12 @@ func (controller *SituationController) Create(response http.ResponseWriter, body
 
 	err := json.Unmarshal(body, &situation)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	if situation.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (controller *SituationController) Create(response http.ResponseWriter, body
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&situation)

@@ -23,24 +23,24 @@ func NewPartnerController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *PartnerController) getActionId(action, url string) (string, error) {
+func (controller *PartnerController) getActionId(action, url string) (string, bool) {
 	index := strings.LastIndex(url, action) + len(action) + 1
 	if index >= len(url)-1 {
-		return "", fmt.Errorf("No id")
+		return "", false
 	}
-	id := url[index:len(url)]
+	id := url[index:]
 
 	sz := len(id)
 	if sz > 0 && id[sz-1] == '/' {
 		id = id[:sz-1]
 	}
-	return id, nil
+	return id, true
 }
 
 func (controller *PartnerController) subscriptionsIndex(response http.ResponseWriter, requestData *RequestData) {
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
 		return
 	}
 	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
@@ -53,14 +53,14 @@ func (controller *PartnerController) subscriptionsIndex(response http.ResponseWr
 func (controller *PartnerController) subscriptionsDelete(response http.ResponseWriter, requestData *RequestData) {
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
 		return
 	}
 	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
 
-	id, err := controller.getActionId(requestData.Action, requestData.Url)
-	if err != nil {
-		http.Error(response, "Invalid request, id can't be nil", 400)
+	id, ok := controller.getActionId(requestData.Action, requestData.Url)
+	if !ok {
+		http.Error(response, "Invalid request, id can't be nil", http.StatusBadRequest)
 		return
 	}
 	partner.Subscriptions().DeleteById(core.SubscriptionId(id))
@@ -71,7 +71,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 
 	partner := controller.findPartner(requestData.Id)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), 500)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 
 	err := json.Unmarshal(requestData.Body, &apiSubscription)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (controller *PartnerController) Action(response http.ResponseWriter, reques
 		controller.subscriptions(response, requestData)
 		return
 	}
-	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), 500)
+	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), http.StatusInternalServerError)
 }
 
 func (controller *PartnerController) findPartner(identifier string) *core.Partner {
@@ -128,7 +128,7 @@ func (controller *PartnerController) Index(response http.ResponseWriter, filters
 func (controller *PartnerController) Show(response http.ResponseWriter, identifier string) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get partner %s", identifier)
@@ -140,7 +140,7 @@ func (controller *PartnerController) Show(response http.ResponseWriter, identifi
 func (controller *PartnerController) Delete(response http.ResponseWriter, identifier string) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete partner %s", identifier)
@@ -154,7 +154,7 @@ func (controller *PartnerController) Delete(response http.ResponseWriter, identi
 func (controller *PartnerController) Update(response http.ResponseWriter, identifier string, body []byte) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -163,11 +163,11 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 	if apiPartner.Id != partner.Id() {
-		http.Error(response, "Invalid request (Id specified)", 400)
+		http.Error(response, "Invalid request (Id specified)", http.StatusBadRequest)
 		return
 	}
 
@@ -194,11 +194,11 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 	apiPartner := partner.Definition()
 	err := json.Unmarshal(body, apiPartner)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 	if apiPartner.Id != "" {
-		http.Error(response, "Invalid request (Id specified)", 400)
+		http.Error(response, "Invalid request (Id specified)", http.StatusBadRequest)
 		return
 	}
 

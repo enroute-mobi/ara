@@ -51,7 +51,7 @@ func (controller *LineController) Show(response http.ResponseWriter, identifier 
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get line %s", identifier)
@@ -67,7 +67,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete line %s", identifier)
@@ -77,7 +77,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 	err := tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	response.Write(jsonBytes)
@@ -90,7 +90,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	line, ok := controller.findLine(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -98,14 +98,14 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 
 	err := json.Unmarshal(body, &line)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range line.ObjectIDs() {
 		l, ok := tx.Model().Lines().FindByObjectId(obj)
 		if ok && l.Id() != line.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -114,7 +114,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&line)
@@ -132,19 +132,19 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 
 	err := json.Unmarshal(body, &line)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	if line.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range line.ObjectIDs() {
 		l, ok := tx.Model().Lines().FindByObjectId(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&line)

@@ -51,11 +51,11 @@ type Controller struct {
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
-		http.Error(response, "Invalid request: Can't read request body", 400)
+		http.Error(response, "Invalid request: Can't read request body", http.StatusBadRequest)
 		return nil
 	}
 	if len(body) == 0 {
-		http.Error(response, "Invalid request: Empty body", 400)
+		http.Error(response, "Invalid request: Empty body", http.StatusBadRequest)
 		return nil
 	}
 	return body
@@ -66,14 +66,14 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 	if requestData.Method == "PUT" || (requestData.Method == "POST" && requestData.Id != "save") {
 		requestData.Body = getRequestBody(response, request)
 		if requestData.Body == nil {
-			http.Error(response, "Invalid request", 400)
+			http.Error(response, "Invalid request", http.StatusBadRequest)
 			return
 		}
 	}
 
 	// Check request Id
 	if (requestData.Method == "DELETE" || requestData.Method == "PUT") && requestData.Id == "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (controller *Controller) serve(response http.ResponseWriter, request *http.
 			}
 		}
 		if requestData.Id != "" {
-			http.Error(response, "Invalid request", 400)
+			http.Error(response, "Invalid request", http.StatusBadRequest)
 			return
 		}
 		controller.restfulResource.Create(response, requestData.Body)

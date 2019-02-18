@@ -51,7 +51,7 @@ func (controller *OperatorController) Show(response http.ResponseWriter, identif
 
 	operator, ok := controller.findOperator(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get operator %s", identifier)
@@ -67,7 +67,7 @@ func (controller *OperatorController) Delete(response http.ResponseWriter, ident
 
 	operator, ok := controller.findOperator(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete operator %s", identifier)
@@ -77,7 +77,7 @@ func (controller *OperatorController) Delete(response http.ResponseWriter, ident
 	err := tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	response.Write(jsonBytes)
@@ -90,7 +90,7 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 
 	operator, ok := controller.findOperator(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -98,14 +98,14 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 
 	err := json.Unmarshal(body, &operator)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range operator.ObjectIDs() {
 		o, ok := tx.Model().Operators().FindByObjectId(obj)
 		if ok && o.Id() != operator.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -114,7 +114,7 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&operator)
@@ -132,19 +132,19 @@ func (controller *OperatorController) Create(response http.ResponseWriter, body 
 
 	err := json.Unmarshal(body, &operator)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	if operator.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range operator.ObjectIDs() {
 		o, ok := tx.Model().Operators().FindByObjectId(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (controller *OperatorController) Create(response http.ResponseWriter, body 
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := json.Marshal(&operator)

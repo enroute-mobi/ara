@@ -90,7 +90,7 @@ func (controller *StopVisitController) Show(response http.ResponseWriter, identi
 
 	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get stopVisit %s", identifier)
@@ -106,7 +106,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 
 	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
@@ -116,7 +116,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 	err := tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	response.Write(jsonBytes)
@@ -129,7 +129,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	stopVisit, ok := controller.findStopVisit(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -137,14 +137,14 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
 		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
 		if ok && sv.Id() != stopVisit.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 
@@ -173,19 +173,19 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	if stopVisit.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
 		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -194,7 +194,7 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := stopVisit.MarshalJSON()

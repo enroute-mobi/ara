@@ -40,7 +40,7 @@ func (controller *ReferentialController) Index(response http.ResponseWriter, fil
 func (controller *ReferentialController) Show(response http.ResponseWriter, identifier string) {
 	referential := controller.findReferential(identifier)
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get referential %s", identifier)
@@ -52,7 +52,7 @@ func (controller *ReferentialController) Show(response http.ResponseWriter, iden
 func (controller *ReferentialController) Delete(response http.ResponseWriter, identifier string) {
 	referential := controller.findReferential(identifier)
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete referential %s", identifier)
@@ -66,7 +66,7 @@ func (controller *ReferentialController) Delete(response http.ResponseWriter, id
 func (controller *ReferentialController) Update(response http.ResponseWriter, identifier string, body []byte) {
 	referential := controller.findReferential(identifier)
 	if referential == nil {
-		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 	apiReferential := referential.Definition()
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (controller *ReferentialController) Create(response http.ResponseWriter, bo
 	apiReferential := referential.Definition()
 	err := json.Unmarshal(body, apiReferential)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 

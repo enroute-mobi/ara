@@ -31,40 +31,40 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 	}
 }
 
-func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *core.Partner, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
-	referential.Tokens = []string{"testToken"}
-	referential.Save()
+// func partnerPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *core.Partner, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+// 	// Create a referential
+// 	referentials := core.NewMemoryReferentials()
+// 	server := &Server{}
+// 	server.SetReferentials(referentials)
+// 	referential = referentials.New("default")
+// 	referential.Tokens = []string{"testToken"}
+// 	referential.Save()
 
-	// Initialize the partners manager
-	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	// Save a new partner
-	partner = referential.Partners().New("First Partner")
-	referential.Partners().Save(partner)
+// 	// Initialize the partners manager
+// 	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+// 	// Save a new partner
+// 	partner = referential.Partners().New("First Partner")
+// 	referential.Partners().Save(partner)
 
-	// Create a request
-	address := []byte("/default/partners")
-	if sendIdentifier {
-		address = append(address, fmt.Sprintf("/%s", partner.Id())...)
-	}
-	request, err := http.NewRequest(method, string(address), bytes.NewReader(body))
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	// Create a request
+// 	address := []byte("/default/partners")
+// 	if sendIdentifier {
+// 		address = append(address, fmt.Sprintf("/%s", partner.Id())...)
+// 	}
+// 	request, err := http.NewRequest(method, string(address), bytes.NewReader(body))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	request.Header.Set("Authorization", "Token token=testToken")
-	// Create a ResponseRecorder
-	responseRecorder = httptest.NewRecorder()
+// 	request.Header.Set("Authorization", "Token token=testToken")
+// 	// Create a ResponseRecorder
+// 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+// 	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+// 	server.HandleFlow(responseRecorder, request)
 
-	return
-}
+// 	return
+// }
 
 func createReferential() (*Server, *core.Referential) {
 	referentials := core.NewMemoryReferentials()

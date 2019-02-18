@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -38,9 +37,7 @@ type RequestData struct {
 func NewRequestDataFromContent(params []string) *RequestData {
 	requestFiller := make([]string, 15)
 
-	for i, param := range params {
-		requestFiller[i] = param
-	}
+	copy(requestFiller, params)
 
 	return &RequestData{
 		Referential: requestFiller[1],
@@ -67,7 +64,7 @@ func (server *Server) ListenAndServe() error {
 func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	newController, ok := newControllerMap[requestData.Referential]
 	if !ok {
-		http.Error(response, "Invalid ressource", 500)
+		http.Error(response, "Invalid ressource", http.StatusBadRequest)
 		return
 	}
 
@@ -77,15 +74,15 @@ func (server *Server) handleControllers(response http.ResponseWriter, request *h
 	controller.serve(response, request, requestData)
 }
 
-func (server *Server) parse(response http.ResponseWriter, request *http.Request) (*RequestData, error) {
+func (server *Server) parse(response http.ResponseWriter, request *http.Request) (*RequestData, bool) {
 	path := request.URL.RequestURI()
 
 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?/?([0-9a-zA-Z-_]+)?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(path)
 	if foundStrings == nil || foundStrings[1] == "" {
-		http.Error(response, "Invalid request", 400)
-		return nil, errors.New("Invalid request")
+		http.Error(response, "Invalid request", http.StatusBadRequest)
+		return nil, false
 	}
 
 	requestData := NewRequestDataFromContent(foundStrings)
@@ -95,7 +92,7 @@ func (server *Server) parse(response http.ResponseWriter, request *http.Request)
 
 	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Server", version.ApplicationName())
-	return requestData, nil
+	return requestData, true
 }
 
 func (server *Server) getToken(r *http.Request) string {
@@ -111,10 +108,7 @@ func (server *Server) getToken(r *http.Request) string {
 }
 
 func (server *Server) isAdmin(r *http.Request) bool {
-	if server.getToken(r) != config.Config.ApiKey {
-		return false
-	}
-	return true
+	return server.getToken(r) == config.Config.ApiKey
 }
 
 func (server *Server) isAuth(referential *core.Referential, request *http.Request) bool {
@@ -137,7 +131,7 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 		server.handleSIRI(response, request, requestData)
 	} else if strings.HasPrefix(requestData.Referential, "_") {
 		if !server.isAdmin(request) {
-			http.Error(response, "Unauthorized request", 401)
+			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%v", request)
 			return
 		}
@@ -151,12 +145,11 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 }
 
 func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-
-	requestData, err := server.parse(response, request)
-
-	if err != nil {
+	requestData, ok := server.parse(response, request)
+	if !ok {
 		return
 	}
+
 	server.handleRoutes(response, request, requestData)
 }
 
@@ -164,16 +157,16 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 	if foundReferential == nil {
-		http.Error(response, "Referential not found", 500)
+		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
 	}
 	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", 401)
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
 	newController, ok := newWithReferentialControllerMap[requestData.Resource]
 	if !ok {
-		http.Error(response, "Invalid ressource", 500)
+		http.Error(response, "Invalid ressource", http.StatusBadRequest)
 		return
 	}
 

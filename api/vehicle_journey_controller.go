@@ -51,7 +51,7 @@ func (controller *VehicleJourneyController) Show(response http.ResponseWriter, i
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get vehicleJourney %s", identifier)
@@ -67,7 +67,7 @@ func (controller *VehicleJourneyController) Delete(response http.ResponseWriter,
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Delete vehicleJourney %s", identifier)
@@ -77,7 +77,7 @@ func (controller *VehicleJourneyController) Delete(response http.ResponseWriter,
 	err := tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	response.Write(jsonBytes)
@@ -90,7 +90,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	vehicleJourney, ok := controller.findVehicleJourney(tx, identifier)
 	if !ok {
-		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), 404)
+		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 
@@ -98,14 +98,14 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 
 	err := json.Unmarshal(body, &vehicleJourney)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range vehicleJourney.ObjectIDs() {
 		vj, ok := tx.Model().VehicleJourneys().FindByObjectId(obj)
 		if ok && vj.Id() != vehicleJourney.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -114,7 +114,7 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := vehicleJourney.MarshalJSON()
@@ -132,19 +132,19 @@ func (controller *VehicleJourneyController) Create(response http.ResponseWriter,
 
 	err := json.Unmarshal(body, &vehicleJourney)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), 400)
+		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	if vehicleJourney.Id() != "" {
-		http.Error(response, "Invalid request", 400)
+		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	for _, obj := range vehicleJourney.ObjectIDs() {
 		vj, ok := tx.Model().VehicleJourneys().FindByObjectId(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), 400)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (controller *VehicleJourneyController) Create(response http.ResponseWriter,
 	err = tx.Commit()
 	if err != nil {
 		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", 500)
+		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
 	jsonBytes, _ := vehicleJourney.MarshalJSON()
