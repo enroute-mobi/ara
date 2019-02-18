@@ -44,7 +44,7 @@ type Partners interface {
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
-	SaveToDatabase() (error, int)
+	SaveToDatabase() (int, error)
 }
 
 type PartnerStatus struct {
@@ -436,13 +436,8 @@ func (partner *Partner) hasSubscribers() bool {
 	if ok {
 		return true
 	}
-
 	_, ok = partner.connectors[SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER]
-	if ok {
-		return true
-	}
-
-	return false
+	return ok
 }
 
 func (partner *Partner) Connector(connectorType string) (Connector, bool) {
@@ -589,14 +584,14 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 
 func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
 	partnersId := []PartnerId{}
-	for id, _ := range manager.byId {
+	for id := range manager.byId {
 		partnersId = append(partnersId, id)
 	}
 	return json.Marshal(partnersId)
 }
 
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
-	partner, _ := manager.byId[id]
+	partner := manager.byId[id]
 	return partner
 }
 
@@ -689,29 +684,29 @@ func (manager *PartnerManager) Load() error {
 	return nil
 }
 
-func (manager *PartnerManager) SaveToDatabase() (error, int) {
+func (manager *PartnerManager) SaveToDatabase() (int, error) {
 	// Check presence of Referential
 	selectReferentials := []model.SelectReferential{}
 	sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
 	_, err := model.Database.Select(&selectReferentials, sqlQuery)
 	if err != nil {
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 	if len(selectReferentials) == 0 {
-		return errors.New("can't save Partners without Referential in Database"), http.StatusNotAcceptable
+		return http.StatusNotAcceptable, errors.New("can't save Partners without Referential in Database")
 	}
 
 	// Begin transaction
 	_, err = model.Database.Exec("BEGIN;")
 	if err != nil {
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Truncate Table
 	_, err = model.Database.Exec("truncate partners;")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Insert partners
@@ -719,22 +714,22 @@ func (manager *PartnerManager) SaveToDatabase() (error, int) {
 		dbPartner, err := manager.newDbPartner(partner)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
+			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
 		}
 		err = model.Database.Insert(dbPartner)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
+			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
 		}
 	}
 
 	// Commit transaction
 	_, err = model.Database.Exec("COMMIT;")
 	if err != nil {
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
-	return nil, http.StatusOK
+	return http.StatusOK, nil
 }
 
 func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePartner, error) {

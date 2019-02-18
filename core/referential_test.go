@@ -323,7 +323,7 @@ func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	refErr, status := referentials.SaveToDatabase()
+	status, refErr := referentials.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
@@ -334,7 +334,7 @@ func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
 	ref2.Tokens = []string{"token"}
 	ref2.Save()
 
-	refErr, status = referentials.SaveToDatabase()
+	status, refErr = referentials.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
@@ -386,7 +386,7 @@ func Test_MemoryReferentials_SaveToDatabase_CleanPartners(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	refErr, status := referentials.SaveToDatabase()
+	status, refErr := referentials.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
@@ -415,7 +415,7 @@ func Test_MemoryReferentials_SaveToDatabase_PartnerWithoutReferential(t *testing
 	partner := ref.partners.New("slug")
 	partner.Save()
 
-	err, status := ref.partners.SaveToDatabase()
+	status, err := ref.partners.SaveToDatabase()
 	if status != 406 {
 		t.Fatalf("Partner save should return an error, got: %v", err)
 	}
@@ -430,7 +430,7 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	ref := referentials.New("slug")
 	ref.Save()
 
-	refErr, status := referentials.SaveToDatabase()
+	status, refErr := referentials.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Referentials: %v", refErr)
 	}
@@ -440,7 +440,7 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	partner := partners.New("slug")
 	partner.Save()
 
-	err, status := partners.SaveToDatabase()
+	status, err := partners.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Partners: %v", err)
 	}
@@ -451,7 +451,7 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	partner2.ConnectorTypes = []string{"connector"}
 	partner2.Save()
 
-	err, status = partners.SaveToDatabase()
+	status, err = partners.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Error while saving Partners: %v", err)
 	}

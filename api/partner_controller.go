@@ -219,7 +219,7 @@ func (controller *PartnerController) Create(response http.ResponseWriter, body [
 func (controller *PartnerController) Save(response http.ResponseWriter) {
 	logger.Log.Debugf("Saving partners to database")
 
-	err, status := controller.referential.Partners().SaveToDatabase()
+	status, err := controller.referential.Partners().SaveToDatabase()
 
 	if err != nil {
 		response.WriteHeader(status)

@@ -123,7 +123,7 @@ func (controller *ReferentialController) Create(response http.ResponseWriter, bo
 func (controller *ReferentialController) Save(response http.ResponseWriter) {
 	logger.Log.Debugf("Saving referentials to database")
 
-	err, status := controller.server.CurrentReferentials().SaveToDatabase()
+	status, err := controller.server.CurrentReferentials().SaveToDatabase()
 
 	if err != nil {
 		response.WriteHeader(status)

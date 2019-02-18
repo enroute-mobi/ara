@@ -365,7 +365,7 @@ func Test_PartnerController_Save(t *testing.T) {
 	referential := referentials.New("default")
 	referential.Tokens = []string{"testToken"}
 	referential.Save()
-	refErr, status := referentials.SaveToDatabase()
+	status, refErr := referentials.SaveToDatabase()
 	if status != 200 {
 		t.Fatalf("Cannot save referentials to Database: %v", refErr)
 	}

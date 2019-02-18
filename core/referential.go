@@ -47,7 +47,7 @@ type Referentials interface {
 	Save(stopArea *Referential) bool
 	Delete(stopArea *Referential) bool
 	Load() error
-	SaveToDatabase() (error, int)
+	SaveToDatabase() (int, error)
 }
 
 var referentials = NewMemoryReferentials()
@@ -283,7 +283,7 @@ func (manager *MemoryReferentials) new() *Referential {
 }
 
 func (manager *MemoryReferentials) Find(id ReferentialId) *Referential {
-	referential, _ := manager.byId[id]
+	referential := manager.byId[id]
 	return referential
 }
 
@@ -355,18 +355,18 @@ func (manager *MemoryReferentials) Load() error {
 	return nil
 }
 
-func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
+func (manager *MemoryReferentials) SaveToDatabase() (int, error) {
 	// Begin transaction
 	_, err := model.Database.Exec("BEGIN;")
 	if err != nil {
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Truncate Table
 	_, err = model.Database.Exec("truncate referentials;")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Insert referentials
@@ -374,12 +374,12 @@ func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
 		dbReferential, err := manager.newDbReferential(referential)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
+			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
 		}
 		err = model.Database.Insert(dbReferential)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+			return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 		}
 	}
 
@@ -387,16 +387,16 @@ func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
 	_, err = model.Database.Exec("delete from partners where referential_id not in (select referential_id from referentials);")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Commit transaction
 	_, err = model.Database.Exec("COMMIT;")
 	if err != nil {
-		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
-	return nil, http.StatusOK
+	return http.StatusOK, nil
 }
 
 func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*model.DatabaseReferential, error) {
