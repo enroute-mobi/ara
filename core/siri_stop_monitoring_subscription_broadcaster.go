@@ -351,8 +351,8 @@ type TestSIRIStopMonitoringSubscriptionBroadcasterFactory struct{}
 type TestStopMonitoringSubscriptionBroadcaster struct {
 	model.UUIDConsumer
 
-	events                    []*model.StopMonitoringBroadcastEvent
-	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
+	events []*model.StopMonitoringBroadcastEvent
+	// stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 }
 
 func NewTestStopMonitoringSubscriptionBroadcaster() *TestStopMonitoringSubscriptionBroadcaster {

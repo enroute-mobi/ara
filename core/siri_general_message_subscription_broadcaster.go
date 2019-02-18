@@ -217,8 +217,8 @@ type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 type TestGeneralMessageSubscriptionBroadcaster struct {
 	model.UUIDConsumer
 
-	events                    []*model.GeneralMessageBroadcastEvent
-	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
+	events []*model.GeneralMessageBroadcastEvent
+	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster
 }
 
 func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscriptionBroadcaster {
