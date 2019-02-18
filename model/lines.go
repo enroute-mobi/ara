@@ -273,9 +273,11 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 		}
 
 		if sl.References.Valid && len(sl.References.String) > 0 {
-			if err = json.Unmarshal([]byte(sl.References.String), &line.References); err != nil {
+			references := make(map[string]Reference)
+			if err = json.Unmarshal([]byte(sl.References.String), &references); err != nil {
 				return err
 			}
+			line.References.SetReferences(references)
 		}
 
 		if sl.ObjectIDs.Valid && len(sl.ObjectIDs.String) > 0 {

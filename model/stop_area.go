@@ -480,9 +480,11 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 
 		if sa.References.Valid && len(sa.References.String) > 0 {
-			if err = json.Unmarshal([]byte(sa.References.String), &stopArea.References); err != nil {
+			references := make(map[string]Reference)
+			if err = json.Unmarshal([]byte(sa.References.String), &references); err != nil {
 				return err
 			}
+			stopArea.References.SetReferences(references)
 		}
 
 		if sa.ObjectIDs.Valid && len(sa.ObjectIDs.String) > 0 {

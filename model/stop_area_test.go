@@ -307,7 +307,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		ObjectIDs:       `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
-		References:      "{}",
+		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
 		CollectedAlways: true,
 		CollectChildren: true,
 	}
@@ -367,5 +367,8 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 	if stopArea.LineIds[0] != "d0eebc99-9c0b" || stopArea.LineIds[1] != "e0eebc99-9c0b" {
 		t.Errorf("Wrong LineIds:\n got: %v\n expected: [d0eebc99-9c0b,e0eebc99-9c0b]", stopArea.LineIds)
+	}
+	if ref, ok := stopArea.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
 	}
 }

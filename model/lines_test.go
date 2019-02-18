@@ -206,7 +206,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 		Name:            "line",
 		ObjectIDs:       `{"internal":"value"}`,
 		Attributes:      "{}",
-		References:      "{}",
+		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseLine, "lines")
@@ -242,5 +242,8 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}
 	if objectid, ok := line.ObjectID("internal"); !ok || objectid.Value() != "value" {
 		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	}
+	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
 	}
 }
