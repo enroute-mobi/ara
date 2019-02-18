@@ -44,8 +44,7 @@ func main() {
 	}
 
 	// Load configuration files
-	var err error
-	err = config.LoadConfig(*configPtr)
+	err := config.LoadConfig(*configPtr)
 	if err != nil {
 		logger.Log.Panicf("Error while loading configuration: %v", err)
 	}
@@ -103,8 +102,8 @@ func main() {
 			if err != nil {
 				logger.Log.Panicf("%v", err)
 			}
-			defer file.Close()
 			pprof.Lookup("goroutine").WriteTo(file, 1)
+			file.Close()
 		}
 	}()
 
