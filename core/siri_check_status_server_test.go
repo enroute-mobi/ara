@@ -38,6 +38,9 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	}
 
 	response, err := connector.CheckStatus(request)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	time := model.DefaultClock().Now()
 	if response.Address != "http://edwig" {
