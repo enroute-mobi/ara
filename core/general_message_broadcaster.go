@@ -115,7 +115,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		}
 
 		// Prepare Id Array
-		var messageArray []string
+		// var messageArray []string
 
 		builder := NewBroadcastGeneralMessageBuilder(tx, gmb.connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		builder.InfoChannelRef = strings.Split(sub.SubscriptionOption("InfoChannelRef"), ",")
@@ -137,7 +137,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			if siriGeneralMessage == nil {
 				continue
 			}
-			messageArray = append(messageArray, siriGeneralMessage.InfoMessageIdentifier)
+			// messageArray = append(messageArray, siriGeneralMessage.InfoMessageIdentifier)
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
 		if len(notify.GeneralMessages) != 0 {
