@@ -18,12 +18,12 @@ func NewPurifier(days int) *Purifier {
 
 func (p *Purifier) Purge() error {
 	if p.date == "" {
-		return fmt.Errorf("Purifier date is empty")
+		return fmt.Errorf("purifier date is empty")
 	}
 
 	_, err := Database.Exec("BEGIN;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err)
+		return fmt.Errorf("database error: %v", err)
 	}
 
 	table_names := []string{"stop_areas", "lines", "vehicle_journeys", "stop_visits", "operators"}
@@ -31,7 +31,7 @@ func (p *Purifier) Purge() error {
 		r, err := Database.Exec(p.query(table_names[i]))
 		if err != nil {
 			Database.Exec("ROLLBACK;")
-			return fmt.Errorf("Database error: %v", err)
+			return fmt.Errorf("database error: %v", err)
 		}
 		ra, err := r.RowsAffected()
 		if err != nil {
@@ -43,7 +43,7 @@ func (p *Purifier) Purge() error {
 	// Commit transaction
 	_, err = Database.Exec("COMMIT;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err)
+		return fmt.Errorf("database error: %v", err)
 	}
 
 	return nil

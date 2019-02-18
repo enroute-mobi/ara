@@ -26,7 +26,7 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 		return nil, err
 	}
 	if len(content) == 0 {
-		return nil, errors.New("Empty body")
+		return nil, errors.New("empty body")
 	}
 	// Parse the XML and store the body
 	doc, err := xml.Parse(content, xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
@@ -39,7 +39,7 @@ func NewSOAPEnvelope(body io.Reader) (*SOAPEnvelope, error) {
 	}
 
 	if len(nodes) == 0 {
-		return nil, errors.New("Unable to find body when parsing SOAP request")
+		return nil, errors.New("unable to find body when parsing SOAP request")
 	}
 
 	soapEnvelope := &SOAPEnvelope{body: nodes[0]}

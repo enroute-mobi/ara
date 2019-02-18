@@ -23,12 +23,12 @@ type DiffResult struct {
 
 func Equal(x, y interface{}) (*DiffResult, error) {
 	if x == nil || y == nil {
-		return nil, errors.New("Use of Equal with nil value")
+		return nil, errors.New("use of Equal with nil value")
 	}
 	v1 := handlePtr(reflect.ValueOf(x))
 	v2 := handlePtr(reflect.ValueOf(y))
 	if v1.Type() != v2.Type() {
-		return nil, errors.New("Use of Equal with different type values")
+		return nil, errors.New("use of Equal with different type values")
 	}
 
 	result := &DiffResult{

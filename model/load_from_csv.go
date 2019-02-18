@@ -49,7 +49,7 @@ func (loader Loader) load() error {
 	file, err := os.Open(loader.filePath)
 	defer file.Close()
 	if err != nil {
-		return fmt.Errorf("Error while opening file: %v", err)
+		return fmt.Errorf("error while opening file: %v", err)
 	}
 
 	reader := csv.NewReader(file)
@@ -164,7 +164,7 @@ func prepareDatabase() {
 
 func (loader Loader) handleStopArea(record []string) error {
 	if len(record) != 13 {
-		return fmt.Errorf("Wrong number of entries, expected 13 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 13 got %v", len(record))
 	}
 
 	var err error
@@ -249,7 +249,7 @@ func (loader Loader) handleStopArea(record []string) error {
 
 func (loader Loader) handleOperator(record []string) error {
 	if len(record) != 5 {
-		return fmt.Errorf("Wrong number of entries, expected 5 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 5 got %v", len(record))
 	}
 
 	operator := DatabaseOperator{
@@ -278,7 +278,7 @@ func (loader Loader) handleOperator(record []string) error {
 
 func (loader Loader) handleLine(record []string) error {
 	if len(record) != 8 {
-		return fmt.Errorf("Wrong number of entries, expected 8 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 8 got %v", len(record))
 	}
 
 	var err error
@@ -326,7 +326,7 @@ func (loader Loader) handleLine(record []string) error {
 
 func (loader Loader) handleVehicleJourney(record []string) error {
 	if len(record) != 10 {
-		return fmt.Errorf("Wrong number of entries, expected 10 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 10 got %v", len(record))
 	}
 
 	vehicleJourney := DatabaseVehicleJourney{
@@ -360,7 +360,7 @@ func (loader Loader) handleVehicleJourney(record []string) error {
 
 func (loader Loader) handleStopVisit(record []string) error {
 	if len(record) != 10 {
-		return fmt.Errorf("Wrong number of entries, expected 10 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 10 got %v", len(record))
 	}
 
 	var err error

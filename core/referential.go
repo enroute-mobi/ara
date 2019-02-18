@@ -359,14 +359,14 @@ func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
 	// Begin transaction
 	_, err := model.Database.Exec("BEGIN;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Truncate Table
 	_, err = model.Database.Exec("truncate referentials;")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Insert referentials
@@ -374,12 +374,12 @@ func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
 		dbReferential, err := manager.newDbReferential(referential)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
+			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
 		}
 		err = model.Database.Insert(dbReferential)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+			return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 		}
 	}
 
@@ -387,13 +387,13 @@ func (manager *MemoryReferentials) SaveToDatabase() (error, int) {
 	_, err = model.Database.Exec("delete from partners where referential_id not in (select referential_id from referentials);")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Commit transaction
 	_, err = model.Database.Exec("COMMIT;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	return nil, http.StatusOK

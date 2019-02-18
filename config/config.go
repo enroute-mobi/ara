@@ -110,7 +110,7 @@ func getConfigDirectory(path string) (string, error) {
 			return directoryPath, nil
 		}
 	}
-	return "", errors.New("Cant find config directory")
+	return "", errors.New("can't find config directory")
 }
 
 func checkDirectory(path string) bool {
@@ -137,5 +137,5 @@ func getConfigFileContent(path, file string) ([]byte, error) {
 	}
 
 	logger.Log.Debugf("Can't find %s config file in %s", file, path)
-	return nil, fmt.Errorf("Can't find %s configuration file", file)
+	return nil, fmt.Errorf("can't find %s configuration file", file)
 }

@@ -59,7 +59,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	if len(request.XMLSubscriptionGMEntries()) > 0 {
 		gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
-			return nil, fmt.Errorf("No GeneralMessageSubscriptionBroadcaster Connector")
+			return nil, fmt.Errorf("no GeneralMessageSubscriptionBroadcaster Connector")
 		}
 		for _, sgm := range gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, sgm)
@@ -73,7 +73,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	if len(request.XMLSubscriptionSMEntries()) > 0 {
 		smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		if !ok {
-			return nil, fmt.Errorf("No StopMonitoringSubscriptionBroadcaster Connector")
+			return nil, fmt.Errorf("no StopMonitoringSubscriptionBroadcaster Connector")
 		}
 		for _, smr := range smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
@@ -87,7 +87,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	if len(request.XMLSubscriptionETTEntries()) > 0 {
 		smbc, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
-			return nil, fmt.Errorf("No EstimatedTimeTableSubscriptionBroadcaster Connector")
+			return nil, fmt.Errorf("no EstimatedTimeTableSubscriptionBroadcaster Connector")
 		}
 		for _, smr := range smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request) {
 			response.ResponseStatus = append(response.ResponseStatus, smr)
@@ -98,7 +98,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		return &response, nil
 	}
 
-	return nil, fmt.Errorf("Subscription not supported")
+	return nil, fmt.Errorf("subscription not supported")
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse {

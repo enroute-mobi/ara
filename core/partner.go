@@ -514,7 +514,7 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	if partner.CheckStatusClient() == nil {
 		logger.Log.Debugf("No CheckStatusClient connector")
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
-		return partnerStatus, errors.New("No CheckStatusClient connector")
+		return partnerStatus, errors.New("no CheckStatusClient connector")
 	}
 	partnerStatus, err := partner.CheckStatusClient().Status()
 
@@ -695,23 +695,23 @@ func (manager *PartnerManager) SaveToDatabase() (error, int) {
 	sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
 	_, err := model.Database.Select(&selectReferentials, sqlQuery)
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 	if len(selectReferentials) == 0 {
-		return errors.New("Can't save Partners without Referential in Database"), http.StatusNotAcceptable
+		return errors.New("can't save Partners without Referential in Database"), http.StatusNotAcceptable
 	}
 
 	// Begin transaction
 	_, err = model.Database.Exec("BEGIN;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Truncate Table
 	_, err = model.Database.Exec("truncate partners;")
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	// Insert partners
@@ -719,19 +719,19 @@ func (manager *PartnerManager) SaveToDatabase() (error, int) {
 		dbPartner, err := manager.newDbPartner(partner)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
+			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
 		}
 		err = model.Database.Insert(dbPartner)
 		if err != nil {
 			model.Database.Exec("ROLLBACK;")
-			return fmt.Errorf("Internal error: %v", err), http.StatusInternalServerError
+			return fmt.Errorf("internal error: %v", err), http.StatusInternalServerError
 		}
 	}
 
 	// Commit transaction
 	_, err = model.Database.Exec("COMMIT;")
 	if err != nil {
-		return fmt.Errorf("Database error: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("database error: %v", err), http.StatusInternalServerError
 	}
 
 	return nil, http.StatusOK
