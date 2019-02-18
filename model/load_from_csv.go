@@ -47,10 +47,10 @@ func (loader Loader) load() error {
 	var errors int
 
 	file, err := os.Open(loader.filePath)
-	defer file.Close()
 	if err != nil {
 		return fmt.Errorf("error while opening file: %v", err)
 	}
+	defer file.Close()
 
 	reader := csv.NewReader(file)
 	reader.Comment = '#'
