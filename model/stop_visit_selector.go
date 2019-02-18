@@ -33,10 +33,7 @@ func StopVisitSelectorBeforeTime(endTime time.Time) StopVisitSelector {
 
 func StopVisitSelectByStopAreaId(stopAreaId StopAreaId) StopVisitSelector {
 	return func(stopVisit StopVisit) bool {
-		if stopVisit.StopAreaId != stopAreaId {
-			return false
-		}
-		return true
+		return stopVisit.StopAreaId == stopAreaId
 	}
 }
 
