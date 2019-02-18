@@ -11,10 +11,6 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type StopPointsDiscoveryRequestBroadcaster interface {
-	stopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error)
-}
-
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
 	model.ClockConsumer
 
@@ -47,7 +43,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" || stopArea.CollectedAlways == false {
+		if stopArea.Name == "" || !stopArea.CollectedAlways {
 			continue
 		}
 
