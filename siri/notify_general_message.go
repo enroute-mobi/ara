@@ -95,10 +95,8 @@ func (notify *XMLNotifyGeneralMessage) GeneralMessagesDeliveries() []*XMLGeneral
 	if notify.deliveries == nil {
 		deliveries := []*XMLGeneralMessageDelivery{}
 		nodes := notify.findNodes("GeneralMessageDelivery")
-		if nodes != nil {
-			for _, node := range nodes {
-				deliveries = append(deliveries, NewXMLGeneralMessageDelivery(node))
-			}
+		for _, node := range nodes {
+			deliveries = append(deliveries, NewXMLGeneralMessageDelivery(node))
 		}
 		notify.deliveries = deliveries
 	}
@@ -122,10 +120,8 @@ func (delivery *XMLGeneralMessageDelivery) SubscriberRef() string {
 func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMessage {
 	if delivery.xmlGeneralMessages == nil {
 		nodes := delivery.findNodes("GeneralMessage")
-		if nodes != nil {
-			for _, node := range nodes {
-				delivery.xmlGeneralMessages = append(delivery.xmlGeneralMessages, NewXMLGeneralMessage(node))
-			}
+		for _, node := range nodes {
+			delivery.xmlGeneralMessages = append(delivery.xmlGeneralMessages, NewXMLGeneralMessage(node))
 		}
 	}
 	return delivery.xmlGeneralMessages
@@ -135,10 +131,8 @@ func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessagesCancellations() []*
 	if delivery.xmlGeneralMessagesCancellations == nil {
 		cancellations := []*XMLGeneralMessageCancellation{}
 		nodes := delivery.findNodes("GeneralMessageCancellation")
-		if nodes != nil {
-			for _, node := range nodes {
-				cancellations = append(cancellations, NewXMLCancelledGeneralMessage(node))
-			}
+		for _, node := range nodes {
+			cancellations = append(cancellations, NewXMLCancelledGeneralMessage(node))
 		}
 		delivery.xmlGeneralMessagesCancellations = cancellations
 	}

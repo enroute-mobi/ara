@@ -45,10 +45,8 @@ func NewXMLGetEstimatedTimetableFromContent(content []byte) (*XMLGetEstimatedTim
 func (request *XMLEstimatedTimetableRequest) Lines() []string {
 	if len(request.lines) == 0 {
 		nodes := request.findNodes("LineRef")
-		if nodes != nil {
-			for _, node := range nodes {
-				request.lines = append(request.lines, strings.TrimSpace(node.NativeNode().Content()))
-			}
+		for _, node := range nodes {
+			request.lines = append(request.lines, strings.TrimSpace(node.NativeNode().Content()))
 		}
 	}
 	return request.lines

@@ -301,10 +301,8 @@ func (visit *XMLGeneralMessage) Content() interface{} {
 func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() []string {
 	if len(visit.groupOfLinesRef) == 0 {
 		nodes := visit.findNodes("GroupOfLinesRef")
-		if nodes != nil {
-			for _, groupOfLinesRef := range nodes {
-				visit.groupOfLinesRef = append(visit.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-			}
+		for _, groupOfLinesRef := range nodes {
+			visit.groupOfLinesRef = append(visit.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
 		}
 	}
 	return visit.groupOfLinesRef
@@ -313,10 +311,8 @@ func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() []string {
 func (visit *IDFGeneralMessageStructure) RouteRef() []string {
 	if len(visit.routeRef) == 0 {
 		nodes := visit.findNodes("RouteRef")
-		if nodes != nil {
-			for _, routeRef := range nodes {
-				visit.routeRef = append(visit.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
-			}
+		for _, routeRef := range nodes {
+			visit.routeRef = append(visit.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
 	}
 	return visit.routeRef
@@ -325,10 +321,8 @@ func (visit *IDFGeneralMessageStructure) RouteRef() []string {
 func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 	if len(visit.destinationRef) == 0 {
 		nodes := visit.findNodes("DestinationRef")
-		if nodes != nil {
-			for _, destinationRef := range nodes {
-				visit.destinationRef = append(visit.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
-			}
+		for _, destinationRef := range nodes {
+			visit.destinationRef = append(visit.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
 		}
 	}
 	return visit.destinationRef
@@ -337,10 +331,8 @@ func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 func (visit *IDFGeneralMessageStructure) JourneyPatternRef() []string {
 	if len(visit.journeyPatternRef) == 0 {
 		nodes := visit.findNodes("JourneyPatternRef")
-		if nodes != nil {
-			for _, journeyPatternRef := range nodes {
-				visit.journeyPatternRef = append(visit.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
-			}
+		for _, journeyPatternRef := range nodes {
+			visit.journeyPatternRef = append(visit.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
 		}
 	}
 	return visit.journeyPatternRef
@@ -349,10 +341,8 @@ func (visit *IDFGeneralMessageStructure) JourneyPatternRef() []string {
 func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
 	if len(visit.stopPointRef) == 0 {
 		nodes := visit.findNodes("StopPointRef")
-		if nodes != nil {
-			for _, stopPointRef := range nodes {
-				visit.stopPointRef = append(visit.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
-			}
+		for _, stopPointRef := range nodes {
+			visit.stopPointRef = append(visit.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
 		}
 	}
 	return visit.stopPointRef
@@ -361,10 +351,8 @@ func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
 func (visit *IDFGeneralMessageStructure) LineRef() []string {
 	if len(visit.lineRef) == 0 {
 		nodes := visit.findDirectChildrenNodes("LineRef")
-		if nodes != nil {
-			for _, lineRef := range nodes {
-				visit.lineRef = append(visit.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))
-			}
+		for _, lineRef := range nodes {
+			visit.lineRef = append(visit.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))
 		}
 	}
 	return visit.lineRef
@@ -373,10 +361,8 @@ func (visit *IDFGeneralMessageStructure) LineRef() []string {
 func (visit *IDFGeneralMessageStructure) LineSections() []*IDFLineSectionStructure {
 	if len(visit.lineSections) == 0 {
 		nodes := visit.findNodes("LineSection")
-		if nodes != nil {
-			for _, lineNode := range nodes {
-				visit.lineSections = append(visit.lineSections, NewXMLLineSection(lineNode))
-			}
+		for _, lineNode := range nodes {
+			visit.lineSections = append(visit.lineSections, NewXMLLineSection(lineNode))
 		}
 	}
 	return visit.lineSections
@@ -385,10 +371,8 @@ func (visit *IDFGeneralMessageStructure) LineSections() []*IDFLineSectionStructu
 func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 	if len(visit.messages) == 0 {
 		nodes := visit.findNodes("Message")
-		if nodes != nil {
-			for _, messageNode := range nodes {
-				visit.messages = append(visit.messages, NewXMLMessage(messageNode))
-			}
+		for _, messageNode := range nodes {
+			visit.messages = append(visit.messages, NewXMLMessage(messageNode))
 		}
 	}
 	return visit.messages

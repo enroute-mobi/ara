@@ -38,10 +38,8 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSMEntries() []*XMLStopMoni
 		return request.smEntries
 	}
 	nodes := request.findNodes("StopMonitoringSubscriptionRequest")
-	if nodes != nil {
-		for _, stopMonitoring := range nodes {
-			request.smEntries = append(request.smEntries, NewXMLStopMonitoringSubscriptionRequestEntry(stopMonitoring))
-		}
+	for _, stopMonitoring := range nodes {
+		request.smEntries = append(request.smEntries, NewXMLStopMonitoringSubscriptionRequestEntry(stopMonitoring))
 	}
 	return request.smEntries
 }
@@ -51,10 +49,8 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionETTEntries() []*XMLEstimat
 		return request.ettEntries
 	}
 	nodes := request.findNodes("EstimatedTimetableSubscriptionRequest")
-	if nodes != nil {
-		for _, ett := range nodes {
-			request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
-		}
+	for _, ett := range nodes {
+		request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
 	}
 	return request.ettEntries
 }
@@ -64,10 +60,8 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionGMEntries() []*XMLGeneralM
 		return request.gmEntries
 	}
 	nodes := request.findNodes("GeneralMessageSubscriptionRequest")
-	if nodes != nil {
-		for _, generalMessage := range nodes {
-			request.gmEntries = append(request.gmEntries, NewXMLGeneralMessageSubscriptionRequestEntry(generalMessage))
-		}
+	for _, generalMessage := range nodes {
+		request.gmEntries = append(request.gmEntries, NewXMLGeneralMessageSubscriptionRequestEntry(generalMessage))
 	}
 	return request.gmEntries
 }

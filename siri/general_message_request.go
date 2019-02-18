@@ -123,10 +123,8 @@ func (request *XMLGeneralMessageRequest) RequestTimestamp() time.Time {
 func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
 	if len(request.infoChannelRef) == 0 {
 		nodes := request.findNodes("InfoChannelRef")
-		if nodes != nil {
-			for _, infoChannelRef := range nodes {
-				request.infoChannelRef = append(request.infoChannelRef, strings.TrimSpace(infoChannelRef.NativeNode().Content()))
-			}
+		for _, infoChannelRef := range nodes {
+			request.infoChannelRef = append(request.infoChannelRef, strings.TrimSpace(infoChannelRef.NativeNode().Content()))
 		}
 	}
 	return request.infoChannelRef
@@ -135,10 +133,8 @@ func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
 func (request *XMLGeneralMessageRequest) GroupOfLinesRef() []string {
 	if len(request.groupOfLinesRef) == 0 {
 		nodes := request.findNodes("GroupOfLinesRef")
-		if nodes != nil {
-			for _, groupOfLinesRef := range nodes {
-				request.groupOfLinesRef = append(request.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-			}
+		for _, groupOfLinesRef := range nodes {
+			request.groupOfLinesRef = append(request.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
 		}
 	}
 	return request.groupOfLinesRef
@@ -147,10 +143,8 @@ func (request *XMLGeneralMessageRequest) GroupOfLinesRef() []string {
 func (request *XMLGeneralMessageRequest) RouteRef() []string {
 	if len(request.routeRef) == 0 {
 		nodes := request.findNodes("RouteRef")
-		if nodes != nil {
-			for _, routeRef := range nodes {
-				request.routeRef = append(request.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
-			}
+		for _, routeRef := range nodes {
+			request.routeRef = append(request.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
 	}
 	return request.routeRef
@@ -159,10 +153,8 @@ func (request *XMLGeneralMessageRequest) RouteRef() []string {
 func (request *XMLGeneralMessageRequest) DestinationRef() []string {
 	if len(request.destinationRef) == 0 {
 		nodes := request.findNodes("DestinationRef")
-		if nodes != nil {
-			for _, destinationRef := range nodes {
-				request.destinationRef = append(request.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
-			}
+		for _, destinationRef := range nodes {
+			request.destinationRef = append(request.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
 		}
 	}
 	return request.destinationRef
@@ -171,10 +163,8 @@ func (request *XMLGeneralMessageRequest) DestinationRef() []string {
 func (request *XMLGeneralMessageRequest) JourneyPatternRef() []string {
 	if len(request.journeyPatternRef) == 0 {
 		nodes := request.findNodes("JourneyPatternRef")
-		if nodes != nil {
-			for _, journeyPatternRef := range nodes {
-				request.journeyPatternRef = append(request.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
-			}
+		for _, journeyPatternRef := range nodes {
+			request.journeyPatternRef = append(request.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
 		}
 	}
 	return request.journeyPatternRef
@@ -183,10 +173,8 @@ func (request *XMLGeneralMessageRequest) JourneyPatternRef() []string {
 func (request *XMLGeneralMessageRequest) StopPointRef() []string {
 	if len(request.stopPointRef) == 0 {
 		nodes := request.findNodes("StopPointRef")
-		if nodes != nil {
-			for _, stopPointRef := range nodes {
-				request.stopPointRef = append(request.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
-			}
+		for _, stopPointRef := range nodes {
+			request.stopPointRef = append(request.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
 		}
 	}
 	return request.stopPointRef
@@ -195,10 +183,8 @@ func (request *XMLGeneralMessageRequest) StopPointRef() []string {
 func (request *XMLGeneralMessageRequest) LineRef() []string {
 	if len(request.lineRef) == 0 {
 		nodes := request.findNodes("LineRef")
-		if nodes != nil {
-			for _, lineRef := range nodes {
-				request.lineRef = append(request.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))
-			}
+		for _, lineRef := range nodes {
+			request.lineRef = append(request.lineRef, strings.TrimSpace(lineRef.NativeNode().Content()))
 		}
 	}
 	return request.lineRef

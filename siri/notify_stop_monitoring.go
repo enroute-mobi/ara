@@ -15,10 +15,8 @@ func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLStopMoni
 	if notify.deliveries == nil {
 		deliveries := []*XMLStopMonitoringDelivery{}
 		nodes := notify.findNodes("StopMonitoringDelivery")
-		if nodes != nil {
-			for _, node := range nodes {
-				deliveries = append(deliveries, NewXMLStopMonitoringDelivery(node))
-			}
+		for _, node := range nodes {
+			deliveries = append(deliveries, NewXMLStopMonitoringDelivery(node))
 		}
 		notify.deliveries = deliveries
 	}

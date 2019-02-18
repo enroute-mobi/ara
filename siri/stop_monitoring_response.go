@@ -316,10 +316,8 @@ func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisitCancellations() 
 	if response.monitoredStopVisitCancellations == nil {
 		cancellations := []*XMLMonitoredStopVisitCancellation{}
 		nodes := response.findNodes("MonitoredStopVisitCancellation")
-		if nodes != nil {
-			for _, node := range nodes {
-				cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
-			}
+		for _, node := range nodes {
+			cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
 		}
 		response.monitoredStopVisitCancellations = cancellations
 	}
@@ -330,10 +328,8 @@ func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisitCancellations() 
 	if delivery.monitoredStopVisitCancellations == nil {
 		cancellations := []*XMLMonitoredStopVisitCancellation{}
 		nodes := delivery.findNodes("MonitoredStopVisitCancellation")
-		if nodes != nil {
-			for _, node := range nodes {
-				cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
-			}
+		for _, node := range nodes {
+			cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
 		}
 		delivery.monitoredStopVisitCancellations = cancellations
 	}
@@ -358,10 +354,8 @@ func (response *XMLStopMonitoringResponse) XMLMonitoredStopVisits() []*XMLMonito
 	if response.monitoredStopVisits == nil {
 		stopVisits := []*XMLMonitoredStopVisit{}
 		nodes := response.findNodes("MonitoredStopVisit")
-		if nodes != nil {
-			for _, node := range nodes {
-				stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
-			}
+		for _, node := range nodes {
+			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
 		}
 		response.monitoredStopVisits = stopVisits
 	}
@@ -372,10 +366,8 @@ func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonito
 	if delivery.monitoredStopVisits == nil {
 		stopVisits := []*XMLMonitoredStopVisit{}
 		nodes := delivery.findNodes("MonitoredStopVisit")
-		if nodes != nil {
-			for _, node := range nodes {
-				stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
-			}
+		for _, node := range nodes {
+			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
 		}
 		delivery.monitoredStopVisits = stopVisits
 	}
