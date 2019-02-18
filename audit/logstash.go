@@ -120,11 +120,11 @@ func (logStash *TCPLogStash) run() {
 func (logStash *TCPLogStash) send(jsonBytes []byte) {
 	for {
 		_, err := logStash.connection.Write(jsonBytes)
-		if err != nil {
-			logStash.connection.Close()
-			logStash.connectLogstash()
+		if err == nil {
+			return
 		}
-		return
+		logStash.connection.Close()
+		logStash.connectLogstash()
 	}
 }
 
