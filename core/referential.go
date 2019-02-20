@@ -225,7 +225,8 @@ func (referential *Referential) setNextReloadAt() {
 	now := referential.Clock().Now()
 
 	day := now.Day()
-	if now.Hour() >= hour && now.Minute() >= minute {
+
+	if now.Hour() > hour || (now.Hour() == hour && now.Minute() > minute) {
 		day += 1
 	}
 
