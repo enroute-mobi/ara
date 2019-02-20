@@ -237,25 +237,26 @@ func (sh *schedulesHandler) handleDepartureStatus(svDs model.StopVisitDepartureS
 
 type optionParser struct{}
 
-func (subscription *optionParser) getOptionDuration(option string) time.Duration {
+func (parser *optionParser) getOptionDuration(option string) time.Duration {
 
-	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
+	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:[\.,](\d{1,3}))?S)?)?`)
 	matches := durationRegex.FindStringSubmatch(strings.TrimSpace(option))
 
 	if len(matches) == 0 {
 		return 0
 	}
-	years := subscription.parseDuration(matches[1]) * 24 * 365 * time.Hour
-	months := subscription.parseDuration(matches[2]) * 30 * 24 * time.Hour
-	days := subscription.parseDuration(matches[3]) * 24 * time.Hour
-	hours := subscription.parseDuration(matches[4]) * time.Hour
-	minutes := subscription.parseDuration(matches[5]) * time.Minute
-	seconds := subscription.parseDuration(matches[6]) * time.Second
+	years := parser.parseDuration(matches[1]) * 24 * 365 * time.Hour
+	months := parser.parseDuration(matches[2]) * 30 * 24 * time.Hour
+	days := parser.parseDuration(matches[3]) * 24 * time.Hour
+	hours := parser.parseDuration(matches[4]) * time.Hour
+	minutes := parser.parseDuration(matches[5]) * time.Minute
+	seconds := parser.parseDuration(matches[6]) * time.Second
+	rest := parser.parseDuration(matches[7]) * parser.durationPow(10, 3-len(matches[7])) * time.Millisecond
 
-	return time.Duration(years + months + days + hours + minutes + seconds)
+	return time.Duration(years + months + days + hours + minutes + seconds + rest)
 }
 
-func (subscription *optionParser) parseDuration(value string) time.Duration {
+func (parser *optionParser) parseDuration(value string) time.Duration {
 	if len(value) == 0 {
 		return 0
 	}
@@ -264,4 +265,16 @@ func (subscription *optionParser) parseDuration(value string) time.Duration {
 		return 0
 	}
 	return time.Duration(parsed)
+}
+
+func (parser *optionParser) durationPow(a, b int) time.Duration {
+	p := 1
+	for b > 0 {
+		if b&1 != 0 {
+			p *= a
+		}
+		b >>= 1
+		a *= a
+	}
+	return time.Duration(p)
 }
