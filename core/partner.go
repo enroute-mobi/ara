@@ -61,6 +61,7 @@ type Partner struct {
 	Settings       map[string]string
 
 	connectors          map[string]Connector
+	startedAt           time.Time
 	context             Context
 	subscriptionManager Subscriptions
 	manager             Partners
@@ -206,6 +207,10 @@ func (partner *Partner) Subscriptions() Subscriptions {
 	return partner.subscriptionManager
 }
 
+func (partner *Partner) StartedAt() time.Time {
+	return partner.startedAt
+}
+
 func (partner *Partner) Id() PartnerId {
 	return partner.id
 }
@@ -301,6 +306,8 @@ func (partner *Partner) Stop() {
 }
 
 func (partner *Partner) Start() {
+	partner.startedAt = partner.manager.Referential().Clock().Now()
+
 	for _, connector := range partner.connectors {
 		c, ok := connector.(model.Startable)
 		if ok {

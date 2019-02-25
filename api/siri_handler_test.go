@@ -35,8 +35,6 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 
 	// Create the default referential with the appropriate connectors
 	referential := server.CurrentReferentials().New("default")
-	referential.Start()
-	referential.Stop()
 
 	partner := referential.Partners().New("partner")
 	partner.Settings = map[string]string{
@@ -66,6 +64,8 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 
 	partner.Save()
 	referential.Save()
+	referential.Start()
+	referential.Stop()
 
 	return server, referential
 }

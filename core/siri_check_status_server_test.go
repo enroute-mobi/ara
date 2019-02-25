@@ -14,11 +14,12 @@ import (
 func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
-	referential.Start()
-	referential.Stop()
 	partner := referential.Partners().New("partner")
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Save()
+	referential.Start()
+	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
 	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())

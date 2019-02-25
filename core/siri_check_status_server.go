@@ -38,9 +38,9 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 		ProducerRef:               connector.Partner().ProducerRef(),
 		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-		Status:             true,
-		ResponseTimestamp:  connector.Clock().Now(),
-		ServiceStartedTime: connector.Partner().Referential().StartedAt(),
+		Status:                    true,
+		ResponseTimestamp:         connector.Clock().Now(),
+		ServiceStartedTime:        connector.Partner().StartedAt(),
 	}
 
 	logSIRICheckStatusResponse(logStashEvent, response)
