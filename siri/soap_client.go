@@ -21,6 +21,7 @@ const (
 	DEFAULT requestType = iota
 	SUBSCRIPTION
 	NOTIFICATION
+	CHECK_STATUS
 )
 
 type Request interface {
@@ -146,16 +147,21 @@ func (client *SOAPClient) getURL(requestType requestType) string {
 }
 
 func getTimeOut(rt requestType) time.Duration {
-	if rt == SUBSCRIPTION {
+	switch rt {
+	case SUBSCRIPTION:
 		return 30 * time.Second
+	case CHECK_STATUS:
+		return 9 * time.Second
+	default:
+		return 5 * time.Second
 	}
-	return 5 * time.Second
 }
 
 func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLCheckStatusResponse, error) {
 	node, err := client.prepareAndSendRequest(soapClientArguments{
 		request:          request,
 		expectedResponse: "CheckStatusResponse",
+		requestType:      CHECK_STATUS,
 		acceptGzip:       true,
 	})
 	if err != nil {
