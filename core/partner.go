@@ -387,12 +387,12 @@ func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
 }
 
 func (partner *Partner) LogSubscriptionStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_stop_monitoring_notifications"])
+	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_notifications"])
 	return
 }
 
 func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_stop_monitoring_requests"])
+	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_requests"])
 	return
 }
 

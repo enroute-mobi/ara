@@ -218,3 +218,13 @@ func (stopVisit *SIRIMonitoredStopVisit) BuildMonitoredStopVisitXML() (string, e
 	}
 	return buffer.String(), nil
 }
+
+func (stopVisit *SIRICancelledStopVisit) BuildCancelledStopVisitXML() (string, error) {
+	var buffer bytes.Buffer
+	var stopMonitoringDelivery = template.Must(template.New("cancelledStopVisit").Parse(cancelledStopVisitTemplate))
+	if err := stopMonitoringDelivery.Execute(&buffer, stopVisit); err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
+}
