@@ -386,6 +386,16 @@ func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
 	return
 }
 
+func (partner *Partner) LogSubscriptionStopMonitoringDeliveries() (l bool) {
+	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_stop_monitoring_notifications"])
+	return
+}
+
+func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
+	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_stop_monitoring_requests"])
+	return
+}
+
 // APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id

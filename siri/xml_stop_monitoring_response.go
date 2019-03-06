@@ -133,6 +133,25 @@ func (response *XMLStopMonitoringResponse) StopMonitoringDeliveries() []*XMLStop
 	return response.deliveries
 }
 
+func (delivery *XMLStopMonitoringDelivery) MonitoringRef() string {
+	if delivery.monitoringRef == "" {
+		delivery.monitoringRef = delivery.findStringChildContent("MonitoringRef")
+	}
+	return delivery.monitoringRef
+}
+
+func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
+	if delivery.monitoredStopVisits == nil {
+		stopVisits := []*XMLMonitoredStopVisit{}
+		nodes := delivery.findNodes("MonitoredStopVisit")
+		for _, node := range nodes {
+			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
+		}
+		delivery.monitoredStopVisits = stopVisits
+	}
+	return delivery.monitoredStopVisits
+}
+
 func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
 	if delivery.monitoredStopVisitCancellations == nil {
 		cancellations := []*XMLMonitoredStopVisitCancellation{}
@@ -157,25 +176,6 @@ func (cancel *XMLMonitoredStopVisitCancellation) MonitoringRef() string {
 		cancel.monitoringRef = cancel.findStringChildContent("MonitoringRef")
 	}
 	return cancel.monitoringRef
-}
-
-func (delivery *XMLStopMonitoringDelivery) MonitoringRef() string {
-	if delivery.monitoringRef == "" {
-		delivery.monitoringRef = delivery.findStringChildContent("MonitoringRef")
-	}
-	return delivery.monitoringRef
-}
-
-func (delivery *XMLStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
-	if delivery.monitoredStopVisits == nil {
-		stopVisits := []*XMLMonitoredStopVisit{}
-		nodes := delivery.findNodes("MonitoredStopVisit")
-		for _, node := range nodes {
-			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
-		}
-		delivery.monitoredStopVisits = stopVisits
-	}
-	return delivery.monitoredStopVisits
 }
 
 func NewXMLCancelledStopVisit(node XMLNode) *XMLMonitoredStopVisitCancellation {
