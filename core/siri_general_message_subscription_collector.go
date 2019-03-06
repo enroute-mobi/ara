@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -212,13 +213,15 @@ func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = notify.RawXML()
-	// logStashEvent["status"] = strconv.FormatBool(notify.Status())
-	// if !notify.Status() {
-	// 	logStashEvent["errorType"] = notify.ErrorType()
-	// 	if notify.ErrorType() == "OtherError" {
-	// 		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
-	// 	}
-	// 	logStashEvent["errorText"] = notify.ErrorText()
-	// 	logStashEvent["errorDescription"] = notify.ErrorDescription()
-	// }
+
+	status := "true"
+	errorCount := 0
+	for _, delivery := range notify.GeneralMessagesDeliveries() {
+		if !delivery.Status() {
+			status = "false"
+			errorCount++
+		}
+	}
+	logStashEvent["status"] = status
+	logStashEvent["errorCount"] = strconv.Itoa(errorCount)
 }
