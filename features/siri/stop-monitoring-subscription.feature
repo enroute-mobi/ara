@@ -517,6 +517,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
@@ -683,6 +684,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
@@ -847,6 +849,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
@@ -1012,6 +1015,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
       <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
