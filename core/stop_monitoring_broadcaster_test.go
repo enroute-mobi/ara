@@ -287,9 +287,14 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	}
 
 	sv := delivery[0].XMLMonitoredStopVisits()
-
-	if len(sv) != 2 {
-		t.Errorf("Should have received 1 StopVisit but got == %v", len(sv))
+	var expected int
+	if delivery[0].MonitoringRef() == string(stopArea.Id()) {
+		expected = 2
+	} else {
+		expected = 1
+	}
+	if len(sv) != expected {
+		t.Errorf("Should have received %v StopVisits but got == %v", expected, len(sv))
 	}
 
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
