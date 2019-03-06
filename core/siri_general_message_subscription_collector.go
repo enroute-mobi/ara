@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/af83/edwig/audit"
@@ -108,6 +107,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	logXMLGeneralMessageDelivery(logStashEvent, notify)
 
 	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
+	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
 
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
@@ -125,7 +125,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 			continue
 		}
 		connector.cancelGeneralMessage(delivery)
-		connector.setGeneralMessageUpdateEvents(situationUpdateEvents, delivery)
+
+		builder.SetGeneralMessageDeliveryUpdateEvents(situationUpdateEvents, delivery, notify.ProducerRef())
 
 		if len(subscriptionErrors) != 0 {
 			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
@@ -161,11 +162,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	}
 
 	logXMLDeleteSubscriptionResponse(logStashEvent, response)
-}
-
-func (connector *SIRIGeneralMessageSubscriptionCollector) setGeneralMessageUpdateEvents(events *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
-	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
-	builder.SetGeneralMessageDeliveryUpdateEvents(events, xmlResponse)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -216,13 +212,13 @@ func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *sir
 	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = notify.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(notify.Status())
-	if !notify.Status() {
-		logStashEvent["errorType"] = notify.ErrorType()
-		if notify.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
-		}
-		logStashEvent["errorText"] = notify.ErrorText()
-		logStashEvent["errorDescription"] = notify.ErrorDescription()
-	}
+	// logStashEvent["status"] = strconv.FormatBool(notify.Status())
+	// if !notify.Status() {
+	// 	logStashEvent["errorType"] = notify.ErrorType()
+	// 	if notify.ErrorType() == "OtherError" {
+	// 		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+	// 	}
+	// 	logStashEvent["errorText"] = notify.ErrorText()
+	// 	logStashEvent["errorDescription"] = notify.ErrorDescription()
+	// }
 }

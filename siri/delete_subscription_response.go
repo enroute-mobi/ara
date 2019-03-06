@@ -2,8 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
 	"text/template"
 	"time"
 
@@ -23,17 +21,7 @@ type XMLDeleteSubscriptionResponse struct {
 }
 
 type XMLTerminationResponseStatus struct {
-	XMLStructure
-
-	subscriberRef     string
-	subscriptionRef   string
-	responseTimestamp time.Time
-
-	status           Bool
-	errorType        string
-	errorNumber      int
-	errorText        string
-	errorDescription string
+	LightSubscriptionDeliveryXMLStructure
 }
 
 type SIRIDeleteSubscriptionResponse struct {
@@ -134,79 +122,6 @@ func (response *XMLDeleteSubscriptionResponse) ResponseStatus() []*XMLTerminatio
 		}
 	}
 	return response.responseStatus
-}
-
-func (response *XMLTerminationResponseStatus) SubscriptionRef() string {
-	if response.subscriptionRef == "" {
-		response.subscriptionRef = response.findStringChildContent("SubscriptionRef")
-	}
-	return response.subscriptionRef
-}
-
-func (response *XMLTerminationResponseStatus) SubscriberRef() string {
-	if response.subscriberRef == "" {
-		response.subscriberRef = response.findStringChildContent("SubscriberRef")
-	}
-	return response.subscriberRef
-}
-
-func (response *XMLTerminationResponseStatus) ResponseTimestamp() time.Time {
-	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
-	}
-	return response.responseTimestamp
-}
-
-func (response *XMLTerminationResponseStatus) Status() bool {
-	if !response.status.Defined {
-		response.status.SetValue(response.findBoolChildContent("Status"))
-	}
-	return response.status.Value
-}
-
-func (response *XMLTerminationResponseStatus) ErrorType() string {
-	if !response.Status() && response.errorType == "" {
-		node := response.findNode("ErrorText")
-		if node != nil {
-			response.errorType = node.Parent().Name()
-			// Find errorText and errorNumber to avoir too much parsing
-			response.errorText = strings.TrimSpace(node.Content())
-			if response.errorType == "OtherError" {
-				n, err := strconv.Atoi(node.Parent().Attr("number"))
-				if err != nil {
-					return ""
-				}
-				response.errorNumber = n
-			}
-		}
-	}
-	return response.errorType
-}
-
-func (response *XMLTerminationResponseStatus) ErrorNumber() int {
-	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
-		node := response.findNode("ErrorText")
-		n, err := strconv.Atoi(node.Parent().Attr("number"))
-		if err != nil {
-			return -1
-		}
-		response.errorNumber = n
-	}
-	return response.errorNumber
-}
-
-func (response *XMLTerminationResponseStatus) ErrorText() string {
-	if !response.Status() && response.errorText == "" {
-		response.errorText = response.findStringChildContent("ErrorText")
-	}
-	return response.errorText
-}
-
-func (response *XMLTerminationResponseStatus) ErrorDescription() string {
-	if !response.Status() && response.errorDescription == "" {
-		response.errorDescription = response.findStringChildContent("Description")
-	}
-	return response.errorDescription
 }
 
 func (notify *SIRIDeleteSubscriptionResponse) BuildXML() (string, error) {

@@ -250,11 +250,12 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(response.XMLMonitoredStopVisits()) != 2 {
-		t.Fatalf("Past StopVisit should be ignored, got %v stopVisits", len(response.XMLMonitoredStopVisits()))
+	delivery := response.StopMonitoringDeliveries()[0]
+	if len(delivery.XMLMonitoredStopVisits()) != 2 {
+		t.Fatalf("Past StopVisit should be ignored, got %v stopVisits", len(delivery.XMLMonitoredStopVisits()))
 	}
 
-	if !response.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(response.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {
+	if !delivery.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(delivery.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {
 		t.Errorf("Stop visits are not chronollogicaly ordered ")
 	}
 

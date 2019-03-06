@@ -126,14 +126,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotifi
 
 	logXMLSubscriptionTerminatedNotification(logStashEvent, response)
 
-	subscriptionTerminated := response.XMLSubscriptionTerminateds()
-	connector.setSubscriptionTerminatedEvents(subscriptionTerminated)
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) setSubscriptionTerminatedEvents(terminations []*siri.XMLSubscriptionTerminated) {
-	for _, termination := range terminations {
-		connector.partner.Subscriptions().DeleteById(SubscriptionId(termination.SubscriptionRef()))
-	}
+	connector.partner.Subscriptions().DeleteById(SubscriptionId(response.SubscriptionRef()))
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
@@ -143,7 +136,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
-	logXMLStopMonitoringDelivery(logStashEvent, notify)
+	logXMLNotifyStopMonitoringDelivery(logStashEvent, notify)
 
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
 	for _, delivery := range notify.StopMonitoringDeliveries() {
@@ -215,7 +208,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(logStashEvent, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}, originStopAreaObjectId model.ObjectID) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLNotifyStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}, originStopAreaObjectId model.ObjectID) {
 	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
 	if len(xmlStopVisitEvents) == 0 {
 		return
@@ -232,7 +225,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitUpdateEven
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.StopAreaUpdateEvent, xmlResponse *siri.XMLNotifyStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
 	xmlStopVisitCancellationEvents := xmlResponse.XMLMonitoredStopVisitCancellations()
 	if len(xmlStopVisitCancellationEvents) == 0 {
 		return
@@ -282,22 +275,22 @@ func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request
 	logStashEvent["requestXML"] = xml
 }
 
-func logXMLStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
+func logXMLNotifyStopMonitoringDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
 	logStashEvent["siriType"] = "CollectedNotifyStopMonitoring"
 	logStashEvent["producerRef"] = notify.ProducerRef()
 	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
 	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = notify.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(notify.Status())
-	if !notify.Status() {
-		logStashEvent["errorType"] = notify.ErrorType()
-		if notify.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
-		}
-		logStashEvent["errorText"] = notify.ErrorText()
-		logStashEvent["errorDescription"] = notify.ErrorDescription()
-	}
+	// logStashEvent["status"] = strconv.FormatBool(notify.Status())
+	// if !notify.Status() {
+	// 	logStashEvent["errorType"] = notify.ErrorType()
+	// 	if notify.ErrorType() == "OtherError" {
+	// 		logStashEvent["errorNumber"] = strconv.Itoa(notify.ErrorNumber())
+	// 	}
+	// 	logStashEvent["errorText"] = notify.ErrorText()
+	// 	logStashEvent["errorDescription"] = notify.ErrorDescription()
+	// }
 }
 
 func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLDeleteSubscriptionResponse) {
@@ -316,20 +309,16 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 func logXMLSubscriptionTerminatedNotification(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
 	logStashEvent["siriType"] = "TerminatedSubscriptionNotification"
 	logStashEvent["producerRef"] = response.ProducerRef()
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
+	logStashEvent["subscriberRef"] = response.SubscriberRef()
+	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
 	logStashEvent["responseXML"] = response.RawXML()
 
-	logStashEvent["status"] = strconv.FormatBool(response.Status())
-	if !response.Status() {
-		logStashEvent["errorType"] = response.ErrorType()
-		if response.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
-		}
-		logStashEvent["errorText"] = response.ErrorText()
-		logStashEvent["errorDescription"] = response.ErrorDescription()
+	logStashEvent["errorType"] = response.ErrorType()
+	if response.ErrorType() == "OtherError" {
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
 	}
+	logStashEvent["errorDescription"] = response.ErrorDescription()
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {

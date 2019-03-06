@@ -67,6 +67,19 @@ type XMLStructure struct {
 	node XMLNode
 }
 
+type RequestXMLStructure struct {
+	LightRequestXMLStructure
+
+	requestorRef string
+}
+
+type LightRequestXMLStructure struct {
+	XMLStructure
+
+	messageIdentifier string
+	requestTimestamp  time.Time
+}
+
 type ResponseXMLStructure struct {
 	XMLStructure
 
@@ -75,20 +88,49 @@ type ResponseXMLStructure struct {
 	requestMessageRef         string
 	responseMessageIdentifier string
 	responseTimestamp         time.Time
+}
+
+type ResponseXMLStructureWithStatus struct {
+	DeliveryXMLStructure // To avoid code duplication as much as possible
+
+	address                   string
+	producerRef               string
+	responseMessageIdentifier string
+}
+
+type DeliveryXMLStructure struct {
+	LightDeliveryXMLStructure
+
+	requestMessageRef string
+}
+
+type LightDeliveryXMLStructure struct {
+	XMLStatus
+
+	responseTimestamp time.Time
+}
+
+type SubscriptionDeliveryXMLStructure struct {
+	LightSubscriptionDeliveryXMLStructure
+
+	requestMessageRef string
+}
+
+type LightSubscriptionDeliveryXMLStructure struct {
+	LightDeliveryXMLStructure
+
+	subscriberRef   string
+	subscriptionRef string
+}
+
+type XMLStatus struct {
+	XMLStructure
 
 	status           Bool
 	errorType        string
 	errorNumber      int
 	errorText        string
 	errorDescription string
-}
-
-type RequestXMLStructure struct {
-	XMLStructure
-
-	messageIdentifier string
-	requestorRef      string
-	requestTimestamp  time.Time
 }
 
 func (xmlStruct *XMLStructure) findNodeWithNamespace(localName string) xml.Node {
@@ -244,13 +286,6 @@ func (xmlStruct *XMLStructure) RawXML() string {
 	return xmlStruct.node.NativeNode().String()
 }
 
-func (request *RequestXMLStructure) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
 func (request *RequestXMLStructure) RequestorRef() string {
 	if request.requestorRef == "" {
 		request.requestorRef = request.findStringChildContent("RequestorRef")
@@ -258,7 +293,14 @@ func (request *RequestXMLStructure) RequestorRef() string {
 	return request.requestorRef
 }
 
-func (request *RequestXMLStructure) RequestTimestamp() time.Time {
+func (request *LightRequestXMLStructure) MessageIdentifier() string {
+	if request.messageIdentifier == "" {
+		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
+	}
+	return request.messageIdentifier
+}
+
+func (request *LightRequestXMLStructure) RequestTimestamp() time.Time {
 	if request.requestTimestamp.IsZero() {
 		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
 	}
@@ -279,18 +321,18 @@ func (response *ResponseXMLStructure) ProducerRef() string {
 	return response.producerRef
 }
 
-func (response *ResponseXMLStructure) RequestMessageRef() string {
-	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
-	}
-	return response.requestMessageRef
-}
-
 func (response *ResponseXMLStructure) ResponseMessageIdentifier() string {
 	if response.responseMessageIdentifier == "" {
 		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
 	}
 	return response.responseMessageIdentifier
+}
+
+func (response *ResponseXMLStructure) RequestMessageRef() string {
+	if response.requestMessageRef == "" {
+		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
+	}
+	return response.requestMessageRef
 }
 
 func (response *ResponseXMLStructure) ResponseTimestamp() time.Time {
@@ -300,14 +342,70 @@ func (response *ResponseXMLStructure) ResponseTimestamp() time.Time {
 	return response.responseTimestamp
 }
 
-func (response *ResponseXMLStructure) Status() bool {
+func (response *ResponseXMLStructureWithStatus) Address() string {
+	if response.address == "" {
+		response.address = response.findStringChildContent("Address")
+	}
+	return response.address
+}
+
+func (response *ResponseXMLStructureWithStatus) ProducerRef() string {
+	if response.producerRef == "" {
+		response.producerRef = response.findStringChildContent("ProducerRef")
+	}
+	return response.producerRef
+}
+
+func (response *ResponseXMLStructureWithStatus) ResponseMessageIdentifier() string {
+	if response.responseMessageIdentifier == "" {
+		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
+	}
+	return response.responseMessageIdentifier
+}
+
+func (delivery *DeliveryXMLStructure) RequestMessageRef() string {
+	if delivery.requestMessageRef == "" {
+		delivery.requestMessageRef = delivery.findStringChildContent("RequestMessageRef")
+	}
+	return delivery.requestMessageRef
+}
+
+func (delivery *LightDeliveryXMLStructure) ResponseTimestamp() time.Time {
+	if delivery.responseTimestamp.IsZero() {
+		delivery.responseTimestamp = delivery.findTimeChildContent("ResponseTimestamp")
+	}
+	return delivery.responseTimestamp
+}
+
+func (delivery *SubscriptionDeliveryXMLStructure) RequestMessageRef() string {
+	if delivery.requestMessageRef == "" {
+		delivery.requestMessageRef = delivery.findStringChildContent("RequestMessageRef")
+	}
+	return delivery.requestMessageRef
+}
+
+func (delivery *LightSubscriptionDeliveryXMLStructure) SubscriberRef() string {
+	if delivery.subscriberRef == "" {
+		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
+	}
+	return delivery.subscriberRef
+}
+
+func (delivery *LightSubscriptionDeliveryXMLStructure) SubscriptionRef() string {
+	if delivery.subscriptionRef == "" {
+		delivery.subscriptionRef = delivery.findStringChildContent("SubscriptionRef")
+	}
+	return delivery.subscriptionRef
+}
+
+func (response *XMLStatus) Status() bool {
 	if !response.status.Defined {
 		response.status.SetValue(response.findBoolChildContent("Status"))
 	}
 	return response.status.Value
 }
 
-func (response *ResponseXMLStructure) ErrorType() string {
+func (response *XMLStatus) ErrorType() string {
 	if !response.Status() && response.errorType == "" {
 		node := response.findNode("ErrorText")
 		if node != nil {
@@ -326,7 +424,7 @@ func (response *ResponseXMLStructure) ErrorType() string {
 	return response.errorType
 }
 
-func (response *ResponseXMLStructure) ErrorNumber() int {
+func (response *XMLStatus) ErrorNumber() int {
 	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
 		node := response.findNode("ErrorText")
 		n, err := strconv.Atoi(node.Parent().Attr("number"))
@@ -338,14 +436,14 @@ func (response *ResponseXMLStructure) ErrorNumber() int {
 	return response.errorNumber
 }
 
-func (response *ResponseXMLStructure) ErrorText() string {
+func (response *XMLStatus) ErrorText() string {
 	if !response.Status() && response.errorText == "" {
 		response.errorText = response.findStringChildContent("ErrorText")
 	}
 	return response.errorText
 }
 
-func (response *ResponseXMLStructure) ErrorDescription() string {
+func (response *XMLStatus) ErrorDescription() string {
 	if !response.Status() && response.errorDescription == "" {
 		response.errorDescription = response.findStringChildContent("Description")
 	}

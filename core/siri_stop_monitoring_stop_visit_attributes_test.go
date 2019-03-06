@@ -21,7 +21,7 @@ func getMonitoredStopVisit(t *testing.T) *siri.XMLMonitoredStopVisit {
 		t.Fatal(err)
 	}
 	response, _ := siri.NewXMLStopMonitoringResponseFromContent(content)
-	return response.XMLMonitoredStopVisits()[0]
+	return response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0]
 }
 
 func Test_SIRIStopVisitUpdateAttributes_StopVisitAttributes(t *testing.T) {

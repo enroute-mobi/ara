@@ -17,11 +17,7 @@ type XMLGetGeneralMessage struct {
 }
 
 type XMLGeneralMessageRequest struct {
-	XMLStructure
-
-	messageIdentifier string
-
-	requestTimestamp time.Time
+	LightRequestXMLStructure
 
 	// Filters
 	infoChannelRef    []string
@@ -104,20 +100,6 @@ func (request *XMLGetGeneralMessage) RequestorRef() string {
 		request.requestorRef = request.findStringChildContent("RequestorRef")
 	}
 	return request.requestorRef
-}
-
-func (request *XMLGeneralMessageRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLGeneralMessageRequest) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
 }
 
 func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {

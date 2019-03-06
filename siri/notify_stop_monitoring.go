@@ -8,33 +8,56 @@ import (
 type XMLNotifyStopMonitoring struct {
 	ResponseXMLStructure
 
-	deliveries []*XMLStopMonitoringDelivery
+	deliveries []*XMLNotifyStopMonitoringDelivery
 }
 
-func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLStopMonitoringDelivery {
+type XMLNotifyStopMonitoringDelivery struct {
+	SubscriptionDeliveryXMLStructure
+
+	monitoredStopVisits             []*XMLMonitoredStopVisit
+	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
+}
+
+func NewXMLNotifyStopMonitoringDelivery(node XMLNode) *XMLNotifyStopMonitoringDelivery {
+	delivery := &XMLNotifyStopMonitoringDelivery{}
+	delivery.node = node
+	return delivery
+}
+
+func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLNotifyStopMonitoringDelivery {
 	if notify.deliveries == nil {
-		deliveries := []*XMLStopMonitoringDelivery{}
+		deliveries := []*XMLNotifyStopMonitoringDelivery{}
 		nodes := notify.findNodes("StopMonitoringDelivery")
 		for _, node := range nodes {
-			deliveries = append(deliveries, NewXMLStopMonitoringDelivery(node))
+			deliveries = append(deliveries, NewXMLNotifyStopMonitoringDelivery(node))
 		}
 		notify.deliveries = deliveries
 	}
 	return notify.deliveries
 }
 
-func (delivery *XMLStopMonitoringDelivery) SubscriptionRef() string {
-	if delivery.subscriptionRef == "" {
-		delivery.subscriptionRef = delivery.findStringChildContent("SubscriptionRef")
+func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
+	if delivery.monitoredStopVisits == nil {
+		stopVisits := []*XMLMonitoredStopVisit{}
+		nodes := delivery.findNodes("MonitoredStopVisit")
+		for _, node := range nodes {
+			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
+		}
+		delivery.monitoredStopVisits = stopVisits
 	}
-	return delivery.subscriptionRef
+	return delivery.monitoredStopVisits
 }
 
-func (delivery *XMLStopMonitoringDelivery) SubscriberRef() string {
-	if delivery.subscriberRef == "" {
-		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
+func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
+	if delivery.monitoredStopVisitCancellations == nil {
+		cancellations := []*XMLMonitoredStopVisitCancellation{}
+		nodes := delivery.findNodes("MonitoredStopVisitCancellation")
+		for _, node := range nodes {
+			cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
+		}
+		delivery.monitoredStopVisitCancellations = cancellations
 	}
-	return delivery.subscriberRef
+	return delivery.monitoredStopVisitCancellations
 }
 
 func NewXMLNotifyStopMonitoring(node xml.Node) *XMLNotifyStopMonitoring {

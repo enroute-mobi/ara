@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
@@ -99,27 +98,27 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
-	if !xmlStopMonitoringResponse.Status() {
-		return
-	}
-
-	// WIP
 	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
-
 	builder := newStopVisitUpdateEventBuilder(connector.partner, objectid)
-	builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, xmlStopMonitoringResponse.XMLMonitoredStopVisits())
+
+	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
+		if !delivery.Status() {
+			continue
+		}
+		builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery.XMLMonitoredStopVisits())
+	}
 
 	for _, event := range stopAreaUpdateEvents {
 		event.SetId(connector.NewUUID())
 		monitoredStopVisits := []model.ObjectID{}
 
 		collectedStopArea, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ObjectId)
-		event.StopAreaId = collectedStopArea.Id()
-
 		if !ok {
 			connector.broadcastStopAreaUpdateEvent(event)
 			continue
 		}
+
+		event.StopAreaId = collectedStopArea.Id()
 
 		for _, sv := range tx.Model().StopVisits().FindByStopAreaId(collectedStopArea.Id()) {
 			if sv.IsCollected() {
@@ -197,13 +196,13 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = response.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(response.Status())
-	if !response.Status() {
-		logStashEvent["errorType"] = response.ErrorType()
-		if response.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
-		}
-		logStashEvent["errorText"] = response.ErrorText()
-		logStashEvent["errorDescription"] = response.ErrorDescription()
-	}
+	// logStashEvent["status"] = strconv.FormatBool(response.Status())
+	// if !response.Status() {
+	// 	logStashEvent["errorType"] = response.ErrorType()
+	// 	if response.ErrorType() == "OtherError" {
+	// 		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+	// 	}
+	// 	logStashEvent["errorText"] = response.ErrorText()
+	// 	logStashEvent["errorDescription"] = response.ErrorDescription()
+	// }
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type XMLCheckStatusResponse struct {
-	ResponseXMLStructure
+	ResponseXMLStructureWithStatus
 
 	serviceStartedTime time.Time
 }

@@ -6,28 +6,15 @@ import (
 )
 
 type XMLStopMonitoringSubscriptionTerminatedResponse struct {
-	ResponseXMLStructure
+	SubscriptionDeliveryXMLStructure
 
-	subscriptionTerminateds []*XMLSubscriptionTerminated
-}
-
-type XMLSubscriptionTerminated struct {
-	ResponseXMLStructure
-
-	subscriberRef   string
-	subscriptionRef string
+	producerRef string
 }
 
 func NewXMLStopMonitoringSubscriptionTerminatedResponse(node xml.Node) *XMLStopMonitoringSubscriptionTerminatedResponse {
 	xmlStopMonitoringSubscriptionTerminatedResponse := &XMLStopMonitoringSubscriptionTerminatedResponse{}
 	xmlStopMonitoringSubscriptionTerminatedResponse.node = NewXMLNode(node)
 	return xmlStopMonitoringSubscriptionTerminatedResponse
-}
-
-func NewXMLSubscriptionTerminated(node XMLNode) *XMLSubscriptionTerminated {
-	xmlSubscriptionTerminated := &XMLSubscriptionTerminated{}
-	xmlSubscriptionTerminated.node = node
-	return xmlSubscriptionTerminated
 }
 
 func NewXMLStopMonitoringSubscriptionTerminatedResponseFromContent(content []byte) (*XMLStopMonitoringSubscriptionTerminatedResponse, error) {
@@ -39,29 +26,9 @@ func NewXMLStopMonitoringSubscriptionTerminatedResponseFromContent(content []byt
 	return request, nil
 }
 
-func (response *XMLStopMonitoringSubscriptionTerminatedResponse) XMLSubscriptionTerminateds() []*XMLSubscriptionTerminated {
-	if len(response.subscriptionTerminateds) == 0 {
-		nodes := response.findNodes("SubscriptionTerminatedNotification")
-		if nodes == nil {
-			return response.subscriptionTerminateds
-		}
-		for _, subscriptionTerminatedNode := range nodes {
-			response.subscriptionTerminateds = append(response.subscriptionTerminateds, NewXMLSubscriptionTerminated(subscriptionTerminatedNode))
-		}
+func (response *XMLStopMonitoringSubscriptionTerminatedResponse) ProducerRef() string {
+	if response.producerRef == "" {
+		response.producerRef = response.findStringChildContent("ProducerRef")
 	}
-	return response.subscriptionTerminateds
-}
-
-func (sub *XMLSubscriptionTerminated) SubscriberRef() string {
-	if sub.subscriberRef == "" {
-		sub.subscriberRef = sub.findStringChildContent("SubscriberRef")
-	}
-	return sub.subscriberRef
-}
-
-func (sub *XMLSubscriptionTerminated) SubscriptionRef() string {
-	if sub.subscriptionRef == "" {
-		sub.subscriptionRef = sub.findStringChildContent("SubscriptionRef")
-	}
-	return sub.subscriptionRef
+	return response.producerRef
 }
