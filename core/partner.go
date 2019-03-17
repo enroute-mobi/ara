@@ -322,8 +322,11 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" {
+	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" && partner.Setting("collect.exclude_stop_areas") == "" {
 		return true
+	}
+	if partner.excludedStopArea(stopAreaObjectId) {
+		return false
 	}
 	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds)
 }
@@ -342,10 +345,18 @@ func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 }
 
 func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
-	if partner.Setting("collect.include_stop_areas") == "" {
+	return partner.stopAreaInSetting(stopAreaObjectId, "collect.include_stop_areas")
+}
+
+func (partner *Partner) excludedStopArea(stopAreaObjectId model.ObjectID) bool {
+	return partner.stopAreaInSetting(stopAreaObjectId, "collect.exclude_stop_areas")
+}
+
+func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setting string) bool {
+	if partner.Setting(setting) == "" {
 		return false
 	}
-	stopAreas := strings.Split(partner.Settings["collect.include_stop_areas"], ",")
+	stopAreas := strings.Split(partner.Settings[setting], ",")
 	for _, stopArea := range stopAreas {
 		if strings.TrimSpace(stopArea) == stopAreaObjectId.Value() {
 			return true
