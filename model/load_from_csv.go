@@ -14,6 +14,7 @@ import (
 
 /* CSV Structure
 
+operator,Id,ReferentialSlug,ModelName,Name,ObjectIDs
 stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References
@@ -48,7 +49,7 @@ func (loader Loader) load() error {
 
 	file, err := os.Open(loader.filePath)
 	if err != nil {
-		return fmt.Errorf("error while opening file: %v", err)
+		return fmt.Errorf("loader error: error while opening file: %v", err)
 	}
 	defer file.Close()
 
@@ -133,23 +134,25 @@ func (loader Loader) load() error {
 	}
 
 	if (importedStopAreas + importedLines + importedVehicleJourneys + importedStopVisits + importedOperators) == 0 {
-		logger.Log.Debugf("Nothing imported, import raised %v errors", errors)
-		fmt.Printf("Nothing imported, import raised %v errors\n", errors)
-	} else {
-		logger.Log.Debugf("Import successful, import raised %v errors", errors)
-		logger.Log.Debugf("  %v StopAreas", importedStopAreas)
-		logger.Log.Debugf("  %v Lines", importedLines)
-		logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
-		logger.Log.Debugf("  %v StopVisits", importedStopVisits)
-		logger.Log.Debugf("  %v Operators", importedOperators)
-
-		fmt.Printf("Import successful, import raised %v errors\n", errors)
-		fmt.Printf("  %v StopAreas\n", importedStopAreas)
-		fmt.Printf("  %v Lines\n", importedLines)
-		fmt.Printf("  %v VehicleJourneys\n", importedVehicleJourneys)
-		fmt.Printf("  %v StopVisits\n", importedStopVisits)
-		fmt.Printf("  %v Operators\n", importedOperators)
+		if errors == 0 {
+			return fmt.Errorf("loader error: empty file")
+		}
+		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", errors)
 	}
+
+	logger.Log.Debugf("Import successful, import raised %v errors", errors)
+	logger.Log.Debugf("  %v StopAreas", importedStopAreas)
+	logger.Log.Debugf("  %v Lines", importedLines)
+	logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
+	logger.Log.Debugf("  %v StopVisits", importedStopVisits)
+	logger.Log.Debugf("  %v Operators", importedOperators)
+
+	fmt.Printf("Import successful, import raised %v errors\n", errors)
+	fmt.Printf("  %v StopAreas\n", importedStopAreas)
+	fmt.Printf("  %v Lines\n", importedLines)
+	fmt.Printf("  %v VehicleJourneys\n", importedVehicleJourneys)
+	fmt.Printf("  %v StopVisits\n", importedStopVisits)
+	fmt.Printf("  %v Operators\n", importedOperators)
 
 	return nil
 }
