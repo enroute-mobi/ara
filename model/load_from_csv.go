@@ -25,10 +25,19 @@ Separators are ',' leading spaces are trimed
 
 Escape quotes with another quote ex: "[""1234"",""5678""]"
 */
+const (
+	STOP_AREA       = "stop_area"
+	LINE            = "line"
+	VEHICLE_JOURNEY = "vehicle_journey"
+	STOP_VISIT      = "stop_visit"
+	OPERATOR        = "operator"
+)
+
 type Loader struct {
 	filePath        string
 	referentialSlug string
 	force           bool
+	deletedModels   map[string]map[string]struct{}
 }
 
 func LoadFromCSV(filePath string, referentialSlug string, force bool) error {
@@ -36,10 +45,15 @@ func LoadFromCSV(filePath string, referentialSlug string, force bool) error {
 }
 
 func newLoader(filePath string, referentialSlug string, force bool) *Loader {
+	d := make(map[string]map[string]struct{})
+	for _, m := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
+		d[m] = make(map[string]struct{})
+	}
 	return &Loader{
 		filePath:        filePath,
 		referentialSlug: referentialSlug,
 		force:           force,
+		deletedModels:   d,
 	}
 }
 
@@ -80,7 +94,7 @@ func (loader Loader) load() error {
 		}
 
 		switch record[0] {
-		case "stop_area":
+		case STOP_AREA:
 			err := loader.handleStopArea(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
@@ -89,7 +103,7 @@ func (loader Loader) load() error {
 			} else {
 				importedStopAreas++
 			}
-		case "line":
+		case LINE:
 			err := loader.handleLine(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
@@ -98,7 +112,7 @@ func (loader Loader) load() error {
 			} else {
 				importedLines++
 			}
-		case "vehicle_journey":
+		case VEHICLE_JOURNEY:
 			err := loader.handleVehicleJourney(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
@@ -107,7 +121,7 @@ func (loader Loader) load() error {
 			} else {
 				importedVehicleJourneys++
 			}
-		case "stop_visit":
+		case STOP_VISIT:
 			err := loader.handleStopVisit(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
@@ -116,7 +130,7 @@ func (loader Loader) load() error {
 			} else {
 				importedStopVisits++
 			}
-		case "operator":
+		case OPERATOR:
 			err := loader.handleOperator(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
@@ -235,10 +249,13 @@ func (loader Loader) handleStopArea(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from stop_areas where model_name='%v'", stopArea.ModelName)
-		_, err := Database.Exec(query)
-		if err != nil {
-			return err
+		if _, ok := loader.deletedModels[STOP_AREA][stopArea.ModelName]; !ok {
+			loader.deletedModels[STOP_AREA][stopArea.ModelName] = struct{}{}
+			query := fmt.Sprintf("delete from stop_areas where model_name='%v'", stopArea.ModelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -264,10 +281,13 @@ func (loader Loader) handleOperator(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from operators where model_name='%v'", operator.ModelName)
-		_, err := Database.Exec(query)
-		if err != nil {
-			return err
+		if _, ok := loader.deletedModels[OPERATOR][operator.ModelName]; !ok {
+			loader.deletedModels[OPERATOR][operator.ModelName] = struct{}{}
+			query := fmt.Sprintf("delete from operators where model_name='%v'", operator.ModelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -312,10 +332,13 @@ func (loader Loader) handleLine(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from lines where model_name='%v'", line.ModelName)
-		_, err := Database.Exec(query)
-		if err != nil {
-			return err
+		if _, ok := loader.deletedModels[LINE][line.ModelName]; !ok {
+			loader.deletedModels[LINE][line.ModelName] = struct{}{}
+			query := fmt.Sprintf("delete from lines where model_name='%v'", line.ModelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -346,10 +369,13 @@ func (loader Loader) handleVehicleJourney(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from vehicle_journeys where model_name='%v'", vehicleJourney.ModelName)
-		_, err := Database.Exec(query)
-		if err != nil {
-			return err
+		if _, ok := loader.deletedModels[VEHICLE_JOURNEY][vehicleJourney.ModelName]; !ok {
+			loader.deletedModels[VEHICLE_JOURNEY][vehicleJourney.ModelName] = struct{}{}
+			query := fmt.Sprintf("delete from vehicle_journeys where model_name='%v'", vehicleJourney.ModelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -396,10 +422,13 @@ func (loader Loader) handleStopVisit(record []string) error {
 	}
 
 	if loader.force {
-		query := fmt.Sprintf("delete from stop_visits where model_name='%v'", stopVisit.ModelName)
-		_, err := Database.Exec(query)
-		if err != nil {
-			return err
+		if _, ok := loader.deletedModels[STOP_VISIT][stopVisit.ModelName]; !ok {
+			loader.deletedModels[STOP_VISIT][stopVisit.ModelName] = struct{}{}
+			query := fmt.Sprintf("delete from stop_visits where model_name='%v'", stopVisit.ModelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

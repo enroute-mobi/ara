@@ -164,6 +164,7 @@ func main() {
 
 		if loadFlags.NArg() < 2 {
 			logger.Log.Printf("Incorrect use of command load: not enough aguments")
+			logger.Log.Printf("usage: edwig load [-force] <path>")
 			os.Exit(2)
 		}
 
