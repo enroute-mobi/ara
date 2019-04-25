@@ -2,8 +2,6 @@ package siri
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
 	"text/template"
 	"time"
 
@@ -25,19 +23,8 @@ type XMLSubscriptionResponse struct {
 }
 
 type XMLResponseStatus struct {
-	XMLStructure
+	SubscriptionDeliveryXMLStructure
 
-	requestMessageRef string
-	subscriberRef     string
-	subscriptionRef   string
-
-	status           Bool
-	errorType        string
-	errorNumber      int
-	errorText        string
-	errorDescription string
-
-	responseTimestamp time.Time
 	validUntil        time.Time
 }
 
@@ -158,91 +145,11 @@ func (response *XMLSubscriptionResponse) ResponseTimestamp() time.Time {
 	return response.responseTimestamp
 }
 
-func (response *XMLResponseStatus) RequestMessageRef() string {
-	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
-	}
-	return response.requestMessageRef
-}
-
-func (response *XMLResponseStatus) SubscriberRef() string {
-	if response.subscriberRef == "" {
-		response.subscriberRef = response.findStringChildContent("SubscriberRef")
-	}
-	return response.subscriberRef
-}
-
-func (response *XMLResponseStatus) SubscriptionRef() string {
-	if response.subscriptionRef == "" {
-		response.subscriptionRef = response.findStringChildContent("SubscriptionRef")
-	}
-	return response.subscriptionRef
-}
-
-func (response *XMLResponseStatus) ResponseTimestamp() time.Time {
-	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
-	}
-	return response.responseTimestamp
-}
-
 func (response *XMLResponseStatus) ValidUntil() time.Time {
 	if response.validUntil.IsZero() {
 		response.validUntil = response.findTimeChildContent("ValidUntil")
 	}
 	return response.validUntil
-}
-
-func (response *XMLResponseStatus) Status() bool {
-	if !response.status.Defined {
-		response.status.SetValue(response.findBoolChildContent("Status"))
-	}
-	return response.status.Value
-}
-
-func (response *XMLResponseStatus) ErrorType() string {
-	if !response.Status() && response.errorType == "" {
-		node := response.findNode("ErrorText")
-		if node != nil {
-			response.errorType = node.Parent().Name()
-			// Find errorText and errorNumber to avoir too much parsing
-			response.errorText = strings.TrimSpace(node.Content())
-			if response.errorType == "OtherError" {
-				n, err := strconv.Atoi(node.Parent().Attr("number"))
-				if err != nil {
-					return ""
-				}
-				response.errorNumber = n
-			}
-		}
-	}
-	return response.errorType
-}
-
-func (response *XMLResponseStatus) ErrorNumber() int {
-	if !response.Status() && response.ErrorType() == "OtherError" && response.errorNumber == 0 {
-		node := response.findNode("ErrorText")
-		n, err := strconv.Atoi(node.Parent().Attr("number"))
-		if err != nil {
-			return -1
-		}
-		response.errorNumber = n
-	}
-	return response.errorNumber
-}
-
-func (response *XMLResponseStatus) ErrorText() string {
-	if !response.Status() && response.errorText == "" {
-		response.errorText = response.findStringChildContent("ErrorText")
-	}
-	return response.errorText
-}
-
-func (response *XMLResponseStatus) ErrorDescription() string {
-	if !response.Status() && response.errorDescription == "" {
-		response.errorDescription = response.findStringChildContent("Description")
-	}
-	return response.errorDescription
 }
 
 func (response *SIRISubscriptionResponse) BuildXML() (string, error) {

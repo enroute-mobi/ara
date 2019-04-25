@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"text/template"
 	"time"
-
-	"github.com/jbowtie/gokogiri/xml"
 )
 
 type XMLGeneralMessageSubscriptionRequestEntry struct {
@@ -13,7 +11,6 @@ type XMLGeneralMessageSubscriptionRequestEntry struct {
 
 	subscriberRef          string
 	subscriptionIdentifier string
-
 	initialTerminationTime time.Time
 }
 
@@ -54,12 +51,6 @@ const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http:
 	</Request>
 	<RequestExtension/>
 </sw:Subscribe>`
-
-func NewXMLGeneralMessageSubscriptionResponse(node xml.Node) *XMLGeneralMessageSubscriptionResponse {
-	xmlGeneralMessageSubscriptionResponse := &XMLGeneralMessageSubscriptionResponse{}
-	xmlGeneralMessageSubscriptionResponse.node = NewXMLNode(node)
-	return xmlGeneralMessageSubscriptionResponse
-}
 
 func NewXMLGeneralMessageSubscriptionRequestEntry(node XMLNode) *XMLGeneralMessageSubscriptionRequestEntry {
 	xmlGeneralMessageSubscriptionRequestEntry := &XMLGeneralMessageSubscriptionRequestEntry{}

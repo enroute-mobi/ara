@@ -184,7 +184,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	// Create a test http server
+	// Create a test referential
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
 	referential.SetClock(fakeClock)
@@ -231,7 +231,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	subscription.CreateAddNewResource(reference)
 	subscription.CreateAddNewResource(reference2)
 	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
-	subscription.subscriptionOptions["MaximumStopVisits"] = "1"
+	// subscription.subscriptionOptions["MaximumStopVisits"] = "1"
 	subscription.Save()
 
 	line := referential.Model().Lines().New()
@@ -255,10 +255,18 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit2.SetObjectID(model.NewObjectID("internal", string(stopArea.Id())))
 	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
+	stopVisit3 := referential.Model().StopVisits().New()
+	stopVisit3.StopAreaId = stopArea2.Id()
+	stopVisit3.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit3.SetObjectID(model.NewObjectID("internal", string(stopArea2.Id())))
+	stopVisit3.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 	stopVisit.Save()
 	time.Sleep(10 * time.Millisecond)
 	stopVisit2.Save()
+	time.Sleep(10 * time.Millisecond)
+	stopVisit3.Save()
 
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
@@ -266,8 +274,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(response)
 	delivery := notify.StopMonitoringDeliveries()
 
-	if len(delivery) != 1 {
-		t.Errorf("Should have received 1 delivery but got == %v", len(delivery))
+	if len(delivery) != 2 {
+		t.Errorf("Should have received 2 deliveries but got == %v", len(delivery))
 	}
 
 	if delivery[0].SubscriberRef() != "external" {
@@ -279,9 +287,14 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	}
 
 	sv := delivery[0].XMLMonitoredStopVisits()
-
-	if len(sv) != 1 {
-		t.Errorf("Should have received 1 StopVisit but got == %v", len(sv))
+	var expected int
+	if delivery[0].MonitoringRef() == string(stopArea.Id()) {
+		expected = 2
+	} else {
+		expected = 1
+	}
+	if len(sv) != expected {
+		t.Errorf("Should have received %v StopVisits but got == %v", expected, len(sv))
 	}
 
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))

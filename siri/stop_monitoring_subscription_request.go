@@ -7,18 +7,11 @@ import (
 )
 
 type XMLStopMonitoringSubscriptionRequestEntry struct {
-	XMLStructure
+	LightXMLStopMonitoringRequest
 
-	lineRef                string
-	maximumStopVisits      string
-	messageIdentifier      string
-	monitoringRef          string
-	stopVisitTypes         string
 	subscriberRef          string
 	subscriptionIdentifier string
-
 	initialTerminationTime time.Time
-	requestTimestamp       time.Time
 }
 
 type SIRIStopMonitoringSubscriptionRequest struct {
@@ -86,48 +79,6 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) InitialTerminationTime
 		request.initialTerminationTime = request.findTimeChildContent("InitialTerminationTime")
 	}
 	return request.initialTerminationTime
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) LineRef() string {
-	if request.lineRef == "" {
-		request.lineRef = request.findStringChildContent("LineRef")
-	}
-	return request.lineRef
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) MaximumStopVisits() string {
-	if request.maximumStopVisits == "" {
-		request.maximumStopVisits = request.findStringChildContent("MaximumStopVisits")
-	}
-	return request.maximumStopVisits
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) MonitoringRef() string {
-	if request.monitoringRef == "" {
-		request.monitoringRef = request.findStringChildContent("MonitoringRef")
-	}
-	return request.monitoringRef
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
-}
-
-func (request *XMLStopMonitoringSubscriptionRequestEntry) StopVisitTypes() string {
-	if request.stopVisitTypes == "" {
-		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
-	}
-	return request.stopVisitTypes
 }
 
 func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {

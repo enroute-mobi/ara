@@ -22,7 +22,7 @@ func (fb *fakeBroadcaster) FakeBroadcaster(event *model.StopAreaUpdateEvent) {
 	fb.Events = append(fb.Events, event)
 }
 
-func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) *model.StopAreaUpdateEvent {
+func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []*model.StopAreaUpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 
 	// Create a test http server
@@ -66,20 +66,19 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 
 	time.Sleep(42 * time.Millisecond)
-	event := &model.StopAreaUpdateEvent{}
 
-	for _, event = range fs.Events {
-		if event.StopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
+	return fs.Events
+}
+
+func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T) {
+	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
+	stopAreaUpdateEvent := &model.StopAreaUpdateEvent{}
+	for _, stopAreaUpdateEvent = range stopAreaUpdateEvents {
+		if stopAreaUpdateEvent.StopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
 			break
 		}
 	}
 
-	return event
-}
-
-// WIP
-func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T) {
-	stopAreaUpdateEvent := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
 	if stopAreaUpdateEvent == nil {
 		t.Error("RequestStopAreaUpdate should not return nil")
 	}
@@ -124,6 +123,13 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	}
 	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:54:00+02:00"); !schedule.ArrivalTime().Equal(expected) {
 		t.Errorf("Wrong ActualArrivalTime for stopVisitEvent:\n expected: %v\n got: %v", expected, schedule.ArrivalTime())
+	}
+}
+
+func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate_MultipleDeliveries(t *testing.T) {
+	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-double-delivery-soap.xml")
+	if len(stopAreaUpdateEvents) != 2 {
+		t.Errorf("Wrong number of UpdateEvents, should have 2 got %v", len(stopAreaUpdateEvents))
 	}
 }
 

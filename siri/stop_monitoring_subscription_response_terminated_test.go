@@ -24,21 +24,20 @@ func getXMLStopMonitoringSubscriptionTerminatedNotification(t *testing.T) *XMLSt
 
 func Test_XMLStopMonitoringSubscriptionTerminatedResponse(t *testing.T) {
 	response := getXMLStopMonitoringSubscriptionTerminatedNotification(t)
-	subscriptionTerminated := response.XMLSubscriptionTerminateds()[0]
 
-	if expected := "KUBRICK"; subscriptionTerminated.ProducerRef() != expected {
-		t.Errorf("Incorrect ProducerRef expected: %v\n got: %v", expected, subscriptionTerminated.ProducerRef())
+	if expected := "KUBRICK"; response.ProducerRef() != expected {
+		t.Errorf("Incorrect ProducerRef expected: %v\n got: %v", expected, response.ProducerRef())
 	}
 
-	if expected := "NADER"; subscriptionTerminated.SubscriberRef() != expected {
-		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, subscriptionTerminated.SubscriberRef())
+	if expected := "NADER"; response.SubscriberRef() != expected {
+		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, response.SubscriberRef())
 	}
 
-	if expected := "6ba7b814-9dad-11d1-0-00c04fd430c8"; subscriptionTerminated.SubscriptionRef() != expected {
-		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, subscriptionTerminated.SubscriptionRef())
+	if expected := "6ba7b814-9dad-11d1-0-00c04fd430c8"; response.SubscriptionRef() != expected {
+		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, response.SubscriptionRef())
 	}
 
-	if expected := "Weekley restart"; subscriptionTerminated.ErrorDescription() != expected {
-		t.Errorf("Incorrect ErrorNumber ErrorDescription: %v\n got: %v", expected, subscriptionTerminated.ErrorDescription())
+	if expected := "Weekley restart"; response.ErrorDescription() != expected {
+		t.Errorf("Incorrect ErrorNumber ErrorDescription: %v\n got: %v", expected, response.ErrorDescription())
 	}
 }

@@ -16,14 +16,14 @@ func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateE
 	return GeneralMessageUpdateEventBuilder{partner: partner}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery) {
+func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery, producerRef string) {
 	xmlGeneralMessageEvents := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessageEvents) == 0 {
 		return
 	}
 
 	for _, xmlGeneralMessageEvents := range xmlGeneralMessageEvents {
-		builder.buildGeneralMessageUpdateEvent(event, xmlGeneralMessageEvents, xmlResponse.ProducerRef())
+		builder.buildGeneralMessageUpdateEvent(event, xmlGeneralMessageEvents, producerRef)
 	}
 }
 

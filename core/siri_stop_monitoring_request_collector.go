@@ -76,7 +76,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
+	monitoringRefMap := make(map[string]struct{})
 	startTime := connector.Clock().Now()
 
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
@@ -99,27 +99,34 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
-	if !xmlStopMonitoringResponse.Status() {
-		return
+	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
+	builder := newStopVisitUpdateEventBuilder(connector.partner, objectid)
+
+	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
+		if connector.Partner().LogRequestStopMonitoringDeliveries() {
+			deliveryLogStashEvent := connector.newLogStashEvent()
+			logXMLRequestStopMonitoringDelivery(deliveryLogStashEvent, xmlStopMonitoringResponse.ResponseMessageIdentifier(), delivery)
+			audit.CurrentLogStash().WriteEvent(deliveryLogStashEvent)
+		}
+
+		if !delivery.Status() {
+			continue
+		}
+		builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery.XMLMonitoredStopVisits())
 	}
 
-	// WIP
-	stopAreaUpdateEvents := make(map[string]*model.StopAreaUpdateEvent)
-
-	builder := newStopVisitUpdateEventBuilder(connector.partner, objectid)
-	builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, xmlStopMonitoringResponse.XMLMonitoredStopVisits())
-
 	for _, event := range stopAreaUpdateEvents {
+		monitoringRefMap[event.StopAreaAttributes.ObjectId.Value()] = struct{}{}
 		event.SetId(connector.NewUUID())
 		monitoredStopVisits := []model.ObjectID{}
 
 		collectedStopArea, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ObjectId)
-		event.StopAreaId = collectedStopArea.Id()
-
 		if !ok {
 			connector.broadcastStopAreaUpdateEvent(event)
 			continue
 		}
+
+		event.StopAreaId = collectedStopArea.Id()
 
 		for _, sv := range tx.Model().StopVisits().FindByStopAreaId(collectedStopArea.Id()) {
 			if sv.IsCollected() {
@@ -132,6 +139,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		connector.findAndSetStopVisitNotCollectedEvent(event, monitoredStopVisits)
 		connector.broadcastStopAreaUpdateEvent(event)
 	}
+	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
@@ -197,13 +205,32 @@ func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = response.RawXML()
-	logStashEvent["status"] = strconv.FormatBool(response.Status())
-	if !response.Status() {
-		logStashEvent["errorType"] = response.ErrorType()
-		if response.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+	status := "true"
+	errorCount := 0
+	for _, delivery := range response.StopMonitoringDeliveries() {
+		if !delivery.Status() {
+			status = "false"
+			errorCount++
 		}
-		logStashEvent["errorText"] = response.ErrorText()
-		logStashEvent["errorDescription"] = response.ErrorDescription()
+	}
+	logStashEvent["status"] = status
+	logStashEvent["errorCount"] = strconv.Itoa(errorCount)
+}
+
+func logXMLRequestStopMonitoringDelivery(logStashEvent audit.LogStashEvent, parent string, delivery *siri.XMLStopMonitoringDelivery) {
+	logStashEvent["siriType"] = "StopMonitoringRequestDelivery"
+	logStashEvent["parentMessageIdentifier"] = parent
+	logStashEvent["monitoringRef"] = delivery.MonitoringRef()
+	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
+	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp().String()
+
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status())
+	if !delivery.Status() {
+		logStashEvent["errorType"] = delivery.ErrorType()
+		if delivery.ErrorType() == "OtherError" {
+			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber())
+		}
+		logStashEvent["errorText"] = delivery.ErrorText()
+		logStashEvent["errorDescription"] = delivery.ErrorDescription()
 	}
 }

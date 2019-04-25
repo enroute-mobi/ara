@@ -16,19 +16,19 @@ type XMLGetStopMonitoring struct {
 }
 
 type XMLStopMonitoringRequest struct {
-	XMLStructure
+	LightXMLStopMonitoringRequest
 
-	messageIdentifier string
+	previewInterval time.Duration
+	startTime       time.Time
+}
+
+type LightXMLStopMonitoringRequest struct {
+	LightRequestXMLStructure
+
 	monitoringRef     string
 	stopVisitTypes    string
 	lineRef           string
-
 	maximumStopVisits int
-
-	previewInterval time.Duration
-
-	startTime        time.Time
-	requestTimestamp time.Time
 }
 
 type SIRIGetStopMonitoringRequest struct {
@@ -116,46 +116,32 @@ func (request *SIRIStopMonitoringRequest) BuildStopMonitoringRequestXML() (strin
 	return buffer.String(), nil
 }
 
-func (request *XMLStopMonitoringRequest) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent("MessageIdentifier")
-	}
-	return request.messageIdentifier
-}
-
-func (request *XMLStopMonitoringRequest) MonitoringRef() string {
+func (request *LightXMLStopMonitoringRequest) MonitoringRef() string {
 	if request.monitoringRef == "" {
 		request.monitoringRef = request.findStringChildContent("MonitoringRef")
 	}
 	return request.monitoringRef
 }
 
-func (request *XMLStopMonitoringRequest) StopVisitTypes() string {
+func (request *LightXMLStopMonitoringRequest) StopVisitTypes() string {
 	if request.stopVisitTypes == "" {
 		request.stopVisitTypes = request.findStringChildContent("StopVisitTypes")
 	}
 	return request.stopVisitTypes
 }
 
-func (request *XMLStopMonitoringRequest) LineRef() string {
+func (request *LightXMLStopMonitoringRequest) LineRef() string {
 	if request.lineRef == "" {
 		request.lineRef = request.findStringChildContent("LineRef")
 	}
 	return request.lineRef
 }
 
-func (request *XMLStopMonitoringRequest) MaximumStopVisits() int {
+func (request *LightXMLStopMonitoringRequest) MaximumStopVisits() int {
 	if request.maximumStopVisits == 0 {
 		request.maximumStopVisits = request.findIntChildContent("MaximumStopVisits")
 	}
 	return request.maximumStopVisits
-}
-
-func (request *XMLStopMonitoringRequest) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent("RequestTimestamp")
-	}
-	return request.requestTimestamp
 }
 
 func (request *XMLStopMonitoringRequest) PreviewInterval() time.Duration {

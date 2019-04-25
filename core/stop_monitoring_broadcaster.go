@@ -102,21 +102,32 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 		}
 
 		for producer := range producers {
-			delivery := &siri.SIRINotifyStopMonitoring{
+			notification := &siri.SIRINotifyStopMonitoring{
 				Address:                   smb.connector.Partner().Address(),
 				ProducerRef:               smb.connector.Partner().ProducerRef(),
-				ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-				SubscriberRef:             smb.connector.SIRIPartner().SubscriberRef(),
-				SubscriptionIdentifier:    sub.ExternalId(),
-				ResponseTimestamp:         smb.connector.Clock().Now(),
-				Status:                    false,
-				ErrorType:                 "OtherError",
-				ErrorNumber:               1,
-				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
 				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
+				ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				ResponseTimestamp:         smb.connector.Clock().Now(),
 			}
 
-			smb.sendDelivery(delivery)
+			delivery := &siri.SIRINotifyStopMonitoringDelivery{
+				SubscriberRef:          smb.connector.SIRIPartner().SubscriberRef(),
+				SubscriptionIdentifier: sub.ExternalId(),
+				RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
+				ResponseTimestamp:      smb.connector.Clock().Now(),
+				Status:                 false,
+				ErrorType:              "OtherError",
+				ErrorNumber:            1,
+				ErrorText:              fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
+			}
+
+			notification.Deliveries = []*siri.SIRINotifyStopMonitoringDelivery{delivery}
+
+			logStashEvent := smb.newLogStashEvent()
+			logSIRINotMonitoredNotify(logStashEvent, notification)
+			audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+			smb.sendNotification(notification)
 		}
 	}
 }
@@ -142,19 +153,17 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.SIRIPartner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOption("StopVisitTypes")
 
-		maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
+		// maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
 		monitoredStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
 
-		delivery := &siri.SIRINotifyStopMonitoring{
+		notification := &siri.SIRINotifyStopMonitoring{
 			Address:                   smb.connector.Partner().Address(),
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-			SubscriberRef:             smb.connector.SIRIPartner().SubscriberRef(),
-			SubscriptionIdentifier:    sub.ExternalId(),
-			ResponseTimestamp:         smb.connector.Clock().Now(),
-			Status:                    true,
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
+			ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseTimestamp:         smb.connector.Clock().Now(),
 		}
+		deliveries := make(map[string]*siri.SIRINotifyStopMonitoringDelivery)
 
 		for _, stopVisitId := range stopVisits {
 			// Check if resource is already in the map
@@ -174,6 +183,9 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				continue
 			}
 
+			// Get the delivery
+			delivery := smb.getDelivery(deliveries, sub, monitoringRef)
+
 			// Get the monitoredStopVisit
 			stopMonitoringBuilder.MonitoringRef = monitoringRef
 			if !smb.handledStopVisitAppend(stopVisit, delivery, stopMonitoringBuilder) {
@@ -182,12 +194,13 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			monitoredStopVisits[stopVisitId] = struct{}{}
 
-			// Refresh delivery
-			if maximumStopVisits != 0 && (len(delivery.MonitoredStopVisits)+len(delivery.CancelledStopVisits)) >= maximumStopVisits {
-				smb.sendDelivery(delivery)
-				delivery.MonitoredStopVisits = []*siri.SIRIMonitoredStopVisit{}
-				delivery.CancelledStopVisits = []*siri.SIRICancelledStopVisit{}
-			}
+			// See what to do about the MaximumStopVisits #10333
+			// // Refresh delivery
+			// if maximumStopVisits != 0 && (len(delivery.MonitoredStopVisits)+len(delivery.CancelledStopVisits)) >= maximumStopVisits {
+			// 	smb.sendNotification(delivery)
+			// 	delivery.MonitoredStopVisits = []*siri.SIRIMonitoredStopVisit{}
+			// 	delivery.CancelledStopVisits = []*siri.SIRICancelledStopVisit{}
+			// }
 
 			// Get the Resource lastState for the StopVisit
 			lastStateInterface, _ := resource.LastState(string(stopVisitId))
@@ -197,10 +210,36 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 			lastState.UpdateState(&stopVisit)
 		}
-		if len(delivery.MonitoredStopVisits) != 0 || len(delivery.CancelledStopVisits) != 0 {
-			smb.sendDelivery(delivery)
+
+		for _, delivery := range deliveries {
+			if len(delivery.MonitoredStopVisits) != 0 || len(delivery.CancelledStopVisits) != 0 {
+				notification.Deliveries = append(notification.Deliveries, delivery)
+			}
+		}
+		if len(notification.Deliveries) != 0 {
+			logStashEvent := smb.newLogStashEvent()
+			logSIRIStopMonitoringNotify(logStashEvent, notification)
+			audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+			smb.sendNotification(notification)
 		}
 	}
+}
+
+func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStopMonitoringDelivery, sub *Subscription, monitoringRef string) (delivery *siri.SIRINotifyStopMonitoringDelivery) {
+	delivery, ok := deliveries[monitoringRef]
+	if !ok {
+		delivery = &siri.SIRINotifyStopMonitoringDelivery{
+			MonitoringRef:          monitoringRef,
+			RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
+			ResponseTimestamp:      smb.connector.Clock().Now(),
+			SubscriberRef:          smb.connector.SIRIPartner().SubscriberRef(),
+			SubscriptionIdentifier: sub.ExternalId(),
+			Status:                 true,
+		}
+		deliveries[monitoringRef] = delivery
+	}
+	return
 }
 
 func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription, tx *model.Transaction) (string, *SubscribedResource, bool) {
@@ -213,7 +252,7 @@ func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscri
 	return "", nil, false
 }
 
-func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoring, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 
 	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return smb.handleCancelledStopVisit(stopVisit, delivery, stopMonitoringBuilder)
@@ -222,7 +261,7 @@ func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, deli
 	}
 }
 
-func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoring, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 	cancelledStopVisit := stopMonitoringBuilder.BuildCancelledStopVisit(stopVisit)
 	if cancelledStopVisit == nil {
 		return false
@@ -232,7 +271,7 @@ func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit model.StopVisit, de
 	return true
 }
 
-func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoring, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 	monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(stopVisit)
 	if monitoredStopVisit == nil {
 		return false
@@ -241,13 +280,10 @@ func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit model.StopVisit, de
 	return true
 }
 
-func (smb *SMBroadcaster) sendDelivery(delivery *siri.SIRINotifyStopMonitoring) {
-	logStashEvent := smb.newLogStashEvent()
-	logSIRIStopMonitoringNotify(logStashEvent, delivery)
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	err := smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(delivery)
+func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring) {
+	err := smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(notify)
 	if err != nil {
+		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
 		event := smb.newLogStashEvent()
 		logSIRINotifyError(err.Error(), event)
 		audit.CurrentLogStash().WriteEvent(event)
@@ -260,33 +296,54 @@ func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyStopMonitoring) {
+func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, notification *siri.SIRINotifyStopMonitoring) {
 	monitoringRefs := []string{}
-	for _, sv := range response.MonitoredStopVisits {
-		monitoringRefs = append(monitoringRefs, sv.MonitoringRef)
-	}
-
 	cancelledMonitoringRefs := []string{}
-	for _, sv := range response.CancelledStopVisits {
-		cancelledMonitoringRefs = append(cancelledMonitoringRefs, sv.MonitoringRef)
+
+	for _, delivery := range notification.Deliveries {
+		for _, sv := range delivery.MonitoredStopVisits {
+			monitoringRefs = append(monitoringRefs, sv.MonitoringRef)
+		}
+		for _, sv := range delivery.CancelledStopVisits {
+			cancelledMonitoringRefs = append(cancelledMonitoringRefs, sv.MonitoringRef)
+		}
 	}
 
 	logStashEvent["siriType"] = "NotifyStopMonitoring"
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
+	logStashEvent["producerRef"] = notification.ProducerRef
+	logStashEvent["requestMessageRef"] = notification.RequestMessageRef
+	logStashEvent["responseMessageIdentifier"] = notification.ResponseMessageIdentifier
+	logStashEvent["responseTimestamp"] = notification.ResponseTimestamp.String()
+	logStashEvent["subscriberRef"] = notification.Deliveries[0].SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = notification.Deliveries[0].SubscriptionIdentifier
 	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["cancelledMonitoringRefs"] = strings.Join(cancelledMonitoringRefs, ",")
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	if !response.Status {
-		logStashEvent["errorType"] = response.ErrorType
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		logStashEvent["errorText"] = response.ErrorText
+	logStashEvent["status"] = "true"
+
+	xml, err := notification.BuildXML()
+	if err != nil {
+		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
+		return
 	}
-	xml, err := response.BuildXML()
+	logStashEvent["responseXML"] = xml
+}
+
+func logSIRINotMonitoredNotify(logStashEvent audit.LogStashEvent, notification *siri.SIRINotifyStopMonitoring) {
+	logStashEvent["siriType"] = "NotifyStopMonitoring"
+	logStashEvent["producerRef"] = notification.ProducerRef
+	logStashEvent["requestMessageRef"] = notification.RequestMessageRef
+	logStashEvent["responseMessageIdentifier"] = notification.ResponseMessageIdentifier
+	logStashEvent["responseTimestamp"] = notification.ResponseTimestamp.String()
+
+	delivery := notification.Deliveries[0]
+	logStashEvent["subscriberRef"] = delivery.SubscriberRef
+	logStashEvent["subscriptionIdentifier"] = delivery.SubscriptionIdentifier
+	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
+	logStashEvent["errorType"] = delivery.ErrorType
+	logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+	logStashEvent["errorText"] = delivery.ErrorText
+
+	xml, err := notification.BuildXML()
 	if err != nil {
 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
 		return

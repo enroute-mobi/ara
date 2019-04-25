@@ -16,10 +16,7 @@ type XMLNotifyGeneralMessage struct {
 }
 
 type XMLGeneralMessageDelivery struct {
-	ResponseXMLStructure
-
-	subscriptionRef string
-	subscriberRef   string
+	SubscriptionDeliveryXMLStructure
 
 	xmlGeneralMessages              []*XMLGeneralMessage
 	xmlGeneralMessagesCancellations []*XMLGeneralMessageCancellation
@@ -101,20 +98,6 @@ func (notify *XMLNotifyGeneralMessage) GeneralMessagesDeliveries() []*XMLGeneral
 		notify.deliveries = deliveries
 	}
 	return notify.deliveries
-}
-
-func (delivery *XMLGeneralMessageDelivery) SubscriptionRef() string {
-	if delivery.subscriptionRef == "" {
-		delivery.subscriptionRef = delivery.findStringChildContent("SubscriptionRef")
-	}
-	return delivery.subscriptionRef
-}
-
-func (delivery *XMLGeneralMessageDelivery) SubscriberRef() string {
-	if delivery.subscriberRef == "" {
-		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
-	}
-	return delivery.subscriberRef
 }
 
 func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMessage {

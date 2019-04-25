@@ -11,7 +11,7 @@ import (
 )
 
 type XMLGeneralMessageResponse struct {
-	ResponseXMLStructure
+	ResponseXMLStructureWithStatus
 
 	xmlGeneralMessages []*XMLGeneralMessage
 }
