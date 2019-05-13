@@ -42,7 +42,7 @@ Then(/^a Situation "([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/
   # For tests
   # puts RestClient.get situations_path, {Authorization: "Token token=#{$token}"}
 
-  response = RestClient.get situation_path(identifier ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}{|response, request, result| response }
+  response = RestClient.get(situation_path(identifier ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){ |response, request, result| response }
 
   if condition.nil?
     expect(response.code).to eq(200)

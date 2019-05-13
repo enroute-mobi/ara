@@ -411,18 +411,17 @@ func (manager *MemoryStopAreas) findAscendantsWithObjectIdKind(stopAreaId StopAr
 		return
 	}
 
+	id, ok := sa.ObjectID(kind)
+	if ok {
+		stopAreaObjectIds = []ObjectID{id}
+	}
+
 	if sa.ParentId != "" {
 		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ParentId, kind)...)
 	}
 	if sa.ReferentId != "" {
 		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
 	}
-
-	id, ok := sa.ObjectID(kind)
-	if !ok {
-		return
-	}
-	stopAreaObjectIds = []ObjectID{id}
 
 	return
 }
