@@ -2,7 +2,8 @@ Gokogiri
 ========
 [![Build Status](https://travis-ci.org/jbowtie/gokogiri.svg?branch=master)](https://travis-ci.org/jbowtie/gokogiri)
 [![codecov](https://codecov.io/gh/jbowtie/gokogiri/branch/master/graph/badge.svg)](https://codecov.io/gh/jbowtie/gokogiri)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/jbowtie/gokogiri)](https://goreportcard.com/report/github.com/jbowtie/gokogiri)
+[![GoDoc](https://godoc.org/github.com/jbowtie/gokogiri?status.svg)](https://godoc.org/github.com/jbowtie/gokogiri)
 
 LibXML bindings for the Go programming language.
 ------------------------------------------------
