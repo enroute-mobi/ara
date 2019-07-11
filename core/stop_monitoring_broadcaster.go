@@ -285,7 +285,7 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
 		event := smb.newLogStashEvent()
-		logSIRINotifyError(err.Error(), event)
+		logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
 		audit.CurrentLogStash().WriteEvent(event)
 	}
 }

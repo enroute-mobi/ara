@@ -350,7 +350,7 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTa
 	err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
 	if err != nil {
 		event := ett.newLogStashEvent()
-		logSIRINotifyError(err.Error(), event)
+		logSIRINotifyError(err.Error(), delivery.ResponseMessageIdentifier, event)
 		audit.CurrentLogStash().WriteEvent(event)
 	}
 }

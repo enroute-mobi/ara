@@ -149,7 +149,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			err := gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
 			if err != nil {
 				event := gmb.newLogStashEvent()
-				logSIRINotifyError(err.Error(), event)
+				logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
 				audit.CurrentLogStash().WriteEvent(event)
 			}
 		}
@@ -162,10 +162,11 @@ func (gmb *GMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRINotifyError(err string, logStashEvent audit.LogStashEvent) {
+func logSIRINotifyError(err, rmi string, logStashEvent audit.LogStashEvent) {
 	logStashEvent["siriType"] = "NotifyError"
 	logStashEvent["errorDescription"] = err
 	logStashEvent["status"] = "false"
+	logStashEvent["responseMessageIdentifier"] = rmi
 }
 
 func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyGeneralMessage) {
