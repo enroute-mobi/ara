@@ -15,14 +15,14 @@ import (
 )
 
 type fakeBroadcaster struct {
-	Events []*model.StopAreaUpdateEvent
+	Events []*model.LegacyStopAreaUpdateEvent
 }
 
-func (fb *fakeBroadcaster) FakeBroadcaster(event *model.StopAreaUpdateEvent) {
+func (fb *fakeBroadcaster) FakeBroadcaster(event *model.LegacyStopAreaUpdateEvent) {
 	fb.Events = append(fb.Events, event)
 }
 
-func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []*model.StopAreaUpdateEvent {
+func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []*model.LegacyStopAreaUpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 
 	// Create a test http server
@@ -72,7 +72,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 
 func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T) {
 	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
-	stopAreaUpdateEvent := &model.StopAreaUpdateEvent{}
+	stopAreaUpdateEvent := &model.LegacyStopAreaUpdateEvent{}
 	for _, stopAreaUpdateEvent = range stopAreaUpdateEvents {
 		if stopAreaUpdateEvent.StopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
 			break

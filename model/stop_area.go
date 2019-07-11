@@ -40,7 +40,9 @@ type StopArea struct {
 	CollectChildren bool
 	Attributes      Attributes
 	References      References
-	// ...
+
+	Longitude float64 `json:",omitempty"`
+	Latitude  float64 `json:",omitempty"`
 }
 
 func NewStopArea(model Model) *StopArea {
