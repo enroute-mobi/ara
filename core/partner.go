@@ -333,7 +333,7 @@ func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[
 
 func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 	if partner.Setting("collect.include_lines") == "" {
-		return true
+		return false
 	}
 	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
 	for _, line := range lines {
