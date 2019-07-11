@@ -14,9 +14,9 @@ func NewUpdateManager(transactionProvider TransactionProvider) func(UpdateEvent)
 
 func (manager *UpdateManager) Update(event UpdateEvent) {
 	switch event.EventKind() {
-	case StopAreaEvent:
+	case STOP_AREA_EVENT:
 		manager.updateStopArea(event.(*StopAreaUpdateEvent))
-	case LineEvent:
+	case LINE_EVENT:
 		manager.updateLine(event.(*LineUpdateEvent))
 	}
 }

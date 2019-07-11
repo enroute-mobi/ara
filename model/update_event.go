@@ -3,8 +3,8 @@ package model
 type EventKind int
 
 const (
-	StopAreaEvent EventKind = iota
-	LineEvent
+	STOP_AREA_EVENT EventKind = iota
+	LINE_EVENT
 )
 
 type UpdateEvent interface {
@@ -27,7 +27,7 @@ func NewStopAreaUpdateEvent() *StopAreaUpdateEvent {
 }
 
 func (ue *StopAreaUpdateEvent) EventKind() EventKind {
-	return StopAreaEvent
+	return STOP_AREA_EVENT
 }
 
 type LineUpdateEvent struct {
@@ -42,5 +42,5 @@ func NewLineUpdateEvent() *LineUpdateEvent {
 }
 
 func (ue *LineUpdateEvent) EventKind() EventKind {
-	return LineEvent
+	return LINE_EVENT
 }
