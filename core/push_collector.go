@@ -27,7 +27,7 @@ func (factory *PushCollectorFactory) CreateConnector(partner *Partner) Connector
 
 func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting(PUSH_TOKEN)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
 	return ok
 }
 

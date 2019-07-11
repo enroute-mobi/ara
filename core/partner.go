@@ -23,7 +23,6 @@ const (
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
 
 	LOCAL_CREDENTIAL = "local_credential"
-	PUSH_TOKEN       = "push_token"
 )
 
 type PartnerId string
@@ -121,7 +120,6 @@ func (partner *APIPartner) Validate() bool {
 
 	// Check local_credential and Slug uniqueness
 	credentials, ok := partner.Settings[LOCAL_CREDENTIAL]
-	pushToken, ok2 := partner.Settings[PUSH_TOKEN]
 	for _, existingPartner := range partner.manager.FindAll() {
 		if existingPartner.id != partner.Id {
 			if partner.Slug == existingPartner.slug {
@@ -129,9 +127,6 @@ func (partner *APIPartner) Validate() bool {
 			}
 			if ok && credentials == existingPartner.Settings[LOCAL_CREDENTIAL] {
 				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
-			}
-			if ok2 && pushToken == existingPartner.Settings[PUSH_TOKEN] {
-				partner.Errors.Add("Settings[\"push_token\"]", ERROR_UNIQUE)
 			}
 		}
 	}
