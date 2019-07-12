@@ -15,8 +15,6 @@ EOF
 
 cd $source_dir
 
-export GO111MODULE=on
-go get -d -v ./...
 go install -v ./...
 
 PGHOST=${EDWIG_DB_HOST:-localhost} PGUSER=${EDWIG_DB_USER:-jenkins} PGPASSWORD=${EDWIG_DB_PASSWORD} createdb $EDWIG_DB_NAME
@@ -24,7 +22,7 @@ PGHOST=${EDWIG_DB_HOST:-localhost} PGUSER=${EDWIG_DB_USER:-jenkins} PGPASSWORD=$
 export EDWIG_ENV=test
 $GOPATH/bin/edwig migrate up
 
-go test -v -cover ./...
+go test ./...
 
 tmp_dir=$GOPATH/tmp
 

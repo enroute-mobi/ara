@@ -22,7 +22,13 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle install --jobs 4 --deployment
 
 # Install application file
+COPY go.mod go.sum ./
+
 ENV GOPATH=/go
+ENV GO111MODULE=on
+RUN go get -d -v ./...
+
 COPY . .
 
+ENV TZ=Europe/Paris
 CMD ["sh", "ci.sh"]
