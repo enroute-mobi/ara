@@ -48,6 +48,9 @@ touch config/production.yml
 echo "Start $command"
 case $command in
   api)
+    if [ "$RUN_MIGRATIONS" = "true" ]; then
+        ./edwig migrate up || exit $?
+    fi
     exec ./edwig api -listen 0.0.0.0:8080
     ;;
   shell)
