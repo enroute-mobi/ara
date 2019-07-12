@@ -1,0 +1,6 @@
+/.git
+/Dockerfile
+/.gitignore
+/README.md
+/Makefile
+.DS_Store
