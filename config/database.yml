@@ -2,10 +2,12 @@ development:
   name: edwig
   user: edwig
   password: edwig
+  host: localhost
   port: 5432
 
 test:
   name: edwig_test
   user: edwig
   password: edwig
+  host: localhost
   port: 5432
