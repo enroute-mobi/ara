@@ -7,7 +7,7 @@ import (
 
 	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
-	"github.com/rubenv/sql-migrate"
+	migrate "github.com/rubenv/sql-migrate"
 	"gopkg.in/gorp.v1"
 
 	_ "github.com/lib/pq"
@@ -59,18 +59,9 @@ func InitTestDb(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	_, err = Database.Exec("BEGIN;")
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func CleanTestDb(t *testing.T) {
-	_, err := Database.Exec("ROLLBACK;")
-	if err != nil {
-		t.Fatal(err)
-	}
 	CloseDB(Database)
 }
 
