@@ -2,7 +2,7 @@
 # docker build -t ara .
 # docker run -it --add-host db:172.17.0.1 -e EDWIG_DB_NAME=edwig -e EDWIG_DB_USER=edwig -e EDWIG_DB_PASSWORD=edwig -e EDWIG_API_KEY=secret -e EDWIG_DEBUG=true -p 8080:8080 ara
 
-FROM golang:1.7 AS builder
+FROM golang:1.12 AS builder
 
 ENV DEV_PACKAGES="libxml2-dev"
 RUN apt-get update && apt-get -y install --no-install-recommends $DEV_PACKAGES
