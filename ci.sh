@@ -13,15 +13,18 @@ test:
   port: ${EDWIG_DB_PORT:-5432}
 EOF
 
-#(cd $source_dir; GO111MODULE=on go get -d -v ./...)
-go install github.com/af83/edwig
+cd $source_dir
+
+export GO111MODULE=on
+go get -d -v ./...
+go install -v ./...
 
 PGHOST=${EDWIG_DB_HOST:-localhost} PGUSER=${EDWIG_DB_USER:-jenkins} PGPASSWORD=${EDWIG_DB_PASSWORD} createdb $EDWIG_DB_NAME
 
 export EDWIG_ENV=test
-(cd $source_dir; $GOPATH/bin/edwig migrate up)
+$GOPATH/bin/edwig migrate up
 
-go test -v -cover github.com/af83/edwig/...
+go test -v -cover ./...
 
 tmp_dir=$GOPATH/tmp
 
