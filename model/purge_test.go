@@ -162,14 +162,14 @@ func test_Purifier_Purge(date time.Time, expected_count int, t *testing.T) {
 	check_record_count(expected_count, t)
 }
 
-func Test_Purigier_Purge_0day(t *testing.T) {
+func Test_Purifier_Purge_0day(t *testing.T) {
 	test_Purifier_Purge(time.Date(2017, time.January, 01, 0, 0, 0, 0, time.UTC), 2, t)
 }
 
-func Test_Purigier_Purge_1day(t *testing.T) {
+func Test_Purifier_Purge_1day(t *testing.T) {
 	test_Purifier_Purge(time.Date(2017, time.January, 02, 0, 0, 0, 0, time.UTC), 1, t)
 }
 
-func Test_Purigier_Purge_2days(t *testing.T) {
+func Test_Purifier_Purge_2days(t *testing.T) {
 	test_Purifier_Purge(time.Date(2017, time.January, 04, 0, 0, 0, 0, time.UTC), 0, t)
 }
