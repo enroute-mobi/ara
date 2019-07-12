@@ -13,7 +13,7 @@ run:
 	go run edwig.go api
 
 tests:
-	go test github.com/af83/edwig/...
+	go test github.com/af83/edwig/... -p 1 -count 1
 
 cucumber:
 	bundle exec cucumber -t ~@wip
