@@ -94,8 +94,11 @@ func LoadDatabaseConfig(configPath string) error {
 	Config.DB.Name = databaseYaml["name"].(string)
 	Config.DB.User = databaseYaml["user"].(string)
 	Config.DB.Password = databaseYaml["password"].(string)
-	Config.DB.Host = databaseYaml["host"].(string)
 	Config.DB.Port = uint(databaseYaml["port"].(int))
+
+	if databaseYaml["host"] != nil {
+		Config.DB.Host = databaseYaml["host"].(string)
+	}
 
 	return nil
 }
