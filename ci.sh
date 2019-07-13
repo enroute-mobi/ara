@@ -22,7 +22,7 @@ PGHOST=${EDWIG_DB_HOST:-localhost} PGUSER=${EDWIG_DB_USER:-jenkins} PGPASSWORD=$
 export EDWIG_ENV=test
 $GOPATH/bin/edwig migrate up
 
-go test ./...
+go test -p 1 ./...
 
 tmp_dir=$GOPATH/tmp
 
