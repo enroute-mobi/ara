@@ -73,7 +73,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			}
 			annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
 		}
-		if len(annotedStopPoint.Lines) == 0 {
+		if len(annotedStopPoint.Lines) == 0 && connector.ignoreStopWithoutLine() {
 			continue
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
@@ -85,6 +85,10 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 
 	return response, nil
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) ignoreStopWithoutLine() bool {
+	return connector.partner.Setting("ignore_stop_without_line") != "false"
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
