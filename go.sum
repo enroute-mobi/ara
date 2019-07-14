@@ -1,3 +1,7 @@
+github.com/af83/ara-external-models v0.0.3 h1:PfjYQhMzbhkX1alHgj4225Bx/TF3tQsFP6hhiU2HxEg=
+github.com/af83/ara-external-models v0.0.3/go.mod h1:mX4oZEApZwpnFkDqZcdledk3wfeskP2czsCzeUrye2M=
+github.com/golang/protobuf v1.3.2 h1:6nsPYzhq5kReh6QImI3k5qWzO4PEbvbIW2cwSfR/6xs=
+github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f h1:6UIvzqlGM38lOpKP380Wbl0kUyyjutcc7KJUaDM/U4o=
 github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f/go.mod h1:C3R3VzPq+DAwilxue7DiV6F2QL1rrQX0L56GyI+sBxM=
 github.com/jonboulle/clockwork v0.1.0 h1:VKV+ZcuP6l3yW9doeqz6ziZGgcynBVQO+obU0+0hcPo=
@@ -10,6 +14,8 @@ github.com/rubenv/sql-migrate v0.0.0-20160620083229-6f4757563362 h1:lmOdpLt3XS6Q
 github.com/rubenv/sql-migrate v0.0.0-20160620083229-6f4757563362/go.mod h1:WS0rl9eEliYI8DPnr3TOwz4439pay+qNgzJoVya/DmY=
 github.com/satori/uuid v1.2.0 h1:6TFY4nxn5XwBx0gDfzbEMCNT6k4N/4FNIuN8RACZ0KI=
 github.com/satori/uuid v1.2.0/go.mod h1:B8HLsPLik/YNn6KKWVMDJ8nzCL8RP5WyfsnmvnAEwIU=
+github.com/satori/uuid v1.2.1-0.20181028125025-b2ce2384e17b h1:yc0oN20HNiztm5uIjA3dYuSASIfJdZC3HTR16nThTAM=
+github.com/satori/uuid v1.2.1-0.20181028125025-b2ce2384e17b/go.mod h1:B8HLsPLik/YNn6KKWVMDJ8nzCL8RP5WyfsnmvnAEwIU=
 golang.org/x/text v0.0.0-20170323194135-fc7fa097411d h1:1sMc8NOVcdoY8yek1CZ8tdEKC75kaIaQVvFp1655q6Q=
 golang.org/x/text v0.0.0-20170323194135-fc7fa097411d/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 gopkg.in/gorp.v1 v1.7.1 h1:GBB9KrWRATQZh95HJyVGUZrWwOPswitEYEyqlK8JbAA=

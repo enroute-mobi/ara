@@ -20,7 +20,7 @@ func newStopVisitUpdateEventBuilder(partner *Partner, originStopAreaObjectId mod
 	}
 }
 
-func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.StopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
+func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.LegacyStopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
 	stopVisitEvent := &model.StopVisitUpdateEvent{
 		Id:                     builder.NewUUID(),
 		Origin:                 string(builder.partner.Slug()),
@@ -55,7 +55,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 	stopAreaObjectidString := stopVisitEvent.StopAreaObjectId.String()
 	event, ok := events[stopAreaObjectidString]
 	if !ok {
-		event = &model.StopAreaUpdateEvent{}
+		event = &model.LegacyStopAreaUpdateEvent{}
 		event.Origin = string(builder.partner.Slug())
 		event.StopAreaAttributes.Name = xmlStopVisitEvent.StopPointName()
 		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
@@ -68,7 +68,7 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 	event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
 }
 
-func (builder *StopVisitUpdateEventBuilder) setStopVisitUpdateEvents(events map[string]*model.StopAreaUpdateEvent, stopVisits []*siri.XMLMonitoredStopVisit) {
+func (builder *StopVisitUpdateEventBuilder) setStopVisitUpdateEvents(events map[string]*model.LegacyStopAreaUpdateEvent, stopVisits []*siri.XMLMonitoredStopVisit) {
 	for _, xmlStopVisitEvent := range stopVisits {
 		builder.buildStopVisitUpdateEvent(events, xmlStopVisitEvent)
 	}

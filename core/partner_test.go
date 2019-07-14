@@ -402,12 +402,12 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	existingPartner.Settings["local_credential"] = "cred"
 	partners.Save(existingPartner)
 
-	partner, ok := partners.FindByLocalCredential("cred")
+	partner, ok := partners.FindBySetting(LOCAL_CREDENTIAL, "cred")
 	if !ok {
-		t.Fatal("FindByLocalCredential should return true when Partner is found")
+		t.Fatal("FindBySetting should return true when Partner is found")
 	}
 	if partner.Id() != existingPartner.Id() {
-		t.Errorf("FindByLocalCredential should return a Partner with the given local_credential")
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
 	}
 }
 

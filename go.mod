@@ -3,6 +3,8 @@ module github.com/af83/edwig
 go 1.12
 
 require (
+	github.com/af83/ara-external-models v0.0.3
+	github.com/golang/protobuf v1.3.2
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
 	github.com/jonboulle/clockwork v0.1.1-0.20190114141812-62fb9bc030d1
 	github.com/lib/pq v0.0.0-20161102074814-a37edb862148

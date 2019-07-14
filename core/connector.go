@@ -1,6 +1,7 @@
 package core
 
 const (
+	PUSH_COLLECTOR                                    = "push-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER    = "siri-stop-points-discovery-request-broadcaster"
 	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER          = "siri-lines-discovery-request-broadcaster"
 	SIRI_SERVICE_REQUEST_BROADCASTER                  = "siri-service-request-broadcaster"
@@ -58,6 +59,8 @@ type ConnectorFactory interface {
 
 func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
+	case PUSH_COLLECTOR:
+		return &PushCollectorFactory{}
 	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER:
 		return &SIRIStopPointsDiscoveryRequestBroadcasterFactory{}
 	case SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER:

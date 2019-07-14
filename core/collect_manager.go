@@ -7,14 +7,21 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-type StopAreaUpdateSubscriber func(*model.StopAreaUpdateEvent)
+type StopAreaUpdateSubscriber func(*model.LegacyStopAreaUpdateEvent)
 type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
+type UpdateSubscriber func(model.UpdateEvent)
 
 type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
 	UpdateStopArea(request *StopAreaUpdateRequest)
-	HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)
-	BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent)
+
+	// Legacy
+	HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber)
+	BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent)
+
+	// New update events
+	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
+	BroadcastUpdateEvent(event model.UpdateEvent)
 
 	UpdateSituation(request *SituationUpdateRequest)
 	HandleSituationUpdateEvent(SituationUpdateSubscriber)
@@ -26,14 +33,16 @@ type CollectManager struct {
 
 	StopAreaUpdateSubscribers  []StopAreaUpdateSubscriber
 	SituationUpdateSubscribers []SituationUpdateSubscriber
+	UpdateSubscribers          []UpdateSubscriber
 	referential                *Referential
 }
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
 type TestCollectManager struct {
 	Done            chan bool
-	Events          []*model.StopAreaUpdateEvent
+	Events          []*model.LegacyStopAreaUpdateEvent
 	StopVisitEvents []*model.StopVisitUpdateEvent
+	UpdateEvents    []model.UpdateEvent
 }
 
 func NewTestCollectManager() CollectManagerInterface {
@@ -43,20 +52,28 @@ func NewTestCollectManager() CollectManagerInterface {
 }
 
 func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
-	event := &model.StopAreaUpdateEvent{}
+	event := &model.LegacyStopAreaUpdateEvent{}
 	manager.Events = append(manager.Events, event)
 
 	manager.Done <- true
 }
 
-func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.StopAreaUpdateEvent) {
+func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.LegacyStopAreaUpdateEvent) {
 	manager.StopVisitEvents = append(manager.StopVisitEvents, event.StopVisitUpdateEvents...)
 }
 
 func (manager *TestCollectManager) HandlePartnerStatusChange(partner string, status bool) {}
-func (manager *TestCollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber)    {}
-func (manager *TestCollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+
+// Legacy
+func (manager *TestCollectManager) HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
+func (manager *TestCollectManager) BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
 	manager.Events = append(manager.Events, event)
+}
+
+// New structure
+func (manager *TestCollectManager) HandleUpdateEvent(UpdateSubscriber) {}
+func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent) {
+	manager.UpdateEvents = append(manager.UpdateEvents, event)
 }
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
@@ -71,23 +88,34 @@ func NewCollectManager(referential *Referential) CollectManagerInterface {
 		referential:                referential,
 		StopAreaUpdateSubscribers:  make([]StopAreaUpdateSubscriber, 0),
 		SituationUpdateSubscribers: make([]SituationUpdateSubscriber, 0),
+		UpdateSubscribers:          make([]UpdateSubscriber, 0),
 	}
 }
 
-func (manager *CollectManager) HandleStopAreaUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
+func (manager *CollectManager) HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
 	manager.StopAreaUpdateSubscribers = append(manager.StopAreaUpdateSubscribers, StopAreaUpdateSubscriber)
 }
 
-func (manager *CollectManager) BroadcastStopAreaUpdateEvent(event *model.StopAreaUpdateEvent) {
+func (manager *CollectManager) BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
 	for _, StopAreaUpdateSubscriber := range manager.StopAreaUpdateSubscribers {
 		StopAreaUpdateSubscriber(event)
+	}
+}
+
+func (manager *CollectManager) HandleUpdateEvent(UpdateSubscriber UpdateSubscriber) {
+	manager.UpdateSubscribers = append(manager.UpdateSubscribers, UpdateSubscriber)
+}
+
+func (manager *CollectManager) BroadcastUpdateEvent(event model.UpdateEvent) {
+	for _, UpdateSubscriber := range manager.UpdateSubscribers {
+		UpdateSubscriber(event)
 	}
 }
 
 func (manager *CollectManager) HandlePartnerStatusChange(partner string, status bool) {
 	for _, stopAreaId := range manager.referential.Model().StopAreas().FindByOrigin(partner) {
 		event := model.NewStopAreaMonitoredEvent(manager.NewUUID(), stopAreaId, partner, status)
-		manager.BroadcastStopAreaUpdateEvent(event)
+		manager.BroadcastLegacyStopAreaUpdateEvent(event)
 	}
 }
 

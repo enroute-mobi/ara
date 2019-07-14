@@ -129,6 +129,8 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	if requestData.Resource == "siri" {
 		server.handleSIRI(response, request, requestData)
+	} else if requestData.Resource == "push" {
+		server.handlePush(response, request, requestData)
 	} else if strings.HasPrefix(requestData.Referential, "_") {
 		if !server.isAdmin(request) {
 			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
@@ -183,4 +185,13 @@ func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Req
 
 	siriHandler := NewSIRIHandler(foundReferential)
 	siriHandler.serve(response, request)
+}
+
+func (server *Server) handlePush(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
+
+	logger.Log.Debugf("Push request: %v", request)
+
+	pushHandler := NewPushHandler(foundReferential, server.getToken(request))
+	pushHandler.serve(response, request)
 }

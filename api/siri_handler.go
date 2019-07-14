@@ -8,7 +8,6 @@ import (
 
 	"github.com/af83/edwig/core"
 	"github.com/af83/edwig/siri"
-	"github.com/af83/edwig/version"
 )
 
 type SIRIRequestHandler interface {
@@ -81,7 +80,6 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
-	response.Header().Set("Server", version.ApplicationName())
 
 	if handler.referential == nil {
 		siriError("NotFound", "Referential not found", response)
@@ -114,7 +112,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	partner, ok := handler.referential.Partners().FindByLocalCredential(requestHandler.RequestorRef())
+	partner, ok := handler.referential.Partners().FindBySetting(core.LOCAL_CREDENTIAL, requestHandler.RequestorRef())
 	if !ok {
 		siriErrorWithRequest("UnknownCredential", "RequestorRef Unknown", envelope.Body().String(), response)
 		return

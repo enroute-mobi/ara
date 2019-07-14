@@ -21,6 +21,8 @@ const (
 	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = "unknown"
 	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
+
+	LOCAL_CREDENTIAL = "local_credential"
 )
 
 type PartnerId string
@@ -33,7 +35,7 @@ type Partners interface {
 
 	New(slug PartnerSlug) *Partner
 	Find(id PartnerId) *Partner
-	FindByLocalCredential(credential string) (*Partner, bool)
+	FindBySetting(setting, value string) (*Partner, bool)
 	FindBySlug(slug PartnerSlug) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
@@ -117,13 +119,13 @@ func (partner *APIPartner) Validate() bool {
 	}
 
 	// Check local_credential and Slug uniqueness
-	credentials, ok := partner.Settings["local_credential"]
+	credentials, ok := partner.Settings[LOCAL_CREDENTIAL]
 	for _, existingPartner := range partner.manager.FindAll() {
 		if existingPartner.id != partner.Id {
 			if partner.Slug == existingPartner.slug {
 				partner.Errors.Add("Slug", ERROR_UNIQUE)
 			}
-			if ok && credentials == existingPartner.Settings["local_credential"] {
+			if ok && credentials == existingPartner.Settings[LOCAL_CREDENTIAL] {
 				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
 			}
 		}
@@ -623,9 +625,9 @@ func (manager *PartnerManager) Find(id PartnerId) *Partner {
 	return partner
 }
 
-func (manager *PartnerManager) FindByLocalCredential(credential string) (*Partner, bool) {
+func (manager *PartnerManager) FindBySetting(setting, value string) (*Partner, bool) {
 	for _, partner := range manager.byId {
-		if partner.Setting("local_credential") == credential {
+		if partner.Setting(setting) == value {
 			return partner, true
 		}
 	}

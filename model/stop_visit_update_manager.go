@@ -16,7 +16,7 @@ type StopVisitUpdater struct {
 	event *StopVisitUpdateEvent
 }
 
-func NewStopAreaUpdateManager(transactionProvider TransactionProvider) func(*StopAreaUpdateEvent) {
+func NewStopAreaUpdateManager(transactionProvider TransactionProvider) func(*LegacyStopAreaUpdateEvent) {
 	manager := newStopAreaUpdateManager(transactionProvider)
 	return manager.UpdateStopArea
 }
@@ -25,7 +25,7 @@ func newStopAreaUpdateManager(transactionProvider TransactionProvider) *StopArea
 	return &StopAreaUpdateManager{transactionProvider: transactionProvider}
 }
 
-func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateStopArea(event *LegacyStopAreaUpdateEvent) {
 	if event.StopAreaMonitoredEvent != nil {
 		manager.UpdateMonitoredStopArea(event)
 		return
@@ -35,7 +35,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 
 	stopArea, found := tx.Model().StopAreas().Find(event.StopAreaId)
 	if !found {
-		logger.Log.Debugf("StopAreaUpdateEvent for unknown StopArea %v", event.StopAreaId)
+		logger.Log.Debugf("LegacyStopAreaUpdateEvent for unknown StopArea %v", event.StopAreaId)
 
 		stopArea = tx.Model().StopAreas().New()
 
@@ -74,7 +74,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *StopAreaUpdateEvent)
 	}
 }
 
-func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *StopAreaUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *LegacyStopAreaUpdateEvent) {
 	// Should never happen, but don't want to ever have a go nil pointer exception
 	if event.StopAreaMonitoredEvent == nil {
 		return
