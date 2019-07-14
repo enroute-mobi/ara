@@ -52,8 +52,8 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 	tx := manager.transactionProvider.NewTransaction()
 
-	line, ok := tx.Model().Lines().FindByObjectId(event.ObjectId)
-	if ok {
+	line, found := tx.Model().Lines().FindByObjectId(event.ObjectId)
+	if !found {
 		line = tx.Model().Lines().New()
 
 		line.SetObjectID(event.ObjectId)
