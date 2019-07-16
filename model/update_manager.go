@@ -58,10 +58,11 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 
 		line.SetObjectID(event.ObjectId)
 		line.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+
+		line.CollectGeneralMessages = true
 	}
 
 	line.Name = event.Name
-	line.CollectGeneralMessages = true
 	line.SetOrigin(event.Origin)
 
 	line.Updated(manager.Clock().Now())
