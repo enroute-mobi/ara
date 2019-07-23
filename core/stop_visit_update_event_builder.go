@@ -5,7 +5,7 @@ import (
 	"github.com/af83/edwig/siri"
 )
 
-type StopVisitUpdateEventBuilder struct {
+type LegacyStopVisitUpdateEventBuilder struct {
 	model.ClockConsumer
 	model.UUIDConsumer
 
@@ -13,15 +13,15 @@ type StopVisitUpdateEventBuilder struct {
 	partner                *Partner
 }
 
-func newStopVisitUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) StopVisitUpdateEventBuilder {
-	return StopVisitUpdateEventBuilder{
+func newLegacyStopVisitUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) LegacyStopVisitUpdateEventBuilder {
+	return LegacyStopVisitUpdateEventBuilder{
 		partner:                partner,
 		originStopAreaObjectId: originStopAreaObjectId,
 	}
 }
 
-func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map[string]*model.LegacyStopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
-	stopVisitEvent := &model.StopVisitUpdateEvent{
+func (builder *LegacyStopVisitUpdateEventBuilder) buildLegacyStopVisitUpdateEvent(events map[string]*model.LegacyStopAreaUpdateEvent, xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
+	stopVisitEvent := &model.LegacyStopVisitUpdateEvent{
 		Id:                     builder.NewUUID(),
 		Origin:                 string(builder.partner.Slug()),
 		DataFrameRef:           xmlStopVisitEvent.DataFrameRef(),
@@ -65,11 +65,11 @@ func (builder *StopVisitUpdateEventBuilder) buildStopVisitUpdateEvent(events map
 			event.StopAreaAttributes.ParentObjectId = builder.originStopAreaObjectId
 		}
 	}
-	event.StopVisitUpdateEvents = append(event.StopVisitUpdateEvents, stopVisitEvent)
+	event.LegacyStopVisitUpdateEvents = append(event.LegacyStopVisitUpdateEvents, stopVisitEvent)
 }
 
-func (builder *StopVisitUpdateEventBuilder) setStopVisitUpdateEvents(events map[string]*model.LegacyStopAreaUpdateEvent, stopVisits []*siri.XMLMonitoredStopVisit) {
+func (builder *LegacyStopVisitUpdateEventBuilder) setLegacyStopVisitUpdateEvents(events map[string]*model.LegacyStopAreaUpdateEvent, stopVisits []*siri.XMLMonitoredStopVisit) {
 	for _, xmlStopVisitEvent := range stopVisits {
-		builder.buildStopVisitUpdateEvent(events, xmlStopVisitEvent)
+		builder.buildLegacyStopVisitUpdateEvent(events, xmlStopVisitEvent)
 	}
 }

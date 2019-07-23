@@ -8,6 +8,8 @@ import (
 	"github.com/af83/edwig/audit"
 	"github.com/af83/edwig/logger"
 	"github.com/af83/edwig/model"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type PushCollector struct {
@@ -52,8 +54,11 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 
 func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalCompleteModel) {
 	t := time.Now()
+
 	pc.handleStopAreas(model.GetStopAreas())
 	pc.handleLines(model.GetLines())
+	pc.handleVehicleJourneys(model.GetVehicleJourneys())
+	pc.handleStopVisits(model.GetStopVisits())
 
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
 	logger.Log.Debugf("PushCollector handled %v models in %v", total, time.Since(t))
@@ -96,6 +101,61 @@ func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) {
 
 		pc.broadcastUpdateEvent(event)
 	}
+}
+
+func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVehicleJourney) {
+	partner := string(pc.Partner().Slug())
+	id_kind := pc.Partner().Setting("remote_objectid_kind")
+
+	for i := range vjs {
+		vj := vjs[i]
+		event := model.NewVehicleJourneyUpdateEvent()
+
+		event.Origin = partner
+		event.ObjectId = model.NewObjectID(id_kind, vj.GetObjectid())
+		event.LineObjectId = model.NewObjectID(id_kind, vj.GetLineRef())
+		event.OriginRef = vj.GetOriginRef()
+		event.OriginName = vj.GetOriginName()
+		event.DestinationRef = vj.GetDestinationRef()
+		event.DestinationName = vj.GetDestinationName()
+		event.Direction = vj.GetDirection()
+
+		pc.broadcastUpdateEvent(event)
+	}
+}
+
+func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVisit) {
+	partner := string(pc.Partner().Slug())
+	id_kind := pc.Partner().Setting("remote_objectid_kind")
+
+	for i := range svs {
+		sv := svs[i]
+		event := model.NewStopVisitUpdateEvent()
+
+		event.Origin = partner
+		event.ObjectId = model.NewObjectID(id_kind, sv.GetObjectid())
+		event.StopAreaObjectId = model.NewObjectID(id_kind, sv.GetStopAreaRef())
+		event.VehicleJourneyObjectId = model.NewObjectID(id_kind, sv.GetVehicleJourneyRef())
+		event.Monitored = sv.GetMonitored()
+
+		handleSchedules(&event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
+
+		pc.broadcastUpdateEvent(event)
+	}
+}
+
+func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival *external_models.ExternalStopVisit_Times) {
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, convertProtoTimes(protoDeparture.GetAimed()), convertProtoTimes(protoArrival.GetAimed()))
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, convertProtoTimes(protoDeparture.GetActual()), convertProtoTimes(protoArrival.GetActual()))
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, convertProtoTimes(protoDeparture.GetExpected()), convertProtoTimes(protoArrival.GetExpected()))
+}
+
+func convertProtoTimes(protoTime *timestamp.Timestamp) time.Time {
+	t, err := ptypes.Timestamp(protoTime)
+	if err != nil {
+		t = time.Time{}
+	}
+	return t
 }
 
 func (pc *PushCollector) newLogStashEvent() audit.LogStashEvent {

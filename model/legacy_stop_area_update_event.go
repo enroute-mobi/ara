@@ -6,7 +6,7 @@ type LegacyStopAreaUpdateEvent struct {
 	StopAreaId                  StopAreaId
 	StopAreaAttributes          StopAreaAttributes
 	StopAreaMonitoredEvent      *StopAreaMonitoredEvent
-	StopVisitUpdateEvents       []*StopVisitUpdateEvent
+	LegacyStopVisitUpdateEvents []*LegacyStopVisitUpdateEvent
 	StopVisitNotCollectedEvents []*StopVisitNotCollectedEvent
 }
 

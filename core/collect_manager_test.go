@@ -58,7 +58,7 @@ func Test_CollectManager_BestPartner(t *testing.T) {
 // 	collectManager.HandleLegacyStopAreaUpdateEvent(testManager.TestStopAreaUpdateSubscriber)
 //
 // 	if len(collectManager.StopAreaUpdateSubscribers) != 1 {
-// 		t.Error("CollectManager should have a subscriber after HandleStopVisitUpdateEvent call")
+// 		t.Error("CollectManager should have a subscriber after HandleLegacyStopVisitUpdateEvent call")
 // 	}
 //
 // 	request := NewStopAreaUpdateRequest(stopArea.Id())
@@ -87,14 +87,14 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
 
-	stopVisitUpdateEvent := &model.StopVisitUpdateEvent{
+	stopVisitUpdateEvent := &model.LegacyStopVisitUpdateEvent{
 		StopVisitObjectid: objectid,
 		DepartureStatus:   model.STOP_VISIT_DEPARTURE_ONTIME,
 		ArrivalStatus:     model.STOP_VISIT_ARRIVAL_ARRIVED,
 		Attributes:        &model.TestStopVisitUpdateAttributes{},
 	}
 	stopAreaUpdateEvent := model.NewLegacyStopAreaUpdateEvent("test", stopArea.Id())
-	stopAreaUpdateEvent.StopVisitUpdateEvents = []*model.StopVisitUpdateEvent{stopVisitUpdateEvent}
+	stopAreaUpdateEvent.LegacyStopVisitUpdateEvents = []*model.LegacyStopVisitUpdateEvent{stopVisitUpdateEvent}
 	referential.collectManager.BroadcastLegacyStopAreaUpdateEvent(stopAreaUpdateEvent)
 
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())

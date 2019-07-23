@@ -15,7 +15,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit_found(t *testing.T) {
 
 	manager := newStopAreaUpdateManager(model)
 
-	event := &StopVisitUpdateEvent{
+	event := &LegacyStopVisitUpdateEvent{
 		StopAreaObjectId:  objectid,
 		StopVisitObjectid: objectid,
 		DepartureStatus:   STOP_VISIT_DEPARTURE_CANCELLED,
@@ -45,7 +45,7 @@ func Test_StopVisitUpdateManager_UpdateStopVisit(t *testing.T) {
 	sa.SetObjectID(objectid)
 	sa.Save()
 
-	event := &StopVisitUpdateEvent{
+	event := &LegacyStopVisitUpdateEvent{
 		Attributes:        &TestStopVisitUpdateAttributes{},
 		StopAreaObjectId:  objectid,
 		StopVisitObjectid: objectid,

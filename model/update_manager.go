@@ -1,5 +1,7 @@
 package model
 
+import "github.com/af83/edwig/logger"
+
 type UpdateManager struct {
 	ClockConsumer
 	UUIDConsumer
@@ -18,6 +20,10 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 		manager.updateStopArea(event.(*StopAreaUpdateEvent))
 	case LINE_EVENT:
 		manager.updateLine(event.(*LineUpdateEvent))
+	case VEHICLE_JOURNEY_EVENT:
+		manager.updateVehicleJourney(event.(*VehicleJourneyUpdateEvent))
+	case STOP_VISIT_EVENT:
+		manager.updateStopVisit(event.(*StopVisitUpdateEvent))
 	}
 }
 
@@ -30,12 +36,12 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 
 		stopArea.SetObjectID(event.ObjectId)
 		stopArea.CollectGeneralMessages = true
-	}
 
-	stopArea.Name = event.Name
-	stopArea.CollectedAlways = event.CollectedAlways
-	stopArea.Longitude = event.Longitude
-	stopArea.Latitude = event.Latitude
+		stopArea.Name = event.Name
+		stopArea.CollectedAlways = event.CollectedAlways
+		stopArea.Longitude = event.Longitude
+		stopArea.Latitude = event.Latitude
+	}
 
 	if stopArea.ParentId == "" && event.ParentObjectId.Value() != "" {
 		parentSA, _ := tx.Model().StopAreas().FindByObjectId(event.ParentObjectId)
@@ -45,6 +51,21 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 	stopArea.Updated(manager.Clock().Now())
 
 	tx.Model().StopAreas().Save(&stopArea)
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, partner string, status bool) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	ascendants := tx.Model().StopAreas().FindAscendants(stopAreaId)
+	for i := range ascendants {
+		stopArea := ascendants[i]
+		stopArea.Origins.SetPartnerStatus(partner, status)
+		stopArea.Monitored = stopArea.Origins.Monitored()
+		tx.Model().StopAreas().Save(&stopArea)
+	}
+
 	tx.Commit()
 	tx.Close()
 }
@@ -60,14 +81,100 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 		line.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
 
 		line.CollectGeneralMessages = true
-	}
 
-	line.Name = event.Name
-	line.SetOrigin(event.Origin)
+		line.Name = event.Name
+
+		line.SetOrigin(event.Origin)
+	}
 
 	line.Updated(manager.Clock().Now())
 
 	tx.Model().Lines().Save(&line)
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEvent) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	vj, found := tx.Model().VehicleJourneys().FindByObjectId(event.ObjectId)
+	if !found {
+		vj = tx.Model().VehicleJourneys().New()
+
+		vj.SetObjectID(event.ObjectId)
+		vj.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+
+		// LineObjectId
+		l, ok := tx.Model().Lines().FindByObjectId(event.LineObjectId)
+		if !ok {
+			logger.Log.Debugf("VehicleJourney update event without corresponding line: %v", event.LineObjectId.String())
+			return
+		}
+		vj.LineId = l.Id()
+
+		vj.Origin = event.Origin
+	}
+
+	vj.References.SetObjectId("OriginRef", NewObjectID(event.ObjectId.Kind(), event.OriginRef))
+	vj.OriginName = event.OriginName
+
+	vj.References.SetObjectId("DestinationRef", NewObjectID(event.ObjectId.Kind(), event.DestinationRef))
+	vj.DestinationName = event.DestinationName
+
+	vj.Attributes.Set("DirectionName", event.Direction)
+
+	tx.Model().VehicleJourneys().Save(&vj)
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	sa, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaObjectId)
+	if !ok {
+		logger.Log.Debugf("StopVisit update event without corresponding stop area: %v", event.StopAreaObjectId.String())
+		return
+	}
+
+	vj, ok := tx.Model().VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
+	if !ok {
+		logger.Log.Debugf("StopVisit update event without corresponding vehicle journey: %v", event.VehicleJourneyObjectId.String())
+		return
+	}
+
+	sv, found := tx.Model().StopVisits().FindByObjectId(event.ObjectId)
+	if !found {
+		sv = tx.Model().StopVisits().New()
+
+		sv.SetObjectID(event.ObjectId)
+		sv.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+
+		// StopAreaObjectId
+		sv.StopAreaId = sa.Id()
+
+		// VehicleJourneyObjectId
+		sv.VehicleJourneyId = vj.Id()
+
+		sv.Origin = event.Origin
+	}
+
+	sv.Schedules.Merge(&event.Schedules)
+	sv.Collected(manager.Clock().Now())
+
+	if event.Monitored != vj.Monitored {
+		vj.Monitored = event.Monitored
+		tx.Model().VehicleJourneys().Save(&vj)
+	}
+
+	if event.Origin != "" {
+		status, ok := sa.Origins.Origin(event.Origin)
+		if status != event.Monitored || !ok {
+			manager.updateMonitoredStopArea(sa.Id(), event.Origin, event.Monitored)
+		}
+	}
+
+	tx.Model().StopVisits().Save(&sv)
 	tx.Commit()
 	tx.Close()
 }

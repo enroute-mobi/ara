@@ -41,7 +41,7 @@ type CollectManager struct {
 type TestCollectManager struct {
 	Done            chan bool
 	Events          []*model.LegacyStopAreaUpdateEvent
-	StopVisitEvents []*model.StopVisitUpdateEvent
+	StopVisitEvents []*model.LegacyStopVisitUpdateEvent
 	UpdateEvents    []model.UpdateEvent
 }
 
@@ -59,7 +59,7 @@ func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest
 }
 
 func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.LegacyStopAreaUpdateEvent) {
-	manager.StopVisitEvents = append(manager.StopVisitEvents, event.StopVisitUpdateEvents...)
+	manager.StopVisitEvents = append(manager.StopVisitEvents, event.LegacyStopVisitUpdateEvents...)
 }
 
 func (manager *TestCollectManager) HandlePartnerStatusChange(partner string, status bool) {}
