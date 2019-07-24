@@ -1063,3 +1063,139 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 </S:Body>
 </S:Envelope>
 """
+
+  Scenario: Manage a DeleteSubscription Request
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+         <SubscriptionAnswerInfo
+           xmlns:ns2="http://www.ifopt.org.uk/acsb"
+           xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+           xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+           xmlns:ns5="http://www.siri.org.uk/siri"
+           xmlns:ns6="http://wsdl.siri.org.uk/siri">
+           <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+           <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+           <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+           <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">Subscription:Test:0</ns5:RequestMessageRef>
+         </SubscriptionAnswerInfo>
+         <Answer
+           xmlns:ns2="http://www.ifopt.org.uk/acsb"
+           xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+           xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+           xmlns:ns5="http://www.siri.org.uk/siri"
+           xmlns:ns6="http://wsdl.siri.org.uk/siri">
+           <ns5:ResponseStatus>
+               <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+               <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
+               <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
+               <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
+               <ns5:Status>true</ns5:Status>
+               <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
+           </ns5:ResponseStatus>
+           <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
+         </Answer>
+         <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+       </ns1:SubscribeResponse>
+      </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And 30 seconds have passed
+    And a Subscription exist with the following attributes:
+      | Kind              | StopMonitoringBroadcast                            |
+      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                                  | Passage 32                                      |
+      | ObjectIDs                             | "internal": "NINOXE:VehicleJourney:201"         |
+      | LineId                                | 6ba7b814-9dad-11d1-5-00c04fd430c8               |
+      | Monitored                             | true                                            |
+      | Attribute[DirectionRef]               | Aller                                           |
+      | OriginName                            | Le début                                        |
+      | DestinationName                       | La fin.                                         |
+      | Reference[DestinationRef]#ObjectID    | "external": "ThisIsTheEnd"                      |
+      | Reference[JourneyPatternRef]#ObjectID | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | DataFrameRef                    | abcd                                                                 |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | DataFrameRef                    | abcd                                                                 |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And 10 seconds have passed
+    When I send this SIRI request
+      """
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header />
+  <S:Body>
+    <sw:DeleteSubscription xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <DeleteSubscriptionInfo>
+        <siri:RequestTimestamp>2006-01-02T15:04:05.000Z07:00</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+        <siri:MessageIdentifier>MessageIdentifier</siri:MessageIdentifier>
+      </DeleteSubscriptionInfo>
+      <Request version="2.0:FR-IDF-2.4">
+        <siri:All/>
+      </Request>
+      <RequestExtension/>
+    </sw:DeleteSubscription>
+  </S:Body>
+</S:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:DeleteSubscriptionResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+      <DeleteSubscriptionAnswerInfo>
+        <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+        <siri:ResponderRef>test</siri:ResponderRef>
+        <siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
+      </DeleteSubscriptionAnswerInfo>
+      <Answer>
+        <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+        <siri:ResponderRef>test</siri:ResponderRef>
+        <siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
+        <siri:TerminationResponseStatus>
+          <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+          <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
+          <siri:SubscriptionRef/>
+          <siri:Status>true</siri:Status>
+        </siri:TerminationResponseStatus>
+      </Answer>
+      <AnswerExtension/>
+    </sw:DeleteSubscriptionResponse>
+  </S:Body>
+</S:Envelope>
+      """

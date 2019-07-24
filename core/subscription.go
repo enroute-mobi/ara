@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -309,7 +310,7 @@ func (manager *MemorySubscriptions) FindBroadcastSubscriptions() (subscriptions 
 	defer manager.mutex.RUnlock()
 
 	for _, subscription := range manager.byIdentifier {
-		if subscription.externalId != "" {
+		if strings.HasSuffix(subscription.Kind(), "Broadcast") {
 			subscriptions = append(subscriptions, subscription)
 		}
 	}
