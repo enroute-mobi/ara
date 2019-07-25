@@ -37,7 +37,7 @@ func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector
 
 func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
 	stopAreaUpdateEvent := model.NewLegacyStopAreaUpdateEvent(connector.NewUUID(), request.StopAreaId())
-	stopAreaUpdateEvent.StopVisitUpdateEvents = append(stopAreaUpdateEvent.StopVisitUpdateEvents, &model.StopVisitUpdateEvent{})
+	stopAreaUpdateEvent.LegacyStopVisitUpdateEvents = append(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents, &model.LegacyStopVisitUpdateEvent{})
 }
 
 func (factory *TestStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
@@ -100,7 +100,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
 	stopAreaUpdateEvents := make(map[string]*model.LegacyStopAreaUpdateEvent)
-	builder := newStopVisitUpdateEventBuilder(connector.partner, objectid)
+	builder := newLegacyStopVisitUpdateEventBuilder(connector.partner, objectid)
 
 	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
 		if connector.Partner().LogRequestStopMonitoringDeliveries() {
@@ -112,7 +112,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		if !delivery.Status() {
 			continue
 		}
-		builder.setStopVisitUpdateEvents(stopAreaUpdateEvents, delivery.XMLMonitoredStopVisits())
+		builder.setLegacyStopVisitUpdateEvents(stopAreaUpdateEvents, delivery.XMLMonitoredStopVisits())
 	}
 
 	for _, event := range stopAreaUpdateEvents {
@@ -151,7 +151,7 @@ func (connector *SIRIStopMonitoringRequestCollector) broadcastLegacyStopAreaUpda
 func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotCollectedEvent(event *model.LegacyStopAreaUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID) {
 	objId := make(map[model.ObjectID]bool)
 
-	for _, stopVisitEvent := range event.StopVisitUpdateEvents {
+	for _, stopVisitEvent := range event.LegacyStopVisitUpdateEvents {
 		objId[stopVisitEvent.StopVisitObjectid] = true
 	}
 

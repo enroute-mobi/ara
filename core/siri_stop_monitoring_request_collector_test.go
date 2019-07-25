@@ -74,7 +74,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
 	stopAreaUpdateEvent := &model.LegacyStopAreaUpdateEvent{}
 	for _, stopAreaUpdateEvent = range stopAreaUpdateEvents {
-		if stopAreaUpdateEvent.StopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
+		if stopAreaUpdateEvent.LegacyStopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
 			break
 		}
 	}
@@ -82,10 +82,10 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if stopAreaUpdateEvent == nil {
 		t.Error("RequestStopAreaUpdate should not return nil")
 	}
-	if len(stopAreaUpdateEvent.StopVisitUpdateEvents) != 1 {
-		t.Errorf("RequestStopAreaUpdate should have 1 StopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.StopVisitUpdateEvents))
+	if len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents) != 1 {
+		t.Errorf("RequestStopAreaUpdate should have 1 LegacyStopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents))
 	}
-	stopVisitEvent := stopAreaUpdateEvent.StopVisitUpdateEvents[0]
+	stopVisitEvent := stopAreaUpdateEvent.LegacyStopVisitUpdateEvents[0]
 
 	// Date is time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC) with fake clock
 	if expected := model.FAKE_CLOCK_INITIAL_DATE; stopVisitEvent.Created_at != expected {

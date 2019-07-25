@@ -69,10 +69,10 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	}
 
 	for _, event := range collectManager.(*TestCollectManager).Events {
-		if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && len(event.StopVisitUpdateEvents) != 2 {
-			t.Errorf("StopArea 6ba7b814-9dad-11d1-0-00c04fd430c8 should have 2 StopVisitEvents, got %v", len(event.StopVisitUpdateEvents))
-		} else if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8") && len(event.StopVisitUpdateEvents) != 1 {
-			t.Errorf("StopArea 6ba7b814-9dad-11d1-1-00c04fd430c8 should have 1 StopVisitEvent, got %v", len(event.StopVisitUpdateEvents))
+		if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && len(event.LegacyStopVisitUpdateEvents) != 2 {
+			t.Errorf("StopArea 6ba7b814-9dad-11d1-0-00c04fd430c8 should have 2 StopVisitEvents, got %v", len(event.LegacyStopVisitUpdateEvents))
+		} else if event.StopAreaId == model.StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8") && len(event.LegacyStopVisitUpdateEvents) != 1 {
+			t.Errorf("StopArea 6ba7b814-9dad-11d1-1-00c04fd430c8 should have 1 StopVisitEvent, got %v", len(event.LegacyStopVisitUpdateEvents))
 		} else if event.StopAreaId != model.StopAreaId("6ba7b814-9dad-11d1-0-00c04fd430c8") && event.StopAreaId != model.StopAreaId("6ba7b814-9dad-11d1-1-00c04fd430c8") {
 			t.Errorf("Wrong StopAreaId, want 6ba7b814-9dad-11d1-0-00c04fd430c8 or 6ba7b814-9dad-11d1-1-00c04fd430c8, got %v", event.StopAreaId)
 		}

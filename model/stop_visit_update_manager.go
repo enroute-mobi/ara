@@ -13,7 +13,7 @@ type StopVisitUpdater struct {
 	ClockConsumer
 
 	tx    *Transaction
-	event *StopVisitUpdateEvent
+	event *LegacyStopVisitUpdateEvent
 }
 
 func NewStopAreaUpdateManager(transactionProvider TransactionProvider) func(*LegacyStopAreaUpdateEvent) {
@@ -66,7 +66,7 @@ func (manager *StopAreaUpdateManager) UpdateStopArea(event *LegacyStopAreaUpdate
 		}
 	}
 
-	for _, stopVisitUpdateEvent := range event.StopVisitUpdateEvents {
+	for _, stopVisitUpdateEvent := range event.LegacyStopVisitUpdateEvents {
 		manager.UpdateStopVisit(stopVisitUpdateEvent)
 	}
 	for _, stopVisitNotCollectedEvent := range event.StopVisitNotCollectedEvents {
@@ -94,7 +94,7 @@ func (manager *StopAreaUpdateManager) UpdateMonitoredStopArea(event *LegacyStopA
 	tx.Close()
 }
 
-func (manager *StopAreaUpdateManager) UpdateStopVisit(event *StopVisitUpdateEvent) {
+func (manager *StopAreaUpdateManager) UpdateStopVisit(event *LegacyStopVisitUpdateEvent) {
 	tx := manager.transactionProvider.NewTransaction()
 	defer tx.Close()
 
@@ -124,7 +124,7 @@ func (manager *StopAreaUpdateManager) UpdateNotCollectedStopVisit(event *StopVis
 	tx.Commit()
 }
 
-func NewStopVisitUpdater(tx *Transaction, event *StopVisitUpdateEvent) *StopVisitUpdater {
+func NewStopVisitUpdater(tx *Transaction, event *LegacyStopVisitUpdateEvent) *StopVisitUpdater {
 	return &StopVisitUpdater{tx: tx, event: event}
 }
 
