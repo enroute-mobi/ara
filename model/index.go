@@ -8,6 +8,8 @@ type ModelId string
 
 type ModelInstance interface {
 	ObjectIDConsumerInterface
+
+	modelId() ModelId
 }
 type IndexableExtractor func(ModelInstance) ModelId
 

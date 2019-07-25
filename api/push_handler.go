@@ -69,4 +69,5 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	connector.(*core.PushCollector).HandlePushNotification(externalModel)
+	response.WriteHeader(http.StatusOK)
 }

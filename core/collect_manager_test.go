@@ -80,6 +80,8 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	referentials.Save(referential)
 
 	stopArea := referential.Model().StopAreas().New()
+	saObjectid := model.NewObjectID("kind", "saValue")
+	stopArea.SetObjectID(saObjectid)
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
@@ -88,6 +90,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	stopVisit.Save()
 
 	stopVisitUpdateEvent := &model.LegacyStopVisitUpdateEvent{
+		StopAreaObjectId:  saObjectid,
 		StopVisitObjectid: objectid,
 		DepartureStatus:   model.STOP_VISIT_DEPARTURE_ONTIME,
 		ArrivalStatus:     model.STOP_VISIT_ARRIVAL_ARRIVED,

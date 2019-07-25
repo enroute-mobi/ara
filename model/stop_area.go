@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-type StopAreaId string
+// type StopAreaId string
+type StopAreaId ModelId
 
 type StopAreaAttributes struct {
 	ObjectId        ObjectID
@@ -55,6 +56,10 @@ func NewStopArea(model Model) *StopArea {
 	}
 	stopArea.objectids = make(ObjectIDs)
 	return stopArea
+}
+
+func (stopArea *StopArea) modelId() ModelId {
+	return ModelId(stopArea.id)
 }
 
 func (stopArea *StopArea) copy() *StopArea {
@@ -204,8 +209,10 @@ type MemoryStopAreas struct {
 
 	model *MemoryModel
 
-	mutex          *sync.RWMutex
-	byIdentifier   map[StopAreaId]*StopArea
+	mutex        *sync.RWMutex
+	byIdentifier map[StopAreaId]*StopArea
+	byObjectId   *ObjectIdIndex
+
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
 
@@ -229,6 +236,7 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 	return &MemoryStopAreas{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
@@ -268,15 +276,19 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 
 func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
 	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 
-	for _, stopArea := range manager.byIdentifier {
-		stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
-		if stopAreaObjectId.Value() == objectid.Value() {
-			manager.mutex.RUnlock()
-			return *(stopArea.copy()), true
-		}
+	// for _, stopArea := range manager.byIdentifier {
+	// 	stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
+	// 	if stopAreaObjectId.Value() == objectid.Value() {
+	// 		return *(stopArea.copy()), true
+	// 	}
+	// }
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return *manager.byIdentifier[StopAreaId(id)], true
 	}
-	manager.mutex.RUnlock()
+
 	return StopArea{}, false
 }
 
@@ -328,6 +340,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
+	manager.byObjectId.Index(stopArea)
 
 	manager.mutex.Unlock()
 
@@ -348,6 +361,8 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopArea.Id())
+	manager.byObjectId.Delete(ModelId(stopArea.id))
+
 	return true
 }
 

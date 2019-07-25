@@ -194,11 +194,13 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	referential.Partners().Save(partner)
 
 	sub := partner.Subscriptions().New("Test")
+	sub.kind = "Broadcast"
 	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
 
 	partner.Subscriptions().Save(sub)
 
 	sub = partner.Subscriptions().New("Test")
+	sub.kind = "Broadcast"
 	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c9:LOC")
 
 	partner.Subscriptions().Save(sub)
@@ -211,7 +213,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
 
 	if len(response.ResponseStatus) != 2 {
-		t.Fatalf("Response should have 1 responseStatus, got: %v", len(response.ResponseStatus))
+		t.Fatalf("Response should have 2 responseStatus, got: %v", len(response.ResponseStatus))
 	}
 	if !response.ResponseStatus[0].Status || !response.ResponseStatus[1].Status {
 		t.Errorf("Status should be true but got false: %v %v", response.ResponseStatus[0].Status, response.ResponseStatus[1].Status)
