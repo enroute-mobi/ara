@@ -2,6 +2,14 @@ package model
 
 import "github.com/af83/edwig/logger"
 
+type ModelId string
+
+type ModelInstance interface {
+	ObjectIDConsumerInterface
+
+	modelId() ModelId
+}
+
 type Model interface {
 	Date() Date
 	Lines() Lines

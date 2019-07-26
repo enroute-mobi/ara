@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type LineId string
+type LineId ModelId
 
 type LineAttributes struct {
 	ObjectId ObjectID
@@ -39,6 +39,10 @@ func NewLine(model Model) *Line {
 
 	line.objectids = make(ObjectIDs)
 	return line
+}
+
+func (line *Line) modelId() ModelId {
+	return ModelId(line.id)
 }
 
 func (line *Line) Id() LineId {
@@ -152,6 +156,7 @@ type MemoryLines struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
+	byObjectId   *ObjectIdIndex
 }
 
 type Lines interface {
@@ -169,6 +174,7 @@ func NewMemoryLines() *MemoryLines {
 	return &MemoryLines{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
@@ -205,11 +211,9 @@ func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, line := range manager.byIdentifier {
-		lineObjectId, _ := line.ObjectID(objectid.Kind())
-		if lineObjectId.Value() == objectid.Value() {
-			return *line, true
-		}
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return *manager.byIdentifier[LineId(id)], true
 	}
 	return Line{}, false
 }
@@ -237,6 +241,8 @@ func (manager *MemoryLines) Save(line *Line) bool {
 
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
+	manager.byObjectId.Index(line)
+
 	return true
 }
 
@@ -245,6 +251,8 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
+	manager.byObjectId.Delete(ModelId(line.id))
+
 	return true
 }
 

@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-type VehicleJourneyId string
+type VehicleJourneyId ModelId
 
 type VehicleJourneyAttributes struct {
 	ObjectId     ObjectID
@@ -44,6 +44,10 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 	}
 	vehicleJourney.objectids = make(ObjectIDs)
 	return vehicleJourney
+}
+
+func (vehicleJourney *VehicleJourney) modelId() ModelId {
+	return ModelId(vehicleJourney.id)
 }
 
 func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
@@ -144,6 +148,7 @@ type MemoryVehicleJourneys struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[VehicleJourneyId]*VehicleJourney
+	byObjectId   *ObjectIdIndex
 }
 
 type VehicleJourneys interface {
@@ -162,6 +167,7 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	return &MemoryVehicleJourneys{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[VehicleJourneyId]*VehicleJourney),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
@@ -186,11 +192,9 @@ func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (Vehicle
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, vehicleJourney := range manager.byIdentifier {
-		vehicleJourneyObjectId, _ := vehicleJourney.ObjectID(objectid.Kind())
-		if vehicleJourneyObjectId.Value() == objectid.Value() {
-			return *vehicleJourney, true
-		}
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return *manager.byIdentifier[VehicleJourneyId(id)], true
 	}
 	return VehicleJourney{}, false
 }
@@ -230,6 +234,8 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 
 	vehicleJourney.model = manager.model
 	manager.byIdentifier[vehicleJourney.Id()] = vehicleJourney
+	manager.byObjectId.Index(vehicleJourney)
+
 	return true
 }
 
@@ -238,6 +244,8 @@ func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) boo
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, vehicleJourney.Id())
+	manager.byObjectId.Delete(ModelId(vehicleJourney.id))
+
 	return true
 }
 

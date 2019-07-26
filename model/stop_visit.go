@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-// type StopVisitId string
 type StopVisitId ModelId
 
 type StopVisitAttributes struct {
@@ -285,17 +284,10 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, b
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	// for _, stopVisit := range manager.byIdentifier {
-	// 	stopVisitObjectId, _ := stopVisit.ObjectID(objectid.Kind())
-	// 	if stopVisitObjectId.Value() == objectid.Value() {
-	// 		return *(stopVisit.copy()), true
-	// 	}
-	// }
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
 		return *manager.byIdentifier[StopVisitId(id)], true
 	}
-
 	return StopVisit{}, false
 }
 

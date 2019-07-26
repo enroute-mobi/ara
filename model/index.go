@@ -1,16 +1,5 @@
 package model
 
-type ModelId string
-
-//type StopAreaId ModelId
-//type LineId ModelId
-// ...
-
-type ModelInstance interface {
-	ObjectIDConsumerInterface
-
-	modelId() ModelId
-}
 type IndexableExtractor func(ModelInstance) ModelId
 
 type Index struct {

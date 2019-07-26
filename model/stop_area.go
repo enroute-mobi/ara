@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-// type StopAreaId string
 type StopAreaId ModelId
 
 type StopAreaAttributes struct {
@@ -278,17 +277,10 @@ func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, boo
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	// for _, stopArea := range manager.byIdentifier {
-	// 	stopAreaObjectId, _ := stopArea.ObjectID(objectid.Kind())
-	// 	if stopAreaObjectId.Value() == objectid.Value() {
-	// 		return *(stopArea.copy()), true
-	// 	}
-	// }
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
 		return *manager.byIdentifier[StopAreaId(id)], true
 	}
-
 	return StopArea{}, false
 }
 
