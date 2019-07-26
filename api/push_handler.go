@@ -1,7 +1,9 @@
 package api
 
 import (
+	"compress/gzip"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -48,8 +50,22 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	// Check if request is gzip
+	var requestReader io.Reader
+	if request.Header.Get("Content-Encoding") == "gzip" {
+		gzipReader, err := gzip.NewReader(request.Body)
+		if err != nil {
+			http.Error(response, "Can't unzip request", http.StatusBadRequest)
+			return
+		}
+		defer gzipReader.Close()
+		requestReader = gzipReader
+	} else {
+		requestReader = request.Body
+	}
+
 	// Attempt to read the body
-	content, err := ioutil.ReadAll(request.Body)
+	content, err := ioutil.ReadAll(requestReader)
 	if err != nil {
 		e := fmt.Sprintf("Error while reading body: %v", err)
 		http.Error(response, e, http.StatusBadRequest)
