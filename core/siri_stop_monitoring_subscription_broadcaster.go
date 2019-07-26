@@ -172,7 +172,9 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 					connector.notMonitored[sub.Id()] = nm
 				}
 				for _, partner := range partners {
-					nm[partner] = struct{}{}
+					if partner != string(connector.partner.Slug()) {
+						nm[partner] = struct{}{}
+					}
 				}
 			}
 			lastState.(*stopAreaLastChange).UpdateState(stopArea)
