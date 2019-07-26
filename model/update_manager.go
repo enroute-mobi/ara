@@ -159,8 +159,10 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		sv.Origin = event.Origin
 	}
 
+	if sv.Schedules.Eq(&event.Schedules) {
+		sv.RecordedAt = manager.Clock().Now()
+	}
 	sv.Schedules.Merge(&event.Schedules)
-	sv.RecordedAt = manager.Clock().Now()
 	sv.Collected(manager.Clock().Now())
 
 	if event.Monitored != vj.Monitored {

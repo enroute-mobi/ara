@@ -24,8 +24,8 @@ type BroadcastManager struct {
 func NewBroadcastManager(referential *Referential) *BroadcastManager {
 	return &BroadcastManager{
 		Referential:  referential,
-		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 100),
-		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 100),
+		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 2000),
+		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 2000),
 	}
 }
 

@@ -48,6 +48,7 @@ Feature: Support SIRI GeneralMessage by subscription
         | local_credential                | NINOXE:default        |
         | remote_objectid_kind            | internal              |
         | collect.filter_general_messages | true                  |
+        | collect.include_lines           | 1234                  |
       And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name                   | Test              |

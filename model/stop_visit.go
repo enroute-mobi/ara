@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type StopVisitId string
+type StopVisitId ModelId
 
 type StopVisitAttributes struct {
 	ObjectId         ObjectID
@@ -60,6 +60,10 @@ func NewStopVisit(model Model) *StopVisit {
 	}
 	stopVisit.objectids = make(ObjectIDs)
 	return stopVisit
+}
+
+func (stopVisit *StopVisit) modelId() ModelId {
+	return ModelId(stopVisit.id)
 }
 
 func (stopVisit *StopVisit) copy() *StopVisit {
@@ -227,8 +231,10 @@ type MemoryStopVisits struct {
 
 	model Model
 
-	mutex          *sync.RWMutex
-	byIdentifier   map[StopVisitId]*StopVisit
+	mutex        *sync.RWMutex
+	byIdentifier map[StopVisitId]*StopVisit
+	byObjectId   *ObjectIdIndex
+
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
 
@@ -252,6 +258,7 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 	return &MemoryStopVisits{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopVisitId]*StopVisit),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
@@ -277,11 +284,9 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, b
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, stopVisit := range manager.byIdentifier {
-		stopVisitObjectId, _ := stopVisit.ObjectID(objectid.Kind())
-		if stopVisitObjectId.Value() == objectid.Value() {
-			return *(stopVisit.copy()), true
-		}
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return *manager.byIdentifier[StopVisitId(id)], true
 	}
 	return StopVisit{}, false
 }
@@ -370,6 +375,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
+	manager.byObjectId.Index(stopVisit)
 
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
@@ -387,7 +393,9 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
-	delete(manager.byIdentifier, stopVisit.Id())
+	delete(manager.byIdentifier, stopVisit.id)
+	manager.byObjectId.Delete(ModelId(stopVisit.id))
+
 	return true
 }
 

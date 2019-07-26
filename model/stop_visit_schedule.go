@@ -114,6 +114,23 @@ func (schedules *StopVisitSchedules) Merge(newSchedules *StopVisitSchedules) {
 	newSchedules.RUnlock()
 }
 
+func (schedules *StopVisitSchedules) Eq(scs *StopVisitSchedules) bool {
+	schedules.RLock()
+	scs.RLock()
+
+	for k, v := range schedules.byType {
+		if !v.ArrivalTime().Equal(scs.byType[k].ArrivalTime()) || !v.DepartureTime().Equal(scs.byType[k].DepartureTime()) {
+			schedules.RUnlock()
+			scs.RUnlock()
+			return false
+		}
+	}
+
+	schedules.RUnlock()
+	scs.RUnlock()
+	return true
+}
+
 func (schedules *StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType, departureTime time.Time) {
 	schedules.Lock()
 	_, ok := schedules.byType[kind]

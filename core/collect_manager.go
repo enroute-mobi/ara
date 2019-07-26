@@ -127,7 +127,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	}
 	partner := manager.bestPartner(stopArea)
 	if partner == nil {
-		logger.Log.Debugf("Can't find a partner for StopArea %v in Collect Manager", request.StopAreaId())
+		// logger.Log.Debugf("Can't find a partner for StopArea %v in Collect Manager", request.StopAreaId())
 		return
 	}
 	manager.requestStopAreaUpdate(partner, request)
@@ -271,7 +271,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID.Value())
 		return
 	}
-	logger.Log.Debugf("Can't find a partner to request filtered Situations for Line %v", requestedId)
+	// logger.Log.Debugf("Can't find a partner to request filtered Situations for Line %v", requestedId)
 }
 
 func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId string) {
@@ -328,5 +328,5 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaObjectID.Value())
 		return
 	}
-	logger.Log.Debugf("Can't find a partner to request filtered Situations for StopArea %v", requestedId)
+	// logger.Log.Debugf("Can't find a partner to request filtered Situations for StopArea %v", requestedId)
 }

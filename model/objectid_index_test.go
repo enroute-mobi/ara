@@ -10,7 +10,7 @@ func Test_ObjectIDIndex_simple(t *testing.T) {
 	stopVisit.objectids = make(ObjectIDs)
 	stopVisit.SetObjectID(objectid)
 
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(stopVisit)
 
 	foundStopVisit, ok := index.Find(objectid)
 	if !ok {
@@ -29,14 +29,14 @@ func Test_ObjectIDIndex_Multiple(t *testing.T) {
 	stopVisit.objectids = make(ObjectIDs)
 	stopVisit.SetObjectID(objectid)
 
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(stopVisit)
 
 	objectid2 := NewObjectID("kind", "value2")
 	stopVisit2 := &StopVisit{id: "stopVisitId2"}
 	stopVisit2.objectids = make(ObjectIDs)
 	stopVisit2.SetObjectID(objectid2)
 
-	index.Index(ModelId(stopVisit2.Id()), stopVisit2)
+	index.Index(stopVisit2)
 
 	foundStopVisit, ok := index.Find(objectid)
 	if !ok {
@@ -63,11 +63,11 @@ func Test_ObjectIDIndex_Change(t *testing.T) {
 	stopVisit.objectids = make(ObjectIDs)
 	stopVisit.SetObjectID(objectid)
 
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(stopVisit)
 
 	objectid2 := NewObjectID("kind", "value2")
 	stopVisit.SetObjectID(objectid2)
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(stopVisit)
 
 	_, ok := index.Find(objectid)
 	if ok {
@@ -90,7 +90,7 @@ func Test_ObjectIDIndex_Delete(t *testing.T) {
 	stopVisit.objectids = make(ObjectIDs)
 	stopVisit.SetObjectID(objectid)
 
-	index.Index(ModelId(stopVisit.Id()), stopVisit)
+	index.Index(stopVisit)
 	index.Delete("stopVisitId")
 
 	_, ok := index.Find(objectid)
@@ -132,13 +132,13 @@ func benchmarkObjectIDFindWithIndex(sv int, b *testing.B) {
 		objectid := NewObjectID("kind", DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetObjectID(objectid)
 		stopVisit.Save()
-		index.Index(ModelId(stopVisit.Id()), &stopVisit)
+		index.Index(&stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
-	index.Index(ModelId(stopVisit.Id()), &stopVisit)
+	index.Index(&stopVisit)
 
 	var foundStopVisit ModelId
 	for n := 0; n < b.N; n++ {
