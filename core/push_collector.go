@@ -141,8 +141,6 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 		handleSchedules(&event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
 
 		pc.broadcastUpdateEvent(event)
-
-		logger.Log.Printf("Handle SV n°%v", i)
 	}
 }
 
