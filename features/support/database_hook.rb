@@ -1,11 +1,15 @@
 require 'pg'
 
-$database = 'edwig_test'
+Before('@database') do
+  config = YAML.load_file("config/database.yml")["test"]
+  config["dbname"] = config.delete("name")
+  puts config.inspect
+  @connection = PG.connect config
+end
 
 After('@database') do
   # Truncate all tables
-  conn = PG.connect dbname: $database, user: ENV["POSTGRESQL_ENV_POSTGRES_USER"], password: ENV["POSTGRESQL_ENV_POSTGRES_PASSWORD"]
-  conn.exec(
+  @connection.exec(
     "DO $$DECLARE statements CURSOR FOR
       SELECT table_name FROM information_schema.tables
       WHERE table_schema='public' AND table_name NOT IN ('gorp_migrations', 'ar_internal_metadata', 'schema_migrations');
