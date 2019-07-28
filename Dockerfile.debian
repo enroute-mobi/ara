@@ -16,6 +16,7 @@ COPY . /build
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV GOLANG_VERSION=1.12.7
+ENV BUILD_NUMBER=""
 
 VOLUME /target
 CMD ["./build-debian.sh", "/target"]
