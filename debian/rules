@@ -8,9 +8,11 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
+export GOLANG_VERSION=1.12.7
 
 override_dh_auto_configure:
 	cp debian/Makefile .
+	curl -s https://dl.google.com/go/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -xzf - -C /
 
 %:
 	dh $@
