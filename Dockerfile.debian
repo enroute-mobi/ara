@@ -1,8 +1,8 @@
 # docker build -t edwig-build -f Dockerfile.debian .
 # docker run -v $PWD/target:/target edwig-build
 
-ARG DEBIAN_VERSION=jessie
-FROM debian:${DEBIAN_VERSION}-slim
+# ARG DEBIAN_VERSION=jessie
+FROM debian:jessie-slim
 
 ARG WEEK
 
