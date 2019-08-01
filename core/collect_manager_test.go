@@ -6,31 +6,6 @@ import (
 	"github.com/af83/edwig/model"
 )
 
-func Test_CollectManager_BestPartner(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
-
-	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
-	stopArea.Save()
-
-	partners := referential.Partners()
-	collectManager := NewCollectManager(referential)
-	partner := partners.New("partner")
-	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_REQUEST_COLLECTOR}
-	partner.RefreshConnectors()
-	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
-	partner.Settings["collect.include_stop_areas"] = "boarle"
-	partner.Settings["remote_objectid_kind"] = "internal"
-	partners.Save(partner)
-
-	foundPartner := collectManager.(*CollectManager).bestPartner(stopArea)
-
-	if foundPartner != partner {
-		t.Errorf("collectManager.bestPartner should return correct partner:\n got: %v\n want: %v", foundPartner, partner)
-	}
-}
-
 // Already tested by siriStopMonitoringRequestCollectorTest
 // func Test_CollectManager_UpdateStopArea(t *testing.T) {
 // 	referentials := NewMemoryReferentials()

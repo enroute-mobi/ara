@@ -125,25 +125,19 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		logger.Log.Debugf("Can't find StopArea %v in Collect Manager", request.StopAreaId())
 		return
 	}
-	partner := manager.bestPartner(stopArea)
-	if partner == nil {
-		// logger.Log.Debugf("Can't find a partner for StopArea %v in Collect Manager", request.StopAreaId())
-		return
-	}
-	manager.requestStopAreaUpdate(partner, request)
-}
 
-func (manager *CollectManager) bestPartner(stopArea model.StopArea) *Partner {
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		subscriptionCollector := partner.StopMonitoringSubscriptionCollector()
+		requestCollector := partner.StopMonitoringRequestCollector()
+
+		if subscriptionCollector == nil && requestCollector == nil {
 			continue
 		}
-		_, connectorPresent := partner.Connector(SIRI_STOP_MONITORING_REQUEST_COLLECTOR)
-		_, testConnectorPresent := partner.Connector(TEST_STOP_MONITORING_REQUEST_COLLECTOR)
-		_, subscriptionPresent := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR)
 
-		if !(connectorPresent || testConnectorPresent || subscriptionPresent) {
-			continue
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			if b, _ := strconv.ParseBool(partner.Setting("subscriptions.persistent")); !b || subscriptionCollector == nil {
+				continue
+			}
 		}
 
 		partnerKind := partner.Setting("remote_objectid_kind")
@@ -167,20 +161,16 @@ func (manager *CollectManager) bestPartner(stopArea model.StopArea) *Partner {
 		}
 
 		if partner.CanCollect(stopAreaObjectID, lineIds) {
-			return partner
+			logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
+
+			if subscriptionCollector != nil {
+				subscriptionCollector.RequestStopAreaUpdate(request)
+				return
+			}
+			requestCollector.RequestStopAreaUpdate(request)
+			return
 		}
 	}
-	return nil
-}
-
-func (manager *CollectManager) requestStopAreaUpdate(partner *Partner, request *StopAreaUpdateRequest) {
-	logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
-
-	if collect := partner.StopMonitoringSubscriptionCollector(); collect != nil {
-		collect.RequestStopAreaUpdate(request)
-		return
-	}
-	partner.StopMonitoringRequestCollector().RequestStopAreaUpdate(request)
 }
 
 func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
