@@ -78,7 +78,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 				return
 			}
 			if !resource.SubscribedAt.IsZero() {
-				resource.SubscribedUntil = resource.SubscribedUntil.Add(2 * time.Minute)
+				resource.SubscribedUntil = connector.Clock().Now().Add(2 * time.Minute)
 			}
 		}
 		return

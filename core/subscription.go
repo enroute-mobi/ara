@@ -200,7 +200,7 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 
 	resource := SubscribedResource{
 		Reference:        reference,
-		SubscribedUntil:  subscription.Clock().Now().Add(1 * time.Minute),
+		SubscribedUntil:  subscription.Clock().Now().Add(2 * time.Minute),
 		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
 	}
