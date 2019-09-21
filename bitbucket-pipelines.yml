@@ -18,22 +18,24 @@ pipelines:
           - docker build . -t $IMAGE_NAME
           # PUBLISH IMAGE
           - docker push $IMAGE_NAME
-    - step:
-        name: Deploy to production
-        image: google/cloud-sdk:latest
-        caches:
-          - docker
-        deployment: production
-        trigger: manual
-        script:
-          # Tag image in registry with production label
-          - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
-          - export TAGGED_IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:production
-          - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-          - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-          - gcloud config set project $GCLOUD_PROJECT
-          - gcloud auth configure-docker --quiet
-          - docker pull $IMAGE_NAME
-          - docker tag $IMAGE_NAME $TAGGED_IMAGE_NAME
-          - docker push $TAGGED_IMAGE_NAME
-          - ssh $SSH_TARGET bitbucket-deploy $BITBUCKET_REPO_SLUG
+  branches:
+    master:
+      - step:
+          name: Deploy to production
+          image: google/cloud-sdk:latest
+          caches:
+            - docker
+          deployment: production
+          trigger: manual
+          script:
+            # Tag image in registry with production label
+            - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+            - export TAGGED_IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:production
+            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud config set project $GCLOUD_PROJECT
+            - gcloud auth configure-docker --quiet
+            - docker pull $IMAGE_NAME
+            - docker tag $IMAGE_NAME $TAGGED_IMAGE_NAME
+            - docker push $TAGGED_IMAGE_NAME
+            - ssh $SSH_TARGET bitbucket-deploy $BITBUCKET_REPO_SLUG
