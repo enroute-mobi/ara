@@ -4,3 +4,4 @@
 /README.md
 /Makefile
 .DS_Store
+/bitbucket-pipelines.yml
