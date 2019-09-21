@@ -36,3 +36,4 @@ pipelines:
           - docker pull $IMAGE_NAME
           - docker tag $IMAGE_NAME $TAGGED_IMAGE_NAME
           - docker push $TAGGED_IMAGE_NAME
+          - ssh $SSH_TARGET bitbucket-deploy $BITBUCKET_REPO_SLUG
