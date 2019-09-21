@@ -33,4 +33,4 @@ pipelines:
           - gcloud auth configure-docker --quiet
           - docker pull $IMAGE_NAME
           - docker tag $IMAGE_NAME $TAGGED_IMAGE_NAME
-          - docker push $IMAGE_NAME $TAGGED_IMAGE_NAME
+          - docker push $TAGGED_IMAGE_NAME
