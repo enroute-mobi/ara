@@ -60,7 +60,7 @@ func (logger *Logger) Writer() LogWriter {
 			}
 			logger.writer = syslogWriter
 		} else {
-			logger.writer = &StdWriter{Out: os.Stderr}
+			logger.writer = &StdWriter{Out: os.Stdout}
 		}
 	}
 	return logger.writer
