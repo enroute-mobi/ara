@@ -4,22 +4,32 @@ options:
 pipelines:
   default:
     - step:
-        name: Build Docker
-        image: google/cloud-sdk:latest
-        caches:
-          - docker
+        name: Unit tests
+        image: golang:1.11
         script:
-          - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
-          - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-          - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-          - gcloud config set project $GCLOUD_PROJECT
-          - gcloud auth configure-docker --quiet
-          # BUILD IMAGE
-          - docker build . -t $IMAGE_NAME
-          # PUBLISH IMAGE
-          - docker push $IMAGE_NAME
+          - echo TODO
   branches:
     master:
+      - step:
+          name: Unit tests
+          image: golang:1.11
+          script:
+            - echo TODO
+      - step:
+          name: Build Docker
+          image: google/cloud-sdk:latest
+          caches:
+            - docker
+          script:
+            - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud config set project $GCLOUD_PROJECT
+            - gcloud auth configure-docker --quiet
+            # BUILD IMAGE
+            - docker build . -t $IMAGE_NAME
+            # PUBLISH IMAGE
+            - docker push $IMAGE_NAME
       - step:
           name: Deploy to production
           image: google/cloud-sdk:latest
