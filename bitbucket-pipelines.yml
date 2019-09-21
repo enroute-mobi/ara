@@ -21,6 +21,8 @@ pipelines:
     - step:
         name: Deploy to production
         image: google/cloud-sdk:latest
+        caches:
+          - docker
         deployment: production
         trigger: manual
         script:
