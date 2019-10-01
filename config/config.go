@@ -107,7 +107,7 @@ func getConfigDirectory(path string) (string, error) {
 	paths := [3]string{
 		path,
 		os.Getenv("EDWIG_CONFIG"),
-		fmt.Sprintf("%s/src/github.com/af83/edwig/config", os.Getenv("GOPATH")),
+		fmt.Sprintf("%s/src/bitbucket.org/enroute-mobi/ara/config", os.Getenv("GOPATH")),
 	}
 	for _, directoryPath := range paths {
 		if found := checkDirectory(directoryPath); found {
