@@ -537,7 +537,7 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	partnerStatus := PartnerStatus{}
 
 	if partner.CheckStatusClient() == nil {
-		logger.Log.Debugf("No CheckStatusClient connector")
+		logger.Log.Debugf("No CheckStatusClient connector for partner %v", partner.slug)
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 		return partnerStatus, errors.New("no CheckStatusClient connector")
 	}
