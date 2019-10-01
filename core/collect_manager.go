@@ -135,7 +135,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		}
 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if b, _ := strconv.ParseBool(partner.Setting("subscriptions.persistent")); !b || subscriptionCollector == nil {
+			if b, _ := strconv.ParseBool(partner.Setting("collect.subscriptions.persistent")); !b || subscriptionCollector == nil {
 				continue
 			}
 		}
