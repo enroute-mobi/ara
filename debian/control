@@ -1,10 +1,10 @@
 Source: edwig
 Section: misc
 Priority: extra
-Maintainer: af83 devs <devs+debian@af83.com>
+Maintainer: enRoute team <team@enroute.mobi>
 Build-Depends: debhelper (>= 8.0.0), git-core, build-essential, curl, ca-certificates, pkg-config, libxml2-dev
 Standards-Version: 3.9.4
-Homepage: http://af83.com
+Homepage: http://enroute.mobi
 
 Package: edwig
 Architecture: any
