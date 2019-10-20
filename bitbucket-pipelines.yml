@@ -31,6 +31,22 @@ pipelines:
             # PUBLISH IMAGE
             - docker push $IMAGE_NAME
       - step:
+          name: Build Debian package
+          caches:
+            - docker
+          script:
+            - export IMAGE_NAME=$BITBUCKET_REPO_SLUG-$BITBUCKET_BRANCH-debian-build
+            - docker build -f Dockerfile.debian -t $IMAGE_NAME .
+            - docker run -v $PWD/target:/target -e BUILD_NUMBER=${BITBUCKET_BUILD_NUMBER} $IMAGE_NAME
+      - step:
+          name: Deploy to staging
+          deployment: staging
+          trigger: manual
+          script:
+            - export PACKAGE_FILE=`ls -1 target/*.deb`
+            - echo "Publish package $PACKAGE_FILE on Gemfury"
+            - curl -F package=@$PACKAGE_FILE https://$GEMFURY_TOKEN@push.fury.io/enroute/
+      - step:
           name: Deploy to production
           image: google/cloud-sdk:latest
           caches:
