@@ -31,6 +31,12 @@ pipelines:
             # PUBLISH IMAGE
             - docker push $IMAGE_NAME
       - step:
+          name: Deploy to staging
+          deployment: staging
+          trigger: manual
+          script:
+            - echo TODO
+      - step:
           name: Build Debian package
           caches:
             - docker
@@ -38,9 +44,11 @@ pipelines:
             - export IMAGE_NAME=$BITBUCKET_REPO_SLUG-$BITBUCKET_BRANCH-debian-build
             - docker build -f Dockerfile.debian -t $IMAGE_NAME .
             - docker run -v $PWD/target:/target -e BUILD_NUMBER=${BITBUCKET_BUILD_NUMBER} $IMAGE_NAME
+          artifacts:
+            - target/*.deb
       - step:
-          name: Deploy to staging
-          deployment: staging
+          name: Publish Debian package
+          deployment: gemfury
           trigger: manual
           script:
             - export PACKAGE_FILE=`ls -1 target/*.deb`
