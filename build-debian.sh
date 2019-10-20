@@ -5,7 +5,7 @@ set -e
 TARGET_DIR=${1:-target}
 
 if [ -z "$BUILD_BRANCH" -o "$BUILD_BRANCH" == "master" ]; then
-  deploy_env="dev"
+  deploy_env="build"
 else
   deploy_env=$BUILD_BRANCH
 fi
