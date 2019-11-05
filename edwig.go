@@ -164,7 +164,7 @@ func main() {
 
 		if loadFlags.NArg() < 2 {
 			logger.Log.Printf("Incorrect use of command load: not enough aguments")
-			logger.Log.Printf("usage: edwig load [-force] <path>")
+			logger.Log.Printf("usage: edwig load [-force] <path> <referential slug>")
 			os.Exit(2)
 		}
 
@@ -244,7 +244,6 @@ func enableCpuProfile(file string) error {
 		return err
 	}
 	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -252,6 +251,7 @@ func enableCpuProfile(file string) error {
 		for sig := range c {
 			logger.Log.Debugf("Receive interrupt signal: %v", sig)
 			pprof.StopCPUProfile()
+			f.Close()
 			os.Exit(0)
 		}
 	}()
