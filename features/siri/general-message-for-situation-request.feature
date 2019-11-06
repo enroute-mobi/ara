@@ -374,6 +374,7 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
 
+  @wip
   Scenario: Manage a Request without filter
     Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
     """
