@@ -1,20 +1,21 @@
 package model
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/af83/edwig/config"
 	"github.com/af83/edwig/logger"
 )
 
 /* CSV Structure
 
-operator,Id,ReferentialSlug,ModelName,Name,ObjectIDs
+operator,Id,ModelName,Name,ObjectIDs
 stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References
@@ -38,6 +39,14 @@ type Loader struct {
 	referentialSlug string
 	force           bool
 	deletedModels   map[string]map[string]struct{}
+	operators       []byte
+	stopAreas       []byte
+	lines           []byte
+	vehicleJourneys []byte
+	stopVisits      []byte
+	bulkCounter     map[string]int
+	insertedCount   map[string]int64
+	errors          int
 }
 
 func LoadFromCSV(filePath string, referentialSlug string, force bool) error {
@@ -54,30 +63,27 @@ func newLoader(filePath string, referentialSlug string, force bool) *Loader {
 		referentialSlug: referentialSlug,
 		force:           force,
 		deletedModels:   d,
+		bulkCounter:     make(map[string]int),
+		insertedCount:   make(map[string]int64),
 	}
 }
 
 func (loader Loader) load() error {
-	prepareDatabase()
-	var errors int
-
 	file, err := os.Open(loader.filePath)
 	if err != nil {
 		return fmt.Errorf("loader error: error while opening file: %v", err)
 	}
 	defer file.Close()
 
+	// Config CSV reader
 	reader := csv.NewReader(file)
 	reader.Comment = '#'
 	reader.FieldsPerRecord = -1
 	reader.LazyQuotes = true
 	reader.TrimLeadingSpace = true
 
-	importedStopAreas := 0
-	importedLines := 0
-	importedVehicleJourneys := 0
-	importedStopVisits := 0
-	importedOperators := 0
+	startTime := time.Now()
+	logger.Log.Debugf("Load operation started at %v", startTime)
 
 	var i int
 	for {
@@ -89,119 +95,157 @@ func (loader Loader) load() error {
 		if err != nil {
 			logger.Log.Debugf("Error while reading: %v", err)
 			fmt.Printf("Error while reading: %v\n", err)
-			errors++
+			loader.errors++
 			continue
 		}
 
 		switch record[0] {
+		case OPERATOR:
+			err := loader.handleOperator(record)
+			if err != nil {
+				logger.Log.Debugf("Error on line %d: %v", i, err)
+				fmt.Printf("Error on line %d: %v\n", i, err)
+				loader.errors++
+			}
 		case STOP_AREA:
 			err := loader.handleStopArea(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Printf("Error on line %d: %v\n", i, err)
-				errors++
-			} else {
-				importedStopAreas++
+				loader.errors++
 			}
 		case LINE:
 			err := loader.handleLine(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Printf("Error on line %d: %v\n", i, err)
-				errors++
-			} else {
-				importedLines++
+				loader.errors++
 			}
 		case VEHICLE_JOURNEY:
 			err := loader.handleVehicleJourney(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Printf("Error on line %d: %v\n", i, err)
-				errors++
-			} else {
-				importedVehicleJourneys++
+				loader.errors++
 			}
 		case STOP_VISIT:
 			err := loader.handleStopVisit(record)
 			if err != nil {
 				logger.Log.Debugf("Error on line %d: %v", i, err)
 				fmt.Printf("Error on line %d: %v\n", i, err)
-				errors++
-			} else {
-				importedStopVisits++
-			}
-		case OPERATOR:
-			err := loader.handleOperator(record)
-			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				errors++
-			} else {
-				importedOperators++
+				loader.errors++
 			}
 		default:
 			logger.Log.Debugf("Unknown record type: %v", record[0])
 			fmt.Printf("Unknown record type: %v\n", record[0])
-			errors++
+			loader.errors++
 			continue
 		}
 	}
 
-	if (importedStopAreas + importedLines + importedVehicleJourneys + importedStopVisits + importedOperators) == 0 {
-		if errors == 0 {
+	loader.insertOperators()
+	loader.insertStopAreas()
+	loader.insertLines()
+	loader.insertVehicleJourneys()
+	loader.insertStopVisits()
+
+	logger.Log.Debugf("Load operation done in %v", time.Since(startTime))
+
+	if (loader.insertedCount[OPERATOR] + loader.insertedCount[STOP_AREA] + loader.insertedCount[LINE] + loader.insertedCount[VEHICLE_JOURNEY] + loader.insertedCount[STOP_VISIT]) == 0 {
+		if loader.errors == 0 {
 			return fmt.Errorf("loader error: empty file")
 		}
-		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", errors)
+		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", loader.errors)
 	}
 
-	logger.Log.Debugf("Import successful, import raised %v errors", errors)
-	logger.Log.Debugf("  %v StopAreas", importedStopAreas)
-	logger.Log.Debugf("  %v Lines", importedLines)
-	logger.Log.Debugf("  %v VehicleJourneys", importedVehicleJourneys)
-	logger.Log.Debugf("  %v StopVisits", importedStopVisits)
-	logger.Log.Debugf("  %v Operators", importedOperators)
+	logger.Log.Debugf("Import successful, import raised %v errors", loader.errors)
+	logger.Log.Debugf("  %v Operators", loader.insertedCount[OPERATOR])
+	logger.Log.Debugf("  %v StopAreas", loader.insertedCount[STOP_AREA])
+	logger.Log.Debugf("  %v Lines", loader.insertedCount[LINE])
+	logger.Log.Debugf("  %v VehicleJourneys", loader.insertedCount[VEHICLE_JOURNEY])
+	logger.Log.Debugf("  %v StopVisits", loader.insertedCount[STOP_VISIT])
 
-	fmt.Printf("Import successful, import raised %v errors\n", errors)
-	fmt.Printf("  %v StopAreas\n", importedStopAreas)
-	fmt.Printf("  %v Lines\n", importedLines)
-	fmt.Printf("  %v VehicleJourneys\n", importedVehicleJourneys)
-	fmt.Printf("  %v StopVisits\n", importedStopVisits)
-	fmt.Printf("  %v Operators\n", importedOperators)
+	fmt.Printf("Import successful, import raised %v errors\n", loader.errors)
+	fmt.Printf("  %v Operators\n", loader.insertedCount[OPERATOR])
+	fmt.Printf("  %v StopAreas\n", loader.insertedCount[STOP_AREA])
+	fmt.Printf("  %v Lines\n", loader.insertedCount[LINE])
+	fmt.Printf("  %v VehicleJourneys\n", loader.insertedCount[VEHICLE_JOURNEY])
+	fmt.Printf("  %v StopVisits\n", loader.insertedCount[STOP_VISIT])
 
 	return nil
 }
 
-func prepareDatabase() {
-	Database.AddTableWithName(DatabaseStopArea{}, "stop_areas")
-	Database.AddTableWithName(DatabaseLine{}, "lines")
-	Database.AddTableWithName(DatabaseVehicleJourney{}, "vehicle_journeys")
-	Database.AddTableWithName(DatabaseStopVisit{}, "stop_visits")
-	Database.AddTableWithName(DatabaseOperator{}, "operators")
+func (loader *Loader) handleForce(klass, modelName string) error {
+	if loader.force {
+		if _, ok := loader.deletedModels[klass][modelName]; !ok {
+			loader.deletedModels[klass][modelName] = struct{}{}
+			query := fmt.Sprintf("delete from %vs where model_name='%v'", klass, modelName)
+			_, err := Database.Exec(query)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
-func (loader Loader) handleStopArea(record []string) error {
+func (loader *Loader) handleOperator(record []string) error {
+	if len(record) != 5 {
+		return fmt.Errorf("wrong number of entries, expected 5 got %v", len(record))
+	}
+
+	err := loader.handleForce(OPERATOR, record[2])
+	if err != nil {
+		return err
+	}
+
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),", loader.referentialSlug, record[1], record[2], record[3], record[4])
+	loader.operators = append(loader.operators, values...)
+	loader.bulkCounter[OPERATOR]++
+
+	if loader.bulkCounter[OPERATOR] >= config.Config.LoadMaxInsert {
+		loader.insertOperators()
+	}
+
+	return nil
+}
+
+func (loader *Loader) insertOperators() {
+	if len(loader.operators) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.operators = []byte{}
+		loader.bulkCounter[OPERATOR] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_name,name,object_ids) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		logger.Log.Debugf("Error while inserting operators: %v", err)
+		fmt.Printf("Error while inserting operators: %v", err)
+		loader.errors++
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		logger.Log.Debugf("Unexpected error while inserting operators: %v", err)
+		fmt.Printf("Unexpected error while inserting operators: %v", err)
+		loader.errors++
+		return
+	}
+
+	loader.insertedCount[OPERATOR] += rows
+}
+
+func (loader *Loader) handleStopArea(record []string) error {
 	if len(record) != 13 {
 		return fmt.Errorf("wrong number of entries, expected 13 got %v", len(record))
 	}
 
 	var err error
 	parseErrors := make(map[string]string)
-
-	var parent sql.NullString
-	if record[2] != "" {
-		parent = sql.NullString{
-			String: record[2],
-			Valid:  true,
-		}
-	}
-
-	var referent sql.NullString
-	if record[3] != "" {
-		referent = sql.NullString{
-			String: record[3],
-			Valid:  true,
-		}
-	}
 
 	var collectedAlways bool
 	if record[10] != "" {
@@ -232,74 +276,81 @@ func (loader Loader) handleStopArea(record []string) error {
 		return fmt.Errorf(string(json))
 	}
 
-	stopArea := DatabaseStopArea{
-		Id:                     record[1],
-		ReferentialSlug:        loader.referentialSlug,
-		ParentId:               parent,
-		ReferentId:             referent,
-		ModelName:              record[4],
-		Name:                   record[5],
-		ObjectIDs:              record[6],
-		LineIds:                record[7],
-		Attributes:             record[8],
-		References:             record[9],
-		CollectedAlways:        collectedAlways,
-		CollectChildren:        collectChildren,
-		CollectGeneralMessages: collectGeneralMessages,
-	}
-
-	if loader.force {
-		if _, ok := loader.deletedModels[STOP_AREA][stopArea.ModelName]; !ok {
-			loader.deletedModels[STOP_AREA][stopArea.ModelName] = struct{}{}
-			query := fmt.Sprintf("delete from stop_areas where model_name='%v'", stopArea.ModelName)
-			_, err := Database.Exec(query)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err = Database.Insert(&stopArea)
+	err = loader.handleForce(STOP_AREA, record[4])
 	if err != nil {
 		return err
+	}
+
+	var parent string
+	if record[2] != "" {
+		parent = fmt.Sprintf("$$%v$$", record[2])
+	} else {
+		parent = "null"
+	}
+
+	var referent string
+	if record[3] != "" {
+		referent = fmt.Sprintf("$$%v$$", record[3])
+	} else {
+		referent = "null"
+	}
+
+	values := fmt.Sprintf("($$%v$$, $$%v$$, %v, %v, $$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$, %v, %v, %v),",
+		loader.referentialSlug,
+		record[1],
+		parent,
+		referent,
+		record[4],
+		record[5],
+		record[6],
+		record[7],
+		record[8],
+		record[9],
+		collectedAlways,
+		collectChildren,
+		collectGeneralMessages,
+	)
+	loader.stopAreas = append(loader.stopAreas, values...)
+	loader.bulkCounter[STOP_AREA]++
+
+	if loader.bulkCounter[STOP_AREA] >= config.Config.LoadMaxInsert {
+		loader.insertStopAreas()
 	}
 
 	return nil
 }
 
-func (loader Loader) handleOperator(record []string) error {
-	if len(record) != 5 {
-		return fmt.Errorf("wrong number of entries, expected 5 got %v", len(record))
+func (loader *Loader) insertStopAreas() {
+	if len(loader.stopAreas) == 0 {
+		return
 	}
 
-	operator := DatabaseOperator{
-		Id:              record[1],
-		ReferentialSlug: loader.referentialSlug,
-		ModelName:       record[2],
-		Name:            record[3],
-		ObjectIDs:       record[4],
-	}
+	defer func() {
+		loader.stopAreas = []byte{}
+		loader.bulkCounter[STOP_AREA] = 0
+	}()
 
-	if loader.force {
-		if _, ok := loader.deletedModels[OPERATOR][operator.ModelName]; !ok {
-			loader.deletedModels[OPERATOR][operator.ModelName] = struct{}{}
-			query := fmt.Sprintf("delete from operators where model_name='%v'", operator.ModelName)
-			_, err := Database.Exec(query)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err := Database.Insert(&operator)
+	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, object_ids, line_ids, attributes, siri_references, collected_always, collect_children, collect_general_messages) VALUES %v;",
+		string(loader.stopAreas[:len(loader.stopAreas)-1]))
+	result, err := Database.Exec(query)
 	if err != nil {
-		return err
+		logger.Log.Debugf("Error while inserting stopAreas: %v", err)
+		fmt.Printf("Error while inserting stopAreas: %v", err)
+		loader.errors++
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		logger.Log.Debugf("Unexpected error while inserting stopAreas: %v", err)
+		fmt.Printf("Unexpected error while inserting stopAreas: %v", err)
+		loader.errors++
+		return
 	}
 
-	return nil
+	loader.insertedCount[STOP_AREA] += rows
 }
 
-func (loader Loader) handleLine(record []string) error {
+func (loader *Loader) handleLine(record []string) error {
 	if len(record) != 8 {
 		return fmt.Errorf("wrong number of entries, expected 8 got %v", len(record))
 	}
@@ -320,74 +371,122 @@ func (loader Loader) handleLine(record []string) error {
 		return fmt.Errorf(string(json))
 	}
 
-	line := DatabaseLine{
-		Id:                     record[1],
-		ReferentialSlug:        loader.referentialSlug,
-		ModelName:              record[2],
-		Name:                   record[3],
-		ObjectIDs:              record[4],
-		Attributes:             record[5],
-		References:             record[6],
-		CollectGeneralMessages: collectGeneralMessages,
-	}
-
-	if loader.force {
-		if _, ok := loader.deletedModels[LINE][line.ModelName]; !ok {
-			loader.deletedModels[LINE][line.ModelName] = struct{}{}
-			query := fmt.Sprintf("delete from lines where model_name='%v'", line.ModelName)
-			_, err := Database.Exec(query)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err = Database.Insert(&line)
+	err = loader.handleForce(LINE, record[2])
 	if err != nil {
 		return err
+	}
+
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v),",
+		loader.referentialSlug,
+		record[1],
+		record[2],
+		record[3],
+		record[4],
+		record[5],
+		record[6],
+		collectGeneralMessages,
+	)
+	loader.lines = append(loader.lines, values...)
+	loader.bulkCounter[LINE]++
+
+	if loader.bulkCounter[LINE] >= config.Config.LoadMaxInsert {
+		loader.insertLines()
 	}
 
 	return nil
 }
 
-func (loader Loader) handleVehicleJourney(record []string) error {
+func (loader *Loader) insertLines() {
+	if len(loader.lines) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.lines = []byte{}
+		loader.bulkCounter[LINE] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_general_messages) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		logger.Log.Debugf("Error while inserting lines: %v", err)
+		fmt.Printf("Error while inserting lines: %v", err)
+		loader.errors++
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		logger.Log.Debugf("Unexpected error while inserting lines: %v", err)
+		fmt.Printf("Unexpected error while inserting lines: %v", err)
+		loader.errors++
+		return
+	}
+
+	loader.insertedCount[LINE] += rows
+}
+
+func (loader *Loader) handleVehicleJourney(record []string) error {
 	if len(record) != 10 {
 		return fmt.Errorf("wrong number of entries, expected 10 got %v", len(record))
 	}
 
-	vehicleJourney := DatabaseVehicleJourney{
-		Id:              record[1],
-		ReferentialSlug: loader.referentialSlug,
-		ModelName:       record[2],
-		Name:            record[3],
-		ObjectIDs:       record[4],
-		LineId:          record[5],
-		OriginName:      record[6],
-		DestinationName: record[7],
-		Attributes:      record[8],
-		References:      record[9],
-	}
-
-	if loader.force {
-		if _, ok := loader.deletedModels[VEHICLE_JOURNEY][vehicleJourney.ModelName]; !ok {
-			loader.deletedModels[VEHICLE_JOURNEY][vehicleJourney.ModelName] = struct{}{}
-			query := fmt.Sprintf("delete from vehicle_journeys where model_name='%v'", vehicleJourney.ModelName)
-			_, err := Database.Exec(query)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err := Database.Insert(&vehicleJourney)
+	err := loader.handleForce(VEHICLE_JOURNEY, record[2])
 	if err != nil {
 		return err
+	}
+
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
+		loader.referentialSlug,
+		record[1],
+		record[2],
+		record[3],
+		record[4],
+		record[5],
+		record[6],
+		record[7],
+		record[8],
+		record[9],
+	)
+	loader.vehicleJourneys = append(loader.vehicleJourneys, values...)
+	loader.bulkCounter[VEHICLE_JOURNEY]++
+
+	if loader.bulkCounter[VEHICLE_JOURNEY] >= config.Config.LoadMaxInsert {
+		loader.insertVehicleJourneys()
 	}
 
 	return nil
 }
 
-func (loader Loader) handleStopVisit(record []string) error {
+func (loader *Loader) insertVehicleJourneys() {
+	if len(loader.vehicleJourneys) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.vehicleJourneys = []byte{}
+		loader.bulkCounter[VEHICLE_JOURNEY] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,object_ids,line_id,origin_name,destination_name,attributes,siri_references) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		logger.Log.Debugf("Error while inserting vehicleJourneys: %v", err)
+		fmt.Printf("Error while inserting vehicleJourneys: %v", err)
+		loader.errors++
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		logger.Log.Debugf("Unexpected error while inserting vehicleJourneys: %v", err)
+		fmt.Printf("Unexpected error while inserting vehicleJourneys: %v", err)
+		loader.errors++
+		return
+	}
+
+	loader.insertedCount[VEHICLE_JOURNEY] += rows
+}
+
+func (loader *Loader) handleStopVisit(record []string) error {
 	if len(record) != 10 {
 		return fmt.Errorf("wrong number of entries, expected 10 got %v", len(record))
 	}
@@ -408,34 +507,58 @@ func (loader Loader) handleStopVisit(record []string) error {
 		return fmt.Errorf(string(json))
 	}
 
-	stopVisit := DatabaseStopVisit{
-		Id:               record[1],
-		ReferentialSlug:  loader.referentialSlug,
-		ModelName:        record[2],
-		ObjectIDs:        record[3],
-		StopAreaId:       record[4],
-		VehicleJourneyId: record[5],
-		PassageOrder:     passageOrder,
-		Schedules:        record[7],
-		Attributes:       record[8],
-		References:       record[9],
-	}
-
-	if loader.force {
-		if _, ok := loader.deletedModels[STOP_VISIT][stopVisit.ModelName]; !ok {
-			loader.deletedModels[STOP_VISIT][stopVisit.ModelName] = struct{}{}
-			query := fmt.Sprintf("delete from stop_visits where model_name='%v'", stopVisit.ModelName)
-			_, err := Database.Exec(query)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	err = Database.Insert(&stopVisit)
+	err = loader.handleForce(STOP_VISIT, record[2])
 	if err != nil {
 		return err
 	}
 
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
+		loader.referentialSlug,
+		record[1],
+		record[2],
+		record[3],
+		record[4],
+		record[5],
+		passageOrder,
+		record[7],
+		record[8],
+		record[9],
+	)
+	loader.stopVisits = append(loader.stopVisits, values...)
+	loader.bulkCounter[STOP_VISIT]++
+
+	if loader.bulkCounter[STOP_VISIT] >= config.Config.LoadMaxInsert {
+		loader.insertStopVisits()
+	}
+
 	return nil
+}
+
+func (loader *Loader) insertStopVisits() {
+	if len(loader.stopVisits) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.stopVisits = []byte{}
+		loader.bulkCounter[STOP_VISIT] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_name,object_ids,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		logger.Log.Debugf("Error while inserting stopVisits: %v", err)
+		fmt.Printf("Error while inserting stopVisits: %v", err)
+		loader.errors++
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		logger.Log.Debugf("Unexpected error while inserting stopVisits: %v", err)
+		fmt.Printf("Unexpected error while inserting stopVisits: %v", err)
+		loader.errors++
+		return
+	}
+
+	loader.insertedCount[STOP_VISIT] += rows
 }

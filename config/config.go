@@ -22,15 +22,16 @@ type DatabaseConfig struct {
 var Config = struct {
 	DB DatabaseConfig
 
-	ApiKey   string
-	Debug    bool
-	LogStash string
-	Syslog   bool
+	ApiKey        string
+	Debug         bool
+	LogStash      string
+	Syslog        bool
+	LoadMaxInsert int
 }{}
 
 func LoadConfig(path string) error {
 	// Default values
-	// ...
+	Config.LoadMaxInsert = 100000
 
 	env := Environment()
 	logger.Log.Debugf("Loading %s configuration", env)
