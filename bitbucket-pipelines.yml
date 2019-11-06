@@ -1,24 +1,57 @@
-options:
-  docker: true
-
-pipelines:
-  default:
-    - step:
+definitions:
+  services:
+    postgres:
+      image: postgres:9.6
+      environment:
+        POSTGRES_DB: ara
+        POSTGRES_USER: ara
+        POSTGRES_PASSWORD: ara
+  steps:
+    - step: &unit-tests
         name: Unit tests
         image: golang:1.11
         script:
-          - echo TODO
+          - export TZ=Europe/Paris LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+          - apt-get update
+          - mkdir -p /usr/share/man/man1 /usr/share/man/man7
+          - export PACKAGES="build-essential ruby-dev libpq-dev libxml2-dev zlib1g-dev git-core postgresql-client-common"
+          - export BUNDLER_VERSION="2.0.1"
+          - apt-get -y install --no-install-recommends locales $PACKAGES
+          - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+          - gem install bundler:$BUNDLER_VERSION
+
+          # FIXME
+          - export BASE_PATH="${GOPATH}/src/github.com/af83"
+          - mkdir -p ${BASE_PATH}
+          - export IMPORT_PATH="${BASE_PATH}/edwig"
+          - ln -s ${PWD} ${IMPORT_PATH}
+          - cd ${IMPORT_PATH}
+
+          - export GO111MODULE="on"
+          - go get -d -v ./...
+
+          - bundle install --jobs 4 --deployment
+
+          - export EDWIG_DB_NAME=ara EDWIG_DB_USER=ara EDWIG_DB_PASSWORD=ara EDWIG_DB_HOST=localhost
+          - export EDWIG_CONFIG=$PWD/config
+          - ./ci.sh
+        services:
+          - postgres
+
+pipelines:
+  default:
+    - step: *unit-tests
+
   branches:
     master:
-      - step:
-          name: Unit tests
-          image: golang:1.11
-          script:
-            - echo TODO
+      - step: *unit-tests
       - step:
           name: Build Docker
           image: google/cloud-sdk:latest
           caches:
+            - docker
+          services:
             - docker
           script:
             - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
@@ -40,6 +73,8 @@ pipelines:
           name: Build Debian package
           caches:
             - docker
+          services:
+            - docker
           script:
             - export IMAGE_NAME=$BITBUCKET_REPO_SLUG-$BITBUCKET_BRANCH-debian-build
             - docker build -f Dockerfile.debian -t $IMAGE_NAME .
@@ -58,6 +93,8 @@ pipelines:
           name: Deploy to production
           image: google/cloud-sdk:latest
           caches:
+            - docker
+          services:
             - docker
           deployment: production
           trigger: manual
