@@ -17,8 +17,6 @@ cd $source_dir
 
 go install -v ./...
 
-PGHOST=${EDWIG_DB_HOST:-localhost} PGUSER=${EDWIG_DB_USER:-jenkins} PGPASSWORD=${EDWIG_DB_PASSWORD} createdb $EDWIG_DB_NAME
-
 export EDWIG_ENV=test
 $GOPATH/bin/edwig migrate up
 
