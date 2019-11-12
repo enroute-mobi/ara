@@ -1,6 +1,4 @@
-[![Edwig logo](https://github.com/af83/edwig/wiki/images/edwig_logo.png)](https://enroute.mobi/produits/edwig/)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability)](https://codeclimate.com/github/af83/edwig/maintainability)
+[![Logo Ara](https://bitbucket.org/repo/d6Abpo8/images/925946015-Logo%20Ara.png)](https://enroute.mobi/produits/ara/)
 
 ## An innovative and modular solution
 
@@ -33,7 +31,7 @@ In broadcast only:
 
 ## Real-time logging
 
-Outsource, process and store in real time all exchanges managed by Edwig :
+Outsource, process and store in real time all exchanges managed by Ara :
 
 * Send real time exchange data to LogStash processing
 * High performance storage for consultation and statistics via ElasticSearch
@@ -45,9 +43,9 @@ Some technical articles are available [on the wiki](../../wiki) too.
 
 Related projects :
 
-* [Documentation](https://github.com/af83/edwig-docs)
-* [Administration interface](https://github.com/af83/edwig-admin)
-* [Ruby SDK](https://github.com/af83/edwig)
+* [Administration interface](https://bitbucket.org/enroute-mobi/ara-admin)
+* [Ruby SDK](https://bitbucket.org/enroute-mobi/ara-ruby)
+* [Models for Protocol Buffers exchange with Ara](https://bitbucket.org/enroute-mobi/ara-external-models)
 
 ## License
 
@@ -55,4 +53,4 @@ This project is licensed under the Apache2 license, a copy of which can be found
 
 ## Support
 
-Contact [af83 Edwig team](mailto:edwig-dev@af83.com) to know how to contribute to the Edwig project
+Contact [enRoute Ara team](mailto:contact@enroute.mobi) to know how to contribute to the Ara project
