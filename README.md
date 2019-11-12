@@ -2,6 +2,10 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/bdf4ce25da411be47722/maintainability)](https://codeclimate.com/github/af83/edwig/maintainability)
 
+## :warning: Project changes
+
+Edwig changed name to Ara, and is now located here: https://bitbucket.org/enroute-mobi/ara
+
 ## An innovative and modular solution
 
 * Modular architecture organized in Collection, Model & Broadcast
