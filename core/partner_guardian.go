@@ -70,7 +70,13 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP)
 	}
 
-	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN || partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
+	if partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
+		partner.PartnerStatus = partnerStatus
+		partner.Subscriptions().CancelSubscriptions()
+		return false
+	}
+
+	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN {
 		partner.PartnerStatus = partnerStatus
 
 		if b, _ := strconv.ParseBool(partner.Setting("collect.subscriptions.persistent")); !b {
