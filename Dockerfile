@@ -14,7 +14,7 @@ ENV GO111MODULE=on
 RUN go get -d -v ./...
 RUN go install -v ./...
 
-FROM debian:latest
+FROM debian:buster
 
 ENV RUN_PACKAGES="libxml2"
 
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --no-install
 
 WORKDIR /app
 COPY --from=builder /go/bin/edwig ./
-ADD docker-entrypoint.sh ./
+COPY docker-entrypoint.sh ./
 COPY db/migrations ./db/migrations
 RUN chmod +x ./edwig ./docker-entrypoint.sh && mkdir ./config
 
