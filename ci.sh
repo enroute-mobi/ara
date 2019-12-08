@@ -2,9 +2,9 @@
 
 set -ex
 
-source_dir=`dirname $0`
+source_dir=$(dirname "$0")
 
-cat > $source_dir/config/database.yml <<EOF
+cat > "$source_dir/config/database.yml" <<EOF
 test:
   name: ${EDWIG_DB_NAME:-edwig_test}
   user: ${EDWIG_DB_USER:-jenkins}
@@ -18,7 +18,7 @@ cd $source_dir
 go install -v ./...
 
 export EDWIG_ENV=test
-$GOPATH/bin/edwig migrate up
+"$GOPATH/bin/edwig" migrate up
 
 go get github.com/schrej/godacov
 
@@ -28,11 +28,8 @@ if [ -n "$CODACY_PROJECT_TOKEN" ]; then
     $GOPATH/bin/godacov -t "$CODACY_PROJECT_TOKEN" -r ./coverage.out -c "$BITBUCKET_COMMIT"
 fi
 
-tmp_dir=$GOPATH/tmp
-
-cd $source_dir
+cd "$source_dir"
 # $bundle exec license_finder
 bundle exec bundle-audit check --update
 
-mkdir -p $tmp_dir/cucumber
-bundle exec cucumber --tags "~@wip" --format json --out $tmp_dir/cucumber/cucumber.json --format html --out $tmp_dir/cucumber/index.html --format pretty --no-color
+bundle exec cucumber --tags "~@wip" --format pretty --no-color
