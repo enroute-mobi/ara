@@ -21,6 +21,7 @@ type Server struct {
 
 	bind        string
 	startedTime time.Time
+	apiKey      string
 }
 
 type RequestData struct {
@@ -50,6 +51,8 @@ func NewRequestDataFromContent(params []string) *RequestData {
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
+
+	server.apiKey = config.Config.ApiKey
 
 	return &server
 }
@@ -108,7 +111,7 @@ func (server *Server) getToken(r *http.Request) string {
 }
 
 func (server *Server) isAdmin(r *http.Request) bool {
-	return server.getToken(r) == config.Config.ApiKey
+	return server.getToken(r) == server.apiKey
 }
 
 func (server *Server) isAuth(referential *core.Referential, request *http.Request) bool {
@@ -132,7 +135,7 @@ func (server *Server) handleRoutes(response http.ResponseWriter, request *http.R
 	} else if requestData.Resource == "push" {
 		server.handlePush(response, request, requestData)
 	} else if strings.HasPrefix(requestData.Referential, "_") {
-		if !server.isAdmin(request) {
+		if requestData.Referential != "_status" && !server.isAdmin(request) {
 			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%v", request)
 			return

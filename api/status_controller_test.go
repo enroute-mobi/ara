@@ -15,33 +15,34 @@ func statusCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *t
 	}
 }
 
-func statusPrepareRequest(method string, t *testing.T) (responseRecorder *httptest.ResponseRecorder) {
-	server := &Server{}
-	request, err := http.NewRequest(method, "/_status", nil)
+func statusPrepareRequest(method string, t *testing.T) (server *Server, request *http.Request, responseRecorder *httptest.ResponseRecorder) {
+	server = &Server{}
+	var err error
+	request, err = http.NewRequest(method, "/_status", nil)
 	if err != nil {
 		t.Fatal(err)
-
 	}
 
 	responseRecorder = httptest.NewRecorder()
-
-	server.HandleFlow(responseRecorder, request)
-
 	return
 }
 
 func Test_status_check(t *testing.T) {
-
-	responseRecorder := statusPrepareRequest("GET", t)
-
+	server, request, responseRecorder := statusPrepareRequest("GET", t)
+	server.HandleFlow(responseRecorder, request)
 	statusCheckResponseStatus(responseRecorder, t)
+}
 
+func Test_status_check_withApiKey(t *testing.T) {
+	server, request, responseRecorder := statusPrepareRequest("GET", t)
+	server.apiKey = "dummy"
+	server.HandleFlow(responseRecorder, request)
+	statusCheckResponseStatus(responseRecorder, t)
 }
 
 func Test_status_check_version(t *testing.T) {
-
-	responseRecorder := statusPrepareRequest("GET", t)
-
+	server, request, responseRecorder := statusPrepareRequest("GET", t)
+	server.HandleFlow(responseRecorder, request)
 	statusCheckResponseStatus(responseRecorder, t)
 
 	status := &Status{}
