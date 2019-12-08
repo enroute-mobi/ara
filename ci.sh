@@ -20,7 +20,13 @@ go install -v ./...
 export EDWIG_ENV=test
 $GOPATH/bin/edwig migrate up
 
-go test -p 1 ./...
+go get github.com/schrej/godacov
+
+go test -coverprofile=coverage.out -p 1 ./...
+
+if [ -n "$CODACY_PROJECT_TOKEN" ]; then
+    $GOPATH/bin/godacov -t "$CODACY_PROJECT_TOKEN" -r ./coverage.out -c "$BITBUCKET_COMMIT"
+fi
 
 tmp_dir=$GOPATH/tmp
 
