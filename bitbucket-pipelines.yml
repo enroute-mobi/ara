@@ -54,15 +54,21 @@ pipelines:
           services:
             - docker
           script:
-            - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
-            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-            - gcloud config set project $GCLOUD_PROJECT
-            - gcloud auth configure-docker --quiet
-            # BUILD IMAGE
-            - docker build . -t $IMAGE_NAME
-            # PUBLISH IMAGE
-            - docker push $IMAGE_NAME
+            - ./script/bitbucket-gcloud-configure-docker.sh
+            - ./script/bitbucket-build-docker.sh
+      - step:
+          name: Deploy to test
+          deployment: test
+          script:
+            - ./script/bitbucket-gcloud-configure-docker.sh
+            - ./script/bitbucket-tag-docker.sh latest
+            - ./script/bitbucket-update-image.sh
+            - pipe: atlassian/datadog-send-event:1.0.1
+              variables:
+                API_KEY: $DATADOG_KEY
+                TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara test"
+          services:
+            - docker
       - step:
           name: Deploy to staging
           deployment: staging
@@ -100,13 +106,6 @@ pipelines:
           trigger: manual
           script:
             # Tag image in registry with production label
-            - export IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
-            - export TAGGED_IMAGE_NAME=eu.gcr.io/$GCLOUD_PROJECT/$BITBUCKET_REPO_SLUG:production
-            - echo $GCLOUD_API_KEYFILE | base64 -d > ~/.gcloud-api-key.json
-            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
-            - gcloud config set project $GCLOUD_PROJECT
-            - gcloud auth configure-docker --quiet
-            - docker pull $IMAGE_NAME
-            - docker tag $IMAGE_NAME $TAGGED_IMAGE_NAME
-            - docker push $TAGGED_IMAGE_NAME
+            - ./script/bitbucket-gcloud-configure-docker.sh
+            - ./script/bitbucket-tag-docker.sh production
             - ssh $SSH_TARGET bitbucket-deploy $BITBUCKET_REPO_SLUG
