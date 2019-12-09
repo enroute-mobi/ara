@@ -58,6 +58,7 @@ pipelines:
             - ./script/bitbucket-build-docker.sh
       - step:
           name: Deploy to test
+          image: google/cloud-sdk:latest
           deployment: test
           script:
             - ./script/bitbucket-gcloud-configure-docker.sh
