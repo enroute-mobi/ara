@@ -30,13 +30,14 @@ func main() {
 	configPtr := flag.String("config", "", "Config directory")
 	flag.BoolVar(&config.Config.Debug, "debug", false, "Enable debug messages")
 	flag.BoolVar(&config.Config.Syslog, "syslog", false, "Redirect messages to syslog")
+	flag.BoolVar(&config.Config.ColorizeLog, "colorizelog", false, "Colorize messages in log")
 
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
 		fmt.Println("Edwig", version.Value())
 		fmt.Println("Usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
-		fmt.Println("             [-config=<path>] [-debug] [-syslog]")
+		fmt.Println("             [-config=<path>] [-debug] [-syslog] [-colorizelog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi [-listen=<url>]")
 		fmt.Println("\tmigrate [-path=<path>] <up|down>")
