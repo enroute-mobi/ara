@@ -34,7 +34,8 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
-		fmt.Println("usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
+		fmt.Println("Edwig", version.Value())
+		fmt.Println("Usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
 		fmt.Println("             [-config=<path>] [-debug] [-syslog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi [-listen=<url>]")

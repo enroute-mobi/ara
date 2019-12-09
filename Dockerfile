@@ -1,8 +1,9 @@
 # Usage :
-# docker build -t ara .
+# docker build -t ara --build-arg VERSION="build-999" .
 # docker run -it --add-host db:172.17.0.1 -e EDWIG_DB_NAME=edwig -e EDWIG_DB_USER=edwig -e EDWIG_DB_PASSWORD=edwig -e EDWIG_API_KEY=secret -e EDWIG_DEBUG=true -p 8080:8080 ara
 
 FROM golang:1.12 AS builder
+ARG VERSION=dev
 
 ENV DEV_PACKAGES="libxml2-dev"
 RUN apt-get update && apt-get -y install --no-install-recommends $DEV_PACKAGES
@@ -12,7 +13,7 @@ COPY . .
 
 ENV GO111MODULE=on
 RUN go get -d -v ./...
-RUN go install -v ./...
+RUN go install -v -ldflags "-X github.com/af83/edwig/version.value=${VERSION}" ./...
 
 FROM debian:buster
 
