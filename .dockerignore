@@ -5,3 +5,6 @@
 /Makefile
 .DS_Store
 /bitbucket-pipelines.yml
+/.bundle/
+/target/
+/vendor/

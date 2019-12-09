@@ -10,3 +10,8 @@
 /edwig
 
 /*.prof
+
+/.bundle/
+/target/
+/vendor/
+/coverage.out
