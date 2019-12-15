@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 
-	"github.com/af83/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type Purifier struct {

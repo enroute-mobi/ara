@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {

@@ -3,7 +3,7 @@ package core
 import (
 	"testing"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {

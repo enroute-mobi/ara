@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/config"
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/version"
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/version"
 )
 
 type Server struct {

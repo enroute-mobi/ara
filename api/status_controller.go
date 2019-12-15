@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/af83/edwig/version"
+	"bitbucket.org/enroute-mobi/edwig/version"
 )
 
 type StatusController struct{}

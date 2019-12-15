@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type lastState interface {

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {

@@ -1,9 +1,9 @@
-module github.com/af83/edwig
+module bitbucket.org/enroute-mobi/edwig
 
 go 1.12
 
 require (
-	github.com/af83/ara-external-models v0.0.3
+	bitbucket.org/enroute-mobi/ara-external-models v0.0.4
 	github.com/golang/protobuf v1.3.2
 	github.com/golangci/golangci-lint v1.21.0 // indirect
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f

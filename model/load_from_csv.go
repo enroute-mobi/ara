@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/af83/edwig/config"
-	"github.com/af83/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 /* CSV Structure

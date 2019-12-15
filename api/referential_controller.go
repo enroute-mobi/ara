@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type ReferentialController struct {

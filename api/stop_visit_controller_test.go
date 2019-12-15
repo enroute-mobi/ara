@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {

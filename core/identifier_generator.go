@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 var defaultIdentifierGenerators = map[string]string{

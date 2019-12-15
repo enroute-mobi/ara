@@ -1,6 +1,6 @@
 package model
 
-import "github.com/af83/edwig/logger"
+import "bitbucket.org/enroute-mobi/edwig/logger"
 
 type UpdateManager struct {
 	ClockConsumer
@@ -24,6 +24,8 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 		manager.updateVehicleJourney(event.(*VehicleJourneyUpdateEvent))
 	case STOP_VISIT_EVENT:
 		manager.updateStopVisit(event.(*StopVisitUpdateEvent))
+	case VEHICLE_EVENT:
+		manager.updateVehicle(event.(*VehicleUpdateEvent))
 	}
 }
 
@@ -178,6 +180,28 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	tx.Model().StopVisits().Save(&sv)
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	vj, _ := tx.Model().VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
+
+	vehicle, found := tx.Model().Vehicles().FindByObjectId(event.ObjectId)
+	if !found {
+		vehicle = tx.Model().Vehicles().New()
+
+		vehicle.SetObjectID(event.ObjectId)
+	}
+
+	vehicle.VehicleJourneyId = vj.Id()
+	vehicle.Longitude = event.Longitude
+	vehicle.Latitude = event.Latitude
+	vehicle.Bearing = event.Bearing
+
+	tx.Model().Vehicles().Save(&vehicle)
 	tx.Commit()
 	tx.Close()
 }

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {

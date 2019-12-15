@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type ServiceRequestBroadcaster interface {
@@ -39,9 +39,9 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	response := &siri.SIRIServiceResponse{
 		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
-		Status:            true,
-		RequestMessageRef: request.MessageIdentifier(),
-		ResponseTimestamp: connector.Clock().Now(),
+		Status:                    true,
+		RequestMessageRef:         request.MessageIdentifier(),
+		ResponseTimestamp:         connector.Clock().Now(),
 	}
 
 	if smRequests := request.StopMonitoringRequests(); len(smRequests) != 0 {

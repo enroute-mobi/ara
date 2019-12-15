@@ -41,6 +41,14 @@ func (vehicle *Vehicle) Save() (ok bool) {
 	return
 }
 
+func (vehicle *Vehicle) VehicleJourney() *VehicleJourney {
+	vehicleJourney, ok := vehicle.model.VehicleJourneys().Find(vehicle.VehicleJourneyId)
+	if !ok {
+		return nil
+	}
+	return &vehicleJourney
+}
+
 func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	type Alias Vehicle
 	aux := struct {

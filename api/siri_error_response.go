@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SiriErrorResponse struct {

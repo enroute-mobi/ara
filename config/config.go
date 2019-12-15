@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/af83/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	yaml "gopkg.in/yaml.v2"
 )
 

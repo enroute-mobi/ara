@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	external_models "github.com/af83/ara-external-models"
-	"github.com/af83/edwig/core"
+	external_models "bitbucket.org/enroute-mobi/ara-external-models"
+	"bitbucket.org/enroute-mobi/edwig/core"
 	"github.com/golang/protobuf/proto"
 )
 

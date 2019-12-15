@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type StopMonitoringRequestCollector interface {
