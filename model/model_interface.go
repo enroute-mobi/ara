@@ -18,14 +18,17 @@ type Model interface {
 	StopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
 	Operators() Operators
+	Vehicles() Vehicles
 }
 
 type MemoryModel struct {
+	date Date
+
 	stopAreas       *MemoryStopAreas
 	stopVisits      *MemoryStopVisits
 	vehicleJourneys *MemoryVehicleJourneys
 	lines           *MemoryLines
-	date            Date
+	vehicles        *MemoryVehicles
 	situations      *MemorySituations
 	operators       *MemoryOperators
 
@@ -64,6 +67,10 @@ func NewMemoryModel() *MemoryModel {
 	operators := NewMemoryOperators()
 	operators.model = model
 	model.operators = operators
+
+	vehicles := NewMemoryVehicles()
+	vehicles.model = model
+	model.vehicles = vehicles
 
 	return model
 }
@@ -135,6 +142,10 @@ func (model *MemoryModel) Lines() Lines {
 
 func (model *MemoryModel) Operators() Operators {
 	return model.operators
+}
+
+func (model *MemoryModel) Vehicles() Vehicles {
+	return model.vehicles
 }
 
 func (model *MemoryModel) NewTransaction() *Transaction {
