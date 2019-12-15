@@ -16,7 +16,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "test"
 	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
 	connector := NewSIRILinesDiscoveryRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	line := referential.Model().Lines().New()

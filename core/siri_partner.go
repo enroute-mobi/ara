@@ -1,16 +1,11 @@
 package core
 
 import (
-	"fmt"
-
 	"bitbucket.org/enroute-mobi/edwig/logger"
-	"bitbucket.org/enroute-mobi/edwig/model"
 	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIPartner struct {
-	model.UUIDConsumer
-
 	partner *Partner
 
 	soapClient *siri.SOAPClient
@@ -43,12 +38,4 @@ func (siriPartner *SIRIPartner) SubscriberRef() string {
 
 func (siriPartner *SIRIPartner) Partner() *Partner {
 	return siriPartner.partner
-}
-
-func (siriPartner *SIRIPartner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
-	formatString := siriPartner.partner.Setting(fmt.Sprintf("generators.%v", generatorName))
-	if formatString == "" {
-		formatString = defaultIdentifierGenerators[generatorName]
-	}
-	return NewIdentifierGeneratorWithUUID(formatString, siriPartner.UUIDConsumer)
 }

@@ -44,7 +44,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
 		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
-	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	// Check the request filter

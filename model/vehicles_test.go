@@ -27,7 +27,7 @@ func Test_Vehicle_MarshalJSON(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	vehicle.SetObjectID(objectid)
 
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","ObjectIDs":{"kind":"value"},"VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","ObjectIDs":{"kind":"value"},"VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"RecordedAtTime":"0001-01-01T00:00:00Z"}`
 	jsonBytes, err := vehicle.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

@@ -44,7 +44,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 
 	connector, _ := partner.Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 
-	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).SIRIPartner().SetUUIDGenerator(uuidGenerator)
+	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).Partner().SetUUIDGenerator(uuidGenerator)
 	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).SetClock(fakeClock)
 	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).estimatedTimeTableBroadcaster = NewFakeEstimatedTimeTableBroadcaster(connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster))
 

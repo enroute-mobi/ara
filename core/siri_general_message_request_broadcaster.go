@@ -41,7 +41,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
 
 	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
@@ -62,7 +62,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 	// Prepare Id Array
 	var messageArray []string
 
-	builder := NewBroadcastGeneralMessageBuilder(tx, connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
+	builder := NewBroadcastGeneralMessageBuilder(tx, connector.Partner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
 	builder.InfoChannelRef = request.InfoChannelRef()
 	builder.SetLineRef(request.LineRef())
 	builder.SetStopPointRef(request.StopPointRef())

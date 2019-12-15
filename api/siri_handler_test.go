@@ -59,7 +59,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
 
-	siriPartner.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	partner.Context().SetValue(core.SIRI_PARTNER, siriPartner)
 
 	partner.Save()

@@ -19,7 +19,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
@@ -74,7 +74,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
@@ -117,7 +117,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	line := referential.Model().Lines().New()

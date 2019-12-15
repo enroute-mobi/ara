@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"sync"
+	"time"
 )
 
 type VehicleId ModelId
@@ -13,11 +14,14 @@ type Vehicle struct {
 	model Model
 
 	id               VehicleId
+	lineId           LineId
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
 	Longitude float64 `json:",omitempty"`
 	Latitude  float64 `json:",omitempty"`
 	Bearing   float64 `json:",omitempty"`
+
+	RecordedAtTime time.Time
 }
 
 func NewVehicle(model Model) *Vehicle {
@@ -103,6 +107,7 @@ type Vehicles interface {
 	New() Vehicle
 	Find(id VehicleId) (Vehicle, bool)
 	FindByObjectId(objectid ObjectID) (Vehicle, bool)
+	FindByLineId(id LineId) []Vehicle
 	FindAll() []Vehicle
 	Save(vehicle *Vehicle) bool
 	Delete(vehicle *Vehicle) bool
@@ -146,6 +151,18 @@ func (manager *MemoryVehicles) FindByObjectId(objectid ObjectID) (Vehicle, bool)
 		return *manager.byIdentifier[VehicleId(id)], true
 	}
 	return Vehicle{}, false
+}
+
+func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []Vehicle) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, vehicle := range manager.byIdentifier {
+		if vehicle.lineId == id {
+			vehicles = append(vehicles, *vehicle)
+		}
+	}
+	return
 }
 
 func (manager *MemoryVehicles) FindAll() (vehicles []Vehicle) {

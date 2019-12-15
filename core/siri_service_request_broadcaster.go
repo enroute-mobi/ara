@@ -38,7 +38,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 	response := &siri.SIRIServiceResponse{
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 		Status:                    true,
 		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseTimestamp:         connector.Clock().Now(),

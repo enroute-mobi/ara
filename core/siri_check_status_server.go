@@ -37,7 +37,7 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
 		RequestMessageRef:         request.MessageIdentifier(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 		Status:                    true,
 		ResponseTimestamp:         connector.Clock().Now(),
 		ServiceStartedTime:        connector.Partner().StartedAt(),

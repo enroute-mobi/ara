@@ -25,11 +25,6 @@ func NewPushHandler(referential *core.Referential, token string) *PushHandler {
 }
 
 func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Request) {
-	if handler.referential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
-		return
-	}
-
 	// Check if request header is protobuf or return an error
 	if request.Header.Get("Content-Type") != "application/x-protobuf" {
 		http.Error(response, "Expected application/x-protobuf content", http.StatusUnsupportedMediaType)

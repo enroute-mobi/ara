@@ -23,6 +23,7 @@ const (
 	SIRI_CHECK_STATUS_CLIENT_TYPE                     = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE                     = "test-check-status-client"
 	SIRI_CHECK_STATUS_SERVER_TYPE                     = "siri-check-status-server"
+	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER  = "siri-lite-vehicle-monitoring-request-broadcaster"
 	TEST_VALIDATION_CONNECTOR                         = "test-validation-connector"
 	TEST_STARTABLE_CONNECTOR                          = "test-startable-connector-connector"
 )
@@ -103,6 +104,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &TestCheckStatusClientFactory{}
 	case SIRI_CHECK_STATUS_SERVER_TYPE:
 		return &SIRICheckStatusServerFactory{}
+	case SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER:
+		return &SIRILiteVehicleMonitoringRequestBroadcasterFactory{}
 	case TEST_VALIDATION_CONNECTOR:
 		return &TestValidationFactory{}
 	case TEST_STARTABLE_CONNECTOR:

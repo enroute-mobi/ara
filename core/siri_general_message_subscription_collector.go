@@ -148,7 +148,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "GeneralMessageSubscriptionCollector")

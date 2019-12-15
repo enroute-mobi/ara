@@ -71,7 +71,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  startTime,
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 
 	logSIRICheckStatusRequest(logStashEvent, request)

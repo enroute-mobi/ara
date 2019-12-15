@@ -525,3 +525,60 @@ func Test_Partners_StartStop(t *testing.T) {
 		t.Errorf("Connector should be stoped")
 	}
 }
+
+func Test_Partner_IdentifierGenerator(t *testing.T) {
+	partner := &Partner{
+		slug:     "partner",
+		Settings: make(map[string]string),
+	}
+
+	midGenerator := partner.IdentifierGenerator("message_identifier")
+	if expected := "%{uuid}"; midGenerator.formatString != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("response_message_identifier")
+	if expected := "%{uuid}"; midGenerator.formatString != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("data_frame_identifier")
+	if expected := "%{id}"; midGenerator.formatString != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("reference_identifier")
+	if expected := "%{type}:%{default}"; midGenerator.formatString != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("reference_stop_area_identifier")
+	if expected := "%{default}"; midGenerator.formatString != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+
+	partner.Settings = map[string]string{
+		"generators.message_identifier":             "mid",
+		"generators.response_message_identifier":    "rmid",
+		"generators.data_frame_identifier":          "dfid",
+		"generators.reference_identifier":           "rid",
+		"generators.reference_stop_area_identifier": "rsaid",
+	}
+
+	midGenerator = partner.IdentifierGenerator("message_identifier")
+	if expected := "mid"; midGenerator.formatString != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("response_message_identifier")
+	if expected := "rmid"; midGenerator.formatString != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("data_frame_identifier")
+	if expected := "dfid"; midGenerator.formatString != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("reference_identifier")
+	if expected := "rid"; midGenerator.formatString != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+	midGenerator = partner.IdentifierGenerator("reference_stop_area_identifier")
+	if expected := "rsaid"; midGenerator.formatString != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	}
+}

@@ -106,7 +106,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		notify := siri.SIRINotifyGeneralMessage{
 			Address:                   gmb.connector.Partner().Address(),
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: gmb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             gmb.connector.SIRIPartner().SubscriberRef(),
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
@@ -117,7 +117,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		// Prepare Id Array
 		// var messageArray []string
 
-		builder := NewBroadcastGeneralMessageBuilder(tx, gmb.connector.SIRIPartner(), SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
+		builder := NewBroadcastGeneralMessageBuilder(tx, gmb.connector.Partner(), SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		builder.InfoChannelRef = strings.Split(sub.SubscriptionOption("InfoChannelRef"), ",")
 		if sub.SubscriptionOption("LineRef") != "" {
 			builder.SetLineRef(strings.Split(sub.SubscriptionOption("LineRef"), ","))

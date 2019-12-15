@@ -188,6 +188,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	tx := manager.transactionProvider.NewTransaction()
 
 	vj, _ := tx.Model().VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
+	line := vj.Line()
 
 	vehicle, found := tx.Model().Vehicles().FindByObjectId(event.ObjectId)
 	if !found {
@@ -200,6 +201,11 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	vehicle.Longitude = event.Longitude
 	vehicle.Latitude = event.Latitude
 	vehicle.Bearing = event.Bearing
+	vehicle.RecordedAtTime = manager.Clock().Now()
+
+	if line != nil {
+		vehicle.lineId = line.Id()
+	}
 
 	tx.Model().Vehicles().Save(&vehicle)
 	tx.Commit()

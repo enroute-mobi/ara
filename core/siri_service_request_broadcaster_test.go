@@ -98,7 +98,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
@@ -205,7 +205,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/siri-service-smrequest-soap.xml")

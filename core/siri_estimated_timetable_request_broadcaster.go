@@ -42,7 +42,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	response := &siri.SIRIEstimatedTimeTableResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
 
 	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest, logStashEvent)
@@ -101,7 +101,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					logger.Log.Debugf("Vehicle journey with id %v does not have a proper objectid at %v", vehicleJourneyId, connector.Clock().Now())
 					continue
 				}
-				referenceGenerator := connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+				referenceGenerator := connector.Partner().IdentifierGenerator("reference_identifier")
 				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
 			}
 
@@ -207,7 +207,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 				continue
 			}
 		}
-		generator := connector.SIRIPartner().IdentifierGenerator("reference_stop_area_identifier")
+		generator := connector.Partner().IdentifierGenerator("reference_stop_area_identifier")
 		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
 		references[refType] = *model.NewReference(defaultObjectID)
 	}

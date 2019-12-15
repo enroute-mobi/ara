@@ -21,7 +21,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referential.Start()
 	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")
