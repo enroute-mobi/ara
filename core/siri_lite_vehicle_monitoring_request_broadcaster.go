@@ -44,10 +44,15 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	logStashEvent["RequestURL"] = url
 
 	siriLiteResponse = siri.NewSiriLiteResponse()
+	siriLiteResponse.Siri.ServiceDelivery.ResponseTimestamp = connector.Clock().Now()
+	siriLiteResponse.Siri.ServiceDelivery.ProducerRef = connector.Partner().ProducerRef()
+	siriLiteResponse.Siri.ServiceDelivery.ResponseMessageIdentifier = connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier()
+	siriLiteResponse.Siri.ServiceDelivery.RequestMessageRef = filters.Get("MessageIdentifier")
+
 	response := siri.NewSiriLiteVehicleMonitoringDelivery()
 	response.ResponseTimestamp = connector.Clock().Now()
 	response.RequestMessageRef = filters.Get("MessageIdentifier")
-	siriLiteResponse.ServiceDelivery.VehicleMonitoringDelivery = response
+	siriLiteResponse.Siri.ServiceDelivery.VehicleMonitoringDelivery = response
 
 	lineRef := filters.Get("LineRef")
 	objectid := model.NewObjectID(connector.remoteObjectidKind, lineRef)

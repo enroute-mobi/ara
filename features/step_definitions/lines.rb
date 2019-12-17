@@ -7,7 +7,8 @@ def line_path(id, attributes = {})
 end
 
 Given(/^a Line exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, line|
-  RestClient.post lines_path(referential: referential), model_attributes(line).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+  response = RestClient.post lines_path(referential: referential), model_attributes(line).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+  # puts response.body
 end
 
 When(/^a Line is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, line|

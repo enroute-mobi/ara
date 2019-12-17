@@ -7,6 +7,10 @@ import (
 )
 
 type SiriLiteResponse struct {
+	Siri *SiriLiteResponseSubstructure
+}
+
+type SiriLiteResponseSubstructure struct {
 	ServiceDelivery *ServiceDelivery
 }
 
@@ -16,6 +20,8 @@ type ServiceDelivery struct {
 	ResponseMessageIdentifier string                     `json:",omitempty"`
 	RequestMessageRef         string                     `json:",omitempty"`
 	VehicleMonitoringDelivery *VehicleMonitoringDelivery `json:",omitempty"`
+	// StopMonitoringDelivery *StopMonitoringDelivery `json:",omitempty"`
+	// ...
 }
 
 type ErrorCondition struct {
@@ -37,6 +43,6 @@ func (ec *ErrorCondition) MarshalJson() ([]byte, error) {
 
 func NewSiriLiteResponse() *SiriLiteResponse {
 	return &SiriLiteResponse{
-		ServiceDelivery: &ServiceDelivery{},
+		Siri: &SiriLiteResponseSubstructure{ServiceDelivery: &ServiceDelivery{}},
 	}
 }

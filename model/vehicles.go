@@ -14,7 +14,7 @@ type Vehicle struct {
 	model Model
 
 	id               VehicleId
-	lineId           LineId
+	LineId           LineId           `json:",omitempty"`
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
 	Longitude float64 `json:",omitempty"`
@@ -158,7 +158,7 @@ func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []Vehicle) {
 	defer manager.mutex.RUnlock()
 
 	for _, vehicle := range manager.byIdentifier {
-		if vehicle.lineId == id {
+		if vehicle.LineId == id {
 			vehicles = append(vehicles, *vehicle)
 		}
 	}

@@ -45,7 +45,7 @@ func (manager *TransactionalVehicles) FindByObjectId(objectid ObjectID) (Vehicle
 func (manager *TransactionalVehicles) FindByLineId(id LineId) (vehicles []Vehicle) {
 	// Check saved Vehicles
 	for _, vehicle := range manager.saved {
-		if vehicle.lineId == id {
+		if vehicle.LineId == id {
 			vehicles = append(vehicles, *vehicle)
 		}
 	}

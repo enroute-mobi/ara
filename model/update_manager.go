@@ -204,7 +204,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	vehicle.RecordedAtTime = manager.Clock().Now()
 
 	if line != nil {
-		vehicle.lineId = line.Id()
+		vehicle.LineId = line.Id()
 	}
 
 	tx.Model().Vehicles().Save(&vehicle)
