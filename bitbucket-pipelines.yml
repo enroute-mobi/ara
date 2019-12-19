@@ -75,7 +75,13 @@ pipelines:
           deployment: staging
           trigger: manual
           script:
-            - echo TODO
+            - ./script/bitbucket-gcloud-configure-docker.sh
+            - ./script/bitbucket-tag-docker.sh staging
+            # - ./script/bitbucket-update-image.sh
+            # - pipe: atlassian/datadog-send-event:1.0.1
+            #   variables:
+            #     API_KEY: $DATADOG_KEY
+            #     TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara test"
       - step:
           name: Build Debian package
           caches:
