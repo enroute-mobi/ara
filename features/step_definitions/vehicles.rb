@@ -43,7 +43,8 @@ end
 
 
 Then(/^a Vehicle "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(vehicle_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"})
+  response = RestClient.get(vehicle_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+
   if condition.nil?
     expect(response.code).to eq(200)
   else
