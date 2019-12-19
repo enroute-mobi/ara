@@ -7,7 +7,7 @@ def stop_area_path(id, attributes = {})
 end
 
 Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
-  response = RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
   # puts response
 end
 
@@ -36,7 +36,7 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
 end
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
- response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+  response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"})
 
   if condition.nil?
     expect(response.code).to eq(200)
