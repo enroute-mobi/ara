@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type LogStashEvent map[string]string

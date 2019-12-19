@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type RequestTestData struct {

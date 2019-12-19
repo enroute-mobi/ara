@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type StopMonitoringRequestBroadcaster interface {
@@ -84,7 +84,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	var stopVisitArray []string
 
 	// Initialize builder
-	stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, connector.SIRIPartner(), SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, connector.Partner(), SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
 	stopMonitoringBuilder.StopVisitTypes = request.StopVisitTypes()
 	stopMonitoringBuilder.MonitoringRef = request.MonitoringRef()
 
@@ -129,7 +129,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response := &siri.SIRIStopMonitoringResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 	}
 
 	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringRequest)

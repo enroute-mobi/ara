@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
@@ -19,7 +19,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -180,7 +180,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()

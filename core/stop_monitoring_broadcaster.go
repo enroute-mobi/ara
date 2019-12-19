@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIStopMonitoringBroadcaster interface {
@@ -106,7 +106,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 				Address:                   smb.connector.Partner().Address(),
 				ProducerRef:               smb.connector.Partner().ProducerRef(),
 				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-				ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 				ResponseTimestamp:         smb.connector.Clock().Now(),
 			}
 
@@ -150,7 +150,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		}
 
 		// Initialize builder
-		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.SIRIPartner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.Partner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOption("StopVisitTypes")
 
 		// maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
@@ -160,7 +160,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			Address:                   smb.connector.Partner().Address(),
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			ResponseMessageIdentifier: smb.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 		}
 		deliveries := make(map[string]*siri.SIRINotifyStopMonitoringDelivery)

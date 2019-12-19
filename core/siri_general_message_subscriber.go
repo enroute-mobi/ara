@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIGeneralMessageSubscriber interface {
@@ -102,7 +102,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
 					subId:    subscription.id,
@@ -122,7 +122,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}

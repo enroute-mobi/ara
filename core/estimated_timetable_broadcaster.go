@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIEstimatedTimeTableBroadcaster interface {
@@ -105,7 +105,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 			delivery := &siri.SIRINotifyEstimatedTimeTable{
 				Address:                   ett.connector.Partner().Address(),
 				ProducerRef:               ett.connector.Partner().ProducerRef(),
-				ResponseMessageIdentifier: ett.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 				SubscriberRef:             ett.connector.SIRIPartner().SubscriberRef(),
 				SubscriptionIdentifier:    sub.ExternalId(),
 				ResponseTimestamp:         ett.connector.Clock().Now(),
@@ -148,7 +148,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		delivery := &siri.SIRINotifyEstimatedTimeTable{
 			Address:                   ett.connector.Partner().Address(),
 			ProducerRef:               ett.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: ett.connector.SIRIPartner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
 			SubscriberRef:             ett.connector.SIRIPartner().SubscriberRef(),
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         ett.connector.Clock().Now(),
@@ -221,7 +221,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ett.connector.SIRIPartner().IdentifierGenerator("reference_identifier")
+					referenceGenerator := ett.connector.Partner().IdentifierGenerator("reference_identifier")
 					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
 				}
 
@@ -309,7 +309,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 				continue
 			}
 		}
-		generator := connector.SIRIPartner().IdentifierGenerator("reference_stop_area_identifier")
+		generator := connector.Partner().IdentifierGenerator("reference_stop_area_identifier")
 		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
 		references[refType] = *model.NewReference(defaultObjectID)
 	}

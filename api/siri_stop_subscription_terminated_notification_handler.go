@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIStopMonitoringSubscriptionTerminatedResponseHandler struct {

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
@@ -19,7 +19,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "modelOperatorRef")
@@ -136,7 +136,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	partner.Settings["local_url"] = "http://edwig"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
@@ -233,7 +233,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -308,7 +308,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -374,7 +374,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/stopmonitoring-request-soap.xml")

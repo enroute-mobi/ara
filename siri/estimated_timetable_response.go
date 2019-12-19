@@ -5,7 +5,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type SIRIEstimatedTimeTableResponse struct {

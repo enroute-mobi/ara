@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type OperationnalStatus string
@@ -55,6 +55,8 @@ type PartnerStatus struct {
 }
 
 type Partner struct {
+	model.UUIDConsumer
+
 	id            PartnerId
 	slug          PartnerSlug
 	PartnerStatus PartnerStatus
@@ -229,10 +231,12 @@ func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
 }
 
-func (partner *Partner) Generator(name string) *IdentifierGenerator {
-	sp := NewSIRIPartner(partner)
-
-	return sp.IdentifierGenerator(name)
+func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
+	if formatString == "" {
+		formatString = defaultIdentifierGenerators[generatorName]
+	}
+	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
 }
 
 func (partner *Partner) RemoteObjectIDKind(connectorName string) string {

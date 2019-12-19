@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
@@ -21,7 +21,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referential.Start()
 	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")

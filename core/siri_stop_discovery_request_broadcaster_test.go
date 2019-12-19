@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
@@ -16,7 +16,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "test"
 	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	line := referential.Model().Lines().New()
@@ -115,7 +115,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	partner.Settings["remote_objectid_kind"] = "test"
 	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
-	connector.SIRIPartner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
 
 	line := referential.Model().Lines().New()

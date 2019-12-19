@@ -1,6 +1,6 @@
 package api
 
-import "github.com/af83/edwig/core"
+import "bitbucket.org/enroute-mobi/edwig/core"
 
 func NewTestServer() *Server {
 	server := Server{}

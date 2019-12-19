@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type SubscriptionId string
@@ -393,7 +393,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	defer manager.mutex.Unlock()
 
 	if subscription.Id() == "" {
-		generator := manager.partner.Generator("subscription_identifier")
+		generator := manager.partner.IdentifierGenerator("subscription_identifier")
 		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 

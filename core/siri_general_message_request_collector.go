@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type GeneralMessageRequestCollector interface {
@@ -44,7 +44,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
 		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
-	siriGeneralMessageRequest.MessageIdentifier = connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	// Check the request filter

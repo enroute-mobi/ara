@@ -9,6 +9,7 @@ type TransactionalModel struct {
 	stopVisits      *TransactionalStopVisits
 	vehicleJourneys *TransactionalVehicleJourneys
 	operators       *TransactionalOperators
+	vehicles        *TransactionalVehicles
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
@@ -19,6 +20,7 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 	model.stopVisits = NewTransactionalStopVisits(parent)
 	model.vehicleJourneys = NewTransactionalVehicleJourneys(parent)
 	model.operators = NewTransactionalOperators(parent)
+	model.vehicles = NewTransactionalVehicles(parent)
 	return model
 }
 
@@ -50,50 +52,63 @@ func (model *TransactionalModel) Operators() Operators {
 	return model.operators
 }
 
+func (model *TransactionalModel) Vehicles() Vehicles {
+	return model.vehicles
+}
+
 func (model *TransactionalModel) NewTransaction() *Transaction {
 	return NewTransaction(model)
 }
 
 func (model *TransactionalModel) Commit() error {
-	if err := model.stopAreas.Commit(); err != nil {
+	var err error
+	if err = model.stopAreas.Commit(); err != nil {
 		return err
 	}
-	if err := model.stopVisits.Commit(); err != nil {
+	if err = model.stopVisits.Commit(); err != nil {
 		return err
 	}
-	if err := model.vehicleJourneys.Commit(); err != nil {
+	if err = model.vehicleJourneys.Commit(); err != nil {
 		return err
 	}
-	if err := model.lines.Commit(); err != nil {
+	if err = model.lines.Commit(); err != nil {
 		return err
 	}
-	if err := model.situations.Commit(); err != nil {
+	if err = model.situations.Commit(); err != nil {
 		return err
 	}
-	if err := model.operators.Commit(); err != nil {
+	if err = model.operators.Commit(); err != nil {
+		return err
+	}
+	if err = model.vehicles.Commit(); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (model *TransactionalModel) Rollback() error {
-	if err := model.stopAreas.Rollback(); err != nil {
+	var err error
+	if err = model.stopAreas.Rollback(); err != nil {
 		return err
 	}
-	if err := model.stopVisits.Rollback(); err != nil {
+	if err = model.stopVisits.Rollback(); err != nil {
 		return err
 	}
-	if err := model.vehicleJourneys.Rollback(); err != nil {
+	if err = model.vehicleJourneys.Rollback(); err != nil {
 		return err
 	}
-	if err := model.lines.Rollback(); err != nil {
+	if err = model.lines.Rollback(); err != nil {
 		return err
 	}
-	if err := model.situations.Rollback(); err != nil {
+	if err = model.situations.Rollback(); err != nil {
 		return err
 	}
-	if err := model.operators.Rollback(); err != nil {
+	if err = model.operators.Rollback(); err != nil {
 		return err
 	}
+	if err = model.vehicles.Rollback(); err != nil {
+		return err
+	}
+
 	return nil
 }

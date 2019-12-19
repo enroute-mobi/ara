@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/af83/edwig/api"
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/config"
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
-	"github.com/af83/edwig/version"
+	"bitbucket.org/enroute-mobi/edwig/api"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/version"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 package core
 
-import "github.com/af83/edwig/model"
+import "bitbucket.org/enroute-mobi/edwig/model"
 
 type Context map[string]interface{}
 

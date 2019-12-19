@@ -1,6 +1,6 @@
 package model
 
-import "github.com/af83/edwig/logger"
+import "bitbucket.org/enroute-mobi/edwig/logger"
 
 type StopAreaUpdateManager struct {
 	ClockConsumer

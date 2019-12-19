@@ -3,9 +3,9 @@ package core
 import (
 	"strings"
 
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type BroadcastStopMonitoringBuilder struct {
@@ -16,7 +16,6 @@ type BroadcastStopMonitoringBuilder struct {
 	MonitoringRef  string
 
 	tx                            *model.Transaction
-	siriPartner                   *SIRIPartner
 	referenceGenerator            *IdentifierGenerator
 	stopAreareferenceGenerator    *IdentifierGenerator
 	dataFrameGenerator            *IdentifierGenerator
@@ -26,17 +25,16 @@ type BroadcastStopMonitoringBuilder struct {
 	rewriteJourneyPatternRef      bool
 }
 
-func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastStopMonitoringBuilder {
+func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		tx:                            tx,
-		siriPartner:                   siriPartner,
-		referenceGenerator:            siriPartner.IdentifierGenerator("reference_identifier"),
-		stopAreareferenceGenerator:    siriPartner.IdentifierGenerator("reference_stop_area_identifier"),
-		dataFrameGenerator:            siriPartner.IdentifierGenerator("data_frame_identifier"),
-		remoteObjectidKind:            siriPartner.Partner().RemoteObjectIDKind(connector),
-		noDestinationRefRewritingFrom: siriPartner.Partner().NoDestinationRefRewritingFrom(),
-		noDataFrameRefRewritingFrom:   siriPartner.Partner().NoDataFrameRefRewritingFrom(),
-		rewriteJourneyPatternRef:      siriPartner.Partner().RewriteJourneyPatternRef(),
+		referenceGenerator:            partner.IdentifierGenerator("reference_identifier"),
+		stopAreareferenceGenerator:    partner.IdentifierGenerator("reference_stop_area_identifier"),
+		dataFrameGenerator:            partner.IdentifierGenerator("data_frame_identifier"),
+		remoteObjectidKind:            partner.RemoteObjectIDKind(connector),
+		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
+		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
+		rewriteJourneyPatternRef:      partner.RewriteJourneyPatternRef(),
 	}
 }
 

@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIStopMonitoringSubscriber interface {
@@ -99,7 +99,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
 				stopAreasToRequest[messageIdentifier] = &saToRequest{
 					subId: subscription.id,
 					saId:  *(resource.Reference.ObjectId),
@@ -117,7 +117,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}

@@ -1,13 +1,22 @@
 def siri_path(attributes = {})
   attributes = {
-    referential: 'test'
+    referential: 'test',
+    path: 'siri'
   }.merge(attributes.delete_if { |k,v| v.nil? })
-
-  url_for(attributes.merge(path: "siri"))
+  url_for(attributes)
 end
 
 def send_siri_request(request, attributes = {})
   response = RestClient.post siri_path(attributes), request, {content_type: :xml}
+  save_siri_messages request: request, response: response.body
+  @last_siri_request = request
+  @last_siri_response = response.body
+end
+
+def send_siri_lite_request(request, token, attributes = {})
+  attributes.merge! path: "siri/v2.0/#{request}.json?#{attributes[:params].map {|k,v| "#{k}=#{v}"}.join('&')}"
+  response = RestClient.get siri_path(attributes), {Authorization: "Token token=#{token}"}
+
   save_siri_messages request: request, response: response.body
   @last_siri_request = request
   @last_siri_response = response.body
@@ -47,9 +56,18 @@ When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referen
   send_siri_request request, referential: referential
 end
 
+When(/^I send a (\S+) SIRI Lite request(?: to the Referential "([^"]*)")? with the following parameters$/) do |request, referential, params|
+  h = params.rows_hash
+  send_siri_lite_request request, h.delete("Token"), referential: referential, params: h
+end
+
 Then(/^I should receive this SIRI response$/) do |expected_xml|
   save_siri_messages expected: normalized_xml(expected_xml), received: normalized_xml(@last_siri_response), received_raw: @last_siri_response
   expect(normalized_xml(@last_siri_response)).to eq(normalized_xml(expected_xml))
+end
+
+Then(/^I should receive this SIRI Lite response$/) do |expected_json|
+  expect(JSON.pretty_generate(JSON.parse(@last_siri_response))).to eq(JSON.pretty_generate(JSON.parse(expected_json)))
 end
 
 When(/^I receive this GeneralMessageRequest$/) do |message_type|

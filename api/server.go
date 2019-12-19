@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/af83/edwig/config"
-	"github.com/af83/edwig/core"
-	"github.com/af83/edwig/logger"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/version"
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/version"
 )
 
 type Server struct {
@@ -22,6 +22,13 @@ type Server struct {
 	bind        string
 	startedTime time.Time
 	apiKey      string
+}
+
+type SIRIRequestData struct {
+	Filters     url.Values
+	Referential string
+	Request     string
+	Url         string
 }
 
 type RequestData struct {
@@ -40,12 +47,38 @@ func NewRequestDataFromContent(params []string) *RequestData {
 
 	copy(requestFiller, params)
 
+	pathRegexp := "([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?)?(?:/([0-9a-zA-Z-_]+))?"
+	pattern := regexp.MustCompile(pathRegexp)
+	foundStrings := pattern.FindStringSubmatch(requestFiller[3])
+
 	return &RequestData{
 		Referential: requestFiller[1],
 		Resource:    requestFiller[2],
-		Id:          requestFiller[3],
-		Action:      requestFiller[4],
+		Id:          foundStrings[1],
+		Action:      foundStrings[2],
 	}
+}
+
+func NewSIRIRequestDataFromContent(params []string) (*SIRIRequestData, bool) {
+	requestFiller := make([]string, 15)
+
+	copy(requestFiller, params)
+
+	requestData := &SIRIRequestData{
+		Referential: requestFiller[1],
+	}
+
+	if requestFiller[3] != "" {
+		pathRegexp := "v2.0/([a-z-]+).json"
+		pattern := regexp.MustCompile(pathRegexp)
+		foundStrings := pattern.FindStringSubmatch(requestFiller[3])
+		if len(foundStrings) == 0 {
+			return nil, false
+		}
+		requestData.Request = foundStrings[1]
+	}
+
+	return requestData, true
 }
 
 func NewServer(bind string) *Server {
@@ -75,27 +108,6 @@ func (server *Server) handleControllers(response http.ResponseWriter, request *h
 
 	controller := newController(server)
 	controller.serve(response, request, requestData)
-}
-
-func (server *Server) parse(response http.ResponseWriter, request *http.Request) (*RequestData, bool) {
-	path := request.URL.RequestURI()
-
-	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?))?/?([0-9a-zA-Z-_]+)?"
-	pattern := regexp.MustCompile(pathRegexp)
-	foundStrings := pattern.FindStringSubmatch(path)
-	if foundStrings == nil || foundStrings[1] == "" {
-		http.Error(response, "Invalid request", http.StatusBadRequest)
-		return nil, false
-	}
-
-	requestData := NewRequestDataFromContent(foundStrings)
-	requestData.Method = request.Method
-	requestData.Url = request.URL.Path
-	requestData.Filters = request.URL.Query()
-
-	response.Header().Set("Content-Type", "application/json")
-	response.Header().Set("Server", version.ApplicationName())
-	return requestData, true
 }
 
 func (server *Server) getToken(r *http.Request) string {
@@ -129,33 +141,55 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 	return false
 }
 
-func (server *Server) handleRoutes(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-	if requestData.Resource == "siri" {
+func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
+	path := request.URL.RequestURI()
+	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?"
+	pattern := regexp.MustCompile(pathRegexp)
+	foundStrings := pattern.FindStringSubmatch(path)
+	if foundStrings == nil || foundStrings[1] == "" {
+		http.Error(response, "Invalid request", http.StatusBadRequest)
+		return
+	}
+	response.Header().Set("Server", version.ApplicationName())
+
+	if foundStrings[2] == "siri" {
+		requestData, ok := NewSIRIRequestDataFromContent(foundStrings)
+		if !ok {
+			http.Error(response, "Invalid request", http.StatusBadRequest)
+			return
+		}
+		requestData.Filters = request.URL.Query()
+		requestData.Url = request.URL.RequestURI()
 		server.handleSIRI(response, request, requestData)
-	} else if requestData.Resource == "push" {
-		server.handlePush(response, request, requestData)
-	} else if strings.HasPrefix(requestData.Referential, "_") {
+		return
+	}
+
+	if foundStrings[2] == "push" {
+		server.handlePush(response, request, foundStrings[1])
+		return
+	}
+
+	requestData := NewRequestDataFromContent(foundStrings)
+	requestData.Method = request.Method
+	requestData.Url = request.URL.Path
+	requestData.Filters = request.URL.Query()
+
+	response.Header().Set("Content-Type", "application/json")
+
+	if strings.HasPrefix(requestData.Referential, "_") {
 		if requestData.Referential != "_status" && !server.isAdmin(request) {
 			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-			logger.Log.Debugf("Tried to access ressource admin without autorization token \n%v", request)
+			logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
 			return
 		}
 		if requestData.Referential == "_referentials" {
 			requestData.Id = requestData.Resource
 		}
 		server.handleControllers(response, request, requestData)
-	} else {
-		server.handleWithReferentialControllers(response, request, requestData)
-	}
-}
-
-func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-	requestData, ok := server.parse(response, request)
-	if !ok {
 		return
 	}
 
-	server.handleRoutes(response, request, requestData)
+	server.handleWithReferentialControllers(response, request, requestData)
 }
 
 func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
@@ -181,17 +215,27 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 	controller.serve(response, request, requestData)
 }
 
-func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *SIRIRequestData) {
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 
 	logger.Log.Debugf("SIRI request: %v", request)
 
-	siriHandler := NewSIRIHandler(foundReferential)
-	siriHandler.serve(response, request)
+	if requestData.Request == "" {
+		siriHandler := NewSIRIHandler(foundReferential)
+		siriHandler.serve(response, request)
+		return
+	}
+
+	siriHandler := NewSIRILiteHandler(foundReferential, server.getToken(request))
+	siriHandler.serve(response, request, requestData)
 }
 
-func (server *Server) handlePush(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
+func (server *Server) handlePush(response http.ResponseWriter, request *http.Request, referential string) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
 
 	logger.Log.Debugf("Push request: %v", request)
 

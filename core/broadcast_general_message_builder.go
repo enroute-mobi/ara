@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type BroadcastGeneralMessageBuilder struct {
@@ -10,7 +10,7 @@ type BroadcastGeneralMessageBuilder struct {
 	model.UUIDConsumer
 
 	tx                 *model.Transaction
-	siriPartner        *SIRIPartner
+	partner            *Partner
 	referenceGenerator *IdentifierGenerator
 	remoteObjectidKind string
 	lineRef            map[string]struct{}
@@ -19,12 +19,12 @@ type BroadcastGeneralMessageBuilder struct {
 	InfoChannelRef []string
 }
 
-func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, siriPartner *SIRIPartner, connector string) *BroadcastGeneralMessageBuilder {
+func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
 		tx:                 tx,
-		siriPartner:        siriPartner,
-		referenceGenerator: siriPartner.IdentifierGenerator("reference_identifier"),
-		remoteObjectidKind: siriPartner.Partner().RemoteObjectIDKind(connector),
+		partner:            partner,
+		referenceGenerator: partner.IdentifierGenerator("reference_identifier"),
+		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),
 	}
@@ -51,7 +51,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 }
 
 func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
-	if situation.Origin == string(builder.siriPartner.Partner().Slug()) || situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
+	if situation.Origin == string(builder.partner.Slug()) || situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
 		return nil
 	}
 

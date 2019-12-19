@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {

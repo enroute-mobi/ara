@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/af83/edwig/audit"
-	"github.com/af83/edwig/model"
-	"github.com/af83/edwig/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type CheckStatusClient interface {
@@ -71,7 +71,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  startTime,
-		MessageIdentifier: connector.SIRIPartner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
 	}
 
 	logSIRICheckStatusRequest(logStashEvent, request)

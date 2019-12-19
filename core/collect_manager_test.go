@@ -3,7 +3,7 @@ package core
 import (
 	"testing"
 
-	"github.com/af83/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 // Already tested by siriStopMonitoringRequestCollectorTest

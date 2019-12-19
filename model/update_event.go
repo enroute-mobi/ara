@@ -7,6 +7,7 @@ const (
 	LINE_EVENT
 	VEHICLE_JOURNEY_EVENT
 	STOP_VISIT_EVENT
+	VEHICLE_EVENT
 )
 
 type UpdateEvent interface {
