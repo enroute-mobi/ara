@@ -11,6 +11,7 @@ import (
 type Logger struct {
 	Syslog bool
 	Debug  bool
+	Color  bool
 
 	writer LogWriter
 }
@@ -22,7 +23,8 @@ type LogWriter interface {
 }
 
 type StdWriter struct {
-	Out io.Writer
+	Out   io.Writer
+	Color bool
 }
 
 const (
@@ -44,9 +46,12 @@ func (writer *StdWriter) Emerg(message string) error {
 }
 
 func (writer *StdWriter) output(message string, color int) error {
-	fmt.Fprintf(writer.Out, "%v \033[%dm%s\033[39m\n", time.Now(), color, message)
+	if writer.Color {
+		fmt.Fprintf(writer.Out, "%v \033[%dm%s\033[39m\n", time.Now(), color, message)
+	} else {
+		fmt.Fprintln(writer.Out, message)
+	}
 	return nil
-
 }
 
 var Log *Logger = &Logger{}
@@ -60,7 +65,7 @@ func (logger *Logger) Writer() LogWriter {
 			}
 			logger.writer = syslogWriter
 		} else {
-			logger.writer = &StdWriter{Out: os.Stdout}
+			logger.writer = &StdWriter{Out: os.Stdout, Color: logger.Color}
 		}
 	}
 	return logger.writer
