@@ -32,6 +32,10 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	// Find Partner by authorization Key
+	if handler.token == "" {
+		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
+		return
+	}
 	partner, ok := handler.referential.Partners().FindBySetting(core.LOCAL_CREDENTIAL, handler.token)
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
