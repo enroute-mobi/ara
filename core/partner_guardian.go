@@ -49,11 +49,11 @@ func (guardian *PartnersGuardian) Run() {
 
 func (guardian *PartnersGuardian) routineWork(partner *Partner) {
 	s := guardian.checkPartnerStatus(partner)
-	if !s {
-		return
+	if s {
+		guardian.checkSubscriptionsTerminatedTime(partner)
 	}
 
-	guardian.checkSubscriptionsTerminatedTime(partner)
+	guardian.checkPartnerDiscovery(partner)
 }
 
 func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
@@ -73,11 +73,13 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus
 		partner.Subscriptions().CancelSubscriptions()
+		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner reloaded
 		return false
 	}
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN {
 		partner.PartnerStatus.OperationnalStatus = partnerStatus.OperationnalStatus
+		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
 
 		collectPersistent, _ := strconv.ParseBool(partner.Setting("collect.subscriptions.persistent"))
 		if !collectPersistent {
@@ -112,5 +114,15 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 		if sub.ResourcesLen() == 0 {
 			sub.Delete()
 		}
+	}
+}
+
+func (guardian *PartnersGuardian) checkPartnerDiscovery(partner *Partner) {
+	if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		return
+	}
+
+	if partner.LastDiscovery().IsZero() || partner.LastDiscovery().Before(guardian.Clock().Now().Add(partner.DiscoveryInterval())) {
+		partner.Discover()
 	}
 }

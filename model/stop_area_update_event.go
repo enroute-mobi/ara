@@ -7,6 +7,7 @@ type StopAreaUpdateEvent struct {
 	ParentObjectId  ObjectID
 	Name            string
 	CollectedAlways bool
+	Monitored       bool
 	Longitude       float64
 	Latitude        float64
 }

@@ -66,6 +66,7 @@ type Partner struct {
 
 	connectors          map[string]Connector
 	startedAt           time.Time
+	lastDiscovery       time.Time
 	context             Context
 	subscriptionManager Subscriptions
 	manager             Partners
@@ -313,6 +314,7 @@ func (partner *Partner) Stop() {
 
 func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
+	partner.lastDiscovery = time.Time{}
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(model.Startable)
@@ -571,6 +573,36 @@ func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
 	logStashEvent["referential"] = string(partner.manager.Referential().Slug())
 	logStashEvent["partner"] = string(partner.slug)
 	return logStashEvent
+}
+
+func (partner *Partner) LastDiscovery() time.Time {
+	return partner.lastDiscovery
+}
+
+func (partner *Partner) DiscoveryInterval() time.Duration {
+	d, _ := time.ParseDuration(partner.Settings["discovery_interval"])
+	if d == 0 {
+		d = 1 * time.Hour
+	}
+	return -1 * time.Hour
+}
+
+func (partner *Partner) Discover() {
+	partner.lastDiscovery = partner.manager.Referential().Clock().Now()
+	// partner.LineDiscovery()
+	partner.stopDiscovery()
+}
+
+func (partner *Partner) stopDiscovery() {
+	logger.Log.Debugf("StopDiscovery for partner '%s'", partner.slug)
+
+	c, ok := partner.connectors[SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR]
+	if !ok {
+		logger.Log.Debugf("No SiriStopPointsDiscoveryRequestCollector found for partner '%s'", partner.slug)
+		return
+	}
+
+	c.(StopPointsDiscoveryRequestCollector).RequestStopPoints()
 }
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
