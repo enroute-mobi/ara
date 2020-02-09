@@ -36,6 +36,7 @@ Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$
 end
 
 Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
+ # puts RestClient.get stop_areas_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
  response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
 
   if condition.nil?

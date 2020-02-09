@@ -172,10 +172,25 @@ func (client *SOAPClient) CheckStatus(request *SIRICheckStatusRequest) (*XMLChec
 	return checkStatus, nil
 }
 
+func (client *SOAPClient) StopDiscovery(request *SIRIStopPointsDiscoveryRequest) (*XMLStopPointsDiscoveryResponse, error) {
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		expectedResponse: "StopPointsDiscoveryResponse",
+		acceptGzip:       true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	stopDiscovery := NewXMLStopPointsDiscoveryResponse(node)
+	return stopDiscovery, nil
+}
+
 func (client *SOAPClient) StopMonitoring(request *SIRIGetStopMonitoringRequest) (*XMLStopMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(soapClientArguments{
 		request:          request,
 		expectedResponse: "GetStopMonitoringResponse",
+		acceptGzip:       true,
 	})
 	if err != nil {
 		return nil, err
@@ -189,6 +204,7 @@ func (client *SOAPClient) SituationMonitoring(request *SIRIGetGeneralMessageRequ
 	node, err := client.prepareAndSendRequest(soapClientArguments{
 		request:          request,
 		expectedResponse: "GetGeneralMessageResponse",
+		acceptGzip:       true,
 	})
 	if err != nil {
 		return nil, err
@@ -203,6 +219,7 @@ func (client *SOAPClient) StopMonitoringSubscription(request *SIRIStopMonitoring
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "SubscribeResponse",
+		acceptGzip:       true,
 	})
 	if err != nil {
 		return nil, err
@@ -216,6 +233,7 @@ func (client *SOAPClient) GeneralMessageSubscription(request *SIRIGeneralMessage
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "SubscribeResponse",
+		acceptGzip:       true,
 	})
 	if err != nil {
 		return nil, err
@@ -229,6 +247,7 @@ func (client *SOAPClient) DeleteSubscription(request *SIRIDeleteSubscriptionRequ
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "DeleteSubscriptionResponse",
+		acceptGzip:       true,
 	})
 	if err != nil {
 		return nil, err
