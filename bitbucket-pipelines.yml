@@ -72,16 +72,17 @@ pipelines:
             - docker
       - step:
           name: Deploy to staging
+          image: google/cloud-sdk:latest
           deployment: staging
           trigger: manual
           script:
             - ./script/bitbucket-gcloud-configure-docker.sh
             - ./script/bitbucket-tag-docker.sh staging
-            # - ./script/bitbucket-update-image.sh
-            # - pipe: atlassian/datadog-send-event:1.0.1
-            #   variables:
-            #     API_KEY: $DATADOG_KEY
-            #     TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara test"
+            - ./script/bitbucket-update-image.sh
+            - pipe: atlassian/datadog-send-event:1.0.1
+              variables:
+                API_KEY: $DATADOG_KEY
+                TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara staging"
       - step:
           name: Build Debian package
           caches:
@@ -116,3 +117,7 @@ pipelines:
             - ./script/bitbucket-gcloud-configure-docker.sh
             - ./script/bitbucket-tag-docker.sh production
             - ssh $SSH_TARGET bitbucket-deploy $BITBUCKET_REPO_SLUG
+            - pipe: atlassian/datadog-send-event:1.0.1
+              variables:
+                API_KEY: $DATADOG_KEY
+                TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara production"
