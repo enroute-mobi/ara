@@ -768,8 +768,9 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
-	// Truncate Table
-	_, err = model.Database.Exec("truncate partners;")
+	// Delete partners
+	sqlQuery = fmt.Sprintf("delete from partners where referential_id = '%s';", manager.referential.Id())
+	_, err = model.Database.Exec(sqlQuery)
 	if err != nil {
 		model.Database.Exec("ROLLBACK;")
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
