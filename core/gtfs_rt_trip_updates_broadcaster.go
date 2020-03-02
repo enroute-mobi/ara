@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"time"
 
 	"bitbucket.org/enroute-mobi/edwig/audit"
 	"bitbucket.org/enroute-mobi/edwig/logger"
@@ -133,6 +134,10 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 		sort.Slice(entity.TripUpdate.StopTimeUpdate, func(i, j int) bool {
 			return *entity.TripUpdate.StopTimeUpdate[i].StopSequence < *entity.TripUpdate.StopTimeUpdate[j].StopSequence
 		})
+		if entity.TripUpdate.StopTimeUpdate[0].Departure.Time != nil {
+			startTime := time.Unix(*entity.TripUpdate.StopTimeUpdate[0].Departure.Time, 0).Format("15:04:05")
+			entity.TripUpdate.Trip.StartTime = &startTime
+		}
 		feed.Entity = append(feed.Entity, entity)
 		n++
 	}

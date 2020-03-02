@@ -38,7 +38,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	stopVisit.SetObjectID(svId1)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit.Schedules.SetArrivalTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
@@ -87,30 +87,33 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	}
 
 	if r := "trip:vjId"; entity.GetId() != r {
-		t.Errorf("Response first Feed entity have incorrect Id:\n got: %v\n want: %v", *entity.Id, r)
+		t.Errorf("Response first Feed entity have incorrect Id:\n got: %v\n want: %v", entity.GetId(), r)
 	}
 	tripUpdate := entity.TripUpdate
 	if r := "vjId"; tripUpdate.Trip.GetTripId() != r {
-		t.Errorf("Response first Trip Update have incorrect TripId:\n got: %v\n want: %v", *tripUpdate.Trip.TripId, r)
+		t.Errorf("Response first Trip Update have incorrect TripId:\n got: %v\n want: %v", tripUpdate.Trip.GetTripId(), r)
 	}
 	if r := "lId"; tripUpdate.Trip.GetRouteId() != r {
-		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", *tripUpdate.Trip.RouteId, r)
+		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", tripUpdate.Trip.GetRouteId(), r)
+	}
+	if r := "02:10:00"; tripUpdate.Trip.GetStartTime() != r {
+		t.Errorf("Response first Trip Update have incorrect StartTime:\n got: %v\n want: %v", tripUpdate.Trip.GetStartTime(), r)
 	}
 	if l := len(tripUpdate.StopTimeUpdate); l != 1 {
 		t.Errorf("Response first Trip Update have incorrect number of StopTimeUpdate:\n got: %v\n want: 1", l)
 	}
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
 	if r := uint32(1); stopTimeUpdate.GetStopSequence() != r {
-		t.Errorf("Incorrect StopSequence in StopTimeUpdate:\n got: %v\n want: %v", *stopTimeUpdate.StopSequence, r)
+		t.Errorf("Incorrect StopSequence in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopSequence(), r)
 	}
 	if r := "saId"; stopTimeUpdate.GetStopId() != r {
-		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", *stopTimeUpdate.StopId, r)
+		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopId(), r)
 	}
-	if r := int64(referential.Clock().Now().Add(10 * time.Minute).Unix()); stopTimeUpdate.Arrival.GetTime() != r {
-		t.Errorf("Incorrect Arrival.Time in StopTimeUpdate:\n got: %v\n want: %v", *stopTimeUpdate.Arrival.Time, r)
+	if r := int64(referential.Clock().Now().Add(10 * time.Minute).Unix()); stopTimeUpdate.Departure.GetTime() != r {
+		t.Errorf("Incorrect Departure.Time in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetDeparture().Time, r)
 	}
-	if r := int64(0); stopTimeUpdate.Departure.GetTime() != r {
-		t.Errorf("Incorrect Departure.Time in StopTimeUpdate:\n got: %v\n want: %v", *stopTimeUpdate.Departure.Time, r)
+	if r := int64(0); stopTimeUpdate.Arrival.GetTime() != r {
+		t.Errorf("Incorrect Arrival.Time in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetArrival().Time, r)
 	}
 }
 
