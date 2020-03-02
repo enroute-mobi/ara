@@ -75,7 +75,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	connector.HandleGtfs(gtfsFeed, l)
 
 	if l := len(gtfsFeed.Entity); l != 2 {
-		t.Errorf("Response have incorrect number of entities:\n got: %v\n want: 2", l)
+		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 2", l)
 	}
 	var entity *gtfs.FeedEntity
 	if len(gtfsFeed.Entity[0].TripUpdate.StopTimeUpdate) == 1 && len(gtfsFeed.Entity[1].TripUpdate.StopTimeUpdate) == 2 {
