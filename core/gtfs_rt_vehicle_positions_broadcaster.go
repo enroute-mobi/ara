@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bitbucket.org/enroute-mobi/edwig/audit"
 	"bitbucket.org/enroute-mobi/edwig/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
@@ -29,5 +30,5 @@ func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster
 	return connector
 }
 
-func (vpb *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
+func (vpb *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
 }

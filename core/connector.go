@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bitbucket.org/enroute-mobi/edwig/audit"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
@@ -42,7 +43,7 @@ const (
 type Connector interface{}
 
 type GtfsConnector interface {
-	HandleGtfs(*gtfs.FeedMessage)
+	HandleGtfs(*gtfs.FeedMessage, audit.LogStashEvent)
 }
 
 type BaseConnector struct {

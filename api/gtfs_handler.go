@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"net/http"
 	"strconv"
+	"time"
 
 	"bitbucket.org/enroute-mobi/edwig/audit"
 	"bitbucket.org/enroute-mobi/edwig/core"
@@ -33,6 +34,8 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	startTime := handler.referential.Clock().Now()
+
 	logStashEvent := partner.NewLogStashEvent()
 	logStashEvent["connector"] = "GtfsHandler"
 	logStashEvent["resource"] = "resource"
@@ -55,13 +58,14 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 
 	version := "2.0"
 	timestamp := uint64(handler.referential.Clock().Now().Unix())
+	// Default Incrementality is 0 -> FULL_DATASET
 	feed := &gtfs.FeedMessage{}
 	feed.Header = &gtfs.FeedHeader{}
 	feed.Header.GtfsRealtimeVersion = &version
 	feed.Header.Timestamp = &timestamp
 
 	for i := range gc {
-		gc[i].HandleGtfs(feed)
+		gc[i].HandleGtfs(feed, logStashEvent)
 	}
 
 	data, err := proto.Marshal(feed)
@@ -90,6 +94,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	logStashEvent["protobuf_size"] = strconv.Itoa(buffer.Len())
+	logStashEvent["response_time"] = time.Since(startTime).String()
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	response.WriteHeader(http.StatusOK)
