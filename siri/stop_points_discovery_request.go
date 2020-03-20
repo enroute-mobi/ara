@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -19,15 +19,6 @@ type SIRIStopPointsDiscoveryRequest struct {
 
 	RequestTimestamp time.Time
 }
-
-const stopPointsDiscoveryRequestTemplate = `<sw:StopPointsDiscovery xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<Request>
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-	</Request>
-	<RequestExtension />
-</sw:StopPointsDiscovery>`
 
 func NewXMLStopPointsDiscoveryRequest(node xml.Node) *XMLStopPointsDiscoveryRequest {
 	xmlStopDiscoveryRequest := &XMLStopPointsDiscoveryRequest{}
@@ -54,8 +45,8 @@ func NewSIRIStopPointsDiscoveryRequest(messageIdentifier, requestorRef string, r
 
 func (request *SIRIStopPointsDiscoveryRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(stopPointsDiscoveryRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "stop_points_discovery_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

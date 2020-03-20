@@ -1,0 +1,23 @@
+{{ if .FormatRef }}<siri:GeneralMessage formatRef="{{ .FormatRef }}">{{ else }}<siri:GeneralMessage>{{ end }}
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
+				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
+				<siri:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</siri:InfoMessageIdentifier>
+				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
+				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
+				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
+				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xsi:type="stif:IDFGeneralMessageStructure">{{range .References }}
+					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
+					<siri:LineSection>{{ if .FirstStop }}
+						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
+						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
+						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
+					</siri:LineSection>{{end}}{{range .Messages}}
+					<Message>{{if .Type}}
+						<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
+						<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines }}
+						<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
+						<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
+					</Message>{{end}}
+				</siri:Content>
+			</siri:GeneralMessage>

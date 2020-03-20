@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -42,32 +42,6 @@ type SIRITerminationResponseStatus struct {
 	ErrorNumber string
 	ErrorText   string
 }
-
-const deleteSubscriptionResponseTemplate = `<sw:DeleteSubscriptionResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<DeleteSubscriptionAnswerInfo>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-	</DeleteSubscriptionAnswerInfo>
-	<Answer>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-		<siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>{{ range .ResponseStatus }}
-		<siri:TerminationResponseStatus>
-			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-			<siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
-			<siri:SubscriptionRef>{{ .SubscriptionRef }}</siri:SubscriptionRef>
-			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
-			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
-				<siri:{{.ErrorType}}>{{ end }}
-					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
-				</siri:{{.ErrorType}}>
-			</siri:ErrorCondition>{{ end }}
-		</siri:TerminationResponseStatus>{{ end }}
-	</Answer>
-	<AnswerExtension/>
-</sw:DeleteSubscriptionResponse>`
 
 func NewXMLDeleteSubscriptionResponse(node xml.Node) *XMLDeleteSubscriptionResponse {
 	xmlDeleteSubscriptionResponse := &XMLDeleteSubscriptionResponse{}
@@ -126,8 +100,8 @@ func (response *XMLDeleteSubscriptionResponse) ResponseStatus() []*XMLTerminatio
 
 func (notify *SIRIDeleteSubscriptionResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var deleteSubscriptionResponse = template.Must(template.New("deleteSubscriptionResponseTemplate").Parse(deleteSubscriptionResponseTemplate))
-	if err := deleteSubscriptionResponse.Execute(&buffer, notify); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "delete_subscription_response.template", notify); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

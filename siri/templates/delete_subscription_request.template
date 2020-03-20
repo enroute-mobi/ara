@@ -1,0 +1,12 @@
+<sw:DeleteSubscription xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+	<DeleteSubscriptionInfo>
+		<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
+		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
+		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
+	</DeleteSubscriptionInfo>
+	<Request version="2.0:FR-IDF-2.4">{{ if .CancelAll }}
+		<siri:All/>{{ else }}
+		<siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>{{ end }}
+	</Request>
+	<RequestExtension/>
+</sw:DeleteSubscription>

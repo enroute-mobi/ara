@@ -2,8 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 type SIRINotifyStopMonitoring struct {
@@ -32,41 +33,10 @@ type SIRINotifyStopMonitoringDelivery struct {
 	CancelledStopVisits []*SIRICancelledStopVisit
 }
 
-const stopMonitoringNotifyTemplate = `<sw:NotifyStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<ServiceDeliveryInfo>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
-		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
-		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-	</ServiceDeliveryInfo>
-	<Notification>{{ range .Deliveries }}
-		{{ .BuildNotifyStopMonitoringDeliveryXML }}{{ end }}
-	</Notification>
-	<NotifyExtension />
-</sw:NotifyStopMonitoring>`
-
-const notifyStopMonitoringDeliveryTemplate = `<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-			<siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
-			<siri:SubscriptionRef>{{ .SubscriptionIdentifier }}</siri:SubscriptionRef>{{ if .MonitoringRef }}
-			<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>{{ end }}
-			<siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
-			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<siri:OtherError number="{{ .ErrorNumber }}">{{ else }}
-				<siri:{{ .ErrorType }}>{{ end }}
-					<siri:ErrorText>{{ .ErrorText }}</siri:ErrorText>
-				</siri:{{ .ErrorType }}>
-			</siri:ErrorCondition>{{ else }}{{ range .MonitoredStopVisits }}
-			{{ .BuildMonitoredStopVisitXML }}{{ end }}{{ range .CancelledStopVisits }}
-			{{ .BuildCancelledStopVisitXML }}{{ end }}{{ end }}
-		</siri:StopMonitoringDelivery>`
-
 func (notify *SIRINotifyStopMonitoring) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var notifyDelivery = template.Must(template.New("stopMonitoringNotify").Parse(stopMonitoringNotifyTemplate))
-	if err := notifyDelivery.Execute(&buffer, notify); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "stop_monitoring_notify.template", notify); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -74,8 +44,8 @@ func (notify *SIRINotifyStopMonitoring) BuildXML() (string, error) {
 
 func (delivery *SIRINotifyStopMonitoringDelivery) BuildNotifyStopMonitoringDeliveryXML() (string, error) {
 	var buffer bytes.Buffer
-	var stopMonitoringDelivery = template.Must(template.New("notifyStopMonitoringDelivery").Parse(notifyStopMonitoringDeliveryTemplate))
-	if err := stopMonitoringDelivery.Execute(&buffer, delivery); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "notify_stop_monitoring_delivery.template", delivery); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
