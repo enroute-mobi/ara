@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 type SIRILiteVehicleMonitoringRequestHandler struct {

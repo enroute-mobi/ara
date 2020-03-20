@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 type Purifier struct {

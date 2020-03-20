@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func createTestPartnerManager() *PartnerManager {

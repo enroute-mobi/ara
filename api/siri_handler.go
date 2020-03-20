@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type SIRIRequestHandler interface {

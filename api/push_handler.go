@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	external_models "bitbucket.org/enroute-mobi/ara-external-models"
-	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/ara/core"
 	"github.com/golang/protobuf/proto"
 )
 

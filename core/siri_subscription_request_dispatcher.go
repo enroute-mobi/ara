@@ -3,10 +3,10 @@ package core
 import (
 	"fmt"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/logger"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type SubscriptionRequestDispatcher interface {

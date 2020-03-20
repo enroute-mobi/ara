@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/ara/core"
 )
 
 var newControllerMap = map[string](func(*Server) ControllerInterface){
