@@ -33,18 +33,29 @@ func (guardian *PartnersGuardian) Stop() {
 }
 
 func (guardian *PartnersGuardian) Run() {
+	partnerChannel := make(chan *Partner)
+	guardian.listen(partnerChannel)
 	for {
 		select {
 		case <-guardian.stop:
+			close(partnerChannel)
 			logger.Log.Debugf("Stop Partners Guardian")
 			return
 		case <-guardian.Clock().After(30 * time.Second):
 			logger.Log.Debugf("Check partners status")
 			for _, partner := range guardian.referential.Partners().FindAll() {
-				go guardian.routineWork(partner)
+				partnerChannel <- partner
 			}
 		}
 	}
+}
+
+func (guardian *PartnersGuardian) listen(partnerChannel <-chan *Partner) {
+	go func() {
+		for p := range partnerChannel {
+			guardian.routineWork(p)
+		}
+	}()
 }
 
 func (guardian *PartnersGuardian) routineWork(partner *Partner) {
@@ -118,7 +129,7 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 }
 
 func (guardian *PartnersGuardian) checkPartnerDiscovery(partner *Partner) {
-	if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+	if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
 		return
 	}
 
