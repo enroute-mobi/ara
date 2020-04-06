@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"bitbucket.org/enroute-mobi/ara/core"
-	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIStopMonitoringRequestDeliveriesResponseHandler struct {

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {

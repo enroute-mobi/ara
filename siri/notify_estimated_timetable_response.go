@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type SIRINotifyEstimatedTimeTable struct {

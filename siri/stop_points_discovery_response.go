@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type SIRIStopPointsDiscoveryResponse struct {

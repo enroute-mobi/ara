@@ -3,9 +3,9 @@ package core
 import (
 	"strings"
 
-	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type BroadcastStopMonitoringBuilder struct {

@@ -3,8 +3,8 @@ package core
 import (
 	"strconv"
 
-	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type StopAreaUpdateSubscriber func(*model.LegacyStopAreaUpdateEvent)

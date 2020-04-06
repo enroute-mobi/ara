@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type PartnersGuardian struct {

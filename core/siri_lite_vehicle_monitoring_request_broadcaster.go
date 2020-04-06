@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"strings"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type VehicleMonitoringRequestBroadcaster interface {

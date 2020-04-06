@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/core"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {

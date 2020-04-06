@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/config"
-	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	migrate "github.com/rubenv/sql-migrate"
 	"gopkg.in/gorp.v1"
 

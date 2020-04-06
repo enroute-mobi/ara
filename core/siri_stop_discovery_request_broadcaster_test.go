@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {

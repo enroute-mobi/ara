@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type fakeSituationBroadcaster struct {

@@ -1,6 +1,6 @@
 package api
 
-import "bitbucket.org/enroute-mobi/ara/core"
+import "bitbucket.org/enroute-mobi/edwig/core"
 
 func NewTestServer() *Server {
 	server := Server{}

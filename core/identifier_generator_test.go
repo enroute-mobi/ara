@@ -3,7 +3,7 @@ package core
 import (
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {

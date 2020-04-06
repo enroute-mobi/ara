@@ -1,4 +1,4 @@
-module bitbucket.org/enroute-mobi/ara
+module bitbucket.org/enroute-mobi/edwig
 
 go 1.12
 

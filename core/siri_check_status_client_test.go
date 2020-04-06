@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) PartnerStatus {

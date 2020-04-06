@@ -13,7 +13,7 @@ populate:
 	psql -U edwig -d edwig -a -f model/populate.sql
 
 tests:
-	go test bitbucket.org/enroute-mobi/ara/... -p 1 -count 1
+	go test bitbucket.org/enroute-mobi/edwig/... -p 1 -count 1
 
 cucumber:
 	bundle exec cucumber -t ~@wip

@@ -1,8 +1,8 @@
 package core
 
 import (
-	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/edwig/siri"
 )
 
 type SIRIStopVisitUpdateAttributes struct {

@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/edwig/core"
 )
 
 type SIRILiteRequestHandler interface {

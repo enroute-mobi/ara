@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/version"
+	"bitbucket.org/enroute-mobi/edwig/version"
 	"github.com/jbowtie/gokogiri/xml"
 	"golang.org/x/text/encoding/charmap"
 )

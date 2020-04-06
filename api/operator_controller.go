@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"regexp"
 
-	"bitbucket.org/enroute-mobi/ara/core"
-	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/edwig/core"
+	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/edwig/model"
 )
 
 type OperatorController struct {
