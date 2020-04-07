@@ -2,7 +2,7 @@
 
 set -ex
 
-source_dir=$(dirname "$0")
+source_dir="$(pwd -P)/$(dirname "$0")"
 
 cat > "$source_dir/config/database.yml" <<EOF
 test:
