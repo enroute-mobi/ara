@@ -1,20 +1,20 @@
 package siri
 
 import (
-	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
+
+	"bitbucket.org/enroute-mobi/edwig/config"
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 var templates *template.Template
 
 func init() {
-	// Small hack to make tests work, otherwise the relative path don't work
-	wd, _ := os.Getwd()
-	for !strings.HasSuffix(wd, "ara") {
-		wd = filepath.Dir(wd)
+	templatePath, err := config.GetTemplateDirectory()
+	if err != nil {
+		logger.Log.Panicf("Error while loading templates: %v", err)
 	}
 
-	templates = template.Must(template.ParseGlob(filepath.Join(wd, "siri/templates/*.template")))
+	templates = template.Must(template.ParseGlob(filepath.Join(templatePath, "*.template")))
 }
