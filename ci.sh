@@ -18,6 +18,7 @@ cd $source_dir
 go install -v ./...
 
 export EDWIG_ENV=test
+export EDWIG_ROOT=$source_dir
 "$GOPATH/bin/edwig" migrate up
 
 go get github.com/schrej/godacov
