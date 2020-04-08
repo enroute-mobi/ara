@@ -15,7 +15,7 @@ RUN apt-get update && mkdir -p /usr/share/man/man1 /usr/share/man/man7 && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen && \
     gem install bundler:$BUNDLER_VERSION
 
-WORKDIR /go/src/github.com/af83/edwig
+WORKDIR /go/src/bitbucket.org/enroute-mobi/edwig
 
 # Install bundler packages
 COPY Gemfile Gemfile.lock ./
