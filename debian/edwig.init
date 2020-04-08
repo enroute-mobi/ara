@@ -16,6 +16,8 @@ NAME="edwig"
 DESC="Edwig Server"
 OUTPUT_FILE=/var/log/edwig/output.log
 
+export EDWIG_ROOT=/usr/share/edwig
+
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 test -x $DAEMON || exit 0

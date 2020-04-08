@@ -1,4 +1,5 @@
 etc/edwig
 usr/bin
 usr/share/edwig
+usr/share/edwig/siri
 var/log/edwig
