@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/edwig/audit"
@@ -57,6 +58,8 @@ type PartnerStatus struct {
 type Partner struct {
 	model.UUIDConsumer
 
+	mutex *sync.RWMutex
+
 	id            PartnerId
 	slug          PartnerSlug
 	PartnerStatus PartnerStatus
@@ -82,12 +85,6 @@ func (a ByPriority) Less(i, j int) bool {
 	return first > second
 }
 
-func (manager *PartnerManager) FindAllByCollectPriority() []*Partner {
-	partners := manager.FindAll()
-	sort.Sort(ByPriority(partners))
-	return partners
-}
-
 type APIPartner struct {
 	Id             PartnerId `json:"Id,omitempty"`
 	Slug           PartnerSlug
@@ -101,6 +98,8 @@ type APIPartner struct {
 
 type PartnerManager struct {
 	model.UUIDConsumer
+
+	mutex *sync.RWMutex
 
 	byId        map[PartnerId]*Partner
 	guardian    *PartnersGuardian
@@ -191,6 +190,7 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 
 func NewPartner() *Partner {
 	partner := &Partner{
+		mutex:          &sync.RWMutex{},
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{},
 		connectors:     make(map[string]Connector),
@@ -607,6 +607,7 @@ func (partner *Partner) stopDiscovery() {
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
+		mutex:       &sync.RWMutex{},
 		byId:        make(map[PartnerId]*Partner),
 		referential: referential,
 	}
@@ -657,36 +658,51 @@ func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
 }
 
 func (manager *PartnerManager) Find(id PartnerId) *Partner {
+	manager.mutex.RLock()
 	partner := manager.byId[id]
+	manager.mutex.RUnlock()
 	return partner
 }
 
 func (manager *PartnerManager) FindBySetting(setting, value string) (*Partner, bool) {
+	manager.mutex.RLock()
 	for _, partner := range manager.byId {
 		if partner.Setting(setting) == value {
+			manager.mutex.RUnlock()
 			return partner, true
 		}
 	}
+
+	manager.mutex.RUnlock()
 	return nil, false
 }
 
 func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
+	manager.mutex.RLock()
 	for _, partner := range manager.byId {
 		if partner.slug == slug {
+			manager.mutex.RUnlock()
 			return partner, true
 		}
 	}
+
+	manager.mutex.RUnlock()
 	return nil, false
 }
 
 func (manager *PartnerManager) FindAll() (partners []*Partner) {
-	if len(manager.byId) == 0 {
-		return []*Partner{}
-	}
+	manager.mutex.RLock()
 	for _, partner := range manager.byId {
 		partners = append(partners, partner)
 	}
+	manager.mutex.RUnlock()
 	return
+}
+
+func (manager *PartnerManager) FindAllByCollectPriority() []*Partner {
+	partners := manager.FindAll()
+	sort.Sort(ByPriority(partners))
+	return partners
 }
 
 func (manager *PartnerManager) Save(partner *Partner) bool {
@@ -694,12 +710,19 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 		partner.id = PartnerId(manager.NewUUID())
 	}
 	partner.manager = manager
+
+	manager.mutex.Lock()
 	manager.byId[partner.id] = partner
+	manager.mutex.Unlock()
+
 	return true
 }
 
 func (manager *PartnerManager) Delete(partner *Partner) bool {
+	manager.mutex.Lock()
 	delete(manager.byId, partner.id)
+	manager.mutex.Unlock()
+
 	return true
 }
 
@@ -716,9 +739,11 @@ func (manager *PartnerManager) Referential() *Referential {
 }
 
 func (manager *PartnerManager) CancelSubscriptions() {
+	manager.mutex.Lock()
 	for _, partner := range manager.byId {
 		partner.CancelSubscriptions()
 	}
+	manager.mutex.Unlock()
 }
 
 func (manager *PartnerManager) Load() error {
@@ -777,6 +802,8 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 	}
 
 	// Insert partners
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 	for _, partner := range manager.byId {
 		dbPartner, err := manager.newDbPartner(partner)
 		if err != nil {

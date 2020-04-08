@@ -1,5 +1,5 @@
-run:
-	go run edwig.go api
+run: # for dev
+	go run -race edwig.go api
 
 migrations:
 	go run edwig.go migrate up
