@@ -44,10 +44,14 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	var c core.Connector
 	if resource == "trip-updates" {
 		c, ok = partner.Connector(core.GTFS_RT_TRIP_UPDATES_BROADCASTER)
-		gc[0] = c.(core.GtfsConnector)
+		if ok {
+			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
+		}
 	} else if resource == "vehicle-positions" {
 		c, ok = partner.Connector(core.GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-		gc[0] = c.(core.GtfsConnector)
+		if ok {
+			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
+		}
 	} else {
 		gc, ok = partner.GtfsConnectors()
 	}
