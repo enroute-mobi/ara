@@ -3,9 +3,9 @@ package siri
 import (
 	"bytes"
 	"strings"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -121,57 +121,6 @@ type SIRIMessage struct {
 	NumberOfLines       int
 	NumberOfCharPerLine int
 }
-
-const generalMessageResponseTemplate = `<sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<ServiceDeliveryInfo>
-		<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
-		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
-		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-	</ServiceDeliveryInfo>
-	<Answer>
-		{{ .BuildGeneralMessageDeliveryXML }}
-	</Answer>
-	<AnswerExtension/>
-</sw:GetGeneralMessageResponse>`
-
-const generalMessageDeliveryTemplate = `<siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
-			<siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-			<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-			<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
-			<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-				<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
-				<siri:{{.ErrorType}}>{{ end }}
-					<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
-				</siri:{{.ErrorType}}>
-			</siri:ErrorCondition>{{ else }}{{range .GeneralMessages}}
-			{{ .BuildGeneralMessageXML }}{{end}}{{end}}
-		</siri:GeneralMessageDelivery>`
-
-const generalMessageTemplate = `{{ if .FormatRef }}<siri:GeneralMessage formatRef="{{ .FormatRef }}">{{ else }}<siri:GeneralMessage>{{ end }}
-				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
-				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
-				<siri:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</siri:InfoMessageIdentifier>
-				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
-				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
-				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
-				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:type="stif:IDFGeneralMessageStructure">{{range .References }}
-					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
-					<siri:LineSection>{{ if .FirstStop }}
-						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
-						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
-						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
-					</siri:LineSection>{{end}}{{range .Messages}}
-					<Message>{{if .Type}}
-						<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
-						<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines }}
-						<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
-						<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
-					</Message>{{end}}
-				</siri:Content>
-			</siri:GeneralMessage>`
 
 func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
 	doc, err := gokogiri.ParseXml(content)
@@ -429,8 +378,8 @@ func (message *XMLMessage) NumberOfCharPerLine() int {
 
 func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessage = template.Must(template.New("generalMessageResponse").Parse(generalMessageResponseTemplate))
-	if err := generalMessage.Execute(&buffer, response); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "general_message_response.template", response); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -438,8 +387,8 @@ func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
 
 func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageDeliveryXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessageDelivery = template.Must(template.New("generalMessageDelivery").Parse(generalMessageDeliveryTemplate))
-	if err := generalMessageDelivery.Execute(&buffer, delivery); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "general_message_delivery.template", delivery); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -447,8 +396,8 @@ func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageDeliveryXML() (st
 
 func (message *SIRIGeneralMessage) BuildGeneralMessageXML() (string, error) {
 	var buffer bytes.Buffer
-	var generalMessage = template.Must(template.New("generalMessage").Parse(generalMessageTemplate))
-	if err := generalMessage.Execute(&buffer, message); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "general_message.template", message); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

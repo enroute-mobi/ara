@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -45,23 +45,6 @@ type SIRIStopMonitoringRequest struct {
 	RequestTimestamp time.Time
 }
 
-const getStopMonitoringRequestTemplate = `<sw:GetStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<ServiceRequestInfo>
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-	</ServiceRequestInfo>
-	<Request version="2.0:FR-IDF-2.4">
-		{{ .BuildStopMonitoringRequestXML }}
-	</Request>
-	<RequestExtension />
-</sw:GetStopMonitoring>`
-
-const stopMonitoringRequestTemplate = `<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-		<siri:MonitoringRef>{{.MonitoringRef}}</siri:MonitoringRef>{{ if .StopVisitTypes }}
-		<siri:StopVisitTypes>{{.StopVisitTypes}}</siri:StopVisitTypes>{{ end }}`
-
 func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {
 	xmlStopMonitoringRequest := &XMLGetStopMonitoring{}
 	xmlStopMonitoringRequest.node = NewXMLNode(node)
@@ -100,8 +83,8 @@ func (request *XMLGetStopMonitoring) RequestorRef() string {
 
 func (request *SIRIGetStopMonitoringRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(getStopMonitoringRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "get_stop_monitoring_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -109,8 +92,8 @@ func (request *SIRIGetStopMonitoringRequest) BuildXML() (string, error) {
 
 func (request *SIRIStopMonitoringRequest) BuildStopMonitoringRequestXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "stop_monitoring_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

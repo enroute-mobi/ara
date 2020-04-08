@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -27,27 +27,6 @@ type SIRICheckStatusResponse struct {
 	ResponseTimestamp         time.Time
 	ServiceStartedTime        time.Time
 }
-
-const checkStatusResponseTemplate = `<sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<CheckStatusAnswerInfo>
-		<siri:ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ResponseTimestamp>
-		<siri:ProducerRef>{{.ProducerRef}}</siri:ProducerRef>{{ if .Address }}
-		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
-		<siri:ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>{{.RequestMessageRef}}</siri:RequestMessageRef>
-	</CheckStatusAnswerInfo>
-	<Answer>
-		<siri:Status>{{.Status}}</siri:Status>{{ if not .Status }}
-		<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-			<siri:OtherError number="{{.ErrorNumber}}">{{ else }}
-			<siri:{{.ErrorType}}>{{ end }}
-				<siri:ErrorText>{{.ErrorText}}</siri:ErrorText>
-			</siri:{{.ErrorType}}>
-		</siri:ErrorCondition>{{ end }}
-		<siri:ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ServiceStartedTime>
-	</Answer>
-	<AnswerExtension/>
-</sw:CheckStatusResponse>`
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
 	xmlCheckStatusResponse := &XMLCheckStatusResponse{}
@@ -80,12 +59,12 @@ func NewSIRICheckStatusResponse(
 		ProducerRef:               producerRef,
 		RequestMessageRef:         requestMessageRef,
 		ResponseMessageIdentifier: responseMessageIdentifier,
-		Status:             status,
-		ErrorType:          errorType,
-		ErrorNumber:        errorNumber,
-		ErrorText:          errorText,
-		ResponseTimestamp:  responseTimestamp,
-		ServiceStartedTime: serviceStartedTime}
+		Status:                    status,
+		ErrorType:                 errorType,
+		ErrorNumber:               errorNumber,
+		ErrorText:                 errorText,
+		ResponseTimestamp:         responseTimestamp,
+		ServiceStartedTime:        serviceStartedTime}
 }
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
@@ -98,8 +77,8 @@ func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 // TODO : Handle errors
 func (response *SIRICheckStatusResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriResponse = template.Must(template.New("siriResponse").Parse(checkStatusResponseTemplate))
-	if err := siriResponse.Execute(&buffer, response); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "check_status_response.template", response); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

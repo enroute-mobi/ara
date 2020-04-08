@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -24,19 +24,6 @@ type XMLDeleteSubscriptionRequest struct {
 	cancelAll       Bool
 	subscriptionRef string
 }
-
-const deleteSubscriptionRequestTemplate = `<sw:DeleteSubscription xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<DeleteSubscriptionInfo>
-		<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
-	</DeleteSubscriptionInfo>
-	<Request version="2.0:FR-IDF-2.4">{{ if .CancelAll }}
-		<siri:All/>{{ else }}
-		<siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>{{ end }}
-	</Request>
-	<RequestExtension/>
-</sw:DeleteSubscription>`
 
 func NewXMLDeleteSubscriptionRequest(node xml.Node) *XMLDeleteSubscriptionRequest {
 	xmlDeleteSubscriptionRequest := &XMLDeleteSubscriptionRequest{}
@@ -69,8 +56,8 @@ func (request *XMLDeleteSubscriptionRequest) CancelAll() bool {
 
 func (request *SIRIDeleteSubscriptionRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var deleteSubscriptionRequest = template.Must(template.New("deleteSubscriptionRequestTemplate").Parse(deleteSubscriptionRequestTemplate))
-	if err := deleteSubscriptionRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "delete_subscription_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -25,7 +25,7 @@ type XMLSubscriptionResponse struct {
 type XMLResponseStatus struct {
 	SubscriptionDeliveryXMLStructure
 
-	validUntil        time.Time
+	validUntil time.Time
 }
 
 type SIRISubscriptionResponse struct {
@@ -52,33 +52,6 @@ type SIRIResponseStatus struct {
 	ResponseTimestamp time.Time
 	ValidUntil        time.Time
 }
-
-const subscriptionResponseTemplate = `<sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-    <SubscriptionAnswerInfo>
-        <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-        <siri:Address>{{ .Address }}</siri:Address>
-        <siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
-        <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">{{.RequestMessageRef}}</siri:RequestMessageRef>
-    </SubscriptionAnswerInfo>
-    <Answer>{{ range .ResponseStatus }}
-        <siri:ResponseStatus>
-            <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-            <siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-            <siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
-            <siri:SubscriptionRef>{{ .SubscriptionRef }}</siri:SubscriptionRef>
-            <siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
-						<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}
-							<siri:OtherError number="{{ .ErrorNumber }}">{{ else }}
-							<siri:{{ .ErrorType }}>{{ end }}
-								<siri:ErrorText>{{ .ErrorText }}</siri:ErrorText>
-							</siri:{{ .ErrorType }}>
-						</siri:ErrorCondition>{{ end }}{{ if not .ValidUntil.IsZero }}
-            <siri:ValidUntil>{{ .ValidUntil.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntil>{{ end }}
-        </siri:ResponseStatus>{{ end }}
-        <siri:ServiceStartedTime>{{ .ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ServiceStartedTime>
-    </Answer>
-		<AnswerExtension />
-</sw:SubscribeResponse>`
 
 func NewXMLSubscriptionResponse(node xml.Node) *XMLSubscriptionResponse {
 	xmlStopMonitoringSubscriptionResponse := &XMLSubscriptionResponse{}
@@ -154,8 +127,8 @@ func (response *XMLResponseStatus) ValidUntil() time.Time {
 
 func (response *SIRISubscriptionResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriResponse = template.Must(template.New("SubscribeResponse").Parse(subscriptionResponseTemplate))
-	if err := siriResponse.Execute(&buffer, response); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "subscription_response.template", response); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

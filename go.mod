@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.4
+	github.com/af83/edwig v0.0.0-20191112150804-cf6bad9da63b // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/golangci/golangci-lint v1.21.0 // indirect
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
@@ -14,4 +15,5 @@ require (
 	golang.org/x/text v0.3.2
 	gopkg.in/gorp.v1 v1.7.1
 	gopkg.in/yaml.v2 v2.2.4
+	honnef.co/go/tools v0.0.1-2019.2.3
 )

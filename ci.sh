@@ -2,7 +2,7 @@
 
 set -ex
 
-source_dir=$(dirname "$0")
+source_dir="$(pwd -P)/$(dirname "$0")"
 
 cat > "$source_dir/config/database.yml" <<EOF
 test:
@@ -18,6 +18,7 @@ cd $source_dir
 go install -v ./...
 
 export EDWIG_ENV=test
+export EDWIG_ROOT=$source_dir
 "$GOPATH/bin/edwig" migrate up
 
 go get github.com/schrej/godacov

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/edwig/logger"
@@ -113,22 +114,36 @@ func getConfigDirectory(path string) (string, error) {
 		fmt.Sprintf("%s/src/bitbucket.org/enroute-mobi/ara/config", os.Getenv("GOPATH")),
 	}
 	for _, directoryPath := range paths {
-		if found := checkDirectory(directoryPath); found {
+		if found := checkDirectory("config", directoryPath); found {
 			return directoryPath, nil
 		}
 	}
 	return "", errors.New("can't find config directory")
 }
 
-func checkDirectory(path string) bool {
+func GetTemplateDirectory() (string, error) {
+	paths := [2]string{
+		os.Getenv("EDWIG_ROOT"),
+		fmt.Sprintf("%s/src/bitbucket.org/enroute-mobi/ara", os.Getenv("GOPATH")),
+	}
+	for _, directoryPath := range paths {
+		templatePath := filepath.Join(directoryPath, "/siri/templates")
+		if found := checkDirectory("template", templatePath); found {
+			return templatePath, nil
+		}
+	}
+	return "", errors.New("can't find template directory")
+}
+
+func checkDirectory(kind, path string) bool {
 	if path == "" {
 		return false
 	}
 	if _, err := os.Stat(path); err == nil {
-		logger.Log.Debugf("Found config directory at %s", path)
+		logger.Log.Debugf("Found %v directory at %s", kind, path)
 		return true
 	}
-	logger.Log.Debugf("Can't find config directory at %s", path)
+	logger.Log.Debugf("Can't find %v directory at %s", kind, path)
 	return false
 }
 

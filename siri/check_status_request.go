@@ -2,9 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -18,15 +18,6 @@ type SIRICheckStatusRequest struct {
 	RequestorRef      string
 	RequestTimestamp  time.Time
 }
-
-const checkStatusRequestTemplate = `<sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<Request>
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
-	</Request>
-	<RequestExtension/>
-</sw:CheckStatus>`
 
 func NewXMLCheckStatusRequest(node xml.Node) *XMLCheckStatusRequest {
 	xmlCheckStatusRequest := &XMLCheckStatusRequest{}
@@ -57,8 +48,8 @@ func NewSIRICheckStatusRequest(
 // TODO : Handle errors
 func (request *SIRICheckStatusRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(checkStatusRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "check_status_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

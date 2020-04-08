@@ -28,7 +28,7 @@ COPY docker-entrypoint.sh ./
 COPY db/migrations ./db/migrations
 RUN chmod +x ./edwig ./docker-entrypoint.sh && mkdir ./config
 
-ENV EDWIG_CONFIG=./config EDWIG_ENV=production
+ENV EDWIG_CONFIG=./config EDWIG_ENV=production EDWIG_ROOT=/app
 EXPOSE 8080
 
 ENTRYPOINT ["./docker-entrypoint.sh"]

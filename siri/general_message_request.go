@@ -3,9 +3,9 @@ package siri
 import (
 	"bytes"
 	"strings"
-	"text/template"
 	"time"
 
+	"bitbucket.org/enroute-mobi/edwig/logger"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -51,34 +51,6 @@ type SIRIGeneralMessageRequest struct {
 	RouteRef          []string
 	GroupOfLinesRef   []string
 }
-
-const getGeneralMessageRequestTemplate = `<sw:GetGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
-	<ServiceRequestInfo>
-		<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{ .RequestorRef }}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
-	</ServiceRequestInfo>
-	<Request version="2.0:FR-IDF-2.4">
-		{{ .BuildGeneralMessageRequestXML }}
-	</Request>
-	<RequestExtension/>
-</sw:GetGeneralMessage>`
-
-const generalMessageRequestTemplate = `<siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
-		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>{{ range .InfoChannelRef }}
-		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}
-		<siri:Extensions>{{ if .XsdInWsdl }}
-			<siri:IDFGeneralMessageRequestFilter>{{ else }}
-			<sws:IDFGeneralMessageRequestFilter>{{ end }}{{ range .LineRef }}
-				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .StopPointRef }}
-				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
-				<siri:JourneyPatternRef>{{ . }}</siri:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
-				<siri:DestinationRef>{{ . }}</siri:DestinationRef>{{ end }}{{ range .RouteRef }}
-				<siri:RouteRef>{{ . }}</siri:RouteRef>{{ end }}{{ range .GroupOfLinesRef }}
-				<siri:GroupOfLinesRef>{{ . }}</siri:GroupOfLinesRef>{{ end }}{{ if .XsdInWsdl }}
-			</siri:IDFGeneralMessageRequestFilter>{{ else }}
-			</sws:IDFGeneralMessageRequestFilter>{{ end }}
-		</siri:Extensions>`
 
 func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
 	xmlGeneralMessageRequest := &XMLGetGeneralMessage{}
@@ -186,8 +158,8 @@ func NewSIRIGeneralMessageRequest(
 
 func (request *SIRIGetGeneralMessageRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("getGeneralMessageRequest").Parse(getGeneralMessageRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "get_general_message_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -195,8 +167,8 @@ func (request *SIRIGetGeneralMessageRequest) BuildXML() (string, error) {
 
 func (request *SIRIGeneralMessageRequest) BuildGeneralMessageRequestXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("generalMessageRequest").Parse(generalMessageRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "general_message_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

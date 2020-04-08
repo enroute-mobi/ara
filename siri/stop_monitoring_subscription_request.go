@@ -2,8 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
+
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type XMLStopMonitoringSubscriptionRequestEntry struct {
@@ -31,28 +32,6 @@ type SIRIStopMonitoringSubscriptionRequestEntry struct {
 
 	InitialTerminationTime time.Time
 }
-
-const stopMonitoringSubscriptionRequestTemplate = `<ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<SubscriptionRequestInfo>
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
-		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
-	</SubscriptionRequestInfo>
-	<Request>{{ range .Entries }}
-		<siri:StopMonitoringSubscriptionRequest>
-			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
-			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
-			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
-			<siri:StopMonitoringRequest version="2.0:FR-IDF-2.4">
-				{{ .BuildStopMonitoringRequestXML }}
-			</siri:StopMonitoringRequest>
-			<siri:IncrementalUpdates>true</siri:IncrementalUpdates>
-			<siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
-		</siri:StopMonitoringSubscriptionRequest>{{end}}
-	</Request>
-	<RequestExtension />
-</ws:Subscribe>`
 
 func NewXMLStopMonitoringSubscriptionRequestEntry(node XMLNode) *XMLStopMonitoringSubscriptionRequestEntry {
 	xmlStopMonitoringSubscriptionRequestEntry := &XMLStopMonitoringSubscriptionRequestEntry{}
@@ -83,8 +62,8 @@ func (request *XMLStopMonitoringSubscriptionRequestEntry) InitialTerminationTime
 
 func (request *SIRIStopMonitoringSubscriptionRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(stopMonitoringSubscriptionRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "stop_monitoring_subscription_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil

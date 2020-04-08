@@ -2,8 +2,9 @@ package siri
 
 import (
 	"bytes"
-	"text/template"
 	"time"
+
+	"bitbucket.org/enroute-mobi/edwig/logger"
 )
 
 type XMLGeneralMessageSubscriptionRequestEntry struct {
@@ -31,26 +32,6 @@ type SIRIGeneralMessageSubscriptionRequestEntry struct {
 
 	InitialTerminationTime time.Time
 }
-
-const generalMessageSubscriptionRequestTemplate = `<sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
-	<SubscriptionRequestInfo>
-		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
-		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
-		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
-		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
-	</SubscriptionRequestInfo>
-	<Request>{{ range .Entries }}
-		<siri:GeneralMessageSubscriptionRequest>
-			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
-			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
-			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
-			<siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
-				{{ .BuildGeneralMessageRequestXML }}
-			</siri:GeneralMessageRequest>
-		</siri:GeneralMessageSubscriptionRequest>{{ end }}
-	</Request>
-	<RequestExtension/>
-</sw:Subscribe>`
 
 func NewXMLGeneralMessageSubscriptionRequestEntry(node XMLNode) *XMLGeneralMessageSubscriptionRequestEntry {
 	xmlGeneralMessageSubscriptionRequestEntry := &XMLGeneralMessageSubscriptionRequestEntry{}
@@ -81,8 +62,8 @@ func (request *XMLGeneralMessageSubscriptionRequestEntry) InitialTerminationTime
 
 func (request *SIRIGeneralMessageSubscriptionRequest) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	var siriRequest = template.Must(template.New("siriRequest").Parse(generalMessageSubscriptionRequestTemplate))
-	if err := siriRequest.Execute(&buffer, request); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "general_message_subscription_request.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
 	return buffer.String(), nil
