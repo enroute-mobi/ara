@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{"actual", "expected", "aimed"}
+
 type StopVisitId ModelId
 
 type StopVisitAttributes struct {
@@ -202,20 +204,27 @@ func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
 }
 
 func (stopVisit *StopVisit) ReferenceTime() time.Time {
-	orderMap := []StopVisitScheduleType{"actual", "expected", "aimed"}
+	if t := stopVisit.ReferenceArrivalTime(); !t.IsZero() {
+		return t
+	}
+	return stopVisit.ReferenceDepartureTime()
+}
 
-	for _, kind := range orderMap {
+func (stopVisit *StopVisit) ReferenceArrivalTime() time.Time {
+	for _, kind := range SCHEDULE_ORDER_MAP {
 		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.ArrivalTime().IsZero() {
 			return schedule.ArrivalTime()
 		}
 	}
+	return time.Time{}
+}
 
-	for _, kind := range orderMap {
+func (stopVisit *StopVisit) ReferenceDepartureTime() time.Time {
+	for _, kind := range SCHEDULE_ORDER_MAP {
 		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.DepartureTime().IsZero() {
 			return schedule.DepartureTime()
 		}
 	}
-
 	return time.Time{}
 }
 

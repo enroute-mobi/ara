@@ -415,6 +415,11 @@ func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
 	return
 }
 
+func (partner *Partner) GzipGtfs() (r bool) {
+	r, _ = strconv.ParseBool(partner.Settings["broadcast.gzip_gtfs"])
+	return
+}
+
 // APIPartner.Validate should be called for APIPartner factories to be set
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id
@@ -496,6 +501,20 @@ func (partner *Partner) CheckStatusClient() CheckStatusClient {
 		return client.(CheckStatusClient)
 	}
 	return nil
+}
+
+func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
+	c, ok1 := partner.connectors[GTFS_RT_TRIP_UPDATES_BROADCASTER]
+	if ok1 {
+		connectors = append(connectors, c.(GtfsConnector))
+	}
+	c, ok2 := partner.connectors[GTFS_RT_VEHICLE_POSITIONS_BROADCASTER]
+	if ok2 {
+		connectors = append(connectors, c.(GtfsConnector))
+	}
+	ok = ok1 || ok2
+
+	return
 }
 
 func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCollector {

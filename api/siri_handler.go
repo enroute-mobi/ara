@@ -112,6 +112,10 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	if requestHandler.RequestorRef() == "" {
+		siriErrorWithRequest("UnknownCredential", "Can't have empty credentials", envelope.Body().String(), response)
+		return
+	}
 	partner, ok := handler.referential.Partners().FindBySetting(core.LOCAL_CREDENTIAL, requestHandler.RequestorRef())
 	if !ok {
 		siriErrorWithRequest("UnknownCredential", "RequestorRef Unknown", envelope.Body().String(), response)

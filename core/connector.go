@@ -1,5 +1,10 @@
 package core
 
+import (
+	"bitbucket.org/enroute-mobi/edwig/audit"
+	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
+)
+
 const (
 	PUSH_COLLECTOR                                    = "push-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR      = "siri-stop-points-discovery-request-collector"
@@ -27,6 +32,8 @@ const (
 	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER  = "siri-lite-vehicle-monitoring-request-broadcaster"
 	TEST_VALIDATION_CONNECTOR                         = "test-validation-connector"
 	TEST_STARTABLE_CONNECTOR                          = "test-startable-connector-connector"
+	GTFS_RT_TRIP_UPDATES_BROADCASTER                  = "gtfs-rt-trip-updates-broadcaster"
+	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER             = "gtfs-rt-vehicle-positions-broadcaster"
 )
 
 const (
@@ -34,6 +41,10 @@ const (
 )
 
 type Connector interface{}
+
+type GtfsConnector interface {
+	HandleGtfs(*gtfs.FeedMessage, audit.LogStashEvent)
+}
 
 type BaseConnector struct {
 	partner *Partner
@@ -109,6 +120,10 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER:
 		return &SIRILiteVehicleMonitoringRequestBroadcasterFactory{}
+	case GTFS_RT_TRIP_UPDATES_BROADCASTER:
+		return &TripUpdatesBroadcasterFactory{}
+	case GTFS_RT_VEHICLE_POSITIONS_BROADCASTER:
+		return &VehiclePositionBroadcasterFactory{}
 	case TEST_VALIDATION_CONNECTOR:
 		return &TestValidationFactory{}
 	case TEST_STARTABLE_CONNECTOR:

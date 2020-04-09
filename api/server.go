@@ -169,6 +169,11 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 		return
 	}
 
+	if foundStrings[2] == "gtfs" {
+		server.handleGtfs(response, request, foundStrings[1], foundStrings[3])
+		return
+	}
+
 	requestData := NewRequestDataFromContent(foundStrings)
 	requestData.Method = request.Method
 	requestData.Url = request.URL.Path
@@ -241,4 +246,17 @@ func (server *Server) handlePush(response http.ResponseWriter, request *http.Req
 
 	pushHandler := NewPushHandler(foundReferential, server.getToken(request))
 	pushHandler.serve(response, request)
+}
+
+func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request, referential, resource string) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	logger.Log.Debugf("Gtfs request: %v", request)
+
+	gtfsHandler := NewGtfsHandler(foundReferential, server.getToken(request))
+	gtfsHandler.serve(response, request, resource)
 }
