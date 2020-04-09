@@ -1,5 +1,7 @@
 bitbucket.org/enroute-mobi/ara-external-models v0.0.4 h1:1p1MMF6KOx1+5nDUwwGp+T1481U6a3ocWBnOL4mPNT8=
 bitbucket.org/enroute-mobi/ara-external-models v0.0.4/go.mod h1:E3mgDSDmQX3ovOBADTZx3JW2ZxvOYBQcBmI1fgz3K4Q=
+bitbucket.org/enroute-mobi/ara-external-models v0.0.5 h1:pO6R3WOrKkHe8lL2Pxn0Co8394giKNmCXCsNS0mwegU=
+bitbucket.org/enroute-mobi/ara-external-models v0.0.5/go.mod h1:E3mgDSDmQX3ovOBADTZx3JW2ZxvOYBQcBmI1fgz3K4Q=
 github.com/MobilityData/gtfs-realtime-bindings v0.0.0-20191010155923-84afb4d32b79 h1:+LSmbKsA4/n1LrZpyo5rvc9WGQu/juHcK/nycR68Wxc=
 github.com/MobilityData/gtfs-realtime-bindings v0.0.0-20191010155923-84afb4d32b79/go.mod h1:bo+EAJ4BOgOw/d7mR+GSgy6ezVGrRD8EasCryJ5BkNg=
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=

@@ -3,7 +3,7 @@ module bitbucket.org/enroute-mobi/edwig
 go 1.12
 
 require (
-	bitbucket.org/enroute-mobi/ara-external-models v0.0.4
+	bitbucket.org/enroute-mobi/ara-external-models v0.0.5
 	github.com/MobilityData/gtfs-realtime-bindings v0.0.0-20191010155923-84afb4d32b79
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.3.2
