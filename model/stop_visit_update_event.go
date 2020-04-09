@@ -7,8 +7,9 @@ type StopVisitUpdateEvent struct {
 	StopAreaObjectId       ObjectID
 	VehicleJourneyObjectId ObjectID
 
-	Monitored bool
-	Schedules StopVisitSchedules
+	PassageOrder int
+	Monitored    bool
+	Schedules    StopVisitSchedules
 }
 
 func NewStopVisitUpdateEvent() *StopVisitUpdateEvent {

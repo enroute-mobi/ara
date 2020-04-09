@@ -159,6 +159,8 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		sv.VehicleJourneyId = vj.Id()
 
 		sv.Origin = event.Origin
+
+		sv.PassageOrder = event.PassageOrder
 	}
 
 	if sv.Schedules.Eq(&event.Schedules) {
