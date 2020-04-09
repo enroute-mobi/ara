@@ -26,6 +26,7 @@ WORKDIR /app
 COPY --from=builder /go/bin/edwig ./
 COPY docker-entrypoint.sh ./
 COPY db/migrations ./db/migrations
+COPY siri/templates ./siri/templates
 RUN chmod +x ./edwig ./docker-entrypoint.sh && mkdir ./config
 
 ENV EDWIG_CONFIG=./config EDWIG_ENV=production EDWIG_ROOT=/app
