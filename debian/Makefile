@@ -1,8 +1,8 @@
 PWD := $(shell pwd)
 TMPGOPATH := "${PWD}/go"
-GOPKG := github.com/af83/edwig
+GOPKG := bitbucket.org/enroute-mobi/edwig
 VERSION := $(shell head -1 debian/changelog | sed 's/edwig (\(.*\)) .*/\1/')
-LDFLAGS := -ldflags "-X github.com/af83/edwig/version.value=${VERSION}"
+LDFLAGS := -ldflags "-X bitbucket.org/enroute-mobi/edwig/version.value=${VERSION}"
 
 export PATH := /go/bin:$(PATH)
 

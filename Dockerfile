@@ -8,12 +8,12 @@ ARG VERSION=dev
 ENV DEV_PACKAGES="libxml2-dev"
 RUN apt-get update && apt-get -y install --no-install-recommends $DEV_PACKAGES
 
-WORKDIR /go/src/github.com/af83/edwig
+WORKDIR /go/src/bitbucket.org/enroute-mobi/edwig
 COPY . .
 
 ENV GO111MODULE=on
 RUN go get -d -v ./...
-RUN go install -v -ldflags "-X github.com/af83/edwig/version.value=${VERSION}" ./...
+RUN go install -v -ldflags "-X bitbucket.org/enroute-mobi/edwig/version.value=${VERSION}" ./...
 
 FROM debian:buster
 

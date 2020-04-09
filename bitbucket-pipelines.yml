@@ -22,7 +22,7 @@ definitions:
           - gem install bundler:$BUNDLER_VERSION
 
           # FIXME
-          - export BASE_PATH="${GOPATH}/src/github.com/af83"
+          - export BASE_PATH="${GOPATH}/src/bitbucket.org/enroute-mobi"
           - mkdir -p ${BASE_PATH}
           - export IMPORT_PATH="${BASE_PATH}/edwig"
           - ln -s ${PWD} ${IMPORT_PATH}
