@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func getXMLStopMonitoringSubscriptionTerminatedNotification(t *testing.T) *XMLStopMonitoringSubscriptionTerminatedResponse {
+func getXMLSubscriptionTerminatedNotification(t *testing.T) *XMLSubscriptionTerminatedNotification {
 	file, err := os.Open("testdata/subscription_terminated_notification-soap.xml")
 	if err != nil {
 		t.Fatal(err)
@@ -18,12 +18,12 @@ func getXMLStopMonitoringSubscriptionTerminatedNotification(t *testing.T) *XMLSt
 		t.Fatal(err)
 	}
 
-	response, _ := NewXMLStopMonitoringSubscriptionTerminatedResponseFromContent(content)
+	response, _ := NewXMLSubscriptionTerminatedNotificationFromContent(content)
 	return response
 }
 
-func Test_XMLStopMonitoringSubscriptionTerminatedResponse(t *testing.T) {
-	response := getXMLStopMonitoringSubscriptionTerminatedNotification(t)
+func Test_XMLSubscriptionTerminatedNotification(t *testing.T) {
+	response := getXMLSubscriptionTerminatedNotification(t)
 
 	if expected := "KUBRICK"; response.ProducerRef() != expected {
 		t.Errorf("Incorrect ProducerRef expected: %v\n got: %v", expected, response.ProducerRef())

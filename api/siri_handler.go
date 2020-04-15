@@ -50,9 +50,13 @@ func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequ
 		return &SIRIGeneralMessageRequestDeliveriesResponseHandler{
 			xmlRequest: siri.NewXMLNotifyGeneralMessage(envelope.Body()),
 		}
+	case "NotifySubscriptionTerminated":
+		return &SIRINotifySubscriptionTerminatedHandler{
+			xmlRequest: siri.NewXMLNotifySubscriptionTerminated(envelope.Body()),
+		}
 	case "SubscriptionTerminatedNotification":
-		return &SIRIStopMonitoringSubscriptionTerminatedResponseHandler{
-			xmlRequest: siri.NewXMLStopMonitoringSubscriptionTerminatedResponse(envelope.Body()),
+		return &SIRISubscriptionTerminatedNotificationHandler{
+			xmlRequest: siri.NewXMLSubscriptionTerminatedNotification(envelope.Body()),
 		}
 	case "StopPointsDiscovery":
 		return &SIRIStopDiscoveryRequestHandler{

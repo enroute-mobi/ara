@@ -429,3 +429,97 @@ func Test_ReceiveStateGM(t *testing.T) {
 	}
 
 }
+
+func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
+	file, err := os.Open("../siri/testdata/subscription_terminated_notification-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := siri.NewXMLSubscriptionTerminatedNotificationFromContent(content)
+	connectors := make(map[string]Connector)
+
+	partners := createTestPartnerManager()
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"remote_url":           "une url",
+			"remote_objectid_kind": "_internal",
+		},
+		manager:    partners,
+		connectors: connectors,
+	}
+
+	connector := NewSIRISubscriptionRequestDispatcher(partner)
+	connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
+
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription.Save()
+
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
+		t.Fatalf("Subscriptions should be found")
+	}
+
+	connector.HandleSubscriptionTerminatedNotification(response)
+
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
+		t.Errorf("Subscriptions should not be found")
+	}
+}
+
+func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
+	file, err := os.Open("../siri/testdata/notify-subscription-terminated-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := siri.NewXMLNotifySubscriptionTerminatedFromContent(content)
+	connectors := make(map[string]Connector)
+
+	partners := createTestPartnerManager()
+	partner := &Partner{
+		context: make(Context),
+		Settings: map[string]string{
+			"remote_url":           "une url",
+			"remote_objectid_kind": "_internal",
+		},
+		manager:    partners,
+		connectors: connectors,
+	}
+
+	connector := NewSIRISubscriptionRequestDispatcher(partner)
+	connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
+
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	partners.Save(partner)
+
+	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription.Save()
+
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
+		t.Fatalf("Subscriptions should be found")
+	}
+
+	connector.HandleNotifySubscriptionTerminated(response)
+
+	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
+		t.Errorf("Subscriptions should not be found")
+	}
+}

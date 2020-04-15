@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 
 	"bitbucket.org/enroute-mobi/edwig/audit"
 	"bitbucket.org/enroute-mobi/edwig/logger"
@@ -12,6 +13,8 @@ import (
 type SubscriptionRequestDispatcher interface {
 	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRISubscriptionResponse, error)
 	CancelSubscription(*siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse
+	HandleSubscriptionTerminatedNotification(*siri.XMLSubscriptionTerminatedNotification)
+	HandleNotifySubscriptionTerminated(*siri.XMLNotifySubscriptionTerminated)
 }
 
 type SIRISubscriptionRequestDispatcherFactory struct{}
@@ -153,6 +156,24 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	return resp
 }
 
+func (connector *SIRISubscriptionRequestDispatcher) HandleSubscriptionTerminatedNotification(response *siri.XMLSubscriptionTerminatedNotification) {
+	logStashEvent := make(audit.LogStashEvent)
+
+	logXMLSubscriptionTerminatedNotification(logStashEvent, response)
+
+	connector.partner.Subscriptions().DeleteById(SubscriptionId(response.SubscriptionRef()))
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+}
+
+func (connector *SIRISubscriptionRequestDispatcher) HandleNotifySubscriptionTerminated(r *siri.XMLNotifySubscriptionTerminated) {
+	logStashEvent := connector.newLogStashEvent()
+
+	logXMLNotifySubscriptionTerminated(logStashEvent, r)
+
+	connector.partner.Subscriptions().DeleteById(SubscriptionId(r.SubscriptionRef()))
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+}
+
 func (connector *SIRISubscriptionRequestDispatcher) newLogStashEvent() audit.LogStashEvent {
 	return connector.partner.NewLogStashEvent()
 }
@@ -203,4 +224,31 @@ func logSIRICancelSubscriptionResponse(logStashEvent audit.LogStashEvent, respon
 		return
 	}
 	logStashEvent["responseXML"] = xml
+}
+
+func logXMLNotifySubscriptionTerminated(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifySubscriptionTerminated) {
+	logStashEvent["siriType"] = "NotifySubscriptionTerminated"
+	logStashEvent["address"] = notify.Address()
+	logStashEvent["producerRef"] = notify.ProducerRef()
+	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
+	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
+	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
+	logStashEvent["subscriberRef"] = notify.SubscriberRef()
+	logStashEvent["subscriptionRef"] = notify.SubscriptionRef()
+	logStashEvent["responseXML"] = notify.RawXML()
+}
+
+func logXMLSubscriptionTerminatedNotification(logStashEvent audit.LogStashEvent, response *siri.XMLSubscriptionTerminatedNotification) {
+	logStashEvent["siriType"] = "TerminatedSubscriptionNotification"
+	logStashEvent["producerRef"] = response.ProducerRef()
+	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
+	logStashEvent["subscriberRef"] = response.SubscriberRef()
+	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
+	logStashEvent["responseXML"] = response.RawXML()
+
+	logStashEvent["errorType"] = response.ErrorType()
+	if response.ErrorType() == "OtherError" {
+		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
+	}
+	logStashEvent["errorDescription"] = response.ErrorDescription()
 }
