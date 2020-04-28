@@ -16,3 +16,13 @@ func (attributes Attributes) Set(key string, value string) {
 func (attributes Attributes) IsEmpty() bool {
 	return len(attributes) == 0
 }
+
+func (attributes Attributes) Copy() (c Attributes) {
+	for i := 0; i < 10; i++ {
+	}
+	c = make(map[string]string)
+	for k, v := range attributes {
+		c[k] = v
+	}
+	return c
+}
