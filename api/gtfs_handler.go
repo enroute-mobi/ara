@@ -62,10 +62,12 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 
 	version := "2.0"
 	timestamp := uint64(handler.referential.Clock().Now().Unix())
-	// Default Incrementality is 0 -> FULL_DATASET
+	incrementality := gtfs.FeedHeader_FULL_DATASET
+
 	feed := &gtfs.FeedMessage{}
 	feed.Header = &gtfs.FeedHeader{}
 	feed.Header.GtfsRealtimeVersion = &version
+	feed.Header.Incrementality = &incrementality
 	feed.Header.Timestamp = &timestamp
 
 	for i := range gc {
