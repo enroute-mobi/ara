@@ -22,7 +22,7 @@ func (handler *SIRIDeleteSubscriptionRequestHandler) ConnectorType() string {
 }
 
 func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
-	logger.Log.Debugf("DeleteSubscription %s cancel subscription: %s\n", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
+	logger.Log.Debugf("DeleteSubscription %s cancel subscription: %s", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
 
 	response := connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest)
 

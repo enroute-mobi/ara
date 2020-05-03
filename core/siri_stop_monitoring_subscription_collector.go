@@ -18,7 +18,6 @@ type StopMonitoringSubscriptionCollector interface {
 
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
 	HandleNotifyStopMonitoring(delivery *siri.XMLNotifyStopMonitoring)
-	HandleTerminatedNotification(termination *siri.XMLStopMonitoringSubscriptionTerminatedResponse)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -118,15 +117,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastLegacyStopAre
 	if connector.stopAreaUpdateSubscriber != nil {
 		connector.stopAreaUpdateSubscriber(event)
 	}
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleTerminatedNotification(response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent := make(audit.LogStashEvent)
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logXMLSubscriptionTerminatedNotification(logStashEvent, response)
-
-	connector.partner.Subscriptions().DeleteById(SubscriptionId(response.SubscriptionRef()))
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
@@ -334,21 +324,6 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
 	}
 	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
-}
-
-func logXMLSubscriptionTerminatedNotification(logStashEvent audit.LogStashEvent, response *siri.XMLStopMonitoringSubscriptionTerminatedResponse) {
-	logStashEvent["siriType"] = "TerminatedSubscriptionNotification"
-	logStashEvent["producerRef"] = response.ProducerRef()
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef()
-	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
-	logStashEvent["responseXML"] = response.RawXML()
-
-	logStashEvent["errorType"] = response.ErrorType()
-	if response.ErrorType() == "OtherError" {
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
-	}
-	logStashEvent["errorDescription"] = response.ErrorDescription()
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {

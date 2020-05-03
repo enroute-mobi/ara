@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 
 	"bitbucket.org/enroute-mobi/edwig/audit"
 	"bitbucket.org/enroute-mobi/edwig/model"
@@ -125,71 +124,6 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 
 	if subscription.ResourcesLen() != 1 {
 		t.Errorf("Response should have 1 ressource but got %v\n", subscription.ResourcesLen())
-	}
-}
-
-func Test_SIRIStopMonitoringSubscriptionTerminationCollector(t *testing.T) {
-	file, err := os.Open("../siri/testdata/subscription_terminated_notification-soap.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer file.Close()
-	content, err := ioutil.ReadAll(file)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	response, _ := siri.NewXMLStopMonitoringSubscriptionTerminatedResponseFromContent(content)
-	connectors := make(map[string]Connector)
-
-	partners := createTestPartnerManager()
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"remote_url":           "une url",
-			"remote_objectid_kind": "_internal",
-		},
-		ConnectorTypes: []string{"siri-stop-monitoring-subscription-collector"},
-		manager:        partners,
-		connectors:     connectors,
-	}
-
-	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
-	connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR] = connector
-
-	partner.subscriptionManager = NewMemorySubscriptions(partner)
-	partners.Save(partner)
-
-	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
-
-	referential := partner.Referential()
-	stopArea := referential.Model().StopAreas().New()
-	stopArea.CollectedAlways = false
-	objectid := model.NewObjectID("_internal", "coicogn2")
-	stopArea.SetObjectID(objectid)
-	stopArea.Save()
-
-	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.Collected(time.Now())
-	objectid = model.NewObjectID("_internal", "stopvisit1")
-	stopVisit.SetObjectID(objectid)
-	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Save()
-
-	objId := model.NewObjectID("_internal", "coicogn2")
-	ref := model.Reference{
-		ObjectId: &objId,
-		Type:     "StopArea",
-	}
-
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
-	subscription.CreateAddNewResource(ref)
-	subscription.Save()
-
-	connector.HandleTerminatedNotification(response)
-
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
-		t.Errorf("Subscriptions should not be found \n")
 	}
 }
 
