@@ -70,6 +70,7 @@ func (stopVisit *StopVisit) modelId() ModelId {
 
 func (stopVisit *StopVisit) copy() *StopVisit {
 	s := *stopVisit
+	s.Attributes = stopVisit.Attributes.Copy()
 	s.Schedules = *(stopVisit.Schedules.Copy())
 	return &s
 }
