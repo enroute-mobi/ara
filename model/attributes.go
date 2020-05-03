@@ -18,8 +18,6 @@ func (attributes Attributes) IsEmpty() bool {
 }
 
 func (attributes Attributes) Copy() (c Attributes) {
-	for i := 0; i < 10; i++ {
-	}
 	c = make(map[string]string)
 	for k, v := range attributes {
 		c[k] = v
