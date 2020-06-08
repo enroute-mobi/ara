@@ -64,6 +64,8 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
 	logger.Log.Debugf("PushCollector handled %v models in %v", total, time.Since(t))
 
+	pc.partner.Pushed()
+
 	logStashEvent := pc.newLogStashEvent()
 	pc.logPushNotification(logStashEvent, model)
 	audit.CurrentLogStash().WriteEvent(logStashEvent)

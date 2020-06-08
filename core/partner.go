@@ -70,6 +70,7 @@ type Partner struct {
 	connectors          map[string]Connector
 	startedAt           time.Time
 	lastDiscovery       time.Time
+	lastPush            time.Time
 	context             Context
 	subscriptionManager Subscriptions
 	manager             Partners
@@ -315,6 +316,7 @@ func (partner *Partner) Stop() {
 func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
 	partner.lastDiscovery = time.Time{}
+	partner.lastPush = time.Time{}
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(model.Startable)
@@ -557,19 +559,38 @@ func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCo
 	return nil
 }
 
+func (partner *Partner) hasPushCollector() (ok bool) {
+	_, ok = partner.connectors[PUSH_COLLECTOR]
+	return ok
+}
+
 func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 	partnerStatus := PartnerStatus{}
 
 	if partner.CheckStatusClient() == nil {
-		logger.Log.Debugf("No CheckStatusClient connector for partner %v", partner.slug)
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
-		return partnerStatus, errors.New("no CheckStatusClient connector")
+		if !partner.hasPushCollector() {
+			logger.Log.Debugf("No CheckStatusClient or PushCollector connector for partner %v", partner.slug)
+			partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+			return partnerStatus, errors.New("no CheckStatusClient or PushCollector connector")
+		}
+		return partner.checkPushStatus()
 	}
 	partnerStatus, err := partner.CheckStatusClient().Status()
 
 	if err != nil {
 		logger.Log.Printf("Error while checking status: %v", err)
+	}
+	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
+	return partnerStatus, nil
+}
+
+func (partner *Partner) checkPushStatus() (partnerStatus PartnerStatus, _ error) {
+	logger.Log.Debugf("Checking %v partner status with PushNotifications", partner.slug)
+	if partner.lastPush.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+	} else {
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
 	}
 	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
@@ -622,6 +643,10 @@ func (partner *Partner) stopDiscovery() {
 	}
 
 	c.(StopPointsDiscoveryRequestCollector).RequestStopPoints()
+}
+
+func (partner *Partner) Pushed() {
+	partner.lastPush = partner.manager.Referential().Clock().Now()
 }
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
