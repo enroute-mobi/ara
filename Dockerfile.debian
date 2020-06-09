@@ -1,4 +1,4 @@
-# docker build -t edwig-build -f Dockerfile.debian .
+# docker build -t edwig-build --build-arg WEEK=`date +%Y%U` -f Dockerfile.debian .
 # docker run -v $PWD/target:/target edwig-build
 
 # ARG DEBIAN_VERSION=jessie
