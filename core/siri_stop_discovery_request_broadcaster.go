@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {

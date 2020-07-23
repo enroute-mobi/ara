@@ -59,7 +59,7 @@ var Log *Logger = &Logger{}
 func (logger *Logger) Writer() LogWriter {
 	if logger.writer == nil {
 		if logger.Syslog {
-			syslogWriter, err := syslog.New(syslog.LOG_DAEMON, "edwig")
+			syslogWriter, err := syslog.New(syslog.LOG_DAEMON, "ara")
 			if err != nil {
 				panic("Can't write to syslog")
 			}

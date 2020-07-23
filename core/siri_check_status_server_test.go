@@ -6,17 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["local_url"] = "http://ara"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	partner.Save()
 	referential.Start()
 	referential.Stop()
@@ -44,17 +44,17 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	}
 
 	time := model.DefaultClock().Now()
-	if response.Address != "http://edwig" {
-		t.Errorf("Wrong Address in response:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Wrong Address in response:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "CheckStatus:Test:0" {
 		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: CheckStatus:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	if !response.Status {
 		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status)

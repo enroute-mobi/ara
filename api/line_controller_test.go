@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {

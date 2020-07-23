@@ -34,7 +34,7 @@ Feature: Support SIRI VehicleMonitoring
   "Siri": {
     "ServiceDelivery": {
       "ResponseTimestamp": "2017-01-01T12:00:00Z",
-      "ProducerRef": "Edwig",
+      "ProducerRef": "Ara",
       "ResponseMessageIdentifier": "RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC",
       "RequestMessageRef": "Test:1234::LOC",
       "VehicleMonitoringDelivery": {
@@ -111,7 +111,7 @@ Feature: Support SIRI VehicleMonitoring
   "Siri": {
     "ServiceDelivery": {
       "ResponseTimestamp": "2017-01-01T12:00:00Z",
-      "ProducerRef": "Edwig",
+      "ProducerRef": "Ara",
       "ResponseMessageIdentifier": "RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC",
       "RequestMessageRef": "Test:1234::LOC",
       "VehicleMonitoringDelivery": {
@@ -194,7 +194,7 @@ Feature: Support SIRI VehicleMonitoring
   "Siri": {
     "ServiceDelivery": {
       "ResponseTimestamp": "2017-01-01T12:00:00Z",
-      "ProducerRef": "Edwig",
+      "ProducerRef": "Ara",
       "ResponseMessageIdentifier": "RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC",
       "RequestMessageRef": "Test:1234::LOC",
       "VehicleMonitoringDelivery": {

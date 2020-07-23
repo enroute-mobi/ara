@@ -1,5 +1,5 @@
 test:
-  name: edwig_test
+  name: ara_test
   user: jenkins
   password: Chae0tiS2i
   host: localhost

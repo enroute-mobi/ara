@@ -15,5 +15,5 @@ func Value() string {
 }
 
 func ApplicationName() string {
-	return fmt.Sprintf("Edwig %s", Value())
+	return fmt.Sprintf("Ara %s", Value())
 }

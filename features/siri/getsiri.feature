@@ -102,7 +102,7 @@ Feature: Support SIRI GetSIRI
           <sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
           <Answer>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
               <siri:Status>true</siri:Status>
@@ -281,7 +281,7 @@ Feature: Support SIRI GetSIRI
           <sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
           <Answer>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
               <siri:Status>false</siri:Status>

@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRIHandler_LogSIRIError(t *testing.T) {
@@ -41,10 +41,10 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"remote_url":                             "",
 		"remote_credential":                      "",
 		"remote_objectid_kind":                   "objectidKind",
-		"local_credential":                       "Edwig",
-		"local_url":                              "http://edwig",
-		"generators.message_identifier":          "Edwig:Message::%{uuid}:LOC",
-		"generators.response_message_identifier": "Edwig:ResponseMessage::%{uuid}:LOC",
+		"local_credential":                       "Ara",
+		"local_url":                              "http://ara",
+		"generators.message_identifier":          "Ara:Message::%{uuid}:LOC",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 		"generators.data_frame_identifier":       "RATPDev:DataFrame::%{id}:LOC",
 	}
 	partner.ConnectorTypes = []string{
@@ -104,9 +104,9 @@ func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, 
 func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	request, err := siri.NewSIRICheckStatusRequest("Edwig",
+	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		model.DefaultClock().Now(),
-		"Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
+		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,19 +121,19 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if expected := "http://edwig"; response.Address() != expected {
+	if expected := "http://ara"; response.Address() != expected {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
 	}
 
-	if expected := "Edwig"; response.ProducerRef() != expected {
+	if expected := "Ara"; response.ProducerRef() != expected {
 		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: %v", response.ProducerRef(), expected)
 	}
 
-	if expected := "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
+	if expected := "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
 		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: %v", response.RequestMessageRef(), expected)
 	}
 
-	if expected := "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
+	if expected := "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
 		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: %v", response.ResponseMessageIdentifier(), expected)
 	}
 
@@ -195,9 +195,9 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
-	request, err := siri.NewSIRIGetStopMonitoringRequest("Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
+	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
-		"Edwig",
+		"Ara",
 		model.DefaultClock().Now()).BuildXML()
 	if err != nil {
 		t.Fatal(err)
@@ -259,19 +259,19 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 		t.Errorf("Stop visits are not chronollogicaly ordered ")
 	}
 
-	if expected := "http://edwig"; response.Address() != expected {
+	if expected := "http://ara"; response.Address() != expected {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
 	}
 
-	if expected := "Edwig"; response.ProducerRef() != expected {
+	if expected := "Ara"; response.ProducerRef() != expected {
 		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: %v", response.ProducerRef(), expected)
 	}
 
-	if expected := "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
+	if expected := "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
 		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: %v", response.RequestMessageRef(), expected)
 	}
 
-	if expected := "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
+	if expected := "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
 		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: %v", response.ResponseMessageIdentifier(), expected)
 	}
 
@@ -377,8 +377,8 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	expectedResponseBody := `<sw:GetSiriServiceResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<Answer>
 		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
-		<siri:ProducerRef>Edwig</siri:ProducerRef>
-		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+		<siri:ProducerRef>Ara</siri:ProducerRef>
+		<siri:ResponseMessageIdentifier>Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
 		<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
 		<siri:Status>true</siri:Status>
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
@@ -641,9 +641,9 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	expectedResponseBody := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
-		<siri:ProducerRef>Edwig</siri:ProducerRef>
-		<siri:Address>http://edwig</siri:Address>
-		<siri:ResponseMessageIdentifier>Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+		<siri:ProducerRef>Ara</siri:ProducerRef>
+		<siri:Address>http://ara</siri:Address>
+		<siri:ResponseMessageIdentifier>Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
 		<siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Answer>

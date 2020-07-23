@@ -6,18 +6,18 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -102,17 +102,17 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	response := connector.RequestStopArea(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "StopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
 	if !response.ResponseTimestamp.Equal(time) {
@@ -133,7 +133,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -203,11 +203,11 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 
 	response := connector.RequestStopArea(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "StopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
@@ -229,9 +229,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -304,9 +304,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -370,9 +370,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -393,17 +393,17 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 
 	response := connector.RequestStopArea(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "StopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
 	if !response.ResponseTimestamp.Equal(time) {
@@ -475,7 +475,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	response := &siri.SIRIStopMonitoringResponse{
-		Address:                   "edwig.edwig",
+		Address:                   "ara.ara",
 		ProducerRef:               "NINOXE:default",
 		ResponseMessageIdentifier: "fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26",
 	}
@@ -486,7 +486,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 	logSIRIStopMonitoringDelivery(logStashEvent, response.SIRIStopMonitoringDelivery)
 	logSIRIStopMonitoringResponse(logStashEvent, response)
 
-	if logStashEvent["address"] != "edwig.edwig" {
+	if logStashEvent["address"] != "ara.ara" {
 		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])
 	}
 	if logStashEvent["producerRef"] != "NINOXE:default" {

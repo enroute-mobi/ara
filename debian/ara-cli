@@ -1,2 +1,2 @@
 #!/bin/sh
-EDWIG_ROOT=/usr/share/edwig EDWIG_ENV=production /usr/bin/edwig --config=/etc/edwig $@
+ARA_ROOT=/usr/share/ara ARA_ENV=production /usr/bin/ara --config=/etc/ara $@

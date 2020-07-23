@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
@@ -14,7 +14,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "test"
-	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
+	partner.Settings["generators.message_identifier"] = "Ara:Message::%{uuid}:LOC"
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -113,7 +113,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "test"
-	partner.Settings["generators.message_identifier"] = "Edwig:Message::%{uuid}:LOC"
+	partner.Settings["generators.message_identifier"] = "Ara:Message::%{uuid}:LOC"
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())

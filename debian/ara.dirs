@@ -1,0 +1,5 @@
+etc/ara
+usr/bin
+usr/share/ara
+usr/share/ara/siri
+var/log/ara

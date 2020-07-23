@@ -6,20 +6,20 @@ source_dir="$(pwd -P)/$(dirname "$0")"
 
 cat > "$source_dir/config/database.yml" <<EOF
 test:
-  name: ${EDWIG_DB_NAME:-edwig_test}
-  user: ${EDWIG_DB_USER:-jenkins}
-  host: ${EDWIG_DB_HOST:-db}
-  password: ${EDWIG_DB_PASSWORD}
-  port: ${EDWIG_DB_PORT:-5432}
+  name: ${ARA_DB_NAME:-ara_test}
+  user: ${ARA_DB_USER:-jenkins}
+  host: ${ARA_DB_HOST:-db}
+  password: ${ARA_DB_PASSWORD}
+  port: ${ARA_DB_PORT:-5432}
 EOF
 
 cd $source_dir
 
 go install -v ./...
 
-export EDWIG_ENV=test
-export EDWIG_ROOT=$source_dir
-"$GOPATH/bin/edwig" migrate up
+export ARA_ENV=test
+export ARA_ROOT=$source_dir
+"$GOPATH/bin/ara" migrate up
 
 go get github.com/schrej/godacov
 

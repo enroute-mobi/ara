@@ -178,7 +178,7 @@ Feature: Support SIRI StopMonitoring by subscription
           | remote_credential                  | test                          |
           | local_credential                   | NINOXE:default                |
           | remote_objectid_kind               | internal                      |
-          | generators.subscription_identifier | Edwig:Subscription::%{id}:LOC |
+          | generators.subscription_identifier | Ara:Subscription::%{id}:LOC |
         And 30 seconds have passed
         And a StopArea exists with the following attributes:
           | Name      | Test                                     |
@@ -214,7 +214,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
                     <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                     <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
-                    <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                    <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                     <ns2:Status>true</ns2:Status>
                     <ns2:MonitoredStopVisitCancellation>
                       <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
@@ -259,7 +259,7 @@ Feature: Support SIRI StopMonitoring by subscription
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-            <ns5:RequestMessageRef>Edwig:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns5:RequestMessageRef>
+            <ns5:RequestMessageRef>Ara:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
             <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
             <ns5:Status>true</ns5:Status>
@@ -382,7 +382,7 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
                   <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                   <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
-                  <ns2:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-33-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                  <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-33-00c04fd430c8:LOC</ns2:SubscriptionRef>
                   <ns2:Status>true</ns2:Status>
                   <ns2:MonitoredStopVisitCancellation>
                     <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>

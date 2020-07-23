@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type fakeBroadcaster struct {
@@ -163,7 +163,7 @@ func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing
 	logStashEvent := make(audit.LogStashEvent)
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &siri.SIRIGetStopMonitoringRequest{
-		RequestorRef: "Edwig",
+		RequestorRef: "Ara",
 	}
 	request.MessageIdentifier = "0000-0000-0000-0000"
 	request.MonitoringRef = "test"
@@ -173,8 +173,8 @@ func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
-	if logStashEvent["requestorRef"] != "Edwig" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: Edwig", logStashEvent["requestorRef"])
+	if logStashEvent["requestorRef"] != "Ara" {
+		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: Ara", logStashEvent["requestorRef"])
 	}
 	if logStashEvent["monitoringRef"] != "test" {
 		t.Errorf("Wrong monitoringRef logged:\n got: %v\n expected: test", logStashEvent["monitoringRef"])

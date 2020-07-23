@@ -30,7 +30,7 @@ Feature: Support SIRI subscription
               <ns2:MessageIdentifier>TermSubReq:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
             <Request version="2.0:FR-IDF-2.4">
-              <ns5:SubscriptionRef>Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:SubscriptionRef>
+              <ns5:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:SubscriptionRef>
             </Request>
             <RequestExtension/>
           </ns1:DeleteSubscription>

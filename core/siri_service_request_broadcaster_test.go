@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
@@ -88,7 +88,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	partner.ConnectorTypes = []string{
 		SIRI_SERVICE_REQUEST_BROADCASTER,
 		SIRI_STOP_MONITORING_REQUEST_BROADCASTER,
@@ -146,14 +146,14 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	if response == nil {
 		t.Fatalf("HandleRequests should return a response")
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
 	if !response.ResponseTimestamp.Equal(time) {
@@ -200,7 +200,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
@@ -224,14 +224,14 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 
 	response := connector.HandleRequests(request)
 
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
 	if !response.ResponseTimestamp.Equal(time) {

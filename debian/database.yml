@@ -1,5 +1,5 @@
 production:
-  name: edwig
-  user: edwig
-  password: edwig
+  name: ara
+  user: ara
+  password: ara
   port: 5432

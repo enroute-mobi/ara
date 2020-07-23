@@ -12,7 +12,7 @@
       <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
       <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
       <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
-      <ns5:SubscriptionRef>Edwig:Subscription::ea7004a9-4eb1-4dbc-9e13-93afe28b41a7:LOC</ns5:SubscriptionRef>
+      <ns5:SubscriptionRef>Ara:Subscription::ea7004a9-4eb1-4dbc-9e13-93afe28b41a7:LOC</ns5:SubscriptionRef>
       <ns5:Status>true</ns5:Status>
       <ns5:MonitoredStopVisitCancellation>
         <ns5:ItemRef>SIRI:43745132</ns5:ItemRef>
@@ -25,7 +25,7 @@
       <ns5:ResponseTimestamp>2017-06-20T11:21:00.441+02:00</ns5:ResponseTimestamp>
       <ns5:RequestMessageRef>RATPDev:Message::db034358-1e76-4156-b306-d5a62707ab36:LOC</ns5:RequestMessageRef>
       <ns5:SubscriberRef>RATPDEV:Concerto</ns5:SubscriberRef>
-      <ns5:SubscriptionRef>Edwig:Subscription::164165c5-79cf-4a5a-96e9-259cea6ce3c4:LOC</ns5:SubscriptionRef>
+      <ns5:SubscriptionRef>Ara:Subscription::164165c5-79cf-4a5a-96e9-259cea6ce3c4:LOC</ns5:SubscriptionRef>
       <ns5:Status>true</ns5:Status>
       <ns5:MonitoredStopVisit>
         <ns5:RecordedAtTime>2017-06-20T11:21:00.428+02:00</ns5:RecordedAtTime>

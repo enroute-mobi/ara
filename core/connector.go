@@ -1,7 +1,7 @@
 package core
 
 import (
-	"bitbucket.org/enroute-mobi/edwig/audit"
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 

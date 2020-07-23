@@ -4,7 +4,7 @@ $server = 'http://localhost:8081'
 $adminToken = "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
 $token = "testtoken"
 
-def start_edwig
+def start_ara
   unless File.directory?("tmp")
     FileUtils.mkdir_p("tmp")
   end
@@ -12,7 +12,7 @@ def start_edwig
     FileUtils.mkdir_p("log")
   end
 
-  system "EDWIG_ROOT=#{Dir.getwd} EDWIG_CONFIG=#{Dir.getwd}/config EDWIG_ENV=test go run edwig.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/edwig.log 2>&1 &"
+  system "ARA_ROOT=#{Dir.getwd} ARA_CONFIG=#{Dir.getwd}/config ARA_ENV=test go run ara.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/ara.log 2>&1 &"
 
   time_limit = Time.now + 30
   while
@@ -30,7 +30,7 @@ def start_edwig
 end
 
 Before('not @database') do
-  start_edwig()
+  start_ara()
 end
 
 After do
