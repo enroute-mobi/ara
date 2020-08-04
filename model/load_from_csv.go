@@ -2,11 +2,11 @@ package model
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/edwig/config"
@@ -32,12 +32,13 @@ const (
 	VEHICLE_JOURNEY = "vehicle_journey"
 	STOP_VISIT      = "stop_visit"
 	OPERATOR        = "operator"
+	ERRORS          = "Errors"
 )
 
 type Loader struct {
-	filePath        string
 	referentialSlug string
 	force           bool
+	printErrors     bool
 	deletedModels   map[string]map[string]struct{}
 	operators       []byte
 	stopAreas       []byte
@@ -45,42 +46,78 @@ type Loader struct {
 	vehicleJourneys []byte
 	stopVisits      []byte
 	bulkCounter     map[string]int
-	insertedCount   map[string]int64
-	errors          int
+	result          Result
 }
 
-func LoadFromCSV(filePath string, referentialSlug string, force bool) error {
-	return newLoader(filePath, referentialSlug, force).load()
+type Result struct {
+	Import map[string]int64
+	Errors map[string][]string
 }
 
-func newLoader(filePath string, referentialSlug string, force bool) *Loader {
-	d := make(map[string]map[string]struct{})
-	for _, m := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
-		d[m] = make(map[string]struct{})
-	}
-	return &Loader{
-		filePath:        filePath,
-		referentialSlug: referentialSlug,
-		force:           force,
-		deletedModels:   d,
-		bulkCounter:     make(map[string]int),
-		insertedCount:   make(map[string]int64),
-	}
+type ComplexError struct {
+	Errors []string
 }
 
-func (loader Loader) load() error {
-	file, err := os.Open(loader.filePath)
+func (c ComplexError) Error() string {
+	return strings.Join(c.Errors, ", ")
+}
+
+func (c *ComplexError) Add(field string, err error) {
+	c.Errors = append(c.Errors, fmt.Sprintf("%v: %v", field, err))
+}
+
+func (c ComplexError) ErrorCount() int {
+	return len(c.Errors)
+}
+
+func LoadFromCSVFile(filePath string, referentialSlug string, force bool) error {
+	file, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("loader error: error while opening file: %v", err)
 	}
 	defer file.Close()
 
+	result := NewLoader(referentialSlug, force, true).Load(file)
+
+	if result.TotalInserts() == 0 {
+		if result.ErrorCount() == 0 {
+			return fmt.Errorf("loader error: empty file")
+		}
+		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", result.ErrorCount())
+	}
+
+	logger.Log.Debugf(result.PrintResult())
+	fmt.Println(result.PrintResult())
+
+	return nil
+}
+
+func NewLoader(referentialSlug string, force, printErrors bool) *Loader {
+	d := make(map[string]map[string]struct{})
+	for _, m := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
+		d[m] = make(map[string]struct{})
+	}
+	r := Result{
+		Import: make(map[string]int64),
+		Errors: make(map[string][]string),
+	}
+	return &Loader{
+		referentialSlug: referentialSlug,
+		force:           force,
+		printErrors:     printErrors,
+		deletedModels:   d,
+		bulkCounter:     make(map[string]int),
+		result:          r,
+	}
+}
+
+func (loader Loader) Load(reader io.Reader) Result {
 	// Config CSV reader
-	reader := csv.NewReader(file)
-	reader.Comment = '#'
-	reader.FieldsPerRecord = -1
-	reader.LazyQuotes = true
-	reader.TrimLeadingSpace = true
+	csvReader := csv.NewReader(reader)
+	csvReader.Comment = '#'
+	csvReader.FieldsPerRecord = -1
+	csvReader.LazyQuotes = true
+	csvReader.TrimLeadingSpace = true
 
 	startTime := time.Now()
 	logger.Log.Debugf("Load operation started at %v", startTime)
@@ -88,14 +125,12 @@ func (loader Loader) load() error {
 	var i int
 	for {
 		i++
-		record, err := reader.Read()
+		record, err := csvReader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			logger.Log.Debugf("Error while reading: %v", err)
-			fmt.Printf("Error while reading: %v\n", err)
-			loader.errors++
+			loader.err(i, err)
 			continue
 		}
 
@@ -103,42 +138,30 @@ func (loader Loader) load() error {
 		case OPERATOR:
 			err := loader.handleOperator(record)
 			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				loader.errors++
+				loader.err(i, err)
 			}
 		case STOP_AREA:
 			err := loader.handleStopArea(record)
 			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				loader.errors++
+				loader.err(i, err)
 			}
 		case LINE:
 			err := loader.handleLine(record)
 			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				loader.errors++
+				loader.err(i, err)
 			}
 		case VEHICLE_JOURNEY:
 			err := loader.handleVehicleJourney(record)
 			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				loader.errors++
+				loader.err(i, err)
 			}
 		case STOP_VISIT:
 			err := loader.handleStopVisit(record)
 			if err != nil {
-				logger.Log.Debugf("Error on line %d: %v", i, err)
-				fmt.Printf("Error on line %d: %v\n", i, err)
-				loader.errors++
+				loader.err(i, err)
 			}
 		default:
-			logger.Log.Debugf("Unknown record type: %v", record[0])
-			fmt.Printf("Unknown record type: %v\n", record[0])
-			loader.errors++
+			loader.err(i, fmt.Errorf("unknown record type %v", record[0]))
 			continue
 		}
 	}
@@ -151,28 +174,7 @@ func (loader Loader) load() error {
 
 	logger.Log.Debugf("Load operation done in %v", time.Since(startTime))
 
-	if (loader.insertedCount[OPERATOR] + loader.insertedCount[STOP_AREA] + loader.insertedCount[LINE] + loader.insertedCount[VEHICLE_JOURNEY] + loader.insertedCount[STOP_VISIT]) == 0 {
-		if loader.errors == 0 {
-			return fmt.Errorf("loader error: empty file")
-		}
-		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", loader.errors)
-	}
-
-	logger.Log.Debugf("Import successful, import raised %v errors", loader.errors)
-	logger.Log.Debugf("  %v Operators", loader.insertedCount[OPERATOR])
-	logger.Log.Debugf("  %v StopAreas", loader.insertedCount[STOP_AREA])
-	logger.Log.Debugf("  %v Lines", loader.insertedCount[LINE])
-	logger.Log.Debugf("  %v VehicleJourneys", loader.insertedCount[VEHICLE_JOURNEY])
-	logger.Log.Debugf("  %v StopVisits", loader.insertedCount[STOP_VISIT])
-
-	fmt.Printf("Import successful, import raised %v errors\n", loader.errors)
-	fmt.Printf("  %v Operators\n", loader.insertedCount[OPERATOR])
-	fmt.Printf("  %v StopAreas\n", loader.insertedCount[STOP_AREA])
-	fmt.Printf("  %v Lines\n", loader.insertedCount[LINE])
-	fmt.Printf("  %v VehicleJourneys\n", loader.insertedCount[VEHICLE_JOURNEY])
-	fmt.Printf("  %v StopVisits\n", loader.insertedCount[STOP_VISIT])
-
-	return nil
+	return loader.result
 }
 
 func (loader *Loader) handleForce(klass, modelName string) error {
@@ -223,20 +225,16 @@ func (loader *Loader) insertOperators() {
 	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_name,name,object_ids) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
-		logger.Log.Debugf("Error while inserting operators: %v", err)
-		fmt.Printf("Error while inserting operators: %v", err)
-		loader.errors++
+		loader.errInsert("operators", err)
 		return
 	}
 	rows, err := result.RowsAffected()
 	if err != nil { // should not happen
-		logger.Log.Debugf("Unexpected error while inserting operators: %v", err)
-		fmt.Printf("Unexpected error while inserting operators: %v", err)
-		loader.errors++
+		loader.errInsert("operators", err)
 		return
 	}
 
-	loader.insertedCount[OPERATOR] += rows
+	loader.result.Import[OPERATOR] += rows
 }
 
 func (loader *Loader) handleStopArea(record []string) error {
@@ -245,13 +243,14 @@ func (loader *Loader) handleStopArea(record []string) error {
 	}
 
 	var err error
-	parseErrors := make(map[string]string)
+	// parseErrors := make(map[string]string)
+	parseErrors := ComplexError{}
 
 	var collectedAlways bool
 	if record[10] != "" {
 		collectedAlways, err = strconv.ParseBool(record[10])
 		if err != nil {
-			parseErrors["CollectedAlways"] = err.Error()
+			parseErrors.Add("CollectedAlways", err)
 		}
 	}
 
@@ -259,7 +258,7 @@ func (loader *Loader) handleStopArea(record []string) error {
 	if record[11] != "" {
 		collectChildren, err = strconv.ParseBool(record[11])
 		if err != nil {
-			parseErrors["CollectChildren"] = err.Error()
+			parseErrors.Add("CollectChildren", err)
 		}
 	}
 
@@ -267,13 +266,12 @@ func (loader *Loader) handleStopArea(record []string) error {
 	if record[12] != "" {
 		collectGeneralMessages, err = strconv.ParseBool(record[12])
 		if err != nil {
-			parseErrors["CollectGeneralMessages"] = err.Error()
+			parseErrors.Add("CollectGeneralMessages", err)
 		}
 	}
 
-	if len(parseErrors) != 0 {
-		json, _ := json.Marshal(parseErrors)
-		return fmt.Errorf(string(json))
+	if parseErrors.ErrorCount() != 0 {
+		return parseErrors
 	}
 
 	err = loader.handleForce(STOP_AREA, record[4])
@@ -334,20 +332,16 @@ func (loader *Loader) insertStopAreas() {
 		string(loader.stopAreas[:len(loader.stopAreas)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
-		logger.Log.Debugf("Error while inserting stopAreas: %v", err)
-		fmt.Printf("Error while inserting stopAreas: %v", err)
-		loader.errors++
+		loader.errInsert("stopAreas", err)
 		return
 	}
 	rows, err := result.RowsAffected()
 	if err != nil { // should not happen
-		logger.Log.Debugf("Unexpected error while inserting stopAreas: %v", err)
-		fmt.Printf("Unexpected error while inserting stopAreas: %v", err)
-		loader.errors++
+		loader.errInsert("stopAreas", err)
 		return
 	}
 
-	loader.insertedCount[STOP_AREA] += rows
+	loader.result.Import[STOP_AREA] += rows
 }
 
 func (loader *Loader) handleLine(record []string) error {
@@ -356,19 +350,18 @@ func (loader *Loader) handleLine(record []string) error {
 	}
 
 	var err error
-	parseErrors := make(map[string]string)
+	parseErrors := ComplexError{}
 
 	var collectGeneralMessages bool
 	if record[7] != "" {
 		collectGeneralMessages, err = strconv.ParseBool(record[7])
 		if err != nil {
-			parseErrors["CollectGeneralMessages"] = err.Error()
+			parseErrors.Add("CollectGeneralMessages", err)
 		}
 	}
 
-	if len(parseErrors) != 0 {
-		json, _ := json.Marshal(parseErrors)
-		return fmt.Errorf(string(json))
+	if parseErrors.ErrorCount() != 0 {
+		return parseErrors
 	}
 
 	err = loader.handleForce(LINE, record[2])
@@ -409,20 +402,16 @@ func (loader *Loader) insertLines() {
 	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_general_messages) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
-		logger.Log.Debugf("Error while inserting lines: %v", err)
-		fmt.Printf("Error while inserting lines: %v", err)
-		loader.errors++
+		loader.errInsert("lines", err)
 		return
 	}
 	rows, err := result.RowsAffected()
 	if err != nil { // should not happen
-		logger.Log.Debugf("Unexpected error while inserting lines: %v", err)
-		fmt.Printf("Unexpected error while inserting lines: %v", err)
-		loader.errors++
+		loader.errInsert("lines", err)
 		return
 	}
 
-	loader.insertedCount[LINE] += rows
+	loader.result.Import[LINE] += rows
 }
 
 func (loader *Loader) handleVehicleJourney(record []string) error {
@@ -470,20 +459,16 @@ func (loader *Loader) insertVehicleJourneys() {
 	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,object_ids,line_id,origin_name,destination_name,attributes,siri_references) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
-		logger.Log.Debugf("Error while inserting vehicleJourneys: %v", err)
-		fmt.Printf("Error while inserting vehicleJourneys: %v", err)
-		loader.errors++
+		loader.errInsert("vehicleJourneys", err)
 		return
 	}
 	rows, err := result.RowsAffected()
 	if err != nil { // should not happen
-		logger.Log.Debugf("Unexpected error while inserting vehicleJourneys: %v", err)
-		fmt.Printf("Unexpected error while inserting vehicleJourneys: %v", err)
-		loader.errors++
+		loader.errInsert("vehicleJourneys", err)
 		return
 	}
 
-	loader.insertedCount[VEHICLE_JOURNEY] += rows
+	loader.result.Import[VEHICLE_JOURNEY] += rows
 }
 
 func (loader *Loader) handleStopVisit(record []string) error {
@@ -492,19 +477,18 @@ func (loader *Loader) handleStopVisit(record []string) error {
 	}
 
 	var err error
-	parseErrors := make(map[string]string)
+	parseErrors := ComplexError{}
 
 	var passageOrder int
 	if record[6] != "" {
 		passageOrder, err = strconv.Atoi(record[6])
 		if err != nil {
-			parseErrors["PassageOrder"] = err.Error()
+			parseErrors.Add("PassageOrder", err)
 		}
 	}
 
-	if len(parseErrors) != 0 {
-		json, _ := json.Marshal(parseErrors)
-		return fmt.Errorf(string(json))
+	if parseErrors.ErrorCount() != 0 {
+		return parseErrors
 	}
 
 	err = loader.handleForce(STOP_VISIT, record[2])
@@ -547,18 +531,64 @@ func (loader *Loader) insertStopVisits() {
 	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_name,object_ids,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
-		logger.Log.Debugf("Error while inserting stopVisits: %v", err)
-		fmt.Printf("Error while inserting stopVisits: %v", err)
-		loader.errors++
+		loader.errInsert("stopVisits", err)
 		return
 	}
 	rows, err := result.RowsAffected()
 	if err != nil { // should not happen
-		logger.Log.Debugf("Unexpected error while inserting stopVisits: %v", err)
-		fmt.Printf("Unexpected error while inserting stopVisits: %v", err)
-		loader.errors++
+		loader.errInsert("stopVisits", err)
 		return
 	}
 
-	loader.insertedCount[STOP_VISIT] += rows
+	loader.result.Import[STOP_VISIT] += rows
+}
+
+func (loader *Loader) err(i int, e error) {
+	if loader.printErrors {
+		logger.Log.Debugf("Error on line %v: %v", i, e)
+		fmt.Printf("Error on line %v: %v\n", i, e)
+	}
+	loader.result.Import[ERRORS]++
+
+	if cerr, ok := e.(ComplexError); ok {
+		for i := range cerr.Errors {
+			loader.result.Errors[fmt.Sprint("Error on line ", i)] = append(loader.result.Errors[fmt.Sprint("Error on line ", i)], cerr.Errors[i])
+		}
+	} else {
+		loader.result.Errors[fmt.Sprint("Error on line ", i)] = append(loader.result.Errors[fmt.Sprint("Error on line ", i)], e.Error())
+	}
+}
+
+func (loader *Loader) errInsert(m string, e error) {
+	if loader.printErrors {
+		logger.Log.Debugf("Error while inserting %v: %v", m, e)
+		fmt.Printf("Error while inserting %v: %v\n", m, e)
+	}
+	loader.result.Import[ERRORS]++
+	loader.result.Errors[fmt.Sprint("Error while inserting ", m)] = append(loader.result.Errors[fmt.Sprint("Error while inserting ", m)], e.Error())
+}
+
+func (r Result) TotalInserts() int64 {
+	var c int64
+	for _, model := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
+		c += r.Import[model]
+	}
+	return c
+}
+
+func (r Result) Inserted(m string) int64 {
+	return r.Import[m]
+}
+
+func (r Result) ErrorCount() int64 {
+	return r.Import[ERRORS]
+}
+
+func (r Result) PrintResult() string {
+	return fmt.Sprintf(`Import successful. Import raised %v errors
+  %v Operators
+  %v StopAreas
+  %v Lines
+  %v VehicleJourneys
+  %v StopVisits`, r.Import[ERRORS], r.Import[OPERATOR], r.Import[STOP_AREA], r.Import[LINE], r.Import[VEHICLE_JOURNEY], r.Import[STOP_VISIT])
 }
