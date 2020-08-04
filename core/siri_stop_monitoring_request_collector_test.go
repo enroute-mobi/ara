@@ -80,7 +80,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	}
 
 	if stopAreaUpdateEvent == nil {
-		t.Error("RequestStopAreaUpdate should not return nil")
+		t.Fatal("RequestStopAreaUpdate should not return nil")
 	}
 	if len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents) != 1 {
 		t.Errorf("RequestStopAreaUpdate should have 1 LegacyStopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents))

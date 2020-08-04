@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -393,7 +392,7 @@ func Test_MemoryReferentials_SaveToDatabase_CleanPartners(t *testing.T) {
 
 	// Check Partner
 	selectPartners := []model.SelectPartner{}
-	sqlQuery := fmt.Sprintf("select * from partners")
+	sqlQuery := "select * from partners"
 	_, err = model.Database.Select(&selectPartners, sqlQuery)
 	if err != nil {
 		t.Fatalf("Error while fetching partners: %v", err)
