@@ -32,6 +32,7 @@ const (
 	VEHICLE_JOURNEY = "vehicle_journey"
 	STOP_VISIT      = "stop_visit"
 	OPERATOR        = "operator"
+	TOTAL_INSERTS   = "Total"
 	ERRORS          = "Errors"
 )
 
@@ -173,6 +174,8 @@ func (loader Loader) Load(reader io.Reader) Result {
 	loader.insertStopVisits()
 
 	logger.Log.Debugf("Load operation done in %v", time.Since(startTime))
+
+	loader.result.setTotalInserts()
 
 	return loader.result
 }
@@ -568,12 +571,16 @@ func (loader *Loader) errInsert(m string, e error) {
 	loader.result.Errors[fmt.Sprint("Error while inserting ", m)] = append(loader.result.Errors[fmt.Sprint("Error while inserting ", m)], e.Error())
 }
 
-func (r Result) TotalInserts() int64 {
+func (r *Result) setTotalInserts() {
 	var c int64
 	for _, model := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
 		c += r.Import[model]
 	}
-	return c
+	r.Import[TOTAL_INSERTS] = c
+}
+
+func (r Result) TotalInserts() int64 {
+	return r.Import[TOTAL_INSERTS]
 }
 
 func (r Result) Inserted(m string) int64 {
