@@ -174,7 +174,7 @@ func main() {
 		model.Database = model.InitDB(config.Config.DB)
 		defer model.CloseDB(model.Database)
 
-		err = model.LoadFromCSV(loadFlags.Arg(0), loadFlags.Arg(1), *forcePtr)
+		err = model.LoadFromCSVFile(loadFlags.Arg(0), loadFlags.Arg(1), *forcePtr)
 	}
 
 	if err != nil {

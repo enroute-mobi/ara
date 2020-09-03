@@ -394,7 +394,7 @@ func Test_PartnerController_Save(t *testing.T) {
 
 	//Test Results
 	selectPartners := []model.SelectPartner{}
-	sqlQuery := fmt.Sprintf("select * from partners")
+	sqlQuery := "select * from partners"
 	_, err = model.Database.Select(&selectPartners, sqlQuery)
 	if err != nil {
 		t.Fatalf("Error while fetching partners: %v", err)

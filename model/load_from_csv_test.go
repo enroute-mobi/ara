@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-func Test_LoadFromCSV(t *testing.T) {
+func Test_LoadFromCSVFile(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
 	// Fill DB
-	LoadFromCSV("testdata/import.csv", "referential", false)
+	LoadFromCSVFile("testdata/import.csv", "referential", false)
 
 	// Fetch data from the db
 	model := NewMemoryModel()
@@ -72,14 +72,14 @@ func Test_LoadFromCSV(t *testing.T) {
 	}
 }
 
-func Test_LoadFromCSV_Force(t *testing.T) {
+func Test_LoadFromCSVFile_Force(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
 	// Fill DB
-	LoadFromCSV("testdata/import.csv", "referential", false)
+	LoadFromCSVFile("testdata/import.csv", "referential", false)
 
-	forceBuilder := newLoader("", "referential", true)
+	forceBuilder := NewLoader("referential", true, true)
 
 	sa := []string{"stop_area", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "2017-01-01", "", "", "", "", "", "", "", ""}
 	o := []string{"operator", "03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", ""}

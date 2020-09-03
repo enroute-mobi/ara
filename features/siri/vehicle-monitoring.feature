@@ -142,6 +142,8 @@ Feature: Support SIRI VehicleMonitoring
 }
       """
 
+  @wip
+  # See ARA-712
   Scenario: Send all the vehicles to a SIRI Lite VehicleMonitoring request
     Given a Line exists with the following attributes:
       | ObjectIDs | "internal": "Test:Line:3:LOC" |
