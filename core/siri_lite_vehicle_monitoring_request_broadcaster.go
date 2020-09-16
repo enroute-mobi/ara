@@ -89,6 +89,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.VehicleMonitoringRef = vehicleId.Value()
 		activity.MonitoredVehicleJourney.LineRef = lineRef
 		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
+		activity.MonitoredVehicleJourney.DirectionName = vj.Attributes["DirectionName"]
 		activity.MonitoredVehicleJourney.OriginName = vj.OriginName
 		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
