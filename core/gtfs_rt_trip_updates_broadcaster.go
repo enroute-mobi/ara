@@ -16,6 +16,9 @@ type TripUpdatesBroadcaster struct {
 	model.ClockConsumer
 
 	BaseConnector
+
+	referenceGenerator         *IdentifierGenerator
+	stopAreareferenceGenerator *IdentifierGenerator
 }
 
 type TripUpdatesBroadcasterFactory struct{}
@@ -32,6 +35,8 @@ func (factory *TripUpdatesBroadcasterFactory) Validate(apiPartner *APIPartner) b
 func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	connector := &TripUpdatesBroadcaster{}
 	connector.partner = partner
+	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
+	connector.stopAreareferenceGenerator = partner.IdentifierGeneratorWithDefault("reference_stop_area_identifier", "%{objectid}")
 
 	return connector
 }
@@ -83,10 +88,10 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 				}
 				linesObjectId[stopVisits[i].VehicleJourneyId] = lineObjectid
 			}
-			routeId = lineObjectid.Value()
+			routeId = connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Line", ObjectId: lineObjectid.Value()})
 
 			// Fill the tripDescriptor
-			tripId := vjId.Value()
+			tripId := connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", ObjectId: vjId.Value()})
 			tripDescriptor := &gtfs.TripDescriptor{
 				TripId:  &tripId,
 				RouteId: &routeId,
@@ -102,7 +107,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 			feedEntities[stopVisits[i].VehicleJourneyId] = feedEntity
 		}
 
-		stopId := saId.Value()
+		stopId := connector.stopAreareferenceGenerator.NewIdentifier(IdentifierAttributes{ObjectId: saId.Value()})
 		stopSequence := uint32(stopVisits[i].PassageOrder)
 		arrival := &gtfs.TripUpdate_StopTimeEvent{}
 		departure := &gtfs.TripUpdate_StopTimeEvent{}

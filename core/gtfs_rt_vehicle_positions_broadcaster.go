@@ -14,6 +14,8 @@ type VehiclePositionBroadcaster struct {
 	model.ClockConsumer
 
 	BaseConnector
+
+	referenceGenerator *IdentifierGenerator
 }
 
 type VehiclePositionBroadcasterFactory struct{}
@@ -30,6 +32,7 @@ func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartne
 func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster {
 	connector := &VehiclePositionBroadcaster{}
 	connector.partner = partner
+	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
 
 	return connector
 }
@@ -77,10 +80,10 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 				}
 				linesObjectId[vehicles[i].VehicleJourneyId] = lineObjectid
 			}
-			routeId = lineObjectid.Value()
+			routeId = connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Line", ObjectId: lineObjectid.Value()})
 
 			// Fill the tripDescriptor
-			tripId := vjId.Value()
+			tripId := connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", ObjectId: vjId.Value()})
 			trip = &gtfs.TripDescriptor{
 				TripId:  &tripId,
 				RouteId: &routeId,

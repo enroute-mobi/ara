@@ -23,9 +23,10 @@ type IdentifierGenerator struct {
 }
 
 type IdentifierAttributes struct {
-	Default string
-	Id      string
-	Type    string
+	Default  string
+	Id       string
+	ObjectId string
+	Type     string
 }
 
 func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
@@ -37,7 +38,7 @@ func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator model.UUI
 }
 
 func (generator *IdentifierGenerator) NewIdentifier(attributes IdentifierAttributes) string {
-	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Default)
+	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Default, "%{objectid}", attributes.ObjectId)
 	return generator.handleuuids(replacer.Replace(generator.formatString))
 }
 

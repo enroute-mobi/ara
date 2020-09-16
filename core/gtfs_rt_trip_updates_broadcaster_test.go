@@ -292,3 +292,65 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdKind(t *testing.T) {
 		t.Errorf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
 	}
 }
+
+func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
+	partner.Settings["generators.reference_stop_area_identifier"] = "%{objectid}:LOC"
+	connector := NewTripUpdatesBroadcaster(partner)
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	saId := model.NewObjectID("objectidKind", "saId")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(saId)
+	stopArea.Save()
+
+	line := referential.model.Lines().New()
+	lId := model.NewObjectID("objectidKind", "lId")
+	line.SetObjectID(lId)
+	line.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vjId := model.NewObjectID("objectidKind", "vjId")
+	vehicleJourney.SetObjectID(vjId)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	svId1 := model.NewObjectID("objectidKind", "svId1")
+	stopVisit.SetObjectID(svId1)
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit.PassageOrder = 1
+	stopVisit.Save()
+
+	gtfsFeed := &gtfs.FeedMessage{}
+
+	l := partner.NewLogStashEvent()
+	connector.HandleGtfs(gtfsFeed, l)
+
+	if l := len(gtfsFeed.Entity); l != 1 {
+		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
+	}
+	entity := gtfsFeed.Entity[0]
+
+	if r := "trip:vjId"; entity.GetId() != r {
+		t.Errorf("Response first Feed entity have incorrect Id:\n got: %v\n want: %v", entity.GetId(), r)
+	}
+	tripUpdate := entity.TripUpdate
+	if r := "VehicleJourney:vjId:LOC"; tripUpdate.Trip.GetTripId() != r {
+		t.Errorf("Response first Trip Update have incorrect TripId:\n got: %v\n want: %v", tripUpdate.Trip.GetTripId(), r)
+	}
+	if r := "Line:lId:LOC"; tripUpdate.Trip.GetRouteId() != r {
+		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", tripUpdate.Trip.GetRouteId(), r)
+	}
+	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
+	if r := "saId:LOC"; stopTimeUpdate.GetStopId() != r {
+		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopId(), r)
+	}
+}

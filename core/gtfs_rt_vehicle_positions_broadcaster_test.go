@@ -273,3 +273,61 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
 	}
 }
+
+func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
+	connector := NewVehiclePositionBroadcaster(partner)
+	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	connector.SetClock(model.NewFakeClock())
+
+	line := referential.model.Lines().New()
+	lId := model.NewObjectID("objectidKind", "lId")
+	line.SetObjectID(lId)
+	line.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vjId := model.NewObjectID("objectidKind", "vjId")
+	vehicleJourney.SetObjectID(vjId)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	svId1 := model.NewObjectID("objectidKind", "svId1")
+	stopVisit.SetObjectID(svId1)
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit.PassageOrder = 1
+	stopVisit.Save()
+
+	vehicle := referential.model.Vehicles().New()
+	vId := model.NewObjectID("objectidKind", "vId")
+	vehicle.SetObjectID(vId)
+	vehicle.VehicleJourneyId = vehicleJourney.Id()
+	vehicle.LineId = line.Id()
+	vehicle.Longitude = 1.23456
+	vehicle.Latitude = 2.34567
+	vehicle.Bearing = 1.2
+	vehicle.Save()
+
+	gtfsFeed := &gtfs.FeedMessage{}
+
+	l := partner.NewLogStashEvent()
+	connector.HandleGtfs(gtfsFeed, l)
+
+	if l := len(gtfsFeed.Entity); l != 1 {
+		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
+	}
+	entity := gtfsFeed.Entity[0]
+
+	trip := entity.GetVehicle().GetTrip()
+	if r := "VehicleJourney:vjId:LOC"; trip.GetTripId() != r {
+		t.Errorf("Incorrect TripId for entity TripUpdate:\n got: %v\n want: %v", trip.GetTripId(), r)
+	}
+	if r := "Line:lId:LOC"; trip.GetRouteId() != r {
+		t.Errorf("Incorrect RouteId for entity TripUpdate:\n got: %v\n want: %v", trip.GetRouteId(), r)
+	}
+}
