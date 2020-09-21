@@ -241,6 +241,14 @@ func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGen
 	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
 }
 
+func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
+	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
+	if formatString == "" {
+		formatString = defaultFormat
+	}
+	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
+}
+
 func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
 		return setting
