@@ -24,6 +24,7 @@ type MonitoredVehicleJourney struct {
 	LineRef                 string                   `json:",omitempty"`
 	FramedVehicleJourneyRef *FramedVehicleJourneyRef `json:",omitempty"`
 	PublishedLineName       string                   `json:",omitempty"`
+	DirectionName           string                   `json:",omitempty"`
 	OriginRef               string                   `json:",omitempty"`
 	OriginName              string                   `json:",omitempty"`
 	DestinationRef          string                   `json:",omitempty"`
