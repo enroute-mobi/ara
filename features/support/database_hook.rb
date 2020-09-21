@@ -3,7 +3,6 @@ require 'pg'
 Before('@database') do
   config = YAML.load_file("config/database.yml")["test"]
   config["dbname"] = config.delete("name")
-  puts config.inspect
   @connection = PG.connect config
 end
 

@@ -32,5 +32,4 @@ fi
 cd "$source_dir"
 # $bundle exec license_finder
 bundle exec bundle-audit check --update
-
-bundle exec cucumber --tags "~@wip" --format pretty --no-color
+bundle exec cucumber --tags "not @wip" --publish
