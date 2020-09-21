@@ -11,7 +11,8 @@ def start_edwig
   unless File.directory?("log")
     FileUtils.mkdir_p("log")
   end
-  system "EDWIG_ENV=test go run edwig.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/edwig.log 2>&1 &"
+
+  system "EDWIG_ROOT=#{Dir.getwd} EDWIG_CONFIG=#{Dir.getwd}/config EDWIG_ENV=test go run edwig.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/edwig.log 2>&1 &"
 
   time_limit = Time.now + 30
   while
@@ -28,7 +29,7 @@ def start_edwig
   end
 end
 
-Before('~@database') do
+Before('not @database') do
   start_edwig()
 end
 
