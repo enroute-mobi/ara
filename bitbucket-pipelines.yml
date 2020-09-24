@@ -9,7 +9,7 @@ definitions:
   steps:
     - step: &unit-tests
         name: Unit tests
-        image: golang:1.11
+        image: golang:1.12
         script:
           - export TZ=Europe/Paris LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
