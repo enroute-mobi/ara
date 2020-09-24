@@ -19,3 +19,25 @@ func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {
 		t.Errorf("Identifier should be %v, got: %v", expected, idf)
 	}
 }
+
+func Test_IdentifierGenerator_NewIdentifier_WithoutSubstitution(t *testing.T) {
+	generator := NewIdentifierGenerator("%{objectid}")
+	attributes := IdentifierAttributes{
+		ObjectId: "unchanged",
+	}
+	identifier := generator.NewIdentifier(attributes)
+	if expected := "unchanged"; identifier != expected {
+		t.Errorf("Identifier should be %v, got: %v", expected, identifier)
+	}
+}
+
+func Test_IdentifierGenerator_NewIdentifier_WithSubstitution(t *testing.T) {
+	generator := NewIdentifierGenerator("%{objectid//pattern/replacement}")
+	attributes := IdentifierAttributes{
+		ObjectId: "before-pattern-between-pattern-after",
+	}
+	identifier := generator.NewIdentifier(attributes)
+	if expected := "before-replacement-between-replacement-after"; identifier != expected {
+		t.Errorf("Identifier should be %v, got: %v", expected, identifier)
+	}
+}
