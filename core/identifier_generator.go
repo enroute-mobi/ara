@@ -48,7 +48,9 @@ func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
 }
 
 func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator model.UUIDConsumer) *IdentifierGenerator {
-	return &IdentifierGenerator{formatString: formatString, UUIDConsumer: uuidGenerator}
+	generator := NewIdentifierGenerator(formatString)
+	generator.UUIDConsumer = uuidGenerator
+	return generator
 }
 
 func (generator *IdentifierGenerator) NewIdentifier(attributes IdentifierAttributes) string {
