@@ -347,6 +347,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 	partner := partners.New("slug")
 	partner.Settings["local_credential"] = "cred"
 	partners.Save(partner)
+
 	apiPartner = &APIPartner{
 		Slug:     "slug",
 		Settings: map[string]string{"local_credential": "cred"},
@@ -379,7 +380,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 		t.Errorf("Validate should return true")
 	}
 	if len(apiPartner.Errors) != 0 {
-		t.Errorf("apiPartner Errors should be empty")
+		t.Errorf("apiPartner Errors should be empty, got %v", apiPartner.Errors)
 	}
 }
 

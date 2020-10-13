@@ -23,7 +23,8 @@ const (
 	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
 
-	LOCAL_CREDENTIAL = "local_credential"
+	LOCAL_CREDENTIAL  = "local_credential"
+	LOCAL_CREDENTIALS = "local_credentials"
 )
 
 type PartnerId string
@@ -44,6 +45,7 @@ type Partners interface {
 	Delete(partner *Partner) bool
 	Model() model.Model
 	Referential() *Referential
+	LocalCredentialsIndex() *LocalCredentialsIndex
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
@@ -102,9 +104,10 @@ type PartnerManager struct {
 
 	mutex *sync.RWMutex
 
-	byId        map[PartnerId]*Partner
-	guardian    *PartnersGuardian
-	referential *Referential
+	byId                  map[PartnerId]*Partner
+	localCredentialsIndex *LocalCredentialsIndex
+	guardian              *PartnersGuardian
+	referential           *Referential
 }
 
 func (partner *APIPartner) Validate() bool {
@@ -121,20 +124,23 @@ func (partner *APIPartner) Validate() bool {
 		factory.Validate(partner)
 	}
 
-	// Check local_credential and Slug uniqueness
-	credentials, ok := partner.Settings[LOCAL_CREDENTIAL]
+	// Check Slug uniqueness
 	for _, existingPartner := range partner.manager.FindAll() {
-		if existingPartner.id != partner.Id {
-			if partner.Slug == existingPartner.slug {
-				partner.Errors.Add("Slug", ERROR_UNIQUE)
-			}
-			if ok && credentials == existingPartner.Settings[LOCAL_CREDENTIAL] {
-				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
-			}
+		if existingPartner.id != partner.Id && existingPartner.slug == partner.Slug {
+			partner.Errors.Add("Slug", ERROR_UNIQUE)
 		}
 	}
 
+	// Check Credentials uniqueness
+	if !partner.manager.LocalCredentialsIndex().UniqCredentials(partner.Id, partner.credentials()) {
+		partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
+	}
+
 	return len(partner.Errors) == 0
+}
+
+func (partner *APIPartner) credentials() string {
+	return fmt.Sprintf("%v,%v", partner.Settings[LOCAL_CREDENTIAL], partner.Settings[LOCAL_CREDENTIALS])
 }
 
 func (partner *APIPartner) setFactories() {
@@ -231,6 +237,10 @@ func (partner *Partner) SetSlug(s PartnerSlug) {
 
 func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
+}
+
+func (partner *Partner) Credentials() string {
+	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
 }
 
 func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
@@ -659,9 +669,10 @@ func (partner *Partner) Pushed() {
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
-		mutex:       &sync.RWMutex{},
-		byId:        make(map[PartnerId]*Partner),
-		referential: referential,
+		mutex:                 &sync.RWMutex{},
+		byId:                  make(map[PartnerId]*Partner),
+		localCredentialsIndex: NewLocalCredentialsIndex(),
+		referential:           referential,
 	}
 	manager.guardian = NewPartnersGuardian(referential)
 	return manager
@@ -669,6 +680,10 @@ func NewPartnerManager(referential *Referential) *PartnerManager {
 
 func (manager *PartnerManager) Guardian() *PartnersGuardian {
 	return manager.guardian
+}
+
+func (manager *PartnerManager) LocalCredentialsIndex() *LocalCredentialsIndex {
+	return manager.localCredentialsIndex
 }
 
 func (manager *PartnerManager) Start() {
@@ -742,6 +757,18 @@ func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
 	return nil, false
 }
 
+func (manager *PartnerManager) FindByCredential(c string) (*Partner, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	id, ok := manager.localCredentialsIndex.Find(c)
+	if !ok {
+		return nil, false
+	}
+	partner, ok := manager.byId[id]
+	return partner, ok
+}
+
 func (manager *PartnerManager) FindAll() (partners []*Partner) {
 	manager.mutex.RLock()
 	for _, partner := range manager.byId {
@@ -765,6 +792,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 
 	manager.mutex.Lock()
 	manager.byId[partner.id] = partner
+	manager.localCredentialsIndex.Index(partner.id, partner.Credentials())
 	manager.mutex.Unlock()
 
 	return true
@@ -772,6 +800,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 
 func (manager *PartnerManager) Delete(partner *Partner) bool {
 	manager.mutex.Lock()
+	manager.localCredentialsIndex.Delete(partner.id)
 	delete(manager.byId, partner.id)
 	manager.mutex.Unlock()
 
