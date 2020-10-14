@@ -254,7 +254,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) newLogStashEvent() audit.Log
 
 func (factory *SIRIEstimatedTimetableBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
 

@@ -165,6 +165,14 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	return true
 }
 
+func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
+	if !partner.IsSettingDefined(LOCAL_CREDENTIAL) && !partner.IsSettingDefined(LOCAL_CREDENTIALS) {
+		partner.Errors.Add("Setting local_credential", ERROR_BLANK)
+		return false
+	}
+	return true
+}
+
 func (partner *APIPartner) ValidatePresenceOfConnector(connector string) bool {
 	for _, listedConnector := range partner.ConnectorTypes {
 		if listedConnector == connector {

@@ -40,7 +40,7 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartn
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
 

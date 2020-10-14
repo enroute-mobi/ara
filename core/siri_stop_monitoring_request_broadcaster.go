@@ -148,7 +148,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) newLogStashEvent() audit.
 
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
 
