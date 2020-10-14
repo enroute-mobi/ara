@@ -20,7 +20,7 @@ func (index *LocalCredentialsIndex) Index(modelId PartnerId, localCredentials st
 	splitCredentials := splitCredentials(localCredentials)
 
 	// Delete from the index all elements of modelId not in the new localCredentials
-	currentCredentials, _ := index.byIdentifier[modelId]
+	currentCredentials := index.byIdentifier[modelId]
 	obsoleteCredentials := difference(currentCredentials, splitCredentials)
 	for i := range obsoleteCredentials {
 		delete(index.byCredentials, obsoleteCredentials[i])
