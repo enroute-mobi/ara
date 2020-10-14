@@ -454,6 +454,39 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	}
 }
 
+func Test_PartnerManager_FindByCredentials(t *testing.T) {
+	partners := createTestPartnerManager()
+
+	existingPartner := partners.New("partner")
+	existingPartner.Settings[LOCAL_CREDENTIAL] = "cred"
+	existingPartner.Settings[LOCAL_CREDENTIALS] = "cred2,cred3"
+	partners.Save(existingPartner)
+
+	partner, ok := partners.FindByCredential("cred")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+
+	partner, ok = partners.FindByCredential("cred2")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+
+	partner, ok = partners.FindByCredential("cred3")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+}
+
 func Test_PartnerManager_FindBySlug(t *testing.T) {
 	partners := createTestPartnerManager()
 

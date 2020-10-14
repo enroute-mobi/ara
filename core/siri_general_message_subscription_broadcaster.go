@@ -42,7 +42,7 @@ func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPar
 	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
 	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
+	ok = ok && apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
 	return ok
 }
 

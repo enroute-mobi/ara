@@ -33,7 +33,7 @@ func (siriPartner *SIRIPartner) RequestorRef() string {
 }
 
 func (siriPartner *SIRIPartner) SubscriberRef() string {
-	return siriPartner.partner.Setting("local_credential")
+	return siriPartner.partner.Setting(LOCAL_CREDENTIAL)
 }
 
 func (siriPartner *SIRIPartner) Partner() *Partner {

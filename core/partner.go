@@ -35,10 +35,11 @@ type Partners interface {
 	model.Startable
 	model.Stopable
 
-	New(slug PartnerSlug) *Partner
-	Find(id PartnerId) *Partner
-	FindBySetting(setting, value string) (*Partner, bool)
-	FindBySlug(slug PartnerSlug) (*Partner, bool)
+	New(PartnerSlug) *Partner
+	Find(PartnerId) *Partner
+	FindBySetting(string, string) (*Partner, bool)
+	FindBySlug(PartnerSlug) (*Partner, bool)
+	FindByCredential(string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
