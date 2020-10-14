@@ -92,12 +92,12 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		partner.PartnerStatus.OperationnalStatus = partnerStatus.OperationnalStatus
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
 
-		collectPersistent, _ := strconv.ParseBool(partner.Setting("collect.subscriptions.persistent"))
+		collectPersistent, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT))
 		if !collectPersistent {
 			partner.Subscriptions().CancelCollectSubscriptions()
 		}
 
-		broadcastPersistent, _ := strconv.ParseBool(partner.Setting("broadcast.subscriptions.persistent"))
+		broadcastPersistent, _ := strconv.ParseBool(partner.Setting(BROADCAST_SUBSCRIPTIONS_PERSISTENT))
 		if !broadcastPersistent {
 			partner.Subscriptions().CancelBroadcastSubscriptions()
 		}

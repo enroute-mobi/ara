@@ -28,7 +28,7 @@ func (factory *PushCollectorFactory) CreateConnector(partner *Partner) Connector
 }
 
 func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
@@ -73,7 +73,7 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 
 func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting("remote_objectid_kind")
+	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range sas {
 		sa := sas[i]
@@ -92,7 +92,7 @@ func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea
 
 func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting("remote_objectid_kind")
+	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range lines {
 		l := lines[i]
@@ -108,7 +108,7 @@ func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) {
 
 func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVehicleJourney) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting("remote_objectid_kind")
+	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range vjs {
 		vj := vjs[i]
@@ -129,7 +129,7 @@ func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVe
 
 func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVisit) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting("remote_objectid_kind")
+	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range svs {
 		sv := svs[i]
@@ -149,7 +149,7 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 }
 
 func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) {
-	id_kind := pc.Partner().Setting("remote_objectid_kind")
+	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range vs {
 		v := vs[i]

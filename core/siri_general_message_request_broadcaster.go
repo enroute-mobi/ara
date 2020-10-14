@@ -41,7 +41,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
@@ -88,7 +88,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) newLogStashEvent() audit.
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }

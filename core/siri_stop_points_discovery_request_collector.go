@@ -30,9 +30,9 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 	return ok
 }
 
@@ -62,7 +62,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	request := &siri.SIRIStopPointsDiscoveryRequest{
-		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 		RequestorRef:      connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  startTime,
 	}
@@ -84,7 +84,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	stopPointRefs := []string{}
-	idKind := connector.partner.Setting("remote_objectid_kind")
+	idKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
 	partner := string(connector.Partner().Slug())
 
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {

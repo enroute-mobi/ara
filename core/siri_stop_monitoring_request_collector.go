@@ -67,7 +67,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	objectidKind := connector.partner.Setting("remote_objectid_kind")
+	objectidKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
 	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
@@ -82,7 +82,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
 		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
-	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
@@ -174,9 +174,9 @@ func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.Lo
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 	return ok
 }
 

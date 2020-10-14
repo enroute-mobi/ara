@@ -44,7 +44,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
 		RequestorRef: connector.SIRIPartner().RequestorRef(),
 	}
-	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	// Check the request filter
@@ -58,7 +58,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	}
 
 	// Check the request version
-	if b, _ := strconv.ParseBool(connector.partner.Setting("generalMessageRequest.version2.2")); b {
+	if b, _ := strconv.ParseBool(connector.partner.Setting(GENEREAL_MESSAGE_REQUEST_2)); b {
 		siriGeneralMessageRequest.XsdInWsdl = true
 	}
 
@@ -101,9 +101,9 @@ func (connector *SIRIGeneralMessageRequestCollector) newLogStashEvent() audit.Lo
 }
 
 func (factory *SIRIGeneralMessageRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 	return ok
 }
 

@@ -80,7 +80,7 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) newLogStashEvent() audit.
 }
 
 func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }

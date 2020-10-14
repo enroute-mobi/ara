@@ -88,7 +88,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) ignoreStopWithoutLine() bool {
-	return connector.partner.Setting("ignore_stop_without_line") != "false"
+	return connector.partner.Setting(IGNORE_STOP_WITHOUT_LINE) != "false"
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
@@ -98,7 +98,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() a
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }

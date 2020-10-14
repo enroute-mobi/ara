@@ -47,7 +47,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 		Origin:            string(builder.partner.Slug()),
 		CreatedAt:         builder.Clock().Now(),
 		RecordedAt:        xmlGeneralMessageEvent.RecordedAtTime(),
-		SituationObjectID: model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlGeneralMessageEvent.InfoMessageIdentifier()),
+		SituationObjectID: model.NewObjectID(builder.partner.Setting(REMOTE_OBJECTID_KIND), xmlGeneralMessageEvent.InfoMessageIdentifier()),
 		Version:           xmlGeneralMessageEvent.InfoMessageVersion(),
 		ProducerRef:       producerRef,
 	}
@@ -77,7 +77,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 	tx := builder.partner.Referential().NewTransaction()
 	defer tx.Close()
 
-	remoteObjectidKind := builder.partner.Setting("remote_objectid_kind")
+	remoteObjectidKind := builder.partner.Setting(REMOTE_OBJECTID_KIND)
 
 	for _, lineref := range content.LineRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, lineref))

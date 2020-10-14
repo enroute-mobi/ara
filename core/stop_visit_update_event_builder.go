@@ -28,8 +28,8 @@ func (builder *LegacyStopVisitUpdateEventBuilder) buildLegacyStopVisitUpdateEven
 		Created_at:             builder.Clock().Now(),
 		RecordedAt:             xmlStopVisitEvent.RecordedAt(),
 		VehicleAtStop:          xmlStopVisitEvent.VehicleAtStop(),
-		StopVisitObjectid:      model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.ItemIdentifier()),
-		StopAreaObjectId:       model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef()),
+		StopVisitObjectid:      model.NewObjectID(builder.partner.Setting(REMOTE_OBJECTID_KIND), xmlStopVisitEvent.ItemIdentifier()),
+		StopAreaObjectId:       model.NewObjectID(builder.partner.Setting(REMOTE_OBJECTID_KIND), xmlStopVisitEvent.StopPointRef()),
 		Schedules:              model.NewStopVisitSchedules(),
 		DepartureStatus:        model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
 		ArrivalStatus:          model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
@@ -39,7 +39,7 @@ func (builder *LegacyStopVisitUpdateEventBuilder) buildLegacyStopVisitUpdateEven
 		DestinationName:        xmlStopVisitEvent.DestinationName(),
 		OriginName:             xmlStopVisitEvent.OriginName(),
 		Monitored:              xmlStopVisitEvent.Monitored(),
-		Attributes:             NewSIRIStopVisitUpdateAttributes(xmlStopVisitEvent, builder.partner.Setting("remote_objectid_kind")),
+		Attributes:             NewSIRIStopVisitUpdateAttributes(xmlStopVisitEvent, builder.partner.Setting(REMOTE_OBJECTID_KIND)),
 	}
 
 	if !xmlStopVisitEvent.AimedDepartureTime().IsZero() || !xmlStopVisitEvent.AimedArrivalTime().IsZero() {
@@ -58,7 +58,7 @@ func (builder *LegacyStopVisitUpdateEventBuilder) buildLegacyStopVisitUpdateEven
 		event = &model.LegacyStopAreaUpdateEvent{}
 		event.Origin = string(builder.partner.Slug())
 		event.StopAreaAttributes.Name = xmlStopVisitEvent.StopPointName()
-		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting("remote_objectid_kind"), xmlStopVisitEvent.StopPointRef())
+		event.StopAreaAttributes.ObjectId = model.NewObjectID(builder.partner.Setting(REMOTE_OBJECTID_KIND), xmlStopVisitEvent.StopPointRef())
 		event.StopAreaAttributes.CollectedAlways = false
 		events[stopVisitEvent.StopAreaObjectId.String()] = event
 		if builder.originStopAreaObjectId.Value() != "" && stopAreaObjectidString != builder.originStopAreaObjectId.String() {

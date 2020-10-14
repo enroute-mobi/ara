@@ -28,9 +28,9 @@ type BroadcastStopMonitoringBuilder struct {
 func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		tx:                            tx,
-		referenceGenerator:            partner.IdentifierGenerator("reference_identifier"),
-		stopAreareferenceGenerator:    partner.IdentifierGenerator("reference_stop_area_identifier"),
-		dataFrameGenerator:            partner.IdentifierGenerator("data_frame_identifier"),
+		referenceGenerator:            partner.IdentifierGenerator(REFERENCE_IDENTIFIER),
+		stopAreareferenceGenerator:    partner.IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER),
+		dataFrameGenerator:            partner.IdentifierGenerator(DATA_FRAME_IDENTIFIER),
 		remoteObjectidKind:            partner.RemoteObjectIDKind(connector),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),

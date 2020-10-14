@@ -23,8 +23,44 @@ const (
 	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
 
+	// Partner settings
 	LOCAL_CREDENTIAL  = "local_credential"
 	LOCAL_CREDENTIALS = "local_credentials"
+	LOCAL_URL         = "local_url"
+
+	REMOTE_CREDENTIAL        = "remote_credential"
+	REMOTE_OBJECTID_KIND     = "remote_objectid_kind"
+	REMOTE_URL               = "remote_url"
+	NOTIFICATIONS_REMOTE_URL = "notifications.remote_url"
+	SUBSCRIPTIONS_REMOTE_URL = "subscriptions.remote_url"
+
+	COLLECT_PRIORITY                 = "collect.priority"
+	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
+	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
+	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
+
+	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
+	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
+	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
+	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
+	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
+
+	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
+	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
+	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
+
+	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
+	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
+
+	// Generators
+	MESSAGE_IDENTIFIER             = "message_identifier"
+	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
+	DATA_FRAME_IDENTIFIER          = "data_frame_identifier"
+	REFERENCE_IDENTIFIER           = "reference_identifier"
+	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
+	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
 
 type PartnerId string
@@ -84,8 +120,8 @@ type ByPriority []*Partner
 func (a ByPriority) Len() int      { return len(a) }
 func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByPriority) Less(i, j int) bool {
-	first, _ := strconv.Atoi(a[i].Settings["collect.priority"])
-	second, _ := strconv.Atoi(a[j].Settings["collect.priority"])
+	first, _ := strconv.Atoi(a[i].Settings[COLLECT_PRIORITY])
+	second, _ := strconv.Atoi(a[j].Settings[COLLECT_PRIORITY])
 	return first > second
 }
 
@@ -272,11 +308,11 @@ func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
 		return setting
 	}
-	return partner.Setting("remote_objectid_kind")
+	return partner.Setting(REMOTE_OBJECTID_KIND)
 }
 
 func (partner *Partner) ProducerRef() string {
-	producerRef := partner.Setting("remote_credential")
+	producerRef := partner.Setting(REMOTE_CREDENTIAL)
 	if producerRef == "" {
 		producerRef = "Edwig"
 	}
@@ -290,7 +326,7 @@ func (partner *Partner) Address() string {
 	// 	address = config.Config.DefaultAddress
 	// }
 	// return address
-	return partner.Setting("local_url")
+	return partner.Setting(LOCAL_URL)
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
@@ -354,12 +390,12 @@ func (partner *Partner) Start() {
 }
 
 func (partner *Partner) CollectPriority() int {
-	value, _ := strconv.Atoi(partner.Setting("collect.priority"))
+	value, _ := strconv.Atoi(partner.Setting(COLLECT_PRIORITY))
 	return value
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" && partner.Setting("collect.exclude_stop_areas") == "" {
+	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" {
 		return true
 	}
 	if partner.excludedStopArea(stopAreaObjectId) {
@@ -369,10 +405,10 @@ func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[
 }
 
 func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
-	if partner.Setting("collect.include_lines") == "" {
+	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
 		return false
 	}
-	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
+	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
 	for _, line := range lines {
 		if strings.TrimSpace(line) == lineObjectId.Value() {
 			return true
@@ -382,11 +418,11 @@ func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 }
 
 func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, "collect.include_stop_areas")
+	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_INCLUDE_STOP_AREAS)
 }
 
 func (partner *Partner) excludedStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, "collect.exclude_stop_areas")
+	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_EXCLUDE_STOP_AREAS)
 }
 
 func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setting string) bool {
@@ -403,10 +439,10 @@ func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setti
 }
 
 func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
-	if partner.Setting("collect.include_lines") == "" {
+	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
 		return false
 	}
-	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
+	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
 	for _, line := range lines {
 		if _, ok := lineIds[line]; ok {
 			return true
@@ -416,36 +452,36 @@ func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
 }
 
 func (partner *Partner) NoDestinationRefRewritingFrom() []string {
-	if partner.Setting("broadcast.no_destinationref_rewriting_from") == "" {
+	if partner.Setting(BROADCAST_NO_DESTINATIONREF_REWRITING_FROM) == "" {
 		return []string{}
 	}
-	return strings.Split(partner.Settings["broadcast.no_destinationref_rewriting_from"], ",")
+	return strings.Split(partner.Settings[BROADCAST_NO_DESTINATIONREF_REWRITING_FROM], ",")
 }
 
 func (partner *Partner) NoDataFrameRefRewritingFrom() []string {
-	if partner.Setting("broadcast.no_dataframeref_rewriting_from") == "" {
+	if partner.Setting(BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM) == "" {
 		return []string{}
 	}
-	return strings.Split(partner.Settings["broadcast.no_dataframeref_rewriting_from"], ",")
+	return strings.Split(partner.Settings[BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM], ",")
 }
 
 func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings["broadcast.rewrite_journey_pattern_ref"])
+	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
 	return
 }
 
 func (partner *Partner) LogSubscriptionStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_notifications"])
+	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS])
 	return
 }
 
 func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_requests"])
+	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS])
 	return
 }
 
 func (partner *Partner) GzipGtfs() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings["broadcast.gzip_gtfs"])
+	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_GZIP_GTFS])
 	return
 }
 

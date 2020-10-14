@@ -106,7 +106,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 				Address:                   smb.connector.Partner().Address(),
 				ProducerRef:               smb.connector.Partner().ProducerRef(),
 				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-				ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+				ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 				ResponseTimestamp:         smb.connector.Clock().Now(),
 			}
 
@@ -160,7 +160,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			Address:                   smb.connector.Partner().Address(),
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 		}
 		deliveries := make(map[string]*siri.SIRINotifyStopMonitoringDelivery)

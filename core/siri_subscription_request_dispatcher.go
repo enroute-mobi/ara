@@ -27,9 +27,9 @@ type SIRISubscriptionRequestDispatcher struct {
 }
 
 func (factory *SIRISubscriptionRequestDispatcherFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 	return ok
 }
 
