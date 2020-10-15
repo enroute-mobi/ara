@@ -347,6 +347,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 	partner := partners.New("slug")
 	partner.Settings["local_credential"] = "cred"
 	partners.Save(partner)
+
 	apiPartner = &APIPartner{
 		Slug:     "slug",
 		Settings: map[string]string{"local_credential": "cred"},
@@ -379,7 +380,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 		t.Errorf("Validate should return true")
 	}
 	if len(apiPartner.Errors) != 0 {
-		t.Errorf("apiPartner Errors should be empty")
+		t.Errorf("apiPartner Errors should be empty, got %v", apiPartner.Errors)
 	}
 }
 
@@ -445,6 +446,39 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	partners.Save(existingPartner)
 
 	partner, ok := partners.FindBySetting(LOCAL_CREDENTIAL, "cred")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+}
+
+func Test_PartnerManager_FindByCredentials(t *testing.T) {
+	partners := createTestPartnerManager()
+
+	existingPartner := partners.New("partner")
+	existingPartner.Settings[LOCAL_CREDENTIAL] = "cred"
+	existingPartner.Settings[LOCAL_CREDENTIALS] = "cred2,cred3"
+	partners.Save(existingPartner)
+
+	partner, ok := partners.FindByCredential("cred")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+
+	partner, ok = partners.FindByCredential("cred2")
+	if !ok {
+		t.Fatal("FindBySetting should return true when Partner is found")
+	}
+	if partner.Id() != existingPartner.Id() {
+		t.Errorf("FindBySetting should return a Partner with the given local_credential")
+	}
+
+	partner, ok = partners.FindByCredential("cred3")
 	if !ok {
 		t.Fatal("FindBySetting should return true when Partner is found")
 	}

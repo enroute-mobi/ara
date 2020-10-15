@@ -28,7 +28,7 @@ func (factory *TripUpdatesBroadcasterFactory) CreateConnector(partner *Partner) 
 }
 
 func (factory *TripUpdatesBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	return ok
 }
 

@@ -106,7 +106,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		notify := siri.SIRINotifyGeneralMessage{
 			Address:                   gmb.connector.Partner().Address(),
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator("response_message_identifier").NewMessageIdentifier(),
+			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 			SubscriberRef:             gmb.connector.SIRIPartner().SubscriberRef(),
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),

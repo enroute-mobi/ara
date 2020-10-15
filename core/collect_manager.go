@@ -135,12 +135,12 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		}
 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if b, _ := strconv.ParseBool(partner.Setting("collect.subscriptions.persistent")); !b || subscriptionCollector == nil {
+			if b, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT)); !b || subscriptionCollector == nil {
 				continue
 			}
 		}
 
-		partnerKind := partner.Setting("remote_objectid_kind")
+		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
 
 		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
 		if !ok {
@@ -201,7 +201,7 @@ func (manager *CollectManager) requestAllSituations() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); b {
+		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); b {
 			continue
 		}
 
@@ -231,7 +231,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); !b {
+		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); !b {
 			continue
 		}
 
@@ -242,7 +242,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 			continue
 		}
 
-		partnerKind := partner.Setting("remote_objectid_kind")
+		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
 
 		lineObjectID, ok := line.ObjectID(partnerKind)
 		if !ok {
@@ -275,7 +275,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting("collect.filter_general_messages")); !b {
+		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); !b {
 			continue
 		}
 
@@ -286,7 +286,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 			continue
 		}
 
-		partnerKind := partner.Setting("remote_objectid_kind")
+		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
 
 		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
 		if !ok {

@@ -17,9 +17,9 @@ func NewSIRIPartner(partner *Partner) *SIRIPartner {
 
 func (siriPartner *SIRIPartner) SOAPClient() *siri.SOAPClient {
 	urls := siri.SOAPClientUrls{
-		Url:              siriPartner.partner.Setting("remote_url"),
-		SubscriptionsUrl: siriPartner.partner.Setting("subscriptions.remote_url"),
-		NotificationsUrl: siriPartner.partner.Setting("notifications.remote_url"),
+		Url:              siriPartner.partner.Setting(REMOTE_URL),
+		SubscriptionsUrl: siriPartner.partner.Setting(SUBSCRIPTIONS_REMOTE_URL),
+		NotificationsUrl: siriPartner.partner.Setting(NOTIFICATIONS_REMOTE_URL),
 	}
 	if siriPartner.soapClient == nil || siriPartner.soapClient.SOAPClientUrls != urls {
 		logger.Log.Debugf("Create SIRI SOAPClient to %s", urls.Url)
@@ -33,7 +33,7 @@ func (siriPartner *SIRIPartner) RequestorRef() string {
 }
 
 func (siriPartner *SIRIPartner) SubscriberRef() string {
-	return siriPartner.partner.Setting("local_credential")
+	return siriPartner.partner.Setting(LOCAL_CREDENTIAL)
 }
 
 func (siriPartner *SIRIPartner) Partner() *Partner {

@@ -37,10 +37,10 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
 
@@ -148,7 +148,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "GeneralMessageSubscriptionCollector")
@@ -175,7 +175,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 	}
 
 	for _, cancellation := range xmlGmCancellations {
-		obj := model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), cancellation.InfoMessageIdentifier())
+		obj := model.NewObjectID(connector.partner.Setting(REMOTE_OBJECTID_KIND), cancellation.InfoMessageIdentifier())
 		situation, ok := tx.Model().Situations().FindByObjectId(obj)
 		if ok {
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())

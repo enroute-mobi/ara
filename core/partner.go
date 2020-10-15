@@ -23,7 +23,44 @@ const (
 	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
 
-	LOCAL_CREDENTIAL = "local_credential"
+	// Partner settings
+	LOCAL_CREDENTIAL  = "local_credential"
+	LOCAL_CREDENTIALS = "local_credentials"
+	LOCAL_URL         = "local_url"
+
+	REMOTE_CREDENTIAL        = "remote_credential"
+	REMOTE_OBJECTID_KIND     = "remote_objectid_kind"
+	REMOTE_URL               = "remote_url"
+	NOTIFICATIONS_REMOTE_URL = "notifications.remote_url"
+	SUBSCRIPTIONS_REMOTE_URL = "subscriptions.remote_url"
+
+	COLLECT_PRIORITY                 = "collect.priority"
+	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
+	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
+	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
+
+	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
+	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
+	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
+	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
+	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
+
+	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
+	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
+	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
+
+	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
+	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
+
+	// Generators
+	MESSAGE_IDENTIFIER             = "message_identifier"
+	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
+	DATA_FRAME_IDENTIFIER          = "data_frame_identifier"
+	REFERENCE_IDENTIFIER           = "reference_identifier"
+	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
+	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
 
 type PartnerId string
@@ -34,16 +71,18 @@ type Partners interface {
 	model.Startable
 	model.Stopable
 
-	New(slug PartnerSlug) *Partner
-	Find(id PartnerId) *Partner
-	FindBySetting(setting, value string) (*Partner, bool)
-	FindBySlug(slug PartnerSlug) (*Partner, bool)
+	New(PartnerSlug) *Partner
+	Find(PartnerId) *Partner
+	FindBySetting(string, string) (*Partner, bool)
+	FindBySlug(PartnerSlug) (*Partner, bool)
+	FindByCredential(string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
 	Model() model.Model
 	Referential() *Referential
+	LocalCredentialsIndex() *LocalCredentialsIndex
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
@@ -81,8 +120,8 @@ type ByPriority []*Partner
 func (a ByPriority) Len() int      { return len(a) }
 func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByPriority) Less(i, j int) bool {
-	first, _ := strconv.Atoi(a[i].Settings["collect.priority"])
-	second, _ := strconv.Atoi(a[j].Settings["collect.priority"])
+	first, _ := strconv.Atoi(a[i].Settings[COLLECT_PRIORITY])
+	second, _ := strconv.Atoi(a[j].Settings[COLLECT_PRIORITY])
 	return first > second
 }
 
@@ -102,9 +141,10 @@ type PartnerManager struct {
 
 	mutex *sync.RWMutex
 
-	byId        map[PartnerId]*Partner
-	guardian    *PartnersGuardian
-	referential *Referential
+	byId                  map[PartnerId]*Partner
+	localCredentialsIndex *LocalCredentialsIndex
+	guardian              *PartnersGuardian
+	referential           *Referential
 }
 
 func (partner *APIPartner) Validate() bool {
@@ -121,20 +161,23 @@ func (partner *APIPartner) Validate() bool {
 		factory.Validate(partner)
 	}
 
-	// Check local_credential and Slug uniqueness
-	credentials, ok := partner.Settings[LOCAL_CREDENTIAL]
+	// Check Slug uniqueness
 	for _, existingPartner := range partner.manager.FindAll() {
-		if existingPartner.id != partner.Id {
-			if partner.Slug == existingPartner.slug {
-				partner.Errors.Add("Slug", ERROR_UNIQUE)
-			}
-			if ok && credentials == existingPartner.Settings[LOCAL_CREDENTIAL] {
-				partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
-			}
+		if existingPartner.id != partner.Id && existingPartner.slug == partner.Slug {
+			partner.Errors.Add("Slug", ERROR_UNIQUE)
 		}
 	}
 
+	// Check Credentials uniqueness
+	if !partner.manager.LocalCredentialsIndex().UniqCredentials(partner.Id, partner.credentials()) {
+		partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
+	}
+
 	return len(partner.Errors) == 0
+}
+
+func (partner *APIPartner) credentials() string {
+	return fmt.Sprintf("%v,%v", partner.Settings[LOCAL_CREDENTIAL], partner.Settings[LOCAL_CREDENTIALS])
 }
 
 func (partner *APIPartner) setFactories() {
@@ -154,6 +197,14 @@ func (partner *APIPartner) IsSettingDefined(setting string) (ok bool) {
 func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	if !partner.IsSettingDefined(setting) {
 		partner.Errors.Add(fmt.Sprintf("Setting %s", setting), ERROR_BLANK)
+		return false
+	}
+	return true
+}
+
+func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
+	if !partner.IsSettingDefined(LOCAL_CREDENTIAL) && !partner.IsSettingDefined(LOCAL_CREDENTIALS) {
+		partner.Errors.Add("Setting local_credential", ERROR_BLANK)
 		return false
 	}
 	return true
@@ -233,6 +284,10 @@ func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
 }
 
+func (partner *Partner) Credentials() string {
+	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
+}
+
 func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
 	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
 	if formatString == "" {
@@ -253,11 +308,11 @@ func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
 		return setting
 	}
-	return partner.Setting("remote_objectid_kind")
+	return partner.Setting(REMOTE_OBJECTID_KIND)
 }
 
 func (partner *Partner) ProducerRef() string {
-	producerRef := partner.Setting("remote_credential")
+	producerRef := partner.Setting(REMOTE_CREDENTIAL)
 	if producerRef == "" {
 		producerRef = "Edwig"
 	}
@@ -271,7 +326,7 @@ func (partner *Partner) Address() string {
 	// 	address = config.Config.DefaultAddress
 	// }
 	// return address
-	return partner.Setting("local_url")
+	return partner.Setting(LOCAL_URL)
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
@@ -335,12 +390,12 @@ func (partner *Partner) Start() {
 }
 
 func (partner *Partner) CollectPriority() int {
-	value, _ := strconv.Atoi(partner.Setting("collect.priority"))
+	value, _ := strconv.Atoi(partner.Setting(COLLECT_PRIORITY))
 	return value
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting("collect.include_stop_areas") == "" && partner.Setting("collect.include_lines") == "" && partner.Setting("collect.exclude_stop_areas") == "" {
+	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" {
 		return true
 	}
 	if partner.excludedStopArea(stopAreaObjectId) {
@@ -350,10 +405,10 @@ func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[
 }
 
 func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
-	if partner.Setting("collect.include_lines") == "" {
+	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
 		return false
 	}
-	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
+	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
 	for _, line := range lines {
 		if strings.TrimSpace(line) == lineObjectId.Value() {
 			return true
@@ -363,11 +418,11 @@ func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 }
 
 func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, "collect.include_stop_areas")
+	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_INCLUDE_STOP_AREAS)
 }
 
 func (partner *Partner) excludedStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, "collect.exclude_stop_areas")
+	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_EXCLUDE_STOP_AREAS)
 }
 
 func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setting string) bool {
@@ -384,10 +439,10 @@ func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setti
 }
 
 func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
-	if partner.Setting("collect.include_lines") == "" {
+	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
 		return false
 	}
-	lines := strings.Split(partner.Settings["collect.include_lines"], ",")
+	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
 	for _, line := range lines {
 		if _, ok := lineIds[line]; ok {
 			return true
@@ -397,36 +452,36 @@ func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
 }
 
 func (partner *Partner) NoDestinationRefRewritingFrom() []string {
-	if partner.Setting("broadcast.no_destinationref_rewriting_from") == "" {
+	if partner.Setting(BROADCAST_NO_DESTINATIONREF_REWRITING_FROM) == "" {
 		return []string{}
 	}
-	return strings.Split(partner.Settings["broadcast.no_destinationref_rewriting_from"], ",")
+	return strings.Split(partner.Settings[BROADCAST_NO_DESTINATIONREF_REWRITING_FROM], ",")
 }
 
 func (partner *Partner) NoDataFrameRefRewritingFrom() []string {
-	if partner.Setting("broadcast.no_dataframeref_rewriting_from") == "" {
+	if partner.Setting(BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM) == "" {
 		return []string{}
 	}
-	return strings.Split(partner.Settings["broadcast.no_dataframeref_rewriting_from"], ",")
+	return strings.Split(partner.Settings[BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM], ",")
 }
 
 func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings["broadcast.rewrite_journey_pattern_ref"])
+	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
 	return
 }
 
 func (partner *Partner) LogSubscriptionStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_notifications"])
+	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS])
 	return
 }
 
 func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings["logstash.log_deliveries_in_sm_collect_requests"])
+	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS])
 	return
 }
 
 func (partner *Partner) GzipGtfs() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings["broadcast.gzip_gtfs"])
+	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_GZIP_GTFS])
 	return
 }
 
@@ -659,9 +714,10 @@ func (partner *Partner) Pushed() {
 
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
-		mutex:       &sync.RWMutex{},
-		byId:        make(map[PartnerId]*Partner),
-		referential: referential,
+		mutex:                 &sync.RWMutex{},
+		byId:                  make(map[PartnerId]*Partner),
+		localCredentialsIndex: NewLocalCredentialsIndex(),
+		referential:           referential,
 	}
 	manager.guardian = NewPartnersGuardian(referential)
 	return manager
@@ -669,6 +725,10 @@ func NewPartnerManager(referential *Referential) *PartnerManager {
 
 func (manager *PartnerManager) Guardian() *PartnersGuardian {
 	return manager.guardian
+}
+
+func (manager *PartnerManager) LocalCredentialsIndex() *LocalCredentialsIndex {
+	return manager.localCredentialsIndex
 }
 
 func (manager *PartnerManager) Start() {
@@ -742,6 +802,18 @@ func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
 	return nil, false
 }
 
+func (manager *PartnerManager) FindByCredential(c string) (*Partner, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	id, ok := manager.localCredentialsIndex.Find(c)
+	if !ok {
+		return nil, false
+	}
+	partner, ok := manager.byId[id]
+	return partner, ok
+}
+
 func (manager *PartnerManager) FindAll() (partners []*Partner) {
 	manager.mutex.RLock()
 	for _, partner := range manager.byId {
@@ -765,6 +837,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 
 	manager.mutex.Lock()
 	manager.byId[partner.id] = partner
+	manager.localCredentialsIndex.Index(partner.id, partner.Credentials())
 	manager.mutex.Unlock()
 
 	return true
@@ -772,6 +845,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 
 func (manager *PartnerManager) Delete(partner *Partner) bool {
 	manager.mutex.Lock()
+	manager.localCredentialsIndex.Delete(partner.id)
 	delete(manager.byId, partner.id)
 	manager.mutex.Unlock()
 

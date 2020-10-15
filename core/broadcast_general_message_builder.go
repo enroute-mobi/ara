@@ -23,7 +23,7 @@ func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, partner *Partner, 
 	return &BroadcastGeneralMessageBuilder{
 		tx:                 tx,
 		partner:            partner,
-		referenceGenerator: partner.IdentifierGenerator("reference_identifier"),
+		referenceGenerator: partner.IdentifierGenerator(REFERENCE_IDENTIFIER),
 		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),

@@ -102,7 +102,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
 					subId:    subscription.id,
@@ -122,7 +122,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
@@ -144,7 +144,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			stopPointRefList = append(stopPointRefList, requestedResource.objectId.Value())
 		}
 
-		if b, _ := strconv.ParseBool(subscriber.connector.partner.Setting("generalMessageRequest.version2.2")); b {
+		if b, _ := strconv.ParseBool(subscriber.connector.partner.Setting(GENEREAL_MESSAGE_REQUEST_2)); b {
 			entry.XsdInWsdl = true
 		}
 

@@ -346,7 +346,7 @@ func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscri
 }
 
 func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
-	maxResource, _ := strconv.Atoi(manager.partner.Setting("subscriptions.maximum_resources"))
+	maxResource, _ := strconv.Atoi(manager.partner.Setting(SUBSCRIPTIONS_MAXIMUM_RESOURCES))
 	if maxResource == 1 {
 		return manager.New(kind)
 	}
@@ -393,7 +393,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	defer manager.mutex.Unlock()
 
 	if subscription.Id() == "" {
-		generator := manager.partner.IdentifierGenerator("subscription_identifier")
+		generator := manager.partner.IdentifierGenerator(SUBSCRIPTION_IDENTIFIER)
 		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 

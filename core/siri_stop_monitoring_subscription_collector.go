@@ -37,10 +37,10 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting("remote_objectid_kind")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_url")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("remote_credential")
-	ok = ok && apiPartner.ValidatePresenceOfSetting("local_credential")
+	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
 	return ok
 }
 
@@ -72,7 +72,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		return
 	}
 
-	objectidKind := connector.Partner().Setting("remote_objectid_kind")
+	objectidKind := connector.Partner().Setting(REMOTE_OBJECTID_KIND)
 	stopAreaObjectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
@@ -157,7 +157,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		if resource != nil {
 			originStopAreaObjectId = *resource.Reference.ObjectId
 		} else if delivery.MonitoringRef() != "" {
-			originStopAreaObjectId = model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), delivery.MonitoringRef())
+			originStopAreaObjectId = model.NewObjectID(connector.Partner().Setting(REMOTE_OBJECTID_KIND), delivery.MonitoringRef())
 		}
 
 		tx := connector.Partner().Referential().NewTransaction()
@@ -190,7 +190,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().IdentifierGenerator("message_identifier").NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "StopMonitoringSubscriptionCollector")
 
@@ -232,7 +232,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 	for _, xmlStopVisitCancellationEvent := range xmlStopVisitCancellationEvents {
 		monitoringRefMap[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
 
-		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting("remote_objectid_kind"), xmlStopVisitCancellationEvent.MonitoringRef())
+		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting(REMOTE_OBJECTID_KIND), xmlStopVisitCancellationEvent.MonitoringRef())
 		stopArea, ok := tx.Model().StopAreas().FindByObjectId(stopAreaObjectId)
 		if !ok {
 			logger.Log.Debugf("StopVisitCancellationEvent for unknown StopArea %v", stopAreaObjectId.Value())
@@ -245,7 +245,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellati
 			events[xmlStopVisitCancellationEvent.MonitoringRef()] = stopAreaUpdateEvent
 		}
 		stopVisitCancellationEvent := &model.StopVisitNotCollectedEvent{
-			StopVisitObjectId: model.NewObjectID(connector.partner.Setting("remote_objectid_kind"), xmlStopVisitCancellationEvent.ItemRef()),
+			StopVisitObjectId: model.NewObjectID(connector.partner.Setting(REMOTE_OBJECTID_KIND), xmlStopVisitCancellationEvent.ItemRef()),
 		}
 		stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, stopVisitCancellationEvent)
 	}
