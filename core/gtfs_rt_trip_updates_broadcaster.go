@@ -45,7 +45,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	stopVisits := tx.Model().StopVisits().FindAll()
+	stopVisits := tx.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(-1 * time.Minute))
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 

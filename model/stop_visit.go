@@ -8,7 +8,11 @@ import (
 	"time"
 )
 
-var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{"actual", "expected", "aimed"}
+var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{
+	STOP_VISIT_SCHEDULE_ACTUAL,
+	STOP_VISIT_SCHEDULE_EXPECTED,
+	STOP_VISIT_SCHEDULE_AIMED,
+}
 
 type StopVisitId ModelId
 
@@ -252,16 +256,17 @@ type StopVisits interface {
 	UUIDInterface
 
 	New() StopVisit
-	Find(id StopVisitId) (StopVisit, bool)
-	FindByObjectId(objectid ObjectID) (StopVisit, bool)
-	FindByVehicleJourneyId(id VehicleJourneyId) []StopVisit
-	FindFollowingByVehicleJourneyId(id VehicleJourneyId) []StopVisit
-	FindByStopAreaId(id StopAreaId) []StopVisit
-	FindFollowingByStopAreaId(id StopAreaId) []StopVisit
-	FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) []StopVisit
+	Find(StopVisitId) (StopVisit, bool)
+	FindByObjectId(ObjectID) (StopVisit, bool)
+	FindByVehicleJourneyId(VehicleJourneyId) []StopVisit
+	FindFollowingByVehicleJourneyId(VehicleJourneyId) []StopVisit
+	FindByStopAreaId(StopAreaId) []StopVisit
+	FindFollowingByStopAreaId(StopAreaId) []StopVisit
+	FindFollowingByStopAreaIds([]StopAreaId) []StopVisit
 	FindAll() []StopVisit
-	Save(stopVisit *StopVisit) bool
-	Delete(stopVisit *StopVisit) bool
+	FindAllAfter(time.Time) []StopVisit
+	Save(*StopVisit) bool
+	Delete(*StopVisit) bool
 }
 
 func NewMemoryStopVisits() *MemoryStopVisits {
@@ -371,6 +376,18 @@ func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 	}
 	for _, stopVisit := range manager.byIdentifier {
 		stopVisits = append(stopVisits, *(stopVisit.copy()))
+	}
+	return
+}
+
+func (manager *MemoryStopVisits) FindAllAfter(t time.Time) (stopVisits []StopVisit) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, stopVisit := range manager.byIdentifier {
+		if stopVisit.ReferenceTime().After(t) {
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
+		}
 	}
 	return
 }
