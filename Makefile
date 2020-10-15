@@ -16,4 +16,4 @@ tests:
 	go test bitbucket.org/enroute-mobi/edwig/... -p 1 -count 1
 
 cucumber:
-	bundle exec cucumber -t ~@wip
+	bundle exec cucumber -t 'not @wip'
