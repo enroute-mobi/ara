@@ -1,6 +1,9 @@
 package model
 
-import "sort"
+import (
+	"sort"
+	"time"
+)
 
 type TransactionalStopVisits struct {
 	UUIDConsumer
@@ -122,8 +125,24 @@ func (manager *TransactionalStopVisits) FindFollowingByStopAreaIds(stopAreaIds [
 	return
 }
 
-func (manager *TransactionalStopVisits) FindAll() []StopVisit {
-	stopVisits := []StopVisit{}
+func (manager *TransactionalStopVisits) FindAllAfter(t time.Time) (stopVisits []StopVisit) {
+	for _, stopVisit := range manager.saved {
+		if stopVisit.ReferenceTime().After(t) {
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
+		}
+	}
+	savedStopVisits := manager.model.StopVisits().FindAll()
+	for _, stopVisit := range savedStopVisits {
+		_, ok := manager.saved[stopVisit.Id()]
+		_, deleted := manager.deleted[stopVisit.Id()]
+		if !ok && !deleted && stopVisit.ReferenceTime().After(t) {
+			stopVisits = append(stopVisits, stopVisit)
+		}
+	}
+	return
+}
+
+func (manager *TransactionalStopVisits) FindAll() (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.saved {
 		stopVisits = append(stopVisits, *(stopVisit.copy()))
 	}
@@ -134,7 +153,7 @@ func (manager *TransactionalStopVisits) FindAll() []StopVisit {
 			stopVisits = append(stopVisits, stopVisit)
 		}
 	}
-	return stopVisits
+	return
 }
 
 func (manager *TransactionalStopVisits) Save(stopVisit *StopVisit) bool {

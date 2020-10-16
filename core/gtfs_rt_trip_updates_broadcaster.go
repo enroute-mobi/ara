@@ -12,6 +12,10 @@ import (
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
+const (
+	PAST_STOP_VISITS_MAX_TIME = -2 * time.Minute
+)
+
 type TripUpdatesBroadcaster struct {
 	model.ClockConsumer
 
@@ -45,7 +49,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	stopVisits := tx.Model().StopVisits().FindAll()
+	stopVisits := tx.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 

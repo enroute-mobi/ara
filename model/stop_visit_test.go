@@ -193,6 +193,22 @@ func Test_MemoryStopVisits_FindAll(t *testing.T) {
 	}
 }
 
+func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
+	stopVisits := NewMemoryStopVisits()
+
+	for i := 0; i < 5; i++ {
+		sv := stopVisits.New()
+		sv.Schedules.SetArrivalTime(STOP_VISIT_SCHEDULE_ACTUAL, time.Now().Add(-time.Duration(i)*time.Minute))
+		stopVisits.Save(&sv)
+	}
+
+	foundStopVisits := stopVisits.FindAllAfter(time.Now().Add(-150 * time.Second))
+
+	if len(foundStopVisits) != 3 {
+		t.Errorf("FindAll should return 3 stopVisits: %v", stopVisits.byIdentifier)
+	}
+}
+
 func Test_MemoryStopVisits_Delete(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 	existingStopVisit := stopVisits.New()
