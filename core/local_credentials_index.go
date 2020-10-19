@@ -64,6 +64,9 @@ func (index *LocalCredentialsIndex) UniqCredentials(modelId PartnerId, localCred
 // Split and trim spaces from the local_credentials string
 // We expect something like local_credential + "," + local_credentials
 func splitCredentials(c string) (r []string) {
+	if c == "" {
+		return []string{""}
+	}
 	sc := strings.Split(c, ",")
 	for i := range sc {
 		sc[i] = strings.TrimSpace(sc[i])
