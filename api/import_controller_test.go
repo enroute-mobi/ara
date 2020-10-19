@@ -122,11 +122,11 @@ func Test_Serve(t *testing.T) {
 	if !ok {
 		t.Errorf("Line should be found after the reload")
 	}
-	// FIXME: We don't reload VJ or SV for now
-	// _, ok = referential.Model().VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	// if !ok {
-	// 	t.Errorf("VehicleJourney should be found after the reload")
-	// }
+	_, ok = referential.Model().VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if !ok {
+		t.Errorf("VehicleJourney should be found after the reload")
+	}
+	// FIXME: We don't reload SV for now
 	// _, ok = referential.Model().StopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	// if !ok {
 	// 	t.Errorf("StopVisit should be found after the reload")

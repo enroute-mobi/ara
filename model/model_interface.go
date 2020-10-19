@@ -105,6 +105,7 @@ func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
 	model.stopAreas.Load(referentialSlug)
 	model.lines.Load(referentialSlug)
 	model.operators.Load(referentialSlug)
+	model.vehicleJourneys.Load(referentialSlug)
 	return model
 }
 
