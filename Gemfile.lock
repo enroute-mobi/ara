@@ -1,3 +1,10 @@
+GIT
+  remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
+  revision: 3a6297428518f6d29af798cab11815a7e9209b83
+  specs:
+    gtfs-rt (0.1.0)
+      ruby-protocol-buffers
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -82,6 +89,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.3)
+    ruby-protocol-buffers (1.6.1)
     rubyzip (2.3.0)
     sys-uname (1.2.1)
       ffi (>= 1.0.0)
@@ -103,6 +111,7 @@ PLATFORMS
 DEPENDENCIES
   bundler-audit
   cucumber
+  gtfs-rt!
   http-cookie
   license_finder
   mime-types

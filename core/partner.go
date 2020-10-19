@@ -285,6 +285,11 @@ func (partner *Partner) Setting(key string) string {
 }
 
 func (partner *Partner) Credentials() string {
+	_, ok := partner.Settings[LOCAL_CREDENTIAL]
+	_, ok2 := partner.Settings[LOCAL_CREDENTIALS]
+	if !ok && !ok2 {
+		return ""
+	}
 	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
 }
 

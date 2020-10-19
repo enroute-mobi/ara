@@ -8,8 +8,6 @@ def getFirstPartner()
   response_array[0]["Id"]
 end
 
-["message_identifier", "response_message_identifier", "data_frame_identifier", "reference_identifier", "reference_stop_area_identifier"]
-
 def set_default_generators! attributes
   default_generators_map = {
     "generators.message_identifier" => "RATPDev:Message::%{uuid}:LOC",
