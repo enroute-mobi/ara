@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+git_source(:en_route) { |name| "https://bitbucket.org/enroute-mobi/#{name}.git" }
 
 group :test do
   gem 'cucumber'
@@ -8,6 +9,7 @@ group :test do
   gem 'http-cookie'
   gem 'rest-client'
   gem 'pg'
+  gem 'gtfs-rt', en_route: 'gtfs-rt'
 end
 
 group :development do
