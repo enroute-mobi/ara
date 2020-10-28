@@ -115,7 +115,7 @@ Feature: Support SIRI CheckStatus
     <sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <CheckStatusAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-        <siri:ProducerRef>Edwig</siri:ProducerRef>
+        <siri:ProducerRef>Ara</siri:ProducerRef>
         <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
         <siri:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</siri:RequestMessageRef>
       </CheckStatusAnswerInfo>
@@ -157,7 +157,7 @@ Feature: Support SIRI CheckStatus
     <sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <CheckStatusAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-        <siri:ProducerRef>Edwig</siri:ProducerRef>
+        <siri:ProducerRef>Ara</siri:ProducerRef>
         <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
         <siri:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</siri:RequestMessageRef>
       </CheckStatusAnswerInfo>
