@@ -89,7 +89,7 @@ Feature: Support SIRI StopMonitoring by request
           <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -240,7 +240,7 @@ Feature: Support SIRI StopMonitoring by request
           <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -374,7 +374,7 @@ Feature: Support SIRI StopMonitoring by request
           <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -509,7 +509,7 @@ Feature: Support SIRI StopMonitoring by request
           <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -648,7 +648,7 @@ Feature: Support SIRI StopMonitoring by request
           <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -798,7 +798,7 @@ Feature: Support SIRI StopMonitoring by request
             <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
               <ServiceDeliveryInfo>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-                <siri:ProducerRef>Edwig</siri:ProducerRef>
+                <siri:ProducerRef>Ara</siri:ProducerRef>
                 <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
               </ServiceDeliveryInfo>

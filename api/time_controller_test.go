@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func timeCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {

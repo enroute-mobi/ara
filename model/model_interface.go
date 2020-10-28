@@ -1,6 +1,6 @@
 package model
 
-import "bitbucket.org/enroute-mobi/edwig/logger"
+import "bitbucket.org/enroute-mobi/ara/logger"
 
 type ModelId string
 

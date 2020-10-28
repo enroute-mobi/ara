@@ -25,7 +25,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
               <ns2:RequestTimestamp>2017-01-01T12:01:00.000Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
               <ns2:MessageIdentifier>ETTSubscription:Test:0</ns2:MessageIdentifier>
-              <ns2:ConsumerAddress>https://edwig-staging.af83.io/test/siri</ns2:ConsumerAddress>
+              <ns2:ConsumerAddress>https://ara-staging.af83.io/test/siri</ns2:ConsumerAddress>
             </SubscriptionRequestInfo>
             <Request version="2.0:FR-IDF-2.4">
               <EstimatedTimetableSubscriptionRequest>

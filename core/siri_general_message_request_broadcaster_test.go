@@ -6,17 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -47,13 +47,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 
 	response, _ := connector.Situations(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
 		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: RATPDev:Message::ade15433-06a6-4f7b-b331-2c1080a5d279:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()
@@ -69,9 +69,9 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -112,9 +112,9 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -158,13 +158,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 
 	response, _ := connector.Situations(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
 		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: RATPDev:Message::ade15433-06a6-4f7b-b331-2c1080a5d279:LOC", response.ResponseMessageIdentifier)
 	}
 	time := connector.Clock().Now()

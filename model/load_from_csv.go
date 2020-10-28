@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/config"
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 /* CSV Structure

@@ -6,18 +6,18 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -113,17 +113,17 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	response := connector.RequestLine(request)
 
-	if response.Address != "http://edwig" {
-		t.Errorf("Response has wrong adress:\n got: %v\n want: http://edwig", response.Address)
+	if response.Address != "http://ara" {
+		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
 	}
-	if response.ProducerRef != "Edwig" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Edwig", response.ProducerRef)
+	if response.ProducerRef != "Ara" {
+		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
 	}
 	if response.RequestMessageRef != "EstimatedTimetable:Test:0" {
 		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
 	}
-	if response.ResponseMessageIdentifier != "Edwig:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
+	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
+		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
 	}
 	if !response.ResponseTimestamp.Equal(connector.Clock().Now()) {
 		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
@@ -176,9 +176,9 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://edwig"
+	partner.Settings["local_url"] = "http://ara"
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Edwig:ResponseMessage::%{uuid}:LOC"
+	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
 	connector.SetClock(model.NewFakeClock())
@@ -351,7 +351,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	response := &siri.SIRIEstimatedTimeTableResponse{
-		Address:                   "edwig.edwig",
+		Address:                   "ara.ara",
 		ProducerRef:               "NINOXE:default",
 		ResponseMessageIdentifier: "fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26",
 	}
@@ -362,8 +362,8 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 	logSIRIEstimatedTimetableDelivery(logStashEvent, response.SIRIEstimatedTimetableDelivery, nil, nil)
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 
-	if logStashEvent["address"] != "edwig.edwig" {
-		t.Errorf("Wrong address logged:\n got: %v\n expected: edwig.edwig", logStashEvent["address"])
+	if logStashEvent["address"] != "ara.ara" {
+		t.Errorf("Wrong address logged:\n got: %v\n expected: ara.ara", logStashEvent["address"])
 	}
 	if logStashEvent["producerRef"] != "NINOXE:default" {
 		t.Errorf("Wrong producerRef logged:\n got: %v\n expected: NINOXE:default", logStashEvent["producerRef"])

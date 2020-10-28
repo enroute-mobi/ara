@@ -23,10 +23,10 @@ When(/^the time is "([^"]*)"$/) do |expected_time|
 	getTime = RestClient.get(time_path, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}).body
 	splitTime = getTime.split(' ')
 
-	edwigTime = Time.parse(splitTime[2])
+	araTime = Time.parse(splitTime[2])
 	expectedTime = Time.parse(expected_time)
 
-	duration =  expectedTime - edwigTime
+	duration =  expectedTime - araTime
 
 	RestClient.post(time_path("advance"), { "duration" => "#{duration}s" }.to_json, {content_type: :json, :Authorization => "Token token=#{$adminToken}"})
 	sleep 1 # don't blame me

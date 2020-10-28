@@ -1,4 +1,4 @@
-Source: edwig
+Source: ara
 Section: misc
 Priority: extra
 Maintainer: enRoute team <team@enroute.mobi>
@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0), git-core, build-essential, curl, ca-certifi
 Standards-Version: 3.9.4
 Homepage: http://enroute.mobi
 
-Package: edwig
+Package: ara
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Realtime Public Transport server

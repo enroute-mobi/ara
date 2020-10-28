@@ -59,7 +59,7 @@ Feature: Support SIRI GeneralMessage for Situation
           <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -139,7 +139,7 @@ Feature: Support SIRI GeneralMessage for Situation
           <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -249,7 +249,7 @@ Feature: Support SIRI GeneralMessage for Situation
           xmlns:ns9="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -357,7 +357,7 @@ Feature: Support SIRI GeneralMessage for Situation
           <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>

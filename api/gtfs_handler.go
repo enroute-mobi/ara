@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 	"github.com/golang/protobuf/proto"
 )

@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/logger"
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type OperationnalStatus string
@@ -319,7 +319,7 @@ func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
 func (partner *Partner) ProducerRef() string {
 	producerRef := partner.Setting(REMOTE_CREDENTIAL)
 	if producerRef == "" {
-		producerRef = "Edwig"
+		producerRef = "Ara"
 	}
 	return producerRef
 }

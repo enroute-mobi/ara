@@ -30,12 +30,12 @@ func Test_SIRIPartner_RequestorRef(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 		Settings: map[string]string{
-			"remote_credential": "edwig",
+			"remote_credential": "ara",
 		},
 	}
 	siriPartner := NewSIRIPartner(partner)
-	if siriPartner.RequestorRef() != "edwig" {
-		t.Errorf("Wrong SIRIPartner RequestorRef:\n got: %s\n want: \"edwig\"", siriPartner.RequestorRef())
+	if siriPartner.RequestorRef() != "ara" {
+		t.Errorf("Wrong SIRIPartner RequestorRef:\n got: %s\n want: \"ara\"", siriPartner.RequestorRef())
 	}
 
 }
@@ -47,12 +47,12 @@ func Test_SIRIPartner_RequestorRef(t *testing.T) {
 // 	siriPartner := NewSIRIPartner(partner)
 
 // 	// Set MessageIdentifierGenerator
-// 	midGenerator := NewFormatMessageIdentifierGenerator("Edwig:Message::%s:LOC")
+// 	midGenerator := NewFormatMessageIdentifierGenerator("Ara:Message::%s:LOC")
 // 	midGenerator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
 // 	siriPartner.SetMessageIdentifierGenerator(midGenerator)
 
 // 	mid := siriPartner.IdentifierGenerator("message_identifier").NewMessageIdentifier()
-// 	if expected := "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; mid != expected {
+// 	if expected := "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; mid != expected {
 // 		t.Errorf("Wrong MessageIdentifier:\n got: %s\n want: %s", mid, expected)
 // 	}
 // }

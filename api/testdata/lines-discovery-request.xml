@@ -5,7 +5,7 @@
                  xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
   <Request>
     <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
-    <ns2:RequestorRef>Edwig</ns2:RequestorRef>
+    <ns2:RequestorRef>Ara</ns2:RequestorRef>
     <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
   </Request>
   <RequestExtension />

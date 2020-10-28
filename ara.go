@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/api"
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/config"
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/logger"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
-	"bitbucket.org/enroute-mobi/edwig/version"
+	"bitbucket.org/enroute-mobi/ara/api"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/version"
 )
 
 func main() {
@@ -35,8 +35,8 @@ func main() {
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
-		fmt.Println("Edwig", version.Value())
-		fmt.Println("Usage: edwig [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
+		fmt.Println("Ara", version.Value())
+		fmt.Println("Usage: ara [-testuuid] [-testclock=<time>] [-pidfile=<filename>]")
 		fmt.Println("             [-config=<path>] [-debug] [-syslog] [-colorizelog]")
 		fmt.Println("\tcheck [-requestor-ref=<requestorRef>] <url>")
 		fmt.Println("\tapi [-listen=<url>]")
@@ -70,7 +70,7 @@ func main() {
 		audit.CurrentLogStash().Start()
 		defer audit.CurrentLogStash().Stop()
 	}
-	logger.Log.Debugf("Edwig started with a version : %v", version.Value())
+	logger.Log.Debugf("Ara started with a version : %v", version.Value())
 
 	if *uuidPtr {
 		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
@@ -114,7 +114,7 @@ func main() {
 	switch command {
 	case "check":
 		checkFlags := flag.NewFlagSet("check", flag.ExitOnError)
-		requestorRefPtr := checkFlags.String("requestor-ref", "Edwig", "Specify requestorRef")
+		requestorRefPtr := checkFlags.String("requestor-ref", "Ara", "Specify requestorRef")
 		checkFlags.Parse(flag.Args()[1:])
 
 		err = checkStatus(checkFlags.Arg(0), *requestorRefPtr)
@@ -166,7 +166,7 @@ func main() {
 
 		if loadFlags.NArg() < 2 {
 			logger.Log.Printf("Incorrect use of command load: not enough aguments")
-			logger.Log.Printf("usage: edwig load [-force] <path> <referential slug>")
+			logger.Log.Printf("usage: ara load [-force] <path> <referential slug>")
 			os.Exit(2)
 		}
 
@@ -194,7 +194,7 @@ func checkStatus(url string, requestorRef string) error {
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
 		RequestTimestamp:  model.DefaultClock().Now(),
-		MessageIdentifier: "Edwig:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
+		MessageIdentifier: "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
 
 	startTime := time.Now()

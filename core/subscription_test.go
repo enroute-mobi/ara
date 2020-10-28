@@ -3,7 +3,7 @@ package core
 import (
 	"testing"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func Test_Subscription_Id(t *testing.T) {

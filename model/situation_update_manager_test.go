@@ -11,7 +11,7 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 		RecordedAt:        testTime,
 		SituationObjectID: objectid,
 		Version:           1,
-		ProducerRef:       "Edwig",
+		ProducerRef:       "Ara",
 	}
 
 	message := &Message{
@@ -47,7 +47,7 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 		ValidUntil:  testTime,
 		Format:      "format",
 		Channel:     "channel",
-		ProducerRef: "Edwig",
+		ProducerRef: "Ara",
 		Version:     1,
 	}
 	testSituation.model = situation.model

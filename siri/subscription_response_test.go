@@ -39,7 +39,7 @@ func Test_XMLSubscriptionResponse(t *testing.T) {
 		t.Errorf("Incorrect SubscriberRef expected: %v\n got: %v", expected, responseStatus.SubscriberRef())
 	}
 
-	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; responseStatus.SubscriptionRef() != expected {
+	if expected := "Ara:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; responseStatus.SubscriptionRef() != expected {
 		t.Errorf("Incorrect SubscriptionRef expected: %v\n got: %v", expected, responseStatus.SubscriptionRef())
 	}
 

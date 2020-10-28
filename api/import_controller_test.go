@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func prepareMultipart(t *testing.T, values map[string]io.Reader) (request *http.Request) {

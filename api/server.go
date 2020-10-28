@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/config"
-	"bitbucket.org/enroute-mobi/edwig/core"
-	"bitbucket.org/enroute-mobi/edwig/logger"
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/version"
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/version"
 )
 
 type Server struct {

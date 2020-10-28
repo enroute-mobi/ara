@@ -24,7 +24,7 @@ definitions:
           # FIXME
           - export BASE_PATH="${GOPATH}/src/bitbucket.org/enroute-mobi"
           - mkdir -p ${BASE_PATH}
-          - export IMPORT_PATH="${BASE_PATH}/edwig"
+          - export IMPORT_PATH="${BASE_PATH}/ara"
           - ln -s ${PWD} ${IMPORT_PATH}
           - cd ${IMPORT_PATH}
 
@@ -33,8 +33,8 @@ definitions:
 
           - bundle install --jobs 4 --deployment
 
-          - export EDWIG_DB_NAME=ara EDWIG_DB_USER=ara EDWIG_DB_PASSWORD=ara EDWIG_DB_HOST=localhost
-          - export EDWIG_CONFIG=$PWD/config
+          - export ARA_DB_NAME=ara ARA_DB_USER=ara ARA_DB_PASSWORD=ara ARA_DB_HOST=localhost
+          - export ARA_CONFIG=$PWD/config
           - ./ci.sh
         services:
           - postgres

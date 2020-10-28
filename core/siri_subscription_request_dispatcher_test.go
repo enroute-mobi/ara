@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/model"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
@@ -96,7 +96,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	}
 
 	sub := subs[0]
-	externalId := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"
+	externalId := "Ara:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"
 	if sub.ExternalId() != externalId {
 		t.Errorf("Wrong ExternalId value want: %v got: %v", externalId, sub.ExternalId())
 	}
@@ -157,7 +157,7 @@ func Test_CancelSubscription(t *testing.T) {
 	referential.Partners().Save(partner)
 
 	sub := partner.Subscriptions().New("Test")
-	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
+	sub.SetExternalId("Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
 
 	partner.Subscriptions().Save(sub)
 
@@ -175,7 +175,7 @@ func Test_CancelSubscription(t *testing.T) {
 		t.Errorf("Status should be true but got false")
 	}
 
-	if _, ok := partner.Subscriptions().FindByExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC"); ok {
+	if _, ok := partner.Subscriptions().FindByExternalId("Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC"); ok {
 		t.Errorf("Subscription shouldn't exist")
 	}
 }
@@ -195,13 +195,13 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 
 	sub := partner.Subscriptions().New("Test")
 	sub.kind = "Broadcast"
-	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
+	sub.SetExternalId("Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC")
 
 	partner.Subscriptions().Save(sub)
 
 	sub = partner.Subscriptions().New("Test")
 	sub.kind = "Broadcast"
-	sub.SetExternalId("Edwig:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c9:LOC")
+	sub.SetExternalId("Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c9:LOC")
 
 	partner.Subscriptions().Save(sub)
 

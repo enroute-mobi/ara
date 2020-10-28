@@ -3,7 +3,7 @@
     <ns5:ResponseTimestamp>2017-06-13T10:12:38.935+02:00</ns5:ResponseTimestamp>
     <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
     <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:374397</ns5:ResponseMessageIdentifier>
-    <ns5:RequestMessageRef>Edwig:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:RequestMessageRef>
+    <ns5:RequestMessageRef>Ara:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
     <ns5:StopMonitoringDelivery version="1.3">

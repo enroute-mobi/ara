@@ -59,7 +59,7 @@ func Test_SIRIGeneralMessageSubscriptionRequest_BuildXML(t *testing.T) {
 
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &SIRIGeneralMessageSubscriptionRequest{
-		ConsumerAddress:   "https://edwig-staging.af83.io/test/siri",
+		ConsumerAddress:   "https://ara-staging.af83.io/test/siri",
 		MessageIdentifier: "test",
 		RequestorRef:      "test",
 		RequestTimestamp:  date,

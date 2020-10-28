@@ -12,6 +12,6 @@ Given(/^the table "([^"]*)" has the following data:$/) do |table_name, datas|
   @connection.exec(request_string)
 end
 
-When(/^I start Edwig$/) do
-  start_edwig()
+When(/^I start Ara$/) do
+  start_ara()
 end

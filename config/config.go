@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -70,9 +70,9 @@ func SetEnvironment(env string) {
 
 func Environment() string {
 	if environment == "" {
-		env := os.Getenv("EDWIG_ENV")
+		env := os.Getenv("ARA_ENV")
 		if env == "" {
-			logger.Log.Debugf("EDWIG_ENV not set, default environment is development")
+			logger.Log.Debugf("ARA_ENV not set, default environment is development")
 			env = "development"
 		}
 		environment = env
@@ -110,7 +110,7 @@ func LoadDatabaseConfig(configPath string) error {
 func getConfigDirectory(path string) (string, error) {
 	paths := [3]string{
 		path,
-		os.Getenv("EDWIG_CONFIG"),
+		os.Getenv("ARA_CONFIG"),
 		fmt.Sprintf("%s/src/bitbucket.org/enroute-mobi/ara/config", os.Getenv("GOPATH")),
 	}
 	for _, directoryPath := range paths {
@@ -123,7 +123,7 @@ func getConfigDirectory(path string) (string, error) {
 
 func GetTemplateDirectory() (string, error) {
 	paths := [2]string{
-		os.Getenv("EDWIG_ROOT"),
+		os.Getenv("ARA_ROOT"),
 		fmt.Sprintf("%s/src/bitbucket.org/enroute-mobi/ara", os.Getenv("GOPATH")),
 	}
 	for _, directoryPath := range paths {

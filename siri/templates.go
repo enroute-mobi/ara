@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"bitbucket.org/enroute-mobi/edwig/config"
-	"bitbucket.org/enroute-mobi/edwig/logger"
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 var templates *template.Template

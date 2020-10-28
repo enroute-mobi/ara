@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strconv"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/model"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 

@@ -83,9 +83,9 @@ Feature: Support SIRI EstimatedTimeTable
       | Schedule[aimed]#Arrival         | 2017-01-01T15:16:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:16:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
-    And I see edwig vehicle_journeys
-    And I see edwig stop_visits
-    And I see edwig lines
+    And I see ara vehicle_journeys
+    And I see ara stop_visits
+    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -123,7 +123,7 @@ Feature: Support SIRI EstimatedTimeTable
           <sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
@@ -274,9 +274,9 @@ Feature: Support SIRI EstimatedTimeTable
       | Schedule[aimed]#Arrival         | 2017-01-01T15:16:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:16:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
-    And I see edwig vehicle_journeys
-    And I see edwig stop_visits
-    And I see edwig lines
+    And I see ara vehicle_journeys
+    And I see ara stop_visits
+    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -314,7 +314,7 @@ Feature: Support SIRI EstimatedTimeTable
           <sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Edwig</siri:ProducerRef>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>EstimatedTimetable:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>

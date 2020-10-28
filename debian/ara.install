@@ -1,0 +1,6 @@
+debian/config.yml etc/ara
+debian/database.yml etc/ara
+debian/ara-cli usr/bin
+debian/production.yml etc/ara
+db/migrations usr/share/ara
+siri/templates usr/share/ara/siri

@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          edwig
+# Provides:          ara
 # Required-Start:    $network $named $remote_fs $syslog postgresql
 # Required-Stop:     $network $named $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -8,15 +8,15 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/bin/edwig
-DAEMON_OPTS="--syslog --config=/etc/edwig api"
-MIGRATE_OPTS="--syslog --config=/etc/edwig migrate --path=/usr/share/edwig/migrations up"
+DAEMON=/usr/bin/ara
+DAEMON_OPTS="--syslog --config=/etc/ara api"
+MIGRATE_OPTS="--syslog --config=/etc/ara migrate --path=/usr/share/ara/migrations up"
 DAEMON_USER="nobody"
-NAME="edwig"
-DESC="Edwig Server"
-OUTPUT_FILE=/var/log/edwig/output.log
+NAME="ara"
+DESC="Ara Server"
+OUTPUT_FILE=/var/log/ara/output.log
 
-export EDWIG_ROOT=/usr/share/edwig
+export ARA_ROOT=/usr/share/ara
 
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 

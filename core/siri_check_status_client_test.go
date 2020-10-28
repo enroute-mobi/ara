@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/edwig/audit"
-	"bitbucket.org/enroute-mobi/edwig/siri"
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) PartnerStatus {
@@ -100,7 +100,7 @@ func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 	logStashEvent := make(audit.LogStashEvent)
 	time := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &siri.SIRICheckStatusRequest{
-		RequestorRef:      "Edwig",
+		RequestorRef:      "Ara",
 		RequestTimestamp:  time,
 		MessageIdentifier: "0000-0000-0000-0000",
 	}
@@ -108,8 +108,8 @@ func Test_SIRICheckStatusClient_LogCheckStatusRequest(t *testing.T) {
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
-	if logStashEvent["requestorRef"] != "Edwig" {
-		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: Edwig", logStashEvent["requestorRef"])
+	if logStashEvent["requestorRef"] != "Ara" {
+		t.Errorf("Wrong requestorRef logged:\n got: %v\n expected: Ara", logStashEvent["requestorRef"])
 	}
 	if expected := time.String(); logStashEvent["requestTimestamp"] != expected {
 		t.Errorf("Wrong requestTimestamp logged:\n got: %v\n expected: %v", logStashEvent["requestTimestamp"], expected)

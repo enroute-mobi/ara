@@ -1,13 +1,13 @@
 development:
-  name: edwig
-  user: edwig
-  password: edwig
+  name: ara
+  user: ara
+  password: ara
   host: localhost
   port: 5432
 
 test:
-  name: edwig_test
-  user: edwig
-  password: edwig
+  name: ara_test
+  user: ara
+  password: ara
   host: localhost
   port: 5432

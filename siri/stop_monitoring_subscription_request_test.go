@@ -42,7 +42,7 @@ func Test_XMLStopMonitoringSubscriptionRequest(t *testing.T) {
 		t.Errorf("Wrong MessageIdentifier:\n got: %v\nwant: %v", request.MessageIdentifier(), expected)
 	}
 
-	if expected := "Edwig:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; entry.SubscriptionIdentifier() != expected {
+	if expected := "Ara:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC"; entry.SubscriptionIdentifier() != expected {
 		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", entry.SubscriptionIdentifier(), expected)
 	}
 
@@ -59,7 +59,7 @@ func Test_SIRIStopMonitoringSubscriptionRequest_BuildXML(t *testing.T) {
 
 	date := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 	request := &SIRIStopMonitoringSubscriptionRequest{
-		ConsumerAddress:   "https://edwig-staging.af83.io/test/siri",
+		ConsumerAddress:   "https://ara-staging.af83.io/test/siri",
 		MessageIdentifier: "test",
 		RequestorRef:      "test",
 		RequestTimestamp:  date,
