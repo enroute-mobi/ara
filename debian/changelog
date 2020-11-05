@@ -1,3 +1,9 @@
+ara (1.0) unstable; urgency=medium
+
+  * Rename edwid into ara
+
+ -- Alban Peignier <alban.peignier@enroute.mobi>  Wed, 28 Oct 2020 12:06:26 +0100
+
 ara (0.3) unstable; urgency=medium
 
   * Initial release
