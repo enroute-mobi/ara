@@ -121,7 +121,7 @@ func (loader Loader) Load(reader io.Reader) Result {
 	csvReader.TrimLeadingSpace = true
 
 	startTime := time.Now()
-	logger.Log.Debugf("Load operation started at %v", startTime)
+	logger.Log.Printf("Load operation started at %v", startTime)
 
 	var i int
 	for {
@@ -173,9 +173,10 @@ func (loader Loader) Load(reader io.Reader) Result {
 	loader.insertVehicleJourneys()
 	loader.insertStopVisits()
 
-	logger.Log.Debugf("Load operation done in %v", time.Since(startTime))
-
 	loader.result.setTotalInserts()
+
+	logger.Log.Printf("Load operation done in %v", time.Since(startTime))
+	logger.Log.Printf(loader.result.PrintResult())
 
 	return loader.result
 }
