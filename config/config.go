@@ -20,16 +20,21 @@ type DatabaseConfig struct {
 	Port     uint
 }
 
-var Config = struct {
+type config struct {
 	DB DatabaseConfig
 
-	ApiKey        string
-	Debug         bool
-	LogStash      string
-	Syslog        bool
-	ColorizeLog   bool
-	LoadMaxInsert int
-}{}
+	ApiKey            string
+	Debug             bool
+	LogStash          string
+	BigQueryProjectID string
+	BigQueryDataset   string
+	BigQueryTable     string
+	Syslog            bool
+	ColorizeLog       bool
+	LoadMaxInsert     int
+}
+
+var Config = config{}
 
 func LoadConfig(path string) error {
 	// Default values
@@ -60,6 +65,10 @@ func LoadConfig(path string) error {
 	logger.Log.Color = Config.ColorizeLog
 
 	return nil
+}
+
+func (c *config) ValidBQConfig() bool {
+	return c.BigQueryProjectID != "" && c.BigQueryDataset != "" && c.BigQueryTable != ""
 }
 
 var environment string
