@@ -17,7 +17,7 @@ RUN go install -v -ldflags "-X bitbucket.org/enroute-mobi/ara/version.value=${VE
 
 FROM debian:buster
 
-ENV RUN_PACKAGES="libxml2"
+ENV RUN_PACKAGES="libxml2 ca-certificates"
 
 RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --no-install-recommends $RUN_PACKAGES && \
     apt-get clean && apt-get -y autoremove && rm -rf /var/lib/apt/lists/*
