@@ -14,6 +14,12 @@ if [ -z "$ARA_API_KEY" ]; then
     exit 1
 fi
 
+if [ -n "$GCLOUD_KEYFILE_JSON" ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS="gcloud-keyfile.json"
+    echo -En "$GCLOUD_KEYFILE_JSON" > "$GOOGLE_APPLICATION_CREDENTIALS"
+    unset GCLOUD_KEYFILE_JSON
+fi
+
 cat > config/database.yml <<EOF
 ${ARA_ENV:-production}:
   name: ${ARA_DB_NAME:-ara}
@@ -32,6 +38,9 @@ cat > config/config.yml <<EOF
 syslog: ${ARA_SYSLOG:-false}
 debug: ${ARA_DEBUG:-false}
 apikey: ${ARA_API_KEY}
+bigqueryprojectid: "${GCLOUD_PROJECT}"
+bigquerydataset: "${ARA_BIGQUERY_DATASET}"
+bigquerytable: "exchange_events"
 EOF
 
 if [ -n "$ARA_LOGSTASH" ]; then
