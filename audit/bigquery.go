@@ -17,13 +17,13 @@ type BigQueryMessage struct {
 	Partner                 string    `bigquery:"partner"`
 	Status                  string    `bigquery:"status"`
 	ErrorDetails            string    `bigquery:"error_details"`
-	RequestRawMessages      string    `bigquery:"request_raw_messages"`
+	RequestRawMessage       string    `bigquery:"request_raw_message"`
 	ResponseRawMessage      string    `bigquery:"response_raw_message"`
 	RequestIdentifier       string    `bigquery:"request_identifier"`
 	ResponseIdentifier      string    `bigquery:"response_identifier"`
 	RequestSize             int       `bigquery:"request_size"`
 	ResponseSize            int       `bigquery:"response_size"`
-	ProcessingTime          float32   `bigquery:"processing_time"`
+	ProcessingTime          float64   `bigquery:"processing_time"`
 	SubscriptionIdentifiers []string  `bigquery:"subscription_identifiers"`
 	Lines                   []string  `bigquery:"lines"`
 	StopAreas               []string  `bigquery:"stop_areas"`
@@ -34,13 +34,13 @@ type BigQuery interface {
 	model.Startable
 	model.Stopable
 
-	WriteMessage(message BigQueryMessage) error
+	WriteMessage(message *BigQueryMessage) error
 }
 
 /**** Null struct to disable BQ by default ****/
 type NullBigQuery struct{}
 
-func (bq *NullBigQuery) WriteMessage(_ BigQueryMessage) error {
+func (bq *NullBigQuery) WriteMessage(_ *BigQueryMessage) error {
 	return nil
 }
 
@@ -63,7 +63,7 @@ func SetCurrentBigQuery(bq BigQuery) {
 
 /**** Test Structure ****/
 type FakeBigQuery struct {
-	messages []BigQueryMessage
+	messages []*BigQueryMessage
 }
 
 func NewFakeBigQuery() *FakeBigQuery {
@@ -73,12 +73,12 @@ func NewFakeBigQuery() *FakeBigQuery {
 func (bq *FakeBigQuery) Start() {}
 func (bq *FakeBigQuery) Stop()  {}
 
-func (bq *FakeBigQuery) WriteMessage(message BigQueryMessage) error {
+func (bq *FakeBigQuery) WriteMessage(message *BigQueryMessage) error {
 	bq.messages = append(bq.messages, message)
 	return nil
 }
 
-func (bq *FakeBigQuery) Messages() []BigQueryMessage {
+func (bq *FakeBigQuery) Messages() []*BigQueryMessage {
 	return bq.messages
 }
 
@@ -93,7 +93,7 @@ type BigQueryClient struct {
 	cancel    context.CancelFunc
 	client    *bigquery.Client
 	inserter  *bigquery.Inserter
-	messages  chan BigQueryMessage
+	messages  chan *BigQueryMessage
 	stop      chan struct{}
 }
 
@@ -102,7 +102,7 @@ func NewBigQueryClient(projectID, dataset, table string) *BigQueryClient {
 		projectID: projectID,
 		dataset:   dataset,
 		table:     table,
-		messages:  make(chan BigQueryMessage, 5),
+		messages:  make(chan *BigQueryMessage, 5),
 	}
 }
 
@@ -117,7 +117,7 @@ func (bq *BigQueryClient) Stop() {
 	}
 }
 
-func (bq *BigQueryClient) WriteMessage(message BigQueryMessage) error {
+func (bq *BigQueryClient) WriteMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
 	default:
