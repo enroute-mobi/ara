@@ -120,10 +120,14 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
+	startTime := connector.partner.Referential().Clock().Now()
+
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+	message := connector.newBQMessage()
+	defer audit.CurrentBigQuery().WriteMessage(message)
 
-	logXMLStopMonitoringRequest(logStashEvent, &request.XMLStopMonitoringRequest)
+	logStopMonitoringRequest(logStashEvent, message, &request.XMLStopMonitoringRequest)
 	logStashEvent["requestorRef"] = request.RequestorRef()
 
 	response := &siri.SIRIStopMonitoringResponse{
@@ -134,8 +138,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 
 	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringRequest)
 
-	logSIRIStopMonitoringDelivery(logStashEvent, response.SIRIStopMonitoringDelivery)
-	logSIRIStopMonitoringResponse(logStashEvent, response)
+	logStopMonitoringResponse(logStashEvent, message, response)
+	message.ProcessingTime = time.Since(startTime).Seconds()
 
 	return response
 }
@@ -146,6 +150,16 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) newLogStashEvent() audit.
 	return event
 }
 
+func (connector *SIRIStopMonitoringRequestBroadcaster) newBQMessage() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Timestamp: connector.partner.Referential().Clock().Now(),
+		Protocol:  "siri",
+		Type:      "StopMonitoringRequest",
+		Direction: "received",
+		Partner:   string(connector.partner.Slug()),
+	}
+}
+
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
 	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
@@ -154,6 +168,44 @@ func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner 
 
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRIStopMonitoringRequestBroadcaster(partner)
+}
+
+func logStopMonitoringRequest(logStashEvent audit.LogStashEvent, m *audit.BigQueryMessage, request *siri.XMLStopMonitoringRequest) {
+	logXMLStopMonitoringRequest(logStashEvent, request)
+
+	m.RequestRawMessage = request.RawXML()
+	m.RequestIdentifier = request.MessageIdentifier()
+	m.StopAreas = []string{request.MonitoringRef()}
+	m.Lines = []string{request.LineRef()}
+}
+
+func logStopMonitoringResponse(logStashEvent audit.LogStashEvent, m *audit.BigQueryMessage, response *siri.SIRIStopMonitoringResponse) {
+	logSIRIStopMonitoringDelivery(logStashEvent, response.SIRIStopMonitoringDelivery)
+	logSIRIStopMonitoringResponse(logStashEvent, response)
+
+	if response.SIRIStopMonitoringDelivery.Status {
+		m.Status = "OK"
+	} else {
+		m.Status = "Error"
+	}
+	if !response.SIRIStopMonitoringDelivery.Status {
+		m.ErrorDetails = fmt.Sprintf("%v: %v", bqErrorType(response.SIRIStopMonitoringDelivery), response.SIRIStopMonitoringDelivery.ErrorText)
+	}
+	m.ResponseIdentifier = response.ResponseMessageIdentifier
+	// FIXME: It isn't optimal to do 2 times this operation, but if we persist with BQ we'll need to refacto the logs anyway
+	xml, err := response.BuildXML()
+	if err != nil {
+		m.ResponseRawMessage = fmt.Sprintf("%v", err)
+		return
+	}
+	m.ResponseRawMessage = xml
+}
+
+func bqErrorType(delivery siri.SIRIStopMonitoringDelivery) string {
+	if delivery.ErrorType == "OtherError" {
+		return fmt.Sprintf("%v %v", delivery.ErrorType, delivery.ErrorNumber)
+	}
+	return delivery.ErrorType
 }
 
 func logXMLStopMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) {

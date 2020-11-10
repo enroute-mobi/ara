@@ -70,6 +70,12 @@ func main() {
 		audit.CurrentLogStash().Start()
 		defer audit.CurrentLogStash().Stop()
 	}
+	// Configure BigQuery
+	if config.Config.ValidBQConfig() {
+		audit.SetCurrentBigQuery(audit.NewBigQueryClient(config.Config.BigQueryProjectID, config.Config.BigQueryDataset, config.Config.BigQueryTable))
+		audit.CurrentBigQuery().Start()
+		defer audit.CurrentBigQuery().Stop()
+	}
 	logger.Log.Debugf("Ara started with a version : %v", version.Value())
 
 	if *uuidPtr {
