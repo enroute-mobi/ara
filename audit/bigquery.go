@@ -11,6 +11,7 @@ import (
 
 type BigQueryMessage struct {
 	Timestamp               time.Time `bigquery:"timestamp"`
+	IPAddress               string    `bigquery:ip_address`
 	Protocol                string    `bigquery:"protocol"`
 	Type                    string    `bigquery:"type"`
 	Direction               string    `bigquery:"direction"`

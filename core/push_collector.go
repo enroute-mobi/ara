@@ -61,14 +61,19 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 	pc.handleStopVisits(model.GetStopVisits())
 	pc.handleVehicles(model.GetVehicles())
 
+	processingTime := time.Since(t)
+
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
-	logger.Log.Debugf("PushCollector handled %v models in %v", total, time.Since(t))
+	logger.Log.Debugf("PushCollector handled %v models in %v", total, processingTime)
 
 	pc.partner.Pushed()
 
 	logStashEvent := pc.newLogStashEvent()
 	pc.logPushNotification(logStashEvent, model)
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	message := pc.newBQMessage(processingTime)
+	audit.CurrentBigQuery().WriteMessage(message)
 }
 
 func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) {
@@ -191,4 +196,16 @@ func (pc *PushCollector) logPushNotification(logStashEvent audit.LogStashEvent, 
 	logStashEvent["lines"] = strconv.Itoa(len(model.GetLines()))
 	logStashEvent["vehicleJourneys"] = strconv.Itoa(len(model.GetVehicleJourneys()))
 	logStashEvent["StopVisits"] = strconv.Itoa(len(model.GetStopVisits()))
+}
+
+func (pc *PushCollector) newBQMessage(processingTime time.Duration) *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Timestamp:      pc.partner.Referential().Clock().Now(),
+		Protocol:       "push",
+		Type:           "push-notification",
+		Direction:      "received",
+		Partner:        string(pc.partner.Slug()),
+		Status:         "OK",
+		ProcessingTime: processingTime.Seconds(),
+	}
 }

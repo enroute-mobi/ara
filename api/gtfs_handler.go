@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -40,8 +41,13 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	logStashEvent["connector"] = "GtfsHandler"
 	logStashEvent["resource"] = "resource"
 
+	message := handler.newBQMessage(partner)
+	defer audit.CurrentBigQuery().WriteMessage(message)
+
 	var gc []core.GtfsConnector
 	var c core.Connector
+	messageType := resource
+
 	if resource == "trip-updates" {
 		c, ok = partner.Connector(core.GTFS_RT_TRIP_UPDATES_BROADCASTER)
 		if ok {
@@ -53,9 +59,14 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
 		}
 	} else {
+		messageType = "trip-updates,vehicle-position"
 		gc, ok = partner.GtfsConnectors()
 	}
+
+	message.Type = messageType
+
 	if !ok {
+		handler.logError(message, startTime, "Partner %v doesn't have the required Gtfs connector %v", partner.Slug(), resource)
 		http.Error(response, "Partner doesn't have the required Gtfs connector", http.StatusNotImplemented)
 		return
 	}
@@ -76,7 +87,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 
 	data, err := proto.Marshal(feed)
 	if err != nil {
-		logger.Log.Debugf("Error while marshaling feed: %v", err)
+		handler.logError(message, startTime, "Error while marshaling feed: %v", err)
 		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
@@ -86,12 +97,12 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	if partner.GzipGtfs() {
 		g := gzip.NewWriter(&buffer)
 		if _, err = g.Write(data); err != nil {
-			logger.Log.Debugf("Can't gzip feed: %v", err)
+			handler.logError(message, startTime, "Can't gzip feed: %v", err)
 			http.Error(response, "Internal error", http.StatusInternalServerError)
 			return
 		}
 		if err = g.Close(); err != nil {
-			logger.Log.Debugf("Can't close gzip writer: %v", err)
+			handler.logError(message, startTime, "Can't close gzip writer: %v", err)
 			http.Error(response, "Internal error", http.StatusInternalServerError)
 			return
 		}
@@ -99,9 +110,15 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		buffer.Write(data)
 	}
 
-	logStashEvent["protobuf_size"] = strconv.Itoa(buffer.Len())
-	logStashEvent["response_time"] = time.Since(startTime).String()
+	requestSize := buffer.Len()
+	processingTime := time.Since(startTime)
+
+	logStashEvent["protobuf_size"] = strconv.Itoa(requestSize)
+	logStashEvent["response_time"] = processingTime.String()
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	message.RequestSize = requestSize
+	message.ProcessingTime = processingTime.Seconds()
 
 	response.WriteHeader(http.StatusOK)
 	request.Header.Set("Content-Type", "application/x-protobuf")
@@ -109,4 +126,23 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		request.Header.Set("Content-Encoding", "gzip")
 	}
 	response.Write(buffer.Bytes())
+}
+
+func (handler *GtfsHandler) newBQMessage(partner *core.Partner) *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Timestamp: handler.referential.Clock().Now(),
+		Protocol:  "gtfs",
+		Direction: "received",
+		Status:    "OK",
+		Partner:   string(partner.Slug()),
+	}
+}
+
+func (handler *GtfsHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+	m.ProcessingTime = time.Since(startTime).Seconds()
+	m.Status = "Error"
+	errorString := fmt.Sprintf(format, values...)
+
+	m.ErrorDetails = errorString
+	logger.Log.Debugf(errorString)
 }
