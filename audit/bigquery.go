@@ -12,9 +12,9 @@ import (
 
 // FIXME: we need to see how we store the table names
 const (
-	EXCHANGE_TABLE = "exchange_events"
-	PARTNER_TABLE  = "partner_events"
-	VEHICLE_TABLE  = "vehicle_events"
+	EXCHANGE_TABLE = "exchanges"
+	PARTNER_TABLE  = "partners"
+	VEHICLE_TABLE  = "vehicles"
 )
 
 type BigQueryMessage struct {
