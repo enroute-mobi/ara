@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"cloud.google.com/go/civil"
 )
 
 type PartnersGuardian struct {
@@ -81,12 +82,12 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
 		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP)
 		partnerEvent := &audit.BigQueryPartnerEvent{
-			Timestamp:      guardian.Clock().Now(),
-			Slug:           string(partner.Slug()),
-			PreviousStatus: string(partner.PartnerStatus.OperationnalStatus),
-			// PreviousServiceStartedAt: partner.PartnerStatus.ServiceStartedAt,
-			NewStatus: string(partnerStatus.OperationnalStatus),
-			// NewServiceStartedAt:      partnerStatus.ServiceStartedAt,
+			Timestamp:                guardian.Clock().Now(),
+			Slug:                     string(partner.Slug()),
+			PreviousStatus:           string(partner.PartnerStatus.OperationnalStatus),
+			PreviousServiceStartedAt: civil.DateTimeOf(partner.PartnerStatus.ServiceStartedAt),
+			NewStatus:                string(partnerStatus.OperationnalStatus),
+			NewServiceStartedAt:      civil.DateTimeOf(partnerStatus.ServiceStartedAt),
 		}
 		audit.CurrentBigQuery().WritePartnerEvent(partnerEvent)
 	}

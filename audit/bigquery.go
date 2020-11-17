@@ -8,9 +8,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
 )
 
-// FIXME: we need to see how we store the table names
 const (
 	EXCHANGE_TABLE = "exchanges"
 	PARTNER_TABLE  = "partners"
@@ -40,12 +40,12 @@ type BigQueryMessage struct {
 }
 
 type BigQueryPartnerEvent struct {
-	Timestamp                time.Time `bigquery:"timestamp"`
-	Slug                     string    `bigquery:"slug"`
-	PreviousStatus           string    `bigquery:"previous_status"`
-	PreviousServiceStartedAt time.Time `bigquery:"previous_service_started_at"`
-	NewStatus                string    `bigquery:"new_status"`
-	NewServiceStartedAt      time.Time `bigquery:"new_service_started_at"`
+	Timestamp                time.Time      `bigquery:"timestamp"`
+	Slug                     string         `bigquery:"slug"`
+	PreviousStatus           string         `bigquery:"previous_status"`
+	PreviousServiceStartedAt civil.DateTime `bigquery:"previous_service_started_at"`
+	NewStatus                string         `bigquery:"new_status"`
+	NewServiceStartedAt      civil.DateTime `bigquery:"new_service_started_at"`
 }
 
 type BigQueryVehicleEvent struct {
