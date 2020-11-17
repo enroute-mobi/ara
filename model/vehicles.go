@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"cloud.google.com/go/civil"
 )
 
 type VehicleId ModelId
@@ -199,13 +200,13 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Unlock()
 
 	vehicleEvent := &audit.BigQueryVehicleEvent{
-		Timestamp: manager.Clock().Now(),
-		ID:        string(vehicle.id),
-		ObjectIDs: vehicle.ObjectIDSlice(),
-		Longitude: vehicle.Longitude,
-		Latitude:  vehicle.Latitude,
-		Bearing:   vehicle.Bearing,
-		// RecordedAtTime: vehicle.RecordedAtTime,
+		Timestamp:      manager.Clock().Now(),
+		ID:             string(vehicle.id),
+		ObjectIDs:      vehicle.ObjectIDSlice(),
+		Longitude:      vehicle.Longitude,
+		Latitude:       vehicle.Latitude,
+		Bearing:        vehicle.Bearing,
+		RecordedAtTime: civil.DateTimeOf(vehicle.RecordedAtTime),
 	}
 	audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
 

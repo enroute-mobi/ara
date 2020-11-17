@@ -49,13 +49,13 @@ type BigQueryPartnerEvent struct {
 }
 
 type BigQueryVehicleEvent struct {
-	Timestamp      time.Time `bigquery:"timestamp"`
-	ID             string    `bigquery:"id"`
-	ObjectIDs      []string  `bigquery:"objectids"`
-	Longitude      float64   `bigquery:"longitude"`
-	Latitude       float64   `bigquery:"latitude"`
-	Bearing        float64   `bigquery:"bearing"`
-	RecordedAtTime time.Time `bigquery:"recorded_at_time"`
+	Timestamp      time.Time      `bigquery:"timestamp"`
+	ID             string         `bigquery:"id"`
+	ObjectIDs      []string       `bigquery:"objectids"`
+	Longitude      float64        `bigquery:"longitude"`
+	Latitude       float64        `bigquery:"latitude"`
+	Bearing        float64        `bigquery:"bearing"`
+	RecordedAtTime civil.DateTime `bigquery:"recorded_at_time"`
 }
 
 type BigQuery interface {
