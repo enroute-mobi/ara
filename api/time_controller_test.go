@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func timeCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -24,7 +24,7 @@ func timeCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *tes
 
 func timePrepareRequest(method string, advance bool, body []byte, t *testing.T) (responseRecorder *httptest.ResponseRecorder, server *Server) {
 	server = &Server{}
-	server.SetClock(model.NewFakeClock())
+	server.SetClock(clock.NewFakeClock())
 
 	// Create a request
 	var address string

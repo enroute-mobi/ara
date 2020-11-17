@@ -1,6 +1,10 @@
 package model
 
-import "testing"
+import (
+	"testing"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
+)
 
 func createTestIndex() *Index {
 	extractor := func(instance ModelInstance) ModelId {
@@ -90,7 +94,7 @@ func benchmarkFindWithoutIndex(sv int, b *testing.B) {
 
 	for i := 0; i < sv; i++ {
 		stopVisit := model.StopVisits().New()
-		stopVisit.VehicleJourneyId = VehicleJourneyId(DefaultUUIDGenerator().NewUUID())
+		stopVisit.VehicleJourneyId = VehicleJourneyId(uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
 	}
 	stopVisit := model.StopVisits().New()
@@ -110,7 +114,7 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 
 	for i := 0; i < sv; i++ {
 		stopVisit := model.StopVisits().New()
-		stopVisit.VehicleJourneyId = VehicleJourneyId(DefaultUUIDGenerator().NewUUID())
+		stopVisit.VehicleJourneyId = VehicleJourneyId(uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
 		index.Index(ModelId(stopVisit.Id()), &stopVisit)
 	}

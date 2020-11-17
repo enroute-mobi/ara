@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
@@ -14,7 +15,7 @@ type ServiceRequestBroadcaster interface {
 }
 
 type SIRIServiceRequestBroadcaster struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	siriConnector
 }

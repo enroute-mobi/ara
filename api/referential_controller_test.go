@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -26,7 +27,7 @@ func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder,
 func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (referential *core.Referential, responseRecorder *httptest.ResponseRecorder, server *Server) {
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new referential
 	referential = referentials.New("First Referential")
 	referentials.Save(referential)
@@ -203,7 +204,7 @@ func Test_ReferentialController_Save(t *testing.T) {
 
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(model.NewRealUUIDGenerator())
+	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
 	// Save a new referential
 	referential := referentials.New("First Referential")
 	referentials.Save(referential)

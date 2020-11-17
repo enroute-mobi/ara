@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type LineId ModelId
@@ -150,7 +152,7 @@ func (line *Line) Save() (ok bool) {
 }
 
 type MemoryLines struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model Model
 
@@ -160,7 +162,7 @@ type MemoryLines struct {
 }
 
 type Lines interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() Line
 	Find(id LineId) (Line, bool)

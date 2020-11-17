@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_VehicleJourney_Id(t *testing.T) {
@@ -20,7 +22,7 @@ func Test_VehicleJourney_Id(t *testing.T) {
 // WIP: Determine what to return in JSON
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	model := NewMemoryModel()
-	generator := NewFakeUUIDGenerator()
+	generator := uuid.NewFakeUUIDGenerator()
 	// Create a StopVisit
 	model.StopVisits().SetUUIDGenerator(generator)
 	stopVisit := model.StopVisits().New()

@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/bigquery"
 )
 
@@ -57,8 +58,8 @@ type BigQueryVehicleEvent struct {
 }
 
 type BigQuery interface {
-	model.Startable
-	model.Stopable
+	state.Startable
+	state.Stopable
 
 	WriteMessage(message *BigQueryMessage) error
 	WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) error
@@ -132,7 +133,7 @@ func (bq *FakeBigQuery) Messages() []*BigQueryMessage {
 
 /**** Real BQ ****/
 type BigQueryClient struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	projectID       string
 	dataset         string

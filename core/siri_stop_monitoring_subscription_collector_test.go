@@ -12,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -21,7 +22,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		collectManager: collectManager,
 		model:          model.NewMemoryModel(),
 	}
-	referential.Model().StopAreas().(*model.MemoryStopAreas).SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	referential.Model().StopAreas().(*model.MemoryStopAreas).SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("_internal", "coicogn2")
@@ -57,7 +58,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 
 	deliveries := siri.NewXMLNotifyStopMonitoring(doc.Root())
 
-	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
 
@@ -160,7 +161,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	}
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
-	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partners.Save(partner)
 
 	objectid := model.NewObjectID("test_kind", "value")

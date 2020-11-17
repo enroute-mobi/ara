@@ -1,13 +1,15 @@
 package model
 
+import "bitbucket.org/enroute-mobi/ara/clock"
+
 type SituationUpdateManager struct {
-	ClockConsumer
+	clock.ClockConsumer
 
 	transactionProvider TransactionProvider
 }
 
 type SituationUpdater struct {
-	ClockConsumer
+	clock.ClockConsumer
 
 	tx     *Transaction
 	events []*SituationUpdateEvent

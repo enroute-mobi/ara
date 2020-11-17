@@ -7,15 +7,17 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	// logger.Log.Debug = true
 
-	fakeClock := model.NewFakeClock()
-	model.SetDefaultClock(fakeClock)
-	uuidGenerator := model.NewFakeUUIDGenerator()
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
+	uuidGenerator := uuid.NewFakeUUIDGenerator()
 	// Create a test http server
 
 	response := []byte{}

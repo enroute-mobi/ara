@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
@@ -12,7 +13,7 @@ type Purifier struct {
 
 func NewPurifier(days int) *Purifier {
 	return &Purifier{
-		date: DefaultClock().Now().AddDate(0, 0, -days).Format("2006-01-02"),
+		date: clock.DefaultClock().Now().AddDate(0, 0, -days).Format("2006-01-02"),
 	}
 }
 

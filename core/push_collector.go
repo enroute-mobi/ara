@@ -6,15 +6,17 @@ import (
 
 	external_models "bitbucket.org/enroute-mobi/ara-external-models"
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type PushCollector struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	BaseConnector
 

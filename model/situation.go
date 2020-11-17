@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"sync"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SituationId string
@@ -122,7 +124,7 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 }
 
 type MemorySituations struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model *MemoryModel
 
@@ -132,7 +134,7 @@ type MemorySituations struct {
 }
 
 type Situations interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() Situation
 	Find(id SituationId) (Situation, bool)

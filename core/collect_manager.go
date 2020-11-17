@@ -5,6 +5,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopAreaUpdateSubscriber func(*model.LegacyStopAreaUpdateEvent)
@@ -29,7 +30,7 @@ type CollectManagerInterface interface {
 }
 
 type CollectManager struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	StopAreaUpdateSubscribers  []StopAreaUpdateSubscriber
 	SituationUpdateSubscribers []SituationUpdateSubscriber

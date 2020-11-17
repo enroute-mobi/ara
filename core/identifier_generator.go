@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 var defaultIdentifierGenerators = map[string]string{
@@ -17,7 +17,7 @@ var defaultIdentifierGenerators = map[string]string{
 }
 
 type IdentifierGenerator struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	formatString string
 	pattern      string
@@ -47,7 +47,7 @@ func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
 	return &IdentifierGenerator{formatString: formatString, pattern: pattern, replacement: replacement}
 }
 
-func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator model.UUIDConsumer) *IdentifierGenerator {
+func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator uuid.UUIDConsumer) *IdentifierGenerator {
 	generator := NewIdentifierGenerator(formatString)
 	generator.UUIDConsumer = uuidGenerator
 	return generator

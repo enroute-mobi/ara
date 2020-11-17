@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
@@ -17,7 +17,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	partner.RefreshConnectors()
 	partners.Save(&partner)
 
-	fakeClock := model.NewFakeClock()
+	fakeClock := clock.NewFakeClock()
 	partners.Guardian().SetClock(fakeClock)
 
 	partners.Start()

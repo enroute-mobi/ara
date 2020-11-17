@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
@@ -61,7 +62,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 
 	fs := fakeBroadcaster{}
 	siriStopMonitoringRequestCollector.SetStopAreaUpdateSubscriber(fs.FakeBroadcaster)
-	siriStopMonitoringRequestCollector.SetClock(model.NewFakeClock())
+	siriStopMonitoringRequestCollector.SetClock(clock.NewFakeClock())
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
 
@@ -88,7 +89,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	stopVisitEvent := stopAreaUpdateEvent.LegacyStopVisitUpdateEvents[0]
 
 	// Date is time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC) with fake clock
-	if expected := model.FAKE_CLOCK_INITIAL_DATE; stopVisitEvent.Created_at != expected {
+	if expected := clock.FAKE_CLOCK_INITIAL_DATE; stopVisitEvent.Created_at != expected {
 		t.Errorf("Wrong Created_At for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Created_at)
 	}
 	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:56:53+02:00"); !stopVisitEvent.RecordedAt.Equal(expected) {

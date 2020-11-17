@@ -1,10 +1,14 @@
 package model
 
-import "bitbucket.org/enroute-mobi/ara/logger"
+import (
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/uuid"
+)
 
 type UpdateManager struct {
-	ClockConsumer
-	UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	transactionProvider TransactionProvider
 }

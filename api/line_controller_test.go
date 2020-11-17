@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -33,7 +34,7 @@ func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *test
 	referential.Save()
 
 	// Set the fake UUID generator
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new line
 	line = referential.Model().Lines().New()
 	referential.Model().Lines().Save(&line)

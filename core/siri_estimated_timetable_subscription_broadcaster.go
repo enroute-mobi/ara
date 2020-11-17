@@ -7,22 +7,25 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type EstimatedTimeTableSubscriptionBroadcaster interface {
-	model.Stopable
-	model.Startable
+	state.Stopable
+	state.Startable
 
 	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 	HandleSubscriptionRequest([]*siri.XMLEstimatedTimetableSubscriptionRequestEntry) []siri.SIRIResponseStatus
 }
 
 type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	siriConnector
 
@@ -315,7 +318,7 @@ func logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent audit.LogS
 type TestSIRIETTSubscriptionBroadcasterFactory struct{}
 
 type TestETTSubscriptionBroadcaster struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	events []*model.StopMonitoringBroadcastEvent
 }

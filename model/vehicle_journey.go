@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type VehicleJourneyId ModelId
@@ -145,7 +147,7 @@ func (vehicleJourney *VehicleJourney) Save() (ok bool) {
 }
 
 type MemoryVehicleJourneys struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model Model
 
@@ -155,7 +157,7 @@ type MemoryVehicleJourneys struct {
 }
 
 type VehicleJourneys interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() VehicleJourney
 	Find(id VehicleJourneyId) (VehicleJourney, bool)

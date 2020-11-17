@@ -1,6 +1,6 @@
 package core
 
-import "bitbucket.org/enroute-mobi/ara/model"
+import "bitbucket.org/enroute-mobi/ara/state"
 
 type Context map[string]interface{}
 
@@ -19,9 +19,9 @@ func (context *Context) SetValue(key string, value interface{}) {
 
 func (context *Context) Close() {
 	for _, contextElement := range *context {
-		_, ok := contextElement.(model.Stopable)
+		_, ok := contextElement.(state.Stopable)
 		if ok {
-			contextElement.(model.Stopable).Stop()
+			contextElement.(state.Stopable).Stop()
 		}
 	}
 }

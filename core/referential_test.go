@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
@@ -29,7 +30,7 @@ func Test_Referential_Slug(t *testing.T) {
 }
 
 func Test_Referential_StartedAt(t *testing.T) {
-	model.SetDefaultClock(model.NewFakeClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
 	referential.Start()
@@ -116,7 +117,7 @@ func Test_Referential_setNextReloadAt(t *testing.T) {
 	for _, condition := range conditions {
 		referential := Referential{Settings: map[string]string{"model.reloadAt": condition.setting}}
 
-		fakeClock := model.NewFakeClockAt(time.Date(2017, time.January, 1, condition.clockHour, condition.clockMinute, 0, 0, time.UTC))
+		fakeClock := clock.NewFakeClockAt(time.Date(2017, time.January, 1, condition.clockHour, condition.clockMinute, 0, 0, time.UTC))
 		referential.SetClock(fakeClock)
 
 		referential.setNextReloadAt()

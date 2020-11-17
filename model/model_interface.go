@@ -1,6 +1,9 @@
 package model
 
-import "bitbucket.org/enroute-mobi/ara/logger"
+import (
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
+)
 
 type ModelId string
 
@@ -39,7 +42,7 @@ type MemoryModel struct {
 func NewMemoryModel() *MemoryModel {
 	model := &MemoryModel{}
 
-	model.date = NewDate(DefaultClock().Now())
+	model.date = NewDate(clock.DefaultClock().Now())
 
 	lines := NewMemoryLines()
 	lines.model = model
@@ -101,7 +104,7 @@ func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
 
 func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
 	model = NewMemoryModel()
-	model.date = NewDate(DefaultClock().Now())
+	model.date = NewDate(clock.DefaultClock().Now())
 	model.stopAreas.Load(referentialSlug)
 	model.lines.Load(referentialSlug)
 	model.operators.Load(referentialSlug)
@@ -113,7 +116,7 @@ func (model *MemoryModel) Clone() *MemoryModel {
 	clone := NewMemoryModel()
 	clone.stopAreas = model.stopAreas.Clone(clone)
 	clone.lines = model.lines.Clone(clone)
-	clone.date = NewDate(DefaultClock().Now())
+	clone.date = NewDate(clock.DefaultClock().Now())
 	return clone
 }
 

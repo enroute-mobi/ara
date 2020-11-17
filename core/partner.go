@@ -14,6 +14,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type OperationnalStatus string
@@ -67,9 +69,9 @@ type PartnerId string
 type PartnerSlug string
 
 type Partners interface {
-	model.UUIDInterface
-	model.Startable
-	model.Stopable
+	uuid.UUIDInterface
+	state.Startable
+	state.Stopable
 
 	New(PartnerSlug) *Partner
 	Find(PartnerId) *Partner
@@ -95,7 +97,7 @@ type PartnerStatus struct {
 }
 
 type Partner struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	mutex *sync.RWMutex
 
@@ -137,7 +139,7 @@ type APIPartner struct {
 }
 
 type PartnerManager struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	mutex *sync.RWMutex
 
@@ -373,7 +375,7 @@ func (partner *Partner) Definition() *APIPartner {
 
 func (partner *Partner) Stop() {
 	for _, connector := range partner.connectors {
-		c, ok := connector.(model.Stopable)
+		c, ok := connector.(state.Stopable)
 		if ok {
 			c.Stop()
 		}
@@ -387,7 +389,7 @@ func (partner *Partner) Start() {
 	partner.lastPush = time.Time{}
 
 	for _, connector := range partner.connectors {
-		c, ok := connector.(model.Startable)
+		c, ok := connector.(state.Startable)
 		if ok {
 			c.Start()
 		}

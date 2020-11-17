@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func Test_StopArea_Id(t *testing.T) {
@@ -287,8 +289,8 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
-	SetDefaultClock(NewFakeClock())
-	defer SetDefaultClock(NewRealClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Insert Data in the test db
 	databaseStopArea := DatabaseStopArea{
@@ -355,7 +357,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
 	}
-	now := DefaultClock().Now()
+	now := clock.DefaultClock().Now()
 	if stopArea.nextCollectAt.Before(now) || stopArea.nextCollectAt.After(now.Add(30*time.Second)) {
 		t.Errorf("Wrong nextCollectAt:\n got: %v\n expected: between %v and %v", stopArea.nextCollectAt, now, now.Add(30*time.Second))
 	}

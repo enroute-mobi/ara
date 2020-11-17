@@ -12,11 +12,13 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/api"
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
 
@@ -79,14 +81,14 @@ func main() {
 	logger.Log.Debugf("Ara started with a version : %v", version.Value())
 
 	if *uuidPtr {
-		model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+		uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	}
 	if *clockPtr != "" {
 		testTime, err := time.Parse("20060102-1504", *clockPtr)
 		if err != nil {
 			panic(err)
 		}
-		model.SetDefaultClock(model.NewFakeClockAt(testTime))
+		clock.SetDefaultClock(clock.NewFakeClockAt(testTime))
 	}
 	if *pidPtr != "" {
 		f, err := os.Create(*pidPtr)
@@ -199,7 +201,7 @@ func checkStatus(url string, requestorRef string) error {
 	client := siri.NewSOAPClient(siri.SOAPClientUrls{Url: url})
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
-		RequestTimestamp:  model.DefaultClock().Now(),
+		RequestTimestamp:  clock.DefaultClock().Now(),
 		MessageIdentifier: "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 	}
 

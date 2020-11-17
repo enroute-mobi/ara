@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
@@ -19,8 +21,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
@@ -74,8 +76,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
@@ -117,8 +119,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.Model().Lines().New()
 	line.SetObjectID(model.NewObjectID("objectidKind", "LineRef"))

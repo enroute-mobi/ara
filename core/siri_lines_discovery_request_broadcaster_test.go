@@ -5,8 +5,10 @@ import (
 	"os"
 	"testing"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
@@ -16,8 +18,8 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "test"
 	partner.Settings["generators.message_identifier"] = "Ara:Message::%{uuid}:LOC"
 	connector := NewSIRILinesDiscoveryRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.Model().Lines().New()
 	line.Name = "line1"

@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
@@ -21,8 +22,8 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referential.Start()
 	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")
 	if err != nil {
@@ -43,7 +44,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	time := model.DefaultClock().Now()
+	time := clock.DefaultClock().Now()
 	if response.Address != "http://ara" {
 		t.Errorf("Wrong Address in response:\n got: %v\n want: http://ara", response.Address)
 	}

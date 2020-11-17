@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type RequestTestData struct {
@@ -41,7 +42,7 @@ func partnerCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 // 	referential.Save()
 
 // 	// Initialize the partners manager
-// 	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+// 	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 // 	// Save a new partner
 // 	partner = referential.Partners().New("First Partner")
 // 	referential.Partners().Save(partner)
@@ -78,7 +79,7 @@ func createReferential() (*Server, *core.Referential) {
 }
 
 func createPartner(referential *core.Referential) *core.Partner {
-	referential.Partners().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partner := referential.Partners().New("First Partner")
 	referential.Partners().Save(partner)
 
@@ -359,7 +360,7 @@ func Test_PartnerController_Save(t *testing.T) {
 
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(model.NewRealUUIDGenerator())
+	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
 	server := &Server{}
 	server.SetReferentials(referentials)
 	referential := referentials.New("default")
@@ -371,7 +372,7 @@ func Test_PartnerController_Save(t *testing.T) {
 	}
 
 	// Initialize the partners manager
-	referential.Partners().SetUUIDGenerator(model.NewRealUUIDGenerator())
+	referential.Partners().SetUUIDGenerator(uuid.NewRealUUIDGenerator())
 	// Save a new partner
 	partner := referential.Partners().New("First Partner")
 	referential.Partners().Save(partner)

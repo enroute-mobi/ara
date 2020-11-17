@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func createTestPartnerManager() *PartnerManager {
@@ -76,7 +78,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	}
 
 	// Push collector but recent collect
-	partner.lastPush = model.DefaultClock().Now()
+	partner.lastPush = clock.DefaultClock().Now()
 
 	ps, err = partner.CheckStatus()
 	if err != nil {
@@ -102,7 +104,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	referential := partner.Referential()
 
 	stopArea := referential.Model().StopAreas().New()

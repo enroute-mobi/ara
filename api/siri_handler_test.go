@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SIRIHandler_LogSIRIError(t *testing.T) {
@@ -27,8 +29,8 @@ func Test_SIRIHandler_LogSIRIError(t *testing.T) {
 }
 
 func siriHandler_PrepareServer() (*Server, *core.Referential) {
-	model.SetDefaultClock(model.NewFakeClock())
-	defer model.SetDefaultClock(model.NewRealClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// create a server with a fake clock and fake UUID generator
 	server := NewTestServer()
@@ -59,7 +61,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	partner.RefreshConnectors()
 	siriPartner := core.NewSIRIPartner(partner)
 
-	partner.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partner.Context().SetValue(core.SIRI_PARTNER, siriPartner)
 
 	partner.Save()
@@ -71,8 +73,8 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 }
 
 func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
-	model.SetDefaultClock(model.NewFakeClock())
-	defer model.SetDefaultClock(model.NewRealClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Create a request
 	request, err := http.NewRequest("POST", "/default/siri", soapEnvelope)
@@ -105,7 +107,7 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	// Generate the request Body
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
-		model.DefaultClock().Now(),
+		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
 	if err != nil {
 		t.Fatal(err)
@@ -198,7 +200,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
 		"Ara",
-		model.DefaultClock().Now()).BuildXML()
+		clock.DefaultClock().Now()).BuildXML()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -493,7 +495,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	server, referential := siriHandler_PrepareServer()
 	partner := referential.Partners().FindAll()[0]
 
-	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
 
@@ -533,7 +535,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	server, referential := siriHandler_PrepareServer()
 	partner := referential.Partners().FindAll()[0]
 
-	partner.Subscriptions().SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 	subscription.Save()
 

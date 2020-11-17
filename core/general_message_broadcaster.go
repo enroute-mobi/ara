@@ -7,18 +7,20 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type SIRIGeneralMessageBroadcaster interface {
-	model.Stopable
-	model.Startable
+	state.Stopable
+	state.Startable
 }
 
 type GMBroadcaster struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	connector *SIRIGeneralMessageSubscriptionBroadcaster
 }
@@ -32,7 +34,7 @@ type GeneralMessageBroadcaster struct {
 type FakeGeneralMessageBroadcaster struct {
 	GMBroadcaster
 
-	model.ClockConsumer
+	clock.ClockConsumer
 }
 
 func NewFakeGeneralMessageBroadcaster(connector *SIRIGeneralMessageSubscriptionBroadcaster) SIRIGeneralMessageBroadcaster {

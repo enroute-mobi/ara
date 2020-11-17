@@ -6,12 +6,13 @@ import (
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
 type VehiclePositionBroadcaster struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	BaseConnector
 

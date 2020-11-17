@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func checkVehicleJourneyResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -33,7 +34,7 @@ func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byt
 	referential.Save()
 
 	// Set the fake UUID generator
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new vehicleJourney
 	vehicleJourney = referential.Model().VehicleJourneys().New()
 	referential.Model().VehicleJourneys().Save(&vehicleJourney)

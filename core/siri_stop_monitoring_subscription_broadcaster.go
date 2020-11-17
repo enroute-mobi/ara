@@ -7,22 +7,25 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopMonitoringSubscriptionBroadcaster interface {
-	model.Stopable
-	model.Startable
+	state.Stopable
+	state.Startable
 
 	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
 	HandleSubscriptionRequest([]*siri.XMLStopMonitoringSubscriptionRequestEntry)
 }
 
 type SIRIStopMonitoringSubscriptionBroadcaster struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	siriConnector
 
@@ -351,7 +354,7 @@ func logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent audit.LogStash
 type TestSIRIStopMonitoringSubscriptionBroadcasterFactory struct{}
 
 type TestStopMonitoringSubscriptionBroadcaster struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	events []*model.StopMonitoringBroadcastEvent
 	// stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster

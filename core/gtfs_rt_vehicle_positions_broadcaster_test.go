@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
@@ -14,8 +16,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewVehiclePositionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -106,8 +108,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewVehiclePositionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("WRONG_KIND", "lId")
@@ -164,8 +166,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewVehiclePositionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -222,8 +224,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewVehiclePositionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -281,8 +283,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
 	connector := NewVehiclePositionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")

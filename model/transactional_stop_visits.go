@@ -3,11 +3,14 @@ package model
 import (
 	"sort"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type TransactionalStopVisits struct {
-	UUIDConsumer
-	ClockConsumer
+	uuid.UUIDConsumer
+	clock.ClockConsumer
 
 	model   Model
 	saved   map[StopVisitId]*StopVisit
