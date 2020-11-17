@@ -12,8 +12,9 @@ import (
 
 // FIXME: we need to see how we store the table names
 const (
-	partnerTable = "partner_events"
-	vehicleTable = "vehicle_events"
+	EXCHANGE_TABLE = "exchange_events"
+	PARTNER_TABLE  = "partner_events"
+	VEHICLE_TABLE  = "vehicle_events"
 )
 
 type BigQueryMessage struct {
@@ -137,7 +138,6 @@ type BigQueryClient struct {
 
 	projectID       string
 	dataset         string
-	table           string
 	ctx             context.Context
 	cancel          context.CancelFunc
 	client          *bigquery.Client
@@ -150,11 +150,10 @@ type BigQueryClient struct {
 	stop            chan struct{}
 }
 
-func NewBigQueryClient(projectID, dataset, table string) *BigQueryClient {
+func NewBigQueryClient(projectID, dataset string) *BigQueryClient {
 	return &BigQueryClient{
 		projectID:     projectID,
 		dataset:       dataset,
-		table:         table,
 		messages:      make(chan *BigQueryMessage, 5),
 		partnerEvents: make(chan *BigQueryPartnerEvent, 5),
 		vehicleEvents: make(chan *BigQueryVehicleEvent, 5),
@@ -241,7 +240,7 @@ func (bq *BigQueryClient) connect() {
 	}
 
 	dataset := bq.client.Dataset(bq.dataset)
-	bq.inserter = dataset.Table(bq.table).Inserter()
-	bq.partnerInserter = dataset.Table(partnerTable).Inserter()
-	bq.vehicleInserter = dataset.Table(vehicleTable).Inserter()
+	bq.inserter = dataset.Table(EXCHANGE_TABLE).Inserter()
+	bq.partnerInserter = dataset.Table(PARTNER_TABLE).Inserter()
+	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
 }

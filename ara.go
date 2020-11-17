@@ -74,7 +74,7 @@ func main() {
 	}
 	// Configure BigQuery
 	if config.Config.ValidBQConfig() {
-		audit.SetCurrentBigQuery(audit.NewBigQueryClient(config.Config.BigQueryProjectID, config.Config.BigQueryDataset, config.Config.BigQueryTable))
+		audit.SetCurrentBigQuery(audit.NewBigQueryClient(config.Config.BigQueryProjectID, config.Config.BigQueryDataset))
 		audit.CurrentBigQuery().Start()
 		defer audit.CurrentBigQuery().Stop()
 	}
