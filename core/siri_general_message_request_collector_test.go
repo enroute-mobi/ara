@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
@@ -61,7 +62,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 
 	fs := fakeSituationBroadcaster{}
 	siriGeneralMessageRequestCollector.SetSituationUpdateSubscriber(fs.FakeBroadcaster)
-	siriGeneralMessageRequestCollector.SetClock(model.NewFakeClock())
+	siriGeneralMessageRequestCollector.SetClock(clock.NewFakeClock())
 	siriGeneralMessageRequestCollector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, "line value")
 
 	return fs.Events
@@ -103,7 +104,7 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 	}
 	situationEvent := situationUpdateEvents[0]
 
-	if expected := model.FAKE_CLOCK_INITIAL_DATE; situationEvent.CreatedAt != expected {
+	if expected := clock.FAKE_CLOCK_INITIAL_DATE; situationEvent.CreatedAt != expected {
 		t.Errorf("Wrong Created_At for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.CreatedAt)
 	}
 	if expected, _ := time.Parse(time.RFC3339, "2017-03-29T03:30:06.000+02:00"); !situationEvent.RecordedAt.Equal(expected) {

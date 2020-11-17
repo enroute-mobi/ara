@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopPointsDiscoveryRequestCollector interface {
@@ -15,8 +17,8 @@ type StopPointsDiscoveryRequestCollector interface {
 }
 
 type SIRIStopPointsDiscoveryRequestCollector struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	siriConnector
 

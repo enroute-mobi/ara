@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"sync"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type VehicleId ModelId
@@ -92,7 +96,8 @@ func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 }
 
 type MemoryVehicles struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
+	clock.ClockConsumer
 
 	model *MemoryModel
 
@@ -102,7 +107,7 @@ type MemoryVehicles struct {
 }
 
 type Vehicles interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() Vehicle
 	Find(id VehicleId) (Vehicle, bool)
@@ -192,6 +197,17 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.byObjectId.Index(vehicle)
 
 	manager.mutex.Unlock()
+
+	vehicleEvent := &audit.BigQueryVehicleEvent{
+		Timestamp:      manager.Clock().Now(),
+		ID:             string(vehicle.id),
+		ObjectIDs:      vehicle.ObjectIDSlice(),
+		Longitude:      vehicle.Longitude,
+		Latitude:       vehicle.Latitude,
+		Bearing:        vehicle.Bearing,
+		RecordedAtTime: vehicle.RecordedAtTime,
+	}
+	audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
 
 	return true
 }

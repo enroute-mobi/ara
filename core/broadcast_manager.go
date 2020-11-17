@@ -3,11 +3,12 @@ package core
 import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type BroadcastManagerInterface interface {
-	model.Startable
-	model.Stopable
+	state.Startable
+	state.Stopable
 
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
 	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent

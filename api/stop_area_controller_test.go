@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func checkStopAreaResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -33,7 +34,7 @@ func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *
 	referential.Save()
 
 	// Set the fake UUID generator
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new stopArea
 	stopArea = referential.Model().StopAreas().New()
 	stopArea.Name = "First StopArea"

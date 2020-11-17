@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
@@ -98,8 +100,8 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
 	stopArea := referential.Model().StopAreas().New()
@@ -205,8 +207,8 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	file, err := os.Open("testdata/siri-service-smrequest-soap.xml")
 	if err != nil {

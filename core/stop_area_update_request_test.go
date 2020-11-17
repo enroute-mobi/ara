@@ -4,11 +4,13 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_StopAreaUpdateRequest_Id(t *testing.T) {
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest("StopAreaId")
 
 	if expected := StopAreaUpdateRequestId("6ba7b814-9dad-11d1-0-00c04fd430c8"); stopAreaUpdateRequest.Id() != expected {
@@ -26,7 +28,7 @@ func Test_StopAreaUpdateRequest_StopAreaId(t *testing.T) {
 
 func Test_StopAreaUpdateRequest_CreatedAt(t *testing.T) {
 	testTime := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
-	model.SetDefaultClock(model.NewFakeClockAt(testTime))
+	clock.SetDefaultClock(clock.NewFakeClockAt(testTime))
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest("stopAreaId")
 
 	if !stopAreaUpdateRequest.CreatedAt().Equal(testTime) {

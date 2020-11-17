@@ -1,7 +1,9 @@
 package model
 
+import "bitbucket.org/enroute-mobi/ara/uuid"
+
 type TransactionalVehicleJourneys struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model   Model
 	saved   map[VehicleJourneyId]*VehicleJourney

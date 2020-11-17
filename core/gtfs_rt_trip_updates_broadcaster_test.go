@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
@@ -14,8 +16,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -123,8 +125,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdKind(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("WRONG_ID", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -167,8 +169,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdKind(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -211,8 +213,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdKind(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -255,8 +257,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdKind(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.Settings["remote_objectid_kind"] = "objectidKind"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -301,8 +303,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
 	partner.Settings["generators.reference_stop_area_identifier"] = "%{objectid}:LOC"
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(model.NewFakeUUIDGenerator())
-	connector.SetClock(model.NewFakeClock())
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()

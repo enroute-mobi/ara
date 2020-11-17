@@ -1,16 +1,20 @@
 package model
 
-import "bitbucket.org/enroute-mobi/ara/logger"
+import (
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/uuid"
+)
 
 type StopAreaUpdateManager struct {
-	ClockConsumer
-	UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	transactionProvider TransactionProvider
 }
 
 type StopVisitUpdater struct {
-	ClockConsumer
+	clock.ClockConsumer
 
 	tx    *Transaction
 	event *LegacyStopVisitUpdateEvent

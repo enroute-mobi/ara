@@ -5,15 +5,16 @@ import (
 	"net"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type LogStashEvent map[string]string
 
 type LogStash interface {
-	model.Startable
-	model.Stopable
+	state.Startable
+	state.Stopable
 
 	WriteEvent(event LogStashEvent) error
 }
@@ -130,7 +131,7 @@ func (logStash *TCPLogStash) send(jsonBytes []byte) {
 
 func (logStash *TCPLogStash) connectLogstash() {
 	for {
-		model.DefaultClock().Sleep(5 * time.Second)
+		clock.DefaultClock().Sleep(5 * time.Second)
 		var err error
 		logStash.connection, err = net.DialTimeout("tcp", logStash.address, 5*time.Second)
 		if err == nil {

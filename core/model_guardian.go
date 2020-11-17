@@ -4,13 +4,15 @@ import (
 	"math/rand"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type ModelGuardian struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	gmTimer     time.Time
 	stop        chan struct{}
@@ -186,7 +188,7 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 }
 
 type ActualAttributesSimulator struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	stopVisit *model.StopVisit
 	now       time.Time

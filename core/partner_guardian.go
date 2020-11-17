@@ -4,12 +4,13 @@ import (
 	"strconv"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type PartnersGuardian struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	stop        chan struct{}
 	referential *Referential
@@ -79,6 +80,15 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus {
 		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
 		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP)
+		partnerEvent := &audit.BigQueryPartnerEvent{
+			Timestamp:                guardian.Clock().Now(),
+			Slug:                     string(partner.Slug()),
+			PreviousStatus:           string(partner.PartnerStatus.OperationnalStatus),
+			PreviousServiceStartedAt: partner.PartnerStatus.ServiceStartedAt,
+			NewStatus:                string(partnerStatus.OperationnalStatus),
+			NewServiceStartedAt:      partnerStatus.ServiceStartedAt,
+		}
+		audit.CurrentBigQuery().WritePartnerEvent(partnerEvent)
 	}
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {

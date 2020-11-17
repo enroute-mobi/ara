@@ -7,15 +7,17 @@ import (
 	"sync"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SubscriptionId string
 
 type Subscription struct {
 	sync.RWMutex
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	manager Subscriptions
 
@@ -224,7 +226,7 @@ func (subscription *Subscription) ResourcesLen() (i int) {
 }
 
 type MemorySubscriptions struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	mutex   *sync.RWMutex
 	partner *Partner
@@ -242,7 +244,7 @@ func (manager *MemorySubscriptions) MarshalJSON() ([]byte, error) {
 }
 
 type Subscriptions interface {
-	model.UUIDInterface
+	uuid.UUIDInterface
 
 	New(kind string) *Subscription
 	Find(id SubscriptionId) (*Subscription, bool)

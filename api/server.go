@@ -7,16 +7,17 @@ import (
 	"strings"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
 
 type Server struct {
-	model.UUIDConsumer
-	model.ClockConsumer
+	uuid.UUIDConsumer
+	clock.ClockConsumer
 	core.ReferentialsConsumer
 
 	bind        string

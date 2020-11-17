@@ -6,14 +6,17 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type GeneralMessageSubscriptionCollector interface {
-	model.Stopable
-	model.Startable
+	state.Stopable
+	state.Startable
 
 	RequestAllSituationsUpdate()
 	RequestSituationUpdate(kind string, requestedId model.ObjectID)
@@ -21,8 +24,8 @@ type GeneralMessageSubscriptionCollector interface {
 }
 
 type SIRIGeneralMessageSubscriptionCollector struct {
-	model.UUIDConsumer
-	model.ClockConsumer
+	uuid.UUIDConsumer
+	clock.ClockConsumer
 
 	siriConnector
 

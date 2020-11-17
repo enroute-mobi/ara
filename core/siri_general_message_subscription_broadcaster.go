@@ -6,21 +6,24 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type GeneralMessageSubscriptionBroadcaster interface {
-	model.Stopable
-	model.Startable
+	state.Stopable
+	state.Startable
 
 	HandleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
 	HandleSubscriptionRequest(*siri.XMLSubscriptionRequest)
 }
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
-	model.ClockConsumer
-	model.UUIDConsumer
+	clock.ClockConsumer
+	uuid.UUIDConsumer
 
 	siriConnector
 
@@ -215,7 +218,7 @@ func logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent audit.LogStash
 type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 
 type TestGeneralMessageSubscriptionBroadcaster struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	events []*model.GeneralMessageBroadcastEvent
 	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster

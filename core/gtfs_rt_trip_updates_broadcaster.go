@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
@@ -17,7 +18,7 @@ const (
 )
 
 type TripUpdatesBroadcaster struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	BaseConnector
 

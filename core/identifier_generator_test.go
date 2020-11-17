@@ -3,12 +3,12 @@ package core
 import (
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {
 	generator := NewIdentifierGenerator("%{type}:%{uuid}:%{default}:%{id}:%{uuid}")
-	generator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	generator.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	attributes := IdentifierAttributes{
 		Default: "Df",
 		Id:      "iD",

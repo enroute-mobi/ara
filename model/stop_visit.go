@@ -6,6 +6,9 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{
@@ -240,8 +243,8 @@ func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTime) Less(i, j int) bool { return !a[i].ReferenceTime().After(a[j].ReferenceTime()) }
 
 type MemoryStopVisits struct {
-	UUIDConsumer
-	ClockConsumer
+	uuid.UUIDConsumer
+	clock.ClockConsumer
 
 	model Model
 
@@ -253,7 +256,7 @@ type MemoryStopVisits struct {
 }
 
 type StopVisits interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() StopVisit
 	Find(StopVisitId) (StopVisit, bool)

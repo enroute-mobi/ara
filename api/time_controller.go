@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type TimeController struct {
@@ -29,7 +29,7 @@ func (controller *TimeController) serve(response http.ResponseWriter, request *h
 		}
 		controller.get(response)
 	case request.Method == "POST":
-		if _, ok := controller.server.Clock().(model.FakeClock); !ok {
+		if _, ok := controller.server.Clock().(clock.FakeClock); !ok {
 			http.Error(response, "Invalid request: server has a real Clock", http.StatusBadRequest)
 			return
 		}
@@ -70,7 +70,7 @@ func (controller *TimeController) advance(response http.ResponseWriter, body []b
 		return
 	}
 	logger.Log.Printf("Advance time by %v", parsedDuration)
-	controller.server.Clock().(model.FakeClock).Advance(parsedDuration)
+	controller.server.Clock().(clock.FakeClock).Advance(parsedDuration)
 	logger.Log.Printf("Time is now %v", controller.server.Clock().Now())
 
 	controller.get(response)

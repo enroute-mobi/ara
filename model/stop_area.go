@@ -6,6 +6,9 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopAreaId ModelId
@@ -204,7 +207,7 @@ func (stopArea *StopArea) Save() (ok bool) {
 }
 
 type MemoryStopAreas struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model *MemoryModel
 
@@ -216,7 +219,7 @@ type MemoryStopAreas struct {
 }
 
 type StopAreas interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() StopArea
 	Find(id StopAreaId) (StopArea, bool)
@@ -462,7 +465,7 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		}
 		if stopArea.CollectedAlways { // To prevent too much spam when initializing
 			rand_duration := time.Duration(rand.Intn(30)) * time.Second
-			stopArea.NextCollect(DefaultClock().Now().Add(rand_duration))
+			stopArea.NextCollect(clock.DefaultClock().Now().Add(rand_duration))
 		}
 		if sa.CollectChildren.Valid {
 			stopArea.CollectChildren = sa.CollectChildren.Bool

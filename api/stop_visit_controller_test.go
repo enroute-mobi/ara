@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -34,7 +35,7 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 	referential.Save()
 
 	// Set the fake UUID generator
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new stopVisit
 	timeLayout := "2006/01/02-15:04:05"
 	stopVisit = model.NewStopVisit(referential.Model())

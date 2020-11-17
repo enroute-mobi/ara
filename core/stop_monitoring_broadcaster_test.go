@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
-	model.SetDefaultClock(model.NewFakeClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -59,7 +60,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 }
 
 func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t *testing.T) {
-	model.SetDefaultClock(model.NewFakeClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -108,7 +109,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 }
 
 func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilter(t *testing.T) {
-	model.SetDefaultClock(model.NewFakeClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -172,8 +173,8 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 }
 
 func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
-	fakeClock := model.NewFakeClock()
-	model.SetDefaultClock(fakeClock)
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
 
 	// Create a test http server
 

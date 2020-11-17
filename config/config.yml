@@ -2,6 +2,6 @@
 #syslog:   true
 debug:    true
 apikey:   "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
+# example config for BQ
 bigqueryprojectid: "test-edouard"
 bigquerydataset: "testbigquery"
-bigquerytable: "messages"

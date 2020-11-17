@@ -7,8 +7,11 @@ import (
 	"strconv"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type ReferentialId string
@@ -19,7 +22,7 @@ const (
 )
 
 type Referential struct {
-	model.ClockConsumer
+	clock.ClockConsumer
 
 	id   ReferentialId
 	slug ReferentialSlug
@@ -38,7 +41,7 @@ type Referential struct {
 }
 
 type Referentials interface {
-	model.Startable
+	state.Startable
 
 	New(slug ReferentialSlug) *Referential
 	Find(id ReferentialId) *Referential
@@ -240,7 +243,7 @@ func (referential *Referential) Load() {
 }
 
 type MemoryReferentials struct {
-	model.UUIDConsumer
+	uuid.UUIDConsumer
 
 	byId map[ReferentialId]*Referential
 }

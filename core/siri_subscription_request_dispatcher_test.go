@@ -8,12 +8,14 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -144,7 +146,7 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 }
 
 func Test_CancelSubscription(t *testing.T) {
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -181,7 +183,7 @@ func Test_CancelSubscription(t *testing.T) {
 }
 
 func Test_CancelSubscriptionAll(t *testing.T) {
-	model.SetDefaultUUIDGenerator(model.NewFakeUUIDGenerator())
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -225,8 +227,8 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 }
 
 func Test_ReceiveStateSM(t *testing.T) {
-	fakeClock := model.NewFakeClock()
-	model.SetDefaultClock(fakeClock)
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
 
 	// Create a test http server
 
@@ -321,8 +323,8 @@ func Test_ReceiveStateSM(t *testing.T) {
 }
 
 func Test_ReceiveStateGM(t *testing.T) {
-	fakeClock := model.NewFakeClock()
-	model.SetDefaultClock(fakeClock)
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
 
 	// Create a test http server
 
@@ -461,7 +463,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
@@ -508,7 +510,7 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	partner.subscriptionManager.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()

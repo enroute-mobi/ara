@@ -48,7 +48,7 @@ func Test_SIRIPartner_RequestorRef(t *testing.T) {
 
 // 	// Set MessageIdentifierGenerator
 // 	midGenerator := NewFormatMessageIdentifierGenerator("Ara:Message::%s:LOC")
-// 	midGenerator.SetUUIDGenerator(model.NewFakeUUIDGenerator())
+// 	midGenerator.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 // 	siriPartner.SetMessageIdentifierGenerator(midGenerator)
 
 // 	mid := siriPartner.IdentifierGenerator("message_identifier").NewMessageIdentifier()

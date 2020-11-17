@@ -3,7 +3,9 @@ package core
 import (
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopAreaUpdateRequestId string
@@ -16,9 +18,9 @@ type StopAreaUpdateRequest struct {
 
 func NewStopAreaUpdateRequest(stopAreaId model.StopAreaId) *StopAreaUpdateRequest {
 	return &StopAreaUpdateRequest{
-		id:         StopAreaUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
+		id:         StopAreaUpdateRequestId(uuid.DefaultUUIDGenerator().NewUUID()),
 		stopAreaId: stopAreaId,
-		createdAt:  model.DefaultClock().Now(),
+		createdAt:  clock.DefaultClock().Now(),
 	}
 }
 

@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
-	model.SetDefaultClock(model.NewFakeClock())
+	clock.SetDefaultClock(clock.NewFakeClock())
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")

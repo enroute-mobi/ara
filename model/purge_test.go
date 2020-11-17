@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func fill_purifier_test_db(t *testing.T) {
@@ -151,7 +153,7 @@ func test_Purifier_Purge(date time.Time, expected_count int, t *testing.T) {
 
 	fill_purifier_test_db(t)
 
-	SetDefaultClock(NewFakeClockAt(date))
+	clock.SetDefaultClock(clock.NewFakeClockAt(date))
 
 	purifier := NewPurifier(0)
 	err := purifier.Purge()

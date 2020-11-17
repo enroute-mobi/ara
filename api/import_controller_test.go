@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
@@ -70,7 +71,7 @@ func Test_Serve(t *testing.T) {
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
-	model.SetDefaultClock(model.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
+	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()

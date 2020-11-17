@@ -3,7 +3,8 @@ package core
 import (
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SituationUpdateRequestId string
@@ -23,10 +24,10 @@ type SituationUpdateRequest struct {
 
 func NewSituationUpdateRequest(kind, requestedId string) *SituationUpdateRequest {
 	return &SituationUpdateRequest{
-		id:          SituationUpdateRequestId(model.DefaultUUIDGenerator().NewUUID()),
+		id:          SituationUpdateRequestId(uuid.DefaultUUIDGenerator().NewUUID()),
 		kind:        kind,
 		requestedId: requestedId,
-		createdAt:   model.DefaultClock().Now(),
+		createdAt:   clock.DefaultClock().Now(),
 	}
 }
 

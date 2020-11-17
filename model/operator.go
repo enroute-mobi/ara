@@ -3,6 +3,8 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type OperatorId string
@@ -74,7 +76,7 @@ func (operator *Operator) UnmarshalJSON(data []byte) error {
 }
 
 type MemoryOperators struct {
-	UUIDConsumer
+	uuid.UUIDConsumer
 
 	model *MemoryModel
 
@@ -82,7 +84,7 @@ type MemoryOperators struct {
 }
 
 type Operators interface {
-	UUIDInterface
+	uuid.UUIDInterface
 
 	New() Operator
 	Find(id OperatorId) (Operator, bool)

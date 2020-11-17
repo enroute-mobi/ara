@@ -1,6 +1,10 @@
 package model
 
-import "testing"
+import (
+	"testing"
+
+	"bitbucket.org/enroute-mobi/ara/uuid"
+)
 
 func Test_ObjectIDIndex_simple(t *testing.T) {
 	index := NewObjectIdIndex()
@@ -107,7 +111,7 @@ func benchmarkObjectIDFindWithoutIndex(sv int, b *testing.B) {
 
 	for i := 0; i < sv; i++ {
 		stopVisit := model.StopVisits().New()
-		objectid := NewObjectID("kind", DefaultUUIDGenerator().NewUUID())
+		objectid := NewObjectID("kind", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetObjectID(objectid)
 		stopVisit.Save()
 	}
@@ -129,7 +133,7 @@ func benchmarkObjectIDFindWithIndex(sv int, b *testing.B) {
 
 	for i := 0; i < sv; i++ {
 		stopVisit := model.StopVisits().New()
-		objectid := NewObjectID("kind", DefaultUUIDGenerator().NewUUID())
+		objectid := NewObjectID("kind", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetObjectID(objectid)
 		stopVisit.Save()
 		index.Index(&stopVisit)

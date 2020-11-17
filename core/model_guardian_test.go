@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
@@ -14,7 +15,7 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
 
-	fakeClock := model.NewFakeClock()
+	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
@@ -42,7 +43,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
 
-	fakeClock := model.NewFakeClock()
+	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
@@ -83,7 +84,7 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
 
-	fakeClock := model.NewFakeClock()
+	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
