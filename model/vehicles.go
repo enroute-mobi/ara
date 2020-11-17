@@ -93,6 +93,7 @@ func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 
 type MemoryVehicles struct {
 	UUIDConsumer
+	ClockConsumer
 
 	model *MemoryModel
 
@@ -192,6 +193,17 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.byObjectId.Index(vehicle)
 
 	manager.mutex.Unlock()
+
+	// vehicleEvent := &audit.BigQueryVehicleEvent{
+	// 	Timestamp:      manager.Clock().Now(),
+	// 	ID:             vehicle.id,
+	// 	ObjectIDs:      vehicle.ObjectIDSlice(),
+	// 	Longitude:      vehicle.Longitude,
+	// 	Latitude:       vehicle.Latitude,
+	// 	Bearing:        vehicle.Bearing,
+	// 	RecordedAtTime: vehicle.RecordedAtTime,
+	// }
+	// audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
 
 	return true
 }

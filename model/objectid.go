@@ -42,6 +42,13 @@ func (identifiers ObjectIDs) MarshalJSON() ([]byte, error) {
 	return json.Marshal(aux)
 }
 
+func (identifiers ObjectIDs) ToSlice() (objs []string) {
+	for _, obj := range identifiers {
+		objs = append(objs, obj.String())
+	}
+	return
+}
+
 type ObjectID struct {
 	kind  string
 	value string
@@ -111,6 +118,7 @@ type ObjectIDConsumerInterface interface {
 	ObjectIDs() ObjectIDs
 	ObjectIDsResponse() map[string]string
 	SetObjectID(ObjectID)
+	ObjectIDSlice() []string
 }
 
 type ObjectIDConsumer struct {
@@ -139,4 +147,8 @@ func (consumer *ObjectIDConsumer) ObjectIDsResponse() map[string]string {
 		objectIds[object.Kind()] = object.Value()
 	}
 	return objectIds
+}
+
+func (consumer *ObjectIDConsumer) ObjectIDSlice() (objs []string) {
+	return consumer.objectids.ToSlice()
 }

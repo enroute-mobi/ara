@@ -68,3 +68,18 @@ func Test_ObjectIDs_UnmarshalJSON(t *testing.T) {
 		t.Errorf("Wrong unmarshalled identifers from %s\n want: %#v\n got: %#v", text, expectedIdentifiers, identifiers)
 	}
 }
+
+func Test_ObjectID_ToSlice(t *testing.T) {
+	m := map[string]string{
+		"kind":  "value",
+		"kind2": "value2",
+	}
+	objs := NewObjectIDsFromMap(m)
+	s := objs.ToSlice()
+	if len(s) != 2 {
+		t.Errorf("Wrong number of entries in objectid slice, want: 2 got: %v", len(s))
+	}
+	if s[0] != "kind:value" && s[1] != "kind:value" {
+		t.Errorf("We should find 'kind:value' in result slice, got %v", s)
+	}
+}
