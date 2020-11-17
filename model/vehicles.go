@@ -199,13 +199,13 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Unlock()
 
 	vehicleEvent := &audit.BigQueryVehicleEvent{
-		Timestamp:      manager.Clock().Now(),
-		ID:             string(vehicle.id),
-		ObjectIDs:      vehicle.ObjectIDSlice(),
-		Longitude:      vehicle.Longitude,
-		Latitude:       vehicle.Latitude,
-		Bearing:        vehicle.Bearing,
-		RecordedAtTime: vehicle.RecordedAtTime,
+		Timestamp: manager.Clock().Now(),
+		ID:        string(vehicle.id),
+		ObjectIDs: vehicle.ObjectIDSlice(),
+		Longitude: vehicle.Longitude,
+		Latitude:  vehicle.Latitude,
+		Bearing:   vehicle.Bearing,
+		// RecordedAtTime: vehicle.RecordedAtTime,
 	}
 	audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
 
