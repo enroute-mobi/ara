@@ -132,6 +132,14 @@ func (bq *FakeBigQuery) Messages() []*BigQueryMessage {
 	return bq.messages
 }
 
+func (bq *FakeBigQuery) PartnerEvents() []*BigQueryPartnerEvent {
+	return bq.partnerEvents
+}
+
+func (bq *FakeBigQuery) VehicleEvents() []*BigQueryVehicleEvent {
+	return bq.vehicleEvents
+}
+
 /**** Real BQ ****/
 type BigQueryClient struct {
 	uuid.UUIDConsumer

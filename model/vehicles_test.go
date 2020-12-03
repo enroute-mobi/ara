@@ -3,6 +3,8 @@ package model
 import (
 	"encoding/json"
 	"testing"
+
+	"bitbucket.org/enroute-mobi/ara/audit"
 )
 
 func Test_Vehicle_Id(t *testing.T) {
@@ -199,4 +201,36 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted vehicle should not be findable by objectid")
 	}
+}
+
+func Test_Save_BiqQuery(t *testing.T) {
+	f := audit.NewFakeBigQuery()
+	audit.SetCurrentBigQuery(f)
+
+	vehicles := NewMemoryVehicles()
+	v := vehicles.New()
+	objectid := NewObjectID("kind", "value")
+	v.SetObjectID(objectid)
+	v.Latitude = 1.0
+	vehicles.Save(&v)
+
+	if len(f.VehicleEvents()) != 1 {
+		t.Error("New VehicleJourney save should have send a BQ message")
+	}
+
+	v2, _ := vehicles.Find(v.id)
+	v2.Latitude = 2.0
+	vehicles.Save(&v2)
+
+	if len(f.VehicleEvents()) != 2 {
+		t.Error("VehicleJourney modification save should have send a BQ message")
+	}
+
+	v3, _ := vehicles.Find(v.id)
+	vehicles.Save(&v3)
+
+	if len(f.VehicleEvents()) != 2 {
+		t.Error("VehicleJourney save without modifications should not have send a BQ message")
+	}
+
 }
