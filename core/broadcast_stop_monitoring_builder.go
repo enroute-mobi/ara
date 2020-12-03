@@ -132,7 +132,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		Order:                  stopVisit.PassageOrder,
 		VehicleAtStop:          stopVisit.VehicleAtStop,
 		Attributes:             make(map[string]map[string]string),
-		References:             make(map[string]map[string]model.Reference),
+		References:             make(map[string]map[string]string),
 	}
 	if !stopPointRef.Monitored {
 		monitoredStopVisit.Monitored = false
@@ -162,10 +162,10 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	builder.resolveOperator(stopVisitRefCopy)
 
 	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
-	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy.GetReferences()
+	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy.GetSiriReferences()
 
 	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
-	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetReferences()
+	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 
 	return monitoredStopVisit
 }

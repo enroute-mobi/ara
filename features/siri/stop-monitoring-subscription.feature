@@ -127,7 +127,7 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-      Then the StopVisit "6ba7b814-9dad-11d1-f-00c04fd430c8" has the following attributes:
+      Then the StopVisit "6ba7b814-9dad-11d1-c-00c04fd430c8" has the following attributes:
       | Collected     | true  |
       | PassageOrder  | 4     |
       | VehicleAtStop | false |
@@ -508,7 +508,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -675,7 +675,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -840,7 +840,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -1006,7 +1006,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>

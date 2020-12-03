@@ -28,7 +28,7 @@ type SIRIStopMonitoringRequestCollector struct {
 
 	siriConnector
 
-	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
+	updateSubscriber UpdateSubscriber
 }
 
 type SIRIStopMonitoringRequestCollectorFactory struct{}
@@ -38,8 +38,6 @@ func NewTestStopMonitoringRequestCollector() *TestStopMonitoringRequestCollector
 }
 
 func (connector *TestStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	stopAreaUpdateEvent := model.NewLegacyStopAreaUpdateEvent(connector.NewUUID(), request.StopAreaId())
-	stopAreaUpdateEvent.LegacyStopVisitUpdateEvents = append(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents, &model.LegacyStopVisitUpdateEvent{})
 }
 
 func (factory *TestStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
@@ -51,12 +49,12 @@ func (factory *TestStopMonitoringRequestCollectorFactory) CreateConnector(partne
 }
 
 func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {
-	siriStopMonitoringRequestCollector := &SIRIStopMonitoringRequestCollector{}
-	siriStopMonitoringRequestCollector.partner = partner
+	connector := &SIRIStopMonitoringRequestCollector{}
+	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriStopMonitoringRequestCollector.stopAreaUpdateSubscriber = manager.BroadcastLegacyStopAreaUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvent
 
-	return siriStopMonitoringRequestCollector
+	return connector
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
@@ -78,7 +76,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-	monitoringRefMap := make(map[string]struct{})
 	startTime := connector.Clock().Now()
 
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
@@ -101,8 +98,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logXMLStopMonitoringResponse(logStashEvent, xmlStopMonitoringResponse)
 
-	stopAreaUpdateEvents := make(map[string]*model.LegacyStopAreaUpdateEvent)
-	builder := newLegacyStopVisitUpdateEventBuilder(connector.partner, objectid)
+	builder := NewStopMonitoringUpdateEventBuilder(connector.partner, objectid)
 
 	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
 		if connector.Partner().LogRequestStopMonitoringDeliveries() {
@@ -114,59 +110,75 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		if !delivery.Status() {
 			continue
 		}
-		builder.setLegacyStopVisitUpdateEvents(stopAreaUpdateEvents, delivery.XMLMonitoredStopVisits())
+		builder.SetUpdateEvents(delivery.XMLMonitoredStopVisits())
 	}
 
-	for _, event := range stopAreaUpdateEvents {
-		monitoringRefMap[event.StopAreaAttributes.ObjectId.Value()] = struct{}{}
-		event.SetId(connector.NewUUID())
-		monitoredStopVisits := []model.ObjectID{}
+	updateEvents := builder.UpdateEvents()
+	logger.Log.Printf("%v", updateEvents)
 
-		collectedStopArea, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaAttributes.ObjectId)
+	// Log MonitoringRefs
+	logMonitoringRefsFromMap(logStashEvent, updateEvents.MonitoringRefs)
+
+	// Broadcast all events
+	connector.broadcastUpdateEvents(&updateEvents)
+
+	// Set all StopVisits not in the response not collected
+	monitoredStopVisits := []model.ObjectID{}
+
+	for stopPointRef, events := range updateEvents.StopVisits {
+		sa, ok := tx.Model().StopAreas().FindByObjectId(model.NewObjectID(objectidKind, stopPointRef))
 		if !ok {
-			connector.broadcastLegacyStopAreaUpdateEvent(event)
 			continue
 		}
 
-		event.StopAreaId = collectedStopArea.Id()
-
-		for _, sv := range tx.Model().StopVisits().FindByStopAreaId(collectedStopArea.Id()) {
-			if sv.IsCollected() {
-				objectid, ok := sv.ObjectID(objectidKind)
-				if ok {
-					monitoredStopVisits = append(monitoredStopVisits, objectid)
-				}
+		for _, sv := range tx.Model().StopVisits().FindMonitoredByOriginByStopAreaId(sa.Id(), string(connector.Partner().Slug())) {
+			objectid, ok := sv.ObjectID(objectidKind)
+			if ok {
+				monitoredStopVisits = append(monitoredStopVisits, objectid)
 			}
 		}
-		connector.findAndSetStopVisitNotCollectedEvent(event, monitoredStopVisits)
-		connector.broadcastLegacyStopAreaUpdateEvent(event)
-	}
-	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
-}
 
-func (connector *SIRIStopMonitoringRequestCollector) broadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
-	if connector.stopAreaUpdateSubscriber != nil {
-		connector.stopAreaUpdateSubscriber(event)
+		connector.broadcastNotCollectedEvents(events, monitoredStopVisits)
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) findAndSetStopVisitNotCollectedEvent(event *model.LegacyStopAreaUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID) {
-	objId := make(map[model.ObjectID]bool)
-
-	for _, stopVisitEvent := range event.LegacyStopVisitUpdateEvents {
-		objId[stopVisitEvent.StopVisitObjectid] = true
+func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
 	}
-
-	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
-		if _, ok := objId[stopVisitObjectID]; !ok {
-			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
-			event.StopVisitNotCollectedEvents = append(event.StopVisitNotCollectedEvents, &model.StopVisitNotCollectedEvent{StopVisitObjectId: stopVisitObjectID})
+	for _, e := range events.StopAreas {
+		connector.updateSubscriber(e)
+	}
+	for _, e := range events.Lines {
+		connector.updateSubscriber(e)
+	}
+	for _, e := range events.VehicleJourneys {
+		connector.updateSubscriber(e)
+	}
+	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
+		for _, e := range es {
+			connector.updateSubscriber(e)
 		}
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
-	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
+func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvent(event model.UpdateEvent) {
+	if connector.updateSubscriber != nil {
+		connector.updateSubscriber(event)
+	}
+}
+
+func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID) {
+	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
+		if _, ok := events[stopVisitObjectID.Value()]; !ok {
+			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
+			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitObjectID))
+		}
+	}
+}
+
+func (connector *SIRIStopMonitoringRequestCollector) SetUpdateSubscriber(updateSubscriber UpdateSubscriber) {
+	connector.updateSubscriber = updateSubscriber
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.LogStashEvent {

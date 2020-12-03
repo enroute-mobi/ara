@@ -125,8 +125,8 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 		t.Fatalf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
 	}
 
-	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value() != "modelOperatorRef" {
-		t.Errorf("OperatorRef should be modelOperatorRef, got: %v", response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"].ObjectId.Value())
+	if response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"] != "modelOperatorRef" {
+		t.Errorf("OperatorRef should be modelOperatorRef, got: %v", response.MonitoredStopVisits[0].References["StopVisitReferences"]["OperatorRef"])
 	}
 
 }

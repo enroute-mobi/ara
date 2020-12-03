@@ -13,13 +13,6 @@ import (
 
 type StopAreaId ModelId
 
-type StopAreaAttributes struct {
-	ObjectId        ObjectID
-	ParentObjectId  ObjectID
-	Name            string
-	CollectedAlways bool
-}
-
 type StopArea struct {
 	ObjectIDConsumer
 
@@ -199,6 +192,11 @@ func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (ObjectID,
 		return objectID, true
 	}
 	return ObjectID{}, false
+}
+
+func (stopArea *StopArea) SetPartnerStatus(partner string, status bool) {
+	stopArea.Origins.SetPartnerStatus(partner, status)
+	stopArea.Monitored = stopArea.Origins.Monitored()
 }
 
 func (stopArea *StopArea) Save() (ok bool) {

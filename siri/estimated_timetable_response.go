@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type SIRIEstimatedTimeTableResponse struct {
@@ -40,7 +39,7 @@ type SIRIEstimatedVehicleJourney struct {
 	DatedVehicleJourneyRef string
 
 	Attributes map[string]string
-	References map[string]model.Reference
+	References map[string]string
 
 	EstimatedCalls []*SIRIEstimatedCall
 }

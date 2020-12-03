@@ -3,8 +3,6 @@ package siri
 import (
 	"testing"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
@@ -141,10 +139,10 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginName":      "origin 1",
 			"DestinationName": "destination 1",
 		},
-		References: map[string]model.Reference{
-			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
-			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
-			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator1")),
+		References: map[string]string{
+			"OriginRef":      "origin1",
+			"DestinationRef": "destination1",
+			"OperatorRef":    "operator1",
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call1, call2},
 	}
@@ -156,10 +154,10 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginName":      "origin 2",
 			"DestinationName": "destination 2",
 		},
-		References: map[string]model.Reference{
-			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin2")),
-			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination2")),
-			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator2")),
+		References: map[string]string{
+			"OriginRef":      "origin2",
+			"DestinationRef": "destination2",
+			"OperatorRef":    "operator2",
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call3},
 	}
@@ -171,10 +169,10 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 			"OriginName":      "origin 3",
 			"DestinationName": "destination 3",
 		},
-		References: map[string]model.Reference{
-			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin3")),
-			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination3")),
-			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator3")),
+		References: map[string]string{
+			"OriginRef":      "origin3",
+			"DestinationRef": "destination3",
+			"OperatorRef":    "operator3",
 		},
 		EstimatedCalls: []*SIRIEstimatedCall{call4},
 	}
@@ -247,10 +245,10 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
 			"OriginName":      "origin 1",
 			"DestinationName": "destination 1",
 		},
-		References: map[string]model.Reference{
-			"OriginRef":      *model.NewReference(model.NewObjectID("kind", "origin1")),
-			"DestinationRef": *model.NewReference(model.NewObjectID("kind", "destination1")),
-			"OperatorRef":    *model.NewReference(model.NewObjectID("kind", "operator1")),
+		References: map[string]string{
+			"OriginRef":      "origin1",
+			"DestinationRef": "destination1",
+			"OperatorRef":    "operator1",
 		},
 	}
 

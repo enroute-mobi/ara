@@ -16,14 +16,14 @@ import (
 )
 
 type fakeBroadcaster struct {
-	Events []*model.LegacyStopAreaUpdateEvent
+	Events []model.UpdateEvent
 }
 
-func (fb *fakeBroadcaster) FakeBroadcaster(event *model.LegacyStopAreaUpdateEvent) {
+func (fb *fakeBroadcaster) FakeBroadcaster(event model.UpdateEvent) {
 	fb.Events = append(fb.Events, event)
 }
 
-func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []*model.LegacyStopAreaUpdateEvent {
+func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []model.UpdateEvent {
 	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 
 	// Create a test http server
@@ -61,7 +61,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
 
 	fs := fakeBroadcaster{}
-	siriStopMonitoringRequestCollector.SetStopAreaUpdateSubscriber(fs.FakeBroadcaster)
+	siriStopMonitoringRequestCollector.SetUpdateSubscriber(fs.FakeBroadcaster)
 	siriStopMonitoringRequestCollector.SetClock(clock.NewFakeClock())
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	siriStopMonitoringRequestCollector.RequestStopAreaUpdate(stopAreaUpdateRequest)
@@ -72,26 +72,19 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 }
 
 func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T) {
-	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
-	stopAreaUpdateEvent := &model.LegacyStopAreaUpdateEvent{}
-	for _, stopAreaUpdateEvent = range stopAreaUpdateEvents {
-		if stopAreaUpdateEvent.LegacyStopVisitUpdateEvents[0].StopVisitObjectid.Value() == "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" {
-			break
-		}
+	updateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-soap.xml")
+
+	// 2 stops 1 Line 2 VehicleJourneys 2 StopVisits
+	if len(updateEvents) != 7 {
+		t.Fatalf("Should have 7 update events, got %v", len(updateEvents))
 	}
 
-	if stopAreaUpdateEvent == nil {
-		t.Fatal("RequestStopAreaUpdate should not return nil")
+	stopVisitEvent := findSVEvent(updateEvents, "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3")
+	if stopVisitEvent == nil {
+		t.Fatal("Cannot find StopVisit event")
 	}
-	if len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents) != 1 {
-		t.Errorf("RequestStopAreaUpdate should have 1 LegacyStopVisitUpdateEvents, got: %v", len(stopAreaUpdateEvent.LegacyStopVisitUpdateEvents))
-	}
-	stopVisitEvent := stopAreaUpdateEvent.LegacyStopVisitUpdateEvents[0]
 
 	// Date is time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC) with fake clock
-	if expected := clock.FAKE_CLOCK_INITIAL_DATE; stopVisitEvent.Created_at != expected {
-		t.Errorf("Wrong Created_At for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Created_at)
-	}
 	if expected, _ := time.Parse(time.RFC3339, "2016-09-22T07:56:53+02:00"); !stopVisitEvent.RecordedAt.Equal(expected) {
 		t.Errorf("Wrong RecorderAt for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.RecordedAt)
 	}
@@ -101,8 +94,8 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if expected := model.STOP_VISIT_DEPARTURE_UNDEFINED; stopVisitEvent.DepartureStatus != expected {
 		t.Errorf("Wrong DepartureStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.DepartureStatus)
 	}
-	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.StopVisitObjectid.Value() != expected {
-		t.Errorf("Wrong ObjectID for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.StopVisitObjectid.Value())
+	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.ObjectId.Value() != expected {
+		t.Errorf("Wrong ObjectID for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.ObjectId.Value())
 	}
 	// Aimed schedule
 	schedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED)
@@ -127,10 +120,24 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	}
 }
 
+func findSVEvent(events []model.UpdateEvent, ref string) *model.StopVisitUpdateEvent {
+	for _, e := range events {
+		svEvent, ok := e.(*model.StopVisitUpdateEvent)
+		if !ok {
+			continue
+		}
+		if svEvent.ObjectId.Value() == ref {
+			return svEvent
+		}
+	}
+	return nil
+}
+
 func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate_MultipleDeliveries(t *testing.T) {
-	stopAreaUpdateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-double-delivery-soap.xml")
-	if len(stopAreaUpdateEvents) != 2 {
-		t.Errorf("Wrong number of UpdateEvents, should have 2 got %v", len(stopAreaUpdateEvents))
+	updateEvents := prepare_SIRIStopMonitoringRequestCollector(t, "testdata/stopmonitoring-response-double-delivery-soap.xml")
+	// 2 StopAreas 1 Line 2 VehicleJourneys 2 StopVisits
+	if len(updateEvents) != 7 {
+		t.Errorf("Should have 7 update events, got %v", len(updateEvents))
 	}
 }
 

@@ -110,7 +110,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				LineRef:                lineObjectId.Value(),
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				Attributes:             make(map[string]string),
-				References:             make(map[string]model.Reference),
+				References:             make(map[string]string),
 			}
 			lineRefs = append(lineRefs, estimatedVehicleJourney.LineRef)
 			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vehicleJourney, tx, vehicleJourney.Origin)
@@ -189,8 +189,8 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 	return model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction, origin string) map[string]model.Reference {
-	references := make(map[string]model.Reference)
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction, origin string) map[string]string {
+	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
 		ref, ok := vehicleJourney.Reference(refType)
@@ -198,19 +198,19 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 			continue
 		}
 		if refType == "DestinationRef" && connector.noDestinationRefRewrite(origin) {
-			references[refType] = ref
+			references[refType] = ref.ObjectId.Value()
 			continue
 		}
 		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
 			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 			if ok {
-				references[refType] = *model.NewReference(obj)
+				references[refType] = obj.Value()
 				continue
 			}
 		}
 		generator := connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER)
 		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
-		references[refType] = *model.NewReference(defaultObjectID)
+		references[refType] = defaultObjectID.Value()
 	}
 
 	return references
@@ -225,7 +225,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(orig
 	return false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]model.Reference, stopVisit model.StopVisit, tx *model.Transaction) {
+func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit model.StopVisit, tx *model.Transaction) {
 	if _, ok := refs["OperatorRef"]; ok {
 		return
 	}
@@ -236,15 +236,15 @@ func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[
 	}
 	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
-		refs["OperatorRef"] = *model.NewReference(*operatorRef.ObjectId)
+		refs["OperatorRef"] = operatorRef.ObjectId.Value()
 		return
 	}
 	obj, ok := operator.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
 	if !ok {
-		refs["OperatorRef"] = *model.NewReference(*operatorRef.ObjectId)
+		refs["OperatorRef"] = operatorRef.ObjectId.Value()
 		return
 	}
-	refs["OperatorRef"] = *model.NewReference(obj)
+	refs["OperatorRef"] = obj.Value()
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) newLogStashEvent() audit.LogStashEvent {

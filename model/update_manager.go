@@ -18,6 +18,11 @@ func NewUpdateManager(transactionProvider TransactionProvider) func(UpdateEvent)
 	return manager.Update
 }
 
+// Test method
+func newUpdateManager(transactionProvider TransactionProvider) *UpdateManager {
+	return &UpdateManager{transactionProvider: transactionProvider}
+}
+
 func (manager *UpdateManager) Update(event UpdateEvent) {
 	switch event.EventKind() {
 	case STOP_AREA_EVENT:
@@ -30,6 +35,10 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 		manager.updateStopVisit(event.(*StopVisitUpdateEvent))
 	case VEHICLE_EVENT:
 		manager.updateVehicle(event.(*VehicleUpdateEvent))
+	case STATUS_EVENT:
+		manager.updateStatus(event.(*StatusUpdateEvent))
+	case NOT_COLLECTED_EVENT:
+		manager.updateNotCollected(event.(*NotCollectedUpdateEvent))
 	}
 }
 
@@ -59,6 +68,13 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 	tx.Model().StopAreas().Save(&stopArea)
 	tx.Commit()
 	tx.Close()
+
+	if event.Origin != "" {
+		status, ok := stopArea.Origins.Origin(event.Origin)
+		if !status || !ok {
+			manager.updateStatus(NewStatusUpdateEvent(stopArea.Id(), event.Origin, true))
+		}
+	}
 }
 
 func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, partner string, status bool) {
@@ -67,8 +83,7 @@ func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, par
 	ascendants := tx.Model().StopAreas().FindAscendants(stopAreaId)
 	for i := range ascendants {
 		stopArea := ascendants[i]
-		stopArea.Origins.SetPartnerStatus(partner, status)
-		stopArea.Monitored = stopArea.Origins.Monitored()
+		stopArea.SetPartnerStatus(partner, status)
 		tx.Model().StopAreas().Save(&stopArea)
 	}
 
@@ -105,20 +120,24 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 
 	vj, found := tx.Model().VehicleJourneys().FindByObjectId(event.ObjectId)
 	if !found {
-		vj = tx.Model().VehicleJourneys().New()
-
-		vj.SetObjectID(event.ObjectId)
-		vj.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
-
 		// LineObjectId
 		l, ok := tx.Model().Lines().FindByObjectId(event.LineObjectId)
 		if !ok {
 			logger.Log.Debugf("VehicleJourney update event without corresponding line: %v", event.LineObjectId.String())
 			return
 		}
-		vj.LineId = l.Id()
+
+		vj = tx.Model().VehicleJourneys().New()
+
+		vj.SetObjectID(event.ObjectId)
+		vj.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
 
 		vj.Origin = event.Origin
+		vj.Name = event.Attributes()["VehicleJourneyName"]
+		vj.LineId = l.Id()
+
+		vj.Attributes = event.Attributes()
+		vj.References = event.References()
 	}
 
 	vj.References.SetObjectId("OriginRef", NewObjectID(event.ObjectId.Kind(), event.OriginRef))
@@ -127,7 +146,11 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	vj.References.SetObjectId("DestinationRef", NewObjectID(event.ObjectId.Kind(), event.DestinationRef))
 	vj.DestinationName = event.DestinationName
 
-	vj.Attributes.Set("DirectionName", event.Direction)
+	if event.Direction != "" {
+		vj.Attributes.Set("DirectionName", event.Direction)
+	}
+
+	vj.Monitored = event.Monitored
 
 	tx.Model().VehicleJourneys().Save(&vj)
 	tx.Commit()
@@ -149,6 +172,18 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		return
 	}
 
+	// Update StopArea Lines
+	l := vj.Line()
+	if l != nil {
+		sa.LineIds.Add(l.Id())
+		referent, ok := tx.Model().StopAreas().Find(sa.ReferentId)
+		if ok {
+			referent.LineIds.Add(l.Id())
+			tx.Model().StopAreas().Save(&referent)
+		}
+		tx.Model().StopAreas().Save(&sa)
+	}
+
 	sv, found := tx.Model().StopVisits().FindByObjectId(event.ObjectId)
 	if !found {
 		sv = tx.Model().StopVisits().New()
@@ -156,21 +191,27 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		sv.SetObjectID(event.ObjectId)
 		sv.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
 
-		// StopAreaObjectId
 		sv.StopAreaId = sa.Id()
-
-		// VehicleJourneyObjectId
 		sv.VehicleJourneyId = vj.Id()
 
 		sv.Origin = event.Origin
-
 		sv.PassageOrder = event.PassageOrder
+		sv.DataFrameRef = event.DataFrameRef
+
+		sv.Attributes = event.Attributes()
+		sv.References = event.References()
 	}
 
-	if sv.Schedules.Eq(&event.Schedules) {
+	if !event.RecordedAt.IsZero() {
+		sv.RecordedAt = event.RecordedAt
+	} else if !sv.Schedules.Eq(&event.Schedules) {
 		sv.RecordedAt = manager.Clock().Now()
 	}
+
 	sv.Schedules.Merge(&event.Schedules)
+	sv.DepartureStatus = event.DepartureStatus
+	sv.ArrivalStatus = event.ArrivalStatus
+	sv.VehicleAtStop = event.VehicleAtStop
 	sv.Collected(manager.Clock().Now())
 
 	if event.Monitored != vj.Monitored {
@@ -214,6 +255,39 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	}
 
 	tx.Model().Vehicles().Save(&vehicle)
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateStatus(event *StatusUpdateEvent) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	ascendants := tx.Model().StopAreas().FindAscendants(event.StopAreaId)
+	for i := range ascendants {
+		stopArea := ascendants[i]
+		stopArea.SetPartnerStatus(event.Partner, event.Status)
+		tx.Model().StopAreas().Save(&stopArea)
+	}
+
+	tx.Commit()
+	tx.Close()
+}
+
+func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent) {
+	tx := manager.transactionProvider.NewTransaction()
+
+	stopVisit, found := tx.Model().StopVisits().FindByObjectId(event.ObjectId)
+	if !found {
+		logger.Log.Debugf("StopVisitNotCollectedEvent on unknown StopVisit: %#v", event)
+		tx.Close()
+		return
+	}
+
+	stopVisit.NotCollected()
+	tx.Model().StopVisits().Save(&stopVisit)
+
+	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.ObjectId)
+
 	tx.Commit()
 	tx.Close()
 }

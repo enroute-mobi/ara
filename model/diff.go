@@ -1,5 +1,7 @@
 package model
 
+// Unused for now
+
 import (
 	"errors"
 	"reflect"

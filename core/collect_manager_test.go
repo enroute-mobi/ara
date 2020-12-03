@@ -59,21 +59,24 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	stopArea.SetObjectID(saObjectid)
 	stopArea.Save()
 
+	vj := referential.Model().VehicleJourneys().New()
+	vjObjectid := model.NewObjectID("kind", "vjValue")
+	vj.SetObjectID(vjObjectid)
+	vj.Save()
+
 	stopVisit := referential.Model().StopVisits().New()
 	objectid := model.NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
 
-	stopVisitUpdateEvent := &model.LegacyStopVisitUpdateEvent{
-		StopAreaObjectId:  saObjectid,
-		StopVisitObjectid: objectid,
-		DepartureStatus:   model.STOP_VISIT_DEPARTURE_ONTIME,
-		ArrivalStatus:     model.STOP_VISIT_ARRIVAL_ARRIVED,
-		Attributes:        &model.TestStopVisitUpdateAttributes{},
+	event := &model.StopVisitUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       saObjectid,
+		VehicleJourneyObjectId: vjObjectid,
+		DepartureStatus:        model.STOP_VISIT_DEPARTURE_ONTIME,
+		ArrivalStatus:          model.STOP_VISIT_ARRIVAL_ARRIVED,
 	}
-	stopAreaUpdateEvent := model.NewLegacyStopAreaUpdateEvent("test", stopArea.Id())
-	stopAreaUpdateEvent.LegacyStopVisitUpdateEvents = []*model.LegacyStopVisitUpdateEvent{stopVisitUpdateEvent}
-	referential.collectManager.BroadcastLegacyStopAreaUpdateEvent(stopAreaUpdateEvent)
+	referential.collectManager.BroadcastUpdateEvent(event)
 
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_ARRIVED {

@@ -3,8 +3,6 @@ package siri
 import (
 	"testing"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
@@ -117,20 +115,17 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 		ExpectedDepartureTime: time.Date(2020, time.September, 21, 20, 14, 46, 0, time.UTC),
 		// ActualDepartureTime: time.Date(2016, time.September, 21, 20, 14, 46, 0, time.UTC),
 		Attributes: make(map[string]map[string]string),
-		References: make(map[string]map[string]model.Reference),
+		References: make(map[string]map[string]string),
 	}
 
-	operatorRefObjId := model.NewObjectID("intenal", "OperatorRef")
-	destinationRefObjId := model.NewObjectID("intenal", "NINOXE:StopPoint:SP:62:LOC")
-
 	siriMonitoredStopVisit.Attributes["StopVisitAttributes"] = make(map[string]string)
-	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]model.Reference)
-	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]model.Reference)
+	siriMonitoredStopVisit.References["VehicleJourney"] = make(map[string]string)
+	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
 	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
-	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = model.Reference{ObjectId: &operatorRefObjId}
-	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = model.Reference{ObjectId: &destinationRefObjId}
+	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = "OperatorRef"
+	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = "NINOXE:StopPoint:SP:62:LOC"
 
 	response.MonitoredStopVisits = []*SIRIMonitoredStopVisit{siriMonitoredStopVisit}
 	xml, err = response.BuildXML()

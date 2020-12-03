@@ -9,23 +9,23 @@
 						<siri:DataFrameRef>{{ .DataFrameRef }}</siri:DataFrameRef>{{ end }}{{ if .DatedVehicleJourneyRef }}
 						<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ end }}
 					</siri:FramedVehicleJourneyRef>{{ end }}{{ if .References.VehicleJourney.JourneyPatternRef }}
-					<siri:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef.ObjectId.Value}}</siri:JourneyPatternRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.JourneyPatternName }}
+					<siri:JourneyPatternRef>{{.References.VehicleJourney.JourneyPatternRef}}</siri:JourneyPatternRef>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.JourneyPatternName }}
 					<siri:JourneyPatternName>{{ .Attributes.VehicleJourneyAttributes.JourneyPatternName }}</siri:JourneyPatternName>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.VehicleMode }}
 					<siri:VehicleMode>{{ .Attributes.VehicleJourneyAttributes.VehicleMode }}</siri:VehicleMode>{{ end }}{{ if .PublishedLineName }}
 					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ end }}{{ if .References.VehicleJourney.RouteRef}}
-					<siri:RouteRef>{{.References.VehicleJourney.RouteRef.ObjectId.Value }}</siri:RouteRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DirectionName}}
+					<siri:RouteRef>{{.References.VehicleJourney.RouteRef }}</siri:RouteRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DirectionName}}
 					<siri:DirectionName>{{.Attributes.VehicleJourneyAttributes.DirectionName}}</siri:DirectionName>{{end}}{{ if .References.StopVisitReferences.OperatorRef}}
-					<siri:OperatorRef>{{.References.StopVisitReferences.OperatorRef.ObjectId.Value}}</siri:OperatorRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ProductCategoryRef}}
+					<siri:OperatorRef>{{.References.StopVisitReferences.OperatorRef}}</siri:OperatorRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ProductCategoryRef}}
 					<siri:ProductCategoryRef>{{.Attributes.VehicleJourneyAttributes.ProductCategoryRef}}</siri:ProductCategoryRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}
 					<siri:ServiceFeatureRef>{{.Attributes.VehicleJourneyAttributes.ServiceFeatureRef}}</siri:ServiceFeatureRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}
-					<siri:VehicleFeatureRef>{{.Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}</siri:VehicleFeatureRef>{{end}}{{ if .References.VehicleJourney.OriginRef.ObjectId.Value}}
-					<siri:OriginRef>{{ .References.VehicleJourney.OriginRef.ObjectId.Value }}</siri:OriginRef>{{ end }}{{ if .OriginName }}
+					<siri:VehicleFeatureRef>{{.Attributes.VehicleJourneyAttributes.VehicleFeatureRef}}</siri:VehicleFeatureRef>{{end}}{{ if .References.VehicleJourney.OriginRef}}
+					<siri:OriginRef>{{ .References.VehicleJourney.OriginRef }}</siri:OriginRef>{{ end }}{{ if .OriginName }}
 					<siri:OriginName>{{ .OriginName }}</siri:OriginName>{{ end }}{{ if or .Attributes.VehicleJourneyAttributes.ViaPlaceName .References.VehicleJourney.PlaceRef }}
 					<siri:Via>{{ if .Attributes.VehicleJourneyAttributes.ViaPlaceName }}
 						<siri:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</siri:PlaceName>{{end}}{{ if .References.VehicleJourney.PlaceRef}}
-					  <siri:PlaceRef>{{.References.VehicleJourney.PlaceRef.ObjectId.Value}}</siri:PlaceRef>{{ end }}
-					</siri:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef.ObjectId.Value }}
-					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef.ObjectId.Value }}</siri:DestinationRef>{{end}}{{ if .DestinationName}}
+					  <siri:PlaceRef>{{.References.VehicleJourney.PlaceRef}}</siri:PlaceRef>{{ end }}
+					</siri:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef }}
+					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef }}</siri:DestinationRef>{{end}}{{ if .DestinationName}}
 					<siri:DestinationName>{{ .DestinationName }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
 					<siri:VehicleJourneyName>{{ .VehicleJourneyName }}</siri:VehicleJourneyName>{{end}}{{ if .Attributes.VehicleJourneyAttributes.JourneyNote}}
 					<siri:JourneyNote>{{.Attributes.VehicleJourneyAttributes.JourneyNote}}</siri:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}

@@ -104,6 +104,12 @@ func (manager *TransactionalStopVisits) FindByStopAreaId(id StopAreaId) (stopVis
 	return
 }
 
+// We never use this method after saving or deleting anything in the transaction
+// WIP while waiting for transactionnal model refacto
+func (manager *TransactionalStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId, origin string) []StopVisit {
+	return manager.model.StopVisits().FindMonitoredByOriginByStopAreaId(id, origin)
+}
+
 func (manager *TransactionalStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	for _, stopVisit := range manager.saved {
 		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
