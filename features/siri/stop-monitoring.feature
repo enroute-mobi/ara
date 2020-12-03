@@ -934,25 +934,29 @@ Feature: Support SIRI StopMonitoring
         """
     And 90 seconds have passed
     When the SIRI server has received 2 GetStopMonitoring requests
-    Then the StopVisit "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
+    Then one StopVisit has the following attributes:
       # "internal": "A"
-      | DepartureStatus | onTime |
-      | ArrivalStatus   | onTime |
-    And the StopVisit "6ba7b814-9dad-11d1-b-00c04fd430c8" has the following attributes:
+      | ObjectIDs       | "internal": "StopVisit:A" |
+      | DepartureStatus | onTime                    |
+      | ArrivalStatus   | onTime                    |
+    Then one StopVisit has the following attributes:
       # "internal": "B"
-      | Collected   | false                |
-      | CollectedAt | 2017-01-01T12:02:00Z |
-    And the StopVisit "6ba7b814-9dad-11d1-c-00c04fd430c8" has the following attributes:
+      | ObjectIDs   | "internal": "StopVisit:B" |
+      | Collected   | false                     |
+      | CollectedAt | 2017-01-01T12:02:00Z      |
+    Then one StopVisit has the following attributes:
       # "internal": "C"
-      | DepartureStatus | onTime |
-      | ArrivalStatus   | onTime |
+      | ObjectIDs       | "internal": "StopVisit:C" |
+      | DepartureStatus | onTime                    |
+      | ArrivalStatus   | onTime                    |
     And 10 seconds have passed
-    And the StopVisit "6ba7b814-9dad-11d1-b-00c04fd430c8" has the following attributes:
+    Then one StopVisit has the following attributes:
       # "internal": "B"
-      | Collected       | false                |
-      | CollectedAt     | 2017-01-01T12:02:00Z |
-      | DepartureStatus | departed             |
-      | ArrivalStatus   | cancelled            |
+      | ObjectIDs       | "internal": "StopVisit:B" |
+      | Collected       | false                     |
+      | CollectedAt     | 2017-01-01T12:02:00Z      |
+      | DepartureStatus | departed                  |
+      | ArrivalStatus   | cancelled                 |
 
   Scenario: 2939 - Partner Setting collect.include_stop_areas is used to select the best Partner
     Given a SIRI server "first" waits GetStopMonitoring request on "http://localhost:8090" to respond with
