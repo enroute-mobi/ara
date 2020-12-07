@@ -248,9 +248,11 @@ type MemoryStopVisits struct {
 
 	model Model
 
-	mutex        *sync.RWMutex
-	byIdentifier map[StopVisitId]*StopVisit
-	byObjectId   *ObjectIdIndex
+	mutex            *sync.RWMutex
+	byIdentifier     map[StopVisitId]*StopVisit
+	byObjectId       *ObjectIdIndex
+	byStopArea       *Index
+	byVehicleJourney *Index
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
@@ -273,10 +275,15 @@ type StopVisits interface {
 }
 
 func NewMemoryStopVisits() *MemoryStopVisits {
+	stopExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).StopAreaId) }
+	vjExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).VehicleJourneyId) }
+
 	return &MemoryStopVisits{
-		mutex:        &sync.RWMutex{},
-		byIdentifier: make(map[StopVisitId]*StopVisit),
-		byObjectId:   NewObjectIdIndex(),
+		mutex:            &sync.RWMutex{},
+		byIdentifier:     make(map[StopVisitId]*StopVisit),
+		byObjectId:       NewObjectIdIndex(),
+		byStopArea:       NewIndex(stopExtractor),
+		byVehicleJourney: NewIndex(vjExtractor),
 	}
 }
 
@@ -287,74 +294,89 @@ func (manager *MemoryStopVisits) New() StopVisit {
 
 func (manager *MemoryStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	stopVisit, ok := manager.byIdentifier[id]
 
 	if ok {
+		manager.mutex.RUnlock()
 		return *(stopVisit.copy()), true
 	} else {
+		manager.mutex.RUnlock()
 		return StopVisit{}, false
 	}
 }
 
 func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
+		manager.mutex.RUnlock()
 		return *manager.byIdentifier[StopVisitId(id)], true
 	}
+
+	manager.mutex.RUnlock()
 	return StopVisit{}, false
 }
 
 func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.VehicleJourneyId == id {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
-		}
+	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
+
+	for _, id := range ids {
+		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		stopVisits = append(stopVisits, *(sv.copy()))
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
 func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.VehicleJourneyId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
+	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
+
+	for _, id := range ids {
+		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		if sv.ReferenceTime().After(manager.Clock().Now()) {
+			stopVisits = append(stopVisits, *(sv.copy()))
 		}
 	}
+
+	manager.mutex.RUnlock()
 	sort.Sort(ByTime(stopVisits))
 	return
 }
 
 func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.StopAreaId == id {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
-		}
+	ids, _ := manager.byStopArea.Find(ModelId(id))
+
+	for _, id := range ids {
+		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		stopVisits = append(stopVisits, *(sv.copy()))
 	}
+
+	defer manager.mutex.RUnlock()
 	return
 }
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	for _, stopVisit := range manager.byIdentifier {
-		if stopVisit.StopAreaId == id && stopVisit.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
+	ids, _ := manager.byStopArea.Find(ModelId(id))
+
+	for _, id := range ids {
+		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		if sv.ReferenceTime().After(manager.Clock().Now()) {
+			stopVisits = append(stopVisits, *(sv.copy()))
 		}
 	}
+
+	manager.mutex.RUnlock()
 	sort.Sort(ByTime(stopVisits))
 	return
 }
@@ -363,35 +385,45 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAr
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, stopAreaId := range stopAreaIds {
-		stopVisits = append(stopVisits, manager.FindFollowingByStopAreaId(stopAreaId)...)
+	var ids []ModelId
+	for _, id := range stopAreaIds {
+		saids, _ := manager.byStopArea.Find(ModelId(id))
+		ids = append(ids, saids...)
 	}
+
+	for _, id := range ids {
+		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		if sv.ReferenceTime().After(manager.Clock().Now()) {
+			stopVisits = append(stopVisits, *(sv.copy()))
+		}
+	}
+
+	manager.mutex.RUnlock()
 	sort.Sort(ByTime(stopVisits))
 	return
 }
 
 func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	if len(manager.byIdentifier) == 0 {
-		return []StopVisit{}
-	}
 	for _, stopVisit := range manager.byIdentifier {
 		stopVisits = append(stopVisits, *(stopVisit.copy()))
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
 func (manager *MemoryStopVisits) FindAllAfter(t time.Time) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.ReferenceTime().After(t) {
 			stopVisits = append(stopVisits, *(stopVisit.copy()))
 		}
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
@@ -406,6 +438,8 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
 	manager.byObjectId.Index(stopVisit)
+	manager.byStopArea.Index(stopVisit)
+	manager.byVehicleJourney.Index(stopVisit)
 
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
@@ -425,6 +459,8 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 
 	delete(manager.byIdentifier, stopVisit.id)
 	manager.byObjectId.Delete(ModelId(stopVisit.id))
+	manager.byStopArea.Delete(ModelId(stopVisit.id))
+	manager.byVehicleJourney.Delete(ModelId(stopVisit.id))
 
 	return true
 }

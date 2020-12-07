@@ -16,27 +16,17 @@ func NewIndex(extractor IndexableExtractor) *Index {
 	}
 }
 
-func (index *Index) removeFromIndexable(indexable, modelId ModelId) {
-	if len(index.byIndexable[indexable]) == 0 {
-		return
-	}
-	for i, indexedModelId := range index.byIndexable[indexable] {
-		if indexedModelId == modelId {
-			index.byIndexable[indexable] = append(index.byIndexable[indexable][:i], index.byIndexable[indexable][i+1:]...)
-			if len(index.byIndexable[indexable]) == 0 {
-				delete(index.byIndexable, indexable)
-			}
-			return
-		}
-	}
-}
-
-func (index *Index) Index(modelId ModelId, model ModelInstance) {
+func (index *Index) Index(model ModelInstance) {
+	modelId := model.modelId()
 	indexable := index.extractor(model)
 
 	currentIndexable, ok := index.byIdentifier[modelId]
-	if ok && currentIndexable != indexable {
-		index.removeFromIndexable(currentIndexable, modelId)
+	if ok {
+		if currentIndexable != indexable {
+			index.removeFromIndexable(currentIndexable, modelId)
+		} else {
+			return
+		}
 	}
 
 	index.byIndexable[indexable] = append(index.byIndexable[indexable], modelId)
@@ -56,4 +46,19 @@ func (index *Index) Delete(modelId ModelId) {
 
 	index.removeFromIndexable(currentIndexable, modelId)
 	delete(index.byIdentifier, modelId)
+}
+
+func (index *Index) removeFromIndexable(indexable, modelId ModelId) {
+	if len(index.byIndexable[indexable]) == 0 {
+		return
+	}
+	for i, indexedModelId := range index.byIndexable[indexable] {
+		if indexedModelId == modelId {
+			index.byIndexable[indexable] = append(index.byIndexable[indexable][:i], index.byIndexable[indexable][i+1:]...)
+			if len(index.byIndexable[indexable]) == 0 {
+				delete(index.byIndexable, indexable)
+			}
+			return
+		}
+	}
 }

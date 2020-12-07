@@ -25,6 +25,26 @@ func Test_ObjectIDIndex_simple(t *testing.T) {
 	}
 }
 
+func Test_ObjectIDIndex_MultipleIndex(t *testing.T) {
+	index := NewObjectIdIndex()
+
+	objectid := NewObjectID("kind", "value")
+	stopVisit := &StopVisit{id: "stopVisitId"}
+	stopVisit.objectids = make(ObjectIDs)
+	stopVisit.SetObjectID(objectid)
+
+	index.Index(stopVisit)
+	index.Index(stopVisit)
+
+	foundStopVisit, ok := index.Find(objectid)
+	if !ok {
+		t.Error("Can't find StopVisit after index: ", index)
+	}
+	if StopVisitId(foundStopVisit) != stopVisit.id {
+		t.Errorf("Wrong Id returned, got: %v want: %v", foundStopVisit, stopVisit.id)
+	}
+}
+
 func Test_ObjectIDIndex_Multiple(t *testing.T) {
 	index := NewObjectIdIndex()
 
