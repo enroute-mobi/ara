@@ -6,9 +6,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	external_models "bitbucket.org/enroute-mobi/ara-external-models"
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -49,11 +52,16 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	startTime := handler.referential.Clock().Now()
+	message := handler.newBQMessage(string(partner.Slug()), request.RemoteAddr)
+	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+
 	// Check if request is gzip
 	var requestReader io.Reader
 	if request.Header.Get("Content-Encoding") == "gzip" {
 		gzipReader, err := gzip.NewReader(request.Body)
 		if err != nil {
+			handler.logError(message, startTime, "Can't unzip request")
 			http.Error(response, "Can't unzip request", http.StatusBadRequest)
 			return
 		}
@@ -67,10 +75,13 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	content, err := ioutil.ReadAll(requestReader)
 	if err != nil {
 		e := fmt.Sprintf("Error while reading body: %v", err)
+		handler.logError(message, startTime, e)
 		http.Error(response, e, http.StatusBadRequest)
 		return
 	}
+	message.RequestSize = len(content)
 	if len(content) == 0 {
+		handler.logError(message, startTime, "Empty body")
 		http.Error(response, "Empty body", http.StatusBadRequest)
 		return
 	}
@@ -79,10 +90,31 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	err = proto.Unmarshal(content, externalModel)
 	if err != nil {
 		e := fmt.Sprintf("Error while unmarshalling body: %v", err)
+		handler.logError(message, startTime, e)
 		http.Error(response, e, http.StatusBadRequest)
 		return
 	}
 
-	connector.(*core.PushCollector).HandlePushNotification(externalModel)
+	connector.(*core.PushCollector).HandlePushNotification(externalModel, message)
 	response.WriteHeader(http.StatusOK)
+}
+
+func (handler *PushHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Protocol:  "push",
+		Type:      "push-notification",
+		Direction: "received",
+		Partner:   slug,
+		Status:    "OK",
+		IPAddress: remoteAddress,
+	}
+}
+
+func (handler *PushHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+	m.ProcessingTime = time.Since(startTime).Seconds()
+	m.Status = "Error"
+	errorString := fmt.Sprintf(format, values...)
+
+	m.ErrorDetails = errorString
+	logger.Log.Debugf(errorString)
 }

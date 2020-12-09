@@ -44,10 +44,24 @@ func (siriError SiriErrorResponse) sendSiriError() {
 	logStashEvent["status"] = "false"
 	logStashEvent["siriType"] = "siriError"
 	logStashEvent["responseXML"] = soapEnvelope.String()
+
+	message := &audit.BigQueryMessage{
+		Protocol:           "siri",
+		Direction:          "send",
+		Status:             "Error",
+		Type:               "siri-error",
+		ErrorDetails:       fmt.Sprintf("%v: %v", siriError.errCode, siriError.errDescription),
+		ResponseRawMessage: soapEnvelope.String(),
+	}
+
 	if siriError.request != "" {
 		logStashEvent["requestXML"] = siriError.request
+		message.RequestRawMessage = siriError.request
 	}
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	soapEnvelope.WriteTo(siriError.response)
+	message.ResponseSize = soapEnvelope.Length()
+
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+	audit.CurrentBigQuery().WriteEvent(message)
 }

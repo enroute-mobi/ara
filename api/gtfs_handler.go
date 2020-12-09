@@ -41,8 +41,8 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	logStashEvent["connector"] = "GtfsHandler"
 	logStashEvent["resource"] = "resource"
 
-	message := handler.newBQMessage(partner)
-	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteMessage(message)
+	message := handler.newBQMessage(string(partner.Slug()), request.RemoteAddr)
+	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 
 	var gc []core.GtfsConnector
 	var c core.Connector
@@ -72,6 +72,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc, logStashEvent) })
+
 	if err != nil {
 		handler.logError(message, startTime, "%v", err)
 		http.Error(response, "Internal error", http.StatusInternalServerError)
@@ -97,14 +98,14 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		buffer.Write(data)
 	}
 
-	requestSize := buffer.Len()
+	responseSize := buffer.Len()
 	processingTime := time.Since(startTime)
 
-	logStashEvent["protobuf_size"] = strconv.Itoa(requestSize)
+	logStashEvent["protobuf_size"] = strconv.Itoa(responseSize)
 	logStashEvent["response_time"] = processingTime.String()
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	message.RequestSize = requestSize
+	message.ResponseSize = responseSize
 	message.ProcessingTime = processingTime.Seconds()
 
 	response.WriteHeader(http.StatusOK)
@@ -133,13 +134,13 @@ func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit
 	return proto.Marshal(feed)
 }
 
-func (handler *GtfsHandler) newBQMessage(partner *core.Partner) *audit.BigQueryMessage {
+func (handler *GtfsHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Timestamp: handler.referential.Clock().Now(),
 		Protocol:  "gtfs",
 		Direction: "received",
 		Status:    "OK",
-		Partner:   string(partner.Slug()),
+		Partner:   slug,
+		IPAddress: remoteAddress,
 	}
 }
 

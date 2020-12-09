@@ -224,7 +224,8 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 		Bearing:        v.Bearing,
 		RecordedAtTime: civil.DateTimeOf(v.RecordedAtTime),
 	}
-	audit.CurrentBigQuery(manager.model.Referential()).WriteVehicleEvent(vehicleEvent)
+
+	audit.CurrentBigQuery(manager.model.Referential()).WriteEvent(vehicleEvent)
 }
 
 func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {

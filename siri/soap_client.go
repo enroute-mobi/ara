@@ -85,7 +85,7 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
 	httpRequest.Header.Set("User-Agent", version.ApplicationName())
-	httpRequest.ContentLength = soapEnvelope.Length()
+	httpRequest.ContentLength = int64(soapEnvelope.Length())
 
 	// Send http request
 	var netTransport = &http.Transport{
