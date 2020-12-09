@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
@@ -22,7 +24,9 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) ConnectorType() string {
 func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("Siri Lite VehicleMonitoring %s", handler.requestUrl)
 
-	response := connector.(core.VehicleMonitoringRequestBroadcaster).RequestVehicles(handler.requestUrl, handler.filters)
+	t := clock.DefaultClock().Now()
+
+	response := connector.(core.VehicleMonitoringRequestBroadcaster).RequestVehicles(handler.requestUrl, handler.filters, message)
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {
@@ -30,10 +34,15 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.C
 		logger.Log.Debugf("Internal error while Marshaling a SiriLite response in vehicle monitoring handler: %v", err)
 		return
 	}
-	_, err = rw.Write(jsonBytes)
+	n, err := rw.Write(jsonBytes)
 	if err != nil {
 		logger.Log.Debugf("Internal error while writing a SiriLite response in vehicle monitoring handler: %v", err)
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
 	}
 
+	message.Type = "VehicleMonitoringRequest"
+	message.ResponseRawMessage = string(jsonBytes)
+	message.ResponseSize = int64(n)
+	message.ProcessingTime = time.Since(t).Seconds()
+	audit.CurrentBigQuery().WriteEvent(message)
 }

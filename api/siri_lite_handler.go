@@ -85,6 +85,7 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 		Direction: "received",
 		Partner:   string(partner.Slug()),
 		IPAddress: request.RemoteAddr,
+		Status:    "OK",
 	}
 
 	requestHandler.Respond(connector, response, m)

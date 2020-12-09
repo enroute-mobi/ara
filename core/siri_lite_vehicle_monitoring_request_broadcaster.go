@@ -12,7 +12,7 @@ import (
 )
 
 type VehicleMonitoringRequestBroadcaster interface {
-	RequestVehicles(string, url.Values) *siri.SiriLiteResponse
+	RequestVehicles(string, url.Values, *audit.BigQueryMessage) *siri.SiriLiteResponse
 }
 
 type SIRILiteVehicleMonitoringRequestBroadcaster struct {
@@ -35,7 +35,7 @@ func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteV
 	return siriVehicleMonitoringRequestBroadcaster
 }
 
-func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values) (siriLiteResponse *siri.SiriLiteResponse) {
+func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
 	tx := connector.Partner().Referential().NewTransaction()
 
 	logStashEvent := connector.newLogStashEvent()
@@ -44,7 +44,11 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 	}()
 
+	lineRef := filters.Get("LineRef")
+
 	logStashEvent["RequestURL"] = url
+	message.RequestIdentifier = filters.Get("MessageIdentifier")
+	message.Lines = []string{lineRef}
 
 	siriLiteResponse = siri.NewSiriLiteResponse()
 	siriLiteResponse.Siri.ServiceDelivery.ResponseTimestamp = connector.Clock().Now()
@@ -57,7 +61,6 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	response.RequestMessageRef = filters.Get("MessageIdentifier")
 	siriLiteResponse.Siri.ServiceDelivery.VehicleMonitoringDelivery = response
 
-	lineRef := filters.Get("LineRef")
 	objectid := model.NewObjectID(connector.remoteObjectidKind, lineRef)
 	line, ok := tx.Model().Lines().FindByObjectId(objectid)
 	if !ok {
@@ -66,10 +69,14 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 			ErrorText: fmt.Sprintf("Line %v not found", objectid.Value()),
 		}
 		logSIRILiteVehicleMonitoringResponse(logStashEvent, siriLiteResponse)
+		message.Status = "Error"
+		message.ErrorDetails = response.ErrorCondition.ErrorText
 		return
 	}
 
 	response.Status = true
+
+	var vehicleIds []string
 
 	for _, vehicle := range tx.Model().Vehicles().FindByLineId(line.Id()) {
 		vehicleId, ok := vehicle.ObjectID(connector.vehicleRemoteObjectidKind)
@@ -113,9 +120,14 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		// Delay                   *time.Time `json:",omitempty"`
 
 		response.VehicleActivity = append(response.VehicleActivity, activity)
+
+		vehicleIds = append(vehicleIds, vehicleId.Value())
 	}
 
+	message.Vehicles = vehicleIds
+
 	logSIRILiteVehicleMonitoringResponse(logStashEvent, siriLiteResponse)
+
 	return siriLiteResponse
 }
 
