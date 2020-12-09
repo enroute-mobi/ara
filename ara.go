@@ -229,7 +229,7 @@ func checkStatus(url string, requestorRef string) error {
 	logstashDatas["requestXML"] = xml
 	logstashDatas["responseXML"] = xmlResponse.RawXML()
 	logstashDatas["processingDuration"] = responseTime.String()
-	// ...
+
 	err = audit.CurrentLogStash().WriteEvent(logstashDatas)
 	if err != nil {
 		logger.Log.Panicf("Error while sending datas to Logstash: %v", err)

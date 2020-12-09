@@ -13,7 +13,7 @@ import (
 )
 
 type GeneralMessageRequestBroadcaster interface {
-	Situations(request *siri.XMLGetGeneralMessage) (*siri.SIRIGeneralMessageResponse, error)
+	Situations(*siri.XMLGetGeneralMessage, *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error)
 }
 
 type SIRIGeneralMessageRequestBroadcaster struct {
@@ -30,7 +30,7 @@ func NewSIRIGeneralMessageRequestBroadcaster(partner *Partner) *SIRIGeneralMessa
 	return siriGeneralMessageRequestBroadcaster
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGetGeneralMessage) (*siri.SIRIGeneralMessageResponse, error) {
+func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGetGeneralMessage, message *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -47,6 +47,13 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	}
 
 	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
+
+	if !response.SIRIGeneralMessageDelivery.Status {
+		message.Status = "Error"
+		message.ErrorDetails = response.SIRIGeneralMessageDelivery.ErrorString()
+	}
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
 	logSIRIGeneralMessageDelivery(logStashEvent, response.SIRIGeneralMessageDelivery)
 	logSIRIGeneralMessageResponse(logStashEvent, response)

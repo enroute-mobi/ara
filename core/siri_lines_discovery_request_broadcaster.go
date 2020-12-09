@@ -12,7 +12,7 @@ import (
 )
 
 type LinesDiscoveryRequestBroadcaster interface {
-	Lines(request *siri.XMLLinesDiscoveryRequest) (*siri.SIRILinesDiscoveryResponse, error)
+	Lines(*siri.XMLLinesDiscoveryRequest, *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error)
 }
 
 type SIRILinesDiscoveryRequestBroadcaster struct {
@@ -29,7 +29,7 @@ func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscove
 	return siriLinesDiscoveryRequestBroadcaster
 }
 
-func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest) (*siri.SIRILinesDiscoveryResponse, error) {
+func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -66,6 +66,9 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 	}
 
 	sort.Sort(siri.SIRIAnnotatedLineByLineRef(response.AnnotatedLines))
+
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.Lines = annotedLineArray
 
 	logStashEvent["annotedLines"] = strings.Join(annotedLineArray, ", ")
 	logSIRILineDiscoveryResponse(logStashEvent, response)

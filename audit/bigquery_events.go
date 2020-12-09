@@ -31,8 +31,8 @@ type BigQueryMessage struct {
 	ResponseRawMessage      string    `bigquery:"response_raw_message"` // XML or JSON for GTFS-RT
 	RequestIdentifier       string    `bigquery:"request_identifier"`
 	ResponseIdentifier      string    `bigquery:"response_identifier"`
-	RequestSize             int       `bigquery:"request_size"`
-	ResponseSize            int       `bigquery:"response_size"`
+	RequestSize             int64     `bigquery:"request_size"`
+	ResponseSize            int64     `bigquery:"response_size"`
 	ProcessingTime          float64   `bigquery:"processing_time"`          // in seconds
 	SubscriptionIdentifiers []string  `bigquery:"subscription_identifiers"` // array of ids
 	StopAreas               []string  `bigquery:"stop_areas"`               // array of objectid values

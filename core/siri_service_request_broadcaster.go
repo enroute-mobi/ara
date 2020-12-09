@@ -11,7 +11,7 @@ import (
 )
 
 type ServiceRequestBroadcaster interface {
-	HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse
+	HandleRequests(*siri.XMLSiriServiceRequest, *audit.BigQueryMessage) *siri.SIRIServiceResponse
 }
 
 type SIRIServiceRequestBroadcaster struct {
@@ -28,7 +28,7 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	return siriServiceRequestBroadcaster
 }
 
-func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest) *siri.SIRIServiceResponse {
+func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -45,22 +45,31 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 		ResponseTimestamp:         connector.Clock().Now(),
 	}
 
+	var stopIds, lineIds []string
 	if smRequests := request.StopMonitoringRequests(); len(smRequests) != 0 {
-		connector.handleStopMonitoringRequests(tx, smRequests, response)
+		stopIds = connector.handleStopMonitoringRequests(tx, smRequests, response)
 	}
 	if gmRequests := request.GeneralMessageRequests(); len(gmRequests) != 0 {
 		connector.handleGeneralMessageRequests(tx, gmRequests, response)
 	}
 	if ettRequests := request.EstimatedTimetableRequests(); len(ettRequests) != 0 {
-		connector.handleEstimatedTimetableRequests(tx, ettRequests, response)
+		lineIds = connector.handleEstimatedTimetableRequests(tx, ettRequests, response)
 	}
+
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
+	if !response.Status {
+		message.Status = "Error"
+	}
+	message.StopAreas = stopIds
+	message.Lines = lineIds
 
 	logSIRIServiceResponse(logStashEvent, response)
 
 	return response
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx *model.Transaction, requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) {
+func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx *model.Transaction, requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
 	for _, stopMonitoringRequest := range requests {
 		SMLogStashEvent := connector.newLogStashEvent("StopMonitoringRequestBroadcaster")
 		logXMLStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
@@ -89,7 +98,10 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx 
 		audit.CurrentLogStash().WriteEvent(SMLogStashEvent)
 
 		response.StopMonitoringDeliveries = append(response.StopMonitoringDeliveries, &delivery)
+
+		stopIds = append(stopIds, stopMonitoringRequest.MonitoringRef())
 	}
+	return
 }
 
 func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx *model.Transaction, requests []*siri.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
@@ -124,7 +136,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx 
 	}
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(tx *model.Transaction, requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) {
+func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(tx *model.Transaction, requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
 	for _, estimatedTimetableRequest := range requests {
 		ETTLogStashEvent := connector.newLogStashEvent("EstimatedTimetableRequestBroadcaster")
 		logXMLEstimatedTimetableRequest(ETTLogStashEvent, estimatedTimetableRequest)
@@ -152,7 +164,10 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 		audit.CurrentLogStash().WriteEvent(ETTLogStashEvent)
 
 		response.EstimatedTimetableDeliveries = append(response.EstimatedTimetableDeliveries, &delivery)
+
+		lineIds = append(lineIds, estimatedTimetableRequest.Lines()...)
 	}
+	return
 }
 
 func (connector *SIRIServiceRequestBroadcaster) newLogStashEvent(connectorName string) audit.LogStashEvent {

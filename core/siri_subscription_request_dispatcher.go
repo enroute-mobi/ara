@@ -12,8 +12,8 @@ import (
 )
 
 type SubscriptionRequestDispatcher interface {
-	Dispatch(*siri.XMLSubscriptionRequest) (*siri.SIRISubscriptionResponse, error)
-	CancelSubscription(*siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse
+	Dispatch(*siri.XMLSubscriptionRequest, *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error)
+	CancelSubscription(*siri.XMLDeleteSubscriptionRequest, *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse
 	HandleSubscriptionTerminatedNotification(*siri.XMLSubscriptionTerminatedNotification)
 	HandleNotifySubscriptionTerminated(*siri.XMLNotifySubscriptionTerminated)
 }
@@ -45,7 +45,7 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 	return siriSubscriptionRequest
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest) (*siri.SIRISubscriptionResponse, error) {
+func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error) {
 	logStashEvent := connector.newLogStashEvent()
 
 	logXMLSubscriptionRequest(logStashEvent, request)
@@ -58,13 +58,15 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		ServiceStartedTime: connector.Partner().Referential().StartedAt(),
 	}
 
+	message.RequestIdentifier = request.MessageIdentifier()
+
 	if len(request.XMLSubscriptionGMEntries()) > 0 {
 		gmbc, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
 			return nil, fmt.Errorf("no GeneralMessageSubscriptionBroadcaster Connector")
 		}
 
-		response.ResponseStatus = append(response.ResponseStatus, gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+		response.ResponseStatus = gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
 		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
@@ -78,7 +80,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			return nil, fmt.Errorf("no StopMonitoringSubscriptionBroadcaster Connector")
 		}
 
-		response.ResponseStatus = append(response.ResponseStatus, smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+		response.ResponseStatus = smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
 		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "StopMonitoringSubscriptionRequest"
@@ -92,7 +94,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 			return nil, fmt.Errorf("no EstimatedTimeTableSubscriptionBroadcaster Connector")
 		}
 
-		response.ResponseStatus = append(response.ResponseStatus, smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request)...)
+		response.ResponseStatus = smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
 		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
 		logStashEvent["siriType"] = "EstimatedTimetableSubscriptionRequest"
@@ -103,8 +105,10 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	return nil, fmt.Errorf("subscription not supported")
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest) *siri.SIRIDeleteSubscriptionResponse {
+func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest, message *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse {
 	logStashEvent := connector.newLogStashEvent()
+
+	message.RequestIdentifier = r.MessageIdentifier()
 
 	logXMLCancelSubscriptionRequest(logStashEvent, r)
 
@@ -140,6 +144,8 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 		ResponseTimestamp: currentTime,
 	}
 
+	message.SubscriptionIdentifiers = []string{r.SubscriptionRef()}
+
 	resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
 
 	sub, ok := connector.Partner().Subscriptions().FindByExternalId(r.SubscriptionRef())
@@ -148,6 +154,10 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 
 		responseStatus.ErrorType = "InvalidDataReferencesError"
 		responseStatus.ErrorText = fmt.Sprintf("Subscription not found: '%s'", r.SubscriptionRef())
+
+		message.Status = "Error"
+		message.ErrorDetails = responseStatus.ErrorText
+
 		return resp
 	}
 

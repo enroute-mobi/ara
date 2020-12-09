@@ -11,17 +11,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
-
-type StopMonitoringSubscriptionBroadcaster interface {
-	state.Stopable
-	state.Startable
-
-	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
-	HandleSubscriptionRequest([]*siri.XMLStopMonitoringSubscriptionRequestEntry)
-}
 
 type SIRIStopMonitoringSubscriptionBroadcaster struct {
 	clock.ClockConsumer
@@ -191,11 +182,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	resps := []siri.SIRIResponseStatus{}
+	var monitoringRefs, subIds []string
 
 	for _, sm := range request.XMLSubscriptionSMEntries() {
 		logStashEvent := connector.newLogStashEvent()
@@ -208,6 +199,8 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			ResponseTimestamp: connector.Clock().Now(),
 		}
 
+		monitoringRefs = append(monitoringRefs, sm.MonitoringRef())
+
 		objectid := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER), sm.MonitoringRef())
 		sa, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 		if !ok {
@@ -218,8 +211,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
 			audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+			message.Status = "Error"
 			continue
 		}
+
+		subIds = append(subIds, sm.SubscriptionIdentifier())
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
 		if !ok {
@@ -256,7 +252,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		connector.addStopAreaStopVisits(sa, sub, r)
 	}
 
-	return resps
+	message.Type = "StopMonitoringSubscriptionRequest"
+	message.SubscriptionIdentifiers = subIds
+	message.StopAreas = monitoringRefs
+
+	return
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {

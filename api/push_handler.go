@@ -79,7 +79,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		http.Error(response, e, http.StatusBadRequest)
 		return
 	}
-	message.RequestSize = len(content)
+	message.RequestSize = int64(len(content))
 	if len(content) == 0 {
 		handler.logError(message, startTime, "Empty body")
 		http.Error(response, "Empty body", http.StatusBadRequest)

@@ -81,6 +81,6 @@ func (writer *SOAPEnvelopeBuffer) String() string {
 	return writer.buffer.String()
 }
 
-func (writer *SOAPEnvelopeBuffer) Length() int {
-	return writer.buffer.Len()
+func (writer *SOAPEnvelopeBuffer) Length() int64 {
+	return int64(writer.buffer.Len())
 }

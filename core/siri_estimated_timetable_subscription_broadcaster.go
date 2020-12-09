@@ -11,17 +11,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
-
-type EstimatedTimeTableSubscriptionBroadcaster interface {
-	state.Stopable
-	state.Startable
-
-	HandleStopMonitoringBroadcastEvent(*model.StopMonitoringBroadcastEvent)
-	HandleSubscriptionRequest([]*siri.XMLEstimatedTimetableSubscriptionRequestEntry) []siri.SIRIResponseStatus
-}
 
 type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 	clock.ClockConsumer
@@ -63,9 +54,11 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	return siriEstimatedTimeTableSubscriptionBroadcaster
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
+
+	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
 		logStashEvent := connector.newLogStashEvent()
@@ -77,6 +70,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			SubscriptionRef:   ett.SubscriptionIdentifier(),
 			ResponseTimestamp: connector.Clock().Now(),
 		}
+
+		lineIds = append(lineIds, ett.Lines()...)
 
 		resources, lineIds := connector.checkLines(ett)
 		if len(lineIds) != 0 {
@@ -96,6 +91,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		if len(lineIds) != 0 {
 			continue
 		}
+
+		subIds = append(subIds, ett.SubscriptionIdentifier())
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
@@ -117,6 +114,10 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		}
 		sub.Save()
 	}
+	message.Type = "EstimatedTimetableSubscriptionRequest"
+	message.SubscriptionIdentifiers = subIds
+	message.StopAreas = lineIds
+
 	return resps
 }
 

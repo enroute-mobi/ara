@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
@@ -18,7 +19,7 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) ConnectorType() string {
 	return core.SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER
 }
 
-func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("Siri Lite VehicleMonitoring %s", handler.requestUrl)
 
 	response := connector.(core.VehicleMonitoringRequestBroadcaster).RequestVehicles(handler.requestUrl, handler.filters)

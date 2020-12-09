@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
@@ -13,7 +14,7 @@ import (
 type SIRIRequestHandler interface {
 	RequestorRef() string
 	ConnectorType() string
-	Respond(core.Connector, http.ResponseWriter)
+	Respond(core.Connector, http.ResponseWriter, *audit.BigQueryMessage)
 }
 
 type SIRIHandler struct {
@@ -131,5 +132,14 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	requestHandler.Respond(connector, response)
+	m := &audit.BigQueryMessage{
+		Protocol:    "siri",
+		Direction:   "received",
+		Partner:     string(partner.Slug()),
+		IPAddress:   request.RemoteAddr,
+		RequestSize: request.ContentLength,
+		Status:      "OK",
+	}
+
+	requestHandler.Respond(connector, response, m)
 }

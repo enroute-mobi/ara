@@ -3,7 +3,10 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -21,10 +24,12 @@ func (handler *SIRIEstimatedTimetableRequestHandler) ConnectorType() string {
 	return core.SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("Estimated Timetable %s\n", handler.xmlRequest.MessageIdentifier())
 
-	response := connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest)
+	t := clock.DefaultClock().Now()
+
+	response := connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
@@ -35,9 +40,16 @@ func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Conn
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
-	_, err = soapEnvelope.WriteTo(rw)
+	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
 		return
 	}
+
+	message.Type = "EstimatedTimetableRequest"
+	message.RequestRawMessage = handler.xmlRequest.RawXML()
+	message.ResponseRawMessage = xmlResponse
+	message.ResponseSize = n
+	message.ProcessingTime = time.Since(t).Seconds()
+	audit.CurrentBigQuery().WriteEvent(message)
 }

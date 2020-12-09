@@ -3,7 +3,10 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -21,10 +24,12 @@ func (handler *SIRIDeleteSubscriptionRequestHandler) ConnectorType() string {
 	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
-func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("DeleteSubscription %s cancel subscription: %s", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
 
-	response := connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest)
+	t := clock.DefaultClock().Now()
+
+	response := connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest, message)
 
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
@@ -36,9 +41,16 @@ func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Conn
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
-	_, err = soapEnvelope.WriteTo(rw)
+	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
 		return
 	}
+
+	message.Type = "DeleteSubscriptionRequest"
+	message.RequestRawMessage = handler.xmlRequest.RawXML()
+	message.ResponseRawMessage = xmlResponse
+	message.ResponseSize = n
+	message.ProcessingTime = time.Since(t).Seconds()
+	audit.CurrentBigQuery().WriteEvent(message)
 }

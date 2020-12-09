@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -38,7 +39,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 
 	if err != nil {
 		t.Fatalf("Error while handling subscription request: %v", err)
@@ -78,7 +79,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatalf("Error while handling subscription request: %v", err)
 	}
@@ -121,7 +122,7 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 	body, _ := ioutil.ReadAll(file)
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 
-	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatalf("Error while handling subscription request: %v", err)
 	}
@@ -168,7 +169,7 @@ func Test_CancelSubscription(t *testing.T) {
 	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
-	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
+	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request, &audit.BigQueryMessage{})
 
 	if len(response.ResponseStatus) != 1 {
 		t.Fatalf("Response should have 1 responseStatus, got: %v", len(response.ResponseStatus))
@@ -212,7 +213,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
-	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request)
+	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request, &audit.BigQueryMessage{})
 
 	if len(response.ResponseStatus) != 2 {
 		t.Fatalf("Response should have 2 responseStatus, got: %v", len(response.ResponseStatus))
@@ -302,7 +303,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 
-	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 	time.Sleep(10 * time.Millisecond)
 
@@ -406,7 +407,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
 	time.Sleep(10 * time.Millisecond)
 
-	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request)
+	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	connector2.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
 	time.Sleep(10 * time.Millisecond)
 

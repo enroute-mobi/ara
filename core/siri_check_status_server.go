@@ -10,7 +10,7 @@ import (
 )
 
 type CheckStatusServer interface {
-	CheckStatus(*siri.XMLCheckStatusRequest) (*siri.SIRICheckStatusResponse, error)
+	CheckStatus(*siri.XMLCheckStatusRequest, *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error)
 }
 
 type SIRICheckStatusServer struct {
@@ -27,7 +27,7 @@ func NewSIRICheckStatusServer(partner *Partner) *SIRICheckStatusServer {
 	return siriCheckStatusServer
 }
 
-func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatusRequest) (*siri.SIRICheckStatusResponse, error) {
+func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatusRequest, message *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -42,6 +42,9 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 		ResponseTimestamp:         connector.Clock().Now(),
 		ServiceStartedTime:        connector.Partner().StartedAt(),
 	}
+
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
 	logSIRICheckStatusResponse(logStashEvent, response)
 

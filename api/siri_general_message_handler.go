@@ -3,7 +3,10 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -21,11 +24,13 @@ func (handler *SIRIGeneralMessageRequestHandler) ConnectorType() string {
 	return core.SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER
 }
 
-func (handler *SIRIGeneralMessageRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRIGeneralMessageRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("General Message %s\n", handler.xmlRequest.MessageIdentifier())
 
+	t := clock.DefaultClock().Now()
+
 	tmp := connector.(*core.SIRIGeneralMessageRequestBroadcaster)
-	response, _ := tmp.Situations(handler.xmlRequest)
+	response, _ := tmp.Situations(handler.xmlRequest, message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
@@ -36,9 +41,16 @@ func (handler *SIRIGeneralMessageRequestHandler) Respond(connector core.Connecto
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
-	_, err = soapEnvelope.WriteTo(rw)
+	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
 		return
 	}
+
+	message.Type = "GeneralMessageRequest"
+	message.RequestRawMessage = handler.xmlRequest.RawXML()
+	message.ResponseRawMessage = xmlResponse
+	message.ResponseSize = n
+	message.ProcessingTime = time.Since(t).Seconds()
+	audit.CurrentBigQuery().WriteEvent(message)
 }

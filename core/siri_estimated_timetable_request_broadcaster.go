@@ -13,7 +13,7 @@ import (
 )
 
 type EstimatedTimetableBroadcaster interface {
-	RequestLine(request *siri.XMLGetEstimatedTimetable) *siri.SIRIEstimatedTimeTableResponse
+	RequestLine(*siri.XMLGetEstimatedTimetable, *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse
 }
 
 type SIRIEstimatedTimetableBroadcaster struct {
@@ -30,7 +30,7 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 	return broadcaster
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable) *siri.SIRIEstimatedTimeTableResponse {
+func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -47,6 +47,14 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	}
 
 	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest, logStashEvent)
+
+	if !response.SIRIEstimatedTimetableDelivery.Status {
+		message.Status = "Error"
+		message.ErrorDetails = response.SIRIEstimatedTimetableDelivery.ErrorString()
+	}
+	message.Lines = request.Lines()
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
 	logSIRIEstimatedTimetableResponse(logStashEvent, response)
 

@@ -105,7 +105,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	logStashEvent["response_time"] = processingTime.String()
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	message.ResponseSize = responseSize
+	message.ResponseSize = int64(responseSize)
 	message.ProcessingTime = processingTime.Seconds()
 
 	response.WriteHeader(http.StatusOK)

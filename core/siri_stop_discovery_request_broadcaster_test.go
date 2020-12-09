@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -70,7 +71,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, err := connector.StopAreas(request)
+	response, err := connector.StopAreas(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +170,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 		t.Fatal(err)
 	}
 
-	response, err := connector.StopAreas(request)
+	response, err := connector.StopAreas(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatal(err)
 	}
