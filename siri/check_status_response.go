@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -65,6 +66,17 @@ func NewSIRICheckStatusResponse(
 		ErrorText:                 errorText,
 		ResponseTimestamp:         responseTimestamp,
 		ServiceStartedTime:        serviceStartedTime}
+}
+
+func (response *XMLCheckStatusResponse) ErrorString() string {
+	return fmt.Sprintf("%v: %v", response.errorType(), response.ErrorText())
+}
+
+func (response *XMLCheckStatusResponse) errorType() string {
+	if response.ErrorType() == "OtherError" {
+		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
+	}
+	return response.ErrorType()
 }
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
