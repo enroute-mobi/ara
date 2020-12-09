@@ -144,17 +144,32 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		}
 		if len(notify.GeneralMessages) != 0 {
 			logStashEvent := gmb.newLogStashEvent()
+			message := gmb.newBQEvent()
 
-			logSIRIGeneralMessageNotify(logStashEvent, &notify)
+			logSIRIGeneralMessageNotify(logStashEvent, message, &notify)
 			audit.CurrentLogStash().WriteEvent(logStashEvent)
+			t := gmb.Clock().Now()
 
 			err := gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
+			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
 			if err != nil {
 				event := gmb.newLogStashEvent()
 				logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
 				audit.CurrentLogStash().WriteEvent(event)
 			}
+
+			audit.CurrentBigQuery().WriteEvent(message)
 		}
+	}
+}
+
+func (gmb *GMBroadcaster) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "NotifyGeneralMessage",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(gmb.connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 
@@ -171,7 +186,11 @@ func logSIRINotifyError(err, rmi string, logStashEvent audit.LogStashEvent) {
 	logStashEvent["responseMessageIdentifier"] = rmi
 }
 
-func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyGeneralMessage) {
+func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
+	message.RequestIdentifier = response.RequestMessageRef
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
+	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
+
 	logStashEvent["siriType"] = "NotifyGeneralMessage"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
@@ -181,11 +200,13 @@ func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *si
 	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
+		message.Status = "Error"
 		logStashEvent["errorType"] = response.ErrorType
 		if response.ErrorType == "OtherError" {
 			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
 		}
 		logStashEvent["errorText"] = response.ErrorText
+		message.ErrorDetails = response.ErrorString()
 	}
 	xml, err := response.BuildXML()
 	if err != nil {
@@ -193,4 +214,6 @@ func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, response *si
 		return
 	}
 	logStashEvent["responseXML"] = xml
+	message.ResponseRawMessage = xml
+	message.ResponseSize = int64(len(xml))
 }

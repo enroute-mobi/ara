@@ -125,10 +125,6 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 
 			notification.Deliveries = []*siri.SIRINotifyStopMonitoringDelivery{delivery}
 
-			logStashEvent := smb.newLogStashEvent()
-			logSIRINotMonitoredNotify(logStashEvent, notification)
-			audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 			smb.sendNotification(notification)
 		}
 	}
@@ -219,10 +215,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 		}
 		if len(notification.Deliveries) != 0 {
-			logStashEvent := smb.newLogStashEvent()
-			logSIRIStopMonitoringNotify(logStashEvent, notification)
-			audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 			smb.sendNotification(notification)
 		}
 	}
@@ -283,12 +275,33 @@ func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit model.StopVisit, de
 }
 
 func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring) {
+	logStashEvent := smb.newLogStashEvent()
+	message := smb.newBQEvent()
+
+	logSIRIStopMonitoringNotify(logStashEvent, message, notify)
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	t := smb.Clock().Now()
+
 	err := smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(notify)
+	message.ProcessingTime = smb.Clock().Since(t).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
 		event := smb.newLogStashEvent()
 		logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
 		audit.CurrentLogStash().WriteEvent(event)
+	}
+
+	audit.CurrentBigQuery().WriteEvent(message)
+}
+
+func (smb *SMBroadcaster) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "NotifyStopMonitoring",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(smb.connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 
@@ -298,7 +311,7 @@ func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, notification *siri.SIRINotifyStopMonitoring) {
+func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
 	monitoringRefs := []string{}
 	cancelledMonitoringRefs := []string{}
 
@@ -311,39 +324,34 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, notification
 		}
 	}
 
+	message.RequestIdentifier = notification.RequestMessageRef
+	message.ResponseIdentifier = notification.ResponseMessageIdentifier
+	message.StopAreas = append(monitoringRefs, cancelledMonitoringRefs...)
+
 	logStashEvent["siriType"] = "NotifyStopMonitoring"
 	logStashEvent["producerRef"] = notification.ProducerRef
 	logStashEvent["requestMessageRef"] = notification.RequestMessageRef
 	logStashEvent["responseMessageIdentifier"] = notification.ResponseMessageIdentifier
 	logStashEvent["responseTimestamp"] = notification.ResponseTimestamp.String()
-	logStashEvent["subscriberRef"] = notification.Deliveries[0].SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = notification.Deliveries[0].SubscriptionIdentifier
+
 	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["cancelledMonitoringRefs"] = strings.Join(cancelledMonitoringRefs, ",")
-	logStashEvent["status"] = "true"
-
-	xml, err := notification.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
-}
-
-func logSIRINotMonitoredNotify(logStashEvent audit.LogStashEvent, notification *siri.SIRINotifyStopMonitoring) {
-	logStashEvent["siriType"] = "NotifyStopMonitoring"
-	logStashEvent["producerRef"] = notification.ProducerRef
-	logStashEvent["requestMessageRef"] = notification.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = notification.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = notification.ResponseTimestamp.String()
 
 	delivery := notification.Deliveries[0]
+
+	message.SubscriptionIdentifiers = []string{delivery.SubscriptionIdentifier}
+
 	logStashEvent["subscriberRef"] = delivery.SubscriberRef
 	logStashEvent["subscriptionIdentifier"] = delivery.SubscriptionIdentifier
 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
-	logStashEvent["errorType"] = delivery.ErrorType
-	logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
-	logStashEvent["errorText"] = delivery.ErrorText
+	if !delivery.Status {
+		message.Status = "Error"
+		message.ErrorDetails = delivery.ErrorString()
+
+		logStashEvent["errorType"] = delivery.ErrorType
+		logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
+		logStashEvent["errorText"] = delivery.ErrorText
+	}
 
 	xml, err := notification.BuildXML()
 	if err != nil {
@@ -351,4 +359,6 @@ func logSIRINotMonitoredNotify(logStashEvent audit.LogStashEvent, notification *
 		return
 	}
 	logStashEvent["responseXML"] = xml
+	message.ResponseRawMessage = xml
+	message.ResponseSize = int64(len(xml))
 }
