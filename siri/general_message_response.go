@@ -162,6 +162,17 @@ func NewXMLMessage(node XMLNode) *XMLMessage {
 	return message
 }
 
+func (response *XMLGeneralMessageResponse) ErrorString() string {
+	return fmt.Sprintf("%v: %v", response.errorType(), response.ErrorText())
+}
+
+func (response *XMLGeneralMessageResponse) errorType() string {
+	if response.ErrorType() == "OtherError" {
+		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
+	}
+	return response.ErrorType()
+}
+
 func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
 	if len(response.xmlGeneralMessages) == 0 {
 		nodes := response.findNodes("GeneralMessage")

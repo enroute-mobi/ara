@@ -41,6 +41,9 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	message := connector.newBQEvent()
+	defer audit.CurrentBigQuery().WriteEvent(message)
+
 	startTime := connector.Clock().Now()
 
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
@@ -54,9 +57,11 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	case SITUATION_UPDATE_REQUEST_LINE:
 		siriGeneralMessageRequest.LineRef = []string{requestedId}
 		logStashEvent["lineRef"] = requestedId
+		message.Lines = []string{requestedId}
 	case SITUATION_UPDATE_REQUEST_STOP_AREA:
 		siriGeneralMessageRequest.StopPointRef = []string{requestedId}
 		logStashEvent["stopPointRef"] = requestedId
+		message.StopAreas = []string{requestedId}
 	}
 
 	// Check the request version
@@ -64,17 +69,22 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 		siriGeneralMessageRequest.XsdInWsdl = true
 	}
 
-	logSIRIGeneralMessageRequest(logStashEvent, siriGeneralMessageRequest)
+	logSIRIGeneralMessageRequest(logStashEvent, message, siriGeneralMessageRequest)
 
 	xmlGeneralMessageResponse, err := connector.SIRIPartner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
+		e := fmt.Sprintf("Error during GetGeneralMessage: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during GetGeneralMessage: %v", err)
+		logStashEvent["errorDescription"] = e
+
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
 
-	logXMLGeneralMessageResponse(logStashEvent, xmlGeneralMessageResponse)
+	logXMLGeneralMessageResponse(logStashEvent, message, xmlGeneralMessageResponse)
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
 	connector.setSituationUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
 
@@ -96,6 +106,16 @@ func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEve
 	}
 }
 
+func (connector *SIRIGeneralMessageRequestCollector) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "GeneralMessageRequest",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(connector.partner.Slug()),
+		Status:    "OK",
+	}
+}
+
 func (connector *SIRIGeneralMessageRequestCollector) newLogStashEvent() audit.LogStashEvent {
 	event := connector.partner.NewLogStashEvent()
 	event["connector"] = "GeneralMessageRequestCollector"
@@ -113,7 +133,7 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIGeneralMessageRequestCollector(partner)
 }
 
-func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGetGeneralMessageRequest) {
+func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRIGetGeneralMessageRequest) {
 	logStashEvent["siriType"] = "GeneralMessageRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -124,9 +144,15 @@ func logSIRIGeneralMessageRequest(logStashEvent audit.LogStashEvent, request *si
 		return
 	}
 	logStashEvent["requestXML"] = xml
+
+	message.RequestIdentifier = request.MessageIdentifier
+	message.RequestRawMessage = xml
+	message.RequestSize = int64(len(xml))
 }
 
-func logXMLGeneralMessageResponse(logStashEvent audit.LogStashEvent, response *siri.XMLGeneralMessageResponse) {
+func logXMLGeneralMessageResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLGeneralMessageResponse) {
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
+
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
@@ -134,12 +160,16 @@ func logXMLGeneralMessageResponse(logStashEvent audit.LogStashEvent, response *s
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 	if !response.Status() {
+		message.Status = "Error"
 		logStashEvent["errorType"] = response.ErrorType()
 		if response.ErrorType() == "OtherError" {
 			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
 		}
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
+		message.ErrorDetails = response.ErrorString()
 	}
 	logStashEvent["responseXML"] = response.RawXML()
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
 }
