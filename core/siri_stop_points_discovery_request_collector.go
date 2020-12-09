@@ -59,9 +59,12 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) broadcastUpdateEvent(e
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	logStashEvent := connector.newLogStashEvent()
-	startTime := connector.Clock().Now()
-
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	message := connector.newBQEvent()
+	defer audit.CurrentBigQuery().WriteEvent(message)
+
+	startTime := connector.Clock().Now()
 
 	request := &siri.SIRIStopPointsDiscoveryRequest{
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
@@ -69,17 +72,22 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 		RequestTimestamp:  startTime,
 	}
 
-	logSIRIStopPointsDiscoveryRequest(logStashEvent, request)
+	logSIRIStopPointsDiscoveryRequest(logStashEvent, message, request)
 
 	response, err := connector.SIRIPartner().SOAPClient().StopDiscovery(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
+		e := fmt.Sprintf("Error during StopDiscovery: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during StopDiscovery: %v", err)
+		logStashEvent["errorDescription"] = e
+
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
 
-	logXMLStopPointsDiscoveryResponse(logStashEvent, response)
+	logXMLStopPointsDiscoveryResponse(logStashEvent, message, response)
 
 	if !response.Status() {
 		return
@@ -102,6 +110,17 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	logStashEvent["stopPointRefs"] = strings.Join(stopPointRefs, ",")
+	message.StopAreas = stopPointRefs
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestCollector) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "StopDiscoveryRequest",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(connector.partner.Slug()),
+		Status:    "OK",
+	}
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) newLogStashEvent() audit.LogStashEvent {
@@ -110,7 +129,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) newLogStashEvent() aud
 	return event
 }
 
-func logSIRIStopPointsDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopPointsDiscoveryRequest) {
+func logSIRIStopPointsDiscoveryRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRIStopPointsDiscoveryRequest) {
 	logStashEvent["siriType"] = "StopPointsDiscoveryRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -121,18 +140,27 @@ func logSIRIStopPointsDiscoveryRequest(logStashEvent audit.LogStashEvent, reques
 		return
 	}
 	logStashEvent["requestXML"] = xml
+
+	message.RequestIdentifier = request.MessageIdentifier
+	message.RequestRawMessage = xml
+	message.RequestSize = int64(len(xml))
 }
 
-func logXMLStopPointsDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.XMLStopPointsDiscoveryResponse) {
+func logXMLStopPointsDiscoveryResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLStopPointsDiscoveryResponse) {
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["responseXML"] = response.RawXML()
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 	if !response.Status() {
+		message.Status = "Error"
 		logStashEvent["errorType"] = response.ErrorType()
 		if response.ErrorType() == "OtherError" {
 			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
 		}
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
+		message.ErrorDetails = response.ErrorString()
 	}
+
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
 }
