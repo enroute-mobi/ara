@@ -199,37 +199,38 @@ func (manager *MemoryLines) New() Line {
 
 func (manager *MemoryLines) Find(id LineId) (Line, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	line, ok := manager.byIdentifier[id]
 	if ok {
+		manager.mutex.RUnlock()
 		return *line, true
 	} else {
+		manager.mutex.RUnlock()
 		return Line{}, false
 	}
 }
 
 func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
+		manager.mutex.RUnlock()
 		return *manager.byIdentifier[LineId(id)], true
 	}
+
+	manager.mutex.RUnlock()
 	return Line{}, false
 }
 
 func (manager *MemoryLines) FindAll() (lines []Line) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
-	if len(manager.byIdentifier) == 0 {
-		return []Line{}
-	}
 	for _, line := range manager.byIdentifier {
 		lines = append(lines, *line)
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 

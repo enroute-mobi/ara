@@ -261,68 +261,65 @@ func (manager *MemoryStopAreas) New() StopArea {
 }
 
 func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
-	if id == "" {
-		return StopArea{}, false
-	}
-
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	stopArea, ok := manager.byIdentifier[id]
 	if ok {
+		manager.mutex.RUnlock()
 		return *(stopArea.copy()), true
 	} else {
+		manager.mutex.RUnlock()
 		return StopArea{}, false
 	}
 }
 
 func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
+		manager.mutex.RUnlock()
 		return *manager.byIdentifier[StopAreaId(id)], true
 	}
+
+	manager.mutex.RUnlock()
 	return StopArea{}, false
 }
 
 func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []StopArea) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	for _, stopArea := range manager.byIdentifier {
 		if stopArea.LineIds.Contains(id) {
 			stopAreas = append(stopAreas, *(stopArea.copy()))
 		}
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
 func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAreaId) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	for _, stopArea := range manager.byIdentifier {
 		if _, ok := stopArea.Origins.Origin(origin); ok {
 			stopAreas = append(stopAreas, stopArea.Id())
 		}
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
 func (manager *MemoryStopAreas) FindAll() (stopAreas []StopArea) {
 	manager.mutex.RLock()
 
-	if len(manager.byIdentifier) == 0 {
-		manager.mutex.RUnlock()
-		return
-	}
 	for _, stopArea := range manager.byIdentifier {
 		stopAreas = append(stopAreas, *(stopArea.copy()))
 	}
-	manager.mutex.RUnlock()
 
+	manager.mutex.RUnlock()
 	return
 }
 
