@@ -11,11 +11,6 @@ import (
 
 type LineId ModelId
 
-type LineAttributes struct {
-	ObjectId ObjectID
-	Name     string
-}
-
 type Line struct {
 	ObjectIDConsumer
 	model  Model

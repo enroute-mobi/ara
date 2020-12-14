@@ -21,18 +21,18 @@ end
 
 When(/^the StopVisit "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
   RestClient.put stop_visit_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  # Kernel.puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
 
 Then(/^the StopVisit "([^"]*)" has the following attributes:$/) do |identifier, attributes|
-  # puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  # Kernel.puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response = RestClient.get stop_visit_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
   stopVisitAttributes = api_attributes(response.body)
   expect(stopVisitAttributes).to include(model_attributes(attributes))
 end
 
 Then(/^one StopVisit has the following attributes:$/) do |attributes|
-  # puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  # Kernel.puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response = RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = JSON.parse(response.body)
 

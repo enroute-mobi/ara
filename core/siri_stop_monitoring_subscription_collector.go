@@ -30,7 +30,7 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 	siriConnector
 
 	stopMonitoringSubscriber SIRIStopMonitoringSubscriber
-	stopAreaUpdateSubscriber StopAreaUpdateSubscriber
+	updateSubscriber         UpdateSubscriber
 }
 
 type SIRIStopMonitoringSubscriptionCollectorFactory struct{}
@@ -51,7 +51,7 @@ func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonit
 	connector := &SIRIStopMonitoringSubscriptionCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.stopAreaUpdateSubscriber = manager.BroadcastLegacyStopAreaUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.stopMonitoringSubscriber = NewSIRIStopMonitoringSubscriber(connector)
 
 	return connector
@@ -112,13 +112,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopAreaUpdateSubscriber(stopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
-	connector.stopAreaUpdateSubscriber = stopAreaUpdateSubscriber
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
-	if connector.stopAreaUpdateSubscriber != nil {
-		connector.stopAreaUpdateSubscriber(event)
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvent(event model.UpdateEvent) {
+	if connector.updateSubscriber != nil {
+		connector.updateSubscriber(event)
 	}
 }
 
@@ -131,7 +127,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	logXMLNotifyStopMonitoring(logStashEvent, notify)
 
-	stopAreaUpdateEvents := make(map[string]*model.LegacyStopAreaUpdateEvent)
 	for _, delivery := range notify.StopMonitoringDeliveries() {
 		if connector.Partner().LogSubscriptionStopMonitoringDeliveries() {
 			deliveryLogStashEvent := connector.newLogStashEvent()
@@ -142,7 +137,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		subscriptionId := delivery.SubscriptionRef()
 
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
-
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
@@ -163,12 +157,17 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			originStopAreaObjectId = model.NewObjectID(connector.Partner().Setting(REMOTE_OBJECTID_KIND), delivery.MonitoringRef())
 		}
 
-		tx := connector.Partner().Referential().NewTransaction()
+		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaObjectId)
+		builder.SetUpdateEvents(delivery.XMLMonitoredStopVisits())
+		builder.SetStopVisitCancellationEvents(delivery)
+		updateEvents := builder.UpdateEvents()
 
-		connector.setLegacyStopVisitUpdateEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap, originStopAreaObjectId)
-		connector.setStopVisitCancellationEvents(stopAreaUpdateEvents, delivery, tx, monitoringRefMap)
+		// Copy MonitoringRefs for global log
+		for k, _ := range updateEvents.MonitoringRefs {
+			monitoringRefMap[k] = struct{}{}
+		}
 
-		tx.Close()
+		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
 	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
@@ -178,10 +177,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 
 	for subId := range subToDelete {
 		connector.cancelSubscription(subId)
-	}
-
-	for _, event := range stopAreaUpdateEvents {
-		connector.broadcastLegacyStopAreaUpdateEvent(event)
 	}
 }
 
@@ -209,48 +204,26 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(logStashEvent, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) setLegacyStopVisitUpdateEvents(events map[string]*model.LegacyStopAreaUpdateEvent, xmlResponse *siri.XMLNotifyStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}, originStopAreaObjectId model.ObjectID) {
-	xmlStopVisitEvents := xmlResponse.XMLMonitoredStopVisits()
-	if len(xmlStopVisitEvents) == 0 {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
+	if connector.updateSubscriber == nil {
 		return
 	}
-
-	builder := newLegacyStopVisitUpdateEventBuilder(connector.partner, originStopAreaObjectId)
-	builder.setLegacyStopVisitUpdateEvents(events, xmlStopVisitEvents)
-
-	for _, update := range events {
-		monitoringRefMap[update.StopAreaAttributes.ObjectId.Value()] = struct{}{}
-		update.SetId(connector.NewUUID())
-		sa, _ := tx.Model().StopAreas().FindByObjectId(update.StopAreaAttributes.ObjectId)
-		update.StopAreaId = sa.Id()
+	for _, e := range events.StopAreas {
+		connector.updateSubscriber(e)
 	}
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) setStopVisitCancellationEvents(events map[string]*model.LegacyStopAreaUpdateEvent, xmlResponse *siri.XMLNotifyStopMonitoringDelivery, tx *model.Transaction, monitoringRefMap map[string]struct{}) {
-	xmlStopVisitCancellationEvents := xmlResponse.XMLMonitoredStopVisitCancellations()
-	if len(xmlStopVisitCancellationEvents) == 0 {
-		return
+	for _, e := range events.Lines {
+		connector.updateSubscriber(e)
 	}
-
-	for _, xmlStopVisitCancellationEvent := range xmlStopVisitCancellationEvents {
-		monitoringRefMap[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
-
-		stopAreaObjectId := model.NewObjectID(connector.Partner().Setting(REMOTE_OBJECTID_KIND), xmlStopVisitCancellationEvent.MonitoringRef())
-		stopArea, ok := tx.Model().StopAreas().FindByObjectId(stopAreaObjectId)
-		if !ok {
-			logger.Log.Debugf("StopVisitCancellationEvent for unknown StopArea %v", stopAreaObjectId.Value())
-			continue
+	for _, e := range events.VehicleJourneys {
+		connector.updateSubscriber(e)
+	}
+	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
+		for _, e := range es {
+			connector.updateSubscriber(e)
 		}
-
-		stopAreaUpdateEvent, ok := events[xmlStopVisitCancellationEvent.MonitoringRef()]
-		if !ok {
-			stopAreaUpdateEvent = model.NewLegacyStopAreaUpdateEvent(connector.NewUUID(), stopArea.Id())
-			events[xmlStopVisitCancellationEvent.MonitoringRef()] = stopAreaUpdateEvent
-		}
-		stopVisitCancellationEvent := &model.StopVisitNotCollectedEvent{
-			StopVisitObjectId: model.NewObjectID(connector.partner.Setting(REMOTE_OBJECTID_KIND), xmlStopVisitCancellationEvent.ItemRef()),
-		}
-		stopAreaUpdateEvent.StopVisitNotCollectedEvents = append(stopAreaUpdateEvent.StopVisitNotCollectedEvents, stopVisitCancellationEvent)
+	}
+	for _, e := range events.Cancellations {
+		connector.updateSubscriber(e)
 	}
 }
 

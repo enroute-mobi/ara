@@ -8,7 +8,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-type StopAreaUpdateSubscriber func(*model.LegacyStopAreaUpdateEvent)
 type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
 type UpdateSubscriber func(model.UpdateEvent)
 
@@ -16,11 +15,6 @@ type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
 	UpdateStopArea(request *StopAreaUpdateRequest)
 
-	// Legacy
-	HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber)
-	BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent)
-
-	// New update events
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
 
@@ -32,7 +26,6 @@ type CollectManagerInterface interface {
 type CollectManager struct {
 	uuid.UUIDConsumer
 
-	StopAreaUpdateSubscribers  []StopAreaUpdateSubscriber
 	SituationUpdateSubscribers []SituationUpdateSubscriber
 	UpdateSubscribers          []UpdateSubscriber
 	referential                *Referential
@@ -40,10 +33,8 @@ type CollectManager struct {
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
 type TestCollectManager struct {
-	Done            chan bool
-	Events          []*model.LegacyStopAreaUpdateEvent
-	StopVisitEvents []*model.LegacyStopVisitUpdateEvent
-	UpdateEvents    []model.UpdateEvent
+	Done         chan bool
+	UpdateEvents []model.UpdateEvent
 }
 
 func NewTestCollectManager() CollectManagerInterface {
@@ -53,23 +44,17 @@ func NewTestCollectManager() CollectManagerInterface {
 }
 
 func (manager *TestCollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
-	event := &model.LegacyStopAreaUpdateEvent{}
-	manager.Events = append(manager.Events, event)
+	event := &model.StopAreaUpdateEvent{}
+	manager.UpdateEvents = append(manager.UpdateEvents, event)
 
 	manager.Done <- true
 }
 
-func (manager *TestCollectManager) TestStopAreaUpdateSubscriber(event *model.LegacyStopAreaUpdateEvent) {
-	manager.StopVisitEvents = append(manager.StopVisitEvents, event.LegacyStopVisitUpdateEvents...)
+func (manager *TestCollectManager) TestUpdateSubscriber(event model.UpdateEvent) {
+	manager.UpdateEvents = append(manager.UpdateEvents, event)
 }
 
 func (manager *TestCollectManager) HandlePartnerStatusChange(partner string, status bool) {}
-
-// Legacy
-func (manager *TestCollectManager) HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber) {}
-func (manager *TestCollectManager) BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
-	manager.Events = append(manager.Events, event)
-}
 
 // New structure
 func (manager *TestCollectManager) HandleUpdateEvent(UpdateSubscriber) {}
@@ -87,19 +72,8 @@ func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.
 func NewCollectManager(referential *Referential) CollectManagerInterface {
 	return &CollectManager{
 		referential:                referential,
-		StopAreaUpdateSubscribers:  make([]StopAreaUpdateSubscriber, 0),
 		SituationUpdateSubscribers: make([]SituationUpdateSubscriber, 0),
 		UpdateSubscribers:          make([]UpdateSubscriber, 0),
-	}
-}
-
-func (manager *CollectManager) HandleLegacyStopAreaUpdateEvent(StopAreaUpdateSubscriber StopAreaUpdateSubscriber) {
-	manager.StopAreaUpdateSubscribers = append(manager.StopAreaUpdateSubscribers, StopAreaUpdateSubscriber)
-}
-
-func (manager *CollectManager) BroadcastLegacyStopAreaUpdateEvent(event *model.LegacyStopAreaUpdateEvent) {
-	for _, StopAreaUpdateSubscriber := range manager.StopAreaUpdateSubscribers {
-		StopAreaUpdateSubscriber(event)
 	}
 }
 
@@ -115,8 +89,8 @@ func (manager *CollectManager) BroadcastUpdateEvent(event model.UpdateEvent) {
 
 func (manager *CollectManager) HandlePartnerStatusChange(partner string, status bool) {
 	for _, stopAreaId := range manager.referential.Model().StopAreas().FindByOrigin(partner) {
-		event := model.NewStopAreaMonitoredEvent(manager.NewUUID(), stopAreaId, partner, status)
-		manager.BroadcastLegacyStopAreaUpdateEvent(event)
+		event := model.NewStatusUpdateEvent(stopAreaId, partner, status)
+		manager.BroadcastUpdateEvent(event)
 	}
 }
 

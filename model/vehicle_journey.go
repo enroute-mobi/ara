@@ -10,15 +10,6 @@ import (
 
 type VehicleJourneyId ModelId
 
-type VehicleJourneyAttributes struct {
-	ObjectId     ObjectID
-	LineObjectId ObjectID
-	Monitored    bool
-
-	Attributes Attributes
-	References References
-}
-
 type VehicleJourney struct {
 	ObjectIDConsumer
 

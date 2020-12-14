@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/civil"
 )
@@ -187,11 +188,19 @@ func (manager *MemoryVehicles) FindAll() (vehicles []Vehicle) {
 }
 
 func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
-	if vehicle.Id() == "" {
-		vehicle.id = VehicleId(manager.NewUUID())
-	}
-
 	manager.mutex.Lock()
+
+	if vehicle.id == "" {
+		vehicle.id = VehicleId(manager.NewUUID())
+		manager.sendBQMessage(vehicle)
+	} else if v, ok := manager.byIdentifier[vehicle.Id()]; ok {
+		r, err := Equal(v, vehicle)
+		if err != nil {
+			logger.Log.Debugf("Error while comparing two vehicles: %v", err)
+		} else if !r.Equal {
+			manager.sendBQMessage(vehicle)
+		}
+	}
 
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
@@ -199,18 +208,20 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 
 	manager.mutex.Unlock()
 
+	return true
+}
+
+func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 	vehicleEvent := &audit.BigQueryVehicleEvent{
 		Timestamp:      manager.Clock().Now(),
-		ID:             string(vehicle.id),
-		ObjectIDs:      vehicle.ObjectIDSlice(),
-		Longitude:      vehicle.Longitude,
-		Latitude:       vehicle.Latitude,
-		Bearing:        vehicle.Bearing,
-		RecordedAtTime: civil.DateTimeOf(vehicle.RecordedAtTime),
+		ID:             string(v.id),
+		ObjectIDs:      v.ObjectIDSlice(),
+		Longitude:      v.Longitude,
+		Latitude:       v.Latitude,
+		Bearing:        v.Bearing,
+		RecordedAtTime: civil.DateTimeOf(v.RecordedAtTime),
 	}
 	audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
-
-	return true
 }
 
 func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {

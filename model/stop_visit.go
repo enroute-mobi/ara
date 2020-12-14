@@ -19,23 +19,6 @@ var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{
 
 type StopVisitId ModelId
 
-type StopVisitAttributes struct {
-	ObjectId         ObjectID
-	StopAreaObjectId ObjectID
-
-	VehicleJourneyObjectId ObjectID
-	PassageOrder           int
-
-	ArrivalStatus   StopVisitArrivalStatus
-	DepartureStatus StopVisitDepartureStatus
-	RecordedAt      time.Time
-	Schedules       StopVisitSchedules
-	VehicleAtStop   bool
-
-	Attributes Attributes
-	References References
-}
-
 type StopVisit struct {
 	ObjectIDConsumer
 
@@ -88,6 +71,8 @@ func (stopVisit *StopVisit) IsCollected() bool {
 
 func (stopVisit *StopVisit) NotCollected() {
 	stopVisit.collected = false
+	stopVisit.ArrivalStatus = STOP_VISIT_ARRIVAL_CANCELLED
+	stopVisit.DepartureStatus = STOP_VISIT_DEPARTURE_DEPARTED
 }
 
 func (stopVisit *StopVisit) CollectedAt() time.Time {
@@ -266,6 +251,7 @@ type StopVisits interface {
 	FindByVehicleJourneyId(VehicleJourneyId) []StopVisit
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []StopVisit
 	FindByStopAreaId(StopAreaId) []StopVisit
+	FindMonitoredByOriginByStopAreaId(StopAreaId, string) []StopVisit
 	FindFollowingByStopAreaId(StopAreaId) []StopVisit
 	FindFollowingByStopAreaIds([]StopAreaId) []StopVisit
 	FindAll() []StopVisit
@@ -360,7 +346,20 @@ func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []S
 		stopVisits = append(stopVisits, *(sv.copy()))
 	}
 
-	defer manager.mutex.RUnlock()
+	manager.mutex.RUnlock()
+	return
+}
+
+func (manager *MemoryStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId, origin string) (stopVisits []StopVisit) {
+	manager.mutex.RLock()
+
+	for _, stopVisit := range manager.byIdentifier {
+		if stopVisit.StopAreaId == id && stopVisit.collected && stopVisit.Origin == origin {
+			stopVisits = append(stopVisits, *(stopVisit.copy()))
+		}
+	}
+
+	manager.mutex.RUnlock()
 	return
 }
 

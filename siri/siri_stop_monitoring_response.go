@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type SIRIStopMonitoringResponse struct {
@@ -73,7 +72,7 @@ type SIRIMonitoredStopVisit struct {
 	Attributes map[string]map[string]string
 
 	// Références
-	References map[string]map[string]model.Reference
+	References map[string]map[string]string
 }
 
 func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {

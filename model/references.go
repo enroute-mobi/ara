@@ -18,6 +18,17 @@ func (references *References) GetReferences() map[string]Reference {
 	return references.ref
 }
 
+func (references *References) GetSiriReferences() map[string]string {
+	sref := make(map[string]string)
+
+	references.mutex.RLock()
+	for k, v := range references.ref {
+		sref[k] = v.ObjectId.Value()
+	}
+	references.mutex.RUnlock()
+	return sref
+}
+
 func (references *References) SetReference(key string, r Reference) {
 	references.mutex.Lock()
 	defer references.mutex.Unlock()
