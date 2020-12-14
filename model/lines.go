@@ -42,6 +42,13 @@ func (line *Line) modelId() ModelId {
 	return ModelId(line.id)
 }
 
+func (line *Line) copy() *Line {
+	l := line
+	l.Attributes = line.Attributes.Copy()
+	l.References = line.References.Copy()
+	return &l
+}
+
 func (line *Line) Id() LineId {
 	return line.id
 }
@@ -198,7 +205,7 @@ func (manager *MemoryLines) Find(id LineId) (Line, bool) {
 	line, ok := manager.byIdentifier[id]
 	if ok {
 		manager.mutex.RUnlock()
-		return *line, true
+		return *(line.copy()), true
 	} else {
 		manager.mutex.RUnlock()
 		return Line{}, false
@@ -207,14 +214,13 @@ func (manager *MemoryLines) Find(id LineId) (Line, bool) {
 
 func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
 	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		manager.mutex.RUnlock()
-		return *manager.byIdentifier[LineId(id)], true
+		return *(manager.byIdentifier[LineId(id)].copy()), true
 	}
 
-	manager.mutex.RUnlock()
 	return Line{}, false
 }
 
@@ -222,7 +228,7 @@ func (manager *MemoryLines) FindAll() (lines []Line) {
 	manager.mutex.RLock()
 
 	for _, line := range manager.byIdentifier {
-		lines = append(lines, *line)
+		lines = append(lines, *(line.copy()))
 	}
 
 	manager.mutex.RUnlock()

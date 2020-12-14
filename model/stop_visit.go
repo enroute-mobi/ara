@@ -61,6 +61,7 @@ func (stopVisit *StopVisit) modelId() ModelId {
 func (stopVisit *StopVisit) copy() *StopVisit {
 	s := *stopVisit
 	s.Attributes = stopVisit.Attributes.Copy()
+	s.References = stopVisit.References.Copy()
 	s.Schedules = *(stopVisit.Schedules.Copy())
 	return &s
 }
@@ -294,14 +295,13 @@ func (manager *MemoryStopVisits) Find(id StopVisitId) (StopVisit, bool) {
 
 func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
 	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		manager.mutex.RUnlock()
-		return *manager.byIdentifier[StopVisitId(id)], true
+		return *(manager.byIdentifier[StopVisitId(id)].copy()), true
 	}
 
-	manager.mutex.RUnlock()
 	return StopVisit{}, false
 }
 

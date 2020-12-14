@@ -43,6 +43,13 @@ func (vehicleJourney *VehicleJourney) modelId() ModelId {
 	return ModelId(vehicleJourney.id)
 }
 
+func (vehicleJourney *VehicleJourney) copy() *VehicleJourney {
+	vj := *vehicleJourney
+	vj.Attributes = vehicleJourney.Attributes.Copy()
+	vj.References = vehicleJourney.References.Copy()
+	return &vj
+}
+
 func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
 }
@@ -182,7 +189,7 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney,
 	vehicleJourney, ok := manager.byIdentifier[id]
 	if ok {
 		manager.mutex.RUnlock()
-		return *vehicleJourney, true
+		return *(vehicleJourney.copy()), true
 	} else {
 		manager.mutex.RUnlock()
 		return VehicleJourney{}, false
@@ -191,14 +198,13 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney,
 
 func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (VehicleJourney, bool) {
 	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		manager.mutex.RUnlock()
-		return *manager.byIdentifier[VehicleJourneyId(id)], true
+		return *(manager.byIdentifier[VehicleJourneyId(id)].copy()), true
 	}
 
-	manager.mutex.RUnlock()
 	return VehicleJourney{}, false
 }
 
@@ -209,7 +215,7 @@ func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys [
 
 	for _, id := range ids {
 		vj, _ := manager.byIdentifier[VehicleJourneyId(id)]
-		vehicleJourneys = append(vehicleJourneys, *vj)
+		vehicleJourneys = append(vehicleJourneys, *(vj.copy()))
 	}
 
 	manager.mutex.RUnlock()
@@ -220,7 +226,7 @@ func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourne
 	manager.mutex.RLock()
 
 	for _, vehicleJourney := range manager.byIdentifier {
-		vehicleJourneys = append(vehicleJourneys, *vehicleJourney)
+		vehicleJourneys = append(vehicleJourneys, *(vehicleJourney.copy()))
 	}
 
 	manager.mutex.RUnlock()

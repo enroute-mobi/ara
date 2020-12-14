@@ -60,6 +60,8 @@ func (stopArea *StopArea) modelId() ModelId {
 func (stopArea *StopArea) copy() *StopArea {
 	s := *stopArea
 	s.Origins = *(stopArea.Origins.Copy())
+	s.Attributes = stopArea.Attributes.Copy()
+	s.References = stopArea.References.Copy()
 	return &s
 }
 
@@ -273,14 +275,13 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (StopArea, bool) {
 
 func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (StopArea, bool) {
 	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		manager.mutex.RUnlock()
-		return *manager.byIdentifier[StopAreaId(id)], true
+		return *(manager.byIdentifier[StopAreaId(id)].copy()), true
 	}
 
-	manager.mutex.RUnlock()
 	return StopArea{}, false
 }
 
