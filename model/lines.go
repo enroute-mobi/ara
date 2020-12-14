@@ -43,7 +43,7 @@ func (line *Line) modelId() ModelId {
 }
 
 func (line *Line) copy() *Line {
-	l := line
+	l := *line
 	l.Attributes = line.Attributes.Copy()
 	l.References = line.References.Copy()
 	return &l
