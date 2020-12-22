@@ -9,7 +9,9 @@ import (
 	"strconv"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
@@ -49,12 +51,12 @@ type Referential struct {
 type Referentials interface {
 	state.Startable
 
-	New(slug ReferentialSlug) *Referential
-	Find(id ReferentialId) *Referential
-	FindBySlug(slug ReferentialSlug) *Referential
+	New(ReferentialSlug) *Referential
+	Find(ReferentialId) *Referential
+	FindBySlug(ReferentialSlug) *Referential
 	FindAll() []*Referential
-	Save(stopArea *Referential) bool
-	Delete(stopArea *Referential) bool
+	Save(*Referential) bool
+	Delete(*Referential) bool
 	Load() error
 	SaveToDatabase() (int, error)
 }
@@ -146,6 +148,13 @@ func (referential *Referential) DatabaseOrganisationId() sql.NullString {
 func (referential *Referential) Start() {
 	referential.startedAt = referential.Clock().Now()
 
+	// Configure BigQuery
+	if config.Config.ValidBQConfig() {
+		dataset := fmt.Sprintf("%v_%v", config.Config.BigQueryDatasetPrefix, referential.slug)
+		audit.SetCurrentBigQuery(string(referential.slug), audit.NewBigQueryClient(config.Config.BigQueryProjectID, dataset))
+		audit.CurrentBigQuery(string(referential.slug)).Start()
+	}
+
 	referential.partners.Start()
 	referential.modelGuardian.Start()
 
@@ -161,6 +170,7 @@ func (referential *Referential) Stop() {
 	referential.partners.Stop()
 	referential.modelGuardian.Stop()
 	referential.broacasterManager.Stop()
+	audit.CurrentBigQuery(string(referential.slug)).Stop()
 }
 
 func (referential *Referential) Save() (ok bool) {
@@ -280,17 +290,12 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
-	referential := manager.new()
-	referential.slug = slug
-	return referential
-}
-
-func (manager *MemoryReferentials) new() *Referential {
-	model := model.NewMemoryModel()
+	model := model.NewMemoryModel(string(slug))
 
 	referential := &Referential{
 		manager:  manager,
 		model:    model,
+		slug:     slug,
 		Settings: make(map[string]string),
 	}
 
@@ -336,6 +341,7 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 		referential.id = ReferentialId(manager.NewUUID())
 	}
 	referential.manager = manager
+	referential.model.SetReferential(string(referential.slug))
 	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential))
 	referential.collectManager.HandleUpdateEvent(model.NewUpdateManager(referential))
 	manager.byId[referential.id] = referential
@@ -355,9 +361,8 @@ func (manager *MemoryReferentials) Load() error {
 	}
 
 	for _, r := range selectReferentials {
-		referential := manager.new()
+		referential := manager.New(ReferentialSlug(r.Slug))
 		referential.id = ReferentialId(r.ReferentialId)
-		referential.slug = ReferentialSlug(r.Slug)
 
 		if r.OrganisationId.Valid {
 			referential.OrganisationId = r.OrganisationId.String

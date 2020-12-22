@@ -15,6 +15,7 @@ type ModelInstance interface {
 
 type Model interface {
 	Date() Date
+	Referential() string
 	Lines() Lines
 	Situations() Situations
 	StopAreas() StopAreas
@@ -25,7 +26,8 @@ type Model interface {
 }
 
 type MemoryModel struct {
-	date Date
+	date        Date
+	referential string
 
 	stopAreas       *MemoryStopAreas
 	stopVisits      *MemoryStopVisits
@@ -39,10 +41,15 @@ type MemoryModel struct {
 	GMEventsChan chan GeneralMessageBroadcastEvent
 }
 
-func NewMemoryModel() *MemoryModel {
-	model := &MemoryModel{}
+// Optionnal argument for tests
+func NewMemoryModel(referential ...string) *MemoryModel {
+	model := &MemoryModel{
+		date: NewDate(clock.DefaultClock().Now()),
+	}
 
-	model.date = NewDate(clock.DefaultClock().Now())
+	if len(referential) != 0 {
+		model.referential = referential[0]
+	}
 
 	lines := NewMemoryLines()
 	lines.model = model
@@ -84,6 +91,14 @@ func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonit
 
 func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan GeneralMessageBroadcastEvent) {
 	model.GMEventsChan = broadcastGMEventChan
+}
+
+func (model *MemoryModel) Referential() string {
+	return model.referential
+}
+
+func (model *MemoryModel) SetReferential(referential string) {
+	model.referential = referential
 }
 
 func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {

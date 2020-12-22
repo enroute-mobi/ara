@@ -126,7 +126,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	message := connector.newBQMessage()
-	defer audit.CurrentBigQuery().WriteMessage(message)
+	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteMessage(message)
 
 	logStopMonitoringRequest(logStashEvent, message, &request.XMLStopMonitoringRequest)
 	logStashEvent["requestorRef"] = request.RequestorRef()

@@ -212,6 +212,9 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 }
 
 func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
+	if manager.model == nil {
+		return
+	}
 	vehicleEvent := &audit.BigQueryVehicleEvent{
 		Timestamp:      manager.Clock().Now(),
 		ID:             string(v.id),
@@ -221,7 +224,7 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 		Bearing:        v.Bearing,
 		RecordedAtTime: civil.DateTimeOf(v.RecordedAtTime),
 	}
-	audit.CurrentBigQuery().WriteVehicleEvent(vehicleEvent)
+	audit.CurrentBigQuery(manager.model.Referential()).WriteVehicleEvent(vehicleEvent)
 }
 
 func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {

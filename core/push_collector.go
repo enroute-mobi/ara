@@ -75,7 +75,7 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message := pc.newBQMessage(processingTime)
-	audit.CurrentBigQuery().WriteMessage(message)
+	audit.CurrentBigQuery(string(pc.Partner().Referential().Slug())).WriteMessage(message)
 }
 
 func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) {

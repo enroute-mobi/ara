@@ -74,12 +74,6 @@ func main() {
 		audit.CurrentLogStash().Start()
 		defer audit.CurrentLogStash().Stop()
 	}
-	// Configure BigQuery
-	if config.Config.ValidBQConfig() {
-		audit.SetCurrentBigQuery(audit.NewBigQueryClient(config.Config.BigQueryProjectID, config.Config.BigQueryDataset))
-		audit.CurrentBigQuery().Start()
-		defer audit.CurrentBigQuery().Stop()
-	}
 	// Configure Sentry
 	if config.Config.Sentry != "" {
 		err = sentry.Init(sentry.ClientOptions{
@@ -89,6 +83,7 @@ func main() {
 			Debug:       config.Config.Debug,
 		})
 	}
+
 	logger.Log.Debugf("Ara started with a version : %v", version.Value())
 
 	if *uuidPtr {
