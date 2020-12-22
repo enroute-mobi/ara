@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -65,9 +64,6 @@ const (
 	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
 	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
-
-// Validation
-var slugRegexp = regexp.MustCompile(`^[a-z0-9_]+$`)
 
 type PartnerId string
 type PartnerSlug string
@@ -161,8 +157,8 @@ func (partner *APIPartner) Validate() bool {
 	// Check if slug is non null
 	if partner.Slug == "" {
 		partner.Errors.Add("Slug", ERROR_BLANK)
-	} else if !slugRegexp.MatchString(string(partner.Slug)) {
-	  partner.Errors.Add("Slug", ERROR_SLUG_FORMAT)
+	} else if !slugRegexp.MatchString(string(partner.Slug)) { // slugRegexp defined in Referential
+		partner.Errors.Add("Slug", ERROR_SLUG_FORMAT)
 	}
 
 	// Check factories

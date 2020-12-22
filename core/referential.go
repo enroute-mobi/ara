@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -21,6 +22,9 @@ type ReferentialSlug string
 const (
 	REFERENTIAL_SETTING_MODEL_RELOAD_AT = "model.reload_at"
 )
+
+// Validation
+var slugRegexp = regexp.MustCompile(`^[a-z0-9_]+$`)
 
 type Referential struct {
 	clock.ClockConsumer
@@ -77,6 +81,8 @@ func (referential *APIReferential) Validate() bool {
 
 	if referential.Slug == "" {
 		referential.Errors.Add("Slug", ERROR_BLANK)
+	} else if !slugRegexp.MatchString(string(referential.Slug)) {
+		referential.Errors.Add("Slug", ERROR_SLUG_FORMAT)
 	}
 
 	// if len(referential.Tokens) == 0 {
