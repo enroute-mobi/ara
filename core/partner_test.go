@@ -357,6 +357,20 @@ func Test_APIPartner_Validate(t *testing.T) {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
 	}
 
+	// Check wrong format slug
+	apiPartner.Slug = "Wrong_format"
+	valid = apiPartner.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiPartner.Errors) != 1 {
+		t.Errorf("apiPartner Errors should not be empty")
+	}
+	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_SLUG_FORMAT {
+		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
+	}
+
 	// Check Already Used Slug and local_credential
 	partner := partners.New("slug")
 	partner.Settings["local_credential"] = "cred"
@@ -384,7 +398,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 
 	// Check ok
 	apiPartner = &APIPartner{
-		Slug:     "slug2",
+		Slug:     "slug_2",
 		Settings: map[string]string{"local_credential": "cred2"},
 		manager:  partners,
 	}

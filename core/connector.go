@@ -6,6 +6,9 @@ import (
 )
 
 const (
+	SIRI_PARTNER = "siri-partner"
+
+	// Connectors
 	PUSH_COLLECTOR                                    = "push-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR      = "siri-stop-points-discovery-request-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER    = "siri-stop-points-discovery-request-broadcaster"
@@ -34,10 +37,6 @@ const (
 	TEST_STARTABLE_CONNECTOR                          = "test-startable-connector-connector"
 	GTFS_RT_TRIP_UPDATES_BROADCASTER                  = "gtfs-rt-trip-updates-broadcaster"
 	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER             = "gtfs-rt-vehicle-positions-broadcaster"
-)
-
-const (
-	SIRI_PARTNER = "siri-partner"
 )
 
 type Connector interface{}
@@ -137,7 +136,7 @@ type TestValidationFactory struct{}
 type TestValidationConnector struct{}
 
 func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) bool {
-	if apiPartner.Slug == PartnerSlug("InvalidSlug") {
+	if apiPartner.Slug == PartnerSlug("invalid_slug") {
 		apiPartner.Errors.Add("slug", "Invalid format")
 		return false
 	}
