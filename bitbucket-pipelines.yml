@@ -80,6 +80,18 @@ pipelines:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
       - step:
+          name: Deploy to production
+          image: google/cloud-sdk:latest
+          deployment: production
+          trigger: manual
+          script:
+            - git clone $(echo $BITBUCKET_GIT_SSH_ORIGIN | sed 's/.git$/-env.git/') env
+            - env/deploy.sh
+            - pipe: atlassian/datadog-send-event:1.0.1
+              variables:
+                API_KEY: $DATADOG_KEY
+                TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
+      - step:
           name: Build Debian package
           caches:
             - docker
@@ -100,7 +112,7 @@ pipelines:
             - echo "Publish package $PACKAGE_FILE on Gemfury"
             - curl -F package=@$PACKAGE_FILE https://$GEMFURY_TOKEN@push.fury.io/enroute/
       - step:
-          name: Deploy to production
+          name: Deploy to legacy production
           image: google/cloud-sdk:latest
           caches:
             - docker
