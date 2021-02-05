@@ -98,9 +98,10 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	if r := "lId"; tripUpdate.Trip.GetRouteId() != r {
 		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", tripUpdate.Trip.GetRouteId(), r)
 	}
-	if r := "02:10:00"; tripUpdate.Trip.GetStartTime() != r {
-		t.Errorf("Response first Trip Update have incorrect StartTime:\n got: %v\n want: %v", tripUpdate.Trip.GetStartTime(), r)
-	}
+	// ARA-829
+	// if r := "02:10:00"; tripUpdate.Trip.GetStartTime() != r {
+	// 	t.Errorf("Response first Trip Update have incorrect StartTime:\n got: %v\n want: %v", tripUpdate.Trip.GetStartTime(), r)
+	// }
 	if l := len(tripUpdate.StopTimeUpdate); l != 1 {
 		t.Errorf("Response first Trip Update have incorrect number of StopTimeUpdate:\n got: %v\n want: 1", l)
 	}
