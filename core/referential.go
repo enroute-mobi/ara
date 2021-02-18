@@ -210,7 +210,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 }
 
 func (referential *Referential) ReloadModel() {
-	logger.Log.Printf("Reset Model")
+	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
 	referential.model = referential.model.Reload(string(referential.Slug()))
 	referential.setNextReloadAt()

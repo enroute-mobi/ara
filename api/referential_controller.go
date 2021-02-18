@@ -22,6 +22,14 @@ func NewReferentialController(server *Server) ControllerInterface {
 	}
 }
 
+func (controller *ReferentialController) Action(response http.ResponseWriter, requestData *RequestData) {
+	if requestData.Action == "reload" {
+		controller.reload(requestData.Id, response)
+		return
+	}
+	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), http.StatusInternalServerError)
+}
+
 func (controller *ReferentialController) findReferential(identifier string) *core.Referential {
 	referential := controller.server.CurrentReferentials().FindBySlug(core.ReferentialSlug(identifier))
 	if referential != nil {
@@ -130,4 +138,18 @@ func (controller *ReferentialController) Save(response http.ResponseWriter) {
 		jsonBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
 		response.Write(jsonBytes)
 	}
+}
+
+func (controller *ReferentialController) reload(identifier string, response http.ResponseWriter) {
+	referential := controller.findReferential(identifier)
+	if referential == nil {
+		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
+		return
+	}
+
+	logger.Log.Debugf("Reload referential %v from API request", referential.Slug())
+
+	referential.ReloadModel()
+
+	response.WriteHeader(http.StatusOK)
 }
