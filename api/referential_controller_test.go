@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -235,5 +236,70 @@ func Test_ReferentialController_Save(t *testing.T) {
 
 	if r := referentials2.Find(core.ReferentialId(referential.Id())); r == nil {
 		t.Errorf("Loaded Referentials should be found")
+	}
+}
+
+func Test_ReferentialController_Reload(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
+
+	// Insert Data in the test db
+	databaseStopArea := model.DatabaseStopArea{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "1984-04-04",
+		Name:            "stopArea",
+		ObjectIDs:       `{"internal":"value"}`,
+		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
+		Attributes:      "{}",
+		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		CollectedAlways: true,
+		CollectChildren: true,
+	}
+
+	model.Database.AddTableWithName(databaseStopArea, "stop_areas")
+	err := model.Database.Insert(&databaseStopArea)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
+	// Save a new referential
+	referential := referentials.New("referential")
+	referentials.Save(referential)
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+	// Create a request
+	request, err := http.NewRequest("POST", fmt.Sprintf("/_referentials/%v/reload", referential.Id()), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+
+	// Test response
+	if status := responseRecorder.Code; status != http.StatusOK {
+		t.Fatalf("Handler returned wrong status code:\n got %v\n want %v",
+			status, http.StatusOK)
+	}
+
+	//Test Results
+	sas := referential.Model().StopAreas().FindAll()
+
+	if len(sas) != 1 {
+		t.Fatalf("After reload, referential should have one stopArea, got %v", len(sas))
+	}
+	if sas[0].Id() != "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" {
+		t.Errorf("Loaded stopArea have wrong id:\n got: %v\n want: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", sas[0].Id())
 	}
 }

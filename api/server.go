@@ -189,6 +189,7 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 			return
 		}
 		if requestData.Referential == "_referentials" {
+			requestData.Action = requestData.Id
 			requestData.Id = requestData.Resource
 		}
 		server.handleControllers(response, request, requestData)

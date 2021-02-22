@@ -51,6 +51,10 @@ type Controller struct {
 }
 
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {
+	if request.Body == nil {
+		http.Error(response, "Invalid request: Can't read request body", http.StatusBadRequest)
+		return nil
+	}
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		http.Error(response, "Invalid request: Can't read request body", http.StatusBadRequest)
@@ -65,10 +69,9 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 
 func (controller *Controller) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	// Check request body
-	if requestData.Method == "PUT" || (requestData.Method == "POST" && requestData.Id != "save") {
+	if requestData.Method == "PUT" || (requestData.Method == "POST" && requestData.Id != "save" && requestData.Action != "reload") {
 		requestData.Body = getRequestBody(response, request)
 		if requestData.Body == nil {
-			http.Error(response, "Invalid request", http.StatusBadRequest)
 			return
 		}
 	}
