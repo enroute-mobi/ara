@@ -166,7 +166,7 @@ func Test_PartnerController_Update(t *testing.T) {
 	sub := partner.Subscriptions().New("Test")
 	sub.Save()
 
-	rdata.Body = []byte(`{ "Slug": "Yet another test" }`)
+	rdata.Body = []byte(`{ "Slug": "Yet another test", "Name": "test" }`)
 	rdata.Method = "PUT"
 	rdata.Server = server
 	rdata.Id = string(partner.Id())
@@ -184,6 +184,9 @@ func Test_PartnerController_Update(t *testing.T) {
 
 	if expected := core.PartnerSlug("Yet another test"); updatedPartner.Slug() != expected {
 		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
+	}
+	if expected := "test"; updatedPartner.Name != expected {
+		t.Errorf("Partner name should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))

@@ -162,6 +162,18 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 	if jsonString != expected {
 		t.Errorf("Partner.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
 	}
+
+	partner.Name = "PartnerName"
+	expected = `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","Name":"PartnerName","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
+	jsonBytes, err = partner.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	jsonString = string(jsonBytes)
+	if jsonString != expected {
+		t.Errorf("Partner.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	}
 }
 
 func Test_Partner_Save(t *testing.T) {
@@ -548,6 +560,7 @@ func Test_MemoryPartners_Load(t *testing.T) {
 		Id:             "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialId:  string(referential.Id()),
 		Slug:           "ratp",
+		Name:           "RATP",
 		Settings:       "{}",
 		ConnectorTypes: "[]",
 	}

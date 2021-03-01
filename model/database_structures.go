@@ -20,6 +20,7 @@ type DatabasePartner struct {
 	Id             string `db:"id"`
 	ReferentialId  string `db:"referential_id"`
 	Slug           string `db:"slug"`
+	Name           string `db:"name"`
 	Settings       string `db:"settings"`
 	ConnectorTypes string `db:"connector_types"`
 }
@@ -28,6 +29,7 @@ type SelectPartner struct {
 	Id             string
 	ReferentialId  string `db:"referential_id"`
 	Slug           string
+	Name           string
 	Settings       sql.NullString
 	ConnectorTypes sql.NullString `db:"connector_types"`
 }
