@@ -27,7 +27,8 @@ type Referential struct {
 	id   ReferentialId
 	slug ReferentialSlug
 
-	Settings map[string]string `json:"Settings,omitempty"`
+	Settings       map[string]string `json:"Settings,omitempty"`
+	OrganisationId string            `json:",omitempty"`
 
 	collectManager    CollectManagerInterface
 	broacasterManager BroadcastManagerInterface
@@ -56,11 +57,12 @@ type Referentials interface {
 var referentials = NewMemoryReferentials()
 
 type APIReferential struct {
-	id       ReferentialId
-	Slug     ReferentialSlug   `json:"Slug,omitempty"`
-	Errors   Errors            `json:"Errors,omitempty"`
-	Settings map[string]string `json:"Settings,omitempty"`
-	Tokens   []string          `json:"Tokens,omitempty"`
+	id             ReferentialId
+	OrganisationId string            `json:",omitempty"`
+	Slug           ReferentialSlug   `json:"Slug,omitempty"`
+	Errors         Errors            `json:"Errors,omitempty"`
+	Settings       map[string]string `json:"Settings,omitempty"`
+	Tokens         []string          `json:"Tokens,omitempty"`
 
 	manager Referentials
 }
@@ -184,18 +186,20 @@ func (referential *Referential) Definition() *APIReferential {
 	}
 
 	return &APIReferential{
-		id:       referential.id,
-		Slug:     referential.slug,
-		Settings: settings,
-		Errors:   NewErrors(),
-		manager:  referential.manager,
-		Tokens:   referential.Tokens,
+		id:             referential.id,
+		OrganisationId: referential.OrganisationId,
+		Slug:           referential.slug,
+		Settings:       settings,
+		Errors:         NewErrors(),
+		manager:        referential.manager,
+		Tokens:         referential.Tokens,
 	}
 }
 
 func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 	initialReloadAt := referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT)
 
+	referential.OrganisationId = apiReferential.OrganisationId
 	referential.slug = apiReferential.Slug
 	referential.Settings = apiReferential.Settings
 	referential.Tokens = apiReferential.Tokens
@@ -335,8 +339,9 @@ func (manager *MemoryReferentials) Load() error {
 
 	for _, r := range selectReferentials {
 		referential := manager.new()
-		referential.id = ReferentialId(r.Referential_id)
+		referential.id = ReferentialId(r.ReferentialId)
 		referential.slug = ReferentialSlug(r.Slug)
+		referential.OrganisationId = r.OrganisationId
 
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
@@ -413,10 +418,11 @@ func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*
 		return nil, err
 	}
 	return &model.DatabaseReferential{
-		ReferentialId: string(referential.id),
-		Slug:          string(referential.slug),
-		Settings:      string(settings),
-		Tokens:        string(tokens),
+		ReferentialId:  string(referential.id),
+		OrganisationId: referential.OrganisationId,
+		Slug:           string(referential.slug),
+		Settings:       string(settings),
+		Tokens:         string(tokens),
 	}, nil
 }
 
