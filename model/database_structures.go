@@ -3,16 +3,16 @@ package model
 import "database/sql"
 
 type DatabaseReferential struct {
-	ReferentialId  string `db:"referential_id"`
-	OrganisationId string `db:"organisation_id"`
-	Slug           string `db:"slug"`
-	Settings       string `db:"settings"`
-	Tokens         string `db:"tokens"`
+	ReferentialId  string         `db:"referential_id"`
+	OrganisationId sql.NullString `db:"organisation_id"`
+	Slug           string         `db:"slug"`
+	Settings       string         `db:"settings"`
+	Tokens         string         `db:"tokens"`
 }
 
 type SelectReferential struct {
-	ReferentialId  string `db:"referential_id"`
-	OrganisationId string `db:"organisation_id"`
+	ReferentialId  string         `db:"referential_id"`
+	OrganisationId sql.NullString `db:"organisation_id"`
 	Slug           string
 	Settings       sql.NullString
 	Tokens         sql.NullString

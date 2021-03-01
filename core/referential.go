@@ -1,6 +1,7 @@
 package core
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -124,6 +125,16 @@ func (referential *Referential) ModelGuardian() *ModelGuardian {
 
 func (referential *Referential) Partners() Partners {
 	return referential.partners
+}
+
+func (referential *Referential) DatabaseOrganisationId() sql.NullString {
+	if referential.OrganisationId == "" {
+		return sql.NullString{}
+	}
+	return sql.NullString{
+		String: referential.OrganisationId,
+		Valid:  true,
+	}
 }
 
 func (referential *Referential) Start() {
@@ -341,7 +352,10 @@ func (manager *MemoryReferentials) Load() error {
 		referential := manager.new()
 		referential.id = ReferentialId(r.ReferentialId)
 		referential.slug = ReferentialSlug(r.Slug)
-		referential.OrganisationId = r.OrganisationId
+
+		if r.OrganisationId.Valid {
+			referential.OrganisationId = r.OrganisationId.String
+		}
 
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
@@ -419,7 +433,7 @@ func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*
 	}
 	return &model.DatabaseReferential{
 		ReferentialId:  string(referential.id),
-		OrganisationId: referential.OrganisationId,
+		OrganisationId: referential.DatabaseOrganisationId(),
 		Slug:           string(referential.slug),
 		Settings:       string(settings),
 		Tokens:         string(tokens),
