@@ -103,6 +103,7 @@ type Partner struct {
 
 	id            PartnerId
 	slug          PartnerSlug
+	Name          string `json:",omitempty"`
 	PartnerStatus PartnerStatus
 
 	ConnectorTypes []string
@@ -130,6 +131,7 @@ func (a ByPriority) Less(i, j int) bool {
 type APIPartner struct {
 	Id             PartnerId `json:"Id,omitempty"`
 	Slug           PartnerSlug
+	Name           string            `json:"Name,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
 	Errors         Errors            `json:"Errors,omitempty"`
@@ -365,6 +367,7 @@ func (partner *Partner) Definition() *APIPartner {
 	return &APIPartner{
 		Id:             partner.id,
 		Slug:           partner.slug,
+		Name:           partner.Name,
 		Settings:       partner.Settings,
 		ConnectorTypes: partner.ConnectorTypes,
 		factories:      make(map[string]ConnectorFactory),
@@ -496,6 +499,7 @@ func (partner *Partner) GzipGtfs() (r bool) {
 func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id
 	partner.slug = apiPartner.Slug
+	partner.Name = apiPartner.Name
 	partner.Settings = apiPartner.Settings
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
@@ -889,6 +893,7 @@ func (manager *PartnerManager) Load() error {
 	for _, p := range selectPartners {
 		partner := manager.New(PartnerSlug(p.Slug))
 		partner.id = PartnerId(p.Id)
+		partner.Name = p.Name
 
 		if p.Settings.Valid && len(p.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(p.Settings.String), &partner.Settings); err != nil {
@@ -972,6 +977,7 @@ func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePa
 		Id:             string(partner.id),
 		ReferentialId:  string(manager.referential.id),
 		Slug:           string(partner.slug),
+		Name:           partner.Name,
 		Settings:       string(settings),
 		ConnectorTypes: string(connectors),
 	}, nil
