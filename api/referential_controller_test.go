@@ -73,7 +73,7 @@ func Test_ReferentialController_Delete(t *testing.T) {
 
 func Test_ReferentialController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Slug": "Yet another test" }`)
+	body := []byte(`{ "Slug": "Yet another test", "OrganisationId": "test" }`)
 	referential, responseRecorder, server := referentialPrepareRequest("PUT", true, body, t)
 
 	// Check response
@@ -87,6 +87,9 @@ func Test_ReferentialController_Update(t *testing.T) {
 
 	if expected := core.ReferentialSlug("Yet another test"); updatedReferential.Slug() != expected {
 		t.Errorf("Referential slug should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.Slug(), expected)
+	}
+	if expected := "test"; updatedReferential.OrganisationId != expected {
+		t.Errorf("Referential slug should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.OrganisationId, expected)
 	}
 	if expected, _ := updatedReferential.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
