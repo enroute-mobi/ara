@@ -4,6 +4,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -87,7 +88,18 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
-	httpClient := &http.Client{Timeout: getTimeOut(args.requestType)}
+	var netTransport = &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second,
+	}
+
+	httpClient := &http.Client{
+		Timeout:   getTimeOut(args.requestType),
+		Transport: netTransport,
+	}
+
 	response, err := httpClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
