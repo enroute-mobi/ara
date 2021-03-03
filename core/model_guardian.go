@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -72,6 +73,8 @@ func (guardian *ModelGuardian) checkReloadModel() bool {
 }
 
 func (guardian *ModelGuardian) refreshStopAreas() {
+	defer monitoring.HandlePanic()
+
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
@@ -118,6 +121,8 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 }
 
 func (guardian *ModelGuardian) refreshLines() {
+	defer monitoring.HandlePanic()
+
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
@@ -149,6 +154,8 @@ func (guardian *ModelGuardian) refreshLines() {
 }
 
 func (guardian *ModelGuardian) requestSituations() {
+	defer monitoring.HandlePanic()
+
 	if guardian.Clock().Now().Before(guardian.gmTimer.Add(1 * time.Minute)) {
 		return
 	}
@@ -164,6 +171,8 @@ func (guardian *ModelGuardian) requestSituations() {
 }
 
 func (guardian *ModelGuardian) simulateActualAttributes() {
+	defer monitoring.HandlePanic()
+
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 

@@ -1,3 +1,6 @@
+export ARA_ROOT=$(PWD)
+export ARA_CONFIG=$(PWD)/config
+
 run: # for dev
 	go run -race ara.go api
 

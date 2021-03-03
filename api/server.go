@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
@@ -20,6 +21,7 @@ type Server struct {
 	clock.ClockConsumer
 	core.ReferentialsConsumer
 
+	srv         *http.Server
 	bind        string
 	startedTime time.Time
 	apiKey      string
@@ -92,10 +94,15 @@ func NewServer(bind string) *Server {
 }
 
 func (server *Server) ListenAndServe() error {
+	server.srv = &http.Server{
+		Addr:         server.bind,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 60 * time.Second,
+	}
 	http.HandleFunc("/", server.HandleFlow)
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
-	return http.ListenAndServe(server.bind, nil)
+	return server.srv.ListenAndServe()
 }
 
 func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
@@ -143,6 +150,8 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 }
 
 func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	path := request.URL.RequestURI()
 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?"
 	pattern := regexp.MustCompile(pathRegexp)

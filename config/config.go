@@ -29,6 +29,7 @@ type config struct {
 	BigQueryProjectID string
 	BigQueryDataset   string
 	BigQueryTable     string
+	Sentry            string
 	Syslog            bool
 	ColorizeLog       bool
 	LoadMaxInsert     int
