@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"cloud.google.com/go/civil"
 )
 
@@ -61,6 +62,8 @@ func (guardian *PartnersGuardian) listen(partnerChannel <-chan *Partner) {
 }
 
 func (guardian *PartnersGuardian) routineWork(partner *Partner) {
+	defer monitoring.HandlePanic()
+
 	s := guardian.checkPartnerStatus(partner)
 	if s {
 		guardian.checkSubscriptionsTerminatedTime(partner)

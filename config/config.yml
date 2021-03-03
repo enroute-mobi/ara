@@ -5,3 +5,4 @@ apikey:   "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
 # example config for BQ
 bigqueryprojectid: "test-edouard"
 bigquerydataset: "testbigquery"
+sentry: "https://2a69717dde0440fe92a94651fdd8cb12@o381631.ingest.sentry.io/5632877"

@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
@@ -149,6 +150,8 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 }
 
 func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	path := request.URL.RequestURI()
 	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?"
 	pattern := regexp.MustCompile(pathRegexp)

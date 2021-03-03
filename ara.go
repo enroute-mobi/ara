@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/getsentry/sentry-go"
+
 	"bitbucket.org/enroute-mobi/ara/api"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -77,6 +79,15 @@ func main() {
 		audit.SetCurrentBigQuery(audit.NewBigQueryClient(config.Config.BigQueryProjectID, config.Config.BigQueryDataset))
 		audit.CurrentBigQuery().Start()
 		defer audit.CurrentBigQuery().Stop()
+	}
+	// Configure Sentry
+	if config.Config.Sentry != "" {
+		err = sentry.Init(sentry.ClientOptions{
+			Dsn:         config.Config.Sentry,
+			Environment: config.Environment(),
+			Release:     version.Value(),
+			Debug:       config.Config.Debug,
+		})
 	}
 	logger.Log.Debugf("Ara started with a version : %v", version.Value())
 
