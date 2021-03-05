@@ -126,7 +126,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	logger.Log.Printf("%v", updateEvents)
 
 	// Log MonitoringRefs
-	logMonitoringRefsFromMap(logStashEvent, updateEvents.MonitoringRefs)
+	logMonitoringRefs(logStashEvent, message, updateEvents.MonitoringRefs)
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)

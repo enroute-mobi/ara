@@ -39,16 +39,23 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(conne
 	message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
 
 	subIds := make(map[string]struct{})
+	mRefs := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.StopMonitoringDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
 		if !delivery.Status() {
 			message.Status = "Error"
 		}
+		mRefs[delivery.MonitoringRef()] = struct{}{}
 	}
 	subs := make([]string, 0, len(subIds))
+	sas := make([]string, 0, len(mRefs))
 	for k := range subIds {
 		subs = append(subs, k)
 	}
+	for k := range mRefs {
+		sas = append(sas, k)
+	}
 	message.SubscriptionIdentifiers = subs
+	message.StopAreas = sas
 	audit.CurrentBigQuery().WriteEvent(message)
 }
