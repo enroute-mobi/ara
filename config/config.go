@@ -23,16 +23,16 @@ type DatabaseConfig struct {
 type config struct {
 	DB DatabaseConfig
 
-	ApiKey            string
-	Debug             bool
-	LogStash          string
-	BigQueryProjectID string
-	BigQueryDataset   string
-	BigQueryTable     string
-	Sentry            string
-	Syslog            bool
-	ColorizeLog       bool
-	LoadMaxInsert     int
+	ApiKey                string
+	Debug                 bool
+	LogStash              string
+	BigQueryProjectID     string
+	BigQueryDatasetPrefix string
+	BigQueryTable         string
+	Sentry                string
+	Syslog                bool
+	ColorizeLog           bool
+	LoadMaxInsert         int
 }
 
 var Config = config{}
@@ -69,7 +69,7 @@ func LoadConfig(path string) error {
 }
 
 func (c *config) ValidBQConfig() bool {
-	return c.BigQueryProjectID != "" && c.BigQueryDataset != "" && c.BigQueryTable != ""
+	return c.BigQueryProjectID != "" && c.BigQueryDatasetPrefix != ""
 }
 
 var environment string

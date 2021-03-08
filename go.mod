@@ -28,6 +28,7 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	golang.org/dl v0.0.0-20200724191219-e4fbcf8a7a81 // indirect
 	golang.org/x/text v0.3.3
+	google.golang.org/api v0.34.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gorp.v1 v1.7.1
 	gopkg.in/yaml.v2 v2.2.4

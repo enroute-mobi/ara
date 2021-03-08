@@ -205,9 +205,11 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 
 func Test_Save_BiqQuery(t *testing.T) {
 	f := audit.NewFakeBigQuery()
-	audit.SetCurrentBigQuery(f)
+	audit.SetCurrentBigQuery("ref", f)
 
+	m := NewMemoryModel("ref")
 	vehicles := NewMemoryVehicles()
+	vehicles.model = m
 	v := vehicles.New()
 	objectid := NewObjectID("kind", "value")
 	v.SetObjectID(objectid)

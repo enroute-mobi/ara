@@ -2,13 +2,14 @@ package audit
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
+	"google.golang.org/api/iterator"
 )
 
 const (
@@ -17,47 +18,6 @@ const (
 	VEHICLE_TABLE  = "vehicles"
 )
 
-type BigQueryMessage struct {
-	Timestamp               time.Time `bigquery:"timestamp"`
-	IPAddress               string    `bigquery:"ip_address"`
-	Protocol                string    `bigquery:"protocol"`
-	Type                    string    `bigquery:"type"`
-	Direction               string    `bigquery:"direction"`
-	Partner                 string    `bigquery:"partner"`
-	Status                  string    `bigquery:"status"`
-	ErrorDetails            string    `bigquery:"error_details"`
-	RequestRawMessage       string    `bigquery:"request_raw_message"`
-	ResponseRawMessage      string    `bigquery:"response_raw_message"`
-	RequestIdentifier       string    `bigquery:"request_identifier"`
-	ResponseIdentifier      string    `bigquery:"response_identifier"`
-	RequestSize             int       `bigquery:"request_size"`
-	ResponseSize            int       `bigquery:"response_size"`
-	ProcessingTime          float64   `bigquery:"processing_time"`
-	SubscriptionIdentifiers []string  `bigquery:"subscription_identifiers"`
-	Lines                   []string  `bigquery:"lines"`
-	StopAreas               []string  `bigquery:"stop_areas"`
-	Vehicles                []string  `bigquery:"vehicles"`
-}
-
-type BigQueryPartnerEvent struct {
-	Timestamp                time.Time      `bigquery:"timestamp"`
-	Slug                     string         `bigquery:"slug"`
-	PreviousStatus           string         `bigquery:"previous_status"`
-	PreviousServiceStartedAt civil.DateTime `bigquery:"previous_service_started_at"`
-	NewStatus                string         `bigquery:"new_status"`
-	NewServiceStartedAt      civil.DateTime `bigquery:"new_service_started_at"`
-}
-
-type BigQueryVehicleEvent struct {
-	Timestamp      time.Time      `bigquery:"timestamp"`
-	ID             string         `bigquery:"id"`
-	ObjectIDs      []string       `bigquery:"objectids"`
-	Longitude      float64        `bigquery:"longitude"`
-	Latitude       float64        `bigquery:"latitude"`
-	Bearing        float64        `bigquery:"bearing"`
-	RecordedAtTime civil.DateTime `bigquery:"recorded_at_time"`
-}
-
 type BigQuery interface {
 	state.Startable
 	state.Stopable
@@ -65,6 +25,35 @@ type BigQuery interface {
 	WriteMessage(message *BigQueryMessage) error
 	WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) error
 	WriteVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error
+}
+
+/**** Manager ****/
+
+type BigQueryManager struct {
+	mutex *sync.RWMutex
+	bq    map[string]BigQuery
+}
+
+var manager = BigQueryManager{
+	mutex: &sync.RWMutex{},
+	bq:    make(map[string]BigQuery),
+}
+
+func CurrentBigQuery(slug string) BigQuery {
+	manager.mutex.Lock()
+	bq, ok := manager.bq[slug]
+	if !ok {
+		bq = NewNullBigQuery()
+		manager.bq[slug] = bq
+	}
+	manager.mutex.Unlock()
+	return bq
+}
+
+func SetCurrentBigQuery(slug string, bq BigQuery) {
+	manager.mutex.Lock()
+	manager.bq[slug] = bq
+	manager.mutex.Unlock()
 }
 
 /**** Null struct to disable BQ by default ****/
@@ -87,16 +76,6 @@ func (bq *NullBigQuery) Stop()  {}
 
 func NewNullBigQuery() BigQuery {
 	return &NullBigQuery{}
-}
-
-var currentBigQuery BigQuery = NewNullBigQuery()
-
-func CurrentBigQuery() BigQuery {
-	return currentBigQuery
-}
-
-func SetCurrentBigQuery(bq BigQuery) {
-	currentBigQuery = bq
 }
 
 /**** Test Structure ****/
@@ -162,9 +141,9 @@ func NewBigQueryClient(projectID, dataset string) *BigQueryClient {
 	return &BigQueryClient{
 		projectID:     projectID,
 		dataset:       dataset,
-		messages:      make(chan *BigQueryMessage, 5),
-		partnerEvents: make(chan *BigQueryPartnerEvent, 5),
-		vehicleEvents: make(chan *BigQueryVehicleEvent, 5),
+		messages:      make(chan *BigQueryMessage, 500),
+		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
+		vehicleEvents: make(chan *BigQueryVehicleEvent, 500),
 	}
 }
 
@@ -247,8 +226,54 @@ func (bq *BigQueryClient) connect() {
 		return
 	}
 
-	dataset := bq.client.Dataset(bq.dataset)
+	dataset, err := bq.findOrCreateDataset()
+	if err != nil {
+		logger.Log.Printf("error while finding or creating the dataset: %v", err)
+		return
+	}
 	bq.inserter = dataset.Table(EXCHANGE_TABLE).Inserter()
 	bq.partnerInserter = dataset.Table(PARTNER_TABLE).Inserter()
 	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
+}
+
+func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
+	it := bq.client.Datasets(bq.ctx)
+	for {
+		dataset, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		if dataset.DatasetID == bq.dataset {
+			logger.Log.Printf("Found dataset %v", bq.dataset)
+			return dataset, nil
+		}
+	}
+
+	logger.Log.Printf("Creating New Dataset and tables")
+	dataset := bq.client.Dataset(bq.dataset)
+	if err := dataset.Create(bq.ctx, &bigquery.DatasetMetadata{Location: "EU"}); err != nil {
+		return nil, err
+	}
+
+	p := &bigquery.TimePartitioning{
+		Field:      "timestamp",
+		Expiration: 30 * 24 * time.Hour,
+	}
+
+	if err := dataset.Table(EXCHANGE_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqMessageSchema}); err != nil {
+		return nil, err
+	}
+
+	if err := dataset.Table(PARTNER_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqPartnerSchema}); err != nil {
+		return nil, err
+	}
+
+	if err := dataset.Table(VEHICLE_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqVehicleSchema}); err != nil {
+		return nil, err
+	}
+
+	return dataset, nil
 }

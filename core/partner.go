@@ -84,7 +84,7 @@ type Partners interface {
 	Delete(partner *Partner) bool
 	Model() model.Model
 	Referential() *Referential
-	LocalCredentialsIndex() *LocalCredentialsIndex
+	UniqCredentials(PartnerId, string) bool
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
@@ -157,6 +157,8 @@ func (partner *APIPartner) Validate() bool {
 	// Check if slug is non null
 	if partner.Slug == "" {
 		partner.Errors.Add("Slug", ERROR_BLANK)
+	} else if !slugRegexp.MatchString(string(partner.Slug)) { // slugRegexp defined in Referential
+		partner.Errors.Add("Slug", ERROR_SLUG_FORMAT)
 	}
 
 	// Check factories
@@ -173,7 +175,7 @@ func (partner *APIPartner) Validate() bool {
 	}
 
 	// Check Credentials uniqueness
-	if !partner.manager.LocalCredentialsIndex().UniqCredentials(partner.Id, partner.credentials()) {
+	if !partner.manager.UniqCredentials(partner.Id, partner.credentials()) {
 		partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
 	}
 
@@ -738,8 +740,8 @@ func (manager *PartnerManager) Guardian() *PartnersGuardian {
 	return manager.guardian
 }
 
-func (manager *PartnerManager) LocalCredentialsIndex() *LocalCredentialsIndex {
-	return manager.localCredentialsIndex
+func (manager *PartnerManager) UniqCredentials(modelId PartnerId, localCredentials string) bool {
+	return manager.localCredentialsIndex.UniqCredentials(modelId, localCredentials)
 }
 
 func (manager *PartnerManager) Start() {

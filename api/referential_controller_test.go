@@ -30,7 +30,7 @@ func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, 
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new referential
-	referential = referentials.New("First Referential")
+	referential = referentials.New("first_referential")
 	referentials.Save(referential)
 
 	server = &Server{}
@@ -73,7 +73,8 @@ func Test_ReferentialController_Delete(t *testing.T) {
 
 func Test_ReferentialController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Slug": "Yet another test", "OrganisationId": "test" }`)
+	body := []byte(`{ "Slug": "another_test", "OrganisationId": "test" }`)
+
 	referential, responseRecorder, server := referentialPrepareRequest("PUT", true, body, t)
 
 	// Check response
@@ -85,7 +86,7 @@ func Test_ReferentialController_Update(t *testing.T) {
 		t.Errorf("Referential should be found after PUT request")
 	}
 
-	if expected := core.ReferentialSlug("Yet another test"); updatedReferential.Slug() != expected {
+	if expected := core.ReferentialSlug("another_test"); updatedReferential.Slug() != expected {
 		t.Errorf("Referential slug should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.Slug(), expected)
 	}
 	if expected := "test"; updatedReferential.OrganisationId != expected {
@@ -176,7 +177,7 @@ func Test_ReferentialController_Create_Invalid(t *testing.T) {
 
 func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{"Slug":"First Referential"}`)
+	body := []byte(`{"Slug":"first_referential"}`)
 	_, responseRecorder, _ := referentialPrepareRequest("POST", false, body, t)
 
 	// Check response
@@ -210,7 +211,7 @@ func Test_ReferentialController_Save(t *testing.T) {
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
 	// Save a new referential
-	referential := referentials.New("First Referential")
+	referential := referentials.New("first_referential")
 	referentials.Save(referential)
 
 	server := &Server{}

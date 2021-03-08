@@ -1,7 +1,8 @@
 package model
 
 type TransactionalModel struct {
-	parent Model
+	parent      Model
+	referential string
 
 	lines           *TransactionalLines
 	situations      *TransactionalSituations
@@ -13,7 +14,10 @@ type TransactionalModel struct {
 }
 
 func NewTransactionalModel(parent Model) *TransactionalModel {
-	model := &TransactionalModel{parent: parent}
+	model := &TransactionalModel{
+		parent:      parent,
+		referential: parent.Referential(),
+	}
 	model.lines = NewTransactionalLines(parent)
 	model.situations = NewTransactionalSituations(parent)
 	model.stopAreas = NewTransactionalStopAreas(parent)
@@ -26,6 +30,10 @@ func NewTransactionalModel(parent Model) *TransactionalModel {
 
 func (model *TransactionalModel) Date() Date {
 	return model.parent.Date()
+}
+
+func (model *TransactionalModel) Referential() string {
+	return model.referential
 }
 
 func (model *TransactionalModel) Lines() Lines {

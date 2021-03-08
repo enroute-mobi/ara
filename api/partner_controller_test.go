@@ -80,7 +80,7 @@ func createReferential() (*Server, *core.Referential) {
 
 func createPartner(referential *core.Referential) *core.Partner {
 	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	partner := referential.Partners().New("First Partner")
+	partner := referential.Partners().New("first_partner")
 	referential.Partners().Save(partner)
 
 	return partner
@@ -166,7 +166,7 @@ func Test_PartnerController_Update(t *testing.T) {
 	sub := partner.Subscriptions().New("Test")
 	sub.Save()
 
-	rdata.Body = []byte(`{ "Slug": "Yet another test", "Name": "test" }`)
+	rdata.Body = []byte(`{ "Slug": "another_test", "Name": "test" }`)
 	rdata.Method = "PUT"
 	rdata.Server = server
 	rdata.Id = string(partner.Id())
@@ -182,7 +182,7 @@ func Test_PartnerController_Update(t *testing.T) {
 		t.Errorf("Partner should be found after PUT request")
 	}
 
-	if expected := core.PartnerSlug("Yet another test"); updatedPartner.Slug() != expected {
+	if expected := core.PartnerSlug("another_test"); updatedPartner.Slug() != expected {
 		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 	if expected := "test"; updatedPartner.Name != expected {
@@ -219,7 +219,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 		t.Errorf("Partner should be found after PUT request")
 	}
 
-	if expected := core.PartnerSlug("First Partner"); updatedPartner.Slug() != expected {
+	if expected := core.PartnerSlug("first_partner"); updatedPartner.Slug() != expected {
 		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
 	}
 
@@ -294,7 +294,7 @@ func Test_PartnerController_Create_Invalid(t *testing.T) {
 	rdata.Id = ""
 	rdata.Method = "POST"
 	rdata.Server = server
-	rdata.Body = []byte(`{ "Slug": "InvalidSlug", "ConnectorTypes": ["test-validation-connector"] }`)
+	rdata.Body = []byte(`{ "Slug": "invalid_slug", "ConnectorTypes": ["test-validation-connector"] }`)
 
 	responseRecorder := sendRequest(rdata, t)
 
@@ -309,7 +309,7 @@ func Test_PartnerController_Create_Invalid(t *testing.T) {
 	}
 
 	// Test Results
-	expected := `{"Slug":"InvalidSlug","ConnectorTypes":["test-validation-connector"],"Errors":{"slug":["Invalid format"]}}`
+	expected := `{"Slug":"invalid_slug","ConnectorTypes":["test-validation-connector"],"Errors":{"slug":["Invalid format"]}}`
 	if responseRecorder.Body.String() != expected {
 		t.Errorf("Wrong body for invalid POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
@@ -328,7 +328,7 @@ func Test_PartnerController_Index(t *testing.T) {
 	partnerCheckResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"First Partner","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"first_partner","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

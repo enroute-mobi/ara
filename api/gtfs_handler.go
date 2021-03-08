@@ -42,7 +42,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	logStashEvent["resource"] = "resource"
 
 	message := handler.newBQMessage(partner)
-	defer audit.CurrentBigQuery().WriteMessage(message)
+	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteMessage(message)
 
 	var gc []core.GtfsConnector
 	var c core.Connector

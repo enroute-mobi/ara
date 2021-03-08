@@ -160,6 +160,20 @@ func Test_APIReferential_Validate(t *testing.T) {
 		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
 	}
 
+	// Check wrong format slug
+	apiReferential.Slug = "Wrong_format"
+	valid = apiReferential.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiReferential.Errors) != 1 {
+		t.Errorf("apiReferential Errors should not be empty")
+	}
+	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_SLUG_FORMAT {
+		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
+	}
+
 	// Check Already Used Slug
 	referential := referentials.New("slug")
 	referentials.Save(referential)
