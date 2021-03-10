@@ -31,7 +31,7 @@ type SelectPartner struct {
 	Id             string
 	ReferentialId  string `db:"referential_id"`
 	Slug           string
-	Name           string
+	Name           sql.NullString
 	Settings       sql.NullString
 	ConnectorTypes sql.NullString `db:"connector_types"`
 }

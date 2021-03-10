@@ -895,7 +895,9 @@ func (manager *PartnerManager) Load() error {
 	for _, p := range selectPartners {
 		partner := manager.New(PartnerSlug(p.Slug))
 		partner.id = PartnerId(p.Id)
-		partner.Name = p.Name
+		if p.Name.Valid {
+			partner.Name = p.Name.String
+		}
 
 		if p.Settings.Valid && len(p.Settings.String) > 0 {
 			if err = json.Unmarshal([]byte(p.Settings.String), &partner.Settings); err != nil {
