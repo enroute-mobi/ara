@@ -38,9 +38,8 @@ cat > config/config.yml <<EOF
 syslog: ${ARA_SYSLOG:-false}
 debug: ${ARA_DEBUG:-false}
 apikey: ${ARA_API_KEY}
-bigqueryprojectid: "${GCLOUD_PROJECT}"
-bigquerydataset: "${ARA_BIGQUERY_DATASET}"
-bigquerytable: "exchange_events"
+bigqueryprojectid: ${GCLOUD_PROJECT}
+bigquerydatasetprefix: ${BIGQUERY_DATASET_PREFIX}
 EOF
 
 if [ -n "$ARA_LOGSTASH" ]; then
