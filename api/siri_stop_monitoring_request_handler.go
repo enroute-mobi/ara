@@ -13,7 +13,8 @@ import (
 )
 
 type SIRIStopMonitoringRequestHandler struct {
-	xmlRequest *siri.XMLGetStopMonitoring
+	xmlRequest  *siri.XMLGetStopMonitoring
+	referential *core.Referential
 }
 
 func (handler *SIRIStopMonitoringRequestHandler) RequestorRef() string {
@@ -32,7 +33,7 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connecto
 	response := connector.(core.StopMonitoringRequestBroadcaster).RequestStopArea(handler.xmlRequest, message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -42,7 +43,7 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connecto
 
 	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -51,5 +52,5 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connecto
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
 	message.ProcessingTime = time.Since(t).Seconds()
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

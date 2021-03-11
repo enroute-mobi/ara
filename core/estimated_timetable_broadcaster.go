@@ -361,7 +361,7 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTa
 		audit.CurrentLogStash().WriteEvent(event)
 	}
 
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(ett.connector.Partner().Referential().Slug())).WriteEvent(message)
 }
 
 func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {

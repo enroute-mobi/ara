@@ -118,7 +118,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message := subscriber.newBQEvent()
-	defer audit.CurrentBigQuery().WriteEvent(message)
+	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),

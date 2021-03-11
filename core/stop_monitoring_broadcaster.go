@@ -292,7 +292,7 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 		audit.CurrentLogStash().WriteEvent(event)
 	}
 
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(smb.connector.Partner().Referential().Slug())).WriteEvent(message)
 }
 
 func (smb *SMBroadcaster) newBQEvent() *audit.BigQueryMessage {

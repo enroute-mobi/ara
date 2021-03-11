@@ -11,7 +11,8 @@ import (
 )
 
 type SIRISubscribeRequestHandler struct {
-	xmlRequest *siri.XMLSubscriptionRequest
+	xmlRequest  *siri.XMLSubscriptionRequest
+	referential *core.Referential
 }
 
 func (handler *SIRISubscribeRequestHandler) RequestorRef() string {
@@ -27,13 +28,13 @@ func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw
 
 	response, err := connector.(core.SubscriptionRequestDispatcher).Dispatch(handler.xmlRequest, message)
 	if err != nil {
-		siriErrorWithRequest("NotFound", err.Error(), handler.xmlRequest.RawXML(), rw)
+		siriErrorWithRequest("NotFound", err.Error(), handler.xmlRequest.RawXML(), string(handler.referential.Slug()), rw)
 		return
 	}
 
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -43,12 +44,12 @@ func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw
 
 	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

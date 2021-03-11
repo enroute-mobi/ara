@@ -28,8 +28,9 @@ func (handler *SIRILiteHandler) requestHandler(requestData *SIRIRequestData) SIR
 	switch requestData.Request {
 	case "vehicle-monitoring":
 		return &SIRILiteVehicleMonitoringRequestHandler{
-			requestUrl: requestData.Url,
-			filters:    requestData.Filters,
+			requestUrl:  requestData.Url,
+			filters:     requestData.Filters,
+			referential: handler.referential,
 		}
 	}
 	// case "CheckStatus":

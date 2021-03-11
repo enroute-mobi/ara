@@ -13,8 +13,9 @@ import (
 )
 
 type SIRILiteVehicleMonitoringRequestHandler struct {
-	requestUrl string
-	filters    url.Values
+	requestUrl  string
+	filters     url.Values
+	referential *core.Referential
 }
 
 func (handler *SIRILiteVehicleMonitoringRequestHandler) ConnectorType() string {
@@ -44,5 +45,5 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.C
 	message.ResponseRawMessage = string(jsonBytes)
 	message.ResponseSize = int64(n)
 	message.ProcessingTime = time.Since(t).Seconds()
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

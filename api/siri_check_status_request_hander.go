@@ -13,7 +13,8 @@ import (
 )
 
 type SIRICheckStatusRequestHandler struct {
-	xmlRequest *siri.XMLCheckStatusRequest
+	xmlRequest  *siri.XMLCheckStatusRequest
+	referential *core.Referential
 }
 
 func (handler *SIRICheckStatusRequestHandler) RequestorRef() string {
@@ -31,12 +32,12 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 
 	response, err := connector.(core.CheckStatusServer).CheckStatus(handler.xmlRequest, message)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -46,7 +47,7 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 
 	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -55,5 +56,5 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
 	message.ProcessingTime = time.Since(t).Seconds()
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

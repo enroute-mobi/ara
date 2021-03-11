@@ -12,7 +12,8 @@ import (
 )
 
 type SIRIGeneralMessageRequestDeliveriesResponseHandler struct {
-	xmlRequest *siri.XMLNotifyGeneralMessage
+	xmlRequest  *siri.XMLNotifyGeneralMessage
+	referential *core.Referential
 }
 
 func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) RequestorRef() string {
@@ -50,5 +51,5 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(conne
 		subs = append(subs, k)
 	}
 	message.SubscriptionIdentifiers = subs
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

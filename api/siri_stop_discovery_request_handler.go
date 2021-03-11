@@ -13,7 +13,8 @@ import (
 )
 
 type SIRIStopDiscoveryRequestHandler struct {
-	xmlRequest *siri.XMLStopPointsDiscoveryRequest
+	xmlRequest  *siri.XMLStopPointsDiscoveryRequest
+	referential *core.Referential
 }
 
 func (handler *SIRIStopDiscoveryRequestHandler) RequestorRef() string {
@@ -33,7 +34,7 @@ func (handler *SIRIStopDiscoveryRequestHandler) Respond(connector core.Connector
 	response, _ := tmp.StopAreas(handler.xmlRequest, message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -43,7 +44,7 @@ func (handler *SIRIStopDiscoveryRequestHandler) Respond(connector core.Connector
 
 	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -52,5 +53,5 @@ func (handler *SIRIStopDiscoveryRequestHandler) Respond(connector core.Connector
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
 	message.ProcessingTime = time.Since(t).Seconds()
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

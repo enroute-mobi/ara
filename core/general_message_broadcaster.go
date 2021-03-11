@@ -158,7 +158,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 				audit.CurrentLogStash().WriteEvent(event)
 			}
 
-			audit.CurrentBigQuery().WriteEvent(message)
+			audit.CurrentBigQuery(string(gmb.connector.Partner().Referential().Slug())).WriteEvent(message)
 		}
 	}
 }

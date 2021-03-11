@@ -12,7 +12,8 @@ import (
 )
 
 type SIRIStopMonitoringRequestDeliveriesResponseHandler struct {
-	xmlRequest *siri.XMLNotifyStopMonitoring
+	xmlRequest  *siri.XMLNotifyStopMonitoring
+	referential *core.Referential
 }
 
 func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) RequestorRef() string {
@@ -57,5 +58,5 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(conne
 	}
 	message.SubscriptionIdentifiers = subs
 	message.StopAreas = sas
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

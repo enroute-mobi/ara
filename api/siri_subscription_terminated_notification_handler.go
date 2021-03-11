@@ -12,7 +12,8 @@ import (
 )
 
 type SIRISubscriptionTerminatedNotificationHandler struct {
-	xmlRequest *siri.XMLSubscriptionTerminatedNotification
+	xmlRequest  *siri.XMLSubscriptionTerminatedNotification
+	referential *core.Referential
 }
 
 func (handler *SIRISubscriptionTerminatedNotificationHandler) RequestorRef() string {
@@ -37,5 +38,5 @@ func (handler *SIRISubscriptionTerminatedNotificationHandler) Respond(connector 
 	message.ProcessingTime = time.Since(t).Seconds()
 	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
 	message.SubscriptionIdentifiers = []string{handler.xmlRequest.SubscriptionRef()}
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

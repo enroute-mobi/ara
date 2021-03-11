@@ -21,7 +21,7 @@ func Test_SIRIHandler_LogSIRIError(t *testing.T) {
 	audit.SetCurrentLogstash(logstash)
 	defer audit.SetCurrentLogstash(audit.NewNullLogStash())
 
-	siriError("errCode", "errDescription", httptest.NewRecorder())
+	siriError("errCode", "errDescription", "", httptest.NewRecorder())
 
 	if len(logstash.Events()) != 1 {
 		t.Errorf("Logstash should have one event, got %d", len(logstash.Events()))

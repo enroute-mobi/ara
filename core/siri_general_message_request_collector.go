@@ -42,7 +42,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message := connector.newBQEvent()
-	defer audit.CurrentBigQuery().WriteEvent(message)
+	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	startTime := connector.Clock().Now()
 

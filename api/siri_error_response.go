@@ -16,20 +16,20 @@ type SiriErrorResponse struct {
 	request        string
 }
 
-func siriError(errCode, errDescription string, response http.ResponseWriter) {
-	siriErrorWithRequest(errCode, errDescription, "", response)
+func siriError(errCode, errDescription, referentialSlug string, response http.ResponseWriter) {
+	siriErrorWithRequest(errCode, errDescription, referentialSlug, "", response)
 }
 
-func siriErrorWithRequest(errCode, errDescription, request string, response http.ResponseWriter) {
+func siriErrorWithRequest(errCode, errDescription, referentialSlug, request string, response http.ResponseWriter) {
 	SiriErrorResponse{
 		response:       response,
 		errCode:        errCode,
 		errDescription: errDescription,
 		request:        request,
-	}.sendSiriError()
+	}.sendSiriError(referentialSlug)
 }
 
-func (siriError SiriErrorResponse) sendSiriError() {
+func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
 	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
 
 	// Wrap soap and send response
@@ -63,5 +63,5 @@ func (siriError SiriErrorResponse) sendSiriError() {
 	message.ResponseSize = soapEnvelope.Length()
 
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
-	audit.CurrentBigQuery().WriteEvent(message)
+	audit.CurrentBigQuery(referentialSlug).WriteEvent(message)
 }
