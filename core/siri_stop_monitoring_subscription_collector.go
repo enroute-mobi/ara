@@ -163,7 +163,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		updateEvents := builder.UpdateEvents()
 
 		// Copy MonitoringRefs for global log
-		for k, _ := range updateEvents.MonitoringRefs {
+		for k := range updateEvents.MonitoringRefs {
 			monitoringRefMap[k] = struct{}{}
 		}
 

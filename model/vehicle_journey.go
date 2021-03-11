@@ -214,7 +214,7 @@ func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys [
 	ids, _ := manager.byLine.Find(ModelId(id))
 
 	for _, id := range ids {
-		vj, _ := manager.byIdentifier[VehicleJourneyId(id)]
+		vj := manager.byIdentifier[VehicleJourneyId(id)]
 		vehicleJourneys = append(vehicleJourneys, *(vj.copy()))
 	}
 
