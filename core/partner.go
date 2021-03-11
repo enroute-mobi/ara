@@ -42,6 +42,7 @@ const (
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_USE_SPD                  = "collect.use_stop_points_discovery"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 
@@ -117,6 +118,7 @@ type Partner struct {
 	Settings       map[string]string
 
 	connectors          map[string]Connector
+	spdStops            map[string]struct{}
 	startedAt           time.Time
 	lastDiscovery       time.Time
 	lastPush            time.Time
@@ -255,12 +257,14 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Test Method
 func NewPartner() *Partner {
 	partner := &Partner{
 		mutex:          &sync.RWMutex{},
 		Settings:       make(map[string]string),
 		ConnectorTypes: []string{},
 		connectors:     make(map[string]Connector),
+		spdStops:       make(map[string]struct{}),
 		context:        make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
@@ -389,15 +393,24 @@ func (partner *Partner) Save() (ok bool) {
 }
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
+	s := make([]string, len(partner.spdStops))
+	i := 0
+	for r := range partner.spdStops {
+		s[i] = r
+		i++
+	}
+
 	type Alias Partner
 	return json.Marshal(&struct {
-		Id   PartnerId
-		Slug PartnerSlug
+		Id                       PartnerId
+		Slug                     PartnerSlug
+		StopPointsDiscoveryStops []string `json:",omitempty"`
 		*Alias
 	}{
-		Id:    partner.id,
-		Slug:  partner.slug,
-		Alias: (*Alias)(partner),
+		Id:                       partner.id,
+		Slug:                     partner.slug,
+		StopPointsDiscoveryStops: s,
+		Alias:                    (*Alias)(partner),
 	})
 }
 
@@ -449,6 +462,11 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
+	if partner.Setting(COLLECT_USE_SPD) != "" {
+		_, ok := partner.spdStops[stopAreaObjectId.Value()]
+		return ok
+	}
+
 	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" {
 		return true
 	}
@@ -767,6 +785,16 @@ func (partner *Partner) Pushed() {
 	partner.lastPush = partner.manager.Referential().Clock().Now()
 }
 
+func (partner *Partner) RegisterSPDStops(stops []string) {
+	partner.mutex.Lock()
+
+	for i := range stops {
+		partner.spdStops[stops[i]] = struct{}{}
+	}
+
+	partner.mutex.Unlock()
+}
+
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
 		mutex:                 &sync.RWMutex{},
@@ -806,6 +834,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		manager:    manager,
 		Settings:   make(map[string]string),
 		connectors: make(map[string]Connector),
+		spdStops:   make(map[string]struct{}),
 		context:    make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,

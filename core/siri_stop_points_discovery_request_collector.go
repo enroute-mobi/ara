@@ -109,6 +109,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 		connector.broadcastUpdateEvent(event)
 	}
 
+	connector.partner.RegisterSPDStops(stopPointRefs)
 	logStashEvent["stopPointRefs"] = strings.Join(stopPointRefs, ",")
 	message.StopAreas = stopPointRefs
 }
