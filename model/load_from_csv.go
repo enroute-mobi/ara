@@ -185,7 +185,7 @@ func (loader *Loader) handleForce(klass, modelName string) error {
 	if loader.force {
 		if _, ok := loader.deletedModels[klass][modelName]; !ok {
 			loader.deletedModels[klass][modelName] = struct{}{}
-			query := fmt.Sprintf("delete from %vs where model_name='%v' and referential_slug='%v'", klass, modelName, loader.referentialSlug)
+			query := fmt.Sprintf("delete from %vs where model_name='%v' and referential_slug='%v';", klass, modelName, loader.referentialSlug)
 			_, err := Database.Exec(query)
 			if err != nil {
 				return err
