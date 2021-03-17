@@ -77,10 +77,9 @@ func main() {
 	// Configure Sentry
 	if config.Config.Sentry != "" {
 		err = sentry.Init(sentry.ClientOptions{
-			Dsn:         config.Config.Sentry,
-			Environment: config.Environment(),
-			Release:     version.Value(),
-			Debug:       config.Config.Debug,
+			Dsn:     config.Config.Sentry,
+			Release: version.Value(),
+			Debug:   config.Config.Debug,
 		})
 	}
 
