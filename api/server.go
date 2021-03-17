@@ -50,7 +50,7 @@ func NewRequestDataFromContent(params []string) *RequestData {
 
 	copy(requestFiller, params)
 
-	pathRegexp := "([0-9a-zA-Z-]+(?::[0-9a-zA-Z-:]+)?)?(?:/([0-9a-zA-Z-_]+))?"
+	pathRegexp := "([0-9a-zA-Z-_]+(?::[0-9a-zA-Z-_:]+)?)?(?:/([0-9a-zA-Z-_]+))?"
 	pattern := regexp.MustCompile(pathRegexp)
 	foundStrings := pattern.FindStringSubmatch(requestFiller[3])
 
