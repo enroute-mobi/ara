@@ -274,6 +274,71 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	if l := len(gtfsFeed.Entity); l != 1 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
 	}
+	if gtfsFeed.Entity[0].GetId() != "vehicle:vId2" {
+		t.Errorf("Response have the wrong Vehicle ID:\n got: %v\n want: vehicle:vId", gtfsFeed.Entity[0].GetId())
+	}
+}
+
+func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *testing.T) {
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.Settings["gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind"] = "WRONG_ID"
+	connector := NewVehiclePositionBroadcaster(partner)
+	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector.SetClock(clock.NewFakeClock())
+
+	line := referential.model.Lines().New()
+	lId := model.NewObjectID("objectidKind", "lId")
+	line.SetObjectID(lId)
+	line.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vjId := model.NewObjectID("objectidKind", "vjId")
+	vehicleJourney.SetObjectID(vjId)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	stopVisit := referential.model.StopVisits().New()
+	svId1 := model.NewObjectID("objectidKind", "svId1")
+	stopVisit.SetObjectID(svId1)
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit.PassageOrder = 1
+	stopVisit.Save()
+
+	vehicle := referential.model.Vehicles().New()
+	vId := model.NewObjectID("WRONG_ID", "vId")
+	vehicle.SetObjectID(vId)
+	vehicle.VehicleJourneyId = vehicleJourney.Id()
+	vehicle.LineId = line.Id()
+	vehicle.Longitude = 1.23456
+	vehicle.Latitude = 2.34567
+	vehicle.Bearing = 1.2
+	vehicle.Save()
+
+	vehicle2 := referential.model.Vehicles().New()
+	vId2 := model.NewObjectID("objectidKind", "vId2")
+	vehicle2.SetObjectID(vId2)
+	vehicle2.VehicleJourneyId = vehicleJourney.Id()
+	vehicle2.LineId = line.Id()
+	vehicle2.Longitude = 3.45678
+	vehicle2.Latitude = 4.56789
+	vehicle2.Bearing = 2.3
+	vehicle2.Save()
+
+	gtfsFeed := &gtfs.FeedMessage{}
+
+	l := partner.NewLogStashEvent()
+	connector.HandleGtfs(gtfsFeed, l)
+
+	if l := len(gtfsFeed.Entity); l != 1 {
+		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
+	}
+	if gtfsFeed.Entity[0].GetId() != "vehicle:vId" {
+		t.Errorf("Response have the wrong Vehicle ID:\n got: %v\n want: vehicle:vId", gtfsFeed.Entity[0].GetId())
+	}
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
