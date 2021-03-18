@@ -126,7 +126,6 @@ type BigQueryClient struct {
 	projectID       string
 	dataset         string
 	ctx             context.Context
-	cancel          context.CancelFunc
 	client          *bigquery.Client
 	inserter        *bigquery.Inserter
 	vehicleInserter *bigquery.Inserter
@@ -192,7 +191,6 @@ func (bq *BigQueryClient) run() {
 		select {
 		case <-bq.stop:
 			bq.client.Close()
-			bq.cancel()
 			return
 		case message := <-bq.messages:
 			bq.send(message, bq.inserter)
