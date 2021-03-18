@@ -20,14 +20,16 @@ type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 
 	BaseConnector
 
-	remoteObjectidKind string
+	remoteObjectidKind        string
+	vehicleRemoteObjectidKind string
 }
 
 type SIRILiteVehicleMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteVehicleMonitoringRequestBroadcaster {
 	siriVehicleMonitoringRequestBroadcaster := &SIRILiteVehicleMonitoringRequestBroadcaster{
-		remoteObjectidKind: partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		remoteObjectidKind:        partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		vehicleRemoteObjectidKind: partner.VehicleRemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
 	}
 	siriVehicleMonitoringRequestBroadcaster.partner = partner
 	return siriVehicleMonitoringRequestBroadcaster
@@ -70,7 +72,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	response.Status = true
 
 	for _, vehicle := range tx.Model().Vehicles().FindByLineId(line.Id()) {
-		vehicleId, ok := vehicle.ObjectID(connector.remoteObjectidKind)
+		vehicleId, ok := vehicle.ObjectID(connector.vehicleRemoteObjectidKind)
 		if !ok {
 			continue
 		}
