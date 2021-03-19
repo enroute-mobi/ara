@@ -6,9 +6,9 @@ def vehicle_path(id, attributes = {})
   url_for_model(attributes.merge(resource: 'vehicle', id: id))
 end
 
-
 Given(/^a Vehicle exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle|
-  RestClient.post vehicles_path(referential: referential), model_attributes(vehicle).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response = RestClient.post vehicles_path(referential: referential), model_attributes(vehicle).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  debug response.body
 end
 
 When(/^a Vehicle is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle|

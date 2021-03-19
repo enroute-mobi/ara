@@ -47,10 +47,11 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 	trips := make(map[model.VehicleJourneyId]*gtfs.TripDescriptor)
 
 	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	vehicleObjectidKind := connector.partner.VehicleRemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 
 	var n int
 	for i := range vehicles {
-		vehicleId, ok := vehicles[i].ObjectID(objectidKind)
+		vehicleId, ok := vehicles[i].ObjectID(vehicleObjectidKind)
 		if !ok {
 			continue
 		}

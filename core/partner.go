@@ -30,11 +30,12 @@ const (
 	LOCAL_CREDENTIALS = "local_credentials"
 	LOCAL_URL         = "local_url"
 
-	REMOTE_CREDENTIAL        = "remote_credential"
-	REMOTE_OBJECTID_KIND     = "remote_objectid_kind"
-	REMOTE_URL               = "remote_url"
-	NOTIFICATIONS_REMOTE_URL = "notifications.remote_url"
-	SUBSCRIPTIONS_REMOTE_URL = "subscriptions.remote_url"
+	REMOTE_CREDENTIAL            = "remote_credential"
+	REMOTE_OBJECTID_KIND         = "remote_objectid_kind"
+	VEHICLE_REMOTE_OBJECTID_KIND = "vehicle_remote_objectid_kind"
+	REMOTE_URL                   = "remote_url"
+	NOTIFICATIONS_REMOTE_URL     = "notifications.remote_url"
+	SUBSCRIPTIONS_REMOTE_URL     = "subscriptions.remote_url"
 
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
@@ -316,7 +317,14 @@ func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFor
 }
 
 func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
-	if setting := partner.Setting(fmt.Sprintf("%s.remote_objectid_kind", connectorName)); setting != "" {
+	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)); setting != "" {
+		return setting
+	}
+	return partner.Setting(REMOTE_OBJECTID_KIND)
+}
+
+func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
+	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
 		return setting
 	}
 	return partner.Setting(REMOTE_OBJECTID_KIND)
