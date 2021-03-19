@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
-  revision: 3a6297428518f6d29af798cab11815a7e9209b83
+  revision: 500388611a6adb7d54d31ca58f3671b25a5099e3
   specs:
     gtfs-rt (0.1.0)
       ruby-protocol-buffers

@@ -8,7 +8,7 @@ end
 
 Given(/^a VehicleJourney exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle_journey|
   response = RestClient.post vehicle_journeys_path(referential: referential), model_attributes(vehicle_journey).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # puts response.body
+  debug response.body
 end
 
 Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
