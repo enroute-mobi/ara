@@ -254,7 +254,7 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
@@ -356,7 +356,7 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
@@ -419,7 +419,7 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
@@ -567,7 +567,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:NumberOfStopsAway                         | 1                                                           | StopVisit#Attribute[NumberOfStopsAway]                |
 
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes with the rewrite JourneyPatternRef setting
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                      | test     |
       | remote_objectid_kind                  | internal |
       | broadcast.rewrite_journey_pattern_ref | true     |
@@ -911,7 +911,7 @@ Feature: Support SIRI StopMonitoring by request
     #   | CollectedUntil | ~ 07h54 |
 
   Scenario: 2481 - Handle a SIRI StopMonitoring request on a unknown StopArea
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     When I send a SIRI GetStopMonitoring request with
@@ -949,7 +949,7 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   Scenario: Handle a SIRI StopMonitoring request with descendants
-      Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
         | local_credential     | test     |
         | remote_objectid_kind | internal |
       And a StopArea exists with the following attributes:
@@ -1110,7 +1110,7 @@ Feature: Support SIRI StopMonitoring by request
       Then the SIRI server should have received 1 GetStopMonitoring request
 
   Scenario: Handle a SIRI StopMonitoring request with Operator
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | external |
     And a StopArea exists with the following attributes:
@@ -1215,7 +1215,7 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   Scenario: Handle a SIRI StopMonitoring request with a not monitored StopArea
-    Given a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | external |
     And a StopArea exists with the following attributes:

@@ -4,7 +4,7 @@ Feature: Support SIRI GetSIRI
     Given a Referential "test" is created
 
   Scenario: 2462 - Handle a SIRI GetSIRIService request with several StopMonitorings
-    Given a Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
       | remote_objectid_kind | internal         |
     And a StopArea exists with the following attributes:
@@ -186,7 +186,7 @@ Feature: Support SIRI GetSIRI
       """
 
   Scenario: 2481 - Handle a GetSIRIService request with a StopMonitoring request on a unknown StopArea
-    Given a Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
       | remote_objectid_kind | internal         |
     And a StopArea exists with the following attributes:

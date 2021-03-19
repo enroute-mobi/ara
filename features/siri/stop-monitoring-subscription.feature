@@ -440,7 +440,7 @@ Feature: Support SIRI StopMonitoring by subscription
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
@@ -606,7 +606,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
        | remote_url                            | http://localhost:8090 |
        | remote_credential                     | test                  |
        | local_credential                      | NINOXE:default        |
@@ -773,7 +773,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
        | remote_url                                 | http://localhost:8090 |
        | remote_credential                          | test                  |
        | local_credential                           | NINOXE:default        |
@@ -937,7 +937,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, test-stop-monitoring-request-collector, siri-stop-monitoring-subscription-broadcaster] and the following settings:
        | remote_url                               | http://localhost:8090 |
        | remote_credential                        | test                  |
        | local_credential                         | NINOXE:default        |
