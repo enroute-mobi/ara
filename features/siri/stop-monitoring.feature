@@ -65,7 +65,7 @@ Feature: Support SIRI StopMonitoring
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ratpdev               |
       | remote_objectid_kind | internal              |
-    And a Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | STIF                                           |
       | remote_objectid_kind | external                                       |
       | remote_credential    | RATPDev                                        |
@@ -230,7 +230,7 @@ Feature: Support SIRI StopMonitoring
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ratpdev               |
       | remote_objectid_kind | internal              |
-    And a Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                           | STIF                                           |
       | remote_objectid_kind                       | external                                       |
       | remote_credential                          | RATPDev                                        |
@@ -392,7 +392,7 @@ Feature: Support SIRI StopMonitoring
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ratpdev               |
       | remote_objectid_kind | internal              |
-    And a Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                         | STIF                                           |
       | remote_objectid_kind                     | external                                       |
       | remote_credential                        | RATPDev                                        |
@@ -554,7 +554,7 @@ Feature: Support SIRI StopMonitoring
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ratpdev               |
       | remote_objectid_kind | internal              |
-    And a Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+    And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | STIF     |
       | remote_objectid_kind | external |
       | remote_credential    | RATPDev  |

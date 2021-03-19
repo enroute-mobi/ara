@@ -22,10 +22,12 @@ def set_default_generators! attributes
   end
 end
 
-Given(/^a Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors \[([^"\]]*)\] and the following settings:$/) do |slug, referential, connectors, settings|
+Given(/^a (SIRI )?Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with connectors \[([^"\]]*)\] and the following settings:$/) do |siri, slug, referential, connectors, settings|
 	attributes = {"slug" => slug, "connectorTypes" => connectors.split(',').map(&:strip), "settings" => settings.rows_hash}
   # Set default generators to avoid updating all cucumber tests
-  set_default_generators!(attributes)
+  if siri
+    set_default_generators!(attributes)
+  end
 
   begin
 	  RestClient.post partners_path(referential: referential), attributes.to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}

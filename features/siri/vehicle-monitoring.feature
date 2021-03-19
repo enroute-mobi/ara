@@ -2,7 +2,7 @@ Feature: Support SIRI VehicleMonitoring
 
   Background:
     Given a Referential "test" exists
-    Given a Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
 

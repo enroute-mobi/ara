@@ -4,7 +4,7 @@ Feature: Support SIRI EstimatedTimeTable
       Given a Referential "test" is created
 
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
-    Given a Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
     And a StopArea exists with the following attributes:
@@ -193,7 +193,7 @@ Feature: Support SIRI EstimatedTimeTable
       """
 
   Scenario: 3950 - Handle a SIRI EstimatedTimeTable request with the no rewrite setting
-    Given a Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential                           | test            |
       | remote_objectid_kind                       | internal        |
       | broadcast.no_destinationref_rewriting_from | NoRewriteOrigin |

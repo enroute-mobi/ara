@@ -25,7 +25,7 @@ Feature: Support SIRI GeneralMessage for Situation
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
-    And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | TestPartner |
       | remote_objectid_kind | internal    |
     When I send this SIRI request
@@ -105,7 +105,7 @@ Feature: Support SIRI GeneralMessage for Situation
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
-    And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
     When I send this SIRI request
@@ -316,7 +316,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidUntil              | 2017-01-01T12:01:00+02:00                                                  |
       | Messages[0]#MessageType | longMessage                                                                |
       | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-    And a Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
     And a Line exists with the following attributes:
@@ -379,7 +379,7 @@ Feature: Support SIRI GeneralMessage for Situation
     Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
     """
     """
-    And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
@@ -416,7 +416,7 @@ Feature: Support SIRI GeneralMessage for Situation
     Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
     """
     """
-      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+      And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
@@ -460,7 +460,7 @@ Feature: Support SIRI GeneralMessage for Situation
     Given a SIRI server waits GetGeneralMessage request on "http://localhost:8090" to respond with
     """
     """
-      And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+      And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |

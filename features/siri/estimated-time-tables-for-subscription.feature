@@ -84,7 +84,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
@@ -208,7 +208,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       </S:Body>
       </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url                                 | http://localhost:8090 |
        | remote_credential                          | test                  |
        | local_credential                           | NINOXE:default        |

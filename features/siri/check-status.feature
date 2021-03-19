@@ -3,7 +3,7 @@ Feature: Support SIRI CheckStatus
     Given a Referential "test" is created
 
   Scenario: 2460 - Handle a SIRI Checkstatus request
-    Given a Partner "test" exists with connectors [siri-check-status-server] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-check-status-server] and the following settings:
       | local_credential | test |
     When I send this SIRI request to the Referential "test"
       """
@@ -84,7 +84,7 @@ Feature: Support SIRI CheckStatus
       """
 
   Scenario: Manage several local credentials on siri-check-status-server connecter
-    Given a Partner "test" exists with connectors [siri-check-status-server] and the following settings:
+    Given a SIRI Partner "test" exists with connectors [siri-check-status-server] and the following settings:
       | local_credentials | test1,test2 |
     When I send this SIRI request to the Referential "test"
       """
