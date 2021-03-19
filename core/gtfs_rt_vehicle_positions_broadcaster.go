@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -91,18 +90,19 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 				RouteId: &routeId,
 			}
 
-			// That part is really not optimized, we could cut it if we have performance problems as StartTime is optionnal
-			stopVisits := tx.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
-			if len(stopVisits) > 0 {
-				sort.Slice(stopVisits, func(i, j int) bool {
-					return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
-				})
-				startTime := stopVisits[0].ReferenceDepartureTime()
-				if !startTime.IsZero() {
-					t := startTime.Format("15:04:05")
-					trip.StartTime = &t
-				}
-			}
+			// ARA-874
+			// // That part is really not optimized, we could cut it if we have performance problems as StartTime is optionnal
+			// stopVisits := tx.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
+			// if len(stopVisits) > 0 {
+			// 	sort.Slice(stopVisits, func(i, j int) bool {
+			// 		return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
+			// 	})
+			// 	startTime := stopVisits[0].ReferenceDepartureTime()
+			// 	if !startTime.IsZero() {
+			// 		t := startTime.Format("15:04:05")
+			// 		trip.StartTime = &t
+			// 	}
+			// }
 
 			trips[vehicles[i].VehicleJourneyId] = trip
 		}
