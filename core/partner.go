@@ -44,6 +44,8 @@ const (
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 
+	DISCOVERY_INTERVAL = "discovery_interval"
+
 	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
@@ -329,7 +331,7 @@ func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
 		return setting
 	}
-	return partner.Setting(VEHICLE_REMOTE_OBJECTID_KIND)
+	return partner.Setting(REMOTE_OBJECTID_KIND)
 }
 
 func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
@@ -711,7 +713,7 @@ func (partner *Partner) LastDiscovery() time.Time {
 }
 
 func (partner *Partner) DiscoveryInterval() time.Duration {
-	d, _ := time.ParseDuration(partner.Settings["discovery_interval"])
+	d, _ := time.ParseDuration(partner.Settings[DISCOVERY_INTERVAL])
 	if d == 0 {
 		d = 1 * time.Hour
 	}
