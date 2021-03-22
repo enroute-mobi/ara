@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
@@ -14,6 +15,8 @@ type VehiclePositionBroadcaster struct {
 	clock.ClockConsumer
 
 	BaseConnector
+
+	cache *cache.CachedItem
 
 	referenceGenerator *IdentifierGenerator
 }
@@ -33,11 +36,21 @@ func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster
 	connector := &VehiclePositionBroadcaster{}
 	connector.partner = partner
 	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
+	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) interface{} { return connector.handleGtfs() })
 
 	return connector
 }
 
 func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
+	entities := connector.cache.Value().([]*gtfs.FeedEntity)
+
+	for i := range entities {
+		feed.Entity = append(feed.Entity, entities[i])
+	}
+	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(len(entities))
+}
+
+func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -48,7 +61,6 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	vehicleObjectidKind := connector.partner.VehicleRemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 
-	var n int
 	for i := range vehicles {
 		vehicleId, ok := vehicles[i].ObjectID(vehicleObjectidKind)
 		if !ok {
@@ -125,9 +137,7 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 			},
 		}
 
-		feed.Entity = append(feed.Entity, feedEntity)
-		n++
+		entities = append(entities, feedEntity)
 	}
-
-	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(n)
+	return
 }

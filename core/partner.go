@@ -57,6 +57,8 @@ const (
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
 
+	CACHE_TIMEOUT = "cache_timeout"
+
 	// Generators
 	MESSAGE_IDENTIFIER             = "message_identifier"
 	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
@@ -327,7 +329,12 @@ func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
 	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
 		return setting
 	}
-	return partner.Setting(REMOTE_OBJECTID_KIND)
+	return partner.Setting(VEHICLE_REMOTE_OBJECTID_KIND)
+}
+
+func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
+	t, _ = time.ParseDuration(partner.Setting(fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)))
+	return
 }
 
 func (partner *Partner) ProducerRef() string {
