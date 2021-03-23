@@ -49,15 +49,20 @@ func (item *CachedItem) SetDataLoader(f func(...interface{}) interface{}) {
 
 func (item *CachedItem) Value(args ...interface{}) interface{} {
 	item.RLock()
-	if item.data != nil {
-		item.RUnlock()
-		return item.data
-	}
+	d := item.data
 	item.RUnlock()
+
+	if d != nil {
+		return d
+	}
 
 	item.Lock()
 	// Double check
 	if item.data == nil && item.loadData != nil {
+		// Ensure we never have 2 AfterFunc simustaniously
+		if item.cleanupTimer != nil {
+			item.cleanupTimer.Stop()
+		}
 		logger.Log.Debugf("Load data for item %v", item.key)
 		item.data = item.loadData(args)
 		item.cleanupTimer = time.AfterFunc(item.lifeSpan, func() { item.expire() })
