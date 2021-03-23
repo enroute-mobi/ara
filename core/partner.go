@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
@@ -51,6 +52,7 @@ const (
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
 	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
 	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
+	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
 	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
@@ -121,6 +123,8 @@ type Partner struct {
 	context             Context
 	subscriptionManager Subscriptions
 	manager             Partners
+
+	gtfsCache *cache.CacheTable
 }
 
 type ByPriority []*Partner
@@ -261,6 +265,7 @@ func NewPartner() *Partner {
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
+		gtfsCache: cache.NewCacheTable(),
 	}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
@@ -293,6 +298,10 @@ func (partner *Partner) SetSlug(s PartnerSlug) {
 
 func (partner *Partner) Setting(key string) string {
 	return partner.Settings[key]
+}
+
+func (partner *Partner) GtfsCache() *cache.CacheTable {
+	return partner.gtfsCache
 }
 
 func (partner *Partner) Credentials() string {
@@ -332,6 +341,16 @@ func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
 		return setting
 	}
 	return partner.Setting(REMOTE_OBJECTID_KIND)
+}
+
+// Very specific for now, we'll refacto if we need to cache more
+func (partner *Partner) GtfsCacheTimeout() (t time.Duration) {
+	t, _ = time.ParseDuration(partner.Setting(BROADCAST_GTFS_CACHE_TIMEOUT))
+	if t < cache.MIN_CACHE_LIFESPAN {
+		t = cache.DEFAULT_CACHE_LIFESPAN
+	}
+
+	return
 }
 
 func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
@@ -403,6 +422,7 @@ func (partner *Partner) Stop() {
 		}
 	}
 	partner.CancelSubscriptions()
+	partner.gtfsCache.Clear()
 }
 
 func (partner *Partner) Start() {
@@ -416,6 +436,11 @@ func (partner *Partner) Start() {
 			c.Start()
 		}
 	}
+
+	to := partner.GtfsCacheTimeout()
+	partner.gtfsCache.Add("trip-updates", to, nil)
+	partner.gtfsCache.Add("vehicle-positions", to, nil)
+	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
 }
 
 func (partner *Partner) CollectPriority() int {
@@ -786,6 +811,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
 		ConnectorTypes: []string{},
+		gtfsCache:      cache.NewCacheTable(),
 	}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner

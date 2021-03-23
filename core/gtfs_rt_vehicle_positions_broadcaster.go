@@ -36,21 +36,22 @@ func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster
 	connector := &VehiclePositionBroadcaster{}
 	connector.partner = partner
 	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
-	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) interface{} { return connector.handleGtfs() })
+	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
 }
 
 func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
-	entities := connector.cache.Value().([]*gtfs.FeedEntity)
+	entities, _ := connector.cache.Value()
+	feedEntities := entities.([]*gtfs.FeedEntity)
 
-	for i := range entities {
-		feed.Entity = append(feed.Entity, entities[i])
+	for i := range feedEntities {
+		feed.Entity = append(feed.Entity, feedEntities[i])
 	}
-	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(len(entities))
+	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(len(feedEntities))
 }
 
-func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity) {
+func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 

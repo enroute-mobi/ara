@@ -45,21 +45,22 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	connector.partner = partner
 	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
 	connector.stopAreareferenceGenerator = partner.IdentifierGeneratorWithDefault("reference_stop_area_identifier", "%{objectid}")
-	connector.cache = cache.NewCachedItem("TripUpdates", partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) interface{} { return connector.handleGtfs() })
+	connector.cache = cache.NewCachedItem("TripUpdates", partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
 }
 
 func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
-	entities := connector.cache.Value().([]*gtfs.FeedEntity)
+	entities, _ := connector.cache.Value()
+	feedEntities := entities.([]*gtfs.FeedEntity)
 
-	for i := range entities {
-		feed.Entity = append(feed.Entity, entities[i])
+	for i := range feedEntities {
+		feed.Entity = append(feed.Entity, feedEntities[i])
 	}
-	logStashEvent["trip_update_quantity"] = strconv.Itoa(len(entities))
+	logStashEvent["trip_update_quantity"] = strconv.Itoa(len(feedEntities))
 }
 
-func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity) {
+func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 

@@ -24,10 +24,10 @@ type CachedItem struct {
 	// To cancel AfterFunc
 	cleanupTimer *time.Timer
 
-	loadData func(...interface{}) interface{}
+	loadData func(...interface{}) (interface{}, error)
 }
 
-func NewCachedItem(key string, lifeSpan time.Duration, data interface{}, loader func(...interface{}) interface{}) *CachedItem {
+func NewCachedItem(key string, lifeSpan time.Duration, data interface{}, loader func(...interface{}) (interface{}, error)) *CachedItem {
 	if lifeSpan < MIN_CACHE_LIFESPAN {
 		lifeSpan = DEFAULT_CACHE_LIFESPAN
 	}
@@ -41,35 +41,48 @@ func NewCachedItem(key string, lifeSpan time.Duration, data interface{}, loader 
 	}
 }
 
-func (item *CachedItem) SetDataLoader(f func(...interface{}) interface{}) {
+func (item *CachedItem) SetDataLoader(f func(...interface{}) (interface{}, error)) {
 	item.Lock()
 	item.loadData = f
 	item.Unlock()
 }
 
-func (item *CachedItem) Value(args ...interface{}) interface{} {
+func (item *CachedItem) Value(args ...interface{}) (interface{}, error) {
+	var f func() (interface{}, error)
+	if item.loadData != nil {
+		f = func() (interface{}, error) { return item.loadData(args) }
+	}
+
+	return item.Fetch(f)
+}
+
+func (item *CachedItem) Fetch(f func() (interface{}, error)) (interface{}, error) {
 	item.RLock()
 	d := item.data
 	item.RUnlock()
 
 	if d != nil {
-		return d
+		return d, nil
 	}
 
 	item.Lock()
+	defer item.Unlock()
+	var err error
 	// Double check
-	if item.data == nil && item.loadData != nil {
+	if item.data == nil && f != nil {
 		// Ensure we never have 2 AfterFunc simustaniously
 		if item.cleanupTimer != nil {
 			item.cleanupTimer.Stop()
 		}
 		logger.Log.Debugf("Load data for item %v", item.key)
-		item.data = item.loadData(args)
+		item.data, err = f()
+		if err != nil {
+			return nil, err
+		}
 		item.cleanupTimer = time.AfterFunc(item.lifeSpan, func() { item.expire() })
 	}
 
-	item.Unlock()
-	return item.data
+	return item.data, nil
 }
 
 func (item *CachedItem) Stop() {
