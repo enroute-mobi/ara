@@ -161,7 +161,7 @@ func Test_APIReferential_Validate(t *testing.T) {
 	}
 
 	// Check wrong format slug
-	apiReferential.Slug = "Wrong_format"
+	apiReferential.Slug = "Wrong_format;"
 	valid = apiReferential.Validate()
 
 	if valid {

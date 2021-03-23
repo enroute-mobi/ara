@@ -12,7 +12,7 @@ func (errors Errors) Empty() bool {
 
 const (
 	ERROR_BLANK       = "Can't be empty"
-	ERROR_SLUG_FORMAT = "Invalid format: only lowercase alphanumeric characters and _"
+	ERROR_SLUG_FORMAT = "Invalid format: only alphanumeric characters - and _"
 	ERROR_ZERO        = "Can't be zero"
 	ERROR_UNIQUE      = "Is already in use"
 )

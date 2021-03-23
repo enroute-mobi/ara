@@ -26,7 +26,7 @@ const (
 )
 
 // Validation
-var slugRegexp = regexp.MustCompile(`^[a-z0-9-_]+$`)
+var slugRegexp = regexp.MustCompile(`^[A-Za-z0-9-_]+$`)
 
 type Referential struct {
 	clock.ClockConsumer
