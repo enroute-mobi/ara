@@ -71,37 +71,24 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	version := "2.0"
-	timestamp := uint64(handler.referential.Clock().Now().Unix())
-	incrementality := gtfs.FeedHeader_FULL_DATASET
-
-	feed := &gtfs.FeedMessage{}
-	feed.Header = &gtfs.FeedHeader{}
-	feed.Header.GtfsRealtimeVersion = &version
-	feed.Header.Incrementality = &incrementality
-	feed.Header.Timestamp = &timestamp
-
-	for i := range gc {
-		gc[i].HandleGtfs(feed, logStashEvent)
-	}
-
-	data, err := proto.Marshal(feed)
+	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc, logStashEvent) })
 	if err != nil {
-		handler.logError(message, startTime, "Error while marshaling feed: %v", err)
+		handler.logError(message, startTime, "%v", err)
 		http.Error(response, "Internal error", http.StatusInternalServerError)
 		return
 	}
+	data := d.([]byte)
 
 	// Prepare the http response
 	var buffer bytes.Buffer
 	if partner.GzipGtfs() {
 		g := gzip.NewWriter(&buffer)
-		if _, err = g.Write(data); err != nil {
+		if _, err := g.Write(data); err != nil {
 			handler.logError(message, startTime, "Can't gzip feed: %v", err)
 			http.Error(response, "Internal error", http.StatusInternalServerError)
 			return
 		}
-		if err = g.Close(); err != nil {
+		if err := g.Close(); err != nil {
 			handler.logError(message, startTime, "Can't close gzip writer: %v", err)
 			http.Error(response, "Internal error", http.StatusInternalServerError)
 			return
@@ -126,6 +113,24 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		request.Header.Set("Content-Encoding", "gzip")
 	}
 	response.Write(buffer.Bytes())
+}
+
+func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit.LogStashEvent) ([]byte, error) {
+	version := "2.0"
+	timestamp := uint64(handler.referential.Clock().Now().Unix())
+	incrementality := gtfs.FeedHeader_FULL_DATASET
+
+	feed := &gtfs.FeedMessage{}
+	feed.Header = &gtfs.FeedHeader{}
+	feed.Header.GtfsRealtimeVersion = &version
+	feed.Header.Incrementality = &incrementality
+	feed.Header.Timestamp = &timestamp
+
+	for i := range gc {
+		gc[i].HandleGtfs(feed, logStashEvent)
+	}
+
+	return proto.Marshal(feed)
 }
 
 func (handler *GtfsHandler) newBQMessage(partner *core.Partner) *audit.BigQueryMessage {

@@ -2,10 +2,10 @@ package core
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
@@ -15,6 +15,8 @@ type VehiclePositionBroadcaster struct {
 	clock.ClockConsumer
 
 	BaseConnector
+
+	cache *cache.CachedItem
 
 	referenceGenerator *IdentifierGenerator
 }
@@ -34,11 +36,22 @@ func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster
 	connector := &VehiclePositionBroadcaster{}
 	connector.partner = partner
 	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
+	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
 }
 
 func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
+	entities, _ := connector.cache.Value()
+	feedEntities := entities.([]*gtfs.FeedEntity)
+
+	for i := range feedEntities {
+		feed.Entity = append(feed.Entity, feedEntities[i])
+	}
+	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(len(feedEntities))
+}
+
+func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -49,7 +62,6 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	vehicleObjectidKind := connector.partner.VehicleRemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 
-	var n int
 	for i := range vehicles {
 		vehicleId, ok := vehicles[i].ObjectID(vehicleObjectidKind)
 		if !ok {
@@ -91,18 +103,19 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 				RouteId: &routeId,
 			}
 
-			// That part is really not optimized, we could cut it if we have performance problems as StartTime is optionnal
-			stopVisits := tx.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
-			if len(stopVisits) > 0 {
-				sort.Slice(stopVisits, func(i, j int) bool {
-					return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
-				})
-				startTime := stopVisits[0].ReferenceDepartureTime()
-				if !startTime.IsZero() {
-					t := startTime.Format("15:04:05")
-					trip.StartTime = &t
-				}
-			}
+			// ARA-874
+			// // That part is really not optimized, we could cut it if we have performance problems as StartTime is optionnal
+			// stopVisits := tx.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
+			// if len(stopVisits) > 0 {
+			// 	sort.Slice(stopVisits, func(i, j int) bool {
+			// 		return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
+			// 	})
+			// 	startTime := stopVisits[0].ReferenceDepartureTime()
+			// 	if !startTime.IsZero() {
+			// 		t := startTime.Format("15:04:05")
+			// 		trip.StartTime = &t
+			// 	}
+			// }
 
 			trips[vehicles[i].VehicleJourneyId] = trip
 		}
@@ -125,9 +138,7 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 			},
 		}
 
-		feed.Entity = append(feed.Entity, feedEntity)
-		n++
+		entities = append(entities, feedEntity)
 	}
-
-	logStashEvent["vehicle_position_quantity"] = strconv.Itoa(n)
+	return
 }

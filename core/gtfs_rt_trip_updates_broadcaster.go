@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -21,6 +22,8 @@ type TripUpdatesBroadcaster struct {
 	clock.ClockConsumer
 
 	BaseConnector
+
+	cache *cache.CachedItem
 
 	referenceGenerator         *IdentifierGenerator
 	stopAreareferenceGenerator *IdentifierGenerator
@@ -42,11 +45,22 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	connector.partner = partner
 	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
 	connector.stopAreareferenceGenerator = partner.IdentifierGeneratorWithDefault("reference_stop_area_identifier", "%{objectid}")
+	connector.cache = cache.NewCachedItem("TripUpdates", partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
 }
 
 func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
+	entities, _ := connector.cache.Value()
+	feedEntities := entities.([]*gtfs.FeedEntity)
+
+	for i := range feedEntities {
+		feed.Entity = append(feed.Entity, feedEntities[i])
+	}
+	logStashEvent["trip_update_quantity"] = strconv.Itoa(len(feedEntities))
+}
+
+func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -136,7 +150,6 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 		feedEntity.TripUpdate.StopTimeUpdate = append(feedEntity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
 	}
 
-	var n int
 	for _, entity := range feedEntities {
 		if len(entity.TripUpdate.StopTimeUpdate) == 0 {
 			continue
@@ -149,9 +162,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 		// 	startTime := time.Unix(*entity.TripUpdate.StopTimeUpdate[0].Departure.Time, 0).Format("15:04:05")
 		// 	entity.TripUpdate.Trip.StartTime = &startTime
 		// }
-		feed.Entity = append(feed.Entity, entity)
-		n++
+		entities = append(entities, entity)
 	}
-
-	logStashEvent["trip_update_quantity"] = strconv.Itoa(n)
+	return
 }
