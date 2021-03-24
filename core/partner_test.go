@@ -358,7 +358,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 	}
 
 	// Check wrong format slug
-	apiPartner.Slug = "Wrong_format;"
+	apiPartner.Slug = "Wrong_format"
 	valid = apiPartner.Validate()
 
 	if valid {
