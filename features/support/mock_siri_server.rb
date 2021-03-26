@@ -5,7 +5,7 @@ class SIRIServer
 
   @@servers = {}
   def self.each(&block)
-    @@servers.values.each &block
+    @@servers.values.each(&block)
   end
 
   def self.create(name, url)
@@ -59,8 +59,11 @@ class SIRIServer
     </ns8:CheckStatusResponse>
   </S:Body>
 </S:Envelope>}
-		  else
-        puts "Receive SIRI request" if ENV["SIRI_DEBUG"]
+      else
+        if ENV["SIRI_DEBUG"]
+          puts "Receive SIRI request:"
+          puts req
+        end
 			  self.requests << req
 
         request_body = self.responses.shift
@@ -69,7 +72,7 @@ class SIRIServer
         request_body.gsub!("{LastRequestMessageRef}", request_message_identifiers.last)
 
 		    res.body = request_body
-		  end
+      end
 
 		  res.content_type = "text/xml"
 	  end
