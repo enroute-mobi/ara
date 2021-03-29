@@ -42,7 +42,7 @@ const (
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
-	COLLECT_USE_SPD                  = "collect.use_stop_points_discovery"
+	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 
@@ -462,7 +462,7 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting(COLLECT_USE_SPD) != "" {
+	if partner.Setting(COLLECT_USE_DISCOVERED_SA) != "" {
 		_, ok := partner.spdStops[stopAreaObjectId.Value()]
 		return ok
 	}

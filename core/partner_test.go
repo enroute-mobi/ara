@@ -239,7 +239,7 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_SPD] = "true"
+	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -256,7 +256,7 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_SPD] = "true"
+	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
 	if partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -271,7 +271,7 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_SPD] = "true"
+	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -310,7 +310,7 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_SPD] = "true"
+	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -334,7 +334,7 @@ func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 	partner.spdStops = make(map[string]struct{})
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
-	partner.Settings[COLLECT_USE_SPD] = "true"
+	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
 	partner.spdStops["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")

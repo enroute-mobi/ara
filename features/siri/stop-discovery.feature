@@ -203,12 +203,12 @@ Feature: Support SIRI StopPointsDiscovery
       | remote_url                        | http://localhost:8090      |
       | remote_credential                 | test                       |
       | remote_objectid_kind              | internal                   |
-      | collect.use_stop_points_discovery | true                       |
+      | collect.use_discovered_stop_areas | true                       |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091      |
       | remote_credential                 | test                       |
       | remote_objectid_kind              | internal                   |
-      | collect.use_stop_points_discovery | true                       |
+      | collect.use_discovered_stop_areas | true                       |
     When 2 minutes have passed
     And 2 minutes have passed
     Then the "A" SIRI server should have received a GetStopMonitoring request with:
