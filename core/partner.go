@@ -830,6 +830,7 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
+		mutex:      &sync.RWMutex{},
 		slug:       slug,
 		manager:    manager,
 		Settings:   make(map[string]string),
