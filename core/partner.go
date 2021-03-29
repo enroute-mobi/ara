@@ -462,18 +462,13 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting(COLLECT_USE_DISCOVERED_SA) != "" {
-		_, ok := partner.spdStops[stopAreaObjectId.Value()]
-		return ok
-	}
-
-	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" {
+	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_USE_DISCOVERED_SA) == "" {
 		return true
 	}
 	if partner.excludedStopArea(stopAreaObjectId) {
 		return false
 	}
-	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds)
+	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds) || partner.checkDiscovered(stopAreaObjectId)
 }
 
 func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
@@ -487,6 +482,11 @@ func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 		}
 	}
 	return false
+}
+
+func (partner *Partner) checkDiscovered(stopAreaObjectId model.ObjectID) (ok bool) {
+	_, ok = partner.spdStops[stopAreaObjectId.Value()]
+	return
 }
 
 func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
