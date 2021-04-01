@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -51,10 +50,11 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 		return
 	}
 
+	message.Partner = string(connector.(*core.SIRICheckStatusServer).Partner().Slug())
 	message.Type = "CheckStatusRequest"
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
-	message.ProcessingTime = time.Since(t).Seconds()
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

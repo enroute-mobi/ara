@@ -77,7 +77,7 @@ Feature: Support SIRI CheckStatus
   <S:Body>
     <S:Fault>
       <faultcode>S:UnknownCredential</faultcode>
-      <faultstring>RequestorRef Unknown</faultstring>
+      <faultstring>RequestorRef Unknown 'invalid'</faultstring>
     </S:Fault>
   </S:Body>
 </S:Envelope>

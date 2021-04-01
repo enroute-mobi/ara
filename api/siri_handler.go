@@ -136,7 +136,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 	partner, ok := handler.referential.Partners().FindByCredential(requestHandler.RequestorRef())
 	if !ok {
-		siriErrorWithRequest("UnknownCredential", "RequestorRef Unknown", string(handler.referential.Slug()), envelope.Body().String(), response)
+		siriErrorWithRequest("UnknownCredential", fmt.Sprintf("RequestorRef Unknown '%s'", requestHandler.RequestorRef()), string(handler.referential.Slug()), envelope.Body().String(), response)
 		return
 	}
 	connector, ok := partner.Connector(requestHandler.ConnectorType())

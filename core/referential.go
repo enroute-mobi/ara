@@ -151,7 +151,7 @@ func (referential *Referential) Start() {
 	// Configure BigQuery
 	if config.Config.ValidBQConfig() {
 		dataset := fmt.Sprintf("%v_%v", config.Config.BigQueryDatasetPrefix, referential.slug)
-		audit.SetCurrentBigQuery(string(referential.slug), audit.NewBigQueryClient(config.Config.BigQueryProjectID, dataset))
+		audit.SetCurrentBigQuery(string(referential.slug), audit.NewBigQuery(dataset))
 		audit.CurrentBigQuery(string(referential.slug)).Start()
 	}
 

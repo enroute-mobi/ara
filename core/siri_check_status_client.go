@@ -168,4 +168,5 @@ func logXMLCheckStatusResponse(logStashEvent audit.LogStashEvent, message *audit
 	logStashEvent["responseXML"] = response.RawXML()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 }

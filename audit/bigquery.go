@@ -1,11 +1,15 @@
 package audit
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
 	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -67,7 +71,7 @@ func NewNullBigQuery() BigQuery {
 	return &NullBigQuery{}
 }
 
-/**** Test Structure ****/
+/**** Test Memory Structure ****/
 type FakeBigQuery struct {
 	messages      []*BigQueryMessage
 	partnerEvents []*BigQueryPartnerEvent
@@ -105,6 +109,43 @@ func (bq *FakeBigQuery) VehicleEvents() []*BigQueryVehicleEvent {
 	return bq.vehicleEvents
 }
 
+/**** Test External Structure ****/
+
+type TestBigQuery struct {
+	clock.ClockConsumer
+
+	target  string
+	dataset string
+}
+
+func NewTestBigQuery(dataset string) *TestBigQuery {
+	return &TestBigQuery{
+		dataset: dataset,
+		target:  config.Config.BigQueryTest,
+	}
+}
+
+func (bq *TestBigQuery) Start() {}
+func (bq *TestBigQuery) Stop()  {}
+
+func (bq *TestBigQuery) WriteEvent(e BigQueryEvent) error {
+	e.SetTimeStamp(bq.Clock().Now())
+	logger.Log.Debugf("WriteEvent %v", e)
+
+	// TODO add dataset to the json payload
+	json, _ := json.Marshal(e)
+
+	_, err := http.Post(
+		bq.target,
+		"application/json",
+		bytes.NewBuffer(json),
+	)
+
+	logger.Log.Debugf("WriteEvent err %v", err)
+
+	return err
+}
+
 /**** Real BQ ****/
 type BigQueryClient struct {
 	uuid.UUIDConsumer
@@ -123,10 +164,18 @@ type BigQueryClient struct {
 	stop            chan struct{}
 }
 
-func NewBigQueryClient(projectID, dataset string) *BigQueryClient {
+func NewBigQuery(dataset string) BigQuery {
+	if config.Config.BigQueryTestMode() {
+		return NewTestBigQuery(dataset)
+	} else {
+		return NewBigQueryClient(dataset)
+	}
+}
+
+func NewBigQueryClient(dataset string) *BigQueryClient {
 	return &BigQueryClient{
-		projectID:     projectID,
 		dataset:       dataset,
+		projectID:     config.Config.BigQueryProjectID,
 		messages:      make(chan *BigQueryMessage, 500),
 		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
 		vehicleEvents: make(chan *BigQueryVehicleEvent, 500),
