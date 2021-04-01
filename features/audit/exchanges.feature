@@ -29,7 +29,6 @@ Feature: Audit API exchanges
       | Status             | OK                    |
       | RequestIdentifier  | enRoute:Message::test |
       | ResponseIdentifier | RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC |
-      | Timestamp          | 2017-01-01T12:00:00Z  |
       | ProcessingTime     | 0                     |
 
   Scenario: Not audit SIRI CheckStatus Request for unknown partner
@@ -54,7 +53,6 @@ Feature: Audit API exchanges
       | Protocol           | siri                                            |
       | Direction          | received                                        |
       | Status             | Error                                           |
-      | Timestamp          | 2017-01-01T12:00:00Z                            |
       | ErrorDetails       | UnknownCredential: RequestorRef Unknown 'dummy' |
 
   Scenario: Audit a sent SIRI CheckStatus Request
@@ -72,10 +70,8 @@ Feature: Audit API exchanges
       | Direction          | sent                  |
       | Status             | OK                    |
       | Partner            | test                  |
-      | Timestamp          | 2017-01-01T12:00:00Z  |
-      | RequestIdentifier  | RATPDev:Message::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC |
+      | RequestIdentifier  | /{test-uuid}/         |
       | ResponseIdentifier | c464f588-5128-46c8-ac3f-8b8a465692ab |
-      | Timestamp          | 2017-01-01T12:01:00Z  |
       | ProcessingTime     | 0                     |
 
   Scenario: Audit a StopMonitoring Subscription request
@@ -105,7 +101,7 @@ Feature: Audit API exchanges
   </S:Body>
   </S:Envelope>
       """
-    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-stop-monitoring-subscription-collector] and the following settings:
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | remote_credential              |
       | local_credential                   | local_credential               |
@@ -117,14 +113,13 @@ Feature: Audit API exchanges
     When I wait that a Subscription has been created with the following attributes:
       | Kind      | StopMonitoringCollect |
     Then an audit event should exist with these attributes:
-      | Type               | StopMonitoringSubscriptionRequest |
-      | Protocol           | siri                 |
-      | Direction          | sent                 |
-      | Status             | OK                   |
-      | Partner            | test                 |
-      | RequestIdentifier  | /{test-uuid}/ |
-      | ResponseIdentifier | c464f588-5128-46c8-ac3f-8b8a465692ab |
-      | Timestamp          | 2017-01-01T12:00:50Z |
-      | ProcessingTime     | 0                    |
+      | Type                    | StopMonitoringSubscriptionRequest     |
+      | Protocol                | siri                                  |
+      | Direction               | sent                                  |
+      | Status                  | OK                                    |
+      | Partner                 | test                                  |
+      | RequestIdentifier       | /{test-uuid}/                         |
+      | ResponseIdentifier      | c464f588-5128-46c8-ac3f-8b8a465692ab  |
+      | ProcessingTime          | 0                                     |
       | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-5-00c04fd430c8"] |
-      | StopAreas | ["enRoute:StopPoint:SP:24:LOC"] |
+      | StopAreas               | ["enRoute:StopPoint:SP:24:LOC"]       |

@@ -24,6 +24,9 @@ def an_audit_event_with_attributes(attributes)
       [ attribute, matcher ]
   end.to_h
 
+  time_reference = Time.utc(2017,1,1,12)
+  attribute_matchers["Timestamp"] ||= satisfy("near #{time_reference}") { |t| Time.parse(t) - time_reference < 300 }
+
   a_hash_including(attribute_matchers)
 end
 
