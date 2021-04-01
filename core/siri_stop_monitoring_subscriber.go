@@ -171,6 +171,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logStashEvent["responseXML"] = response.RawXML()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
 	for _, responseStatus := range response.ResponseStatus() {
 		requestedSa, ok := stopAreasToRequest[responseStatus.RequestMessageRef()]
