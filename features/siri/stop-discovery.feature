@@ -1,9 +1,9 @@
-Feature: Support SIRI StopDiscovery
+Feature: Support SIRI StopPointsDiscovery
 
   Background:
     Given a Referential "test" is created
 
-  Scenario: 2464 3292 - Handle a SIRI StopDiscovery request
+  Scenario: 2464 3292 - Handle a SIRI StopPointsDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
@@ -81,7 +81,7 @@ Feature: Support SIRI StopDiscovery
       </S:Envelope>
       """
 
-  Scenario: StopDiscovery collect
+  Scenario: StopPointsDiscovery collect
     Given a SIRI server waits StopPointsDiscovery request on "http://localhost:8090" to respond with
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -116,5 +116,102 @@ Feature: Support SIRI StopDiscovery
       | remote_objectid_kind       | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
-  Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
+    Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
     And a StopArea "internal":"NINOXE:StopPoint:BP:7:LOC" should exist
+
+  Scenario: Collect Stop Areas discovered by StopPointsDiscovery (ARA-862)
+    Given a SIRI server "A" waits StopPointsDiscovery request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <Answer version="2.0">
+        <siri:Status>true</siri:Status>
+        <siri:AnnotatedStopPointRef>
+          <siri:StopPointRef>StopArea:A</siri:StopPointRef>
+          <siri:Monitored>true</siri:Monitored>
+          <siri:StopName>Stop A</siri:StopName>
+        </siri:AnnotatedStopPointRef>
+      </Answer>
+    </sw:StopPointsDiscoveryResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a SIRI server "B" waits StopPointsDiscovery request on "http://localhost:8091" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <Answer version="2.0">
+        <siri:Status>true</siri:Status>
+        <siri:AnnotatedStopPointRef>
+          <siri:StopPointRef>StopArea:B</siri:StopPointRef>
+          <siri:Monitored>true</siri:Monitored>
+          <siri:StopName>Stop B</siri:StopName>
+        </siri:AnnotatedStopPointRef>
+      </Answer>
+    </sw:StopPointsDiscoveryResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And the SIRI server "A" waits a GetStopMonitoring request to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+        <siri:ProducerRef>enRoute</siri:ProducerRef>
+        <siri:ResponseMessageIdentifier>enRoute:ResponseMessage::6ba7b814-9dad-11d1-e-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+        <siri:RequestMessageRef>enRoute:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <siri:StopMonitoringDelivery>
+          <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
+          <siri:RequestMessageRef>enRoute:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
+          <siri:MonitoringRef>StopArea:A</siri:MonitoringRef>
+          <siri:Status>true</siri:Status>
+          <siri:MonitoredStopVisit>
+            <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
+            <siri:ItemIdentifier>enRoute:Item::63a1ebcfe85a0e9a548c91a611cfb572f4a545af:LOC</siri:ItemIdentifier>
+            <siri:MonitoringRef>StopArea:A</siri:MonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:MonitoredCall>
+                <siri:StopPointRef>StopArea:A</siri:StopPointRef>
+                <siri:Order>44</siri:Order>
+                <siri:StopPointName>Stop A</siri:StopPointName>
+                <siri:AimedArrivalTime>2017-01-01T13:43:05.000+01:00</siri:AimedArrivalTime>
+                <siri:ExpectedArrivalTime>2017-01-01T13:43:05.000+01:00</siri:ExpectedArrivalTime>
+                <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                <siri:AimedDepartureTime>2017-01-01T13:43:05.000+01:00</siri:AimedDepartureTime>
+                <siri:ExpectedDepartureTime>2017-01-01T13:43:05.000+01:00</siri:ExpectedDepartureTime>
+                <siri:DepartureStatus>onTime</siri:DepartureStatus>
+              </siri:MonitoredCall>
+            </siri:MonitoredVehicleJourney>
+          </siri:MonitoredStopVisit>
+        </siri:StopMonitoringDelivery>
+      </Answer>
+      <AnswerExtension/>
+    </sw:GetStopMonitoringResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                        | http://localhost:8090      |
+      | remote_credential                 | test                       |
+      | remote_objectid_kind              | internal                   |
+      | collect.use_discovered_stop_areas | true                       |
+    And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                        | http://localhost:8091      |
+      | remote_credential                 | test                       |
+      | remote_objectid_kind              | internal                   |
+      | collect.use_discovered_stop_areas | true                       |
+    When 2 minutes have passed
+    And 2 minutes have passed
+    Then the "A" SIRI server should have received a GetStopMonitoring request with:
+      | //siri:MonitoringRef | StopArea:A |
+    And the "B" SIRI server should have received a GetStopMonitoring request with:
+      | //siri:MonitoringRef | StopArea:B |

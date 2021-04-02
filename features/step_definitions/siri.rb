@@ -40,16 +40,19 @@ Given(/^a SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond
   SIRIServer.create(name, url).expect_request(message_type, response).start
 end
 
-Given(/^the SIRI server waits (\S+) request to respond with$/) do |message_type, response|
-  SIRIServer.find("default").expect_request(message_type, response)
+Given(/^the SIRI server (?:"([^"]*)" )?waits a (\S+) request to respond with$/) do |name, message_type, response|
+  name ||= "default"
+  SIRIServer.find(name).expect_request(message_type, response)
 end
 
-When(/^the SIRI server has received a (\S+) request$/) do |message_type|
-  SIRIServer.find("default").wait_request message_type
+When(/^the SIRI server (?:"([^"]*)" )?has received a (\S+) request$/) do |name, message_type|
+  name ||= "default"
+  SIRIServer.find(name).wait_request message_type
 end
 
-When(/^the SIRI server has received (\d+) (\S+) requests$/) do |count, message_type|
-  SIRIServer.find("default").wait_request message_type, count.to_i
+When(/^the SIRI server (?:"([^"]*)" )?has received (\d+) (\S+) requests$/) do |name, count, message_type|
+  name ||= "default"
+  SIRIServer.find(name).wait_request message_type, count.to_i
 end
 
 When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|

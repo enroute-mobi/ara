@@ -42,6 +42,7 @@ const (
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 
@@ -117,6 +118,7 @@ type Partner struct {
 	Settings       map[string]string
 
 	connectors          map[string]Connector
+	discoveredStopAreas map[string]struct{}
 	startedAt           time.Time
 	lastDiscovery       time.Time
 	lastPush            time.Time
@@ -255,13 +257,15 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Test Method
 func NewPartner() *Partner {
 	partner := &Partner{
-		mutex:          &sync.RWMutex{},
-		Settings:       make(map[string]string),
-		ConnectorTypes: []string{},
-		connectors:     make(map[string]Connector),
-		context:        make(Context),
+		mutex:               &sync.RWMutex{},
+		Settings:            make(map[string]string),
+		ConnectorTypes:      []string{},
+		connectors:          make(map[string]Connector),
+		discoveredStopAreas: make(map[string]struct{}),
+		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
@@ -449,13 +453,13 @@ func (partner *Partner) CollectPriority() int {
 }
 
 func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" {
+	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_USE_DISCOVERED_SA) == "" {
 		return true
 	}
 	if partner.excludedStopArea(stopAreaObjectId) {
 		return false
 	}
-	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds)
+	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds) || partner.checkDiscovered(stopAreaObjectId)
 }
 
 func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
@@ -469,6 +473,11 @@ func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
 		}
 	}
 	return false
+}
+
+func (partner *Partner) checkDiscovered(stopAreaObjectId model.ObjectID) (ok bool) {
+	_, ok = partner.discoveredStopAreas[stopAreaObjectId.Value()]
+	return
 }
 
 func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
@@ -767,6 +776,20 @@ func (partner *Partner) Pushed() {
 	partner.lastPush = partner.manager.Referential().Clock().Now()
 }
 
+func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
+	if partner.Setting(COLLECT_USE_DISCOVERED_SA) == "" {
+		return
+	}
+
+	partner.mutex.Lock()
+
+	for i := range stops {
+		partner.discoveredStopAreas[stops[i]] = struct{}{}
+	}
+
+	partner.mutex.Unlock()
+}
+
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
 		mutex:                 &sync.RWMutex{},
@@ -802,11 +825,13 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
-		slug:       slug,
-		manager:    manager,
-		Settings:   make(map[string]string),
-		connectors: make(map[string]Connector),
-		context:    make(Context),
+		mutex:               &sync.RWMutex{},
+		slug:                slug,
+		manager:             manager,
+		Settings:            make(map[string]string),
+		connectors:          make(map[string]Connector),
+		discoveredStopAreas: make(map[string]struct{}),
+		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
