@@ -28,7 +28,7 @@ Feature: Audit API exchanges
       | Partner            | test                  |
       | Status             | OK                    |
       | RequestIdentifier  | enRoute:Message::test |
-      | ResponseIdentifier | RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC |
+      | ResponseIdentifier | /{test-uuid}/ |
       | ProcessingTime     | 0                     |
 
   Scenario: Not audit SIRI CheckStatus Request for unknown partner
