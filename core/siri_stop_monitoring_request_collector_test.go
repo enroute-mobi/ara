@@ -177,7 +177,7 @@ func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringRequest(t *testing
 	request.MonitoringRef = "test"
 	request.RequestTimestamp = time
 
-	logSIRIStopMonitoringRequest(logStashEvent, request)
+	logSIRIStopMonitoringRequest(logStashEvent, &audit.BigQueryMessage{}, request)
 	if logStashEvent["messageIdentifier"] != "0000-0000-0000-0000" {
 		t.Errorf("Wrong messageIdentifier logged:\n got: %v\n expected: 0000-0000-0000-0000", logStashEvent["messageIdentifier"])
 	}
@@ -216,7 +216,7 @@ func Test_SIRIStopMonitoringRequestCollector_LogStopMonitoringResponse(t *testin
 		t.Fatal(err)
 	}
 
-	logXMLStopMonitoringResponse(logStashEvent, response)
+	logXMLStopMonitoringResponse(logStashEvent, &audit.BigQueryMessage{}, response)
 
 	if logStashEvent["address"] != "http://appli.chouette.mobi/siri_france/siri" {
 		t.Errorf("Wrong address logged:\n got: %v\n expected: http://appli.chouette.mobi/siri_france/siri", logStashEvent["address"])

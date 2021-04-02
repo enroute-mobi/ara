@@ -25,7 +25,7 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 	return siriStopDiscoveryRequestBroadcaster
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest) (*siri.SIRIStopPointsDiscoveryResponse, error) {
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
@@ -81,7 +81,9 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	sort.Sort(siri.SIRIAnnotatedStopPointByStopPointRef(response.AnnotatedStopPoints))
 
-	logAnnotatedStopPoints(annotedStopPointMap, logStashEvent)
+	message.RequestIdentifier = request.MessageIdentifier()
+
+	logAnnotatedStopPoints(annotedStopPointMap, logStashEvent, message)
 	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
 
 	return response, nil
@@ -107,7 +109,7 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
 }
 
-func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEvent audit.LogStashEvent) {
+func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage) {
 	keys := make([]string, len(annotedStopPointMap))
 	i := 0
 	for key := range annotedStopPointMap {
@@ -116,6 +118,7 @@ func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEve
 	}
 
 	logStashEvent["annotedStopPoints"] = strings.Join(keys, ", ")
+	message.StopAreas = keys
 }
 
 func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {

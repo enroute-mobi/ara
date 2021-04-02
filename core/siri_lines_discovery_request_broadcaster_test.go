@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -47,7 +48,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, err := connector.Lines(request)
+	response, err := connector.Lines(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatal(err)
 	}

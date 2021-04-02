@@ -39,7 +39,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, err := connector.CheckStatus(request)
+	response, err := connector.CheckStatus(request, &audit.BigQueryMessage{})
 	if err != nil {
 		t.Fatal(err)
 	}

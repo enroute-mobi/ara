@@ -113,7 +113,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 		t.Fatal(err)
 	}
 
-	response := connector.RequestLine(request)
+	response := connector.RequestLine(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
@@ -250,7 +250,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 		t.Fatal(err)
 	}
 
-	response := connector.RequestLine(request)
+	response := connector.RequestLine(request, &audit.BigQueryMessage{})
 
 	if len(response.EstimatedJourneyVersionFrames) != 2 {
 		t.Fatalf("Response should have 2 EstimatedJourneyVersionFrames, got: %v", len(response.EstimatedJourneyVersionFrames))

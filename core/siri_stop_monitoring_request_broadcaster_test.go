@@ -102,7 +102,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 		t.Fatal(err)
 	}
 
-	response := connector.RequestStopArea(request)
+	response := connector.RequestStopArea(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
@@ -203,7 +203,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 		t.Fatal(err)
 	}
 
-	response := connector.RequestStopArea(request)
+	response := connector.RequestStopArea(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
@@ -295,7 +295,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 		t.Fatal(err)
 	}
 
-	response := connector.RequestStopArea(request)
+	response := connector.RequestStopArea(request, &audit.BigQueryMessage{})
 
 	if len(response.MonitoredStopVisits) != 1 {
 		t.Fatalf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
@@ -361,7 +361,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 		t.Fatal(err)
 	}
 
-	response := connector.RequestStopArea(request)
+	response := connector.RequestStopArea(request, &audit.BigQueryMessage{})
 
 	if len(response.MonitoredStopVisits) != 1 {
 		t.Fatalf("Response.MonitoredStopVisits should be 1 is %v", len(response.MonitoredStopVisits))
@@ -393,7 +393,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 		t.Fatal(err)
 	}
 
-	response := connector.RequestStopArea(request)
+	response := connector.RequestStopArea(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)

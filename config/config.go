@@ -28,7 +28,7 @@ type config struct {
 	LogStash              string
 	BigQueryProjectID     string
 	BigQueryDatasetPrefix string
-	BigQueryTable         string
+	BigQueryTest          string
 	Sentry                string
 	Syslog                bool
 	ColorizeLog           bool
@@ -61,6 +61,12 @@ func LoadConfig(path string) error {
 	// database config
 	LoadDatabaseConfig(configPath)
 
+	// Test env variables
+	bigQueryTestEnv := os.Getenv("ARA_BIGQUERY_TEST")
+	if bigQueryTestEnv != "" {
+		Config.BigQueryTest = bigQueryTestEnv
+	}
+
 	logger.Log.Syslog = Config.Syslog
 	logger.Log.Debug = Config.Debug
 	logger.Log.Color = Config.ColorizeLog
@@ -69,7 +75,11 @@ func LoadConfig(path string) error {
 }
 
 func (c *config) ValidBQConfig() bool {
-	return c.BigQueryProjectID != "" && c.BigQueryDatasetPrefix != ""
+	return c.BigQueryTestMode() || (c.BigQueryProjectID != "" && c.BigQueryDatasetPrefix != "")
+}
+
+func (c *config) BigQueryTestMode() bool {
+	return c.BigQueryTest != ""
 }
 
 var environment string

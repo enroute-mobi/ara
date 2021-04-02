@@ -12,9 +12,10 @@ import (
 type XMLSubscriptionResponse struct {
 	XMLStructure
 
-	address           string
-	requestMessageRef string
-	responderRef      string
+	address                   string
+	requestMessageRef         string
+	responderRef              string
+	responseMessageIdentifier string
 
 	responseTimestamp  time.Time
 	serviceStartedTime time.Time
@@ -116,6 +117,13 @@ func (response *XMLSubscriptionResponse) ResponseTimestamp() time.Time {
 		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
 	}
 	return response.responseTimestamp
+}
+
+func (response *XMLSubscriptionResponse) ResponseMessageIdentifier() string {
+	if response.responseMessageIdentifier == "" {
+		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
+	}
+	return response.responseMessageIdentifier
 }
 
 func (response *XMLResponseStatus) ValidUntil() time.Time {

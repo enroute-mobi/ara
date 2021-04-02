@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -65,9 +64,9 @@ func (controller *ImportController) serve(response http.ResponseWriter, request 
 	stime := controller.referential.Clock().Now()
 
 	result := model.NewLoader(string(controller.referential.Slug()), controller.importRequest.Force, false).Load(controller.csvReader)
-	logger.Log.Debugf("ImportController Load time : %v", time.Since(stime))
+	logger.Log.Debugf("ImportController Load time : %v", controller.referential.Clock().Since(stime))
 
 	jsonBytes, _ := json.Marshal(result)
-	logger.Log.Debugf("ImportController Json Marshal time : %v ", time.Since(stime))
+	logger.Log.Debugf("ImportController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
 	response.Write(jsonBytes)
 }

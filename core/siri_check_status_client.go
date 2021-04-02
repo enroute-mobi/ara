@@ -63,9 +63,12 @@ func NewSIRICheckStatusClient(partner *Partner) *SIRICheckStatusClient {
 
 func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	logStashEvent := connector.newLogStashEvent()
-	startTime := connector.Clock().Now()
-
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+
+	message := connector.newBQEvent()
+	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
+
+	startTime := connector.Clock().Now()
 
 	partnerStatus := PartnerStatus{}
 	request := &siri.SIRICheckStatusRequest{
@@ -74,18 +77,22 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
-	logSIRICheckStatusRequest(logStashEvent, request)
+	logSIRICheckStatusRequest(logStashEvent, message, request)
 
 	response, err := connector.SIRIPartner().SOAPClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
+		e := fmt.Sprintf("Error during CheckStatus: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during CheckStatus: %v", err)
+		logStashEvent["errorDescription"] = e
+		message.Status = "Error"
+		message.ErrorDetails = e
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 		return partnerStatus, err
 	}
 
-	logXMLCheckStatusResponse(logStashEvent, response)
+	logXMLCheckStatusResponse(logStashEvent, message, response)
 
 	partnerStatus.ServiceStartedAt = response.ServiceStartedTime()
 	if response.Status() {
@@ -94,6 +101,16 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	} else {
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
 		return partnerStatus, nil
+	}
+}
+
+func (connector *SIRICheckStatusClient) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "CheckStatusRequest",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 
@@ -113,7 +130,7 @@ func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) C
 	return NewSIRICheckStatusClient(partner)
 }
 
-func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.SIRICheckStatusRequest) {
+func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRICheckStatusRequest) {
 	logStashEvent["siriType"] = "CheckStatusRequest"
 	logStashEvent["messageIdentifier"] = request.MessageIdentifier
 	logStashEvent["requestorRef"] = request.RequestorRef
@@ -124,23 +141,32 @@ func logSIRICheckStatusRequest(logStashEvent audit.LogStashEvent, request *siri.
 		return
 	}
 	logStashEvent["requestXML"] = xml
+
+	message.RequestIdentifier = request.MessageIdentifier
+	message.RequestRawMessage = xml
+	message.RequestSize = int64(len(xml))
 }
 
-func logXMLCheckStatusResponse(logStashEvent audit.LogStashEvent, response *siri.XMLCheckStatusResponse) {
+func logXMLCheckStatusResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLCheckStatusResponse) {
 	logStashEvent["address"] = response.Address()
 	logStashEvent["producerRef"] = response.ProducerRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
 	logStashEvent["status"] = strconv.FormatBool(response.Status())
 	if !response.Status() {
+		message.Status = "Error"
 		logStashEvent["errorType"] = response.ErrorType()
 		if response.ErrorType() == "OtherError" {
 			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
 		}
 		logStashEvent["errorText"] = response.ErrorText()
 		logStashEvent["errorDescription"] = response.ErrorDescription()
+		message.ErrorDetails = response.ErrorString()
 	}
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
 	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime().String()
 	logStashEvent["responseXML"] = response.RawXML()
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 }

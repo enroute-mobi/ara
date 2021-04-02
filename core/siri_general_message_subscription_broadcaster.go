@@ -9,17 +9,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
-
-type GeneralMessageSubscriptionBroadcaster interface {
-	state.Stopable
-	state.Startable
-
-	HandleGeneralMessageBroadcastEvent(*model.GeneralMessageBroadcastEvent)
-	HandleSubscriptionRequest(*siri.XMLSubscriptionRequest)
-}
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
 	clock.ClockConsumer
@@ -116,8 +107,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	}
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest) []siri.SIRIResponseStatus {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) []siri.SIRIResponseStatus {
 	resps := []siri.SIRIResponseStatus{}
+
+	var subIds []string
 
 	for _, gm := range request.XMLSubscriptionGMEntries() {
 		logStashEvent := connector.newLogStashEvent()
@@ -131,6 +124,8 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			ResponseTimestamp: connector.Clock().Now(),
 			ValidUntil:        gm.InitialTerminationTime(),
 		}
+
+		subIds = append(subIds, gm.SubscriptionIdentifier())
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
@@ -163,6 +158,10 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		logSIRIGeneralMessageSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 	}
+
+	message.Type = "StopMonitoringSubscriptionRequest"
+	message.SubscriptionIdentifiers = subIds
+
 	return resps
 }
 

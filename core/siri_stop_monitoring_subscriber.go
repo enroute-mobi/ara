@@ -117,6 +117,9 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logStashEvent := subscriber.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	message := subscriber.newBQEvent()
+	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
 		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
@@ -124,6 +127,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
+	var subIds []string
 	for messageIdentifier, requestedSa := range stopAreasToRequest {
 		entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
 			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
@@ -135,8 +139,15 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		entry.MonitoringRef = requestedSa.saId.Value()
 
 		monitoringRefList = append(monitoringRefList, entry.MonitoringRef)
+		subIds = append(subIds, entry.SubscriptionIdentifier)
 		siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 	}
+
+	message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
+	message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML()
+	message.RequestSize = int64(len(message.RequestRawMessage))
+	message.StopAreas = monitoringRefList
+	message.SubscriptionIdentifiers = subIds
 
 	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefList, ", ")
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
@@ -144,15 +155,23 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
+	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
+		e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
+		logStashEvent["errorDescription"] = e
 		subscriber.incrementRetryCountFromMap(stopAreasToRequest)
+
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
 
 	logStashEvent["responseXML"] = response.RawXML()
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
 	for _, responseStatus := range response.ResponseStatus() {
 		requestedSa, ok := stopAreasToRequest[responseStatus.RequestMessageRef()]
@@ -176,6 +195,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		if !responseStatus.Status() {
 			logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", requestedSa.saId.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
 			resource.RetryCount++
+			message.Status = "Error"
 			continue
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
@@ -199,6 +219,16 @@ func (subscriber *SMSubscriber) incrementRetryCountFromMap(stopAreasToRequest ma
 			continue
 		}
 		resource.RetryCount++
+	}
+}
+
+func (subscriber *SMSubscriber) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "StopMonitoringSubscriptionRequest",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(subscriber.connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 

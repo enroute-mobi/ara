@@ -16,20 +16,20 @@ type SiriErrorResponse struct {
 	request        string
 }
 
-func siriError(errCode, errDescription string, response http.ResponseWriter) {
-	siriErrorWithRequest(errCode, errDescription, "", response)
+func siriError(errCode, errDescription, referentialSlug string, response http.ResponseWriter) {
+	siriErrorWithRequest(errCode, errDescription, referentialSlug, "", response)
 }
 
-func siriErrorWithRequest(errCode, errDescription, request string, response http.ResponseWriter) {
+func siriErrorWithRequest(errCode, errDescription, referentialSlug, request string, response http.ResponseWriter) {
 	SiriErrorResponse{
 		response:       response,
 		errCode:        errCode,
 		errDescription: errDescription,
 		request:        request,
-	}.sendSiriError()
+	}.sendSiriError(referentialSlug)
 }
 
-func (siriError SiriErrorResponse) sendSiriError() {
+func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
 	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
 
 	// Wrap soap and send response
@@ -44,10 +44,24 @@ func (siriError SiriErrorResponse) sendSiriError() {
 	logStashEvent["status"] = "false"
 	logStashEvent["siriType"] = "siriError"
 	logStashEvent["responseXML"] = soapEnvelope.String()
+
+	message := &audit.BigQueryMessage{
+		Protocol:  "siri",
+		Direction: "received",
+		Status:    "Error",
+		// Type:         "siri-error",
+		ErrorDetails: fmt.Sprintf("%v: %v", siriError.errCode, siriError.errDescription),
+		// ResponseRawMessage: soapEnvelope.String(),
+	}
+
 	if siriError.request != "" {
 		logStashEvent["requestXML"] = siriError.request
+		// message.RequestRawMessage = siriError.request
 	}
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	soapEnvelope.WriteTo(siriError.response)
+	message.ResponseSize = soapEnvelope.Length()
+
+	audit.CurrentLogStash().WriteEvent(logStashEvent)
+	audit.CurrentBigQuery(referentialSlug).WriteEvent(message)
 }

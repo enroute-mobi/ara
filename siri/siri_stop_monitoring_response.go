@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -82,6 +83,17 @@ func (response *SIRIStopMonitoringResponse) BuildXML() (string, error) {
 		return "", err
 	}
 	return buffer.String(), nil
+}
+
+func (delivery *SIRIStopMonitoringDelivery) ErrorString() string {
+	return fmt.Sprintf("%v: %v", delivery.errorType(), delivery.ErrorText)
+}
+
+func (delivery *SIRIStopMonitoringDelivery) errorType() string {
+	if delivery.ErrorType == "OtherError" {
+		return fmt.Sprintf("%v %v", delivery.ErrorType, delivery.ErrorNumber)
+	}
+	return delivery.ErrorType
 }
 
 func (delivery *SIRIStopMonitoringDelivery) BuildStopMonitoringDeliveryXML() (string, error) {

@@ -37,7 +37,7 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request)
+	response := connector.HandleRequests(request, &audit.BigQueryMessage{})
 	if response == nil {
 		t.Fatalf("HandleRequests should return a response")
 	}
@@ -143,7 +143,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request)
+	response := connector.HandleRequests(request, &audit.BigQueryMessage{})
 
 	if response == nil {
 		t.Fatalf("HandleRequests should return a response")
@@ -224,7 +224,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request)
+	response := connector.HandleRequests(request, &audit.BigQueryMessage{})
 
 	if response.ProducerRef != "Ara" {
 		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)

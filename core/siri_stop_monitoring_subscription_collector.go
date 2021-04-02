@@ -303,13 +303,7 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
-	refSlice := make([]string, len(refs))
-	i := 0
-	for monitoringRef := range refs {
-		refSlice[i] = monitoringRef
-		i++
-	}
-	logStashEvent["monitoringRefs"] = strings.Join(refSlice, ", ")
+	logMonitoringRefs(logStashEvent, nil, refs)
 }
 
 func logSubscriptionErrorsFromMap(logStashEvent audit.LogStashEvent, errors map[string]string) {

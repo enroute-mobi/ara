@@ -54,16 +54,16 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 	}
 }
 
-func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalCompleteModel) {
-	t := time.Now()
+func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalCompleteModel, message *audit.BigQueryMessage) {
+	t := clock.DefaultClock().Now()
 
-	pc.handleStopAreas(model.GetStopAreas())
-	pc.handleLines(model.GetLines())
+	message.StopAreas = pc.handleStopAreas(model.GetStopAreas())
+	message.Lines = pc.handleLines(model.GetLines())
 	pc.handleVehicleJourneys(model.GetVehicleJourneys())
 	pc.handleStopVisits(model.GetStopVisits())
-	pc.handleVehicles(model.GetVehicles())
+	message.Vehicles = pc.handleVehicles(model.GetVehicles())
 
-	processingTime := time.Since(t)
+	processingTime := clock.DefaultClock().Since(t)
 
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
 	logger.Log.Debugf("PushCollector handled %v models in %v", total, processingTime)
@@ -74,11 +74,10 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 	pc.logPushNotification(logStashEvent, model)
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-	message := pc.newBQMessage(processingTime)
-	audit.CurrentBigQuery(string(pc.Partner().Referential().Slug())).WriteMessage(message)
+	message.ProcessingTime = processingTime.Seconds()
 }
 
-func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) {
+func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) (stopAreas []string) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
@@ -93,11 +92,14 @@ func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea
 		event.Longitude = sa.GetLongitude()
 		event.Latitude = sa.GetLatitude()
 
+		stopAreas = append(stopAreas, sa.GetObjectid())
+
 		pc.broadcastUpdateEvent(event)
 	}
+	return
 }
 
-func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) {
+func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) (lineIds []string) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
@@ -109,8 +111,11 @@ func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) {
 		event.ObjectId = model.NewObjectID(id_kind, l.GetObjectid())
 		event.Name = l.GetName()
 
+		lineIds = append(lineIds, l.GetObjectid())
+
 		pc.broadcastUpdateEvent(event)
 	}
+	return
 }
 
 func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVehicleJourney) {
@@ -155,7 +160,7 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 	}
 }
 
-func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) {
+func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) (vehicles []string) {
 	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range vs {
@@ -168,8 +173,11 @@ func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) {
 		event.Latitude = v.GetLatitude()
 		event.Bearing = v.GetBearing()
 
+		vehicles = append(vehicles, v.GetObjectid())
+
 		pc.broadcastUpdateEvent(event)
 	}
+	return
 }
 
 func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival *external_models.ExternalStopVisit_Times) {
@@ -198,16 +206,4 @@ func (pc *PushCollector) logPushNotification(logStashEvent audit.LogStashEvent, 
 	logStashEvent["lines"] = strconv.Itoa(len(model.GetLines()))
 	logStashEvent["vehicleJourneys"] = strconv.Itoa(len(model.GetVehicleJourneys()))
 	logStashEvent["StopVisits"] = strconv.Itoa(len(model.GetStopVisits()))
-}
-
-func (pc *PushCollector) newBQMessage(processingTime time.Duration) *audit.BigQueryMessage {
-	return &audit.BigQueryMessage{
-		Timestamp:      pc.partner.Referential().Clock().Now(),
-		Protocol:       "push",
-		Type:           "push-notification",
-		Direction:      "received",
-		Partner:        string(pc.partner.Slug()),
-		Status:         "OK",
-		ProcessingTime: processingTime.Seconds(),
-	}
 }

@@ -3,13 +3,16 @@ package api
 import (
 	"net/http"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type SIRISubscriptionTerminatedNotificationHandler struct {
-	xmlRequest *siri.XMLSubscriptionTerminatedNotification
+	xmlRequest  *siri.XMLSubscriptionTerminatedNotification
+	referential *core.Referential
 }
 
 func (handler *SIRISubscriptionTerminatedNotificationHandler) RequestorRef() string {
@@ -20,10 +23,19 @@ func (handler *SIRISubscriptionTerminatedNotificationHandler) ConnectorType() st
 	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
-func (handler *SIRISubscriptionTerminatedNotificationHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRISubscriptionTerminatedNotificationHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("SubscriptionTerminatedNotification to cancel subscription: %s", handler.xmlRequest.SubscriptionRef())
+
+	t := clock.DefaultClock().Now()
 
 	connector.(core.SubscriptionRequestDispatcher).HandleSubscriptionTerminatedNotification(handler.xmlRequest)
 
 	rw.WriteHeader(http.StatusOK)
+
+	message.Type = "SubscriptionTerminatedNotification"
+	message.RequestRawMessage = handler.xmlRequest.RawXML()
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
+	message.SubscriptionIdentifiers = []string{handler.xmlRequest.SubscriptionRef()}
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

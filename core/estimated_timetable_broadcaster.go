@@ -346,14 +346,31 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRef
 
 func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {
 	logStashEvent := ett.newLogStashEvent()
-	logSIRIEstimatedTimeTableNotify(logStashEvent, delivery)
+	message := ett.newBQEvent()
+
+	logSIRIEstimatedTimeTableNotify(logStashEvent, message, delivery)
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	t := ett.Clock().Now()
+
 	err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+	message.ProcessingTime = ett.Clock().Since(t).Seconds()
 	if err != nil {
 		event := ett.newLogStashEvent()
 		logSIRINotifyError(err.Error(), delivery.ResponseMessageIdentifier, event)
 		audit.CurrentLogStash().WriteEvent(event)
+	}
+
+	audit.CurrentBigQuery(string(ett.connector.Partner().Referential().Slug())).WriteEvent(message)
+}
+
+func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "NotifyEstimatedTimetable",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(ett.connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 
@@ -363,7 +380,7 @@ func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response *siri.SIRINotifyEstimatedTimeTable) {
+func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {
@@ -379,6 +396,12 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 		monitoringRefs = append(monitoringRefs, k)
 	}
 
+	message.RequestIdentifier = response.RequestMessageRef
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
+	message.Lines = lineRefs
+	message.StopAreas = monitoringRefs
+	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
+
 	logStashEvent["siriType"] = "NotifyEstimatedTimetable"
 	logStashEvent["producerRef"] = response.ProducerRef
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef
@@ -389,12 +412,15 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 	logStashEvent["lineRefs"] = strings.Join(lineRefs, ",")
 	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
 	logStashEvent["status"] = strconv.FormatBool(response.Status)
+
 	if !response.Status {
+		message.Status = "Error"
 		logStashEvent["errorType"] = response.ErrorType
 		if response.ErrorType == "OtherError" {
 			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
 		}
 		logStashEvent["errorText"] = response.ErrorText
+		message.ErrorDetails = response.ErrorString()
 	}
 	xml, err := response.BuildXML()
 	if err != nil {
@@ -402,4 +428,6 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, response
 		return
 	}
 	logStashEvent["responseXML"] = xml
+	message.ResponseRawMessage = xml
+	message.ResponseSize = int64(len(xml))
 }

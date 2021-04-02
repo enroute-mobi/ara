@@ -1,10 +1,15 @@
 package audit
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
 	"sync"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -22,9 +27,7 @@ type BigQuery interface {
 	state.Startable
 	state.Stopable
 
-	WriteMessage(message *BigQueryMessage) error
-	WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) error
-	WriteVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error
+	WriteEvent(event BigQueryEvent) error
 }
 
 /**** Manager ****/
@@ -59,17 +62,7 @@ func SetCurrentBigQuery(slug string, bq BigQuery) {
 /**** Null struct to disable BQ by default ****/
 type NullBigQuery struct{}
 
-func (bq *NullBigQuery) WriteMessage(_ *BigQueryMessage) error {
-	return nil
-}
-
-func (bq *NullBigQuery) WritePartnerEvent(_ *BigQueryPartnerEvent) error {
-	return nil
-}
-
-func (bq *NullBigQuery) WriteVehicleEvent(_ *BigQueryVehicleEvent) error {
-	return nil
-}
+func (bq *NullBigQuery) WriteEvent(_ BigQueryEvent) error { return nil }
 
 func (bq *NullBigQuery) Start() {}
 func (bq *NullBigQuery) Stop()  {}
@@ -78,7 +71,7 @@ func NewNullBigQuery() BigQuery {
 	return &NullBigQuery{}
 }
 
-/**** Test Structure ****/
+/**** Test Memory Structure ****/
 type FakeBigQuery struct {
 	messages      []*BigQueryMessage
 	partnerEvents []*BigQueryPartnerEvent
@@ -92,18 +85,15 @@ func NewFakeBigQuery() *FakeBigQuery {
 func (bq *FakeBigQuery) Start() {}
 func (bq *FakeBigQuery) Stop()  {}
 
-func (bq *FakeBigQuery) WriteMessage(message *BigQueryMessage) error {
-	bq.messages = append(bq.messages, message)
-	return nil
-}
-
-func (bq *FakeBigQuery) WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
-	bq.partnerEvents = append(bq.partnerEvents, partnerEvent)
-	return nil
-}
-
-func (bq *FakeBigQuery) WriteVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
-	bq.vehicleEvents = append(bq.vehicleEvents, vehicleEvent)
+func (bq *FakeBigQuery) WriteEvent(e BigQueryEvent) error {
+	switch e.EventType() {
+	case BQ_MESSAGE:
+		bq.messages = append(bq.messages, e.(*BigQueryMessage))
+	case BQ_PARTNER_EVENT:
+		bq.partnerEvents = append(bq.partnerEvents, e.(*BigQueryPartnerEvent))
+	case BQ_VEHICLE_EVENT:
+		bq.vehicleEvents = append(bq.vehicleEvents, e.(*BigQueryVehicleEvent))
+	}
 	return nil
 }
 
@@ -119,9 +109,47 @@ func (bq *FakeBigQuery) VehicleEvents() []*BigQueryVehicleEvent {
 	return bq.vehicleEvents
 }
 
+/**** Test External Structure ****/
+
+type TestBigQuery struct {
+	clock.ClockConsumer
+
+	target  string
+	dataset string
+}
+
+func NewTestBigQuery(dataset string) *TestBigQuery {
+	return &TestBigQuery{
+		dataset: dataset,
+		target:  config.Config.BigQueryTest,
+	}
+}
+
+func (bq *TestBigQuery) Start() {}
+func (bq *TestBigQuery) Stop()  {}
+
+func (bq *TestBigQuery) WriteEvent(e BigQueryEvent) error {
+	e.SetTimeStamp(bq.Clock().Now())
+	logger.Log.Debugf("WriteEvent %v", e)
+
+	// TODO add dataset to the json payload
+	json, _ := json.Marshal(e)
+
+	_, err := http.Post(
+		bq.target,
+		"application/json",
+		bytes.NewBuffer(json),
+	)
+
+	logger.Log.Debugf("WriteEvent err %v", err)
+
+	return err
+}
+
 /**** Real BQ ****/
 type BigQueryClient struct {
 	uuid.UUIDConsumer
+	clock.ClockConsumer
 
 	projectID       string
 	dataset         string
@@ -136,10 +164,18 @@ type BigQueryClient struct {
 	stop            chan struct{}
 }
 
-func NewBigQueryClient(projectID, dataset string) *BigQueryClient {
+func NewBigQuery(dataset string) BigQuery {
+	if config.Config.BigQueryTestMode() {
+		return NewTestBigQuery(dataset)
+	} else {
+		return NewBigQueryClient(dataset)
+	}
+}
+
+func NewBigQueryClient(dataset string) *BigQueryClient {
 	return &BigQueryClient{
-		projectID:     projectID,
 		dataset:       dataset,
+		projectID:     config.Config.BigQueryProjectID,
 		messages:      make(chan *BigQueryMessage, 500),
 		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
 		vehicleEvents: make(chan *BigQueryVehicleEvent, 500),
@@ -157,7 +193,21 @@ func (bq *BigQueryClient) Stop() {
 	}
 }
 
-func (bq *BigQueryClient) WriteMessage(message *BigQueryMessage) error {
+func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
+	e.SetTimeStamp(bq.Clock().Now())
+	switch e.EventType() {
+	case BQ_MESSAGE:
+		return bq.writeMessage(e.(*BigQueryMessage))
+	case BQ_PARTNER_EVENT:
+		return bq.writePartnerEvent(e.(*BigQueryPartnerEvent))
+	case BQ_VEHICLE_EVENT:
+		return bq.writeVehicleEvent(e.(*BigQueryVehicleEvent))
+	}
+	logger.Log.Debugf("Unknown BigQueryMessage type")
+	return nil
+}
+
+func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
 	default:
@@ -166,7 +216,7 @@ func (bq *BigQueryClient) WriteMessage(message *BigQueryMessage) error {
 	return nil
 }
 
-func (bq *BigQueryClient) WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
+func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
 	select {
 	case bq.partnerEvents <- partnerEvent:
 	default:
@@ -175,7 +225,7 @@ func (bq *BigQueryClient) WritePartnerEvent(partnerEvent *BigQueryPartnerEvent) 
 	return nil
 }
 
-func (bq *BigQueryClient) WriteVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
+func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
 	select {
 	case bq.vehicleEvents <- vehicleEvent:
 	default:

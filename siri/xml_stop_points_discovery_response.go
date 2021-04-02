@@ -1,6 +1,7 @@
 package siri
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jbowtie/gokogiri"
@@ -43,6 +44,17 @@ func NewXMLAnnotatedStopPointRef(node XMLNode) *XMLAnnotatedStopPointRef {
 	annotatedStopPoint := &XMLAnnotatedStopPointRef{}
 	annotatedStopPoint.node = node
 	return annotatedStopPoint
+}
+
+func (response *XMLStopPointsDiscoveryResponse) ErrorString() string {
+	return fmt.Sprintf("%v: %v", response.errorType(), response.ErrorText())
+}
+
+func (response *XMLStopPointsDiscoveryResponse) errorType() string {
+	if response.ErrorType() == "OtherError" {
+		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
+	}
+	return response.ErrorType()
 }
 
 func (response *XMLStopPointsDiscoveryResponse) AnnotatedStopPointRefs() []*XMLAnnotatedStopPointRef {

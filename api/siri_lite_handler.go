@@ -3,12 +3,13 @@ package api
 import (
 	"net/http"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 )
 
 type SIRILiteRequestHandler interface {
 	ConnectorType() string
-	Respond(core.Connector, http.ResponseWriter)
+	Respond(core.Connector, http.ResponseWriter, *audit.BigQueryMessage)
 }
 
 type SIRILiteHandler struct {
@@ -27,8 +28,9 @@ func (handler *SIRILiteHandler) requestHandler(requestData *SIRIRequestData) SIR
 	switch requestData.Request {
 	case "vehicle-monitoring":
 		return &SIRILiteVehicleMonitoringRequestHandler{
-			requestUrl: requestData.Url,
-			filters:    requestData.Filters,
+			requestUrl:  requestData.Url,
+			filters:     requestData.Filters,
+			referential: handler.referential,
 		}
 	}
 	// case "CheckStatus":
@@ -79,5 +81,13 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 
 	response.Header().Set("Content-Type", "application/json")
 
-	requestHandler.Respond(connector, response)
+	m := &audit.BigQueryMessage{
+		Protocol:  "siri-lite",
+		Direction: "received",
+		Partner:   string(partner.Slug()),
+		IPAddress: request.RemoteAddr,
+		Status:    "OK",
+	}
+
+	requestHandler.Respond(connector, response, m)
 }

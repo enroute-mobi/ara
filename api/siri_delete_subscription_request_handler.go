@@ -11,25 +11,26 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
-type SIRIEstimatedTimetableRequestHandler struct {
-	xmlRequest  *siri.XMLGetEstimatedTimetable
+type SIRIDeleteSubscriptionRequestHandler struct {
+	xmlRequest  *siri.XMLDeleteSubscriptionRequest
 	referential *core.Referential
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) RequestorRef() string {
+func (handler *SIRIDeleteSubscriptionRequestHandler) RequestorRef() string {
 	return handler.xmlRequest.RequestorRef()
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) ConnectorType() string {
-	return core.SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER
+func (handler *SIRIDeleteSubscriptionRequestHandler) ConnectorType() string {
+	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
-	logger.Log.Debugf("Estimated Timetable %s\n", handler.xmlRequest.MessageIdentifier())
+func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+	logger.Log.Debugf("DeleteSubscription %s cancel subscription: %s", handler.xmlRequest.MessageIdentifier(), handler.xmlRequest.SubscriptionRef())
 
 	t := clock.DefaultClock().Now()
 
-	response := connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, message)
+	response := connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest, message)
+
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
@@ -46,7 +47,7 @@ func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Conn
 		return
 	}
 
-	message.Type = "EstimatedTimetableRequest"
+	message.Type = "DeleteSubscriptionRequest"
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n

@@ -11,25 +11,26 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
-type SIRIEstimatedTimetableRequestHandler struct {
-	xmlRequest  *siri.XMLGetEstimatedTimetable
+type SIRIGeneralMessageRequestHandler struct {
+	xmlRequest  *siri.XMLGetGeneralMessage
 	referential *core.Referential
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) RequestorRef() string {
+func (handler *SIRIGeneralMessageRequestHandler) RequestorRef() string {
 	return handler.xmlRequest.RequestorRef()
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) ConnectorType() string {
-	return core.SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER
+func (handler *SIRIGeneralMessageRequestHandler) ConnectorType() string {
+	return core.SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
-	logger.Log.Debugf("Estimated Timetable %s\n", handler.xmlRequest.MessageIdentifier())
+func (handler *SIRIGeneralMessageRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+	logger.Log.Debugf("General Message %s\n", handler.xmlRequest.MessageIdentifier())
 
 	t := clock.DefaultClock().Now()
 
-	response := connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, message)
+	tmp := connector.(*core.SIRIGeneralMessageRequestBroadcaster)
+	response, _ := tmp.Situations(handler.xmlRequest, message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
 		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
@@ -46,7 +47,7 @@ func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Conn
 		return
 	}
 
-	message.Type = "EstimatedTimetableRequest"
+	message.Type = "GeneralMessageRequest"
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n

@@ -92,7 +92,8 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 			NewStatus:                string(partnerStatus.OperationnalStatus),
 			NewServiceStartedAt:      civil.DateTimeOf(partnerStatus.ServiceStartedAt),
 		}
-		audit.CurrentBigQuery(string(guardian.referential.Slug())).WritePartnerEvent(partnerEvent)
+
+		audit.CurrentBigQuery(string(guardian.referential.Slug())).WriteEvent(partnerEvent)
 	}
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {

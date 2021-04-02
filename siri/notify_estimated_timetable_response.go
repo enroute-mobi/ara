@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -22,6 +23,17 @@ type SIRINotifyEstimatedTimeTable struct {
 	ErrorText         string
 
 	EstimatedJourneyVersionFrames []*SIRIEstimatedJourneyVersionFrame
+}
+
+func (notify *SIRINotifyEstimatedTimeTable) ErrorString() string {
+	return fmt.Sprintf("%v: %v", notify.errorType(), notify.ErrorText)
+}
+
+func (notify *SIRINotifyEstimatedTimeTable) errorType() string {
+	if notify.ErrorType == "OtherError" {
+		return fmt.Sprintf("%v %v", notify.ErrorType, notify.ErrorNumber)
+	}
+	return notify.ErrorType
 }
 
 func (notify *SIRINotifyEstimatedTimeTable) BuildXML() (string, error) {

@@ -122,6 +122,9 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	logStashEvent := subscriber.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
+	message := subscriber.newBQEvent()
+	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
 		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
@@ -157,18 +160,31 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	logStashEvent["stopPointRefs"] = strings.Join(stopPointRefList, ", ")
 	logSIRIGeneralMessageSubscriptionRequest(logStashEvent, gmRequest)
 
+	message.RequestIdentifier = gmRequest.MessageIdentifier
+	message.RequestRawMessage, _ = gmRequest.BuildXML()
+	message.RequestSize = int64(len(message.RequestRawMessage))
+	message.StopAreas = stopPointRefList
+	message.SubscriptionIdentifiers = lineRefList
+
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
+	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
+		e := fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
+		logStashEvent["errorDescription"] = e
 		subscriber.incrementRetryCountFromMap(resourcesToRequest)
+
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
 
 	logStashEvent["responseXML"] = response.RawXML()
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
 
 	for _, responseStatus := range response.ResponseStatus() {
 		requestedResource, ok := resourcesToRequest[responseStatus.RequestMessageRef()]
@@ -192,6 +208,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		if !responseStatus.Status() {
 			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedResource.objectId.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
 			resource.RetryCount++
+			message.Status = "Error"
 			continue
 		}
 		resource.SubscribedAt = subscriber.Clock().Now()
@@ -215,6 +232,16 @@ func (subscriber *GMSubscriber) incrementRetryCountFromMap(resourcesToRequest ma
 			continue
 		}
 		resource.RetryCount++
+	}
+}
+
+func (subscriber *GMSubscriber) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Type:      "GeneralMessageSubscriptionRequest",
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(subscriber.connector.partner.Slug()),
+		Status:    "OK",
 	}
 }
 

@@ -57,3 +57,28 @@ When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following att
   # Test
   # puts RestClient.get path, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
+
+When(/^I wait that a Subscription has been created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, attributes|
+  path = partners_path(referential: referential) + "/" + getFirstPartner() + "/subscriptions"
+
+  retry_count = 0
+  response_array = []
+  while response_array.empty?
+    step "10 seconds have passed"
+
+    response  = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+    response_array = api_attributes(response.body)
+
+    # We're ignoring pending subscriptions
+    response_array.delete_if do |subscription|
+      subscription["Resources"].delete_if do |resource|
+        resource["SubscribedAt"] == "0001-01-01T00:00:00Z"
+      end
+      subscription["Resources"].empty?
+    end
+
+    retry_count += 1
+  end
+
+  expect(response_array).to include(a_hash_including(attributes.rows_hash))
+end

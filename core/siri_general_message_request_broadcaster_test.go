@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -47,7 +48,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, _ := connector.Situations(request)
+	response, _ := connector.Situations(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)
@@ -103,7 +104,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 		t.Fatal(err)
 	}
 
-	response, _ := connector.Situations(request)
+	response, _ := connector.Situations(request, &audit.BigQueryMessage{})
 
 	if len(response.GeneralMessages) != 0 {
 		t.Errorf("Response should have 0 GeneralMessage, got: %v", len(response.GeneralMessages))
@@ -158,7 +159,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 		t.Fatal(err)
 	}
 
-	response, _ := connector.Situations(request)
+	response, _ := connector.Situations(request, &audit.BigQueryMessage{})
 
 	if response.Address != "http://ara" {
 		t.Errorf("Response has wrong adress:\n got: %v\n want: http://ara", response.Address)

@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"time"
 
@@ -159,6 +160,17 @@ func NewXMLMessage(node XMLNode) *XMLMessage {
 	message := &XMLMessage{}
 	message.node = node
 	return message
+}
+
+func (response *XMLGeneralMessageResponse) ErrorString() string {
+	return fmt.Sprintf("%v: %v", response.errorType(), response.ErrorText())
+}
+
+func (response *XMLGeneralMessageResponse) errorType() string {
+	if response.ErrorType() == "OtherError" {
+		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
+	}
+	return response.ErrorType()
 }
 
 func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
@@ -383,6 +395,17 @@ func (response *SIRIGeneralMessageResponse) BuildXML() (string, error) {
 		return "", err
 	}
 	return buffer.String(), nil
+}
+
+func (delivery *SIRIGeneralMessageDelivery) ErrorString() string {
+	return fmt.Sprintf("%v: %v", delivery.errorType(), delivery.ErrorText)
+}
+
+func (delivery *SIRIGeneralMessageDelivery) errorType() string {
+	if delivery.ErrorType == "OtherError" {
+		return fmt.Sprintf("%v %v", delivery.ErrorType, delivery.ErrorNumber)
+	}
+	return delivery.ErrorType
 }
 
 func (delivery *SIRIGeneralMessageDelivery) BuildGeneralMessageDeliveryXML() (string, error) {

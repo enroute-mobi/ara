@@ -32,6 +32,8 @@ class SIRIServer
 	  @http_server = WEBrick::HTTPServer.new(Port: uri.port, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
 
 	  @http_server.mount_proc uri.path do |req, res|
+      request_message_identifiers = req.body.scan(/MessageIdentifier>(.*)</).flatten
+
       if req.body =~ /sw:CheckStatus/
 			  res.body = %Q{<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -48,20 +50,25 @@ class SIRIServer
         <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
         <ns3:Address>#{url}</ns3:Address>
         <ns3:ResponseMessageIdentifier>c464f588-5128-46c8-ac3f-8b8a465692ab</ns3:ResponseMessageIdentifier>
-        <ns3:RequestMessageRef>CheckStatus:Test:0</ns3:RequestMessageRef>
+        <ns3:RequestMessageRef>#{request_message_identifiers.first}</ns3:RequestMessageRef>
       </CheckStatusAnswerInfo>
       <Answer>
         <ns3:Status>true</ns3:Status>
         <ns3:ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ns3:ServiceStartedTime>
       </Answer>
-      <AnswerExtension />
     </ns8:CheckStatusResponse>
   </S:Body>
 </S:Envelope>}
 		  else
         puts "Receive SIRI request" if ENV["SIRI_DEBUG"]
 			  self.requests << req
-		    res.body = self.responses.shift
+
+        request_body = self.responses.shift
+
+        request_body.gsub!("{RequestMessageRef}", request_message_identifiers.first)
+        request_body.gsub!("{LastRequestMessageRef}", request_message_identifiers.last)
+
+		    res.body = request_body
 		  end
 
 		  res.content_type = "text/xml"

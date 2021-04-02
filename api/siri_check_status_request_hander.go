@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 type SIRICheckStatusRequestHandler struct {
-	xmlRequest *siri.XMLCheckStatusRequest
+	xmlRequest  *siri.XMLCheckStatusRequest
+	referential *core.Referential
 }
 
 func (handler *SIRICheckStatusRequestHandler) RequestorRef() string {
@@ -21,17 +24,19 @@ func (handler *SIRICheckStatusRequestHandler) ConnectorType() string {
 	return "siri-check-status-server"
 }
 
-func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter) {
+func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("CheckStatus %s", handler.xmlRequest.MessageIdentifier())
 
-	response, err := connector.(core.CheckStatusServer).CheckStatus(handler.xmlRequest)
+	t := clock.DefaultClock().Now()
+
+	response, err := connector.(core.CheckStatusServer).CheckStatus(handler.xmlRequest, message)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
 
@@ -39,9 +44,17 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
-	_, err = soapEnvelope.WriteTo(rw)
+	n, err := soapEnvelope.WriteTo(rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), rw)
+		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
 		return
 	}
+
+	message.Partner = string(connector.(*core.SIRICheckStatusServer).Partner().Slug())
+	message.Type = "CheckStatusRequest"
+	message.RequestRawMessage = handler.xmlRequest.RawXML()
+	message.ResponseRawMessage = xmlResponse
+	message.ResponseSize = n
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }
