@@ -311,7 +311,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
 
 	for _, id := range ids {
-		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		sv := manager.byIdentifier[StopVisitId(id)]
 		stopVisits = append(stopVisits, *(sv.copy()))
 	}
 
@@ -325,7 +325,7 @@ func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourn
 	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
 
 	for _, id := range ids {
-		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *(sv.copy()))
 		}
@@ -342,7 +342,7 @@ func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []S
 	ids, _ := manager.byStopArea.Find(ModelId(id))
 
 	for _, id := range ids {
-		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		sv := manager.byIdentifier[StopVisitId(id)]
 		stopVisits = append(stopVisits, *(sv.copy()))
 	}
 
@@ -369,7 +369,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopV
 	ids, _ := manager.byStopArea.Find(ModelId(id))
 
 	for _, id := range ids {
-		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *(sv.copy()))
 		}
@@ -391,7 +391,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAr
 	}
 
 	for _, id := range ids {
-		sv, _ := manager.byIdentifier[StopVisitId(id)]
+		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
 			stopVisits = append(stopVisits, *(sv.copy()))
 		}
