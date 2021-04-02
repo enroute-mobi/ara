@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -51,6 +50,6 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connecto
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
-	message.ProcessingTime = time.Since(t).Seconds()
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

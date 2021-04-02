@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -35,7 +34,7 @@ func (handler *SIRISubscriptionTerminatedNotificationHandler) Respond(connector 
 
 	message.Type = "SubscriptionTerminatedNotification"
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ProcessingTime = time.Since(t).Seconds()
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
 	message.SubscriptionIdentifiers = []string{handler.xmlRequest.SubscriptionRef()}
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)

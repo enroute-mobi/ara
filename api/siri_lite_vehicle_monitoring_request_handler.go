@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -44,6 +43,6 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.C
 	message.Type = "VehicleMonitoringRequest"
 	message.ResponseRawMessage = string(jsonBytes)
 	message.ResponseSize = int64(n)
-	message.ProcessingTime = time.Since(t).Seconds()
+	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 }

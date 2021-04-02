@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -44,10 +43,10 @@ func (controller *VehicleController) Index(response http.ResponseWriter, filters
 
 	stime := controller.referential.Clock().Now()
 	vehicles := tx.Model().Vehicles().FindAll()
-	logger.Log.Debugf("VehicleController FindAll time : %v", time.Since(stime))
+	logger.Log.Debugf("VehicleController FindAll time : %v", controller.referential.Clock().Since(stime))
 	stime = controller.referential.Clock().Now()
 	jsonBytes, _ := json.Marshal(vehicles)
-	logger.Log.Debugf("VehicleController Json Marshal time : %v ", time.Since(stime))
+	logger.Log.Debugf("VehicleController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
 	response.Write(jsonBytes)
 }
 

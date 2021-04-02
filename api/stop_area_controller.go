@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -44,10 +43,10 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, filter
 
 	stime := controller.referential.Clock().Now()
 	sas := tx.Model().StopAreas().FindAll()
-	logger.Log.Debugf("StopAreaController FindAll time : %v", time.Since(stime))
+	logger.Log.Debugf("StopAreaController FindAll time : %v", controller.referential.Clock().Since(stime))
 	stime = controller.referential.Clock().Now()
 	jsonBytes, _ := json.Marshal(sas)
-	logger.Log.Debugf("StopAreaController Json Marshal time : %v ", time.Since(stime))
+	logger.Log.Debugf("StopAreaController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
 	response.Write(jsonBytes)
 }
 

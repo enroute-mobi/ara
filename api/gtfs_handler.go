@@ -99,7 +99,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	responseSize := buffer.Len()
-	processingTime := time.Since(startTime)
+	processingTime := handler.referential.Clock().Since(startTime)
 
 	logStashEvent["protobuf_size"] = strconv.Itoa(responseSize)
 	logStashEvent["response_time"] = processingTime.String()
@@ -145,7 +145,7 @@ func (handler *GtfsHandler) newBQMessage(slug, remoteAddress string) *audit.BigQ
 }
 
 func (handler *GtfsHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
-	m.ProcessingTime = time.Since(startTime).Seconds()
+	m.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
 	m.Status = "Error"
 	errorString := fmt.Sprintf(format, values...)
 
