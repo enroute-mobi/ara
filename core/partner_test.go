@@ -174,21 +174,6 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 	if jsonString != expected {
 		t.Errorf("Partner.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
 	}
-
-	partner.spdStops = map[string]struct{}{
-		"test1": struct{}{},
-		"test2": struct{}{},
-	}
-	expected = `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","StopPointsDiscoveryStops":["test1","test2"],"Name":"PartnerName","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
-	jsonBytes, err = partner.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	jsonString = string(jsonBytes)
-	if jsonString != expected {
-		t.Errorf("Partner.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
-	}
 }
 
 func Test_Partner_Save(t *testing.T) {
@@ -336,7 +321,7 @@ func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
-	partner.spdStops = make(map[string]struct{})
+	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
 	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
@@ -348,11 +333,11 @@ func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
-	partner.spdStops = make(map[string]struct{})
+	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
 	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
-	partner.spdStops["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
+	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
@@ -361,11 +346,11 @@ func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
 	partner := &Partner{}
 	partner.Settings = make(map[string]string)
-	partner.spdStops = make(map[string]struct{})
+	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
 
 	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
-	partner.spdStops["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
+	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
 	partner.Settings[COLLECT_EXCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
