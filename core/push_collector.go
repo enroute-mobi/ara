@@ -57,11 +57,11 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalCompleteModel, message *audit.BigQueryMessage) {
 	t := clock.DefaultClock().Now()
 
-	message.StopAreas = pc.handleStopAreas(model.GetStopAreas())
-	message.Lines = pc.handleLines(model.GetLines())
+	pc.handleStopAreas(model.GetStopAreas())
+	pc.handleLines(model.GetLines())
 	pc.handleVehicleJourneys(model.GetVehicleJourneys())
 	pc.handleStopVisits(model.GetStopVisits())
-	message.Vehicles = pc.handleVehicles(model.GetVehicles())
+	pc.handleVehicles(model.GetVehicles())
 
 	processingTime := clock.DefaultClock().Since(t)
 
