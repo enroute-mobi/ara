@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -174,12 +175,16 @@ func NewBigQuery(dataset string) BigQuery {
 
 func NewBigQueryClient(dataset string) *BigQueryClient {
 	return &BigQueryClient{
-		dataset:       dataset,
+		dataset:       formatDatasetName(dataset),
 		projectID:     config.Config.BigQueryProjectID,
 		messages:      make(chan *BigQueryMessage, 500),
 		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
 		vehicleEvents: make(chan *BigQueryVehicleEvent, 500),
 	}
+}
+
+func formatDatasetName(dataset string) string {
+	return strings.ReplaceAll(dataset, "-", "_")
 }
 
 func (bq *BigQueryClient) Start() {
