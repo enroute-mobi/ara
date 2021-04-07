@@ -66,6 +66,10 @@ func LoadConfig(path string) error {
 	if bigQueryTestEnv != "" {
 		Config.BigQueryTest = bigQueryTestEnv
 	}
+	bigQueryPrefixEnv := os.Getenv("ARA_BIGQUERY_PREFIX")
+	if bigQueryPrefixEnv != "" {
+		Config.BigQueryDatasetPrefix = bigQueryPrefixEnv
+	}
 
 	logger.Log.Syslog = Config.Syslog
 	logger.Log.Debug = Config.Debug

@@ -129,12 +129,28 @@ func NewTestBigQuery(dataset string) *TestBigQuery {
 func (bq *TestBigQuery) Start() {}
 func (bq *TestBigQuery) Stop()  {}
 
+type TestBigQueryMessage struct {
+	*BigQueryMessage
+	Dataset string
+}
+
 func (bq *TestBigQuery) WriteEvent(e BigQueryEvent) error {
 	e.SetTimeStamp(bq.Clock().Now())
 	logger.Log.Debugf("WriteEvent %v", e)
 
-	// TODO add dataset to the json payload
+	switch e.EventType() {
+	case BQ_MESSAGE:
+		e = &TestBigQueryMessage{
+			BigQueryMessage: e.(*BigQueryMessage),
+			Dataset:         bq.dataset,
+		}
+		// case BQ_PARTNER_EVENT:
+		// case BQ_VEHICLE_EVENT:
+	}
+
 	json, _ := json.Marshal(e)
+
+	logger.Log.Debugf("Send JSON %v", string(json))
 
 	_, err := http.Post(
 		bq.target,
@@ -166,16 +182,17 @@ type BigQueryClient struct {
 }
 
 func NewBigQuery(dataset string) BigQuery {
+	formattedDataset := formatDatasetName(dataset)
 	if config.Config.BigQueryTestMode() {
-		return NewTestBigQuery(dataset)
+		return NewTestBigQuery(formattedDataset)
 	} else {
-		return NewBigQueryClient(dataset)
+		return NewBigQueryClient(formattedDataset)
 	}
 }
 
 func NewBigQueryClient(dataset string) *BigQueryClient {
 	return &BigQueryClient{
-		dataset:       formatDatasetName(dataset),
+		dataset:       dataset,
 		projectID:     config.Config.BigQueryProjectID,
 		messages:      make(chan *BigQueryMessage, 500),
 		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
