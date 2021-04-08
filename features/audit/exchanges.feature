@@ -123,3 +123,51 @@ Feature: Audit API exchanges
       | ProcessingTime          | 0                                     |
       | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-5-00c04fd430c8"] |
       | StopAreas               | ["enRoute:StopPoint:SP:24:LOC"]       |
+
+  @ARA-880
+  Scenario: Audit a referential with hyphen in the slug
+    Given a Referential "test-with-hyphen" is created
+    And a Partner "test" exists in Referential "test-with-hyphen" with connectors [siri-check-status-server] and the following settings:
+      | local_credential | test |
+    When I send this SIRI request to the Referential "test-with-hyphen"
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <Request>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>test</siri:RequestorRef>
+        <siri:MessageIdentifier>enRoute:Message::test</siri:MessageIdentifier>
+      </Request>
+    </sw:CheckStatus>
+  </S:Body>
+</S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type               | CheckStatusRequest |
+      | Dataset            | cucumber_test_with_hyphen   |
+
+  @ARA-880
+  Scenario: Audit a referential without hyphen in the slug
+    Given a Referential "test_without_hyphen" is created
+    And a Partner "test" exists in Referential "test_without_hyphen" with connectors [siri-check-status-server] and the following settings:
+      | local_credential | test |
+    When I send this SIRI request to the Referential "test_without_hyphen"
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <Request>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>test</siri:RequestorRef>
+        <siri:MessageIdentifier>enRoute:Message::test</siri:MessageIdentifier>
+      </Request>
+    </sw:CheckStatus>
+  </S:Body>
+</S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type               | CheckStatusRequest           |
+      | Dataset            | cucumber_test_without_hyphen |
