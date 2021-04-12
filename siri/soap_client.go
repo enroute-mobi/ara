@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -67,12 +66,8 @@ func NewSOAPClient(urls SOAPClientUrls) *SOAPClient {
 	// }
 
 	netTransport := http.DefaultTransport.(*http.Transport).Clone()
-	netTransport.DialContext = (&net.Dialer{
-		Timeout:   5 * time.Second,
-		KeepAlive: 30 * time.Second,
-	}).DialContext
-	netTransport.MaxConnsPerHost = 100
-	netTransport.MaxIdleConnsPerHost = 100
+	netTransport.MaxConnsPerHost = 30
+	netTransport.MaxIdleConnsPerHost = 10
 	netTransport.TLSHandshakeTimeout = 5 * time.Second
 
 	// set a long default time for safety, but we use context for request specific timeouts
