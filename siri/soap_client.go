@@ -2,9 +2,10 @@ package siri
 
 import (
 	"compress/gzip"
+	"context"
 	"fmt"
 	"io"
-	"net"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -31,6 +32,8 @@ type Request interface {
 
 type SOAPClient struct {
 	SOAPClientUrls
+
+	httpClient *http.Client
 }
 
 type SOAPClientUrls struct {
@@ -47,7 +50,36 @@ type soapClientArguments struct {
 }
 
 func NewSOAPClient(urls SOAPClientUrls) *SOAPClient {
-	return &SOAPClient{SOAPClientUrls: urls}
+	// Customize the Transport based on DefaultTransport
+	// DefaultTransport for reference
+	// var DefaultTransport RoundTripper = &Transport{
+	// 	Proxy: ProxyFromEnvironment,
+	// 	DialContext: (&net.Dialer{
+	// 		Timeout:   30 * time.Second,
+	// 		KeepAlive: 30 * time.Second,
+	// 	}).DialContext,
+	// 	ForceAttemptHTTP2:     true,
+	// 	MaxIdleConns:          100,
+	// 	IdleConnTimeout:       90 * time.Second,
+	// 	TLSHandshakeTimeout:   10 * time.Second,
+	// 	ExpectContinueTimeout: 1 * time.Second,
+	// }
+
+	netTransport := http.DefaultTransport.(*http.Transport).Clone()
+	netTransport.MaxConnsPerHost = 30
+	netTransport.MaxIdleConnsPerHost = 10
+	netTransport.TLSHandshakeTimeout = 5 * time.Second
+
+	// set a long default time for safety, but we use context for request specific timeouts
+	httpClient := &http.Client{
+		Timeout:   60 * time.Second,
+		Transport: netTransport,
+	}
+
+	return &SOAPClient{
+		SOAPClientUrls: urls,
+		httpClient:     httpClient,
+	}
 }
 
 func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
@@ -76,7 +108,10 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	// logger.Log.Debugf("%v", soapEnvelope.String())
 
 	// Create http request
-	httpRequest, err := http.NewRequest("POST", client.getURL(args.requestType), soapEnvelope)
+	ctx, cncl := context.WithTimeout(context.Background(), getTimeOut(args.requestType))
+	defer cncl()
+
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, client.getURL(args.requestType), soapEnvelope)
 	if err != nil {
 		return nil, err
 	}
@@ -88,23 +123,14 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	httpRequest.ContentLength = soapEnvelope.Length()
 
 	// Send http request
-	var netTransport = &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
-		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
-	}
-
-	httpClient := &http.Client{
-		Timeout:   getTimeOut(args.requestType),
-		Transport: netTransport,
-	}
-
-	response, err := httpClient.Do(httpRequest)
+	response, err := client.httpClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, response.Body)
+		response.Body.Close()
+	}()
 
 	// Do nothing if request is a notification
 	if args.requestType == NOTIFICATION {
