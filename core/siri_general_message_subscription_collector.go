@@ -146,6 +146,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(subId string) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+	message := connector.newBQEvent()
+	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp:  connector.Clock().Now(),
@@ -154,18 +156,25 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
-	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "GeneralMessageSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "GeneralMessageSubscriptionCollector")
 	startTime := connector.Clock().Now()
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
-	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+
+	responseTime := connector.Clock().Since(startTime)
+	logStashEvent["responseTime"] = responseTime.String()
+	message.ProcessingTime = responseTime.Seconds()
+
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
+		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["response"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
+		logStashEvent["response"] = e
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
 
-	logXMLDeleteSubscriptionResponse(logStashEvent, response)
+	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -206,6 +215,15 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) newLogStashEvent() aud
 	event := connector.partner.NewLogStashEvent()
 	event["connector"] = "GeneralMessageSubscriptionCollector"
 	return event
+}
+
+func (connector *SIRIGeneralMessageSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(connector.partner.Slug()),
+		Status:    "OK",
+	}
 }
 
 func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {

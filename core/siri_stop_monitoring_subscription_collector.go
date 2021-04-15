@@ -177,6 +177,8 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(subId string) {
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
+	message := connector.newBQEvent()
+	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	request := &siri.SIRIDeleteSubscriptionRequest{
 		RequestTimestamp:  connector.Clock().Now(),
@@ -184,18 +186,25 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestorRef:      connector.partner.ProducerRef(),
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
-	logSIRIDeleteSubscriptionRequest(logStashEvent, request, "StopMonitoringSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
 
 	startTime := connector.Clock().Now()
 	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
-	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
+
+	responseTime := connector.Clock().Since(startTime)
+	logStashEvent["responseTime"] = responseTime.String()
+	message.ProcessingTime = responseTime.Seconds()
+
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
+		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
 		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = fmt.Sprintf("Error during DeleteSubscription: %v", err)
+		logStashEvent["errorDescription"] = e
+		message.Status = "Error"
+		message.ErrorDetails = e
 		return
 	}
-	logXMLDeleteSubscriptionResponse(logStashEvent, response)
+	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
@@ -227,7 +236,16 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() aud
 	return event
 }
 
-func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
+	return &audit.BigQueryMessage{
+		Protocol:  "siri",
+		Direction: "sent",
+		Partner:   string(connector.partner.Slug()),
+		Status:    "OK",
+	}
+}
+
+func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
 	logStashEvent["siriType"] = "DeleteSubscriptionRequest" // This function is also used on GM delete subscription
 	logStashEvent["connector"] = subType
 	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
@@ -241,6 +259,11 @@ func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, request
 		return
 	}
 	logStashEvent["requestXML"] = xml
+
+	message.Type = "DeleteSubscriptionRequest"
+	message.RequestIdentifier = request.MessageIdentifier
+	message.RequestRawMessage = xml
+	message.RequestSize = int64(len(xml))
 }
 
 func logXMLNotifyStopMonitoring(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
@@ -283,7 +306,7 @@ func logXMLSubscriptionStopMonitoringDelivery(logStashEvent audit.LogStashEvent,
 	}
 }
 
-func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.XMLDeleteSubscriptionResponse) {
+func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLDeleteSubscriptionResponse) {
 	logStashEvent["responderRef"] = response.ResponderRef()
 	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
 	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
@@ -294,6 +317,11 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, respons
 		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
 	}
 	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
+
+	message.ResponseRawMessage = response.RawXML()
+	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.SubscriptionIdentifiers = subscriptionIds
+
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
