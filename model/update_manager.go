@@ -204,7 +204,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	if !event.RecordedAt.IsZero() {
 		sv.RecordedAt = event.RecordedAt
-	} else if !sv.Schedules.Eq(&event.Schedules) {
+	} else if !sv.Schedules.Include(&event.Schedules) {
 		sv.RecordedAt = manager.Clock().Now()
 	}
 

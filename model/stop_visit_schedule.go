@@ -14,6 +14,8 @@ const (
 	STOP_VISIT_SCHEDULE_ACTUAL   StopVisitScheduleType = "actual"
 )
 
+var stopVisitScheduleTypes = [3]StopVisitScheduleType{STOP_VISIT_SCHEDULE_AIMED, STOP_VISIT_SCHEDULE_EXPECTED, STOP_VISIT_SCHEDULE_ACTUAL}
+
 type StopVisitSchedule struct {
 	kind          StopVisitScheduleType
 	departureTime time.Time
@@ -114,12 +116,12 @@ func (schedules *StopVisitSchedules) Merge(newSchedules *StopVisitSchedules) {
 	newSchedules.RUnlock()
 }
 
-func (schedules *StopVisitSchedules) Eq(scs *StopVisitSchedules) bool {
+func (schedules *StopVisitSchedules) Include(scs *StopVisitSchedules) bool {
 	schedules.RLock()
 	scs.RLock()
 
-	for k, v := range schedules.byType {
-		if !v.ArrivalTime().Equal(scs.byType[k].ArrivalTime()) || !v.DepartureTime().Equal(scs.byType[k].DepartureTime()) {
+	for k, v := range scs.byType {
+		if !compareSchedules(v, schedules.byType[k]) {
 			schedules.RUnlock()
 			scs.RUnlock()
 			return false
@@ -128,6 +130,40 @@ func (schedules *StopVisitSchedules) Eq(scs *StopVisitSchedules) bool {
 
 	schedules.RUnlock()
 	scs.RUnlock()
+	return true
+
+}
+
+func (schedules *StopVisitSchedules) Eq(scs *StopVisitSchedules) bool {
+	schedules.RLock()
+	scs.RLock()
+
+	for i := range stopVisitScheduleTypes {
+		if schedules.byType[stopVisitScheduleTypes[i]] == nil && scs.byType[stopVisitScheduleTypes[i]] == nil {
+			continue
+		}
+		if !compareSchedules(schedules.byType[stopVisitScheduleTypes[i]], scs.byType[stopVisitScheduleTypes[i]]) {
+			schedules.RUnlock()
+			scs.RUnlock()
+			return false
+		}
+	}
+
+	schedules.RUnlock()
+	scs.RUnlock()
+	return true
+}
+
+func compareSchedules(sc1, sc2 *StopVisitSchedule) bool {
+	if sc1 == nil || sc2 == nil {
+		return false
+	}
+	if sc1.kind != sc2.kind {
+		return false
+	}
+	if !sc1.arrivalTime.Equal(sc2.arrivalTime) || !sc1.departureTime.Equal(sc2.departureTime) {
+		return false
+	}
 	return true
 }
 
