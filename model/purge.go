@@ -22,16 +22,16 @@ func (p *Purifier) Purge() error {
 		return fmt.Errorf("purifier date is empty")
 	}
 
-	_, err := Database.Exec("BEGIN;")
+	tx, err := Database.Begin()
 	if err != nil {
 		return fmt.Errorf("database error: %v", err)
 	}
 
 	table_names := []string{"stop_areas", "lines", "vehicle_journeys", "stop_visits", "operators"}
 	for i := range table_names {
-		r, err := Database.Exec(p.query(table_names[i]))
+		r, err := tx.Exec(p.query(table_names[i]))
 		if err != nil {
-			Database.Exec("ROLLBACK;")
+			tx.Rollback()
 			return fmt.Errorf("database error: %v", err)
 		}
 		ra, err := r.RowsAffected()
@@ -42,7 +42,7 @@ func (p *Purifier) Purge() error {
 	}
 
 	// Commit transaction
-	_, err = Database.Exec("COMMIT;")
+	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("database error: %v", err)
 	}
