@@ -264,6 +264,8 @@ func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, message
 	message.RequestIdentifier = request.MessageIdentifier
 	message.RequestRawMessage = xml
 	message.RequestSize = int64(len(xml))
+
+	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
 }
 
 func logXMLNotifyStopMonitoring(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
@@ -320,8 +322,8 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, message
 
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-	message.SubscriptionIdentifiers = subscriptionIds
-
+	// TODO no ResponseMessageIdentifier() method in XMLDeleteSubscriptionResponse
+	// message.ResponseIdentifier = response.ResponseMessageIdentifier()
 }
 
 func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
