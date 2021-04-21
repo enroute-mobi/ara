@@ -33,6 +33,7 @@ type config struct {
 	Syslog                bool
 	ColorizeLog           bool
 	LoadMaxInsert         int
+	FakeUUIDLegacyFormat  bool
 }
 
 var Config = config{}
@@ -40,6 +41,7 @@ var Config = config{}
 func LoadConfig(path string) error {
 	// Default values
 	Config.LoadMaxInsert = 100000
+	Config.FakeUUIDLegacyFormat = true
 
 	env := Environment()
 	logger.Log.Debugf("Loading %s configuration", env)
@@ -69,6 +71,10 @@ func LoadConfig(path string) error {
 	bigQueryPrefixEnv := os.Getenv("ARA_BIGQUERY_PREFIX")
 	if bigQueryPrefixEnv != "" {
 		Config.BigQueryDatasetPrefix = bigQueryPrefixEnv
+	}
+	fakeUUIDLegacy := os.Getenv("ARA_FAKEUUID_LEGACY")
+	if strings.ToLower(fakeUUIDLegacy) != "false" {
+		Config.FakeUUIDLegacyFormat = false
 	}
 
 	logger.Log.Syslog = Config.Syslog

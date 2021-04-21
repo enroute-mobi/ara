@@ -9,7 +9,7 @@ Feature: Manager Referentials
     When the Referential "test" is destroyed
     Then a Referential "test" should not exist
 
-  @database
+  @nostart @database
   Scenario: 2698 - Referential reloads Model at configured time
     Given the table "stop_areas" has the following data:
     | id                                     | referential_slug     | object_ids               | model_name |
