@@ -76,7 +76,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	}
 
 	// Push collector but recent collect
-	partner.lastPush = clock.DefaultClock().Now()
+	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
 
 	ps, err = partner.CheckStatus()
 	if err != nil {

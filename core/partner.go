@@ -57,6 +57,11 @@ type PartnerStatus struct {
 	ServiceStartedAt   time.Time
 }
 
+type PartnerStatusCheck struct {
+	LastCheck time.Time
+	Status    OperationnalStatus
+}
+
 type Partner struct {
 	uuid.UUIDConsumer
 	PartnerSettings
@@ -74,11 +79,11 @@ type Partner struct {
 	ConnectorTypes []string
 	// Settings       map[string]string
 
-	connectors          map[string]Connector
-	discoveredStopAreas map[string]struct{}
-	startedAt           time.Time
-	lastDiscovery       time.Time
-	lastPush            time.Time
+	connectors             map[string]Connector
+	discoveredStopAreas    map[string]struct{}
+	startedAt              time.Time
+	lastDiscovery          time.Time
+	alternativeStatusCheck PartnerStatusCheck
 
 	httpClient *remote.HTTPClient
 
@@ -281,6 +286,98 @@ func (partner *Partner) SOAPClient() *remote.SOAPClient {
 	return partner.HTTPClient().SOAPClient()
 }
 
+<<<<<<< HEAD
+=======
+func (partner *Partner) Credentials() string {
+	_, ok := partner.Settings[LOCAL_CREDENTIAL]
+	_, ok2 := partner.Settings[LOCAL_CREDENTIALS]
+	if !ok && !ok2 {
+		return ""
+	}
+	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
+}
+
+func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
+	if formatString == "" {
+		formatString = defaultIdentifierGenerators[generatorName]
+	}
+	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
+}
+
+func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
+	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
+	if formatString == "" {
+		formatString = defaultFormat
+	}
+	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
+}
+
+func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
+	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)); setting != "" {
+		return setting
+	}
+	return partner.Setting(REMOTE_OBJECTID_KIND)
+}
+
+func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
+	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
+		return setting
+	}
+	return partner.Setting(REMOTE_OBJECTID_KIND)
+}
+
+// Very specific for now, we'll refacto if we need to cache more
+func (partner *Partner) GtfsCacheTimeout() (t time.Duration) {
+	t, _ = time.ParseDuration(partner.Setting(BROADCAST_GTFS_CACHE_TIMEOUT))
+	if t < cache.MIN_CACHE_LIFESPAN {
+		t = cache.DEFAULT_CACHE_LIFESPAN
+	}
+
+	return
+}
+
+func (partner *Partner) GtfsTTL() (t time.Duration) {
+	t, _ = time.ParseDuration(partner.Setting(COLLECT_GTFS_TTL))
+	if t < DEFAULT_GTFS_TTL {
+		t = DEFAULT_GTFS_TTL
+	}
+
+	return
+}
+
+func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
+	t, _ = time.ParseDuration(partner.Setting(fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)))
+	return
+}
+
+func (partner *Partner) ProducerRef() string {
+	producerRef := partner.Setting(REMOTE_CREDENTIAL)
+	if producerRef == "" {
+		producerRef = "Ara"
+	}
+	return producerRef
+}
+
+func (partner *Partner) RequestorRef() string {
+	return partner.ProducerRef()
+}
+
+func (partner *Partner) SubscriberRef() string {
+	return partner.Setting(LOCAL_CREDENTIAL)
+}
+
+// Ref Issue #4300
+func (partner *Partner) Address() string {
+	// address := partner.Setting("local_url")
+	// if address == "" {
+	// 	address = config.Config.DefaultAddress
+	// }
+	// return address
+	return partner.Setting(LOCAL_URL)
+}
+
+>>>>>>> 9666c70... ARA-878 Implement Gtfs Collector
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }
@@ -331,7 +428,8 @@ func (partner *Partner) Stop() {
 func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
 	partner.lastDiscovery = time.Time{}
-	partner.lastPush = time.Time{}
+	partner.alternativeStatusCheck.LastCheck = time.Time{}
+	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(state.Startable)
@@ -508,17 +606,36 @@ func (partner *Partner) hasPushCollector() (ok bool) {
 	return ok
 }
 
+func (partner *Partner) hasGtfsCollector() (ok bool) {
+	_, ok = partner.connectors[GTFS_RT_REQUEST_COLLECTOR]
+	return ok
+}
+
+func (partner *Partner) alternativeStatusConnector() string {
+	if partner.hasPushCollector() {
+		return "push"
+	}
+	if partner.hasGtfsCollector() {
+		return "gtfs"
+	}
+	return "none"
+}
+
 func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 	partnerStatus := PartnerStatus{}
 
 	if partner.CheckStatusClient() == nil {
-		if !partner.hasPushCollector() {
-			logger.Log.Debugf("No CheckStatusClient or PushCollector connector for partner %v", partner.slug)
+		switch partner.alternativeStatusConnector() {
+		case "push":
+			return partner.checkPushStatus()
+		case "gtfs":
+			return partner.checkGtfsStatus()
+		default:
+			logger.Log.Debugf("Can't define Status for partner %v", partner.slug)
 			partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
-			return partnerStatus, errors.New("no CheckStatusClient or PushCollector connector")
+			return partnerStatus, errors.New("no way to define status")
 		}
-		return partner.checkPushStatus()
 	}
 	partnerStatus, err := partner.CheckStatusClient().Status()
 
@@ -531,10 +648,21 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 
 func (partner *Partner) checkPushStatus() (partnerStatus PartnerStatus, _ error) {
 	logger.Log.Debugf("Checking %v partner status with PushNotifications", partner.slug)
-	if partner.lastPush.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
+	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
 	} else {
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
+	}
+	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
+	return partnerStatus, nil
+}
+
+func (partner *Partner) checkGtfsStatus() (partnerStatus PartnerStatus, _ error) {
+	logger.Log.Debugf("Checking %v partner status with Gtfs collect", partner.slug)
+	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+	} else {
+		partnerStatus.OperationnalStatus = partner.alternativeStatusCheck.Status
 	}
 	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
@@ -582,7 +710,12 @@ func (partner *Partner) stopDiscovery() {
 }
 
 func (partner *Partner) Pushed() {
-	partner.lastPush = partner.manager.Referential().Clock().Now()
+	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
+}
+
+func (partner *Partner) GtfsStatus(s OperationnalStatus) {
+	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
+	partner.alternativeStatusCheck.Status = s
 }
 
 func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {

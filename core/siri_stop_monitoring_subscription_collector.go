@@ -206,7 +206,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
 	if connector.updateSubscriber == nil {
 		return
 	}

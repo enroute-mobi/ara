@@ -109,6 +109,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER:
 		return &SIRILiteVehicleMonitoringRequestBroadcasterFactory{}
+	case GTFS_RT_REQUEST_COLLECTOR:
+		return &GtfsRequestCollectorFactory{}
 	case GTFS_RT_TRIP_UPDATES_BROADCASTER:
 		return &TripUpdatesBroadcasterFactory{}
 	case GTFS_RT_VEHICLE_POSITIONS_BROADCASTER:

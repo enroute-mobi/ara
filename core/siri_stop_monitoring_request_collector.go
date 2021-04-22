@@ -149,7 +149,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
+func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
 	if connector.updateSubscriber == nil {
 		return
 	}
