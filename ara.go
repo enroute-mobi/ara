@@ -19,6 +19,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
@@ -203,7 +204,7 @@ func main() {
 }
 
 func checkStatus(url string, requestorRef string) error {
-	client := siri.NewSOAPClient(siri.SOAPClientUrls{Url: url})
+	client := remote.NewHTTPClient(remote.HTTPClientUrls{Url: url}).SOAPClient()
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
 		RequestTimestamp:  clock.DefaultClock().Now(),

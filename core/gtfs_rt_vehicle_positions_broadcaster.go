@@ -14,7 +14,7 @@ import (
 type VehiclePositionBroadcaster struct {
 	clock.ClockConsumer
 
-	BaseConnector
+	connector
 
 	cache *cache.CachedItem
 }

@@ -18,7 +18,7 @@ type VehicleMonitoringRequestBroadcaster interface {
 type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 	clock.ClockConsumer
 
-	BaseConnector
+	connector
 
 	remoteObjectidKind        string
 	vehicleRemoteObjectidKind string

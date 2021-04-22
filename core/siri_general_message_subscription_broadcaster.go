@@ -16,7 +16,7 @@ type SIRIGeneralMessageSubscriptionBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
 	toBroadcast               map[SubscriptionId][]model.SituationId

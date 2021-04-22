@@ -18,7 +18,7 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 	toBroadcast               map[SubscriptionId][]model.StopVisitId

@@ -784,3 +784,38 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
 }
+
+func Test_Partner_SOAPClient(t *testing.T) {
+	partner := &Partner{
+		slug: "partner",
+	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.SOAPClient()
+	if partner.httpClient == nil {
+		t.Error("partner.SOAPClient() should set Partner httpClient")
+	}
+
+	partner.SetSetting("remote_url", "remote_url")
+	partner.SOAPClient()
+	if partner.httpClient.Url != "remote_url" {
+		t.Error("Partner should have created a new SoapClient when partner setting changes")
+	}
+
+	partner.SetSetting("subscriptions.remote_url", "sub_remote_url")
+	partner.SOAPClient()
+	if partner.httpClient.SubscriptionsUrl != "sub_remote_url" {
+		t.Error("Partner should have created a new SoapClient when partner setting changes")
+	}
+}
+
+func Test_Partner_RequestorRef(t *testing.T) {
+	partner := &Partner{
+		slug: "partner",
+	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.SetSetting("remote_credential", "ara")
+	if partner.RequestorRef() != "ara" {
+		t.Errorf("Wrong Partner RequestorRef:\n got: %s\n want: \"ara\"", partner.RequestorRef())
+	}
+
+}

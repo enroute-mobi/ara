@@ -108,7 +108,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 				Address:                   ett.connector.Partner().Address(),
 				ProducerRef:               ett.connector.Partner().ProducerRef(),
 				ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
-				SubscriberRef:             ett.connector.SIRIPartner().SubscriberRef(),
+				SubscriberRef:             ett.connector.Partner().SubscriberRef(),
 				SubscriptionIdentifier:    sub.ExternalId(),
 				ResponseTimestamp:         ett.connector.Clock().Now(),
 				Status:                    false,
@@ -151,7 +151,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			Address:                   ett.connector.Partner().Address(),
 			ProducerRef:               ett.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
-			SubscriberRef:             ett.connector.SIRIPartner().SubscriberRef(),
+			SubscriberRef:             ett.connector.Partner().SubscriberRef(),
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         ett.connector.Clock().Now(),
 			Status:                    true,
@@ -353,7 +353,7 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTa
 
 	t := ett.Clock().Now()
 
-	err := ett.connector.SIRIPartner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+	err := ett.connector.Partner().SOAPClient().NotifyEstimatedTimeTable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
 	if err != nil {
 		event := ett.newLogStashEvent()

@@ -18,7 +18,7 @@ type LinesDiscoveryRequestBroadcaster interface {
 type SIRILinesDiscoveryRequestBroadcaster struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRILinesDiscoveryRequestBroadcasterFactory struct{}

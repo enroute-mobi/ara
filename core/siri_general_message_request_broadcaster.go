@@ -19,7 +19,7 @@ type GeneralMessageRequestBroadcaster interface {
 type SIRIGeneralMessageRequestBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
-	siriConnector
+	connector
 }
 
 type SIRIGeneralMessageRequestBroadcasterFactory struct{}

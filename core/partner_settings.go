@@ -30,6 +30,7 @@ const (
 	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
+	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
@@ -172,6 +173,16 @@ func (s *PartnerSettings) ProducerRef() (producerRef string) {
 		producerRef = "Ara"
 	}
 	return producerRef
+}
+
+func (s *PartnerSettings) RequestorRef() string {
+	return s.ProducerRef()
+}
+
+func (s *PartnerSettings) SubscriberRef() string {
+	s.m.RLock()
+	defer s.m.RUnlock()
+	return s.s[LOCAL_CREDENTIAL]
 }
 
 // Ref Issue #4300

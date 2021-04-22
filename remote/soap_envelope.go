@@ -1,4 +1,4 @@
-package siri
+package remote
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"bitbucket.org/enroute-mobi/ara/siri"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -63,10 +64,10 @@ func (envelope *SOAPEnvelope) BodyOrError(expectedResponse string) (xml.Node, er
 		return envelope.body, nil
 	}
 	if envelope.BodyType() == "Fault" {
-		se := NewXMLSiriError(envelope.body)
-		return nil, NewSiriError(fmt.Sprintf("SIRI Error: %v", se.Error()))
+		se := siri.NewXMLSiriError(envelope.body)
+		return nil, siri.NewSiriError(fmt.Sprintf("SIRI Error: %v", se.Error()))
 	}
-	return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
+	return nil, siri.NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 }
 
 func NewSOAPEnvelopeBuffer() *SOAPEnvelopeBuffer {

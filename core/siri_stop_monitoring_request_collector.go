@@ -27,7 +27,7 @@ type SIRIStopMonitoringRequestCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	updateSubscriber UpdateSubscriber
 }
@@ -82,7 +82,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	startTime := connector.Clock().Now()
 
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
-		RequestorRef: connector.SIRIPartner().RequestorRef(),
+		RequestorRef: connector.Partner().RequestorRef(),
 	}
 	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
@@ -91,7 +91,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logSIRIStopMonitoringRequest(logStashEvent, message, siriStopMonitoringRequest)
 
-	xmlStopMonitoringResponse, err := connector.SIRIPartner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	xmlStopMonitoringResponse, err := connector.Partner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -25,7 +26,7 @@ func NewSIRIHandler(referential *core.Referential) *SIRIHandler {
 	return &SIRIHandler{referential: referential}
 }
 
-func (handler *SIRIHandler) requestHandler(envelope *siri.SOAPEnvelope) SIRIRequestHandler {
+func (handler *SIRIHandler) requestHandler(envelope *remote.SOAPEnvelope) SIRIRequestHandler {
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
@@ -118,7 +119,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		requestReader = request.Body
 	}
 
-	envelope, err := siri.NewSOAPEnvelope(requestReader)
+	envelope, err := remote.NewSOAPEnvelope(requestReader)
 	if err != nil {
 		siriError("Client", fmt.Sprintf("Invalid Request: %v", err), string(handler.referential.Slug()), response)
 		return

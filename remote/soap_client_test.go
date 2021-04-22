@@ -1,4 +1,4 @@
-package siri
+package remote
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func testSOAPFile(name string) (*os.File, error) {
@@ -41,8 +43,9 @@ func Test_SOAPClient_CheckStatus(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(SOAPClientUrls{Url: ts.URL})
-	request := &SIRICheckStatusRequest{
+	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	client := httpClient.SOAPClient()
+	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      "Ara",
 		RequestTimestamp:  time.Now(),
 		MessageIdentifier: "Ara:Message::6ba7b814-9dad-11d1-32-00c04fd430c8:LOC",
@@ -93,8 +96,9 @@ func Test_SOAPClient_CheckStatus_GzipResponse(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(SOAPClientUrls{Url: ts.URL})
-	request := &SIRICheckStatusRequest{
+	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	client := httpClient.SOAPClient()
+	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      "Ara",
 		RequestTimestamp:  time.Now(),
 		MessageIdentifier: "Ara:Message::6ba7b814-9dad-11d1-32-00c04fd430c8:LOC",
@@ -116,8 +120,9 @@ func Test_SOAPClient_StopMonitoring(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	client := NewSOAPClient(SOAPClientUrls{Url: ts.URL})
-	request := &SIRIGetStopMonitoringRequest{
+	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	client := httpClient.SOAPClient()
+	request := &siri.SIRIGetStopMonitoringRequest{
 		RequestorRef: "Ara",
 	}
 	request.MessageIdentifier = "Ara:Message::6ba7b814-9dad-11d1-32-00c04fd430c8:LOC"

@@ -1,9 +1,11 @@
-package siri
+package remote
 
 import (
 	"bytes"
 	"runtime"
 	"testing"
+
+	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
 func testSOAPEnvelope(name string) (*SOAPEnvelope, error) {
@@ -38,7 +40,7 @@ func Test_SOAPEnvelope_Finalizer(t *testing.T) {
 	runtime.SetFinalizer(envelope, finalizer)
 
 	// Create a CheckStatusResponse and destroy envelope
-	response := NewXMLCheckStatusResponse(envelope.body)
+	response := siri.NewXMLCheckStatusResponse(envelope.body)
 	envelope = nil
 	runtime.GC()
 	<-done
@@ -46,7 +48,7 @@ func Test_SOAPEnvelope_Finalizer(t *testing.T) {
 	if !finalized {
 		t.Errorf("SOAPEnvelope should be destroyed by GC")
 	}
-	if response.node == nil {
+	if response.Node() == nil {
 		t.Errorf("Xml Node shouldn't be destroyed with SOAPEnvelope")
 	}
 }

@@ -6,7 +6,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/remote"
 )
 
 type SiriErrorResponse struct {
@@ -33,7 +33,7 @@ func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
 	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
 
 	// Wrap soap and send response
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(fmt.Sprintf(`
   <S:Fault>
     <faultcode>S:%s</faultcode>

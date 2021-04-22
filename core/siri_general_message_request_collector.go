@@ -21,7 +21,7 @@ type SIRIGeneralMessageRequestCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	situationUpdateSubscriber SituationUpdateSubscriber
 }
@@ -47,7 +47,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	startTime := connector.Clock().Now()
 
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
-		RequestorRef: connector.SIRIPartner().RequestorRef(),
+		RequestorRef: connector.Partner().RequestorRef(),
 	}
 	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
@@ -71,7 +71,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 
 	logSIRIGeneralMessageRequest(logStashEvent, message, siriGeneralMessageRequest)
 
-	xmlGeneralMessageResponse, err := connector.SIRIPartner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
+	xmlGeneralMessageResponse, err := connector.Partner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

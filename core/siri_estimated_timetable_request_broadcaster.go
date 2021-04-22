@@ -19,7 +19,7 @@ type EstimatedTimetableBroadcaster interface {
 type SIRIEstimatedTimetableBroadcaster struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRIEstimatedTimetableBroadcasterFactory struct{}

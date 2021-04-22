@@ -128,13 +128,13 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
 		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
-		RequestorRef:      subscriber.connector.SIRIPartner().RequestorRef(),
+		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
 	for messageIdentifier, requestedResource := range resourcesToRequest {
 		entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
-			SubscriberRef:          subscriber.connector.SIRIPartner().RequestorRef(),
+			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
 			SubscriptionIdentifier: string(requestedResource.subId),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
@@ -167,7 +167,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	message.SubscriptionIdentifiers = lineRefList
 
 	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.SIRIPartner().SOAPClient().GeneralMessageSubscription(gmRequest)
+	response, err := subscriber.connector.Partner().SOAPClient().GeneralMessageSubscription(gmRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {

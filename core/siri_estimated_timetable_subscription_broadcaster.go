@@ -18,7 +18,7 @@ type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.StopVisitId

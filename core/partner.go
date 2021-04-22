@@ -13,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -62,6 +63,9 @@ type Partner struct {
 
 	mutex *sync.RWMutex
 
+	manager             Partners
+	subscriptionManager Subscriptions
+
 	id            PartnerId
 	slug          PartnerSlug
 	Name          string `json:",omitempty"`
@@ -75,9 +79,8 @@ type Partner struct {
 	startedAt           time.Time
 	lastDiscovery       time.Time
 	lastPush            time.Time
-	context             Context
-	subscriptionManager Subscriptions
-	manager             Partners
+
+	httpClient *remote.HTTPClient
 
 	gtfsCache *cache.CacheTable
 }
@@ -220,7 +223,6 @@ func NewPartner() *Partner {
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
-		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
@@ -260,12 +262,25 @@ func (partner *Partner) GtfsCache() *cache.CacheTable {
 	return partner.gtfsCache
 }
 
-func (partner *Partner) OperationnalStatus() OperationnalStatus {
-	return partner.PartnerStatus.OperationnalStatus
+func (partner *Partner) HTTPClient() *remote.HTTPClient {
+	urls := remote.HTTPClientUrls{
+		Url:              partner.Setting(REMOTE_URL),
+		SubscriptionsUrl: partner.Setting(SUBSCRIPTIONS_REMOTE_URL),
+		NotificationsUrl: partner.Setting(NOTIFICATIONS_REMOTE_URL),
+	}
+	if partner.httpClient == nil || partner.httpClient.HTTPClientUrls != urls {
+		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, urls.Url)
+		partner.httpClient = remote.NewHTTPClient(urls)
+	}
+	return partner.httpClient
 }
 
-func (partner *Partner) Context() *Context {
-	return &partner.context
+func (partner *Partner) SOAPClient() *remote.SOAPClient {
+	return partner.HTTPClient().SOAPClient()
+}
+
+func (partner *Partner) OperationnalStatus() OperationnalStatus {
+	return partner.PartnerStatus.OperationnalStatus
 }
 
 func (partner *Partner) Save() (ok bool) {
@@ -623,7 +638,6 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		// Settings:            make(map[string]string),
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
-		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},

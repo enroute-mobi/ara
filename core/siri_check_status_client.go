@@ -23,7 +23,7 @@ type TestCheckStatusClientFactory struct{}
 type SIRICheckStatusClient struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRICheckStatusClientFactory struct{}
@@ -70,14 +70,14 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 
 	partnerStatus := PartnerStatus{}
 	request := &siri.SIRICheckStatusRequest{
-		RequestorRef:      connector.SIRIPartner().RequestorRef(),
+		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	logSIRICheckStatusRequest(logStashEvent, message, request)
 
-	response, err := connector.SIRIPartner().SOAPClient().CheckStatus(request)
+	response, err := connector.Partner().SOAPClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
