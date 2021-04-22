@@ -33,24 +33,24 @@ func (generator *realUUIDGenerator) NewUUID() string {
 }
 
 func NewFakeUUIDGenerator() *FakeUUIDGenerator {
-	return &FakeUUIDGenerator{legacyFormat: config.Config.FakeUUIDLegacyFormat}
+	return &FakeUUIDGenerator{realFormat: config.Config.FakeUUIDRealFormat}
 }
 
 type FakeUUIDGenerator struct {
-	mutex        sync.Mutex
-	counter      int
-	lastUUID     string
-	legacyFormat bool
+	mutex      sync.Mutex
+	counter    int
+	lastUUID   string
+	realFormat bool
 }
 
-const fakeFormat = "6ba7b814-9dad-11d1-%04x-00c04fd430c8"
+const fakeRealFormat = "6ba7b814-9dad-11d1-%04x-00c04fd430c8"
 const fakeLegacyFormat = "6ba7b814-9dad-11d1-%x-00c04fd430c8"
 
 func (generator *FakeUUIDGenerator) Format() string {
-	if generator.legacyFormat {
-		return fakeLegacyFormat
+	if generator.realFormat {
+		return fakeRealFormat
 	} else {
-		return fakeFormat
+		return fakeLegacyFormat
 	}
 }
 
