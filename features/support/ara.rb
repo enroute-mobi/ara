@@ -5,7 +5,9 @@ $adminToken = "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
 $token = "testtoken"
 
 class Ara
-  include Singleton
+  def self.instance
+    @ara ||= new
+  end
 
   attr_writer :fakeuuid_legacy
   def fakeuuid_legacy?
@@ -20,7 +22,8 @@ class Ara
       FileUtils.mkdir_p("log")
     end
 
-    system "ARA_ROOT=#{Dir.getwd} ARA_CONFIG=#{Dir.getwd}/config ARA_ENV=test ARA_BIGQUERY_PREFIX=cucumber ARA_BIGQUERY_TEST=#{BigQuery.url} ARA_FAKEUUID_LEGACY=#{fakeuuid_legacy?} go run ara.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/ara.log 2>&1 &"
+    ara_command = "ARA_ROOT=#{Dir.getwd} ARA_CONFIG=#{Dir.getwd}/config ARA_ENV=test ARA_BIGQUERY_PREFIX=cucumber ARA_BIGQUERY_TEST=#{BigQuery.url} ARA_FAKEUUID_LEGACY=#{fakeuuid_legacy?} go run ara.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/ara.log 2>&1 &"
+    system ara_command
 
     time_limit = Time.now + 30
     while
@@ -37,9 +40,11 @@ class Ara
     end
   end
 
-  def stop
+  def self.stop
     pid = IO.read("tmp/pid")
     Process.kill('KILL',pid.to_i)
+
+    @ara = nil
   end
 
 end
@@ -53,5 +58,5 @@ Before('not @nostart') do
 end
 
 After do
-  Ara.instance.stop
+  Ara.stop
 end

@@ -73,7 +73,7 @@ func LoadConfig(path string) error {
 		Config.BigQueryDatasetPrefix = bigQueryPrefixEnv
 	}
 	fakeUUIDLegacy := os.Getenv("ARA_FAKEUUID_LEGACY")
-	if strings.ToLower(fakeUUIDLegacy) != "false" {
+	if strings.ToLower(fakeUUIDLegacy) == "false" {
 		Config.FakeUUIDLegacyFormat = false
 	}
 

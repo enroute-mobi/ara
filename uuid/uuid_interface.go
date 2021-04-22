@@ -43,8 +43,8 @@ type FakeUUIDGenerator struct {
 	legacyFormat bool
 }
 
-const fakeLegacyFormat = "6ba7b814-9dad-11d1-%04x-00c04fd430c8"
-const fakeFormat = "6ba7b814-9dad-11d1-%x-00c04fd430c8"
+const fakeFormat = "6ba7b814-9dad-11d1-%04x-00c04fd430c8"
+const fakeLegacyFormat = "6ba7b814-9dad-11d1-%x-00c04fd430c8"
 
 func (generator *FakeUUIDGenerator) Format() string {
 	if generator.legacyFormat {
