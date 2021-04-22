@@ -268,9 +268,11 @@ func (partner *Partner) HTTPClient() *remote.HTTPClient {
 		SubscriptionsUrl: partner.Setting(SUBSCRIPTIONS_REMOTE_URL),
 		NotificationsUrl: partner.Setting(NOTIFICATIONS_REMOTE_URL),
 	}
-	if partner.httpClient == nil || partner.httpClient.HTTPClientUrls != urls {
+	if partner.httpClient == nil {
 		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, urls.Url)
 		partner.httpClient = remote.NewHTTPClient(urls)
+	} else if partner.httpClient.HTTPClientUrls != urls {
+		partner.httpClient.SetURLs(urls)
 	}
 	return partner.httpClient
 }

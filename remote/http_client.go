@@ -55,6 +55,10 @@ func NewHTTPClient(urls HTTPClientUrls) *HTTPClient {
 	return c
 }
 
+func (c *HTTPClient) SetURLs(urls HTTPClientUrls) {
+	c.HTTPClientUrls = urls
+}
+
 func (c *HTTPClient) SOAPClient() *SOAPClient {
 	return c.soapClient
 }
