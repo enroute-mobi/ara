@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 )
 
 type PartnerController struct {
@@ -222,6 +223,8 @@ func (controller *PartnerController) Save(response http.ResponseWriter) {
 	status, err := controller.referential.Partners().SaveToDatabase()
 
 	if err != nil {
+		monitoring.ReportError(err)
+
 		response.WriteHeader(status)
 		jsonBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
 		response.Write(jsonBytes)

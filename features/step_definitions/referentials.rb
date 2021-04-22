@@ -57,3 +57,7 @@ Then(/^one Referential has the following attributes:$/) do |attributes|
 
   expect(found_value).to include(parsed_attributes)
 end
+
+When('I save all referentials') do
+  RestClient.post url_for(path: "_referentials/save"), "", {:Authorization => "Token token=#{$adminToken}"}
+end

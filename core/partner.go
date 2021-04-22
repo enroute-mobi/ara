@@ -998,16 +998,16 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 	}
 
 	// Begin transaction
-	_, err = model.Database.Exec("BEGIN;")
+	tx, err := model.Database.Begin()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
 	// Delete partners
 	sqlQuery = fmt.Sprintf("delete from partners where referential_id = '%s';", manager.referential.Id())
-	_, err = model.Database.Exec(sqlQuery)
+	_, err = tx.Exec(sqlQuery)
 	if err != nil {
-		model.Database.Exec("ROLLBACK;")
+		tx.Rollback()
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
@@ -1017,18 +1017,18 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 	for _, partner := range manager.byId {
 		dbPartner, err := manager.newDbPartner(partner)
 		if err != nil {
-			model.Database.Exec("ROLLBACK;")
+			tx.Rollback()
 			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
 		}
-		err = model.Database.Insert(dbPartner)
+		err = tx.Insert(dbPartner)
 		if err != nil {
-			model.Database.Exec("ROLLBACK;")
+			tx.Rollback()
 			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
 		}
 	}
 
 	// Commit transaction
-	_, err = model.Database.Exec("COMMIT;")
+	err = tx.Commit()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}

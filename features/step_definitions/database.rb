@@ -13,5 +13,23 @@ Given(/^the table "([^"]*)" has the following data:$/) do |table_name, datas|
 end
 
 When(/^I start Ara$/) do
-  start_ara()
+  Ara.instance.start
+end
+
+Then('the table {string} has rows with the following values:') do |table_name, values|
+  row_values = values.hashes
+  result = @connection.exec("select * from #{table_name};")
+  expect(result.to_a).to include(*row_values.map { |r| a_hash_including(r) })
+end
+
+Then('the table {string} has a row with the following values:') do |table_name, values|
+  row_values = values.rows_hash
+  result = @connection.exec("select * from #{table_name};")
+  expect(result.to_a).to include(a_hash_including(row_values))
+end
+
+Then('the table {string} has no row with the following values:') do |table_name, values|
+  row_values = values.rows_hash
+  result = @connection.exec("select * from #{table_name};")
+  expect(result.to_a).to_not include(a_hash_including(row_values))
 end

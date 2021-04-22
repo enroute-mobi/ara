@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"bitbucket.org/enroute-mobi/ara/config"
 	"github.com/satori/uuid"
 )
 
@@ -32,17 +33,29 @@ func (generator *realUUIDGenerator) NewUUID() string {
 }
 
 func NewFakeUUIDGenerator() *FakeUUIDGenerator {
-	return &FakeUUIDGenerator{}
+	return &FakeUUIDGenerator{realFormat: config.Config.FakeUUIDRealFormat}
 }
 
 type FakeUUIDGenerator struct {
-	mutex    sync.Mutex
-	counter  int
-	lastUUID string
+	mutex      sync.Mutex
+	counter    int
+	lastUUID   string
+	realFormat bool
+}
+
+const fakeRealFormat = "6ba7b814-9dad-11d1-%04x-00c04fd430c8"
+const fakeLegacyFormat = "6ba7b814-9dad-11d1-%x-00c04fd430c8"
+
+func (generator *FakeUUIDGenerator) Format() string {
+	if generator.realFormat {
+		return fakeRealFormat
+	} else {
+		return fakeLegacyFormat
+	}
 }
 
 func (generator *FakeUUIDGenerator) NextUUID() string {
-	return fmt.Sprintf("6ba7b814-9dad-11d1-%x-00c04fd430c8", generator.counter)
+	return fmt.Sprintf(generator.Format(), generator.counter)
 }
 
 func (generator *FakeUUIDGenerator) NewUUID() string {
