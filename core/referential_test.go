@@ -156,7 +156,7 @@ func Test_APIReferential_Validate(t *testing.T) {
 	if len(apiReferential.Errors) != 1 {
 		t.Errorf("apiReferential Errors should not be empty")
 	}
-	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_BLANK {
+	if len(apiReferential.Errors.Get("Slug")) != 1 || apiReferential.Errors.Get("Slug")[0] != ERROR_BLANK {
 		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
 	}
 
@@ -170,7 +170,7 @@ func Test_APIReferential_Validate(t *testing.T) {
 	if len(apiReferential.Errors) != 1 {
 		t.Errorf("apiReferential Errors should not be empty")
 	}
-	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_SLUG_FORMAT {
+	if len(apiReferential.Errors.Get("Slug")) != 1 || apiReferential.Errors.Get("Slug")[0] != ERROR_SLUG_FORMAT {
 		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
 	}
 
@@ -189,7 +189,7 @@ func Test_APIReferential_Validate(t *testing.T) {
 	if len(apiReferential.Errors) != 1 {
 		t.Errorf("apiReferential Errors should not be empty")
 	}
-	if len(apiReferential.Errors["Slug"]) != 1 || apiReferential.Errors["Slug"][0] != ERROR_UNIQUE {
+	if len(apiReferential.Errors.Get("Slug")) != 1 || apiReferential.Errors.Get("Slug")[0] != ERROR_UNIQUE {
 		t.Errorf("apiReferential should have Error for Slug, got %v", apiReferential.Errors)
 	}
 
