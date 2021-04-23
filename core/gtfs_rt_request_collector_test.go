@@ -13,7 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-func collectGtfs(t *testing.T, feed *gtfs.FeedMessage) ([]model.UpdateEvent, *Partner) {
+func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]model.UpdateEvent, *Partner) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data, _ := proto.Marshal(feed)
@@ -26,7 +26,11 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage) ([]model.UpdateEvent, *Pa
 	defer ts.Close()
 
 	// Create a GtfsRequestCollector
-	partners := createTestPartnerManager()
+	referentials := NewMemoryReferentials()
+	referential := referentials.New(ReferentialSlug("referential"))
+	// referential.collectManager = NewTestCollectManager()
+	referentials.Save(referential)
+	partners := referential.partners
 	partner := partners.New("slug")
 	partner.SetSettingsDefinition(map[string]string{
 		"remote_url":           ts.URL,
@@ -35,25 +39,35 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage) ([]model.UpdateEvent, *Pa
 	partners.Save(partner)
 
 	gtfsCollector := NewGtfsRequestCollector(partner)
-
-	fs := fakeBroadcaster{}
-	gtfsCollector.SetSubscriber(fs.FakeBroadcaster)
 	gtfsCollector.SetClock(clock.NewFakeClock())
-	gtfsCollector.requestGtfs()
 
+	if fakeBroadcast {
+		fs := fakeBroadcaster{}
+		gtfsCollector.SetSubscriber(fs.FakeBroadcaster)
+
+		gtfsCollector.requestGtfs()
+		time.Sleep(42 * time.Millisecond)
+
+		return fs.Events, partner
+	}
+
+	gtfsCollector.Start()
+	time.Sleep(42 * time.Millisecond)
+	gtfsCollector.Clock().(clock.FakeClock).Advance(10 * time.Second)
+	gtfsCollector.Stop()
 	time.Sleep(42 * time.Millisecond)
 
-	return fs.Events, partner
+	return nil, partner
 }
 
-func Test_GtfsCollect(t *testing.T) {
+func Test_GtfsCollectEvents(t *testing.T) {
 	e := []*gtfs.FeedEntity{
 		tripUpdate(),
 		vehiclePosition(),
 	}
 	feed := newGtfsFeed(e)
 
-	events, partner := collectGtfs(t, feed)
+	events, partner := collectGtfs(t, feed, true)
 
 	if len(events) != 7 {
 		t.Errorf("Should have 7 events after gtfs collect, got %v", len(events))
@@ -66,17 +80,43 @@ func Test_GtfsCollect(t *testing.T) {
 	}
 }
 
-func Test_GtfsCollect_SameEvents(t *testing.T) {
+func Test_GtfsCollectEvents_SameEntities(t *testing.T) {
 	e := []*gtfs.FeedEntity{
 		tripUpdate(),
 		tripUpdate(),
 	}
 	feed := newGtfsFeed(e)
 
-	events, _ := collectGtfs(t, feed)
+	events, _ := collectGtfs(t, feed, true)
 
 	if len(events) != 6 {
 		t.Errorf("Should have 6 events after gtfs collect, got %v", len(events))
+	}
+}
+
+func Test_GtfsCollect(t *testing.T) {
+	e := []*gtfs.FeedEntity{
+		tripUpdate(),
+		vehiclePosition(),
+	}
+	feed := newGtfsFeed(e)
+
+	_, partner := collectGtfs(t, feed, false)
+
+	if c := len(partner.Referential().Model().StopAreas().FindAll()); c != 2 {
+		t.Errorf("2 StopAreas should have been created, found %v", c)
+	}
+	if c := len(partner.Referential().Model().Lines().FindAll()); c != 1 {
+		t.Errorf("1 Line should have been created, found %v", c)
+	}
+	if c := len(partner.Referential().Model().VehicleJourneys().FindAll()); c != 1 {
+		t.Errorf("1 VehicleJourney should have been created, found %v", c)
+	}
+	if c := len(partner.Referential().Model().StopVisits().FindAll()); c != 2 {
+		t.Errorf("2 StopVisits should have been created, found %v", c)
+	}
+	if c := len(partner.Referential().Model().Vehicles().FindAll()); c != 1 {
+		t.Errorf("1 Vehicle should have been created, found %v", c)
 	}
 }
 
