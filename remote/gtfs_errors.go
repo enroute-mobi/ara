@@ -10,5 +10,5 @@ func (e GtfsError) Error() string {
 }
 
 func NewGtfsError(message string) error {
-	return &GtfsError{message: message}
+	return GtfsError{message: message}
 }

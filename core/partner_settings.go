@@ -145,6 +145,17 @@ func (s *PartnerSettings) VehicleRemoteObjectIDKind(connectorName string) string
 	return s.s[REMOTE_OBJECTID_KIND]
 }
 
+func (s *PartnerSettings) GtfsTTL() (t time.Duration) {
+	s.m.RLock()
+	t, _ = time.ParseDuration(s.s[COLLECT_GTFS_TTL])
+	s.m.RUnlock()
+	if t < DEFAULT_GTFS_TTL {
+		t = DEFAULT_GTFS_TTL
+	}
+
+	return
+}
+
 // Very specific for now, we'll refacto if we need to cache more
 func (s *PartnerSettings) GtfsCacheTimeout() (t time.Duration) {
 	s.m.RLock()

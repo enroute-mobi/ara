@@ -16,10 +16,9 @@ const DEFAULT_GTFS_TTL = 30 * time.Second
 
 type GtfsRequestCollectorFactory struct{}
 
-func (factory *GtfsRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	return ok
+func (factory *GtfsRequestCollectorFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
 }
 
 func (factory *GtfsRequestCollectorFactory) CreateConnector(partner *Partner) Connector {
@@ -218,6 +217,10 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 	}
 
 	return vjObjectId
+}
+
+func (connector *GtfsRequestCollector) SetSubscriber(s UpdateSubscriber) {
+	connector.subscriber = s
 }
 
 func (connector *GtfsRequestCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {

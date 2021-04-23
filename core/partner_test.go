@@ -87,6 +87,46 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	}
 }
 
+func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
+	partners := createTestPartnerManager()
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_credential":     "loc",
+		"remote_objectid_kind": "_internal",
+	})
+	partner.ConnectorTypes = []string{GTFS_RT_REQUEST_COLLECTOR}
+	partners.Save(partner)
+
+	// No Connectors
+	ps, err := partner.CheckStatus()
+	if err == nil {
+		t.Fatalf("should have an error when partner doesn't have any connectors")
+	}
+
+	// Push collector but old collect
+	partner.RefreshConnectors()
+
+	ps, err = partner.CheckStatus()
+	if err != nil {
+		t.Fatalf("should not have an error during checkstatus: %v", err)
+	}
+	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
+	}
+
+	// Push collector but recent collect
+	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
+	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
+
+	ps, err = partner.CheckStatus()
+	if err != nil {
+		t.Fatalf("should not have an error during checkstatus: %v", err)
+	}
+	if expected := OPERATIONNAL_STATUS_UNKNOWN; ps.OperationnalStatus != expected {
+		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
+	}
+}
+
 func Test_Partner_SubcriptionCancel(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
