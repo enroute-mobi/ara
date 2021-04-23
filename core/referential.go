@@ -33,6 +33,7 @@ type Referential struct {
 
 	id   ReferentialId
 	slug ReferentialSlug
+	Name string `json:",omitempty"`
 
 	Settings       map[string]string `json:"Settings,omitempty"`
 	OrganisationId string            `json:",omitempty"`
@@ -67,6 +68,7 @@ type APIReferential struct {
 	id             ReferentialId
 	OrganisationId string            `json:",omitempty"`
 	Slug           ReferentialSlug   `json:"Slug,omitempty"`
+	Name           string            `json:",omitempty"`
 	Errors         Errors            `json:"Errors,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	Tokens         []string          `json:"Tokens,omitempty"`
@@ -216,6 +218,7 @@ func (referential *Referential) Definition() *APIReferential {
 		id:             referential.id,
 		OrganisationId: referential.OrganisationId,
 		Slug:           referential.slug,
+		Name:           referential.Name,
 		Settings:       settings,
 		Errors:         NewErrors(),
 		manager:        referential.manager,
@@ -228,6 +231,7 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 
 	referential.OrganisationId = apiReferential.OrganisationId
 	referential.slug = apiReferential.Slug
+	referential.Name = apiReferential.Name
 	referential.Settings = apiReferential.Settings
 	referential.Tokens = apiReferential.Tokens
 
@@ -364,6 +368,10 @@ func (manager *MemoryReferentials) Load() error {
 		referential := manager.New(ReferentialSlug(r.Slug))
 		referential.id = ReferentialId(r.ReferentialId)
 
+		if r.Name.Valid {
+			referential.Name = r.Name.String
+		}
+
 		if r.OrganisationId.Valid {
 			referential.OrganisationId = r.OrganisationId.String
 		}
@@ -446,6 +454,7 @@ func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*
 		ReferentialId:  string(referential.id),
 		OrganisationId: referential.DatabaseOrganisationId(),
 		Slug:           string(referential.slug),
+		Name:           referential.Name,
 		Settings:       string(settings),
 		Tokens:         string(tokens),
 	}, nil
