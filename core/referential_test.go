@@ -305,6 +305,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 			Valid:  true,
 		},
 		Slug:     "ratp",
+		Name:     "RATP",
 		Settings: "{ \"test.key\": \"test-value\", \"model.reload_at\": \"01:00\" }",
 		Tokens:   "[\"apiToken\"]",
 	}
@@ -337,6 +338,9 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	}
 	if expected := "ratp"; referential.Slug() != ReferentialSlug(expected) {
 		t.Errorf("Wrong Slug:\n got: %v\n expected: %v", referential.Slug(), expected)
+	}
+	if expected := "RATP"; referential.Name != expected {
+		t.Errorf("Wrong Name:\n got: %v\n expected: %v", referential.Name, expected)
 	}
 	if expected := "apiToken"; len(referential.Tokens) != 1 || referential.Tokens[0] != expected {
 		t.Errorf("Wrong Tokens:\n got: %v\n expected: %v", referential.Tokens, expected)

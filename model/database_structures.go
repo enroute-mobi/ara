@@ -6,6 +6,7 @@ type DatabaseReferential struct {
 	ReferentialId  string         `db:"referential_id"`
 	OrganisationId sql.NullString `db:"organisation_id"`
 	Slug           string         `db:"slug"`
+	Name           string         `db:"name"`
 	Settings       string         `db:"settings"`
 	Tokens         string         `db:"tokens"`
 }
@@ -14,6 +15,7 @@ type SelectReferential struct {
 	ReferentialId  string         `db:"referential_id"`
 	OrganisationId sql.NullString `db:"organisation_id"`
 	Slug           string
+	Name           sql.NullString
 	Settings       sql.NullString
 	Tokens         sql.NullString
 }
