@@ -50,15 +50,12 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 
 func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	partners := createTestPartnerManager()
-	partner := &Partner{
-		connectors: make(map[string]Connector),
-		Settings: map[string]string{
-			"local_credential":     "loc",
-			"remote_objectid_kind": "_internal",
-		},
-		ConnectorTypes: []string{"push-collector"},
-		manager:        partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_credential":     "loc",
+		"remote_objectid_kind": "_internal",
+	})
+	partner.ConnectorTypes = []string{"push-collector"}
 	partners.Save(partner)
 
 	// No Connectors
@@ -92,15 +89,12 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 
 func Test_Partner_SubcriptionCancel(t *testing.T) {
 	partners := createTestPartnerManager()
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"remote_url":           "une url",
-			"remote_objectid_kind": "_internal",
-		},
-		ConnectorTypes: []string{"siri-stop-monitoring-subscription-collector"},
-		manager:        partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"remote_url":           "une url",
+		"remote_objectid_kind": "_internal",
+	})
+	partner.ConnectorTypes = []string{"siri-stop-monitoring-subscription-collector"}
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
@@ -145,12 +139,12 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := Partner{
-		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		PartnerSettings: NewPartnerSettings(),
+		id:              "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
 		slug:           "partner",
-		Settings:       make(map[string]string),
 		ConnectorTypes: []string{},
 	}
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
@@ -216,143 +210,138 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrue(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_INCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 }
 
 func Test_Partner_CanCollectTrueLine(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
-
-	partner.Settings[COLLECT_INCLUDE_LINES] = "NINOXE:Line:SP:24:"
+	partner.SetSetting(COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
 	}
 }
 
 func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 }
 
 func Test_Partner_CanCollectFalse(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "BAD_VALUE")
-
-	partner.Settings[COLLECT_INCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "BAD_VALUE"
+	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
 	}
 }
 
 func Test_Partner_CanCollectFalseLine(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "BAD_VALUE")
-
-	partner.Settings[COLLECT_INCLUDE_LINES] = "NINOXE:Line:SP:24:"
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "BAD_VALUE"
+	partner.SetSetting(COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
 	}
 }
 
 func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_INCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
-	partner.Settings[COLLECT_EXCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:25:LOC"
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 }
 
 func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_INCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
-	partner.Settings[COLLECT_EXCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 }
 
 func Test_Partner_CanCollectFalseSPD(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
 	partner.discoveredStopAreas = make(map[string]struct{})
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 }
 
 func Test_Partner_CanCollectTrueSPD(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
 	partner.discoveredStopAreas = make(map[string]struct{})
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
+	partner.setCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 }
 
 func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := &Partner{PartnerSettings: NewPartnerSettings()}
 	partner.discoveredStopAreas = make(map[string]struct{})
-	stopAreaObjectId := model.NewObjectID("internal", "NINOXE:StopPoint:SP:24:LOC")
-
-	partner.Settings[COLLECT_USE_DISCOVERED_SA] = "true"
+	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.Settings[COLLECT_EXCLUDE_STOP_AREAS] = "NINOXE:StopPoint:SP:24:LOC"
+	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.setCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -360,17 +349,18 @@ func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
 
 func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	partners := createTestPartnerManager()
-	partner1 := Partner{}
-	partner2 := Partner{}
+	partner1 := Partner{
+		slug:            "First",
+		PartnerSettings: NewPartnerSettings(),
+	}
+	partner2 := Partner{
+		slug:            "Second",
+		PartnerSettings: NewPartnerSettings(),
+	}
 
-	partner1.Settings = make(map[string]string)
-	partner2.Settings = make(map[string]string)
+	partner1.SetSetting("collect.priority", "2")
 
-	partner1.Settings["collect.priority"] = "2"
-	partner1.SetSlug("First")
-
-	partner2.Settings["collect.priority"] = "1"
-	partner2.SetSlug("Second")
+	partner2.SetSetting("collect.priority", "1")
 
 	partners.Save(&partner1)
 	partners.Save(&partner2)
@@ -444,7 +434,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 
 	// Check Already Used Slug and local_credential
 	partner := partners.New("slug")
-	partner.Settings["local_credential"] = "cred"
+	partner.SetSetting("local_credential", "cred")
 	partners.Save(partner)
 
 	apiPartner = &APIPartner{
@@ -567,7 +557,7 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.Settings["local_credential"] = "cred"
+	existingPartner.SetSetting("local_credential", "cred")
 	partners.Save(existingPartner)
 
 	partner, ok := partners.FindBySetting(LOCAL_CREDENTIAL, "cred")
@@ -583,8 +573,8 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.Settings[LOCAL_CREDENTIAL] = "cred"
-	existingPartner.Settings[LOCAL_CREDENTIALS] = "cred2,cred3"
+	existingPartner.SetSetting(LOCAL_CREDENTIAL, "cred")
+	existingPartner.SetSetting(LOCAL_CREDENTIALS, "cred2,cred3")
 	partners.Save(existingPartner)
 
 	partner, ok := partners.FindByCredential("cred")
@@ -730,8 +720,8 @@ func Test_Partners_StartStop(t *testing.T) {
 
 func Test_Partner_IdentifierGenerator(t *testing.T) {
 	partner := &Partner{
-		slug:     "partner",
-		Settings: make(map[string]string),
+		PartnerSettings: NewPartnerSettings(),
+		slug:            "partner",
 	}
 
 	midGenerator := partner.IdentifierGenerator("message_identifier")
@@ -755,13 +745,13 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
 
-	partner.Settings = map[string]string{
+	partner.SetSettingsDefinition(map[string]string{
 		"generators.message_identifier":             "mid",
 		"generators.response_message_identifier":    "rmid",
 		"generators.data_frame_identifier":          "dfid",
 		"generators.reference_identifier":           "rid",
 		"generators.reference_stop_area_identifier": "rsaid",
-	}
+	})
 
 	midGenerator = partner.IdentifierGenerator("message_identifier")
 	if expected := "mid"; midGenerator.formatString != expected {

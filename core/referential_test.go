@@ -489,7 +489,7 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 
 	// Save data in the DB 2 times to check uniqueness constraints
 	partner2 := partners.New("slug2")
-	partner2.Settings = map[string]string{"setting": "value"}
+	partner2.SetSetting("setting", "value")
 	partner2.ConnectorTypes = []string{"connector"}
 	partner2.Save()
 
@@ -515,8 +515,9 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	if testPartner.slug != "slug2" {
 		t.Errorf("Wrong Partner Slug, got: %v want: slug2", testPartner.slug)
 	}
-	if len(testPartner.Settings) != 1 || testPartner.Setting("setting") != "value" {
-		t.Errorf("Wrong Partner Settings, got: %v want {\"setting\":\"value\"}", testPartner.Settings)
+	settings := testPartner.SettingsDefinition()
+	if len(settings) != 1 || settings["setting"] != "value" {
+		t.Errorf("Wrong Partner Settings, got: %v want {\"setting\":\"value\"}", settings)
 	}
 	if len(testPartner.ConnectorTypes) != 1 || testPartner.ConnectorTypes[0] != "connector" {
 		t.Errorf("Wrong Partner ConnectorTypes, got: %v want [connector]", testPartner.ConnectorTypes)

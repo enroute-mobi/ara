@@ -35,10 +35,10 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
-	partner.Settings["remote_credential"] = "external"
-	partner.Settings["local_credential"] = "local"
-	partner.Settings["remote_url"] = ts.URL
+	partner.SetSetting("remote_objectid_kind", "internal")
+	partner.SetSetting("remote_credential", "external")
+	partner.SetSetting("local_credential", "local")
+	partner.SetSetting("remote_url", ts.URL)
 
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()

@@ -17,7 +17,7 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
@@ -89,8 +89,8 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	partner.ConnectorTypes = []string{
 		SIRI_SERVICE_REQUEST_BROADCASTER,
 		SIRI_STOP_MONITORING_REQUEST_BROADCASTER,
@@ -201,8 +201,8 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
@@ -249,11 +249,11 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 
 func Test_SIRIServiceRequestBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		slug:           "partner",
-		Settings:       make(map[string]string),
-		ConnectorTypes: []string{"siri-service-request-broadcaster"},
-		connectors:     make(map[string]Connector),
-		manager:        NewPartnerManager(nil),
+		PartnerSettings: NewPartnerSettings(),
+		slug:            "partner",
+		ConnectorTypes:  []string{"siri-service-request-broadcaster"},
+		connectors:      make(map[string]Connector),
+		manager:         NewPartnerManager(nil),
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()

@@ -337,7 +337,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
 	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
-		if origin == strings.TrimSpace(o) {
+		if origin == o {
 			return true
 		}
 	}

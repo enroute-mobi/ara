@@ -21,7 +21,7 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.SetSetting("remote_objectid_kind", "internal")
 	partner.ConnectorTypes = []string{TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -69,9 +69,9 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
-	partner.Settings["local_credential"] = "external"
-	partner.Settings["remote_url"] = ts.URL
+	partner.SetSetting("remote_objectid_kind", "internal")
+	partner.SetSetting("local_credential", "external")
+	partner.SetSetting("remote_url", ts.URL)
 
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()

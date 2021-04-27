@@ -36,8 +36,8 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
-	partner.Settings["remote_objectid_kind"] = "_internal"
-	partner.Settings["generators.subscription_identifier"] = "Subscription::%{id}::LOC"
+	partner.SetSetting("remote_objectid_kind", "_internal")
+	partner.SetSetting("generators.subscription_identifier", "Subscription::%{id}::LOC")
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
@@ -90,15 +90,11 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test_kind",
-		},
-		manager: partners,
-		// connectors: make(map[string]Connector),
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"remote_url":           ts.URL,
+		"remote_objectid_kind": "test_kind",
+	})
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
@@ -140,16 +136,13 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"local_url":                          "http://example.com/test/siri",
-			"remote_url":                         ts.URL,
-			"remote_objectid_kind":               "test_kind",
-			"generators.subscription_identifier": "Subscription::%{id}::LOC",
-		},
-		manager: partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_url":                          "http://example.com/test/siri",
+		"remote_url":                         ts.URL,
+		"remote_objectid_kind":               "test_kind",
+		"generators.subscription_identifier": "Subscription::%{id}::LOC",
+	})
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -199,16 +192,13 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"local_url":                          "http://example.com/test/siri",
-			"remote_url":                         ts.URL,
-			"remote_objectid_kind":               "test_kind",
-			"generators.subscription_identifier": "Subscription::%{id}::LOC",
-		},
-		manager: partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_url":                          "http://example.com/test/siri",
+		"remote_url":                         ts.URL,
+		"remote_objectid_kind":               "test_kind",
+		"generators.subscription_identifier": "Subscription::%{id}::LOC",
+	})
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 

@@ -17,9 +17,9 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -178,9 +178,9 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -297,11 +297,11 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 
 func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		slug:           "partner",
-		Settings:       make(map[string]string),
-		ConnectorTypes: []string{"siri-estimated-timetable-request-broadcaster"},
-		connectors:     make(map[string]Connector),
-		manager:        NewPartnerManager(nil),
+		PartnerSettings: NewPartnerSettings(),
+		slug:            "partner",
+		ConnectorTypes:  []string{"siri-estimated-timetable-request-broadcaster"},
+		connectors:      make(map[string]Connector),
+		manager:         NewPartnerManager(nil),
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
@@ -389,11 +389,10 @@ func Test_SIRIEstimatedTimetableBroadcaster_LogSIRIStopMonitoringResponse(t *tes
 }
 
 func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := NewPartner()
 
-	partner.Settings["siri-estimated-timetable-request-broadcaster.remote_objectid_kind"] = "Kind1"
-	partner.Settings["remote_objectid_kind"] = "Kind2"
+	partner.SetSetting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind", "Kind1")
+	partner.SetSetting("remote_objectid_kind", "Kind2")
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 
@@ -403,11 +402,10 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing
 }
 
 func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := NewPartner()
 
-	partner.Settings["siri-estimated-timetable-request-broadcaster.remote_objectid_kind"] = ""
-	partner.Settings["remote_objectid_kind"] = "Kind2"
+	partner.SetSetting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind", "")
+	partner.SetSetting("remote_objectid_kind", "Kind2")
 
 	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
 

@@ -24,7 +24,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.SetSetting("remote_objectid_kind", "internal")
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -67,7 +67,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	referential.Save()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.SetSetting("remote_objectid_kind", "internal")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -116,7 +116,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 	referential.Save()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.SetSetting("remote_objectid_kind", "internal")
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -193,9 +193,9 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
-	partner.Settings["local_credential"] = "external"
-	partner.Settings["remote_url"] = ts.URL
+	partner.SetSetting("remote_objectid_kind", "internal")
+	partner.SetSetting("local_credential", "external")
+	partner.SetSetting("remote_url", ts.URL)
 
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()

@@ -20,7 +20,7 @@ func Test_EstimatedTimeTableBroadcaster_Create_Events(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.Settings["remote_objectid_kind"] = "internal"
+	partner.SetSetting("remote_objectid_kind", "internal")
 	partner.ConnectorTypes = []string{TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)

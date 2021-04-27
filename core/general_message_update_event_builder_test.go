@@ -25,7 +25,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
 	partner := referential.Partners().New("slug")
-	partner.Settings["remote_objectid_kind"] = "remote_objectid_kind"
+	partner.SetSetting("remote_objectid_kind", "remote_objectid_kind")
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
 
 	events := &[]*model.SituationUpdateEvent{}

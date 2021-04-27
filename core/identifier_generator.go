@@ -31,6 +31,10 @@ type IdentifierAttributes struct {
 	Type     string
 }
 
+func DefaultIdentifierGenerator(k string) string {
+	return defaultIdentifierGenerators[k]
+}
+
 func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
 	objectidSubstitutionPattern := regexp.MustCompile(`%{objectid//([^/]+)/([^/]*)}`)
 	matches := objectidSubstitutionPattern.FindStringSubmatch(formatString)

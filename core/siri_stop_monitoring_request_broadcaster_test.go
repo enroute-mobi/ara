@@ -17,9 +17,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -135,8 +135,8 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -231,9 +231,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -306,9 +306,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -372,9 +372,9 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -418,11 +418,11 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 
 func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		slug:           "partner",
-		Settings:       make(map[string]string),
-		ConnectorTypes: []string{"siri-stop-monitoring-request-broadcaster"},
-		connectors:     make(map[string]Connector),
-		manager:        NewPartnerManager(nil),
+		PartnerSettings: NewPartnerSettings(),
+		slug:            "partner",
+		ConnectorTypes:  []string{"siri-stop-monitoring-request-broadcaster"},
+		connectors:      make(map[string]Connector),
+		manager:         NewPartnerManager(nil),
 	}
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
@@ -513,11 +513,10 @@ func Test_SIRIStopMonitoringRequestBroadcaster_LogSIRIStopMonitoringResponse(t *
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RemoteObjectIDKindPresent(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := NewPartner()
 
-	partner.Settings["siri-stop-monitoring-request-broadcaster.remote_objectid_kind"] = "Kind1"
-	partner.Settings["remote_objectid_kind"] = "Kind2"
+	partner.SetSetting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind", "Kind1")
+	partner.SetSetting("remote_objectid_kind", "Kind2")
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 
@@ -527,11 +526,10 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RemoteObjectIDKindPresent(t *test
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RemoteObjectIDKindAbsent(t *testing.T) {
-	partner := &Partner{}
-	partner.Settings = make(map[string]string)
+	partner := NewPartner()
 
-	partner.Settings["siri-stop-monitoring-request-broadcaster.remote_objectid_kind"] = ""
-	partner.Settings["remote_objectid_kind"] = "Kind2"
+	partner.SetSetting("siri-stop-monitoring-request-broadcaster.remote_objectid_kind", "")
+	partner.SetSetting("remote_objectid_kind", "Kind2")
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 

@@ -34,15 +34,12 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 
 	partners := NewPartnerManager(referential)
 
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"local_url":            "http://example.com/test/siri",
-			"remote_url":           ts.URL,
-			"remote_objectid_kind": "test_kind",
-		},
-		manager: partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_url":            "http://example.com/test/siri",
+		"remote_url":           ts.URL,
+		"remote_objectid_kind": "test_kind",
+	})
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
@@ -86,16 +83,13 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
-	partner := &Partner{
-		context: make(Context),
-		Settings: map[string]string{
-			"local_url":                          "http://example.com/test/siri",
-			"remote_url":                         ts.URL,
-			"remote_objectid_kind":               "test_kind",
-			"generators.subscription_identifier": "Subscription::%{id}::LOC",
-		},
-		manager: partners,
-	}
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_url":                          "http://example.com/test/siri",
+		"remote_url":                         ts.URL,
+		"remote_objectid_kind":               "test_kind",
+		"generators.subscription_identifier": "Subscription::%{id}::LOC",
+	})
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 

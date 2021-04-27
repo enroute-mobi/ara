@@ -4,20 +4,16 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
 	partners := createTestPartnerManager()
-	partner := Partner{
-		ConnectorTypes: []string{"test-check-status-client"},
-		connectors:     make(map[string]Connector),
-		gtfsCache:      cache.NewCacheTable(),
-	}
-	partner.subscriptionManager = NewMemorySubscriptions(&partner)
+	partner := partners.New("slug")
+	partner.ConnectorTypes = []string{"test-check-status-client"}
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partner.RefreshConnectors()
-	partners.Save(&partner)
+	partners.Save(partner)
 
 	fakeClock := clock.NewFakeClock()
 	partners.Guardian().SetClock(fakeClock)
