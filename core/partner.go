@@ -257,22 +257,9 @@ func (partner *Partner) SetSlug(s PartnerSlug) {
 	partner.slug = s
 }
 
-// func (partner *Partner) Setting(key string) string {
-// 	return partner.Settings[key]
-// }
-
 func (partner *Partner) GtfsCache() *cache.CacheTable {
 	return partner.gtfsCache
 }
-
-// func (partner *Partner) Credentials() string {
-// 	_, ok := partner.Settings[LOCAL_CREDENTIAL]
-// 	_, ok2 := partner.Settings[LOCAL_CREDENTIALS]
-// 	if !ok && !ok2 {
-// 		return ""
-// 	}
-// 	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
-// }
 
 func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
 	return NewIdentifierGeneratorWithUUID(partner.IdGeneratorFormat(generatorName), partner.UUIDConsumer)
@@ -281,53 +268,6 @@ func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGen
 func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
 	return NewIdentifierGeneratorWithUUID(partner.IdGeneratorFormatWithDefault(generatorName, defaultFormat), partner.UUIDConsumer)
 }
-
-// func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
-// 	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)); setting != "" {
-// 		return setting
-// 	}
-// 	return partner.Setting(REMOTE_OBJECTID_KIND)
-// }
-
-// func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
-// 	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
-// 		return setting
-// 	}
-// 	return partner.Setting(REMOTE_OBJECTID_KIND)
-// }
-
-// // Very specific for now, we'll refacto if we need to cache more
-// func (partner *Partner) GtfsCacheTimeout() (t time.Duration) {
-// 	t, _ = time.ParseDuration(partner.Setting(BROADCAST_GTFS_CACHE_TIMEOUT))
-// 	if t < cache.MIN_CACHE_LIFESPAN {
-// 		t = cache.DEFAULT_CACHE_LIFESPAN
-// 	}
-
-// 	return
-// }
-
-// func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
-// 	t, _ = time.ParseDuration(partner.Setting(fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)))
-// 	return
-// }
-
-// func (partner *Partner) ProducerRef() string {
-// 	producerRef := partner.Setting(REMOTE_CREDENTIAL)
-// 	if producerRef == "" {
-// 		producerRef = "Ara"
-// 	}
-// 	return producerRef
-// }
-
-// // Ref Issue #4300
-// func (partner *Partner) Address() string {
-// 	// address := partner.Setting("local_url")
-// 	// if address == "" {
-// 	// 	address = config.Config.DefaultAddress
-// 	// }
-// 	// return address
-// 	return partner.Setting(LOCAL_URL)
-// }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
