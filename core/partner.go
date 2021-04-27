@@ -187,7 +187,12 @@ func (partner *APIPartner) Validate() bool {
 
 	// Check Credentials uniqueness
 	if !partner.manager.UniqCredentials(partner.Id, partner.credentials()) {
-		partner.Errors.Add("Settings[\"local_credential\"]", ERROR_UNIQUE)
+		if _, ok := partner.Settings[LOCAL_CREDENTIAL]; ok {
+			partner.Errors.AddSettingError(LOCAL_CREDENTIAL, ERROR_UNIQUE)
+		}
+		if _, ok := partner.Settings[LOCAL_CREDENTIALS]; ok {
+			partner.Errors.AddSettingError(LOCAL_CREDENTIALS, ERROR_UNIQUE)
+		}
 	}
 
 	return len(partner.Errors) == 0
@@ -213,7 +218,7 @@ func (partner *APIPartner) IsSettingDefined(setting string) (ok bool) {
 
 func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 	if !partner.IsSettingDefined(setting) {
-		partner.Errors.Add(fmt.Sprintf("Setting %s", setting), ERROR_BLANK)
+		partner.Errors.AddSettingError(setting, ERROR_BLANK)
 		return false
 	}
 	return true
@@ -221,7 +226,7 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 
 func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
 	if !partner.IsSettingDefined(LOCAL_CREDENTIAL) && !partner.IsSettingDefined(LOCAL_CREDENTIALS) {
-		partner.Errors.Add("Setting local_credential", ERROR_BLANK)
+		partner.Errors.AddSettingError(LOCAL_CREDENTIAL, ERROR_BLANK)
 		return false
 	}
 	return true

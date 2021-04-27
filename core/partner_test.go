@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"testing"
@@ -417,7 +418,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors) != 1 {
 		t.Errorf("apiPartner Errors should not be empty")
 	}
-	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_BLANK {
+	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_BLANK {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
 	}
 
@@ -431,8 +432,14 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors) != 1 {
 		t.Errorf("apiPartner Errors should not be empty")
 	}
-	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_SLUG_FORMAT {
+	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_SLUG_FORMAT {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
+	}
+
+	jsonBytes, _ := json.Marshal(apiPartner)
+	expected := `{"Slug":"Wrong_format","Errors":{"Slug":["Invalid format: only lowercase alphanumeric characters and _"]}}`
+	if string(jsonBytes) != expected {
+		t.Fatalf("Invalid JSON, expected %v, got %v", expected, string(jsonBytes))
 	}
 
 	// Check Already Used Slug and local_credential
@@ -453,11 +460,17 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors) != 2 {
 		t.Errorf("apiPartner Errors should not be empty")
 	}
-	if len(apiPartner.Errors["Slug"]) != 1 || apiPartner.Errors["Slug"][0] != ERROR_UNIQUE {
+	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_UNIQUE {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
 	}
-	if len(apiPartner.Errors["Settings[\"local_credential\"]"]) != 1 || apiPartner.Errors["Settings[\"local_credential\"]"][0] != ERROR_UNIQUE {
+	if len(apiPartner.Errors.GetSettingError(LOCAL_CREDENTIAL)) != 1 || apiPartner.Errors.GetSettingError(LOCAL_CREDENTIAL)[0] != ERROR_UNIQUE {
 		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors)
+	}
+
+	jsonBytes, _ = json.Marshal(apiPartner)
+	expected = `{"Slug":"slug","Settings":{"local_credential":"cred"},"Errors":{"Settings":{"local_credential":["Is already in use"]},"Slug":["Is already in use"]}}`
+	if string(jsonBytes) != expected {
+		t.Fatalf("Invalid JSON, expected %v, got %v", expected, string(jsonBytes))
 	}
 
 	// Check ok
