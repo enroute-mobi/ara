@@ -72,11 +72,11 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		if !present {
 			return nil
 		}
-		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Default: objectid.Value()})
+		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "InfoMessage", Id: objectid.Value()})
 	}
 
 	siriGeneralMessage := &siri.SIRIGeneralMessage{
-		ItemIdentifier:        builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: builder.NewUUID()}),
+		ItemIdentifier:        builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
 		InfoMessageIdentifier: infoMessageIdentifier,
 		InfoChannelRef:        situation.Channel,
 		InfoMessageVersion:    situation.Version,
@@ -159,7 +159,7 @@ func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model
 		return builder.resolveStopAreaRef(reference)
 	default:
 		kind := reference.Type
-		return builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: kind[:len(kind)-3], Default: reference.GetSha1()}), true
+		return builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: kind[:len(kind)-3], Id: reference.GetSha1()}), true
 	}
 }
 

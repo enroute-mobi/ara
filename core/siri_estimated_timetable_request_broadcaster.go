@@ -111,7 +111,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					continue
 				}
 				referenceGenerator := connector.Partner().IdentifierGenerator(REFERENCE_IDENTIFIER)
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
+				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 			}
 
 			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
@@ -217,7 +217,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 			}
 		}
 		generator := connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER)
-		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Default: ref.GetSha1()}))
+		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Id: ref.GetSha1()}))
 		references[refType] = defaultObjectID.Value()
 	}
 

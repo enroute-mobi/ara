@@ -262,11 +262,11 @@ func (partner *Partner) GtfsCache() *cache.CacheTable {
 }
 
 func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
-	return NewIdentifierGeneratorWithUUID(partner.IdGeneratorFormat(generatorName), partner.UUIDConsumer)
+	return NewIdentifierGenerator(partner.IdGeneratorFormat(generatorName), partner.UUIDConsumer)
 }
 
 func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
-	return NewIdentifierGeneratorWithUUID(partner.IdGeneratorFormatWithDefault(generatorName, defaultFormat), partner.UUIDConsumer)
+	return NewIdentifierGenerator(partner.IdGeneratorFormatWithDefault(generatorName, defaultFormat), partner.UUIDConsumer)
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {

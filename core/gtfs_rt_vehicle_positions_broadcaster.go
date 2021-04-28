@@ -17,8 +17,6 @@ type VehiclePositionBroadcaster struct {
 	BaseConnector
 
 	cache *cache.CachedItem
-
-	referenceGenerator *IdentifierGenerator
 }
 
 type VehiclePositionBroadcasterFactory struct{}
@@ -34,7 +32,6 @@ func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartne
 func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster {
 	connector := &VehiclePositionBroadcaster{}
 	connector.partner = partner
-	connector.referenceGenerator = partner.IdentifierGeneratorWithDefault("reference_identifier", "%{objectid}")
 	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
@@ -93,10 +90,10 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 				}
 				linesObjectId[vehicles[i].VehicleJourneyId] = lineObjectid
 			}
-			routeId = connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Line", ObjectId: lineObjectid.Value()})
+			routeId = lineObjectid.Value()
 
 			// Fill the tripDescriptor
-			tripId := connector.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", ObjectId: vjId.Value()})
+			tripId := vjId.Value()
 			trip = &gtfs.TripDescriptor{
 				TripId:  &tripId,
 				RouteId: &routeId,

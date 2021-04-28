@@ -737,11 +737,11 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
 	midGenerator = partner.IdentifierGenerator("reference_identifier")
-	if expected := "%{type}:%{default}"; midGenerator.formatString != expected {
+	if expected := "%{type}:%{id}"; midGenerator.formatString != expected {
 		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
 	midGenerator = partner.IdentifierGenerator("reference_stop_area_identifier")
-	if expected := "%{default}"; midGenerator.formatString != expected {
+	if expected := "%{id}"; midGenerator.formatString != expected {
 		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
 

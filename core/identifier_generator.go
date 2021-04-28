@@ -11,8 +11,8 @@ var defaultIdentifierGenerators = map[string]string{
 	"message_identifier":             "%{uuid}",
 	"response_message_identifier":    "%{uuid}",
 	"data_frame_identifier":          "%{id}",
-	"reference_identifier":           "%{type}:%{default}",
-	"reference_stop_area_identifier": "%{default}",
+	"reference_identifier":           "%{type}:%{id}",
+	"reference_stop_area_identifier": "%{id}",
 	"subscription_identifier":        "%{id}",
 }
 
@@ -20,51 +20,27 @@ type IdentifierGenerator struct {
 	uuid.UUIDConsumer
 
 	formatString string
-	pattern      string
-	replacement  string
 }
 
 type IdentifierAttributes struct {
-	Default  string
-	Id       string
-	ObjectId string
-	Type     string
+	Type string
+	Id   string
 }
 
 func DefaultIdentifierGenerator(k string) string {
 	return defaultIdentifierGenerators[k]
 }
 
-func NewIdentifierGenerator(formatString string) *IdentifierGenerator {
-	objectidSubstitutionPattern := regexp.MustCompile(`%{objectid//([^/]+)/([^/]*)}`)
-	matches := objectidSubstitutionPattern.FindStringSubmatch(formatString)
-
-	var pattern, replacement string
-
-	if len(matches) == 3 {
-		pattern = matches[1]
-		replacement = matches[2]
-
-		formatString = objectidSubstitutionPattern.ReplaceAllString(formatString, `%{objectid}`)
+func NewIdentifierGenerator(formatString string, uuidGenerator uuid.UUIDConsumer) *IdentifierGenerator {
+	return &IdentifierGenerator{
+		UUIDConsumer: uuidGenerator,
+		formatString: formatString,
 	}
-
-	return &IdentifierGenerator{formatString: formatString, pattern: pattern, replacement: replacement}
-}
-
-func NewIdentifierGeneratorWithUUID(formatString string, uuidGenerator uuid.UUIDConsumer) *IdentifierGenerator {
-	generator := NewIdentifierGenerator(formatString)
-	generator.UUIDConsumer = uuidGenerator
-	return generator
 }
 
 func (generator *IdentifierGenerator) NewIdentifier(attributes IdentifierAttributes) string {
-	objectidValue := attributes.ObjectId
-
-	if len(generator.pattern) > 0 {
-		objectidValue = strings.ReplaceAll(objectidValue, generator.pattern, generator.replacement)
-	}
-
-	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Default, "%{objectid}", objectidValue)
+	// default and objectid are legacy values, keep them for now for a smoother transition
+	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Id, "%{objectid}", attributes.Id)
 	return generator.handleuuids(replacer.Replace(generator.formatString))
 }
 

@@ -347,7 +347,6 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.reference_identifier", "%{type}:%{objectid}:LOC")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -392,10 +391,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	entity := gtfsFeed.Entity[0]
 
 	trip := entity.GetVehicle().GetTrip()
-	if r := "VehicleJourney:vjId:LOC"; trip.GetTripId() != r {
+	if r := "vjId"; trip.GetTripId() != r {
 		t.Errorf("Incorrect TripId for entity TripUpdate:\n got: %v\n want: %v", trip.GetTripId(), r)
 	}
-	if r := "Line:lId:LOC"; trip.GetRouteId() != r {
+	if r := "lId"; trip.GetRouteId() != r {
 		t.Errorf("Incorrect RouteId for entity TripUpdate:\n got: %v\n want: %v", trip.GetRouteId(), r)
 	}
 }
