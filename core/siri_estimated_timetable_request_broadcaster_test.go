@@ -297,12 +297,12 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 
 func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		slug:            "partner",
-		ConnectorTypes:  []string{"siri-estimated-timetable-request-broadcaster"},
-		connectors:      make(map[string]Connector),
-		manager:         NewPartnerManager(nil),
+		slug:           "partner",
+		ConnectorTypes: []string{"siri-estimated-timetable-request-broadcaster"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

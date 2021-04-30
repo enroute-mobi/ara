@@ -141,12 +141,12 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate_MultipleDeliv
 // Test Factory Validate
 func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		slug:            "partner",
-		ConnectorTypes:  []string{"siri-stop-monitoring-request-collector"},
-		connectors:      make(map[string]Connector),
-		manager:         NewPartnerManager(nil),
+		slug:           "partner",
+		ConnectorTypes: []string{"siri-stop-monitoring-request-collector"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

@@ -418,12 +418,12 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 
 func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		slug:            "partner",
-		ConnectorTypes:  []string{"siri-stop-monitoring-request-broadcaster"},
-		connectors:      make(map[string]Connector),
-		manager:         NewPartnerManager(nil),
+		slug:           "partner",
+		ConnectorTypes: []string{"siri-stop-monitoring-request-broadcaster"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

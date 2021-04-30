@@ -70,12 +70,12 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 
 func Test_SIRICheckStatusServerFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		slug:            "partner",
-		ConnectorTypes:  []string{"siri-check-status-server"},
-		connectors:      make(map[string]Connector),
-		manager:         NewPartnerManager(nil),
+		slug:           "partner",
+		ConnectorTypes: []string{"siri-check-status-server"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

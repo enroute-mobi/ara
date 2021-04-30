@@ -74,12 +74,12 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		slug:            "partner",
-		ConnectorTypes:  []string{"siri-check-status-client"},
-		connectors:      make(map[string]Connector),
-		manager:         NewPartnerManager(nil),
+		slug:           "partner",
+		ConnectorTypes: []string{"siri-check-status-client"},
+		connectors:     make(map[string]Connector),
+		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

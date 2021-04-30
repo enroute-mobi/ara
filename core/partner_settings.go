@@ -48,25 +48,24 @@ const (
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
 
 	CACHE_TIMEOUT = "cache_timeout"
-
-	// Generators
-	MESSAGE_IDENTIFIER             = "message_identifier"
-	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
-	DATA_FRAME_IDENTIFIER          = "data_frame_identifier"
-	REFERENCE_IDENTIFIER           = "reference_identifier"
-	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
-	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
 
 type PartnerSettings struct {
 	m *sync.RWMutex
-	s map[string]string
+
+	p *Partner
+
+	s  map[string]string
+	cs *CollectSettings
+	g  map[string]*IdentifierGenerator
 }
 
-func NewPartnerSettings() PartnerSettings {
+func NewPartnerSettings(p *Partner) PartnerSettings {
 	return PartnerSettings{
 		m: &sync.RWMutex{},
+		p: p,
 		s: make(map[string]string),
+		g: make(map[string]*IdentifierGenerator),
 	}
 }
 
@@ -80,6 +79,7 @@ func (s *PartnerSettings) Setting(key string) string {
 func (s *PartnerSettings) SetSetting(k, v string) {
 	s.m.Lock()
 	s.s[k] = v
+	s.reloadSettings()
 	s.m.Unlock()
 }
 
@@ -101,6 +101,7 @@ func (s *PartnerSettings) SetSettingsDefinition(m map[string]string) {
 	for k, v := range m {
 		s.s[k] = v
 	}
+	s.reloadSettings()
 	s.m.Unlock()
 	return
 }
@@ -121,28 +122,6 @@ func (s *PartnerSettings) Credentials() string {
 		return ""
 	}
 	return fmt.Sprintf("%v,%v", s.s[LOCAL_CREDENTIAL], s.s[LOCAL_CREDENTIALS])
-}
-
-func (s *PartnerSettings) IdGeneratorFormat(generatorName string) (formatString string) {
-	s.m.RLock()
-	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
-	s.m.RUnlock()
-
-	if formatString == "" {
-		formatString = DefaultIdentifierGenerator(generatorName)
-	}
-	return
-}
-
-func (s *PartnerSettings) IdGeneratorFormatWithDefault(generatorName, defaultFormat string) (formatString string) {
-	s.m.RLock()
-	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
-	s.m.RUnlock()
-
-	if formatString == "" {
-		formatString = defaultFormat
-	}
-	return
 }
 
 func (s *PartnerSettings) RemoteObjectIDKind(connectorName string) string {
@@ -267,10 +246,18 @@ func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 }
 
 func (s *PartnerSettings) CollectSettings() *CollectSettings {
-	s.m.RLock()
-	defer s.m.RUnlock()
+	if s.cs == nil {
+		s.m.RLock()
+		s.setCollectSettings()
+		s.m.RUnlock()
+	}
 
-	return &CollectSettings{
+	return s.cs
+}
+
+// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+func (s *PartnerSettings) setCollectSettings() {
+	s.cs = &CollectSettings{
 		UseDiscovered: s.s[COLLECT_USE_DISCOVERED_SA] != "",
 		includedSA:    trimedSlice(s.s[COLLECT_INCLUDE_STOP_AREAS]),
 		includedLines: trimedSlice(s.s[COLLECT_INCLUDE_LINES]),
@@ -287,4 +274,35 @@ func trimedSlice(s string) (slc []string) {
 		slc[i] = strings.TrimSpace(slc[i])
 	}
 	return
+}
+
+func (s *PartnerSettings) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+	s.m.Lock()
+	generator, ok := s.g[generatorName]
+	if !ok {
+		generator = NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.p.UUIDConsumer)
+		s.g[generatorName] = generator
+	}
+	s.m.Unlock()
+	return generator
+}
+
+func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {
+	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
+
+	if formatString == "" {
+		formatString = DefaultIdentifierGenerator(generatorName)
+	}
+	return
+}
+
+// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+func (s *PartnerSettings) refreshGenerators() {
+	s.g = make(map[string]*IdentifierGenerator)
+}
+
+// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+func (s *PartnerSettings) reloadSettings() {
+	s.setCollectSettings()
+	s.refreshGenerators()
 }

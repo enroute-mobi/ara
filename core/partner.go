@@ -72,7 +72,6 @@ type Partner struct {
 
 	connectors          map[string]Connector
 	discoveredStopAreas map[string]struct{}
-	collectSettings     *CollectSettings
 	startedAt           time.Time
 	lastDiscovery       time.Time
 	lastPush            time.Time
@@ -218,7 +217,6 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 func NewPartner() *Partner {
 	partner := &Partner{
 		mutex:               &sync.RWMutex{},
-		PartnerSettings:     NewPartnerSettings(),
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
@@ -228,6 +226,7 @@ func NewPartner() *Partner {
 		},
 		gtfsCache: cache.NewCacheTable(),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
 	return partner
@@ -259,14 +258,6 @@ func (partner *Partner) SetSlug(s PartnerSlug) {
 
 func (partner *Partner) GtfsCache() *cache.CacheTable {
 	return partner.gtfsCache
-}
-
-func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
-	return NewIdentifierGenerator(partner.IdGeneratorFormat(generatorName), partner.UUIDConsumer)
-}
-
-func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
-	return NewIdentifierGenerator(partner.IdGeneratorFormatWithDefault(generatorName, defaultFormat), partner.UUIDConsumer)
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
@@ -324,7 +315,6 @@ func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
 	partner.lastDiscovery = time.Time{}
 	partner.lastPush = time.Time{}
-	partner.setCollectSettings()
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(state.Startable)
@@ -339,23 +329,19 @@ func (partner *Partner) Start() {
 	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
 }
 
-func (partner *Partner) setCollectSettings() {
-	partner.collectSettings = partner.CollectSettings()
-}
-
 func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) bool {
-	if partner.collectSettings.Empty() {
+	if partner.CollectSettings().Empty() {
 		logger.Log.Printf("empty")
 		return true
 	}
-	if partner.collectSettings.ExcludeStop(stopId) {
+	if partner.CollectSettings().ExcludeStop(stopId) {
 		return false
 	}
-	return partner.collectSettings.IncludeStop(stopId) || partner.collectSettings.CanCollectLines(lineIds) || partner.checkDiscovered(stopId)
+	return partner.CollectSettings().IncludeStop(stopId) || partner.CollectSettings().CanCollectLines(lineIds) || partner.checkDiscovered(stopId)
 }
 
 func (partner *Partner) CanCollectLine(lineId string) bool {
-	return partner.collectSettings.IncludeLine(lineId)
+	return partner.CollectSettings().IncludeLine(lineId)
 }
 
 func (partner *Partner) checkDiscovered(stopId string) (ok bool) {
@@ -584,7 +570,7 @@ func (partner *Partner) Pushed() {
 }
 
 func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
-	if !partner.collectSettings.UseDiscovered {
+	if !partner.CollectSettings().UseDiscovered {
 		return
 	}
 
@@ -632,10 +618,9 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
-		PartnerSettings: NewPartnerSettings(),
-		mutex:           &sync.RWMutex{},
-		slug:            slug,
-		manager:         manager,
+		mutex:   &sync.RWMutex{},
+		slug:    slug,
+		manager: manager,
 		// Settings:            make(map[string]string),
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
@@ -646,6 +631,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
 }

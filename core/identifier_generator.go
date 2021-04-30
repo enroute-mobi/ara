@@ -7,13 +7,22 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
+const (
+	MESSAGE_IDENTIFIER             = "message_identifier"
+	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
+	DATA_FRAME_IDENTIFIER          = "data_frame_identifier"
+	REFERENCE_IDENTIFIER           = "reference_identifier"
+	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
+	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
+)
+
 var defaultIdentifierGenerators = map[string]string{
-	"message_identifier":             "%{uuid}",
-	"response_message_identifier":    "%{uuid}",
-	"data_frame_identifier":          "%{id}",
-	"reference_identifier":           "%{type}:%{id}",
-	"reference_stop_area_identifier": "%{id}",
-	"subscription_identifier":        "%{id}",
+	MESSAGE_IDENTIFIER:             "%{uuid}",
+	RESPONSE_MESSAGE_IDENTIFIER:    "%{uuid}",
+	DATA_FRAME_IDENTIFIER:          "%{id}",
+	REFERENCE_IDENTIFIER:           "%{type}:%{id}",
+	REFERENCE_STOP_AREA_IDENTIFIER: "%{id}",
+	SUBSCRIPTION_IDENTIFIER:        "%{id}",
 }
 
 type IdentifierGenerator struct {
