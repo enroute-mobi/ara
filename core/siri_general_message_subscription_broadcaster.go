@@ -32,12 +32,11 @@ func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector
 	return newSIRIGeneralMessageSubscriptionBroadcaster(partner)
 }
 
-func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
-	return ok
+func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
 }
 
 func newSIRIGeneralMessageSubscriptionBroadcaster(partner *Partner) *SIRIGeneralMessageSubscriptionBroadcaster {
@@ -232,9 +231,8 @@ func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessage
 	connector.events = append(connector.events, event)
 }
 
-func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
+func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+} // Always valid
 
 func (factory *TestSIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewTestGeneralMessageSubscriptionBroadcaster()

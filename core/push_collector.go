@@ -29,10 +29,9 @@ func (factory *PushCollectorFactory) CreateConnector(partner *Partner) Connector
 	return NewPushCollector(partner)
 }
 
-func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewPushCollector(partner *Partner) *PushCollector {

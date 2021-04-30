@@ -77,3 +77,12 @@ func (errors Errors) AddSettingError(attribute, message string) {
 	}
 	se.(Errors).Add(attribute, message)
 }
+
+// Test method
+func (errors Errors) getSettings() Errors {
+	s, ok := errors[SETTINGS]
+	if ok {
+		return s.(Errors)
+	}
+	return NewErrors()
+}

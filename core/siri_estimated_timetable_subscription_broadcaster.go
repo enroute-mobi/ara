@@ -36,12 +36,11 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) CreateConne
 	return newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner)
 }
 
-func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
-	return ok
+func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
 }
 
 func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimeTableSubscriptionBroadcaster {
@@ -333,9 +332,7 @@ func (connector *TestETTSubscriptionBroadcaster) HandleBroadcastEvent(event *mod
 	connector.events = append(connector.events, event)
 }
 
-func (factory *TestSIRIETTSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
+func (factory *TestSIRIETTSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {} // Always valid
 
 func (factory *TestSIRIETTSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewTestETTSubscriptionBroadcaster()
