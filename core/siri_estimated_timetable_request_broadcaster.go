@@ -261,10 +261,9 @@ func (connector *SIRIEstimatedTimetableBroadcaster) newLogStashEvent() audit.Log
 	return event
 }
 
-func (factory *SIRIEstimatedTimetableBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *SIRIEstimatedTimetableBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner *Partner) Connector {

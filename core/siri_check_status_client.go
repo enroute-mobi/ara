@@ -47,9 +47,7 @@ func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
 	connector.partnerStatus.OperationnalStatus = status
 }
 
-func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
+func (factory *TestCheckStatusClientFactory) Validate(apiPartner *APIPartner) {} // Always valid
 
 func (factory *TestCheckStatusClientFactory) CreateConnector(partner *Partner) Connector {
 	return NewTestCheckStatusClient()
@@ -120,10 +118,9 @@ func (connector *SIRICheckStatusClient) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	return ok
+func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {

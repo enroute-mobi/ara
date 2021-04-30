@@ -31,11 +31,10 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) CreateConnector(p
 	return NewSIRIStopPointsDiscoveryRequestCollector(partner)
 }
 
-func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	return ok
+func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
 }
 
 func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPointsDiscoveryRequestCollector {

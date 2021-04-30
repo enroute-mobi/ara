@@ -27,9 +27,8 @@ func (factory *VehiclePositionBroadcasterFactory) CreateConnector(partner *Partn
 	return NewVehiclePositionBroadcaster(partner)
 }
 
-func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	return ok
+func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
 }
 
 func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster {

@@ -36,12 +36,11 @@ func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector
 	return newSIRIStopMonitoringSubscriptionBroadcaster(partner)
 }
 
-func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
-	return ok
+func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
 }
 
 func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMonitoringSubscriptionBroadcaster {
@@ -369,9 +368,8 @@ func (connector *TestStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 	connector.events = append(connector.events, event)
 }
 
-func (factory *TestSIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
+func (factory *TestSIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
+} // Always valid
 
 func (factory *TestSIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewTestStopMonitoringSubscriptionBroadcaster()

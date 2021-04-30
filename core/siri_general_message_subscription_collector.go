@@ -39,12 +39,11 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(p
 	return NewSIRIGeneralMessageSubscriptionCollector(partner)
 }
 
-func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	ok = ok && apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMessageSubscriptionCollector {

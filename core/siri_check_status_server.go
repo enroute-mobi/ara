@@ -57,9 +57,8 @@ func (connector *SIRICheckStatusServer) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func (factory *SIRICheckStatusServerFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *SIRICheckStatusServerFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func (factory *SIRICheckStatusServerFactory) CreateConnector(partner *Partner) Connector {

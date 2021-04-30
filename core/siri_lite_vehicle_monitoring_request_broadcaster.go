@@ -183,10 +183,9 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) newLogStashEvent()
 	return event
 }
 
-func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {

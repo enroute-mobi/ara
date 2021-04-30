@@ -487,6 +487,26 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors) != 0 {
 		t.Errorf("apiPartner Errors should be empty, got %v", apiPartner.Errors)
 	}
+
+	// Check settings errors
+	apiPartner = &APIPartner{
+		Slug:           "",
+		Settings:       map[string]string{},
+		ConnectorTypes: []string{SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER},
+		manager:        partners,
+		factories:      make(map[string]ConnectorFactory),
+	}
+	valid = apiPartner.Validate()
+
+	if valid {
+		t.Errorf("Validate should return false")
+	}
+	if len(apiPartner.Errors) != 2 {
+		t.Errorf("apiPartner Errors should not be empty, got %v", apiPartner.Errors)
+	}
+	if len(apiPartner.Errors.getSettings()) != 2 {
+		t.Errorf("apiPartner Setting Errors should have 2 errors, got %v", apiPartner.Errors.getSettings())
+	}
 }
 
 func Test_NewPartnerManager(t *testing.T) {

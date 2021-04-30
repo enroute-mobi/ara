@@ -180,10 +180,9 @@ func (connector *SIRIServiceRequestBroadcaster) newLogStashEvent(connectorName s
 	return event
 }
 
-func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) bool {
-	ok := apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	ok = ok && apiPartner.ValidatePresenceOfLocalCredentials()
-	return ok
+func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
+	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {

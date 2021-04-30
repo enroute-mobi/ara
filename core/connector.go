@@ -65,7 +65,7 @@ func (connector *siriConnector) SIRIPartner() *SIRIPartner {
 }
 
 type ConnectorFactory interface {
-	Validate(*APIPartner) bool
+	Validate(*APIPartner) // Validate() fill the Errors of the APIPartner
 	CreateConnector(*Partner) Connector
 }
 
@@ -135,12 +135,10 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 type TestValidationFactory struct{}
 type TestValidationConnector struct{}
 
-func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) bool {
+func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) {
 	if apiPartner.Slug == PartnerSlug("invalid_slug") {
 		apiPartner.Errors.Add("slug", "Invalid format")
-		return false
 	}
-	return true
 }
 
 func (factory *TestValidationFactory) CreateConnector(partner *Partner) Connector {
@@ -152,9 +150,7 @@ type TestStartableConnector struct {
 	started bool
 }
 
-func (factory *TestStartableFactory) Validate(apiPartner *APIPartner) bool {
-	return true
-}
+func (factory *TestStartableFactory) Validate(apiPartner *APIPartner) {} // Always valid
 
 func (factory *TestStartableFactory) CreateConnector(partner *Partner) Connector {
 	return &TestStartableConnector{}
