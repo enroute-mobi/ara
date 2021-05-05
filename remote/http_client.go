@@ -104,9 +104,10 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 		return nil, NewGtfsError(fmt.Sprintf("HTTP status %v", strconv.Itoa(response.StatusCode)))
 	}
 
-	if response.Header.Get("Content-Type") != "application/x-protobuf" {
-		return nil, NewGtfsError(fmt.Sprintf("HTTP Content-Type %v", response.Header.Get("Content-Type")))
-	}
+	// ARA-878
+	// if response.Header.Get("Content-Type") != "application/x-protobuf" {
+	// 	return nil, NewGtfsError(fmt.Sprintf("HTTP Content-Type %v", response.Header.Get("Content-Type")))
+	// }
 
 	// Check if response is gzip
 	var responseReader io.Reader
@@ -127,7 +128,7 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 		return nil, NewGtfsError(fmt.Sprintf("Error while reading body: %v", err))
 	}
 	if len(content) == 0 {
-		return nil, NewGtfsError(fmt.Sprintf("Empty Body"))
+		return nil, NewGtfsError("Empty Body")
 	}
 
 	feed := &gtfs.FeedMessage{}
