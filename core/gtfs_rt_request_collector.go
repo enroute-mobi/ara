@@ -122,21 +122,23 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 
 	for _, stu := range t.GetStopTimeUpdate() {
 		sid := stu.GetStopId()
-		svid := fmt.Sprintf("%v-%v", vjObjectId.Value(), sid)
+		svid := fmt.Sprintf("%v-%v", vjObjectId.Value(), stu.GetStopSequence())
 		stopAreaObjectId := model.NewObjectID(connector.remoteObjectidKind, sid)
 
-		_, ok := events.StopAreas[sid]
-		if !ok {
-			// CollectedAlways is false by default
-			event := &model.StopAreaUpdateEvent{
-				Origin:   connector.origin,
-				ObjectId: stopAreaObjectId,
-			}
+		if sid != "" {
+			_, ok := events.StopAreas[sid]
+			if !ok {
+				// CollectedAlways is false by default
+				event := &model.StopAreaUpdateEvent{
+					Origin:   connector.origin,
+					ObjectId: stopAreaObjectId,
+				}
 
-			events.StopAreas[sid] = event
+				events.StopAreas[sid] = event
+			}
 		}
 
-		_, ok = events.StopVisits[sid][svid]
+		_, ok := events.StopVisits[sid][svid]
 		if !ok {
 			stopVisitObjectId := model.NewObjectID(connector.remoteObjectidKind, svid)
 			svEvent := &model.StopVisitUpdateEvent{
