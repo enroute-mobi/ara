@@ -72,6 +72,7 @@ func (guardian *PartnersGuardian) routineWork(partner *Partner) {
 	guardian.checkPartnerDiscovery(partner)
 }
 
+// Returns true if we need to check the subscriptions (false if subscriptions are deleted)
 func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	defer func() {
 		if r := recover(); r != nil {
@@ -80,6 +81,13 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	}()
 
 	partnerStatus, _ := partner.CheckStatus()
+
+	// Do nothing if partner status is unknown
+	if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UNKNOWN && partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN && partner.PartnerStatus.RetryCount < partner.MaximumChechstatusRetry() {
+		partner.PartnerStatus.RetryCount += 1
+		logger.Log.Debugf("Unknow Status, %v retry", partner.PartnerStatus.RetryCount)
+		return partner.PartnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP
+	}
 
 	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus {
 		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
@@ -105,6 +113,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN {
 		partner.PartnerStatus.OperationnalStatus = partnerStatus.OperationnalStatus
+		partner.PartnerStatus.RetryCount = 0
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
 
 		collectPersistent, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT))

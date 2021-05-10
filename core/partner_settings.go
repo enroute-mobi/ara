@@ -16,6 +16,8 @@ const (
 	LOCAL_CREDENTIALS = "local_credentials"
 	LOCAL_URL         = "local_url"
 
+	PARTNER_MAX_RETRY = "partner.status.maximum_retry"
+
 	REMOTE_CREDENTIAL            = "remote_credential"
 	REMOTE_OBJECTID_KIND         = "remote_objectid_kind"
 	VEHICLE_REMOTE_OBJECTID_KIND = "vehicle_remote_objectid_kind"
@@ -184,6 +186,16 @@ func (s *PartnerSettings) Address() string {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.s[LOCAL_URL]
+}
+
+func (s *PartnerSettings) MaximumChechstatusRetry() (i int) {
+	s.m.RLock()
+	i, _ = strconv.Atoi(s.s[PARTNER_MAX_RETRY])
+	if i < 0 {
+		i = 0
+	}
+	s.m.RUnlock()
+	return
 }
 
 func (s *PartnerSettings) CollectPriority() (value int) {

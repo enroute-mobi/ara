@@ -147,7 +147,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 		ConnectorTypes: []string{},
 	}
 	partner.PartnerSettings = NewPartnerSettings(partner)
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -159,7 +159,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 	}
 
 	partner.Name = "PartnerName"
-	expected = `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","Name":"PartnerName","PartnerStatus":{"OperationnalStatus":"unknown","ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
+	expected = `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","Name":"PartnerName","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err = partner.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
