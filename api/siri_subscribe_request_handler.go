@@ -25,6 +25,7 @@ func (handler *SIRISubscribeRequestHandler) ConnectorType() string {
 
 func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
 	logger.Log.Debugf("SubscribeRequest %s\n", handler.xmlRequest.MessageIdentifier())
+	t := handler.referential.Clock().Now()
 
 	response, err := connector.(core.SubscriptionRequestDispatcher).Dispatch(handler.xmlRequest, message)
 	if err != nil {
@@ -48,6 +49,7 @@ func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw
 		return
 	}
 
+	message.ProcessingTime = handler.referential.Clock().Since(t).Seconds()
 	message.RequestRawMessage = handler.xmlRequest.RawXML()
 	message.ResponseRawMessage = xmlResponse
 	message.ResponseSize = n
