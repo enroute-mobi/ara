@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 
@@ -55,6 +56,17 @@ func (envelope *SOAPEnvelope) BodyType() string {
 
 func (envelope *SOAPEnvelope) Body() xml.Node {
 	return envelope.body
+}
+
+func (envelope *SOAPEnvelope) BodyOrError(expectedResponse string) (xml.Node, error) {
+	if envelope.BodyType() == expectedResponse {
+		return envelope.body, nil
+	}
+	if envelope.BodyType() == "Fault" {
+		se := NewXMLSiriError(envelope.body)
+		return nil, NewSiriError(fmt.Sprintf("SIRI Error: %v", se.Error()))
+	}
+	return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
 }
 
 func NewSOAPEnvelopeBuffer() *SOAPEnvelopeBuffer {

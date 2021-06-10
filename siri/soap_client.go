@@ -164,10 +164,7 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	if err != nil {
 		return nil, err
 	}
-	if envelope.BodyType() != args.expectedResponse {
-		return nil, NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong Soap from server: %v", envelope.BodyType()))
-	}
-	return envelope.Body(), nil
+	return envelope.BodyOrError(args.expectedResponse)
 }
 
 func (client *SOAPClient) getURL(requestType requestType) string {

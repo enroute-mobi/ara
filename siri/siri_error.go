@@ -17,7 +17,10 @@ func (e *SiriError) Error() string {
 }
 
 func (e *SiriError) FullMessage() string {
-	return fmt.Sprintf("%v: %v", e.errCode, e.message)
+	if e.errCode != "" {
+		return fmt.Sprintf("%v %v", e.errCode, e.message)
+	}
+	return e.message
 }
 
 func NewSiriError(message string) error {
