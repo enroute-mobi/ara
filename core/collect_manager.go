@@ -135,7 +135,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			lineIds[lineObjectID.Value()] = struct{}{}
 		}
 
-		if partner.CanCollect(stopAreaObjectID, lineIds) {
+		if partner.CanCollect(stopAreaObjectID.Value(), lineIds) {
 			logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
 
 			if subscriptionCollector != nil {
@@ -224,7 +224,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 			continue
 		}
 
-		if !partner.CanCollectLine(lineObjectID) {
+		if !partner.CanCollectLine(lineObjectID.Value()) {
 			continue
 		}
 
@@ -281,7 +281,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 			lineIds[lineObjectID.Value()] = struct{}{}
 		}
 
-		if !partner.CanCollect(stopAreaObjectID, lineIds) {
+		if !partner.CanCollect(stopAreaObjectID.Value(), lineIds) {
 			continue
 		}
 

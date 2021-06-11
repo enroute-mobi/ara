@@ -39,7 +39,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	referential := server.CurrentReferentials().New("default")
 
 	partner := referential.Partners().New("partner")
-	partner.Settings = map[string]string{
+	partner.SetSettingsDefinition(map[string]string{
 		"remote_url":                             "",
 		"remote_credential":                      "",
 		"remote_objectid_kind":                   "objectidKind",
@@ -48,7 +48,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"generators.message_identifier":          "Ara:Message::%{uuid}:LOC",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 		"generators.data_frame_identifier":       "RATPDev:DataFrame::%{id}:LOC",
-	}
+	})
 	partner.ConnectorTypes = []string{
 		"siri-check-status-server",
 		"siri-stop-monitoring-request-broadcaster",

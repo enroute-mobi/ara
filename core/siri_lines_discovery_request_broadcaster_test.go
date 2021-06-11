@@ -16,8 +16,8 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "test"
-	partner.Settings["generators.message_identifier"] = "Ara:Message::%{uuid}:LOC"
+	partner.SetSetting("remote_objectid_kind", "test")
+	partner.SetSetting("generators.message_identifier", "Ara:Message::%{uuid}:LOC")
 	connector := NewSIRILinesDiscoveryRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())

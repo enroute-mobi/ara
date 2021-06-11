@@ -16,8 +16,8 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["local_url"] = "http://ara"
-	partner.Settings["generators.response_message_identifier"] = "Ara:ResponseMessage::%{uuid}:LOC"
+	partner.SetSetting("local_url", "http://ara")
+	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 	partner.Save()
 	referential.Start()
 	referential.Stop()
@@ -71,11 +71,11 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 func Test_SIRICheckStatusServerFactory_Validate(t *testing.T) {
 	partner := &Partner{
 		slug:           "partner",
-		Settings:       make(map[string]string),
 		ConnectorTypes: []string{"siri-check-status-server"},
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

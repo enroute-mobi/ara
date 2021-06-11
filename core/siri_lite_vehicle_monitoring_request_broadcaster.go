@@ -143,7 +143,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourne
 			return "", false
 		}
 		dataVehicleJourneyRef =
-			connector.Partner().IdentifierGenerator(REFERENCE_IDENTIFIER).NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
+			connector.Partner().IdentifierGenerator(REFERENCE_IDENTIFIER).NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -174,7 +174,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef
 			return obj.Value()
 		}
 	}
-	return connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(IdentifierAttributes{Default: reference.GetSha1()})
+	return connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(IdentifierAttributes{Id: reference.GetSha1()})
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {

@@ -201,7 +201,7 @@ func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *mode
 			logger.Log.Printf("Ignore StopVisit %s without default ObjectID", stopVisit.Id())
 			return "", false
 		}
-		itemIdentifier = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Default: defaultObjectID.Value()})
+		itemIdentifier = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Id: defaultObjectID.Value()})
 	}
 	return itemIdentifier, true
 }
@@ -217,7 +217,7 @@ func (builder *BroadcastStopMonitoringBuilder) dataVehicleJourneyRef(vehicleJour
 		if !ok {
 			return "", false
 		}
-		dataVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Default: defaultObjectID.Value()})
+		dataVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -248,7 +248,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 		if !ok {
 			continue
 		}
-		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: refType[:len(refType)-3], Default: reference.GetSha1()}))
+		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
 	}
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
 		reference, ok := references.Get(refType)
@@ -268,7 +268,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *mod
 			return
 		}
 	}
-	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(IdentifierAttributes{Default: reference.GetSha1()}))
+	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(IdentifierAttributes{Id: reference.GetSha1()}))
 }
 
 func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin string) bool {

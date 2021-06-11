@@ -14,7 +14,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -107,7 +107,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -165,7 +165,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -223,7 +223,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -284,8 +284,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind"] = "WRONG_ID"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetSetting("gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind", "WRONG_ID")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -346,8 +346,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -392,10 +391,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	entity := gtfsFeed.Entity[0]
 
 	trip := entity.GetVehicle().GetTrip()
-	if r := "VehicleJourney:vjId:LOC"; trip.GetTripId() != r {
+	if r := "vjId"; trip.GetTripId() != r {
 		t.Errorf("Incorrect TripId for entity TripUpdate:\n got: %v\n want: %v", trip.GetTripId(), r)
 	}
-	if r := "Line:lId:LOC"; trip.GetRouteId() != r {
+	if r := "lId"; trip.GetRouteId() != r {
 		t.Errorf("Incorrect RouteId for entity TripUpdate:\n got: %v\n want: %v", trip.GetRouteId(), r)
 	}
 }

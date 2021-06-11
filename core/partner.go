@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -25,52 +23,6 @@ const (
 	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = "unknown"
 	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
 	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
-
-	// Partner settings
-	LOCAL_CREDENTIAL  = "local_credential"
-	LOCAL_CREDENTIALS = "local_credentials"
-	LOCAL_URL         = "local_url"
-
-	REMOTE_CREDENTIAL            = "remote_credential"
-	REMOTE_OBJECTID_KIND         = "remote_objectid_kind"
-	VEHICLE_REMOTE_OBJECTID_KIND = "vehicle_remote_objectid_kind"
-	REMOTE_URL                   = "remote_url"
-	NOTIFICATIONS_REMOTE_URL     = "notifications.remote_url"
-	SUBSCRIPTIONS_REMOTE_URL     = "subscriptions.remote_url"
-
-	COLLECT_PRIORITY                 = "collect.priority"
-	COLLECT_INCLUDE_LINES            = "collect.include_lines"
-	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
-	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
-	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
-	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
-	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
-
-	DISCOVERY_INTERVAL = "discovery_interval"
-
-	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
-	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
-	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
-	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
-	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
-	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
-
-	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
-	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
-	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
-
-	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
-	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
-
-	CACHE_TIMEOUT = "cache_timeout"
-
-	// Generators
-	MESSAGE_IDENTIFIER             = "message_identifier"
-	RESPONSE_MESSAGE_IDENTIFIER    = "response_message_identifier"
-	DATA_FRAME_IDENTIFIER          = "data_frame_identifier"
-	REFERENCE_IDENTIFIER           = "reference_identifier"
-	REFERENCE_STOP_AREA_IDENTIFIER = "reference_stop_area_identifier"
-	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
 
 type PartnerId string
@@ -106,6 +58,7 @@ type PartnerStatus struct {
 
 type Partner struct {
 	uuid.UUIDConsumer
+	PartnerSettings
 
 	mutex *sync.RWMutex
 
@@ -115,7 +68,7 @@ type Partner struct {
 	PartnerStatus PartnerStatus
 
 	ConnectorTypes []string
-	Settings       map[string]string
+	// Settings       map[string]string
 
 	connectors          map[string]Connector
 	discoveredStopAreas map[string]struct{}
@@ -134,9 +87,7 @@ type ByPriority []*Partner
 func (a ByPriority) Len() int      { return len(a) }
 func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByPriority) Less(i, j int) bool {
-	first, _ := strconv.Atoi(a[i].Settings[COLLECT_PRIORITY])
-	second, _ := strconv.Atoi(a[j].Settings[COLLECT_PRIORITY])
-	return first > second
+	return a[i].CollectPriority() > a[j].CollectPriority()
 }
 
 type APIPartner struct {
@@ -266,7 +217,6 @@ func (partner *APIPartner) UnmarshalJSON(data []byte) error {
 func NewPartner() *Partner {
 	partner := &Partner{
 		mutex:               &sync.RWMutex{},
-		Settings:            make(map[string]string),
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
@@ -276,6 +226,7 @@ func NewPartner() *Partner {
 		},
 		gtfsCache: cache.NewCacheTable(),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
 	return partner
@@ -305,84 +256,8 @@ func (partner *Partner) SetSlug(s PartnerSlug) {
 	partner.slug = s
 }
 
-func (partner *Partner) Setting(key string) string {
-	return partner.Settings[key]
-}
-
 func (partner *Partner) GtfsCache() *cache.CacheTable {
 	return partner.gtfsCache
-}
-
-func (partner *Partner) Credentials() string {
-	_, ok := partner.Settings[LOCAL_CREDENTIAL]
-	_, ok2 := partner.Settings[LOCAL_CREDENTIALS]
-	if !ok && !ok2 {
-		return ""
-	}
-	return fmt.Sprintf("%v,%v", partner.Setting(LOCAL_CREDENTIAL), partner.Setting(LOCAL_CREDENTIALS))
-}
-
-func (partner *Partner) IdentifierGenerator(generatorName string) *IdentifierGenerator {
-	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
-	if formatString == "" {
-		formatString = defaultIdentifierGenerators[generatorName]
-	}
-	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
-}
-
-func (partner *Partner) IdentifierGeneratorWithDefault(generatorName, defaultFormat string) *IdentifierGenerator {
-	formatString := partner.Setting(fmt.Sprintf("generators.%v", generatorName))
-	if formatString == "" {
-		formatString = defaultFormat
-	}
-	return NewIdentifierGeneratorWithUUID(formatString, partner.UUIDConsumer)
-}
-
-func (partner *Partner) RemoteObjectIDKind(connectorName string) string {
-	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)); setting != "" {
-		return setting
-	}
-	return partner.Setting(REMOTE_OBJECTID_KIND)
-}
-
-func (partner *Partner) VehicleRemoteObjectIDKind(connectorName string) string {
-	if setting := partner.Setting(fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)); setting != "" {
-		return setting
-	}
-	return partner.Setting(REMOTE_OBJECTID_KIND)
-}
-
-// Very specific for now, we'll refacto if we need to cache more
-func (partner *Partner) GtfsCacheTimeout() (t time.Duration) {
-	t, _ = time.ParseDuration(partner.Setting(BROADCAST_GTFS_CACHE_TIMEOUT))
-	if t < cache.MIN_CACHE_LIFESPAN {
-		t = cache.DEFAULT_CACHE_LIFESPAN
-	}
-
-	return
-}
-
-func (partner *Partner) CacheTimeout(connectorName string) (t time.Duration) {
-	t, _ = time.ParseDuration(partner.Setting(fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)))
-	return
-}
-
-func (partner *Partner) ProducerRef() string {
-	producerRef := partner.Setting(REMOTE_CREDENTIAL)
-	if producerRef == "" {
-		producerRef = "Ara"
-	}
-	return producerRef
-}
-
-// Ref Issue #4300
-func (partner *Partner) Address() string {
-	// address := partner.Setting("local_url")
-	// if address == "" {
-	// 	address = config.Config.DefaultAddress
-	// }
-	// return address
-	return partner.Setting(LOCAL_URL)
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
@@ -403,10 +278,12 @@ func (partner *Partner) MarshalJSON() ([]byte, error) {
 		Id   PartnerId
 		Slug PartnerSlug
 		*Alias
+		Settings map[string]string
 	}{
-		Id:    partner.id,
-		Slug:  partner.slug,
-		Alias: (*Alias)(partner),
+		Id:       partner.id,
+		Slug:     partner.slug,
+		Settings: partner.SettingsDefinition(),
+		Alias:    (*Alias)(partner),
 	})
 }
 
@@ -415,7 +292,7 @@ func (partner *Partner) Definition() *APIPartner {
 		Id:             partner.id,
 		Slug:           partner.slug,
 		Name:           partner.Name,
-		Settings:       partner.Settings,
+		Settings:       partner.SettingsDefinition(),
 		ConnectorTypes: partner.ConnectorTypes,
 		factories:      make(map[string]ConnectorFactory),
 		Errors:         NewErrors(),
@@ -452,104 +329,23 @@ func (partner *Partner) Start() {
 	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
 }
 
-func (partner *Partner) CollectPriority() int {
-	value, _ := strconv.Atoi(partner.Setting(COLLECT_PRIORITY))
-	return value
-}
-
-func (partner *Partner) CanCollect(stopAreaObjectId model.ObjectID, lineIds map[string]struct{}) bool {
-	if partner.Setting(COLLECT_INCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_INCLUDE_LINES) == "" && partner.Setting(COLLECT_EXCLUDE_STOP_AREAS) == "" && partner.Setting(COLLECT_USE_DISCOVERED_SA) == "" {
+func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) bool {
+	if partner.CollectSettings().Empty() {
+		logger.Log.Printf("empty")
 		return true
 	}
-	if partner.excludedStopArea(stopAreaObjectId) {
+	if partner.CollectSettings().ExcludeStop(stopId) {
 		return false
 	}
-	return partner.collectStopArea(stopAreaObjectId) || partner.collectLine(lineIds) || partner.checkDiscovered(stopAreaObjectId)
+	return partner.CollectSettings().IncludeStop(stopId) || partner.CollectSettings().CanCollectLines(lineIds) || partner.checkDiscovered(stopId)
 }
 
-func (partner *Partner) CanCollectLine(lineObjectId model.ObjectID) bool {
-	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
-		return false
-	}
-	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
-	for _, line := range lines {
-		if strings.TrimSpace(line) == lineObjectId.Value() {
-			return true
-		}
-	}
-	return false
+func (partner *Partner) CanCollectLine(lineId string) bool {
+	return partner.CollectSettings().IncludeLine(lineId)
 }
 
-func (partner *Partner) checkDiscovered(stopAreaObjectId model.ObjectID) (ok bool) {
-	_, ok = partner.discoveredStopAreas[stopAreaObjectId.Value()]
-	return
-}
-
-func (partner *Partner) collectStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_INCLUDE_STOP_AREAS)
-}
-
-func (partner *Partner) excludedStopArea(stopAreaObjectId model.ObjectID) bool {
-	return partner.stopAreaInSetting(stopAreaObjectId, COLLECT_EXCLUDE_STOP_AREAS)
-}
-
-func (partner *Partner) stopAreaInSetting(stopAreaObjectId model.ObjectID, setting string) bool {
-	if partner.Setting(setting) == "" {
-		return false
-	}
-	stopAreas := strings.Split(partner.Settings[setting], ",")
-	for _, stopArea := range stopAreas {
-		if strings.TrimSpace(stopArea) == stopAreaObjectId.Value() {
-			return true
-		}
-	}
-	return false
-}
-
-func (partner *Partner) collectLine(lineIds map[string]struct{}) bool {
-	if partner.Setting(COLLECT_INCLUDE_LINES) == "" {
-		return false
-	}
-	lines := strings.Split(partner.Settings[COLLECT_INCLUDE_LINES], ",")
-	for _, line := range lines {
-		if _, ok := lineIds[line]; ok {
-			return true
-		}
-	}
-	return false
-}
-
-func (partner *Partner) NoDestinationRefRewritingFrom() []string {
-	if partner.Setting(BROADCAST_NO_DESTINATIONREF_REWRITING_FROM) == "" {
-		return []string{}
-	}
-	return strings.Split(partner.Settings[BROADCAST_NO_DESTINATIONREF_REWRITING_FROM], ",")
-}
-
-func (partner *Partner) NoDataFrameRefRewritingFrom() []string {
-	if partner.Setting(BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM) == "" {
-		return []string{}
-	}
-	return strings.Split(partner.Settings[BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM], ",")
-}
-
-func (partner *Partner) RewriteJourneyPatternRef() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
-	return
-}
-
-func (partner *Partner) LogSubscriptionStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS])
-	return
-}
-
-func (partner *Partner) LogRequestStopMonitoringDeliveries() (l bool) {
-	l, _ = strconv.ParseBool(partner.Settings[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS])
-	return
-}
-
-func (partner *Partner) GzipGtfs() (r bool) {
-	r, _ = strconv.ParseBool(partner.Settings[BROADCAST_GZIP_GTFS])
+func (partner *Partner) checkDiscovered(stopId string) (ok bool) {
+	_, ok = partner.discoveredStopAreas[stopId]
 	return
 }
 
@@ -558,7 +354,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id
 	partner.slug = apiPartner.Slug
 	partner.Name = apiPartner.Name
-	partner.Settings = apiPartner.Settings
+	partner.SetSettingsDefinition(apiPartner.Settings)
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 
@@ -751,17 +547,9 @@ func (partner *Partner) LastDiscovery() time.Time {
 	return partner.lastDiscovery
 }
 
-func (partner *Partner) DiscoveryInterval() time.Duration {
-	d, _ := time.ParseDuration(partner.Settings[DISCOVERY_INTERVAL])
-	if d == 0 {
-		d = 1 * time.Hour
-	}
-	return -1 * time.Hour
-}
-
 func (partner *Partner) Discover() {
 	partner.lastDiscovery = partner.manager.Referential().Clock().Now()
-	// partner.LineDiscovery()
+	// partner.lineDiscovery()
 	partner.stopDiscovery()
 }
 
@@ -782,7 +570,7 @@ func (partner *Partner) Pushed() {
 }
 
 func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
-	if partner.Setting(COLLECT_USE_DISCOVERED_SA) == "" {
+	if !partner.CollectSettings().UseDiscovered {
 		return
 	}
 
@@ -830,10 +618,10 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
-		mutex:               &sync.RWMutex{},
-		slug:                slug,
-		manager:             manager,
-		Settings:            make(map[string]string),
+		mutex:   &sync.RWMutex{},
+		slug:    slug,
+		manager: manager,
+		// Settings:            make(map[string]string),
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
 		context:             make(Context),
@@ -843,6 +631,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
 	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
 }
@@ -973,9 +762,11 @@ func (manager *PartnerManager) Load() error {
 		}
 
 		if p.Settings.Valid && len(p.Settings.String) > 0 {
-			if err = json.Unmarshal([]byte(p.Settings.String), &partner.Settings); err != nil {
+			m := make(map[string]string)
+			if err = json.Unmarshal([]byte(p.Settings.String), &m); err != nil {
 				return err
 			}
+			partner.SetSettingsDefinition(m)
 		}
 
 		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
@@ -1042,7 +833,7 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 }
 
 func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePartner, error) {
-	settings, err := json.Marshal(partner.Settings)
+	settings, err := partner.PartnerSettings.ToJson()
 	if err != nil {
 		return nil, err
 	}

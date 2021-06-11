@@ -6,7 +6,6 @@ func Test_Factories_CreateConnector(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	partner := &Partner{
-		Settings: make(map[string]string),
 		ConnectorTypes: []string{
 			"siri-service-request-broadcaster",
 			"siri-stop-monitoring-request-collector",

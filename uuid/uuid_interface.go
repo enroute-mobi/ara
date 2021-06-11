@@ -78,6 +78,10 @@ type UUIDConsumer struct {
 	uuidGenerator UUIDGenerator
 }
 
+func NewUUIDConsumer(g UUIDGenerator) UUIDConsumer {
+	return UUIDConsumer{uuidGenerator: g}
+}
+
 type UUIDInterface interface {
 	SetUUIDGenerator(uuidGenerator UUIDGenerator)
 	UUIDGenerator() UUIDGenerator

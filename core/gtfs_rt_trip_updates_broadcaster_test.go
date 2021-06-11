@@ -14,7 +14,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -124,7 +124,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -168,7 +168,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -212,7 +212,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -256,7 +256,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -300,9 +300,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.Settings["remote_objectid_kind"] = "objectidKind"
-	partner.Settings["generators.reference_identifier"] = "%{type}:%{objectid}:LOC"
-	partner.Settings["generators.reference_stop_area_identifier"] = "%{objectid}:LOC"
+	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -346,14 +344,14 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 		t.Errorf("Response first Feed entity have incorrect Id:\n got: %v\n want: %v", entity.GetId(), r)
 	}
 	tripUpdate := entity.TripUpdate
-	if r := "VehicleJourney:vjId:LOC"; tripUpdate.Trip.GetTripId() != r {
+	if r := "vjId"; tripUpdate.Trip.GetTripId() != r {
 		t.Errorf("Response first Trip Update have incorrect TripId:\n got: %v\n want: %v", tripUpdate.Trip.GetTripId(), r)
 	}
-	if r := "Line:lId:LOC"; tripUpdate.Trip.GetRouteId() != r {
+	if r := "lId"; tripUpdate.Trip.GetRouteId() != r {
 		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", tripUpdate.Trip.GetRouteId(), r)
 	}
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
-	if r := "saId:LOC"; stopTimeUpdate.GetStopId() != r {
+	if r := "saId"; stopTimeUpdate.GetStopId() != r {
 		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopId(), r)
 	}
 }
