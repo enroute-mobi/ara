@@ -331,7 +331,6 @@ func (partner *Partner) Start() {
 
 func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) bool {
 	if partner.CollectSettings().Empty() {
-		logger.Log.Printf("empty")
 		return true
 	}
 	if partner.CollectSettings().ExcludeStop(stopId) {
