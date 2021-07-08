@@ -96,6 +96,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
+			sub.SubscriberRef = ett.SubscriberRef()
 			sub.SetExternalId(ett.SubscriptionIdentifier())
 			connector.fillOptions(sub, request)
 		}

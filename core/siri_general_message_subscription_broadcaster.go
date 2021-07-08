@@ -129,6 +129,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
+			sub.SubscriberRef = gm.SubscriberRef()
 			sub.SetExternalId(gm.SubscriptionIdentifier())
 		}
 

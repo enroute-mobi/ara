@@ -96,6 +96,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	}
 
 	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageBroadcast")
+	subscription.SubscriberRef = "subscriber"
 	subscription.CreateAddNewResource(reference)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
@@ -111,8 +112,8 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 		t.Errorf("Should have received 1 delivery but got == %v", len(delivery))
 	}
 
-	if delivery[0].SubscriberRef() != "external" {
-		t.Errorf("SubscriberRef should be external but got == %v", delivery[0].SubscriptionRef())
+	if delivery[0].SubscriberRef() != "subscriber" {
+		t.Errorf("SubscriberRef should be subscriber but got == %v", delivery[0].SubscriptionRef())
 	}
 
 	sv := delivery[0].XMLGeneralMessages()

@@ -25,6 +25,8 @@ type Subscription struct {
 	kind       string
 	externalId string
 
+	SubscriberRef string
+
 	resourcesByObjectID map[string]*SubscribedResource
 	subscriptionOptions map[string]string
 }

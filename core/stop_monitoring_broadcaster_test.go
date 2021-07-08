@@ -228,6 +228,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	}
 
 	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
+	subscription.SubscriberRef = "subscriber"
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)
 	subscription.CreateAddNewResource(reference2)
@@ -279,8 +280,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 		t.Errorf("Should have received 2 deliveries but got == %v", len(delivery))
 	}
 
-	if delivery[0].SubscriberRef() != "external" {
-		t.Errorf("SubscriberRef should be external but got == %v", delivery[0].SubscriberRef())
+	if delivery[0].SubscriberRef() != "subscriber" {
+		t.Errorf("SubscriberRef should be subscriber but got == %v", delivery[0].SubscriberRef())
 	}
 
 	if delivery[0].SubscriptionRef() != "externalId" {

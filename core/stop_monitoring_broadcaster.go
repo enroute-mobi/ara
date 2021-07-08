@@ -113,7 +113,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 			}
 
 			delivery := &siri.SIRINotifyStopMonitoringDelivery{
-				SubscriberRef:          smb.connector.Partner().SubscriberRef(),
+				SubscriberRef:          sub.SubscriberRef,
 				SubscriptionIdentifier: sub.ExternalId(),
 				RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
 				ResponseTimestamp:      smb.connector.Clock().Now(),
@@ -227,7 +227,7 @@ func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStop
 			MonitoringRef:          monitoringRef,
 			RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
 			ResponseTimestamp:      smb.connector.Clock().Now(),
-			SubscriberRef:          smb.connector.Partner().SubscriberRef(),
+			SubscriberRef:          sub.SubscriberRef,
 			SubscriptionIdentifier: sub.ExternalId(),
 			Status:                 true,
 		}

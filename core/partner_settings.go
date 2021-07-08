@@ -190,12 +190,6 @@ func (s *PartnerSettings) RequestorRef() string {
 	return s.ProducerRef()
 }
 
-func (s *PartnerSettings) SubscriberRef() string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return s.s[LOCAL_CREDENTIAL]
-}
-
 // Ref Issue #4300
 func (s *PartnerSettings) Address() string {
 	// address := s.s("local_url")
