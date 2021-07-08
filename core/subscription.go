@@ -68,12 +68,17 @@ func (sr *SubscribedResource) SetLastState(s string, l lastState) {
 }
 
 type APISubscription struct {
-	Kind       string
+	ExternalId    string
+	Kind          string
+	SubscriberRef string
+
 	References []model.Reference
 }
 
 func (subscription *Subscription) SetDefinition(apisub *APISubscription) {
+	subscription.SetExternalId(apisub.ExternalId)
 	subscription.kind = apisub.Kind
+	subscription.SubscriberRef = apisub.SubscriberRef
 	for _, ref := range apisub.References {
 		if ref.ObjectId != nil {
 			subscription.CreateAddNewResource(ref)

@@ -448,6 +448,8 @@ Feature: Support SIRI StopMonitoring by subscription
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
+      | SubscriberRef     | subscriber                                         |
+      | ExternalId        | externalId                                         |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -515,8 +517,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
@@ -615,6 +617,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
+      | SubscriberRef     | subscriber                                         |
+      | ExternalId        | externalId                                         |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -682,8 +686,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
@@ -782,6 +786,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
+      | SubscriberRef     | subscriber                                         |
+      | ExternalId        | externalId                                         |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -847,8 +853,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
@@ -946,6 +952,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
+      | SubscriberRef     | subscriber                                         |
+      | ExternalId        | externalId                                         |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -1013,8 +1021,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
     <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
       <siri:MonitoredStopVisit>
