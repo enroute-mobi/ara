@@ -97,11 +97,11 @@ Feature: Support SIRI VehicleMonitoring by request
       | Reference[JourneyPatternRef]#ObjectId | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
       | Monitored                             | false                                             |
     And one Vehicle has the following attributes:
-      | ObjectIDs    | "internal": "RLA290" |
-      | SRSName      | EPSG:2154            |
-      | Coordinates  | 1044593 6298716      |
-      | DriverRef    | "5753"               |
-      | Bearing      | 287.0                |
-      | LinkDistance | "349.0"              |
-      | Percentage   | "70.0"               |
+      | ObjectIDs      | "internal": "RLA290"          |
+      | SRSName        | EPSG:2154                     |
+      | Coordinates    | 1044593 6298716               |
+      | DriverRef      | "5753"                        |
+      | Bearing        | 287.0                         |
+      | LinkDistance   | "349.0"                       |
+      | Percentage     | "70.0"                        |
       | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |

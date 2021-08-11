@@ -33,7 +33,7 @@ Feature: Support SIRI EstimatedTimeTable
       | Attribute[DirectionRef]            | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
-      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
@@ -42,7 +42,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -57,7 +57,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:05:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:06:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -68,7 +68,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:10:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:11:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -79,7 +79,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:16:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:16:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -224,7 +224,7 @@ Feature: Support SIRI EstimatedTimeTable
       | Attribute[DirectionRef]            | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
-      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a StopVisit exists with the following attributes:
     #retard d'une minute
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
@@ -233,7 +233,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:01:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -248,7 +248,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:05:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:06:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -259,7 +259,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:10:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:11:00.000Z                                             |
       | ArrivalStatus                   | Delayed                                                              |
@@ -270,7 +270,7 @@ Feature: Support SIRI EstimatedTimeTable
       | StopAreaId                      | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:16:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:16:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |

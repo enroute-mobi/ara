@@ -48,8 +48,8 @@ Feature: Support SIRI GetSIRI
       | DestinationName                       | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | Attribute[DirectionRef]               | cladebr                                       |
-      | Reference[JourneyPatternRef]#ObjectID | "internal": "CdF:JourneyPattern::L475P53:LOC" |
-      | Reference[DestinationRef]#ObjectID    | "internal": "parorle"                         |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
+      | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
@@ -229,8 +229,8 @@ Feature: Support SIRI GetSIRI
       | Attribute[DirectionName]              | Aller                                         |
       | Attribute[DirectionRef]               | cladebr                                       |
       | Attribute[Monitored]                  | true                                          |
-      | Reference[JourneyPatternRef]#ObjectID | "internal": "CdF:JourneyPattern::L475P53:LOC" |
-      | Reference[DestinationRef]#ObjectID    | "internal": "parorle"                         |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
+      | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
