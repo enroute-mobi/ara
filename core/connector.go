@@ -28,6 +28,7 @@ const (
 	SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER      = "siri-estimated-timetable-request-broadcaster"
 	SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster"
 	TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster-test"
+	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR         = "siri-vehicle-monitoring-request-collector"
 	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER              = "siri-subscription-request-dispatcher"
 	SIRI_CHECK_STATUS_CLIENT_TYPE                     = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE                     = "test-check-status-client"
@@ -99,6 +100,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIEstimatedTimetableSubscriptionBroadcasterFactory{}
 	case TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER:
 		return &TestSIRIETTSubscriptionBroadcasterFactory{}
+	case SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR:
+		return &SIRIVehicleMonitoringRequestCollectorFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
 		return &SIRICheckStatusClientFactory{}
 	case SIRI_SUBSCRIPTION_REQUEST_DISPATCHER:

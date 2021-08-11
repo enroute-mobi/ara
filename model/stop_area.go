@@ -14,6 +14,7 @@ import (
 type StopAreaId ModelId
 
 type StopArea struct {
+	Collectable
 	ObjectIDConsumer
 
 	model Model
@@ -22,8 +23,6 @@ type StopArea struct {
 	ParentId   StopAreaId `json:",omitempty"`
 	ReferentId StopAreaId `json:",omitempty"`
 
-	nextCollectAt          time.Time
-	collectedAt            time.Time
 	CollectedUntil         time.Time
 	CollectedAlways        bool
 	CollectGeneralMessages bool
@@ -67,22 +66,6 @@ func (stopArea *StopArea) copy() *StopArea {
 
 func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
-}
-
-func (stopArea *StopArea) NextCollectAt() time.Time {
-	return stopArea.nextCollectAt
-}
-
-func (stopArea *StopArea) NextCollect(collectTime time.Time) {
-	stopArea.nextCollectAt = collectTime
-}
-
-func (stopArea *StopArea) CollectedAt() time.Time {
-	return stopArea.collectedAt
-}
-
-func (stopArea *StopArea) Updated(updateTime time.Time) {
-	stopArea.collectedAt = updateTime
 }
 
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {

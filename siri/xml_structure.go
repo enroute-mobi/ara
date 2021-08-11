@@ -213,6 +213,14 @@ func (xmlStruct *XMLStructure) findStringChildContent(localName string) string {
 	return strings.TrimSpace(node.Content())
 }
 
+func (xmlStruct *XMLStructure) findChildAttribute(localName, attr string) string {
+	node := xmlStruct.findNode(localName)
+	if node == nil {
+		return ""
+	}
+	return strings.TrimSpace(node.Attr(attr))
+}
+
 func (xmlStruct *XMLStructure) containSelfClosing(localName string) bool {
 	node := xmlStruct.findNode(localName)
 	return node != nil

@@ -30,10 +30,16 @@ type XMLMonitoredStopVisitCancellation struct {
 }
 
 type XMLMonitoredStopVisit struct {
+	XMLMonitoredVehicleJourney
+
+	itemIdentifier string
+	monitoringRef  string
+	recordedAt     time.Time
+}
+
+type XMLMonitoredVehicleJourney struct {
 	XMLStructure
 
-	itemIdentifier         string
-	monitoringRef          string
 	stopPointRef           string
 	stopPointName          string
 	datedVehicleJourneyRef string
@@ -43,7 +49,6 @@ type XMLMonitoredStopVisit struct {
 	departureStatus        string
 	arrivalStatus          string
 	dataFrameRef           string
-	recordedAt             time.Time
 	order                  int
 
 	aimedArrivalTime    time.Time
@@ -98,6 +103,14 @@ type XMLMonitoredStopVisit struct {
 	routeRef                    string
 	bearing                     string
 	inPanic                     string
+
+	// VehicleMonitoring attributes
+	srsName     string
+	coordinates string
+	longitude   string
+	latitude    string
+	vehicleRef  string
+	driverRef   string
 }
 
 func NewXMLStopMonitoringResponse(node xml.Node) *XMLStopMonitoringResponse {
@@ -190,432 +203,474 @@ func NewXMLMonitoredStopVisit(node XMLNode) *XMLMonitoredStopVisit {
 	return stopVisit
 }
 
-func (visit *XMLMonitoredStopVisit) ItemIdentifier() string {
-	if visit.itemIdentifier == "" {
-		visit.itemIdentifier = visit.findStringChildContent("ItemIdentifier")
+func (sv *XMLMonitoredStopVisit) ItemIdentifier() string {
+	if sv.itemIdentifier == "" {
+		sv.itemIdentifier = sv.findStringChildContent("ItemIdentifier")
 	}
-	return visit.itemIdentifier
+	return sv.itemIdentifier
 }
 
-func (visit *XMLMonitoredStopVisit) MonitoringRef() string {
-	if visit.monitoringRef == "" {
-		visit.monitoringRef = visit.findStringChildContent("MonitoringRef")
+func (sv *XMLMonitoredStopVisit) MonitoringRef() string {
+	if sv.monitoringRef == "" {
+		sv.monitoringRef = sv.findStringChildContent("MonitoringRef")
 	}
-	return visit.monitoringRef
+	return sv.monitoringRef
 }
 
-func (visit *XMLMonitoredStopVisit) StopPointRef() string {
-	if visit.stopPointRef == "" {
-		visit.stopPointRef = visit.findStringChildContent("StopPointRef")
+func (sv *XMLMonitoredStopVisit) RecordedAt() time.Time {
+	if sv.recordedAt.IsZero() {
+		sv.recordedAt = sv.findTimeChildContent("RecordedAtTime")
 	}
-	return visit.stopPointRef
+	return sv.recordedAt
 }
 
-func (visit *XMLMonitoredStopVisit) StopPointName() string {
-	if visit.stopPointName == "" {
-		visit.stopPointName = visit.findStringChildContent("StopPointName")
+func (vj *XMLMonitoredVehicleJourney) StopPointRef() string {
+	if vj.stopPointRef == "" {
+		vj.stopPointRef = vj.findStringChildContent("StopPointRef")
 	}
-	return visit.stopPointName
+	return vj.stopPointRef
 }
 
-func (visit *XMLMonitoredStopVisit) DatedVehicleJourneyRef() string {
-	if visit.datedVehicleJourneyRef == "" {
-		visit.datedVehicleJourneyRef = visit.findStringChildContent("DatedVehicleJourneyRef")
+func (vj *XMLMonitoredVehicleJourney) StopPointName() string {
+	if vj.stopPointName == "" {
+		vj.stopPointName = vj.findStringChildContent("StopPointName")
 	}
-	return visit.datedVehicleJourneyRef
+	return vj.stopPointName
 }
 
-func (visit *XMLMonitoredStopVisit) DataFrameRef() string {
-	if visit.dataFrameRef == "" {
-		visit.dataFrameRef = visit.findStringChildContent("DataFrameRef")
+func (vj *XMLMonitoredVehicleJourney) DatedVehicleJourneyRef() string {
+	if vj.datedVehicleJourneyRef == "" {
+		vj.datedVehicleJourneyRef = vj.findStringChildContent("DatedVehicleJourneyRef")
 	}
-	return visit.dataFrameRef
+	return vj.datedVehicleJourneyRef
 }
 
-func (visit *XMLMonitoredStopVisit) LineRef() string {
-	if visit.lineRef == "" {
-		visit.lineRef = visit.findStringChildContent("LineRef")
+func (vj *XMLMonitoredVehicleJourney) DataFrameRef() string {
+	if vj.dataFrameRef == "" {
+		vj.dataFrameRef = vj.findStringChildContent("DataFrameRef")
 	}
-	return visit.lineRef
+	return vj.dataFrameRef
 }
 
-func (visit *XMLMonitoredStopVisit) PublishedLineName() string {
-	if visit.publishedLineName == "" {
-		visit.publishedLineName = visit.findStringChildContent("PublishedLineName")
+func (vj *XMLMonitoredVehicleJourney) LineRef() string {
+	if vj.lineRef == "" {
+		vj.lineRef = vj.findStringChildContent("LineRef")
 	}
-	return visit.publishedLineName
+	return vj.lineRef
 }
 
-func (visit *XMLMonitoredStopVisit) DepartureStatus() string {
-	if visit.departureStatus == "" {
-		visit.departureStatus = visit.findStringChildContent("DepartureStatus")
+func (vj *XMLMonitoredVehicleJourney) PublishedLineName() string {
+	if vj.publishedLineName == "" {
+		vj.publishedLineName = vj.findStringChildContent("PublishedLineName")
 	}
-	return visit.departureStatus
+	return vj.publishedLineName
 }
 
-func (visit *XMLMonitoredStopVisit) ArrivalStatus() string {
-	if visit.arrivalStatus == "" {
-		visit.arrivalStatus = visit.findStringChildContent("ArrivalStatus")
+func (vj *XMLMonitoredVehicleJourney) DepartureStatus() string {
+	if vj.departureStatus == "" {
+		vj.departureStatus = vj.findStringChildContent("DepartureStatus")
 	}
-	return visit.arrivalStatus
+	return vj.departureStatus
 }
 
-func (visit *XMLMonitoredStopVisit) RecordedAt() time.Time {
-	if visit.recordedAt.IsZero() {
-		visit.recordedAt = visit.findTimeChildContent("RecordedAtTime")
+func (vj *XMLMonitoredVehicleJourney) ArrivalStatus() string {
+	if vj.arrivalStatus == "" {
+		vj.arrivalStatus = vj.findStringChildContent("ArrivalStatus")
 	}
-	return visit.recordedAt
+	return vj.arrivalStatus
 }
 
-func (visit *XMLMonitoredStopVisit) Order() int {
-	if visit.order == 0 {
-		visit.order = visit.findIntChildContent("Order")
+func (vj *XMLMonitoredVehicleJourney) Order() int {
+	if vj.order == 0 {
+		vj.order = vj.findIntChildContent("Order")
 	}
-	return visit.order
+	return vj.order
 }
 
-func (visit *XMLMonitoredStopVisit) AimedArrivalTime() time.Time {
-	if visit.aimedArrivalTime.IsZero() {
-		visit.aimedArrivalTime = visit.findTimeChildContent("AimedArrivalTime")
+func (vj *XMLMonitoredVehicleJourney) AimedArrivalTime() time.Time {
+	if vj.aimedArrivalTime.IsZero() {
+		vj.aimedArrivalTime = vj.findTimeChildContent("AimedArrivalTime")
 	}
-	return visit.aimedArrivalTime
+	return vj.aimedArrivalTime
 }
 
-func (visit *XMLMonitoredStopVisit) ExpectedArrivalTime() time.Time {
-	if visit.expectedArrivalTime.IsZero() {
-		visit.expectedArrivalTime = visit.findTimeChildContent("ExpectedArrivalTime")
+func (vj *XMLMonitoredVehicleJourney) ExpectedArrivalTime() time.Time {
+	if vj.expectedArrivalTime.IsZero() {
+		vj.expectedArrivalTime = vj.findTimeChildContent("ExpectedArrivalTime")
 	}
-	return visit.expectedArrivalTime
+	return vj.expectedArrivalTime
 }
 
-func (visit *XMLMonitoredStopVisit) ActualArrivalTime() time.Time {
-	if visit.actualArrivalTime.IsZero() {
-		visit.actualArrivalTime = visit.findTimeChildContent("ActualArrivalTime")
+func (vj *XMLMonitoredVehicleJourney) ActualArrivalTime() time.Time {
+	if vj.actualArrivalTime.IsZero() {
+		vj.actualArrivalTime = vj.findTimeChildContent("ActualArrivalTime")
 	}
-	return visit.actualArrivalTime
+	return vj.actualArrivalTime
 }
 
-func (visit *XMLMonitoredStopVisit) AimedDepartureTime() time.Time {
-	if visit.aimedDepartureTime.IsZero() {
-		visit.aimedDepartureTime = visit.findTimeChildContent("AimedDepartureTime")
+func (vj *XMLMonitoredVehicleJourney) AimedDepartureTime() time.Time {
+	if vj.aimedDepartureTime.IsZero() {
+		vj.aimedDepartureTime = vj.findTimeChildContent("AimedDepartureTime")
 	}
-	return visit.aimedDepartureTime
+	return vj.aimedDepartureTime
 }
 
-func (visit *XMLMonitoredStopVisit) ExpectedDepartureTime() time.Time {
-	if visit.expectedDepartureTime.IsZero() {
-		visit.expectedDepartureTime = visit.findTimeChildContent("ExpectedDepartureTime")
+func (vj *XMLMonitoredVehicleJourney) ExpectedDepartureTime() time.Time {
+	if vj.expectedDepartureTime.IsZero() {
+		vj.expectedDepartureTime = vj.findTimeChildContent("ExpectedDepartureTime")
 	}
-	return visit.expectedDepartureTime
+	return vj.expectedDepartureTime
 }
 
-func (visit *XMLMonitoredStopVisit) ActualDepartureTime() time.Time {
-	if visit.actualDepartureTime.IsZero() {
-		visit.actualDepartureTime = visit.findTimeChildContent("ActualDepartureTime")
+func (vj *XMLMonitoredVehicleJourney) ActualDepartureTime() time.Time {
+	if vj.actualDepartureTime.IsZero() {
+		vj.actualDepartureTime = vj.findTimeChildContent("ActualDepartureTime")
 	}
-	return visit.actualDepartureTime
+	return vj.actualDepartureTime
 }
 
 // Attributes
-func (visit *XMLMonitoredStopVisit) Delay() string {
-	if visit.delay == "" {
-		visit.delay = visit.findStringChildContent("Delay")
+func (vj *XMLMonitoredVehicleJourney) Delay() string {
+	if vj.delay == "" {
+		vj.delay = vj.findStringChildContent("Delay")
 	}
-	return visit.delay
+	return vj.delay
 }
 
-func (visit *XMLMonitoredStopVisit) ActualQuayName() string {
-	if visit.actualQuayName == "" {
-		visit.actualQuayName = visit.findStringChildContent("ActualQuayName")
+func (vj *XMLMonitoredVehicleJourney) ActualQuayName() string {
+	if vj.actualQuayName == "" {
+		vj.actualQuayName = vj.findStringChildContent("ActualQuayName")
 	}
-	return visit.actualQuayName
+	return vj.actualQuayName
 }
 
-func (visit *XMLMonitoredStopVisit) AimedHeadwayInterval() string {
-	if visit.aimedHeadwayInterval == "" {
-		visit.aimedHeadwayInterval = visit.findStringChildContent("AimedHeadwayInterval")
+func (vj *XMLMonitoredVehicleJourney) AimedHeadwayInterval() string {
+	if vj.aimedHeadwayInterval == "" {
+		vj.aimedHeadwayInterval = vj.findStringChildContent("AimedHeadwayInterval")
 	}
-	return visit.aimedHeadwayInterval
+	return vj.aimedHeadwayInterval
 }
 
-func (visit *XMLMonitoredStopVisit) ArrivalPlatformName() string {
-	if visit.arrivalPlatformName == "" {
-		visit.arrivalPlatformName = visit.findStringChildContent("ArrivalPlatformName")
+func (vj *XMLMonitoredVehicleJourney) ArrivalPlatformName() string {
+	if vj.arrivalPlatformName == "" {
+		vj.arrivalPlatformName = vj.findStringChildContent("ArrivalPlatformName")
 	}
-	return visit.arrivalPlatformName
+	return vj.arrivalPlatformName
 }
 
-func (visit *XMLMonitoredStopVisit) ArrivalProximyTest() string {
-	if visit.arrivalProximyTest == "" {
-		visit.arrivalProximyTest = visit.findStringChildContent("ArrivalProximyTest")
+func (vj *XMLMonitoredVehicleJourney) ArrivalProximyTest() string {
+	if vj.arrivalProximyTest == "" {
+		vj.arrivalProximyTest = vj.findStringChildContent("ArrivalProximyTest")
 	}
-	return visit.arrivalProximyTest
+	return vj.arrivalProximyTest
 }
 
-func (visit *XMLMonitoredStopVisit) DepartureBoardingActivity() string {
-	if visit.departureBoardingActivity == "" {
-		visit.departureBoardingActivity = visit.findStringChildContent("DepartureBoardingActivity")
+func (vj *XMLMonitoredVehicleJourney) DepartureBoardingActivity() string {
+	if vj.departureBoardingActivity == "" {
+		vj.departureBoardingActivity = vj.findStringChildContent("DepartureBoardingActivity")
 	}
-	return visit.departureBoardingActivity
+	return vj.departureBoardingActivity
 }
 
-func (visit *XMLMonitoredStopVisit) DeparturePlatformName() string {
-	if visit.departurePlatformName == "" {
-		visit.departurePlatformName = visit.findStringChildContent("DeparturePlatformName")
+func (vj *XMLMonitoredVehicleJourney) DeparturePlatformName() string {
+	if vj.departurePlatformName == "" {
+		vj.departurePlatformName = vj.findStringChildContent("DeparturePlatformName")
 	}
-	return visit.departurePlatformName
+	return vj.departurePlatformName
 }
 
-func (visit *XMLMonitoredStopVisit) DestinationDisplay() string {
-	if visit.destinationDisplay == "" {
-		visit.destinationDisplay = visit.findStringChildContent("DestinationDisplay")
+func (vj *XMLMonitoredVehicleJourney) DestinationDisplay() string {
+	if vj.destinationDisplay == "" {
+		vj.destinationDisplay = vj.findStringChildContent("DestinationDisplay")
 	}
-	return visit.destinationDisplay
+	return vj.destinationDisplay
 }
 
-func (visit *XMLMonitoredStopVisit) DistanceFromStop() string {
-	if visit.distanceFromStop == "" {
-		visit.distanceFromStop = visit.findStringChildContent("DistanceFromStop")
+func (vj *XMLMonitoredVehicleJourney) DistanceFromStop() string {
+	if vj.distanceFromStop == "" {
+		vj.distanceFromStop = vj.findStringChildContent("DistanceFromStop")
 	}
-	return visit.distanceFromStop
+	return vj.distanceFromStop
 }
 
-func (visit *XMLMonitoredStopVisit) ExpectedHeadwayInterval() string {
-	if visit.expectedHeadwayInterval == "" {
-		visit.expectedHeadwayInterval = visit.findStringChildContent("ExpectedHeadwayInterval")
+func (vj *XMLMonitoredVehicleJourney) ExpectedHeadwayInterval() string {
+	if vj.expectedHeadwayInterval == "" {
+		vj.expectedHeadwayInterval = vj.findStringChildContent("ExpectedHeadwayInterval")
 	}
-	return visit.expectedHeadwayInterval
+	return vj.expectedHeadwayInterval
 }
 
-func (visit *XMLMonitoredStopVisit) NumberOfStopsAway() string {
-	if visit.numberOfStopsAway == "" {
-		visit.numberOfStopsAway = visit.findStringChildContent("NumberOfStopsAway")
+func (vj *XMLMonitoredVehicleJourney) NumberOfStopsAway() string {
+	if vj.numberOfStopsAway == "" {
+		vj.numberOfStopsAway = vj.findStringChildContent("NumberOfStopsAway")
 	}
-	return visit.numberOfStopsAway
+	return vj.numberOfStopsAway
 }
 
-func (visit *XMLMonitoredStopVisit) PlatformTraversal() string {
-	if visit.platformTraversal == "" {
-		visit.platformTraversal = visit.findStringChildContent("PlatformTraversal")
+func (vj *XMLMonitoredVehicleJourney) PlatformTraversal() string {
+	if vj.platformTraversal == "" {
+		vj.platformTraversal = vj.findStringChildContent("PlatformTraversal")
 	}
-	return visit.platformTraversal
+	return vj.platformTraversal
 }
 
-func (visit *XMLMonitoredStopVisit) DirectionName() string {
-	if visit.directionName == "" {
-		visit.directionName = visit.findStringChildContent("DirectionName")
+func (vj *XMLMonitoredVehicleJourney) DirectionName() string {
+	if vj.directionName == "" {
+		vj.directionName = vj.findStringChildContent("DirectionName")
 	}
-	return visit.directionName
+	return vj.directionName
 }
 
-func (visit *XMLMonitoredStopVisit) DestinationName() string {
-	if visit.destinationName == "" {
-		visit.destinationName = visit.findStringChildContent("DestinationName")
+func (vj *XMLMonitoredVehicleJourney) DestinationName() string {
+	if vj.destinationName == "" {
+		vj.destinationName = vj.findStringChildContent("DestinationName")
 	}
-	return visit.destinationName
+	return vj.destinationName
 }
 
-func (visit *XMLMonitoredStopVisit) DirectionRef() string {
-	if visit.directionRef == "" {
-		visit.directionRef = visit.findStringChildContent("DirectionRef")
+func (vj *XMLMonitoredVehicleJourney) DirectionRef() string {
+	if vj.directionRef == "" {
+		vj.directionRef = vj.findStringChildContent("DirectionRef")
 	}
-	return visit.directionRef
+	return vj.directionRef
 }
 
-func (visit *XMLMonitoredStopVisit) Bearing() string {
-	if visit.bearing == "" {
-		visit.bearing = visit.findStringChildContent("Bearing")
+func (vj *XMLMonitoredVehicleJourney) Bearing() string {
+	if vj.bearing == "" {
+		vj.bearing = vj.findStringChildContent("Bearing")
 	}
-	return visit.bearing
+	return vj.bearing
 }
 
-func (visit *XMLMonitoredStopVisit) InPanic() string {
-	if visit.inPanic == "" {
-		visit.inPanic = visit.findStringChildContent("InPanic")
+func (vj *XMLMonitoredVehicleJourney) InPanic() string {
+	if vj.inPanic == "" {
+		vj.inPanic = vj.findStringChildContent("InPanic")
 	}
-	return visit.inPanic
+	return vj.inPanic
 }
 
-func (visit *XMLMonitoredStopVisit) SituationRef() string {
-	if visit.situationRef == "" {
-		visit.situationRef = visit.findStringChildContent("SituationRef")
+func (vj *XMLMonitoredVehicleJourney) SituationRef() string {
+	if vj.situationRef == "" {
+		vj.situationRef = vj.findStringChildContent("SituationRef")
 	}
-	return visit.situationRef
+	return vj.situationRef
 }
 
-func (visit *XMLMonitoredStopVisit) InCongestion() string {
-	if visit.inCongestion == "" {
-		visit.inCongestion = visit.findStringChildContent("InCongestion")
+func (vj *XMLMonitoredVehicleJourney) InCongestion() string {
+	if vj.inCongestion == "" {
+		vj.inCongestion = vj.findStringChildContent("InCongestion")
 	}
-	return visit.inPanic
+	return vj.inPanic
 }
 
-func (visit *XMLMonitoredStopVisit) HeadwayService() string {
-	if visit.headwayService == "" {
-		visit.headwayService = visit.findStringChildContent("HeadwayService")
+func (vj *XMLMonitoredVehicleJourney) HeadwayService() string {
+	if vj.headwayService == "" {
+		vj.headwayService = vj.findStringChildContent("HeadwayService")
 	}
-	return visit.headwayService
+	return vj.headwayService
 }
 
-func (visit *XMLMonitoredStopVisit) FirstOrLastJourney() string {
-	if visit.firstOrLastJourney == "" {
-		visit.firstOrLastJourney = visit.findStringChildContent("FirstOrLastJourney")
+func (vj *XMLMonitoredVehicleJourney) FirstOrLastJourney() string {
+	if vj.firstOrLastJourney == "" {
+		vj.firstOrLastJourney = vj.findStringChildContent("FirstOrLastJourney")
 	}
-	return visit.firstOrLastJourney
+	return vj.firstOrLastJourney
 }
 
-func (visit *XMLMonitoredStopVisit) JourneyNote() string {
-	if visit.journeyNote == "" {
-		visit.journeyNote = visit.findStringChildContent("JourneyNote")
+func (vj *XMLMonitoredVehicleJourney) JourneyNote() string {
+	if vj.journeyNote == "" {
+		vj.journeyNote = vj.findStringChildContent("JourneyNote")
 	}
-	return visit.journeyNote
+	return vj.journeyNote
 }
 
-func (visit *XMLMonitoredStopVisit) JourneyPatternName() string {
-	if visit.journeyPatternName == "" {
-		visit.journeyPatternName = visit.findStringChildContent("JourneyPatternName")
+func (vj *XMLMonitoredVehicleJourney) JourneyPatternName() string {
+	if vj.journeyPatternName == "" {
+		vj.journeyPatternName = vj.findStringChildContent("JourneyPatternName")
 	}
-	return visit.journeyPatternName
+	return vj.journeyPatternName
 }
 
-func (visit *XMLMonitoredStopVisit) VehicleAtStop() bool {
-	if !visit.vehicleAtStop.Defined {
-		visit.vehicleAtStop.Parse(visit.findStringChildContent("VehicleAtStop"))
+func (vj *XMLMonitoredVehicleJourney) VehicleAtStop() bool {
+	if !vj.vehicleAtStop.Defined {
+		vj.vehicleAtStop.Parse(vj.findStringChildContent("VehicleAtStop"))
 	}
-	return visit.vehicleAtStop.Value
+	return vj.vehicleAtStop.Value
 }
 
-func (visit *XMLMonitoredStopVisit) Monitored() bool {
-	if !visit.monitored.Defined {
-		visit.monitored.Parse(visit.findStringChildContent("Monitored"))
+func (vj *XMLMonitoredVehicleJourney) Monitored() bool {
+	if !vj.monitored.Defined {
+		vj.monitored.Parse(vj.findStringChildContent("Monitored"))
 	}
-	return visit.monitored.Value
+	return vj.monitored.Value
 }
 
-func (visit *XMLMonitoredStopVisit) MonitoringError() string {
-	if visit.monitoringError == "" {
-		visit.monitoringError = visit.findStringChildContent("MonitoringError")
+func (vj *XMLMonitoredVehicleJourney) MonitoringError() string {
+	if vj.monitoringError == "" {
+		vj.monitoringError = vj.findStringChildContent("MonitoringError")
 	}
-	return visit.monitoringError
+	return vj.monitoringError
 }
 
-func (visit *XMLMonitoredStopVisit) Occupancy() string {
-	if visit.occupancy == "" {
-		visit.occupancy = visit.findStringChildContent("Occupancy")
+func (vj *XMLMonitoredVehicleJourney) Occupancy() string {
+	if vj.occupancy == "" {
+		vj.occupancy = vj.findStringChildContent("Occupancy")
 	}
-	return visit.occupancy
+	return vj.occupancy
 }
 
-func (visit *XMLMonitoredStopVisit) OriginAimedDepartureTime() string {
-	if visit.originAimedDepartureTime == "" {
-		visit.originAimedDepartureTime = visit.findStringChildContent("OriginAimedDepartureTime")
+func (vj *XMLMonitoredVehicleJourney) OriginAimedDepartureTime() string {
+	if vj.originAimedDepartureTime == "" {
+		vj.originAimedDepartureTime = vj.findStringChildContent("OriginAimedDepartureTime")
 	}
-	return visit.originAimedDepartureTime
+	return vj.originAimedDepartureTime
 }
 
-func (visit *XMLMonitoredStopVisit) DestinationAimedArrivalTime() string {
-	if visit.destinationAimedArrivalTime == "" {
-		visit.destinationAimedArrivalTime = visit.findStringChildContent("DestinationAimedArrivalTime")
+func (vj *XMLMonitoredVehicleJourney) DestinationAimedArrivalTime() string {
+	if vj.destinationAimedArrivalTime == "" {
+		vj.destinationAimedArrivalTime = vj.findStringChildContent("DestinationAimedArrivalTime")
 	}
-	return visit.destinationAimedArrivalTime
+	return vj.destinationAimedArrivalTime
 }
 
-func (visit *XMLMonitoredStopVisit) OriginName() string {
-	if visit.originName == "" {
-		visit.originName = visit.findStringChildContent("OriginName")
+func (vj *XMLMonitoredVehicleJourney) OriginName() string {
+	if vj.originName == "" {
+		vj.originName = vj.findStringChildContent("OriginName")
 	}
-	return visit.originName
+	return vj.originName
 }
 
-func (visit *XMLMonitoredStopVisit) ProductCategoryRef() string {
-	if visit.productCategoryRef == "" {
-		visit.productCategoryRef = visit.findStringChildContent("ProductCategoryRef")
+func (vj *XMLMonitoredVehicleJourney) ProductCategoryRef() string {
+	if vj.productCategoryRef == "" {
+		vj.productCategoryRef = vj.findStringChildContent("ProductCategoryRef")
 	}
-	return visit.productCategoryRef
+	return vj.productCategoryRef
 }
 
-func (visit *XMLMonitoredStopVisit) ServiceFeatureRef() string {
-	if visit.serviceFeatureRef == "" {
-		visit.serviceFeatureRef = visit.findStringChildContent("ServiceFeatureRef")
+func (vj *XMLMonitoredVehicleJourney) ServiceFeatureRef() string {
+	if vj.serviceFeatureRef == "" {
+		vj.serviceFeatureRef = vj.findStringChildContent("ServiceFeatureRef")
 	}
-	return visit.serviceFeatureRef
+	return vj.serviceFeatureRef
 }
 
-func (visit *XMLMonitoredStopVisit) TrainNumberRef() string {
-	if visit.trainNumberRef == "" {
-		visit.trainNumberRef = visit.findStringChildContent("TrainNumberRef")
+func (vj *XMLMonitoredVehicleJourney) TrainNumberRef() string {
+	if vj.trainNumberRef == "" {
+		vj.trainNumberRef = vj.findStringChildContent("TrainNumberRef")
 	}
-	return visit.trainNumberRef
+	return vj.trainNumberRef
 }
 
-func (visit *XMLMonitoredStopVisit) VehicleFeature() string {
-	if visit.vehicleFeature == "" {
-		visit.vehicleFeature = visit.findStringChildContent("VehicleFeature")
+func (vj *XMLMonitoredVehicleJourney) VehicleFeature() string {
+	if vj.vehicleFeature == "" {
+		vj.vehicleFeature = vj.findStringChildContent("VehicleFeature")
 	}
-	return visit.vehicleFeature
+	return vj.vehicleFeature
 }
 
-func (visit *XMLMonitoredStopVisit) VehicleJourneyName() string {
-	if visit.vehicleJourneyName == "" {
-		visit.vehicleJourneyName = visit.findStringChildContent("VehicleJourneyName")
+func (vj *XMLMonitoredVehicleJourney) VehicleJourneyName() string {
+	if vj.vehicleJourneyName == "" {
+		vj.vehicleJourneyName = vj.findStringChildContent("VehicleJourneyName")
 	}
-	return visit.vehicleJourneyName
+	return vj.vehicleJourneyName
 }
 
-func (visit *XMLMonitoredStopVisit) VehicleMode() string {
-	if visit.vehicleMode == "" {
-		visit.vehicleMode = visit.findStringChildContent("VehicleMode")
+func (vj *XMLMonitoredVehicleJourney) VehicleMode() string {
+	if vj.vehicleMode == "" {
+		vj.vehicleMode = vj.findStringChildContent("VehicleMode")
 	}
-	return visit.vehicleMode
+	return vj.vehicleMode
 }
 
-func (visit *XMLMonitoredStopVisit) ViaPlaceName() string {
-	if visit.viaPlaceName == "" {
-		visit.viaPlaceName = visit.findStringChildContent("PlaceName")
+func (vj *XMLMonitoredVehicleJourney) ViaPlaceName() string {
+	if vj.viaPlaceName == "" {
+		vj.viaPlaceName = vj.findStringChildContent("PlaceName")
 	}
-	return visit.viaPlaceName
+	return vj.viaPlaceName
 }
 
 // References
 
-func (visit *XMLMonitoredStopVisit) OriginRef() string {
-	if visit.originRef == "" {
-		visit.originRef = visit.findStringChildContent("OriginRef")
+func (vj *XMLMonitoredVehicleJourney) OriginRef() string {
+	if vj.originRef == "" {
+		vj.originRef = vj.findStringChildContent("OriginRef")
 	}
-	return visit.originRef
+	return vj.originRef
 }
 
-func (visit *XMLMonitoredStopVisit) PlaceRef() string {
-	if visit.placeRef == "" {
-		visit.placeRef = visit.findStringChildContent("PlaceRef")
+func (vj *XMLMonitoredVehicleJourney) PlaceRef() string {
+	if vj.placeRef == "" {
+		vj.placeRef = vj.findStringChildContent("PlaceRef")
 	}
-	return visit.placeRef
+	return vj.placeRef
 }
 
-func (visit *XMLMonitoredStopVisit) DestinationRef() string {
-	if visit.destinationRef == "" {
-		visit.destinationRef = visit.findStringChildContent("DestinationRef")
+func (vj *XMLMonitoredVehicleJourney) DestinationRef() string {
+	if vj.destinationRef == "" {
+		vj.destinationRef = vj.findStringChildContent("DestinationRef")
 	}
-	return visit.destinationRef
+	return vj.destinationRef
 }
 
-func (visit *XMLMonitoredStopVisit) JourneyPatternRef() string {
-	if visit.journeyPatternRef == "" {
-		visit.journeyPatternRef = visit.findStringChildContent("JourneyPatternRef")
+func (vj *XMLMonitoredVehicleJourney) JourneyPatternRef() string {
+	if vj.journeyPatternRef == "" {
+		vj.journeyPatternRef = vj.findStringChildContent("JourneyPatternRef")
 	}
-	return visit.journeyPatternRef
+	return vj.journeyPatternRef
 }
 
-func (visit *XMLMonitoredStopVisit) RouteRef() string {
-	if visit.routeRef == "" {
-		visit.routeRef = visit.findStringChildContent("RouteRef")
+func (vj *XMLMonitoredVehicleJourney) RouteRef() string {
+	if vj.routeRef == "" {
+		vj.routeRef = vj.findStringChildContent("RouteRef")
 	}
-	return visit.routeRef
+	return vj.routeRef
 }
 
-func (visit *XMLMonitoredStopVisit) OperatorRef() string {
-	if visit.operatorRef == "" {
-		visit.operatorRef = visit.findStringChildContent("OperatorRef")
+func (vj *XMLMonitoredVehicleJourney) OperatorRef() string {
+	if vj.operatorRef == "" {
+		vj.operatorRef = vj.findStringChildContent("OperatorRef")
 	}
-	return visit.operatorRef
+	return vj.operatorRef
+}
+
+func (vj *XMLMonitoredVehicleJourney) Coordinates() string {
+	if vj.coordinates == "" {
+		vj.coordinates = vj.findStringChildContent("Coordinates")
+	}
+	return vj.coordinates
+}
+
+func (vj *XMLMonitoredVehicleJourney) Longitude() string {
+	if vj.longitude == "" {
+		vj.longitude = vj.findStringChildContent("Longitude")
+	}
+	return vj.longitude
+}
+
+func (vj *XMLMonitoredVehicleJourney) Latitude() string {
+	if vj.latitude == "" {
+		vj.latitude = vj.findStringChildContent("Latitude")
+	}
+	return vj.latitude
+}
+
+func (vj *XMLMonitoredVehicleJourney) VehicleRef() string {
+	if vj.vehicleRef == "" {
+		vj.vehicleRef = vj.findStringChildContent("VehicleRef")
+	}
+	return vj.vehicleRef
+}
+
+func (vj *XMLMonitoredVehicleJourney) DriverRef() string {
+	if vj.driverRef == "" {
+		vj.driverRef = vj.findStringChildContent("DriverRef")
+	}
+	return vj.driverRef
+}
+
+func (vj *XMLMonitoredVehicleJourney) SRSName() string {
+	if vj.srsName == "" {
+		vj.srsName = vj.findChildAttribute("VehicleLocation", "srsName")
+	}
+	return vj.srsName
 }
