@@ -53,6 +53,7 @@ type Partners interface {
 
 type PartnerStatus struct {
 	OperationnalStatus OperationnalStatus
+	RetryCount         int
 	ServiceStartedAt   time.Time
 }
 
