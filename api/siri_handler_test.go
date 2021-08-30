@@ -12,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -59,10 +60,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 		"siri-lines-discovery-request-broadcaster",
 	}
 	partner.RefreshConnectors()
-	siriPartner := core.NewSIRIPartner(partner)
-
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	partner.Context().SetValue(core.SIRI_PARTNER, siriPartner)
 
 	partner.Save()
 	referential.Save()
@@ -72,7 +70,7 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	return server, referential
 }
 
-func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
+func siriHandler_Request(server *Server, soapEnvelope *remote.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
 	clock.SetDefaultClock(clock.NewFakeClock())
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
@@ -105,7 +103,7 @@ func siriHandler_Request(server *Server, soapEnvelope *siri.SOAPEnvelopeBuffer, 
 
 func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
@@ -196,7 +194,7 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
 		"Ara",
@@ -285,7 +283,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 func Test_SIRIHandler_SiriService(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")
 	if err != nil {
@@ -369,7 +367,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
 	// responseRecorder.Body.String()
-	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -479,7 +477,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 
 	file, err := os.Open("testdata/notify-stop-monitoring.xml")
 	if err != nil {
@@ -519,7 +517,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 }
 
 func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 
 	file, err := os.Open("../siri/testdata/notify-general-message.xml")
 	if err != nil {
@@ -547,7 +545,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 }
 
 func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 
 	file, err := os.Open("testdata/estimated_timetable_request.xml")
 	if err != nil {
@@ -634,7 +632,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
-	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -711,7 +709,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 }
 
 func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 
 	file, err := os.Open("testdata/lines-discovery-request.xml")
 	if err != nil {
@@ -743,7 +741,7 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 
 	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
 
-	envelope, err := siri.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -58,7 +58,7 @@ Feature: Support GTFS-RT feeds
       | trip_id    | 2345 |
       | route_id   | 1234 |
 
-  # See ARA-872
+  @ARA-872
   Scenario: Retrieve Vehicle Positions with unmatching objectid kind
     Given a Line exists with the following attributes:
       | Name      | Test               |
@@ -76,7 +76,7 @@ Feature: Support GTFS-RT feeds
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should not contain Vehicle Positions
 
-  # See ARA-872
+  @ARA-872
   Scenario: Retrieve Vehicle Positions with setting gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind
     Given a Line exists with the following attributes:
       | Name      | Test               |

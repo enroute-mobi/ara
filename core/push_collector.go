@@ -18,7 +18,7 @@ type PushCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	BaseConnector
+	connector
 
 	subscriber UpdateSubscriber
 }

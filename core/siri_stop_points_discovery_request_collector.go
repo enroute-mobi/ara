@@ -20,7 +20,7 @@ type SIRIStopPointsDiscoveryRequestCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	stopAreaUpdateSubscriber UpdateSubscriber
 }
@@ -67,13 +67,13 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 
 	request := &siri.SIRIStopPointsDiscoveryRequest{
 		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
-		RequestorRef:      connector.SIRIPartner().RequestorRef(),
+		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
 	}
 
 	logSIRIStopPointsDiscoveryRequest(logStashEvent, message, request)
 
-	response, err := connector.SIRIPartner().SOAPClient().StopDiscovery(request)
+	response, err := connector.Partner().SOAPClient().StopDiscovery(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

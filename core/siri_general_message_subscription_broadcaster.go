@@ -16,7 +16,7 @@ type SIRIGeneralMessageSubscriptionBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
 	toBroadcast               map[SubscriptionId][]model.SituationId
@@ -129,6 +129,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
+			sub.SubscriberRef = gm.SubscriberRef()
 			sub.SetExternalId(gm.SubscriptionIdentifier())
 		}
 

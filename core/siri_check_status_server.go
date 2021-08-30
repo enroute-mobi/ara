@@ -16,7 +16,7 @@ type CheckStatusServer interface {
 type SIRICheckStatusServer struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRICheckStatusServerFactory struct{}

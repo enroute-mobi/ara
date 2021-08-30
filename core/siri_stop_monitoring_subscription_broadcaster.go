@@ -18,7 +18,7 @@ type SIRIStopMonitoringSubscriptionBroadcaster struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 	toBroadcast               map[SubscriptionId][]model.StopVisitId
@@ -219,6 +219,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
 		if !ok {
 			sub = connector.Partner().Subscriptions().New("StopMonitoringBroadcast")
+			sub.SubscriberRef = sm.SubscriberRef()
 			sub.SetExternalId(sm.SubscriptionIdentifier())
 		}
 

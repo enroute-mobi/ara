@@ -35,6 +35,7 @@ const (
 	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER  = "siri-lite-vehicle-monitoring-request-broadcaster"
 	TEST_VALIDATION_CONNECTOR                         = "test-validation-connector"
 	TEST_STARTABLE_CONNECTOR                          = "test-startable-connector-connector"
+	GTFS_RT_REQUEST_COLLECTOR                         = "gtfs-rt-request-collector"
 	GTFS_RT_TRIP_UPDATES_BROADCASTER                  = "gtfs-rt-trip-updates-broadcaster"
 	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER             = "gtfs-rt-vehicle-positions-broadcaster"
 )
@@ -45,23 +46,12 @@ type GtfsConnector interface {
 	HandleGtfs(*gtfs.FeedMessage, audit.LogStashEvent)
 }
 
-type BaseConnector struct {
+type connector struct {
 	partner *Partner
 }
 
-func (connector *BaseConnector) Partner() *Partner {
-	return connector.partner
-}
-
-type siriConnector struct {
-	BaseConnector
-}
-
-func (connector *siriConnector) SIRIPartner() *SIRIPartner {
-	if !connector.Partner().Context().IsDefined(SIRI_PARTNER) {
-		connector.Partner().Context().SetValue(SIRI_PARTNER, NewSIRIPartner(connector.Partner()))
-	}
-	return connector.Partner().Context().Value(SIRI_PARTNER).(*SIRIPartner)
+func (c *connector) Partner() *Partner {
+	return c.partner
 }
 
 type ConnectorFactory interface {
@@ -119,6 +109,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER:
 		return &SIRILiteVehicleMonitoringRequestBroadcasterFactory{}
+	case GTFS_RT_REQUEST_COLLECTOR:
+		return &GtfsRequestCollectorFactory{}
 	case GTFS_RT_TRIP_UPDATES_BROADCASTER:
 		return &TripUpdatesBroadcasterFactory{}
 	case GTFS_RT_VEHICLE_POSITIONS_BROADCASTER:

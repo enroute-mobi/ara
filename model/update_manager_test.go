@@ -2,6 +2,52 @@ package model
 
 import "testing"
 
+func Test_UpdateManager_CreateStopVisit(t *testing.T) {
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &StopVisitUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+	}
+
+	manager.Update(event)
+	updatedStopVisit, ok := model.StopVisits().FindByObjectId(objectid)
+	if !ok {
+		t.Fatalf("StopVisit should be created")
+	}
+	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
+		t.Errorf("StopVisit DepartureStatus should be updated")
+	}
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
+		t.Errorf("StopVisit ArrivalStatus should be updated")
+	}
+	if !updatedStopVisit.IsCollected() {
+		t.Errorf("StopVisit ArrivalStatus should be collected")
+	}
+	updatedStopArea, _ := model.StopAreas().Find(sa.Id())
+	if !updatedStopArea.LineIds.Contains(l.Id()) {
+		t.Errorf("StopArea LineIds should be updated")
+	}
+}
+
 func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
 	objectid := NewObjectID("kind", "value")
@@ -27,6 +73,91 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 	event := &StopVisitUpdateEvent{
 		ObjectId:               objectid,
 		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+	}
+
+	manager.Update(event)
+	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
+	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
+		t.Errorf("StopVisit DepartureStatus should be updated")
+	}
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ONTIME {
+		t.Errorf("StopVisit ArrivalStatus should be updated")
+	}
+	if !updatedStopVisit.IsCollected() {
+		t.Errorf("StopVisit ArrivalStatus should be collected")
+	}
+	updatedStopArea, _ := model.StopAreas().Find(sa.Id())
+	if !updatedStopArea.LineIds.Contains(l.Id()) {
+		t.Errorf("StopArea LineIds should be updated")
+	}
+}
+
+func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
+	emptyObjectid := NewObjectID("kind", "")
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &StopVisitUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       emptyObjectid,
+		VehicleJourneyObjectId: objectid,
+		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+	}
+
+	manager.Update(event)
+	_, ok := model.StopVisits().FindByObjectId(objectid)
+	if ok {
+		t.Fatalf("StopVisit should not be created")
+	}
+}
+
+func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
+	emptyObjectid := NewObjectID("kind", "")
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.SetObjectID(objectid)
+	stopVisit.StopAreaId = sa.Id()
+	stopVisit.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &StopVisitUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       emptyObjectid,
 		VehicleJourneyObjectId: objectid,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,

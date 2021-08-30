@@ -14,7 +14,7 @@ import (
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRIStopPointsDiscoveryRequestBroadcasterFactory struct{}

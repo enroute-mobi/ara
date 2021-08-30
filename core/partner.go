@@ -13,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -57,11 +58,19 @@ type PartnerStatus struct {
 	ServiceStartedAt   time.Time
 }
 
+type PartnerStatusCheck struct {
+	LastCheck time.Time
+	Status    OperationnalStatus
+}
+
 type Partner struct {
 	uuid.UUIDConsumer
 	PartnerSettings
 
 	mutex *sync.RWMutex
+
+	manager             Partners
+	subscriptionManager Subscriptions
 
 	id            PartnerId
 	slug          PartnerSlug
@@ -71,14 +80,13 @@ type Partner struct {
 	ConnectorTypes []string
 	// Settings       map[string]string
 
-	connectors          map[string]Connector
-	discoveredStopAreas map[string]struct{}
-	startedAt           time.Time
-	lastDiscovery       time.Time
-	lastPush            time.Time
-	context             Context
-	subscriptionManager Subscriptions
-	manager             Partners
+	connectors             map[string]Connector
+	discoveredStopAreas    map[string]struct{}
+	startedAt              time.Time
+	lastDiscovery          time.Time
+	alternativeStatusCheck PartnerStatusCheck
+
+	httpClient *remote.HTTPClient
 
 	gtfsCache *cache.CacheTable
 }
@@ -221,7 +229,6 @@ func NewPartner() *Partner {
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
-		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
@@ -261,12 +268,27 @@ func (partner *Partner) GtfsCache() *cache.CacheTable {
 	return partner.gtfsCache
 }
 
-func (partner *Partner) OperationnalStatus() OperationnalStatus {
-	return partner.PartnerStatus.OperationnalStatus
+func (partner *Partner) HTTPClient() *remote.HTTPClient {
+	urls := remote.HTTPClientUrls{
+		Url:              partner.Setting(REMOTE_URL),
+		SubscriptionsUrl: partner.Setting(SUBSCRIPTIONS_REMOTE_URL),
+		NotificationsUrl: partner.Setting(NOTIFICATIONS_REMOTE_URL),
+	}
+	if partner.httpClient == nil {
+		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, urls.Url)
+		partner.httpClient = remote.NewHTTPClient(urls)
+	} else if partner.httpClient.HTTPClientUrls != urls {
+		partner.httpClient.SetURLs(urls)
+	}
+	return partner.httpClient
 }
 
-func (partner *Partner) Context() *Context {
-	return &partner.context
+func (partner *Partner) SOAPClient() *remote.SOAPClient {
+	return partner.HTTPClient().SOAPClient()
+}
+
+func (partner *Partner) OperationnalStatus() OperationnalStatus {
+	return partner.PartnerStatus.OperationnalStatus
 }
 
 func (partner *Partner) Save() (ok bool) {
@@ -315,7 +337,8 @@ func (partner *Partner) Stop() {
 func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
 	partner.lastDiscovery = time.Time{}
-	partner.lastPush = time.Time{}
+	partner.alternativeStatusCheck.LastCheck = time.Time{}
+	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(state.Startable)
@@ -492,17 +515,36 @@ func (partner *Partner) hasPushCollector() (ok bool) {
 	return ok
 }
 
+func (partner *Partner) hasGtfsCollector() (ok bool) {
+	_, ok = partner.connectors[GTFS_RT_REQUEST_COLLECTOR]
+	return ok
+}
+
+func (partner *Partner) alternativeStatusConnector() string {
+	if partner.hasPushCollector() {
+		return "push"
+	}
+	if partner.hasGtfsCollector() {
+		return "gtfs"
+	}
+	return "none"
+}
+
 func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
 	partnerStatus := PartnerStatus{}
 
 	if partner.CheckStatusClient() == nil {
-		if !partner.hasPushCollector() {
-			logger.Log.Debugf("No CheckStatusClient or PushCollector connector for partner %v", partner.slug)
+		switch partner.alternativeStatusConnector() {
+		case "push":
+			return partner.checkPushStatus()
+		case "gtfs":
+			return partner.checkGtfsStatus()
+		default:
+			logger.Log.Debugf("Can't define Status for partner %v", partner.slug)
 			partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
-			return partnerStatus, errors.New("no CheckStatusClient or PushCollector connector")
+			return partnerStatus, errors.New("no way to define status")
 		}
-		return partner.checkPushStatus()
 	}
 	partnerStatus, err := partner.CheckStatusClient().Status()
 
@@ -515,10 +557,21 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 
 func (partner *Partner) checkPushStatus() (partnerStatus PartnerStatus, _ error) {
 	logger.Log.Debugf("Checking %v partner status with PushNotifications", partner.slug)
-	if partner.lastPush.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
+	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
 	} else {
 		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
+	}
+	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
+	return partnerStatus, nil
+}
+
+func (partner *Partner) checkGtfsStatus() (partnerStatus PartnerStatus, _ error) {
+	logger.Log.Debugf("Checking %v partner status with Gtfs collect", partner.slug)
+	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+	} else {
+		partnerStatus.OperationnalStatus = partner.alternativeStatusCheck.Status
 	}
 	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
@@ -566,7 +619,12 @@ func (partner *Partner) stopDiscovery() {
 }
 
 func (partner *Partner) Pushed() {
-	partner.lastPush = partner.manager.Referential().Clock().Now()
+	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
+}
+
+func (partner *Partner) GtfsStatus(s OperationnalStatus) {
+	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
+	partner.alternativeStatusCheck.Status = s
 }
 
 func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
@@ -624,7 +682,6 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		// Settings:            make(map[string]string),
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
-		context:             make(Context),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},

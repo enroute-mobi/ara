@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go v0.71.0
 	cloud.google.com/go/bigquery v1.13.0
 	github.com/Joker/jade v1.0.0 // indirect
-	github.com/MobilityData/gtfs-realtime-bindings v0.0.0-20191010155923-84afb4d32b79
+	github.com/MobilityData/gtfs-realtime-bindings v0.0.0-20210408151248-9354c5073bad
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
 	github.com/gavv/monotime v0.0.0-20190418164738-30dba4353424 // indirect
 	github.com/getsentry/sentry-go v0.10.0 // indirect
@@ -29,6 +29,7 @@ require (
 	golang.org/dl v0.0.0-20200724191219-e4fbcf8a7a81 // indirect
 	golang.org/x/text v0.3.3
 	google.golang.org/api v0.34.0
+	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gorp.v1 v1.7.1
 	gopkg.in/yaml.v2 v2.2.4

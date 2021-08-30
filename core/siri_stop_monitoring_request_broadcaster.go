@@ -20,7 +20,7 @@ type StopMonitoringRequestBroadcaster interface {
 type SIRIStopMonitoringRequestBroadcaster struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRIStopMonitoringRequestBroadcasterFactory struct{}

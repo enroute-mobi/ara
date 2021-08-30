@@ -445,7 +445,6 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 	}
 
 	response, _ := siri.NewXMLSubscriptionTerminatedNotificationFromContent(content)
-	connectors := make(map[string]Connector)
 
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
@@ -455,23 +454,22 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 	})
 
 	connector := NewSIRISubscriptionRequestDispatcher(partner)
-	connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
-
+	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
 
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
+	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
 		t.Fatalf("Subscriptions should be found")
 	}
 
 	connector.HandleSubscriptionTerminatedNotification(response)
 
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
+	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
 		t.Errorf("Subscriptions should not be found")
 	}
 }
@@ -488,9 +486,9 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 	}
 
 	response, _ := siri.NewXMLNotifySubscriptionTerminatedFromContent(content)
-	connectors := make(map[string]Connector)
 
 	partners := createTestPartnerManager()
+
 	partner := partners.New("slug")
 	partner.SetSettingsDefinition(map[string]string{
 		"remote_url":           "une url",
@@ -498,23 +496,23 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 	})
 
 	connector := NewSIRISubscriptionRequestDispatcher(partner)
-	connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
+	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
 	subscription.Save()
 
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
+	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
 		t.Fatalf("Subscriptions should be found")
 	}
 
 	connector.HandleNotifySubscriptionTerminated(response)
 
-	if _, ok := connector.partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
+	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); ok {
 		t.Errorf("Subscriptions should not be found")
 	}
 }

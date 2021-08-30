@@ -76,13 +76,53 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	}
 
 	// Push collector but recent collect
-	partner.lastPush = clock.DefaultClock().Now()
+	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
 
 	ps, err = partner.CheckStatus()
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
 	if expected := OPERATIONNAL_STATUS_UP; ps.OperationnalStatus != expected {
+		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
+	}
+}
+
+func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
+	partners := createTestPartnerManager()
+	partner := partners.New("slug")
+	partner.SetSettingsDefinition(map[string]string{
+		"local_credential":     "loc",
+		"remote_objectid_kind": "_internal",
+	})
+	partner.ConnectorTypes = []string{GTFS_RT_REQUEST_COLLECTOR}
+	partners.Save(partner)
+
+	// No Connectors
+	ps, err := partner.CheckStatus()
+	if err == nil {
+		t.Fatalf("should have an error when partner doesn't have any connectors")
+	}
+
+	// Push collector but old collect
+	partner.RefreshConnectors()
+
+	ps, err = partner.CheckStatus()
+	if err != nil {
+		t.Fatalf("should not have an error during checkstatus: %v", err)
+	}
+	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
+	}
+
+	// Push collector but recent collect
+	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
+	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
+
+	ps, err = partner.CheckStatus()
+	if err != nil {
+		t.Fatalf("should not have an error during checkstatus: %v", err)
+	}
+	if expected := OPERATIONNAL_STATUS_UNKNOWN; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
@@ -783,4 +823,39 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 	if expected := "rsaid"; midGenerator.formatString != expected {
 		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
 	}
+}
+
+func Test_Partner_SOAPClient(t *testing.T) {
+	partner := &Partner{
+		slug: "partner",
+	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.SOAPClient()
+	if partner.httpClient == nil {
+		t.Error("partner.SOAPClient() should set Partner httpClient")
+	}
+
+	partner.SetSetting("remote_url", "remote_url")
+	partner.SOAPClient()
+	if partner.httpClient.Url != "remote_url" {
+		t.Error("Partner should have created a new SoapClient when partner setting changes")
+	}
+
+	partner.SetSetting("subscriptions.remote_url", "sub_remote_url")
+	partner.SOAPClient()
+	if partner.httpClient.SubscriptionsUrl != "sub_remote_url" {
+		t.Error("Partner should have created a new SoapClient when partner setting changes")
+	}
+}
+
+func Test_Partner_RequestorRef(t *testing.T) {
+	partner := &Partner{
+		slug: "partner",
+	}
+	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.SetSetting("remote_credential", "ara")
+	if partner.RequestorRef() != "ara" {
+		t.Errorf("Wrong Partner RequestorRef:\n got: %s\n want: \"ara\"", partner.RequestorRef())
+	}
+
 }

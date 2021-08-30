@@ -24,7 +24,7 @@ type SIRISubscriptionRequestDispatcher struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 }
 
 func (factory *SIRISubscriptionRequestDispatcherFactory) Validate(apiPartner *APIPartner) {
@@ -51,7 +51,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 
 	response := siri.SIRISubscriptionResponse{
 		Address:            connector.Partner().Address(),
-		ResponderRef:       connector.SIRIPartner().RequestorRef(),
+		ResponderRef:       connector.Partner().RequestorRef(),
 		ResponseTimestamp:  connector.Clock().Now(),
 		RequestMessageRef:  request.MessageIdentifier(),
 		ServiceStartedTime: connector.Partner().Referential().StartedAt(),
@@ -113,7 +113,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 
 	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
-		ResponderRef:      connector.SIRIPartner().RequestorRef(),
+		ResponderRef:      connector.Partner().RequestorRef(),
 		RequestMessageRef: r.MessageIdentifier(),
 		ResponseTimestamp: currentTime,
 	}

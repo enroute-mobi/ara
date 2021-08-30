@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -40,7 +41,7 @@ func (handler *SIRISubscribeRequestHandler) Respond(connector core.Connector, rw
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
 	n, err := soapEnvelope.WriteTo(rw)

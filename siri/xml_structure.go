@@ -67,6 +67,11 @@ type XMLStructure struct {
 	node XMLNode
 }
 
+// Test Method
+func (xmlStruct *XMLStructure) Node() XMLNode {
+	return xmlStruct.node
+}
+
 type RequestXMLStructure struct {
 	LightRequestXMLStructure
 

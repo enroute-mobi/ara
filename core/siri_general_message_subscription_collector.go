@@ -27,7 +27,7 @@ type SIRIGeneralMessageSubscriptionCollector struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 
 	generalMessageSubscriber  SIRIGeneralMessageSubscriber
 	situationUpdateSubscriber SituationUpdateSubscriber
@@ -157,7 +157,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "GeneralMessageSubscriptionCollector")
 	startTime := connector.Clock().Now()
-	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
+	response, err := connector.Partner().SOAPClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
 	logStashEvent["responseTime"] = responseTime.String()

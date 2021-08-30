@@ -43,6 +43,10 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 }
 
 func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
+	if event.ObjectId.Value() == "" { // Avoid creating a StopArea with an empty objectid
+		return
+	}
+
 	tx := manager.transactionProvider.NewTransaction()
 
 	stopArea, found := tx.Model().StopAreas().FindByObjectId(event.ObjectId)
@@ -92,6 +96,10 @@ func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, par
 }
 
 func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
+	if event.ObjectId.Value() == "" { // Avoid creating a Line with an empty objectid
+		return
+	}
+
 	tx := manager.transactionProvider.NewTransaction()
 
 	line, found := tx.Model().Lines().FindByObjectId(event.ObjectId)
@@ -116,6 +124,10 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 }
 
 func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEvent) {
+	if event.ObjectId.Value() == "" { // Avoid creating a VehicleJourney with an empty objectid
+		return
+	}
+
 	tx := manager.transactionProvider.NewTransaction()
 
 	vj, found := tx.Model().VehicleJourneys().FindByObjectId(event.ObjectId)
@@ -158,18 +170,51 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 }
 
 func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
-	tx := manager.transactionProvider.NewTransaction()
-
-	sa, ok := tx.Model().StopAreas().FindByObjectId(event.StopAreaObjectId)
-	if !ok {
-		logger.Log.Debugf("StopVisit update event without corresponding stop area: %v", event.StopAreaObjectId.String())
+	if event.ObjectId.Value() == "" { // Avoid creating a StopVisit with an empty objectid
 		return
 	}
+
+	tx := manager.transactionProvider.NewTransaction()
 
 	vj, ok := tx.Model().VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
 	if !ok {
 		logger.Log.Debugf("StopVisit update event without corresponding vehicle journey: %v", event.VehicleJourneyObjectId.String())
 		return
+	}
+
+	var sa StopArea
+	var sv StopVisit
+	if event.StopAreaObjectId.Value() == "" {
+		sv, ok = tx.Model().StopVisits().FindByObjectId(event.ObjectId)
+		if !ok {
+			logger.Log.Debugf("Can't find Stopvisit from update event without stop area id")
+			return
+		}
+		sa = sv.StopArea()
+	} else {
+		sa, ok = tx.Model().StopAreas().FindByObjectId(event.StopAreaObjectId)
+		if !ok {
+			logger.Log.Debugf("StopVisit update event without corresponding stop area: %v", event.StopAreaObjectId.String())
+			return
+		}
+
+		sv, ok = tx.Model().StopVisits().FindByObjectId(event.ObjectId)
+		if !ok {
+			sv = tx.Model().StopVisits().New()
+
+			sv.SetObjectID(event.ObjectId)
+			sv.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+
+			sv.StopAreaId = sa.Id()
+			sv.VehicleJourneyId = vj.Id()
+
+			sv.Origin = event.Origin
+			sv.PassageOrder = event.PassageOrder
+			sv.DataFrameRef = event.DataFrameRef
+
+			sv.Attributes = event.Attributes()
+			sv.References = event.References()
+		}
 	}
 
 	// Update StopArea Lines
@@ -182,24 +227,6 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			tx.Model().StopAreas().Save(&referent)
 		}
 		tx.Model().StopAreas().Save(&sa)
-	}
-
-	sv, found := tx.Model().StopVisits().FindByObjectId(event.ObjectId)
-	if !found {
-		sv = tx.Model().StopVisits().New()
-
-		sv.SetObjectID(event.ObjectId)
-		sv.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
-
-		sv.StopAreaId = sa.Id()
-		sv.VehicleJourneyId = vj.Id()
-
-		sv.Origin = event.Origin
-		sv.PassageOrder = event.PassageOrder
-		sv.DataFrameRef = event.DataFrameRef
-
-		sv.Attributes = event.Attributes()
-		sv.References = event.References()
 	}
 
 	if !event.RecordedAt.IsZero() {

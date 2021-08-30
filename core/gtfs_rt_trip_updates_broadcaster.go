@@ -21,7 +21,7 @@ const (
 type TripUpdatesBroadcaster struct {
 	clock.ClockConsumer
 
-	BaseConnector
+	connector
 
 	cache *cache.CachedItem
 }

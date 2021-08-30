@@ -17,7 +17,7 @@ type ServiceRequestBroadcaster interface {
 type SIRIServiceRequestBroadcaster struct {
 	clock.ClockConsumer
 
-	siriConnector
+	connector
 }
 
 type SIRIServiceRequestBroadcasterFactory struct{}

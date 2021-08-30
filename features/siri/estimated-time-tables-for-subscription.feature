@@ -92,6 +92,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimeTableBroadcast           |
       | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -138,8 +139,8 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
         <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
@@ -216,6 +217,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | broadcast.no_destinationref_rewriting_from | NoRewriteOrigin       |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimeTableBroadcast           |
+      | SubscriberRef     | subscriber                            |
       | ExternalId        | externalId                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a StopArea exists with the following attributes:
@@ -264,8 +266,8 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-      <siri:SubscriptionRef></siri:SubscriptionRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
         <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>

@@ -113,7 +113,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 			}
 
 			delivery := &siri.SIRINotifyStopMonitoringDelivery{
-				SubscriberRef:          smb.connector.SIRIPartner().SubscriberRef(),
+				SubscriberRef:          sub.SubscriberRef,
 				SubscriptionIdentifier: sub.ExternalId(),
 				RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
 				ResponseTimestamp:      smb.connector.Clock().Now(),
@@ -227,7 +227,7 @@ func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStop
 			MonitoringRef:          monitoringRef,
 			RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
 			ResponseTimestamp:      smb.connector.Clock().Now(),
-			SubscriberRef:          smb.connector.SIRIPartner().SubscriberRef(),
+			SubscriberRef:          sub.SubscriberRef,
 			SubscriptionIdentifier: sub.ExternalId(),
 			Status:                 true,
 		}
@@ -283,7 +283,7 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 
 	t := smb.Clock().Now()
 
-	err := smb.connector.SIRIPartner().SOAPClient().NotifyStopMonitoring(notify)
+	err := smb.connector.Partner().SOAPClient().NotifyStopMonitoring(notify)
 	message.ProcessingTime = smb.Clock().Since(t).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)

@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -37,7 +38,7 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(connector core.Connecto
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := siri.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
 	n, err := soapEnvelope.WriteTo(rw)

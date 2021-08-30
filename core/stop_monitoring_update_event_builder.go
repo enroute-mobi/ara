@@ -15,16 +15,7 @@ type StopMonitoringUpdateEventBuilder struct {
 	partner                *Partner
 	remoteObjectidKind     string
 
-	stopMonitoringUpdateEvents *StopMonitoringUpdateEvents
-}
-
-type StopMonitoringUpdateEvents struct {
-	StopAreas       map[string]*model.StopAreaUpdateEvent
-	Lines           map[string]*model.LineUpdateEvent
-	VehicleJourneys map[string]*model.VehicleJourneyUpdateEvent
-	StopVisits      map[string]map[string]*model.StopVisitUpdateEvent
-	Cancellations   []*model.NotCollectedUpdateEvent
-	MonitoringRefs  map[string]struct{}
+	stopMonitoringUpdateEvents *CollectUpdateEvents
 }
 
 func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) StopMonitoringUpdateEventBuilder {
@@ -32,17 +23,7 @@ func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectI
 		originStopAreaObjectId:     originStopAreaObjectId,
 		partner:                    partner,
 		remoteObjectidKind:         partner.Setting(REMOTE_OBJECTID_KIND),
-		stopMonitoringUpdateEvents: newStopMonitoringUpdateEvents(),
-	}
-}
-
-func newStopMonitoringUpdateEvents() *StopMonitoringUpdateEvents {
-	return &StopMonitoringUpdateEvents{
-		StopAreas:       make(map[string]*model.StopAreaUpdateEvent),
-		Lines:           make(map[string]*model.LineUpdateEvent),
-		VehicleJourneys: make(map[string]*model.VehicleJourneyUpdateEvent),
-		StopVisits:      make(map[string]map[string]*model.StopVisitUpdateEvent),
-		MonitoringRefs:  make(map[string]struct{}),
+		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }
 
@@ -161,6 +142,6 @@ func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(
 	}
 }
 
-func (builder *StopMonitoringUpdateEventBuilder) UpdateEvents() StopMonitoringUpdateEvents {
+func (builder *StopMonitoringUpdateEventBuilder) UpdateEvents() CollectUpdateEvents {
 	return *builder.stopMonitoringUpdateEvents
 }

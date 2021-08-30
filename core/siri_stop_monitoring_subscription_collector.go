@@ -27,7 +27,7 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	stopMonitoringSubscriber SIRIStopMonitoringSubscriber
 	updateSubscriber         UpdateSubscriber
@@ -188,7 +188,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
 
 	startTime := connector.Clock().Now()
-	response, err := connector.SIRIPartner().SOAPClient().DeleteSubscription(request)
+	response, err := connector.Partner().SOAPClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
 	logStashEvent["responseTime"] = responseTime.String()
@@ -206,7 +206,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *StopMonitoringUpdateEvents) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
 	if connector.updateSubscriber == nil {
 		return
 	}

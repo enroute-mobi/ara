@@ -109,7 +109,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			Address:                   gmb.connector.Partner().Address(),
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
-			SubscriberRef:             gmb.connector.SIRIPartner().SubscriberRef(),
+			SubscriberRef:             sub.SubscriberRef,
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
 			Status:                    true,
@@ -150,7 +150,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			audit.CurrentLogStash().WriteEvent(logStashEvent)
 			t := gmb.Clock().Now()
 
-			err := gmb.connector.SIRIPartner().SOAPClient().NotifyGeneralMessage(&notify)
+			err := gmb.connector.Partner().SOAPClient().NotifyGeneralMessage(&notify)
 			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
 			if err != nil {
 				event := gmb.newLogStashEvent()
