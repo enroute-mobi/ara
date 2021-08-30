@@ -8,7 +8,8 @@ end
 
 
 Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
-  RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response = RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  debug response.body
 end
 
 When(/^a StopVisit is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|

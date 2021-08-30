@@ -8,7 +8,7 @@ end
 
 Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
   response = RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # puts response
+  debug response.body
 end
 
 When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|

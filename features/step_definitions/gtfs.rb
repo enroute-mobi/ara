@@ -25,3 +25,10 @@ Then('this GTFS-RT response should not contain Vehicle Positions') do
   debug @gtfs_response.vehicle_positions.inspect
   expect(@gtfs_response.vehicle_positions).to be_empty
 end
+
+Given(/^a GTFS-RT server (?:"([^"]*)" )?waits request on "([^"]*)" to respond with$/) do |name, url, response|
+  name ||= "default"
+  # response = response.strip
+  puts response
+  GtfsServer.create(name, url).expect_request(response).start
+end
