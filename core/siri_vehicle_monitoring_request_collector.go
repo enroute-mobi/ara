@@ -18,7 +18,7 @@ type SIRIVehicleMonitoringRequestCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	updateSubscriber UpdateSubscriber
 }
@@ -57,7 +57,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 	startTime := connector.Clock().Now()
 
 	siriVehicleMonitoringRequest := &siri.SIRIGetVehicleMonitoringRequest{
-		RequestorRef: connector.SIRIPartner().RequestorRef(),
+		RequestorRef: connector.Partner().RequestorRef(),
 	}
 	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriVehicleMonitoringRequest.LineRef = objectid.Value()
@@ -65,7 +65,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 
 	logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
 
-	xmlVehicleMonitoringResponse, err := connector.SIRIPartner().SOAPClient().VehicleMonitoring(siriVehicleMonitoringRequest)
+	xmlVehicleMonitoringResponse, err := connector.Partner().SOAPClient().VehicleMonitoring(siriVehicleMonitoringRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
 		e := fmt.Sprintf("Error during VehicleMonitoring request: %v", err)

@@ -19,7 +19,7 @@ type SIRIVehicleMonitoringSubscriptionCollector struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	siriConnector
+	connector
 
 	// vehicleMonitoringSubscriber SIRIVehicleMonitoringSubscriber
 	// updateSubscriber            UpdateSubscriber
