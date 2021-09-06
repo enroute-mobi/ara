@@ -123,8 +123,6 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 func (guardian *ModelGuardian) refreshLines() {
 	defer monitoring.HandlePanic()
 
-	logger.Log.Printf("Log ze lines")
-
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
