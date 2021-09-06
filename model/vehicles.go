@@ -29,9 +29,9 @@ type Vehicle struct {
 	Latitude    float64 `json:",omitempty"`
 
 	Bearing        float64   `json:",omitempty"`
+	LinkDistance   float64   `json:",omitempty"`
+	Percentage     float64   `json:",omitempty"`
 	DriverRef      string    `json:",omitempty"`
-	LinkDistance   string    `json:",omitempty"`
-	Percentage     string    `json:",omitempty"`
 	ValidUntilTime time.Time `json:",omitempty"`
 
 	RecordedAtTime time.Time

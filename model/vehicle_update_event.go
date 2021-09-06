@@ -10,8 +10,8 @@ type VehicleUpdateEvent struct {
 	SRSName                string
 	Coordinates            string
 	DriverRef              string
-	LinkDistance           string
-	Percentage             string
+	LinkDistance           float64
+	Percentage             float64
 	Longitude              float64
 	Latitude               float64
 	Bearing                float64

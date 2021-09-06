@@ -107,6 +107,8 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
 		latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
 		bearing, _ := strconv.ParseFloat(xmlVehicleActivity.Bearing(), 64)
+		linkDistance, _ := strconv.ParseFloat(xmlVehicleActivity.LinkDistance(), 64)
+		percentage, _ := strconv.ParseFloat(xmlVehicleActivity.Percentage(), 64)
 
 		vEvent := &model.VehicleUpdateEvent{
 			Origin:                 origin,
@@ -118,8 +120,8 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Longitude:              longitude,
 			Latitude:               latitude,
 			Bearing:                bearing,
-			LinkDistance:           xmlVehicleActivity.LinkDistance(),
-			Percentage:             xmlVehicleActivity.Percentage(),
+			LinkDistance:           linkDistance,
+			Percentage:             percentage,
 			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
 		}
 
