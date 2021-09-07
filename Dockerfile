@@ -5,7 +5,7 @@
 FROM golang:1.16 AS builder
 ARG VERSION=dev
 
-ENV DEV_PACKAGES="libxml2-dev"
+ENV DEV_PACKAGES="libxml2-dev libproj-dev"
 RUN apt-get update && apt-get -y install --no-install-recommends $DEV_PACKAGES
 
 WORKDIR /go/src/bitbucket.org/enroute-mobi/ara

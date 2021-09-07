@@ -1,12 +1,15 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/everystreet/go-proj/v6/proj"
 )
 
 type VehicleMonitoringUpdateEventBuilder struct {
@@ -104,8 +107,6 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	_, ok = builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.VehicleRef()]
 	if !ok {
 		vObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlVehicleActivity.VehicleRef())
-		longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
-		latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
 		bearing, _ := strconv.ParseFloat(xmlVehicleActivity.Bearing(), 64)
 		linkDistance, _ := strconv.ParseFloat(xmlVehicleActivity.LinkDistance(), 64)
 		percentage, _ := strconv.ParseFloat(xmlVehicleActivity.Percentage(), 64)
@@ -114,20 +115,63 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Origin:                 origin,
 			ObjectId:               vObjectId,
 			VehicleJourneyObjectId: vjObjectId,
-			SRSName:                xmlVehicleActivity.SRSName(),
-			Coordinates:            xmlVehicleActivity.Coordinates(),
-			DriverRef:              xmlVehicleActivity.DriverRef(),
-			Longitude:              longitude,
-			Latitude:               latitude,
-			Bearing:                bearing,
-			LinkDistance:           linkDistance,
-			Percentage:             percentage,
-			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
+			// SRSName:                xmlVehicleActivity.SRSName(),
+			// Coordinates:            xmlVehicleActivity.Coordinates(),
+			DriverRef:      xmlVehicleActivity.DriverRef(),
+			Bearing:        bearing,
+			LinkDistance:   linkDistance,
+			Percentage:     percentage,
+			ValidUntilTime: xmlVehicleActivity.ValidUntilTime(),
+		}
+
+		coord, err := builder.handleCoordinates(xmlVehicleActivity)
+		if err != nil {
+			vEvent.Longitude = coord.X
+			vEvent.Latitude = coord.Y
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
 		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.StopPointRef()] = struct{}{}
 	}
+}
+
+func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *siri.XMLVehicleActivity) (xy proj.XY, e error) {
+	longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
+	latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
+
+	if latitude != 0 || longitude != 0 {
+		xy.X = longitude
+		xy.Y = latitude
+		return
+	}
+
+	if xmlVehicleActivity.SRSName() == "" || xmlVehicleActivity.Coordinates() == "" {
+		e = fmt.Errorf("No coordinates")
+		return
+	}
+
+	cs := strings.Split(xmlVehicleActivity.Coordinates(), " ")
+	var x, y float64
+	x, e = strconv.ParseFloat(cs[0], 64)
+	if e != nil {
+		return
+	}
+	y, e = strconv.ParseFloat(cs[1], 64)
+	if e != nil {
+		return
+	}
+
+	xy.X = x
+	xy.Y = y
+
+	e = proj.CRSToCRS(
+		xmlVehicleActivity.SRSName(),
+		"+proj=latlong",
+		func(pj proj.Projection) {
+			proj.TransformForward(pj, &xy)
+		})
+
+	return
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities []*siri.XMLVehicleActivity) {

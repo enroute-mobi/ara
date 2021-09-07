@@ -674,3 +674,21 @@ func (vj *XMLMonitoredVehicleJourney) SRSName() string {
 	}
 	return vj.srsName
 }
+
+// Test methods
+
+func (vj *XMLMonitoredVehicleJourney) SetLongitude(s string) {
+	vj.longitude = s
+}
+
+func (vj *XMLMonitoredVehicleJourney) SetLatitude(s string) {
+	vj.latitude = s
+}
+
+func (vj *XMLMonitoredVehicleJourney) SetSRSName(s string) {
+	vj.srsName = s
+}
+
+func (vj *XMLMonitoredVehicleJourney) SetCoordinates(s string) {
+	vj.coordinates = s
+}
