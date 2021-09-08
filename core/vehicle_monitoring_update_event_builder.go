@@ -125,7 +125,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		coord, err := builder.handleCoordinates(xmlVehicleActivity)
-		if err != nil {
+		if err == nil {
 			vEvent.Longitude = coord.X
 			vEvent.Latitude = coord.Y
 		}

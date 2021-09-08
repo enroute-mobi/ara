@@ -98,8 +98,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | Monitored                             | false                                             |
     And one Vehicle has the following attributes:
       | ObjectIDs      | "internal": "RLA290"          |
-      | SRSName        | EPSG:2154                     |
-      | Coordinates    | 1044593 6298716               |
+      | Longitude      | 7.276192074052043             |
+      | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
       | Bearing        | 287.0                         |
       | LinkDistance   | 349.0                         |
