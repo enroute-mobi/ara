@@ -15,7 +15,7 @@ definitions:
 
           - apt-get update
           - mkdir -p /usr/share/man/man1 /usr/share/man/man7
-          - export PACKAGES="build-essential ruby-dev libpq-dev libxml2-dev zlib1g-dev git-core postgresql-client-common"
+          - export PACKAGES="build-essential ruby-dev libpq-dev libxml2-dev zlib1g-dev git-core postgresql-client-common libproj-dev"
           - export BUNDLER_VERSION="2.0.1"
           - apt-get -y install --no-install-recommends locales $PACKAGES
           - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen

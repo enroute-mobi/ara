@@ -145,7 +145,7 @@ func Test_VehicleController_Index(t *testing.T) {
 	checkVehicleResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"RecordedAtTime":"0001-01-01T00:00:00Z"}]`
+	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"ValidUntilTime":"0001-01-01T00:00:00Z","RecordedAtTime":"0001-01-01T00:00:00Z"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

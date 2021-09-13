@@ -356,7 +356,7 @@ Feature: Support SIRI StopMonitoring by subscription
         | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+        | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
         | DepartureStatus                 | onTime                                                               |
       And a minute has passed
@@ -466,8 +466,8 @@ Feature: Support SIRI StopMonitoring by subscription
       | Attribute[DirectionRef]               | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
-      | Reference[DestinationRef]#ObjectID    | "external": "ThisIsTheEnd"                      |
-      | Reference[JourneyPatternRef]#ObjectID | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | DataFrameRef                    | abcd                                                                 |
@@ -475,7 +475,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -486,7 +486,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -635,8 +635,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[DirectionRef]               | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
-      | Reference[DestinationRef]#ObjectID    | "external": "ThisIsTheEnd"                      |
-      | Reference[JourneyPatternRef]#ObjectID | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | DataFrameRef                    | abcd                                                                 |
@@ -644,7 +644,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -655,7 +655,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -805,14 +805,14 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[DirectionRef]            | Aller                                   |
       | OriginName                         | Le début                                |
       | DestinationName                    | La fin.                                 |
-      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -822,7 +822,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -971,7 +971,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[DirectionRef]            | Aller                                   |
       | OriginName                         | Le début                                |
       | DestinationName                    | La fin.                                 |
-      | Reference[DestinationRef]#ObjectID | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | DataFrameRef                    | abcd                                                                 |
@@ -979,7 +979,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -990,7 +990,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -1135,8 +1135,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Attribute[DirectionRef]               | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
-      | Reference[DestinationRef]#ObjectID    | "external": "ThisIsTheEnd"                      |
-      | Reference[JourneyPatternRef]#ObjectID | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | DataFrameRef                    | abcd                                                                 |
@@ -1144,7 +1144,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
@@ -1155,7 +1155,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |

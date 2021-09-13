@@ -23,9 +23,16 @@ type Vehicle struct {
 	LineId           LineId           `json:",omitempty"`
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
+	// SRSName     string  `json:",omitempty"`
+	// Coordinates string  `json:",omitempty"`
 	Longitude float64 `json:",omitempty"`
 	Latitude  float64 `json:",omitempty"`
-	Bearing   float64 `json:",omitempty"`
+
+	Bearing        float64   `json:",omitempty"`
+	LinkDistance   float64   `json:",omitempty"`
+	Percentage     float64   `json:",omitempty"`
+	DriverRef      string    `json:",omitempty"`
+	ValidUntilTime time.Time `json:",omitempty"`
 
 	RecordedAtTime time.Time
 }

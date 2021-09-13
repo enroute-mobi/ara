@@ -110,8 +110,9 @@ Feature: Support SIRI GeneralMessage by subscription
    </S:Body>
    </S:Envelope>
       """
-    Then the Situation "6ba7b814-9dad-11d1-8-00c04fd430c8" has the following attributes:
-      | Channel | Commercial |
+    Then a Situation exists with the following attributes:
+        | ObjectIDs | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Channel   | Commercial                                |
 
   Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with

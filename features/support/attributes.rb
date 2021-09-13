@@ -3,6 +3,9 @@ def model_attributes(table)
 
   attributes.dup.each do |key, value|
     case value
+    when /\A"\d+.\d+"\Z/
+      # Don't convert integer between quotes
+      attributes[key] = value[1..-2]
     when /\A\d+\Z/
       # Convert integer
       attributes[key] = value.to_i
@@ -94,12 +97,12 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /Reference\[([^\]]+)\]#(ObjectID|Id)/
+    if key =~ /Reference\[([^\]]+)\]#(ObjectId|Id)/
       name = $1
       attribute = $2
       attributes["References"] ||= {}
 
-      if attribute == "ObjectID"
+      if attribute == "ObjectId"
         value = JSON.parse("{ #{value} }")
       end
 

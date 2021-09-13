@@ -160,12 +160,14 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 }
 
 func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) (vehicles []string) {
+	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
 
 	for i := range vs {
 		v := vs[i]
 		event := model.NewVehicleUpdateEvent()
 
+		event.Origin = partner
 		event.ObjectId = model.NewObjectID(id_kind, v.GetObjectid())
 		event.VehicleJourneyObjectId = model.NewObjectID(id_kind, v.GetVehicleJourneyRef())
 		event.Longitude = v.GetLongitude()

@@ -272,9 +272,15 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	}
 
 	vehicle.VehicleJourneyId = vj.Id()
+	// vehicle.SRSName = event.SRSName
+	// vehicle.Coordinates = event.Coordinates
+	vehicle.DriverRef = event.DriverRef
 	vehicle.Longitude = event.Longitude
 	vehicle.Latitude = event.Latitude
 	vehicle.Bearing = event.Bearing
+	vehicle.LinkDistance = event.LinkDistance
+	vehicle.Percentage = event.Percentage
+	vehicle.ValidUntilTime = event.ValidUntilTime
 	vehicle.RecordedAtTime = manager.Clock().Now()
 
 	if line != nil {

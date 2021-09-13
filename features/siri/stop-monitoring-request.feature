@@ -275,7 +275,7 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
@@ -469,11 +469,11 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#ObjectID     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | Reference[JourneyPatternRef]#ObjectID  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[OriginRef]#ObjectID          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[DestinationRef]#ObjectId     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[JourneyPatternRef]#ObjectId  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[OriginRef]#ObjectId          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Reference[RouteRef]#ObjectId           | "internal": "NINOXE:Route:66:LOC"               |
+      | Reference[PlaceRef]#ObjectId           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
@@ -500,7 +500,7 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
       | Attribute[NumberOfStopsAway]         | 1                                                                    |
       | Attribute[PlatformTraversal]         | false                                                                |
-      | Reference[OperatorRef]#ObjectID      | "internal":"NINOXE:Company:15563880:LOC"                             |
+      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
@@ -512,21 +512,21 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                       | VehicleJourney#Attribute[DirectionRef]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                           | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                   | VehicleJourney#ObjectID                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                           | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                           | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                        | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                         | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                               | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC | VehicleJourney#Reference[RouteRef]#ObjectID           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC | VehicleJourney#Reference[RouteRef]#ObjectId           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                              | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                 | StopVisit#Reference[OperatorRef]#ObjectID             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                 | StopVisit#Reference[OperatorRef]#ObjectId             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                           | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                   | VehicleJourney#Attribute[VehicleFeatureRef]           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                  | VehicleJourney#Reference[OriginRef]#ObjectID          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                  | VehicleJourney#Reference[OriginRef]#ObjectId          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                   | Magicien Noir                                               | VehicleJourney#Attribute[OriginName]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceName                                           | Saint Bénédicte                                             | VehicleJourney#Attribute[ViaPlaceName]                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                 | VehicleJourney#Reference[PlaceRef]#ObjectID           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                  | VehicleJourney#Reference[DestinationRef]#ObjectID     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                 | VehicleJourney#Reference[PlaceRef]#ObjectId           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                  | VehicleJourney#Reference[DestinationRef]#ObjectId     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                      | VehicleJourney#Attribute[DestinationName]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                            | VehicleJourney#Name                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                                | VehicleJourney#Attribute[JourneyNote]                 |
@@ -618,11 +618,11 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#ObjectID     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | Reference[JourneyPatternRef]#ObjectID  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[OriginRef]#ObjectID          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | Reference[RouteRef]#ObjectID           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#ObjectID           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[DestinationRef]#ObjectId     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[JourneyPatternRef]#ObjectId  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[OriginRef]#ObjectId          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Reference[RouteRef]#ObjectId           | "internal": "NINOXE:Route:66:LOC"               |
+      | Reference[PlaceRef]#ObjectId           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
@@ -649,7 +649,7 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
       | Attribute[NumberOfStopsAway]         | 1                                                                    |
       | Attribute[PlatformTraversal]         | false                                                                |
-      | Reference[OperatorRef]#ObjectID      | "internal":"NINOXE:Company:15563880:LOC"                             |
+      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
@@ -661,21 +661,21 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                | VehicleJourney#Attribute[DirectionRef]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                    | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                            | VehicleJourney#ObjectID                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectID  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                                 | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                                  | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                        | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectID           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectId           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                       | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                          | StopVisit#Reference[OperatorRef]#ObjectID             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                          | StopVisit#Reference[OperatorRef]#ObjectId             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                    | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                         | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                            | VehicleJourney#Attribute[VehicleFeatureRef]           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                           | VehicleJourney#Reference[OriginRef]#ObjectID          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                           | VehicleJourney#Reference[OriginRef]#ObjectId          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                   | Magicien Noir                                                        | VehicleJourney#Attribute[OriginName]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceName                                           | Saint Bénédicte                                                      | VehicleJourney#Attribute[ViaPlaceName]                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                          | VehicleJourney#Reference[PlaceRef]#ObjectID           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                           | VehicleJourney#Reference[DestinationRef]#ObjectID     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                          | VehicleJourney#Reference[PlaceRef]#ObjectId           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                           | VehicleJourney#Reference[DestinationRef]#ObjectId     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                               | VehicleJourney#Attribute[DestinationName]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                                     | VehicleJourney#Name                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                                         | VehicleJourney#Attribute[JourneyNote]                 |
@@ -983,7 +983,7 @@ Feature: Support SIRI StopMonitoring by request
         | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+        | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       And a StopVisit exists with the following attributes:
         | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-3" |
@@ -991,7 +991,7 @@ Feature: Support SIRI StopMonitoring by request
         | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectID | "internal": "CdF:Company::410:LOC"                                   |
+        | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T14:00:00.000Z                                             |
       When I send a SIRI GetStopMonitoring request with
         | RequestorRef  | test   |
@@ -1131,7 +1131,7 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "internalOperator"                                       |
+      | Reference[OperatorRef]#ObjectId | "internal": "internalOperator"                                       |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     And an Operator exists with the following attributes:
       | Name      | Operator                                                    |
@@ -1237,7 +1237,7 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectID | "internal": "operator"                                               |
+      | Reference[OperatorRef]#ObjectId | "internal": "operator"                                               |
       | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:05.000Z                                             |
     And an Operator exists with the following attributes:

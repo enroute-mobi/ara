@@ -121,7 +121,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	}
 
 	updateEvents := builder.UpdateEvents()
-	logger.Log.Printf("%v", updateEvents)
 
 	// Log MonitoringRefs
 	logMonitoringRefs(logStashEvent, message, updateEvents.MonitoringRefs)
@@ -190,7 +189,7 @@ func (connector *SIRIStopMonitoringRequestCollector) SetUpdateSubscriber(updateS
 
 func (connector *SIRIStopMonitoringRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "GeneralMessageRequest",
+		Type:      "GetStopMonitoringRequest",
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),

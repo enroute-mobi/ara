@@ -12,15 +12,15 @@ import (
 type LineId ModelId
 
 type Line struct {
+	Collectable
 	ObjectIDConsumer
+
 	model  Model
 	origin string
 
 	id LineId
 
 	CollectGeneralMessages bool
-	nextCollectAt          time.Time
-	collectedAt            time.Time
 
 	Name       string `json:",omitempty"`
 	Attributes Attributes
@@ -51,22 +51,6 @@ func (line *Line) copy() *Line {
 
 func (line *Line) Id() LineId {
 	return line.id
-}
-
-func (line *Line) NextCollectAt() time.Time {
-	return line.nextCollectAt
-}
-
-func (line *Line) NextCollect(collectTime time.Time) {
-	line.nextCollectAt = collectTime
-}
-
-func (line *Line) CollectedAt() time.Time {
-	return line.collectedAt
-}
-
-func (line *Line) Updated(updateTime time.Time) {
-	line.collectedAt = updateTime
 }
 
 func (line *Line) Origin() string {

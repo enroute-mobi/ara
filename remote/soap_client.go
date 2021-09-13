@@ -219,6 +219,20 @@ func (client *SOAPClient) SituationMonitoring(request *siri.SIRIGetGeneralMessag
 	return generalMessage, nil
 }
 
+func (client *SOAPClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*siri.XMLVehicleMonitoringResponse, error) {
+	node, err := client.prepareAndSendRequest(soapClientArguments{
+		request:          request,
+		expectedResponse: "GetVehicleMonitoringResponse",
+		acceptGzip:       true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	vehicleMonitoring := siri.NewXMLVehicleMonitoringResponse(node)
+	return vehicleMonitoring, nil
+}
+
 func (client *SOAPClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(soapClientArguments{
 		request:          request,

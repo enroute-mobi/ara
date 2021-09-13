@@ -510,6 +510,24 @@ func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCo
 	return nil
 }
 
+func (partner *Partner) VehicleMonitoringRequestCollector() VehicleMonitoringRequestCollector {
+	// WIP
+	client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return client.(VehicleMonitoringRequestCollector)
+	}
+	return nil
+}
+
+func (partner *Partner) VehicleMonitoringSubscriptionCollector() VehicleMonitoringSubscriptionCollector {
+	// WIP
+	// client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR]
+	// if ok {
+	// 	return client.(VehicleMonitoringSubscriptionCollector)
+	// }
+	return nil
+}
+
 func (partner *Partner) hasPushCollector() (ok bool) {
 	_, ok = partner.connectors[PUSH_COLLECTOR]
 	return ok

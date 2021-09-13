@@ -5,7 +5,7 @@
 FROM golang:1.16 AS builder
 ARG VERSION=dev
 
-ENV DEV_PACKAGES="libxml2-dev"
+ENV DEV_PACKAGES="libxml2-dev libproj-dev"
 RUN apt-get update && apt-get -y install --no-install-recommends $DEV_PACKAGES
 
 WORKDIR /go/src/bitbucket.org/enroute-mobi/ara
@@ -15,7 +15,7 @@ RUN go install -v -ldflags "-X bitbucket.org/enroute-mobi/ara/version.value=${VE
 
 FROM debian:buster
 
-ENV RUN_PACKAGES="libxml2 ca-certificates"
+ENV RUN_PACKAGES="libxml2 proj-bin ca-certificates"
 
 RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --no-install-recommends $RUN_PACKAGES && \
     apt-get clean && apt-get -y autoremove && rm -rf /var/lib/apt/lists/*

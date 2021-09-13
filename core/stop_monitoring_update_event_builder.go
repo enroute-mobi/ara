@@ -80,7 +80,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			Monitored:       xmlStopVisitEvent.Monitored(),
 
 			ObjectidKind: builder.remoteObjectidKind,
-			SiriXML:      xmlStopVisitEvent,
+			SiriXML:      &xmlStopVisitEvent.XMLMonitoredVehicleJourney,
 		}
 
 		builder.stopMonitoringUpdateEvents.VehicleJourneys[xmlStopVisitEvent.DatedVehicleJourneyRef()] = vjEvent

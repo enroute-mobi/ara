@@ -41,8 +41,9 @@ type FramedVehicleJourneyRef struct {
 }
 
 type VehicleLocation struct {
-	Longitude float64
-	Latitude  float64
+	Coordinates string  `json:",omitempty"`
+	Longitude   float64 `json:",omitempty"`
+	Latitude    float64 `json:",omitempty"`
 }
 
 func NewSiriLiteVehicleMonitoringDelivery() *VehicleMonitoringDelivery {

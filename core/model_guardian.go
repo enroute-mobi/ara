@@ -129,10 +129,6 @@ func (guardian *ModelGuardian) refreshLines() {
 	now := guardian.Clock().Now()
 
 	for _, line := range tx.Model().Lines().FindAll() {
-		if !line.CollectGeneralMessages {
-			continue
-		}
-
 		if !line.NextCollectAt().Before(now) {
 			continue
 		}
@@ -148,8 +144,13 @@ func (guardian *ModelGuardian) refreshLines() {
 		lineTx.Commit()
 		lineTx.Close()
 
-		situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(transactionnalLine.Id()))
-		guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+		if line.CollectGeneralMessages {
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(transactionnalLine.Id()))
+			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+		}
+
+		vehicleUpdateRequest := NewVehicleUpdateRequest(transactionnalLine.Id())
+		guardian.referential.CollectManager().UpdateVehicle(vehicleUpdateRequest)
 	}
 }
 

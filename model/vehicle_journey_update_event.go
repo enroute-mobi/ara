@@ -17,7 +17,7 @@ type VehicleJourneyUpdateEvent struct {
 	Monitored       bool
 
 	ObjectidKind string
-	SiriXML      *siri.XMLMonitoredStopVisit
+	SiriXML      *siri.XMLMonitoredVehicleJourney
 	attributes   Attributes
 	references   *References
 }

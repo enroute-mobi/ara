@@ -13,7 +13,9 @@ type UpdateSubscriber func(model.UpdateEvent)
 
 type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
+
 	UpdateStopArea(request *StopAreaUpdateRequest)
+	UpdateVehicle(request *VehicleUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
@@ -66,6 +68,8 @@ func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)     
 func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
 func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 }
+
+func (manager *TestCollectManager) UpdateVehicle(*VehicleUpdateRequest) {}
 
 // TEST END
 
@@ -145,6 +149,48 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			requestCollector.RequestStopAreaUpdate(request)
 			return
 		}
+	}
+}
+
+func (manager *CollectManager) UpdateVehicle(request *VehicleUpdateRequest) {
+	line, ok := manager.referential.Model().Lines().Find(request.LineId())
+	if !ok {
+		logger.Log.Debugf("Can't find Line %v in Collect Manager", request.LineId())
+		return
+	}
+
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		subscriptionCollector := partner.VehicleMonitoringSubscriptionCollector()
+		requestCollector := partner.VehicleMonitoringRequestCollector()
+
+		if subscriptionCollector == nil && requestCollector == nil {
+			continue
+		}
+
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			if b, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT)); !b || subscriptionCollector == nil {
+				continue
+			}
+		}
+
+		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
+
+		lineObjectID, ok := line.ObjectID(partnerKind)
+		if !ok {
+			continue
+		}
+
+		if !partner.CanCollectLine(lineObjectID.Value()) {
+			continue
+		}
+		logger.Log.Debugf("RequestVehicleUpdate with LineId %v", request.LineId())
+
+		if subscriptionCollector != nil {
+			subscriptionCollector.RequestVehicleUpdate(request)
+			return
+		}
+		requestCollector.RequestVehicleUpdate(request)
+		return
 	}
 }
 
