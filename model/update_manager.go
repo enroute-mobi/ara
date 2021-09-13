@@ -102,8 +102,6 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 
 	tx := manager.transactionProvider.NewTransaction()
 
-	logger.Log.Printf("Line Update Event : %v", event)
-
 	line, found := tx.Model().Lines().FindByObjectId(event.ObjectId)
 	if !found {
 		line = tx.Model().Lines().New()
