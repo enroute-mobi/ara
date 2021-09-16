@@ -570,7 +570,7 @@ Feature: Support SIRI StopMonitoring
       | ObjectIDs       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
       | CollectedAlways | false                                                                   |
     And a minute has passed
-    And the SIRI server waits GetStopMonitoring request to respond with
+    And the SIRI server waits a GetStopMonitoring request to respond with
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
@@ -840,7 +840,7 @@ Feature: Support SIRI StopMonitoring
       | Name      | Arletty               |
       | ObjectIDs | "internal": "boaarle" |
     And a minute has passed
-    And the SIRI server waits GetStopMonitoring request to respond with
+    And the SIRI server waits a GetStopMonitoring request to respond with
       # include a MonitoredStopVisit/ItemIdentifier A at 14:00
       # no MonitoredStopVisit/ItemIdentifier B
       # include a MonitoredStopVisit/ItemIdentifier C at 15:00

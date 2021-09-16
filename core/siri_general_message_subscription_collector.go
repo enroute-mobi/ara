@@ -29,6 +29,7 @@ type SIRIGeneralMessageSubscriptionCollector struct {
 
 	connector
 
+	deletedSubscriptions      *DeletedSubscriptions
 	generalMessageSubscriber  SIRIGeneralMessageSubscriber
 	situationUpdateSubscriber SituationUpdateSubscriber
 }
@@ -60,6 +61,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	connector.generalMessageSubscriber.Start()
 }
 
@@ -117,7 +119,9 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		if !ok {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
-			subToDelete[delivery.SubscriptionRef()] = struct{}{}
+			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
+				subToDelete[subscriptionId] = struct{}{}
+			}
 			continue
 		}
 

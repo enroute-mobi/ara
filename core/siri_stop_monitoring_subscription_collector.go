@@ -29,6 +29,7 @@ type SIRIStopMonitoringSubscriptionCollector struct {
 
 	connector
 
+	deletedSubscriptions     *DeletedSubscriptions
 	stopMonitoringSubscriber SIRIStopMonitoringSubscriber
 	updateSubscriber         UpdateSubscriber
 }
@@ -60,6 +61,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) Start() {
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	connector.stopMonitoringSubscriber.Start()
 }
 
@@ -132,7 +134,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
-			subToDelete[delivery.SubscriptionRef()] = struct{}{}
+			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
+				subToDelete[subscriptionId] = struct{}{}
+			}
 			continue
 		}
 		if subscription.Kind() != "StopMonitoringCollect" {
