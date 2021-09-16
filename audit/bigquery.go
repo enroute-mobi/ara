@@ -216,6 +216,7 @@ func (bq *BigQueryClient) Stop() {
 }
 
 func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
+	e.SetUUID(bq.NewUUID())
 	e.SetTimeStamp(bq.Clock().Now())
 	switch e.EventType() {
 	case BQ_MESSAGE:
