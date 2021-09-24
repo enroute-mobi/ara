@@ -1,5 +1,5 @@
 <sw:StopPointsDiscovery xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-	<Request>
+	<Request version="2.0:FR-IDF-2.4">
 		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
 		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>
