@@ -33,7 +33,7 @@ func (a SIRIAnnotatedStopPointByStopPointRef) Less(i, j int) bool {
 
 func (response *SIRIStopPointsDiscoveryResponse) BuildXML() (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "stop_discovery_response.template", response); err != nil {
+	if err := templates.ExecuteTemplate(&buffer, "stop_points_discovery_response.template", response); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
