@@ -101,6 +101,7 @@ func (s *PartnerSettings) SetSettingsDefinition(m map[string]string) {
 		return
 	}
 	s.m.Lock()
+	s.s = make(map[string]string)
 	for k, v := range m {
 		s.s[k] = v
 	}
