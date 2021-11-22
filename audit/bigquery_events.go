@@ -16,9 +16,11 @@ const (
 type BigQueryEvent interface {
 	EventType() string
 	SetTimeStamp(time.Time)
+	SetUUID(string)
 }
 
 type BigQueryMessage struct {
+	UUID                    string    `bigquery:"uuid"`
 	Timestamp               time.Time `bigquery:"timestamp"`
 	IPAddress               string    `bigquery:"ip_address"`
 	Protocol                string    `bigquery:"protocol"`  // "siri", "siri-lite", "gtfs", "push"
@@ -42,8 +44,10 @@ type BigQueryMessage struct {
 
 func (bq *BigQueryMessage) EventType() string        { return BQ_MESSAGE }
 func (bq *BigQueryMessage) SetTimeStamp(t time.Time) { bq.Timestamp = t }
+func (bq *BigQueryMessage) SetUUID(u string)         { bq.UUID = u }
 
 var bqMessageSchema = bigquery.Schema{
+	{Name: "uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "ip_address", Required: false, Type: bigquery.StringFieldType},
 	{Name: "protocol", Required: false, Type: bigquery.StringFieldType},
@@ -66,6 +70,7 @@ var bqMessageSchema = bigquery.Schema{
 }
 
 type BigQueryPartnerEvent struct {
+	UUID                     string         `bigquery:"uuid"`
 	Timestamp                time.Time      `bigquery:"timestamp"`
 	Slug                     string         `bigquery:"slug"`
 	PreviousStatus           string         `bigquery:"previous_status"`
@@ -76,8 +81,10 @@ type BigQueryPartnerEvent struct {
 
 func (bq *BigQueryPartnerEvent) EventType() string        { return BQ_PARTNER_EVENT }
 func (bq *BigQueryPartnerEvent) SetTimeStamp(t time.Time) { bq.Timestamp = t }
+func (bq *BigQueryPartnerEvent) SetUUID(u string)         { bq.UUID = u }
 
 var bqPartnerSchema = bigquery.Schema{
+	{Name: "uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "slug", Required: false, Type: bigquery.StringFieldType},
 	{Name: "previous_status", Required: false, Type: bigquery.StringFieldType},
@@ -87,6 +94,7 @@ var bqPartnerSchema = bigquery.Schema{
 }
 
 type BigQueryVehicleEvent struct {
+	UUID           string         `bigquery:"uuid"`
 	Timestamp      time.Time      `bigquery:"timestamp"`
 	ID             string         `bigquery:"id"`
 	ObjectIDs      []string       `bigquery:"objectids"`
@@ -98,8 +106,10 @@ type BigQueryVehicleEvent struct {
 
 func (bq *BigQueryVehicleEvent) EventType() string        { return BQ_VEHICLE_EVENT }
 func (bq *BigQueryVehicleEvent) SetTimeStamp(t time.Time) { bq.Timestamp = t }
+func (bq *BigQueryVehicleEvent) SetUUID(u string)         { bq.UUID = u }
 
 var bqVehicleSchema = bigquery.Schema{
+	{Name: "uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "id", Required: false, Type: bigquery.StringFieldType},
 	{Name: "longitude", Required: false, Type: bigquery.FloatFieldType},
