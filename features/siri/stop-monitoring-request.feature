@@ -1289,6 +1289,114 @@ Feature: Support SIRI StopMonitoring by request
           <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
           <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
           <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+          <siri:Status>true</siri:Status>
+          <siri:MonitoredStopVisit>
+            <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+            <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+            <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+              <siri:OperatorRef>operator</siri:OperatorRef>
+              <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+              <siri:Monitored>false</siri:Monitored>
+              <siri:MonitoredCall>
+                <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                <siri:Order>4</siri:Order>
+                <siri:StopPointName>Test</siri:StopPointName>
+                <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                <siri:AimedArrivalTime>2017-01-01T13:00:00.000Z</siri:AimedArrivalTime>
+              </siri:MonitoredCall>
+            </siri:MonitoredVehicleJourney>
+          </siri:MonitoredStopVisit>
+        </siri:StopMonitoringDelivery>
+      </Answer>
+      <AnswerExtension/>
+    </sw:GetStopMonitoringResponse>
+  </S:Body>
+</S:Envelope>
+      """
+
+  Scenario: Handle a SIRI StopMonitoring request with a not monitored StopArea and broadcast.send_producer_unavailable_error setting
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential                          | test     |
+      | remote_objectid_kind                      | external |
+      | broadcast.send_producer_unavailable_error | true     |
+    And a StopArea exists with the following attributes:
+      | Name             | Test                                     |
+      | ObjectIDs        | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Origin[partner1] | false                                    |
+      | Monitored        | false                                    |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                              |
+      | ObjectIDs | "external": "NINOXE:VehicleJourney:201" |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectId | "internal": "operator"                                               |
+      | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000Z                                             |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:05.000Z                                             |
+    And an Operator exists with the following attributes:
+      | Name      | Operator                                                    |
+      | ObjectIDs | "internal":"internalOperator","external":"externalOperator" |
+    When I send this SIRI request
+      """
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header />
+  <S:Body>
+    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
+                           xmlns:siri="http://www.ifopt.org.uk/acsb"
+                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+      <ServiceRequestInfo>
+        <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
+        <ns2:RequestorRef>test</ns2:RequestorRef>
+        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+      </ServiceRequestInfo>
+
+      <Request version="2.0:FR-IDF-2.4">
+        <ns2:RequestTimestamp>2016-09-22T07:54:52.977Z</ns2:RequestTimestamp>
+        <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
+        <ns2:StartTime>2016-09-22T07:54:52.977Z</ns2:StartTime>
+        <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+        <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
+      </Request>
+      <RequestExtension />
+    </ns7:GetStopMonitoring>
+  </S:Body>
+</S:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+        <siri:ProducerRef>Ara</siri:ProducerRef>
+        <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+        <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+          <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+          <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>false</siri:Status>
           <siri:ErrorCondition>
             <siri:OtherError number="1">

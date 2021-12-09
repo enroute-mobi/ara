@@ -156,7 +156,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				if stopArea.Monitored {
 					estimatedCall.ExpectedArrivalTime = stopVisit.Schedules.Schedule("expected").ArrivalTime()
 					estimatedCall.ExpectedDepartureTime = stopVisit.Schedules.Schedule("expected").DepartureTime()
-				} else {
+				} else if connector.Partner().SendProducerUnavailableError() {
 					delivery.Status = false
 					delivery.ErrorType = "OtherError"
 					delivery.ErrorNumber = 1
