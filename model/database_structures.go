@@ -9,6 +9,7 @@ type DatabaseReferential struct {
 	Name           string         `db:"name"`
 	Settings       string         `db:"settings"`
 	Tokens         string         `db:"tokens"`
+	ImportTokens   string         `db:"import_tokens"`
 }
 
 type SelectReferential struct {
@@ -18,6 +19,7 @@ type SelectReferential struct {
 	Name           sql.NullString
 	Settings       sql.NullString
 	Tokens         sql.NullString
+	ImportTokens   sql.NullString `db:"import_tokens"`
 }
 
 type DatabasePartner struct {

@@ -134,7 +134,7 @@ func (server *Server) isAdmin(r *http.Request) bool {
 	return server.getToken(r) == server.apiKey
 }
 
-func (server *Server) isAuth(referential *core.Referential, request *http.Request) bool {
+func (server *Server) isAuth(referential *core.Referential, request *http.Request, requestData *RequestData) bool {
 	authToken := server.getToken(request)
 
 	if authToken == "" {
@@ -146,6 +146,15 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 			return true
 		}
 	}
+
+	if requestData.Resource == "import" {
+		for _, token := range referential.ImportTokens {
+			if authToken == token {
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
@@ -215,7 +224,7 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
 	}
-	if !server.isAuth(foundReferential, request) {
+	if !server.isAuth(foundReferential, request, requestData) {
 		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
