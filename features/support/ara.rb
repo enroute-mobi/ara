@@ -9,21 +9,40 @@ class Ara
     @ara ||= new
   end
 
-  attr_writer :fakeuuid_legacy
-  def fakeuuid_legacy?
-    @fakeuuid_legacy.nil? ? true : @fakeuuid_legacy
-  end
-
-  def start
+  def initialize
     unless File.directory?("tmp")
       FileUtils.mkdir_p("tmp")
     end
     unless File.directory?("log")
       FileUtils.mkdir_p("log")
     end
+  end
 
-    ara_command = "ARA_ROOT=#{Dir.getwd} ARA_CONFIG=#{Dir.getwd}/config ARA_ENV=test ARA_BIGQUERY_PREFIX=cucumber ARA_BIGQUERY_TEST=#{BigQuery.url} ARA_FAKEUUID_REAL=#{!fakeuuid_legacy?} go run ara.go -debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081 >> log/ara.log 2>&1 &"
-    system ara_command
+  attr_writer :fakeuuid_legacy
+  def fakeuuid_legacy?
+    @fakeuuid_legacy.nil? ? true : @fakeuuid_legacy
+  end
+
+  def command(arguments)
+    "ARA_ROOT=#{Dir.getwd} ARA_CONFIG=#{Dir.getwd}/config ARA_ENV=test ARA_BIGQUERY_PREFIX=cucumber ARA_BIGQUERY_TEST=#{BigQuery.url} ARA_FAKEUUID_REAL=#{!fakeuuid_legacy?} go run ara.go #{arguments} >> log/ara.log 2>&1"
+  end
+
+  def self.load(referential_slug, file)
+    system Ara.instance.command("load #{file} #{referential_slug}")
+  end
+
+  def self.load_content(referential_slug, content)
+    Tempfile.open(["ara-import",".csv"]) do |file|
+      file.write content
+      file.close
+
+      load referential_slug, file.path
+    end
+  end
+
+  def start
+    ara_command = command "-debug -pidfile=tmp/pid -testuuid -testclock=20170101-1200 api -listen=localhost:8081"
+    system "#{ara_command} &"
 
     time_limit = Time.now + 30
     while
@@ -38,9 +57,17 @@ class Ara
 
       raise "Timeout" if Time.now > time_limit
     end
+
+    @started = true
+  end
+
+  def started?
+    @started
   end
 
   def self.stop
+    return unless @ara&.started?
+
     pid = IO.read("tmp/pid")
     Process.kill('KILL',pid.to_i)
 
