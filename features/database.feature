@@ -51,3 +51,24 @@ Feature: Test Database load and save
       | slug    | first   |
     And the table "referentials" has no row with the following values:
       | slug    | second  |
+
+  @nostart @database @ARA-1003
+  Scenario: Load two referentials with the same models
+    Given the table "referentials" has the following data:
+    | referential_id                         | slug            |
+    | '6ba7b814-9dad-11d1-0000-00c04fd430c8' | 'referential_1' |
+    | '6ba7b814-9dad-11d1-0001-00c04fd430c8' | 'referential_2' |
+    And I import these models in the referential "referential_1":
+      """
+stop_area,5381c0d7-a479-4f6e-a5e8-36072200715c,"","",2031-01-04,First Stop Place,"{""external"":""ABC"",""internal"":""123""}",[],{},{},true,false,true
+line,904945be-6d66-4485-9744-489212506db4,2031-01-04,First Line,"{""external"":""A"",""internal"":""1""}",{},{},true
+stop_area,c521f40d-79fb-4a2c-90f7-ea89a527a65e,"","",2031-01-05,First Stop Place,"{""external"":""ABC"",""internal"":""123""}",[],{},{},true,false,true
+line,bfbfa8d5-9988-4452-9771-28cf6ab3706a,2031-01-05,First Line,"{""external"":""A"",""internal"":""1""}",{},{},true
+      """
+    Then I can import these models in the referential "referential_2":
+      """
+stop_area,5381c0d7-a479-4f6e-a5e8-36072200715c,"","",2031-01-04,First Stop Place,"{""external"":""ABC"",""internal"":""123""}",[],{},{},true,false,true
+line,904945be-6d66-4485-9744-489212506db4,2031-01-04,First Line,"{""external"":""A"",""internal"":""1""}",{},{},true
+stop_area,c521f40d-79fb-4a2c-90f7-ea89a527a65e,"","",2031-01-05,First Stop Place,"{""external"":""ABC"",""internal"":""123""}",[],{},{},true,false,true
+line,bfbfa8d5-9988-4452-9771-28cf6ab3706a,2031-01-05,First Line,"{""external"":""A"",""internal"":""1""}",{},{},true
+      """
