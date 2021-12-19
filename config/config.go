@@ -125,9 +125,15 @@ func LoadDatabaseConfig(configPath string) error {
 	databaseYaml := rawYaml[Environment()].(map[interface{}]interface{})
 
 	Config.DB.Name = databaseYaml["name"].(string)
-	Config.DB.User = databaseYaml["user"].(string)
-	Config.DB.Password = databaseYaml["password"].(string)
-	Config.DB.Port = uint(databaseYaml["port"].(int))
+	if databaseYaml["user"] != nil {
+		Config.DB.User = databaseYaml["user"].(string)
+	}
+	if databaseYaml["password"] != nil {
+		Config.DB.Password = databaseYaml["password"].(string)
+	}
+	if databaseYaml["port"] != nil {
+		Config.DB.Port = uint(databaseYaml["port"].(int))
+	}
 
 	if databaseYaml["host"] != nil {
 		Config.DB.Host = databaseYaml["host"].(string)
