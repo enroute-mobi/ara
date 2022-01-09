@@ -241,7 +241,7 @@ func (simulator *ActualAttributesSimulator) Simulate() bool {
 
 func (simulator *ActualAttributesSimulator) simulateArrival() bool {
 	if simulator.AfterArrivalTime() && simulator.CanArrive() {
-		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
+		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ARRIVED
 		simulator.stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.ArrivalTime())
 
 		logger.Log.Printf("Set StopVisit %s ArrivalStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_ARRIVAL_CANCELLED)
@@ -277,7 +277,7 @@ func (simulator *ActualAttributesSimulator) CanDepart() bool {
 
 func (simulator *ActualAttributesSimulator) simulateDeparture() bool {
 	if simulator.AfterDepartureTime() && simulator.CanDepart() {
-		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_CANCELLED
+		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
 
 		simulator.stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.DepartureTime())
 		simulator.stopVisit.VehicleAtStop = false

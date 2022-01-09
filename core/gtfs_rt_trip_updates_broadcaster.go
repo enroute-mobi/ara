@@ -109,6 +109,11 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 				RouteId: &routeId,
 			}
 
+			if stopVisits[i].DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
+				canceled := gtfs.TripDescriptor_CANCELED
+				tripDescriptor.ScheduleRelationship = &canceled
+			}
+
 			// Fill the FeedEntity
 			newId := fmt.Sprintf("trip:%v", vjId.Value())
 			feedEntity = &gtfs.FeedEntity{

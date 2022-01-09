@@ -152,6 +152,8 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 		event.VehicleJourneyObjectId = model.NewObjectID(id_kind, sv.GetVehicleJourneyRef())
 		event.Monitored = sv.GetMonitored()
 		event.PassageOrder = int(sv.GetPassageOrder())
+		event.ArrivalStatus = model.StopVisitArrivalStatus(sv.GetArrivalStatus())
+		event.DepartureStatus = model.StopVisitDepartureStatus(sv.GetDepartureStatus())
 
 		handleSchedules(&event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
 

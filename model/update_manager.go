@@ -236,8 +236,12 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	sv.Schedules.Merge(&event.Schedules)
-	sv.DepartureStatus = event.DepartureStatus
-	sv.ArrivalStatus = event.ArrivalStatus
+	if event.DepartureStatus != "" {
+		sv.DepartureStatus = event.DepartureStatus
+	}
+	if event.ArrivalStatus != "" {
+		sv.ArrivalStatus = event.ArrivalStatus
+	}
 	sv.VehicleAtStop = event.VehicleAtStop
 	sv.Collected(manager.Clock().Now())
 
