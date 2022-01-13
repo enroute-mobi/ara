@@ -140,6 +140,11 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			Departure:    departure,
 		}
 
+		if stopVisits[i].DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
+			skipped := gtfs.TripUpdate_StopTimeUpdate_SKIPPED
+			stopTimeUpdate.ScheduleRelationship = &skipped
+		}
+
 		feedEntity.TripUpdate.StopTimeUpdate = append(feedEntity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
 	}
 
