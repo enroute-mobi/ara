@@ -314,11 +314,19 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, message
 	logStashEvent["responseXML"] = response.RawXML()
 
 	var subscriptionIds []string
+	var i int
 	for _, responseStatus := range response.ResponseStatus() {
 		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
+		if !responseStatus.Status() {
+			i++
+		}
 	}
 	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
 
+	if i > 0 {
+		message.Status = "Error"
+		message.ErrorDetails = fmt.Sprintf("%d ResponseStatus returned false", i)
+	}
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 	// TODO no ResponseMessageIdentifier() method in XMLDeleteSubscriptionResponse
