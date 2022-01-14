@@ -9,6 +9,7 @@ import (
 	"time"
 
 	external_models "bitbucket.org/enroute-mobi/ara-external-models"
+	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -16,6 +17,8 @@ import (
 )
 
 type PushHandler struct {
+	rah.RemoteAddressHandler
+
 	referential *core.Referential
 	token       string
 }
@@ -53,7 +56,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	startTime := handler.referential.Clock().Now()
-	message := handler.newBQMessage(string(partner.Slug()), request.RemoteAddr)
+	message := handler.newBQMessage(string(partner.Slug()), handler.HandleRemoteAddress(request))
 	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 
 	// Check if request is gzip

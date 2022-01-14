@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -16,6 +17,8 @@ import (
 )
 
 type GtfsHandler struct {
+	rah.RemoteAddressHandler
+
 	referential *core.Referential
 	token       string
 }
@@ -41,7 +44,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	logStashEvent["connector"] = "GtfsHandler"
 	logStashEvent["resource"] = "resource"
 
-	message := handler.newBQMessage(string(partner.Slug()), request.RemoteAddr)
+	message := handler.newBQMessage(string(partner.Slug()), handler.HandleRemoteAddress(request))
 	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 
 	var gc []core.GtfsConnector
