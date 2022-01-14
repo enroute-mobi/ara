@@ -145,7 +145,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 		return
 	}
 
-	if xmlVehicleActivity.SRSName() == "" || xmlVehicleActivity.Coordinates() == "" {
+	if xmlVehicleActivity.Coordinates() == "" {
 		e = fmt.Errorf("No coordinates")
 		return
 	}
@@ -172,6 +172,16 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 		})
 
 	return
+}
+
+func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs string) string {
+	if srs == "" {
+		return builder.partner.DefaultSRSName()
+	}
+	if strings.HasPrefix(srs, "EPSG:") {
+		return srs
+	}
+	return "EPSG:" + srs
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities []*siri.XMLVehicleActivity) {

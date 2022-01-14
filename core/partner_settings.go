@@ -33,6 +33,7 @@ const (
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
+	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
@@ -220,6 +221,17 @@ func (s *PartnerSettings) CollectPriority() (value int) {
 	value, _ = strconv.Atoi(s.s[COLLECT_PRIORITY])
 	s.m.RUnlock()
 	return value
+}
+
+func (s *PartnerSettings) DefaultSRSName() (srsName string) {
+	s.m.RLock()
+	if s.s[COLLECT_DEFAULT_SRS_NAME] == "" {
+		srsName = "EPSG:2154"
+	} else {
+		srsName = s.s[COLLECT_DEFAULT_SRS_NAME]
+	}
+	s.m.RUnlock()
+	return srsName
 }
 
 func (s *PartnerSettings) NoDestinationRefRewritingFrom() []string {
