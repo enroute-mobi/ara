@@ -165,7 +165,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 	xy.Y = y
 
 	e = proj.CRSToCRS(
-		xmlVehicleActivity.SRSName(),
+		builder.formatSRSNameWithDefaut(xmlVehicleActivity.SRSName()),
 		"+proj=latlong",
 		func(pj proj.Projection) {
 			proj.TransformForward(pj, &xy)
