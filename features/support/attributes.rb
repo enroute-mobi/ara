@@ -166,5 +166,18 @@ def has_attributes(response_array, attributes)
   expect(found_value).not_to be_nil
 
   parsed_attributes.delete("ObjectIDs")
+
+  parsed_attributes = parsed_attributes.reduce({}) do |attributes, (key, value)|
+    case value
+    when Float
+      value = a_value_within(0.00001).of(value)
+    else
+      value
+    end
+
+    attributes[key] = value
+    attributes
+  end
+
   expect(found_value).to include(parsed_attributes)
 end
