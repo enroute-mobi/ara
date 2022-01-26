@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 )
@@ -13,6 +14,8 @@ type SIRILiteRequestHandler interface {
 }
 
 type SIRILiteHandler struct {
+	rah.RemoteAddressHandler
+
 	referential *core.Referential
 	token       string
 }
@@ -85,7 +88,7 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 		Protocol:  "siri-lite",
 		Direction: "received",
 		Partner:   string(partner.Slug()),
-		IPAddress: request.RemoteAddr,
+		IPAddress: handler.HandleRemoteAddress(request),
 		Status:    "OK",
 	}
 
