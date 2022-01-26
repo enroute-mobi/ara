@@ -159,7 +159,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 	}
 
-	message.Type = "StopMonitoringSubscriptionRequest"
+	message.Type = "GeneralMessageSubscriptionRequest"
 	message.SubscriptionIdentifiers = subIds
 
 	return resps
