@@ -429,7 +429,7 @@ func toMap(s string) (m map[string]struct{}) {
 	return
 }
 
-func (s *PartnerSettings) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+func (s *PartnerSettings) IdentifierGenerator(generatorName string) *idgen.IdentifierGenerator {
 	s.m.Lock()
 	generator, ok := s.g[generatorName]
 	if !ok {
