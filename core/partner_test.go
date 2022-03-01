@@ -261,6 +261,12 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 
 	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
 	partner.setCollectSettings()
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
+		t.Errorf("Partner can collect should return false")
+	}
+
+	partner.discoveredStopAreas = make(map[string]struct{})
+	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
@@ -279,6 +285,12 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 
 	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
 	partner.setCollectSettings()
+	if partner.CanCollect(stopAreaObjectId, lines) {
+		t.Errorf("Partner can collect should return false")
+	}
+
+	partner.discoveredStopAreas = make(map[string]struct{})
+	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
 	}
@@ -335,6 +347,12 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 
 	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
 	partner.setCollectSettings()
+	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
+		t.Errorf("Partner can collect should return false")
+	}
+
+	partner.discoveredStopAreas = make(map[string]struct{})
+	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}

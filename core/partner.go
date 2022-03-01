@@ -357,17 +357,23 @@ func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) b
 	if partner.CollectSettings().Empty() {
 		return true
 	}
-	if partner.CollectSettings().ExcludeStop(stopId) {
+
+	if partner.CollectSettings().UseDiscovered {
+		return partner.checkDiscovered(stopId, lineIds) // Check excluded stops and lines
+	}
+
+	return partner.CollectSettings().CanCollectStop(stopId) && partner.CollectSettings().CanCollectLines(lineIds)
+}
+
+func (partner *Partner) CanCollectLine(lineId string) bool { // Used for vehicle collect
+	return partner.CollectSettings().CanCollectLine(lineId)
+}
+
+func (partner *Partner) checkDiscovered(stopId string, lineIds map[string]struct{}) (ok bool) {
+	// Return false if we exclude the stop or all the associated lines
+	if partner.CollectSettings().ExcludeStop(stopId) || partner.CollectSettings().ExcludeAllLines(lineIds) {
 		return false
 	}
-	return partner.CollectSettings().IncludeStop(stopId) || partner.CollectSettings().CanCollectLines(lineIds) || partner.checkDiscovered(stopId)
-}
-
-func (partner *Partner) CanCollectLine(lineId string) bool {
-	return partner.CollectSettings().IncludeLine(lineId)
-}
-
-func (partner *Partner) checkDiscovered(stopId string) (ok bool) {
 	_, ok = partner.discoveredStopAreas[stopId]
 	return
 }
