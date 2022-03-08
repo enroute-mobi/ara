@@ -6,6 +6,18 @@ def referential_path(id)
   url_for(path: "_referentials/#{id}")
 end
 
+Given('a Referential {string} exists with the following attributes:') do |referential, table|
+  user_attributes = table.rows_hash
+
+  attributes = {
+    Slug: referential,
+    Tokens: user_attributes.fetch('Tokens', $token).split(','),
+    ImportTokens: user_attributes.fetch('Import Tokens', '').split(',')
+  }
+
+  RestClient.post referentials_path, attributes.to_json, {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
+end
+
 Given(/^a Referential "([^"]+)" exists$/) do |referential|
   attributes = {
     slug: referential,
