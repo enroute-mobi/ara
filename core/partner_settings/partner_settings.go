@@ -1,4 +1,4 @@
-package core
+package partner_settings
 
 import (
 	"encoding/json"
@@ -9,6 +9,9 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
+	"bitbucket.org/enroute-mobi/ara/remote"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 const (
@@ -46,31 +49,33 @@ const (
 	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
-	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
+	GENEREAL_MESSAGE_REQUEST_2_2    = "generalMessageRequest.version2.2"
 	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
 
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
 
 	CACHE_TIMEOUT = "cache_timeout"
+
+	DEFAULT_GTFS_TTL = 30 * time.Second
 )
 
 type PartnerSettings struct {
 	m *sync.RWMutex
 
-	p *Partner
+	ug func() uuid.UUIDGenerator
 
 	s  map[string]string
 	cs *CollectSettings
-	g  map[string]*IdentifierGenerator
+	g  map[string]*ig.IdentifierGenerator
 }
 
-func NewPartnerSettings(p *Partner) PartnerSettings {
+func NewPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
 	return PartnerSettings{
-		m: &sync.RWMutex{},
-		p: p,
-		s: make(map[string]string),
-		g: make(map[string]*IdentifierGenerator),
+		m:  &sync.RWMutex{},
+		ug: ug,
+		s:  make(map[string]string),
+		g:  make(map[string]*ig.IdentifierGenerator),
 	}
 }
 
@@ -130,11 +135,16 @@ func (s *PartnerSettings) Credentials() string {
 	return fmt.Sprintf("%v,%v", s.s[LOCAL_CREDENTIAL], s.s[LOCAL_CREDENTIALS])
 }
 
-func (s *PartnerSettings) RemoteObjectIDKind(connectorName string) string {
+func (s *PartnerSettings) RemoteObjectIDKind(connectorName ...string) string {
+	var cn string
+	if len(connectorName) != 0 {
+		cn = connectorName[0]
+	}
+
 	s.m.RLock()
 	defer s.m.RUnlock()
 
-	if setting := s.s[fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)]; setting != "" {
+	if setting := s.s[fmt.Sprintf("%s.%s", cn, REMOTE_OBJECTID_KIND)]; setting != "" {
 		return setting
 	}
 	return s.s[REMOTE_OBJECTID_KIND]
@@ -217,6 +227,13 @@ func (s *PartnerSettings) MaximumChechstatusRetry() (i int) {
 	return
 }
 
+func (s *PartnerSettings) SubscriptionMaximumResources() (i int) {
+	s.m.RLock()
+	i, _ = strconv.Atoi(s.s[SUBSCRIPTIONS_MAXIMUM_RESOURCES])
+	s.m.RUnlock()
+	return
+}
+
 func (s *PartnerSettings) CollectPriority() (value int) {
 	s.m.RLock()
 	value, _ = strconv.Atoi(s.s[COLLECT_PRIORITY])
@@ -277,6 +294,41 @@ func (s *PartnerSettings) GzipGtfs() (r bool) {
 	return
 }
 
+func (s *PartnerSettings) GeneralMessageRequestVersion22() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[GENEREAL_MESSAGE_REQUEST_2_2])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) PersistentCollectSubscriptions() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[COLLECT_SUBSCRIPTIONS_PERSISTENT])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) PersistentBroadcastSubscriptions() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[BROADCAST_SUBSCRIPTIONS_PERSISTENT])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) CollectFilteredGeneralMessages() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[COLLECT_FILTER_GENERAL_MESSAGES])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) IgnoreStopWithoutLine() (r bool) {
+	s.m.RLock()
+	r = s.s[IGNORE_STOP_WITHOUT_LINE] != "false"
+	s.m.RUnlock()
+	return
+}
+
 func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 	s.m.RLock()
 	d, _ = time.ParseDuration(s.s[DISCOVERY_INTERVAL])
@@ -290,7 +342,7 @@ func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 func (s *PartnerSettings) CollectSettings() *CollectSettings {
 	if s.cs == nil {
 		s.m.RLock()
-		s.setCollectSettings()
+		s.SetCollectSettings()
 		s.m.RUnlock()
 	}
 
@@ -298,13 +350,23 @@ func (s *PartnerSettings) CollectSettings() *CollectSettings {
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) setCollectSettings() {
+func (s *PartnerSettings) SetCollectSettings() {
 	s.cs = &CollectSettings{
 		UseDiscovered: s.s[COLLECT_USE_DISCOVERED_SA] != "",
 		includedSA:    toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
 		excludedSA:    toMap(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
 		includedLines: toMap(s.s[COLLECT_INCLUDE_LINES]),
 		excludedLines: toMap(s.s[COLLECT_EXCLUDE_LINES]),
+	}
+}
+
+func (s *PartnerSettings) HTTPClientURLs() remote.HTTPClientUrls {
+	s.m.RLock()
+	defer s.m.RUnlock()
+	return remote.HTTPClientUrls{
+		Url:              s.s[REMOTE_URL],
+		SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
+		NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
 	}
 }
 
@@ -335,7 +397,7 @@ func (s *PartnerSettings) IdentifierGenerator(generatorName string) *IdentifierG
 	s.m.Lock()
 	generator, ok := s.g[generatorName]
 	if !ok {
-		generator = NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.p.UUIDConsumer)
+		generator = ig.NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.ug())
 		s.g[generatorName] = generator
 	}
 	s.m.Unlock()
@@ -346,18 +408,18 @@ func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString 
 	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
 
 	if formatString == "" {
-		formatString = DefaultIdentifierGenerator(generatorName)
+		formatString = ig.DefaultIdentifierGenerator(generatorName)
 	}
 	return
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) refreshGenerators() {
-	s.g = make(map[string]*IdentifierGenerator)
+	s.g = make(map[string]*ig.IdentifierGenerator)
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) reloadSettings() {
-	s.setCollectSettings()
+	s.SetCollectSettings()
 	s.refreshGenerators()
 }

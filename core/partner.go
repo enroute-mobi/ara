@@ -11,6 +11,8 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/cache"
+	e "bitbucket.org/enroute-mobi/ara/core/api_errors"
+	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"
@@ -65,7 +67,7 @@ type PartnerStatusCheck struct {
 
 type Partner struct {
 	uuid.UUIDConsumer
-	PartnerSettings
+	ps.PartnerSettings
 
 	mutex *sync.RWMutex
 
@@ -99,18 +101,6 @@ func (a ByPriority) Less(i, j int) bool {
 	return a[i].CollectPriority() > a[j].CollectPriority()
 }
 
-type APIPartner struct {
-	Id             PartnerId `json:"Id,omitempty"`
-	Slug           PartnerSlug
-	Name           string            `json:"Name,omitempty"`
-	Settings       map[string]string `json:"Settings,omitempty"`
-	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
-	Errors         Errors            `json:"Errors,omitempty"`
-
-	factories map[string]ConnectorFactory
-	manager   Partners
-}
-
 type PartnerManager struct {
 	uuid.UUIDConsumer
 
@@ -120,106 +110,6 @@ type PartnerManager struct {
 	localCredentialsIndex *LocalCredentialsIndex
 	guardian              *PartnersGuardian
 	referential           *Referential
-}
-
-func (partner *APIPartner) Validate() bool {
-	partner.Errors = NewErrors()
-
-	// Check if slug is non null
-	if partner.Slug == "" {
-		partner.Errors.Add("Slug", ERROR_BLANK)
-	} else if !slugRegexp.MatchString(string(partner.Slug)) { // slugRegexp defined in Referential
-		partner.Errors.Add("Slug", ERROR_SLUG_FORMAT)
-	}
-
-	// Check factories
-	partner.setFactories()
-	for _, factory := range partner.factories {
-		factory.Validate(partner)
-	}
-
-	// Check Slug uniqueness
-	for _, existingPartner := range partner.manager.FindAll() {
-		if existingPartner.id != partner.Id && existingPartner.slug == partner.Slug {
-			partner.Errors.Add("Slug", ERROR_UNIQUE)
-		}
-	}
-
-	// Check Credentials uniqueness
-	if !partner.manager.UniqCredentials(partner.Id, partner.credentials()) {
-		if _, ok := partner.Settings[LOCAL_CREDENTIAL]; ok {
-			partner.Errors.AddSettingError(LOCAL_CREDENTIAL, ERROR_UNIQUE)
-		}
-		if _, ok := partner.Settings[LOCAL_CREDENTIALS]; ok {
-			partner.Errors.AddSettingError(LOCAL_CREDENTIALS, ERROR_UNIQUE)
-		}
-	}
-
-	return len(partner.Errors) == 0
-}
-
-func (partner *APIPartner) credentials() string {
-	return fmt.Sprintf("%v,%v", partner.Settings[LOCAL_CREDENTIAL], partner.Settings[LOCAL_CREDENTIALS])
-}
-
-func (partner *APIPartner) setFactories() {
-	for _, connectorType := range partner.ConnectorTypes {
-		factory := NewConnectorFactory(connectorType)
-		if factory != nil {
-			partner.factories[connectorType] = factory
-		}
-	}
-}
-
-func (partner *APIPartner) IsSettingDefined(setting string) (ok bool) {
-	_, ok = partner.Settings[setting]
-	return
-}
-
-func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
-	if !partner.IsSettingDefined(setting) {
-		partner.Errors.AddSettingError(setting, ERROR_BLANK)
-		return false
-	}
-	return true
-}
-
-func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
-	if !partner.IsSettingDefined(LOCAL_CREDENTIAL) && !partner.IsSettingDefined(LOCAL_CREDENTIALS) {
-		partner.Errors.AddSettingError(LOCAL_CREDENTIAL, ERROR_BLANK)
-		return false
-	}
-	return true
-}
-
-func (partner *APIPartner) ValidatePresenceOfConnector(connector string) bool {
-	for _, listedConnector := range partner.ConnectorTypes {
-		if listedConnector == connector {
-			return true
-		}
-	}
-	partner.Errors.Add(fmt.Sprintf("Connector %s", connector), ERROR_BLANK)
-	return false
-}
-
-func (partner *APIPartner) UnmarshalJSON(data []byte) error {
-	type Alias APIPartner
-	aux := &struct {
-		Settings map[string]string
-		*Alias
-	}{
-		Alias: (*Alias)(partner),
-	}
-	err := json.Unmarshal(data, aux)
-	if err != nil {
-		return err
-	}
-
-	if aux.Settings != nil {
-		partner.Settings = aux.Settings
-	}
-
-	return nil
 }
 
 // Test Method
@@ -234,7 +124,7 @@ func NewPartner() *Partner {
 		},
 		gtfsCache: cache.NewCacheTable(),
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
 	return partner
@@ -269,11 +159,7 @@ func (partner *Partner) GtfsCache() *cache.CacheTable {
 }
 
 func (partner *Partner) HTTPClient() *remote.HTTPClient {
-	urls := remote.HTTPClientUrls{
-		Url:              partner.Setting(REMOTE_URL),
-		SubscriptionsUrl: partner.Setting(SUBSCRIPTIONS_REMOTE_URL),
-		NotificationsUrl: partner.Setting(NOTIFICATIONS_REMOTE_URL),
-	}
+	urls := partner.HTTPClientURLs()
 	if partner.httpClient == nil {
 		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, urls.Url)
 		partner.httpClient = remote.NewHTTPClient(urls)
@@ -318,7 +204,7 @@ func (partner *Partner) Definition() *APIPartner {
 		Settings:       partner.SettingsDefinition(),
 		ConnectorTypes: partner.ConnectorTypes,
 		factories:      make(map[string]ConnectorFactory),
-		Errors:         NewErrors(),
+		Errors:         e.NewErrors(),
 		manager:        partner.manager,
 	}
 }
@@ -700,10 +586,9 @@ func (manager *PartnerManager) Stop() {
 
 func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	partner := &Partner{
-		mutex:   &sync.RWMutex{},
-		slug:    slug,
-		manager: manager,
-		// Settings:            make(map[string]string),
+		mutex:               &sync.RWMutex{},
+		slug:                slug,
+		manager:             manager,
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
 		PartnerStatus: PartnerStatus{
@@ -712,7 +597,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
 }

@@ -37,10 +37,9 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) CreateConne
 }
 
 func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimeTableSubscriptionBroadcaster {

@@ -6,6 +6,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -72,7 +73,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	logSIRICheckStatusRequest(logStashEvent, message, request)
@@ -119,8 +120,7 @@ func (connector *SIRICheckStatusClient) newLogStashEvent() audit.LogStashEvent {
 }
 
 func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {

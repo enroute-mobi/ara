@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -43,7 +44,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
@@ -97,7 +98,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) newLogStashEvent() audit.
 }
 
 func (factory *SIRIGeneralMessageRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

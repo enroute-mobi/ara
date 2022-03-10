@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -32,9 +33,8 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPointsDiscoveryRequestCollector {
@@ -66,7 +66,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	startTime := connector.Clock().Now()
 
 	request := &siri.SIRIStopPointsDiscoveryRequest{
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
 	}
@@ -93,7 +93,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	stopPointRefs := []string{}
-	idKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
+	idKind := connector.partner.RemoteObjectIDKind()
 	partner := string(connector.Partner().Slug())
 
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {

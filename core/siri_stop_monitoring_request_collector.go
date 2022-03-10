@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -66,7 +67,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	objectidKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
+	objectidKind := connector.partner.RemoteObjectIDKind()
 	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
@@ -84,7 +85,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
@@ -204,9 +205,8 @@ func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.Lo
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {

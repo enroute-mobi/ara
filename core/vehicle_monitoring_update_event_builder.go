@@ -33,7 +33,7 @@ type VehicleMonitoringUpdateEvents struct {
 func NewVehicleMonitoringUpdateEventBuilder(partner *Partner) VehicleMonitoringUpdateEventBuilder {
 	return VehicleMonitoringUpdateEventBuilder{
 		partner:                       partner,
-		remoteObjectidKind:            partner.Setting(REMOTE_OBJECTID_KIND),
+		remoteObjectidKind:            partner.RemoteObjectIDKind(),
 		vehicleMonitoringUpdateEvents: newVehicleMonitoringUpdateEvents(),
 	}
 }

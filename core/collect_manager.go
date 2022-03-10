@@ -1,8 +1,6 @@
 package core
 
 import (
-	"strconv"
-
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -114,12 +112,12 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		}
 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if b, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT)); !b || subscriptionCollector == nil {
+			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
 				continue
 			}
 		}
 
-		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
+		partnerKind := partner.RemoteObjectIDKind()
 
 		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
 		if !ok {
@@ -168,12 +166,12 @@ func (manager *CollectManager) UpdateVehicle(request *VehicleUpdateRequest) {
 		}
 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if b, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT)); !b || subscriptionCollector == nil {
+			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
 				continue
 			}
 		}
 
-		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
+		partnerKind := partner.RemoteObjectIDKind()
 
 		lineObjectID, ok := line.ObjectID(partnerKind)
 		if !ok {
@@ -222,7 +220,7 @@ func (manager *CollectManager) requestAllSituations() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); b {
+		if partner.CollectFilteredGeneralMessages() {
 			continue
 		}
 
@@ -252,7 +250,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); !b {
+		if !partner.CollectFilteredGeneralMessages() {
 			continue
 		}
 
@@ -263,7 +261,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 			continue
 		}
 
-		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
+		partnerKind := partner.RemoteObjectIDKind()
 
 		lineObjectID, ok := line.ObjectID(partnerKind)
 		if !ok {
@@ -296,7 +294,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if b, _ := strconv.ParseBool(partner.Setting(COLLECT_FILTER_GENERAL_MESSAGES)); !b {
+		if !partner.CollectFilteredGeneralMessages() {
 			continue
 		}
 
@@ -307,7 +305,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 			continue
 		}
 
-		partnerKind := partner.Setting(REMOTE_OBJECTID_KIND)
+		partnerKind := partner.RemoteObjectIDKind()
 
 		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
 		if !ok {

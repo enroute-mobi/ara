@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
@@ -72,7 +73,7 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

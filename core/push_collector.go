@@ -30,7 +30,7 @@ func (factory *PushCollectorFactory) CreateConnector(partner *Partner) Connector
 }
 
 func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
@@ -78,7 +78,7 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 
 func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) (stopAreas []string) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
+	id_kind := pc.Partner().RemoteObjectIDKind()
 
 	for i := range sas {
 		sa := sas[i]
@@ -100,7 +100,7 @@ func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea
 
 func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) (lineIds []string) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
+	id_kind := pc.Partner().RemoteObjectIDKind()
 
 	for i := range lines {
 		l := lines[i]
@@ -119,7 +119,7 @@ func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) (lin
 
 func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVehicleJourney) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
+	id_kind := pc.Partner().RemoteObjectIDKind()
 
 	for i := range vjs {
 		vj := vjs[i]
@@ -140,7 +140,7 @@ func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVe
 
 func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVisit) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
+	id_kind := pc.Partner().RemoteObjectIDKind()
 
 	for i := range svs {
 		sv := svs[i]
@@ -163,7 +163,7 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 
 func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) (vehicles []string) {
 	partner := string(pc.Partner().Slug())
-	id_kind := pc.Partner().Setting(REMOTE_OBJECTID_KIND)
+	id_kind := pc.Partner().RemoteObjectIDKind()
 
 	for i := range vs {
 		v := vs[i]

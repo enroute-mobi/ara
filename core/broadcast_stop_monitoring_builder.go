@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -18,9 +19,9 @@ type BroadcastStopMonitoringBuilder struct {
 	MonitoringRef  string
 
 	tx                            *model.Transaction
-	referenceGenerator            *IdentifierGenerator
-	stopAreareferenceGenerator    *IdentifierGenerator
-	dataFrameGenerator            *IdentifierGenerator
+	referenceGenerator            *ig.IdentifierGenerator
+	stopAreareferenceGenerator    *ig.IdentifierGenerator
+	dataFrameGenerator            *ig.IdentifierGenerator
 	remoteObjectidKind            string
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
@@ -30,9 +31,9 @@ type BroadcastStopMonitoringBuilder struct {
 func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		tx:                            tx,
-		referenceGenerator:            partner.IdentifierGenerator(REFERENCE_IDENTIFIER),
-		stopAreareferenceGenerator:    partner.IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER),
-		dataFrameGenerator:            partner.IdentifierGenerator(DATA_FRAME_IDENTIFIER),
+		referenceGenerator:            partner.IdentifierGenerator(ig.REFERENCE_IDENTIFIER),
+		stopAreareferenceGenerator:    partner.IdentifierGenerator(ig.REFERENCE_STOP_AREA_IDENTIFIER),
+		dataFrameGenerator:            partner.IdentifierGenerator(ig.DATA_FRAME_IDENTIFIER),
 		remoteObjectidKind:            partner.RemoteObjectIDKind(connector),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
@@ -201,7 +202,7 @@ func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *mode
 			logger.Log.Printf("Ignore StopVisit %s without default ObjectID", stopVisit.Id())
 			return "", false
 		}
-		itemIdentifier = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "Item", Id: defaultObjectID.Value()})
+		itemIdentifier = builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: "Item", Id: defaultObjectID.Value()})
 	}
 	return itemIdentifier, true
 }
@@ -217,7 +218,7 @@ func (builder *BroadcastStopMonitoringBuilder) dataVehicleJourneyRef(vehicleJour
 		if !ok {
 			return "", false
 		}
-		dataVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+		dataVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -248,7 +249,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 		if !ok {
 			continue
 		}
-		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
+		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
 	}
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
 		reference, ok := references.Get(refType)
@@ -268,7 +269,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *mod
 			return
 		}
 	}
-	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(IdentifierAttributes{Id: reference.GetSha1()}))
+	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(ig.IdentifierAttributes{Id: reference.GetSha1()}))
 }
 
 func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin string) bool {
@@ -294,5 +295,5 @@ func (builder *BroadcastStopMonitoringBuilder) dataFrameRef(sv *model.StopVisit,
 		return sv.DataFrameRef
 	}
 	modelDate := builder.tx.Model().Date()
-	return builder.dataFrameGenerator.NewIdentifier(IdentifierAttributes{Id: modelDate.String()})
+	return builder.dataFrameGenerator.NewIdentifier(ig.IdentifierAttributes{Id: modelDate.String()})
 }

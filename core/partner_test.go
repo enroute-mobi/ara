@@ -1,13 +1,13 @@
 package core
 
 import (
-	"encoding/json"
 	"reflect"
 	"strconv"
 	"testing"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -186,7 +186,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 		slug:           "partner",
 		ConnectorTypes: []string{},
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
@@ -251,16 +251,16 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 
 func Test_Partner_CanCollectTrue(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -274,17 +274,17 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 
 func Test_Partner_CanCollectTrueLine(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
-	partner.SetSetting(COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -298,15 +298,15 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 
 func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.setCollectSettings()
+	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -314,10 +314,10 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 
 func Test_Partner_CanCollectFalse(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
 	}
@@ -325,10 +325,10 @@ func Test_Partner_CanCollectFalse(t *testing.T) {
 
 func Test_Partner_CanCollectFalseLine(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
 	}
@@ -336,17 +336,17 @@ func Test_Partner_CanCollectFalseLine(t *testing.T) {
 
 func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
+	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -360,17 +360,17 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 
 func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -378,11 +378,11 @@ func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 
 func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -390,12 +390,12 @@ func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 
 func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.setCollectSettings()
+	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
@@ -403,13 +403,13 @@ func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 
 func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
 	partner := &Partner{}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.discoveredStopAreas = make(map[string]struct{})
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.SetSetting(COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.setCollectSettings()
+	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
@@ -420,15 +420,15 @@ func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	partner1 := &Partner{
 		slug: "First",
 	}
-	partner1.PartnerSettings = NewPartnerSettings(partner1)
+	partner1.PartnerSettings = ps.NewPartnerSettings(partner1.UUIDGenerator)
 	partner2 := &Partner{
 		slug: "Second",
 	}
-	partner2.PartnerSettings = NewPartnerSettings(partner2)
+	partner2.PartnerSettings = ps.NewPartnerSettings(partner2.UUIDGenerator)
 
-	partner1.SetSetting("collect.priority", "2")
+	partner1.SetSetting(ps.COLLECT_PRIORITY, "2")
 
-	partner2.SetSetting("collect.priority", "1")
+	partner2.SetSetting(ps.COLLECT_PRIORITY, "1")
 
 	partners.Save(partner1)
 	partners.Save(partner2)
@@ -447,123 +447,6 @@ func Test_Partner_Subcription(t *testing.T) {
 
 	if len(partner.Subscriptions().FindAll()) != 1 {
 		t.Errorf("Wrong number of subcriptions want : %v got: %v", 1, len(sub.FindAll()))
-	}
-}
-
-func Test_APIPartner_SetFactories(t *testing.T) {
-	partner := &APIPartner{
-		ConnectorTypes: []string{"unexistant-factory", "test-check-status-client"},
-		factories:      make(map[string]ConnectorFactory),
-	}
-	partner.setFactories()
-
-	if len(partner.factories) != 1 {
-		t.Errorf("Factories should have been successfully created by setFactories")
-	}
-}
-
-func Test_APIPartner_Validate(t *testing.T) {
-	partners := createTestPartnerManager()
-	// Check empty Slug
-	apiPartner := &APIPartner{
-		manager: partners,
-	}
-	valid := apiPartner.Validate()
-
-	if valid {
-		t.Errorf("Validate should return false")
-	}
-	if len(apiPartner.Errors) != 1 {
-		t.Errorf("apiPartner Errors should not be empty")
-	}
-	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_BLANK {
-		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
-	}
-
-	// Check wrong format slug
-	apiPartner.Slug = "Wrong_format"
-	valid = apiPartner.Validate()
-
-	if valid {
-		t.Errorf("Validate should return false")
-	}
-	if len(apiPartner.Errors) != 1 {
-		t.Errorf("apiPartner Errors should not be empty")
-	}
-	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_SLUG_FORMAT {
-		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
-	}
-
-	jsonBytes, _ := json.Marshal(apiPartner)
-	expected := `{"Slug":"Wrong_format","Errors":{"Slug":["Invalid format: only lowercase alphanumeric characters and _"]}}`
-	if string(jsonBytes) != expected {
-		t.Fatalf("Invalid JSON, expected %v, got %v", expected, string(jsonBytes))
-	}
-
-	// Check Already Used Slug and local_credential
-	partner := partners.New("slug")
-	partner.SetSetting("local_credential", "cred")
-	partners.Save(partner)
-
-	apiPartner = &APIPartner{
-		Slug:     "slug",
-		Settings: map[string]string{"local_credential": "cred"},
-		manager:  partners,
-	}
-	valid = apiPartner.Validate()
-
-	if valid {
-		t.Errorf("Validate should return false")
-	}
-	if len(apiPartner.Errors) != 2 {
-		t.Errorf("apiPartner Errors should not be empty")
-	}
-	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != ERROR_UNIQUE {
-		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
-	}
-	if len(apiPartner.Errors.GetSettingError(LOCAL_CREDENTIAL)) != 1 || apiPartner.Errors.GetSettingError(LOCAL_CREDENTIAL)[0] != ERROR_UNIQUE {
-		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors)
-	}
-
-	jsonBytes, _ = json.Marshal(apiPartner)
-	expected = `{"Slug":"slug","Settings":{"local_credential":"cred"},"Errors":{"Settings":{"local_credential":["Is already in use"]},"Slug":["Is already in use"]}}`
-	if string(jsonBytes) != expected {
-		t.Fatalf("Invalid JSON, expected %v, got %v", expected, string(jsonBytes))
-	}
-
-	// Check ok
-	apiPartner = &APIPartner{
-		Slug:     "slug_2",
-		Settings: map[string]string{"local_credential": "cred2"},
-		manager:  partners,
-	}
-	valid = apiPartner.Validate()
-
-	if !valid {
-		t.Errorf("Validate should return true")
-	}
-	if len(apiPartner.Errors) != 0 {
-		t.Errorf("apiPartner Errors should be empty, got %v", apiPartner.Errors)
-	}
-
-	// Check settings errors
-	apiPartner = &APIPartner{
-		Slug:           "",
-		Settings:       map[string]string{},
-		ConnectorTypes: []string{SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER},
-		manager:        partners,
-		factories:      make(map[string]ConnectorFactory),
-	}
-	valid = apiPartner.Validate()
-
-	if valid {
-		t.Errorf("Validate should return false")
-	}
-	if len(apiPartner.Errors) != 2 {
-		t.Errorf("apiPartner Errors should not be empty, got %v", apiPartner.Errors)
-	}
-	if len(apiPartner.Errors.getSettings()) != 2 {
-		t.Errorf("apiPartner Setting Errors should have 2 errors, got %v", apiPartner.Errors.getSettings())
 	}
 }
 
@@ -625,10 +508,10 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.SetSetting("local_credential", "cred")
+	existingPartner.SetSetting(ps.LOCAL_CREDENTIAL, "cred")
 	partners.Save(existingPartner)
 
-	partner, ok := partners.FindBySetting(LOCAL_CREDENTIAL, "cred")
+	partner, ok := partners.FindBySetting(ps.LOCAL_CREDENTIAL, "cred")
 	if !ok {
 		t.Fatal("FindBySetting should return true when Partner is found")
 	}
@@ -641,8 +524,8 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.SetSetting(LOCAL_CREDENTIAL, "cred")
-	existingPartner.SetSetting(LOCAL_CREDENTIALS, "cred2,cred3")
+	existingPartner.SetSetting(ps.LOCAL_CREDENTIAL, "cred")
+	existingPartner.SetSetting(ps.LOCAL_CREDENTIALS, "cred2,cred3")
 	partners.Save(existingPartner)
 
 	partner, ok := partners.FindByCredential("cred")
@@ -790,27 +673,27 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 
-	midGenerator := partner.IdentifierGenerator("message_identifier")
-	if expected := "%{uuid}"; midGenerator.formatString != expected {
-		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g := partner.IdentifierGenerator("message_identifier")
+	if expected := "%{uuid}"; g.FormatString() != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("response_message_identifier")
-	if expected := "%{uuid}"; midGenerator.formatString != expected {
-		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("response_message_identifier")
+	if expected := "%{uuid}"; g.FormatString() != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("data_frame_identifier")
-	if expected := "%{id}"; midGenerator.formatString != expected {
-		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("data_frame_identifier")
+	if expected := "%{id}"; g.FormatString() != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("reference_identifier")
-	if expected := "%{type}:%{id}"; midGenerator.formatString != expected {
-		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("reference_identifier")
+	if expected := "%{type}:%{id}"; g.FormatString() != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("reference_stop_area_identifier")
-	if expected := "%{id}"; midGenerator.formatString != expected {
-		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("reference_stop_area_identifier")
+	if expected := "%{id}"; g.FormatString() != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
 
 	partner.SetSettingsDefinition(map[string]string{
@@ -821,25 +704,25 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 		"generators.reference_stop_area_identifier": "rsaid",
 	})
 
-	midGenerator = partner.IdentifierGenerator("message_identifier")
-	if expected := "mid"; midGenerator.formatString != expected {
-		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("message_identifier")
+	if expected := "mid"; g.FormatString() != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("response_message_identifier")
-	if expected := "rmid"; midGenerator.formatString != expected {
-		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("response_message_identifier")
+	if expected := "rmid"; g.FormatString() != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("data_frame_identifier")
-	if expected := "dfid"; midGenerator.formatString != expected {
-		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("data_frame_identifier")
+	if expected := "dfid"; g.FormatString() != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("reference_identifier")
-	if expected := "rid"; midGenerator.formatString != expected {
-		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("reference_identifier")
+	if expected := "rid"; g.FormatString() != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
-	midGenerator = partner.IdentifierGenerator("reference_stop_area_identifier")
-	if expected := "rsaid"; midGenerator.formatString != expected {
-		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, midGenerator.formatString)
+	g = partner.IdentifierGenerator("reference_stop_area_identifier")
+	if expected := "rsaid"; g.FormatString() != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
 	}
 }
 
@@ -847,19 +730,19 @@ func Test_Partner_SOAPClient(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
 	partner.SOAPClient()
 	if partner.httpClient == nil {
 		t.Error("partner.SOAPClient() should set Partner httpClient")
 	}
 
-	partner.SetSetting("remote_url", "remote_url")
+	partner.SetSetting(ps.REMOTE_URL, "remote_url")
 	partner.SOAPClient()
 	if partner.httpClient.Url != "remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
 	}
 
-	partner.SetSetting("subscriptions.remote_url", "sub_remote_url")
+	partner.SetSetting(ps.SUBSCRIPTIONS_REMOTE_URL, "sub_remote_url")
 	partner.SOAPClient()
 	if partner.httpClient.SubscriptionsUrl != "sub_remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
@@ -870,8 +753,8 @@ func Test_Partner_RequestorRef(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = NewPartnerSettings(partner)
-	partner.SetSetting("remote_credential", "ara")
+	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.SetSetting(ps.REMOTE_CREDENTIAL, "ara")
 	if partner.RequestorRef() != "ara" {
 		t.Errorf("Wrong Partner RequestorRef:\n got: %s\n want: \"ara\"", partner.RequestorRef())
 	}

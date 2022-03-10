@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -130,7 +131,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 	response := &siri.SIRIStopMonitoringResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringRequest)
@@ -157,7 +158,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) newLogStashEvent() audit.
 }
 
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

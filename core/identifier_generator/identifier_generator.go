@@ -1,4 +1,4 @@
-package core
+package identifier_generator
 
 import (
 	"regexp"
@@ -26,9 +26,8 @@ var defaultIdentifierGenerators = map[string]string{
 }
 
 type IdentifierGenerator struct {
-	uuid.UUIDConsumer
-
-	formatString string
+	uuidGenerator uuid.UUIDGenerator
+	formatString  string
 }
 
 type IdentifierAttributes struct {
@@ -40,10 +39,10 @@ func DefaultIdentifierGenerator(k string) string {
 	return defaultIdentifierGenerators[k]
 }
 
-func NewIdentifierGenerator(formatString string, uuidGenerator uuid.UUIDConsumer) *IdentifierGenerator {
+func NewIdentifierGenerator(formatString string, uuidGenerator uuid.UUIDGenerator) *IdentifierGenerator {
 	return &IdentifierGenerator{
-		UUIDConsumer: uuidGenerator,
-		formatString: formatString,
+		uuidGenerator: uuidGenerator,
+		formatString:  formatString,
 	}
 }
 
@@ -57,7 +56,11 @@ func (generator *IdentifierGenerator) NewMessageIdentifier() string {
 	return generator.handleuuids(generator.formatString)
 }
 
+func (generator *IdentifierGenerator) FormatString() string {
+	return generator.formatString
+}
+
 func (generator *IdentifierGenerator) handleuuids(s string) string {
 	re := regexp.MustCompile("%{uuid}")
-	return re.ReplaceAllStringFunc(s, func(string) string { return generator.NewUUID() })
+	return re.ReplaceAllStringFunc(s, func(string) string { return generator.uuidGenerator.NewUUID() })
 }

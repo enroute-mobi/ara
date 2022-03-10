@@ -1,4 +1,4 @@
-package core
+package api_errors
 
 import "testing"
 

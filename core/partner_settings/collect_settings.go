@@ -1,4 +1,4 @@
-package core
+package partner_settings
 
 import "bitbucket.org/enroute-mobi/ara/logger"
 

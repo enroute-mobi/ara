@@ -12,13 +12,11 @@ import (
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
-const DEFAULT_GTFS_TTL = 30 * time.Second
-
 type GtfsRequestCollectorFactory struct{}
 
 func (factory *GtfsRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfLightRemoteCredentials()
 }
 
 func (factory *GtfsRequestCollectorFactory) CreateConnector(partner *Partner) Connector {
@@ -51,7 +49,7 @@ func (connector *GtfsRequestCollector) Start() {
 	logger.Log.Debugf("Start GtfsRequestCollector")
 
 	connector.ttl = connector.Partner().GtfsTTL()
-	connector.remoteObjectidKind = connector.Partner().Setting(REMOTE_OBJECTID_KIND)
+	connector.remoteObjectidKind = connector.Partner().RemoteObjectIDKind()
 	connector.origin = string(connector.Partner().Slug())
 	connector.stop = make(chan struct{})
 	go connector.run()

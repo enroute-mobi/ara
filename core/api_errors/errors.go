@@ -1,4 +1,4 @@
-package core
+package api_errors
 
 type Errors map[string]interface{}
 
@@ -79,7 +79,7 @@ func (errors Errors) AddSettingError(attribute, message string) {
 }
 
 // Test method
-func (errors Errors) getSettings() Errors {
+func (errors Errors) GetSettings() Errors {
 	s, ok := errors[SETTINGS]
 	if ok {
 		return s.(Errors)

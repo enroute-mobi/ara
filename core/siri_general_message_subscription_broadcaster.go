@@ -33,10 +33,9 @@ func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector
 }
 
 func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
-	apiPartner.ValidatePresenceOfSetting(LOCAL_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
+	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIGeneralMessageSubscriptionBroadcaster(partner *Partner) *SIRIGeneralMessageSubscriptionBroadcaster {

@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -40,9 +41,8 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
@@ -152,7 +152,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
 	}
 
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "GeneralMessageSubscriptionCollector")
@@ -186,7 +186,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 	}
 
 	for _, cancellation := range xmlGmCancellations {
-		obj := model.NewObjectID(connector.partner.Setting(REMOTE_OBJECTID_KIND), cancellation.InfoMessageIdentifier())
+		obj := model.NewObjectID(connector.partner.RemoteObjectIDKind(), cancellation.InfoMessageIdentifier())
 		situation, ok := tx.Model().Situations().FindByObjectId(obj)
 		if ok {
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())

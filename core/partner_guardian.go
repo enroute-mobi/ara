@@ -1,7 +1,6 @@
 package core
 
 import (
-	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -116,12 +115,12 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		partner.PartnerStatus.RetryCount = 0
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
 
-		collectPersistent, _ := strconv.ParseBool(partner.Setting(COLLECT_SUBSCRIPTIONS_PERSISTENT))
+		collectPersistent := partner.PersistentCollectSubscriptions()
 		if !collectPersistent {
 			partner.Subscriptions().CancelCollectSubscriptions()
 		}
 
-		broadcastPersistent, _ := strconv.ParseBool(partner.Setting(BROADCAST_SUBSCRIPTIONS_PERSISTENT))
+		broadcastPersistent := partner.PersistentBroadcastSubscriptions()
 		if !broadcastPersistent {
 			partner.Subscriptions().CancelBroadcastSubscriptions()
 		}
