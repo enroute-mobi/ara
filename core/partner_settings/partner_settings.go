@@ -61,7 +61,8 @@ const (
 	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
 
-	SIRI_ENVELOPE    = "siri.envelope"
+	SIRI_ENVELOPE = "siri.envelope"
+
 	DEFAULT_GTFS_TTL = 30 * time.Second
 )
 
