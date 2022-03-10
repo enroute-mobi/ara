@@ -47,6 +47,7 @@ type Referential struct {
 	startedAt         time.Time
 	nextReloadAt      time.Time
 	Tokens            []string `json:",omitempty"`
+	ImportTokens      []string `json:",omitempty"`
 }
 
 type Referentials interface {
@@ -68,10 +69,11 @@ type APIReferential struct {
 	id             ReferentialId
 	OrganisationId string            `json:",omitempty"`
 	Slug           ReferentialSlug   `json:"Slug,omitempty"`
-	Name           string            `json:",omitempty"`
+	Name           string            `json:"Name,omitempty"`
 	Errors         Errors            `json:"Errors,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	Tokens         []string          `json:"Tokens,omitempty"`
+	ImportTokens   []string          `json:"ImportTokens,omitempty"`
 
 	manager Referentials
 }
@@ -92,6 +94,7 @@ func (referential *APIReferential) Validate() bool {
 	// if len(referential.Tokens) == 0 {
 	// 	referential.Errors.Add("Tokens", ERROR_BLANK)
 	// }
+
 	// Check Slug uniqueness
 	for _, existingReferential := range referential.manager.FindAll() {
 		if existingReferential.id != referential.Id() {
@@ -223,6 +226,7 @@ func (referential *Referential) Definition() *APIReferential {
 		Errors:         NewErrors(),
 		manager:        referential.manager,
 		Tokens:         referential.Tokens,
+		ImportTokens:   referential.ImportTokens,
 	}
 }
 
@@ -234,6 +238,7 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 	referential.Name = apiReferential.Name
 	referential.Settings = apiReferential.Settings
 	referential.Tokens = apiReferential.Tokens
+	referential.ImportTokens = apiReferential.ImportTokens
 
 	if initialReloadAt != referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT) {
 		referential.setNextReloadAt()
@@ -388,6 +393,12 @@ func (manager *MemoryReferentials) Load() error {
 			}
 		}
 
+		if r.ImportTokens.Valid && len(r.ImportTokens.String) > 0 {
+			if err = json.Unmarshal([]byte(r.ImportTokens.String), &referential.ImportTokens); err != nil {
+				return err
+			}
+		}
+
 		referential.setNextReloadAt()
 		manager.Save(referential)
 		referential.Load()
@@ -450,6 +461,10 @@ func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*
 	if err != nil {
 		return nil, err
 	}
+	importTokens, err := json.Marshal(referential.ImportTokens)
+	if err != nil {
+		return nil, err
+	}
 	return &model.DatabaseReferential{
 		ReferentialId:  string(referential.id),
 		OrganisationId: referential.DatabaseOrganisationId(),
@@ -457,6 +472,7 @@ func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*
 		Name:           referential.Name,
 		Settings:       string(settings),
 		Tokens:         string(tokens),
+		ImportTokens:   string(importTokens),
 	}, nil
 }
 

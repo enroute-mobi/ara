@@ -13,6 +13,61 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
+func TestTokens(t *testing.T) {
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+
+	// Save a new referential
+	referential := referentials.New("first_referential")
+	referentials.Save(referential)
+
+	// Create a request
+	request, err := http.NewRequest("Get", "/first_referential/partners", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	responseRecorder := httptest.NewRecorder()
+	server.HandleFlow(responseRecorder, request)
+
+	if status := responseRecorder.Code; status == http.StatusOK {
+		t.Errorf("Handler returned wrong status code: %v", status)
+		panic(responseRecorder.Body)
+	}
+
+	referential.Tokens = []string{"12345"}
+	referential.ImportTokens = []string{"23456"}
+	referential.Save()
+
+	responseRecorder = httptest.NewRecorder()
+	server.HandleFlow(responseRecorder, request)
+
+	if status := responseRecorder.Code; status == http.StatusOK {
+		t.Errorf("Handler returned wrong status code: %v", status)
+	}
+
+	request.Header.Set("Authorization", "Token token=12345")
+
+	responseRecorder = httptest.NewRecorder()
+	server.HandleFlow(responseRecorder, request)
+
+	if status := responseRecorder.Code; status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: %v", status)
+	}
+
+	request.Header.Set("Authorization", "Token token=23456")
+
+	responseRecorder = httptest.NewRecorder()
+	server.HandleFlow(responseRecorder, request)
+
+	if status := responseRecorder.Code; status == http.StatusOK {
+		t.Errorf("Handler returned wrong status code: %v", status)
+	}
+}
+
 func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
 	if status := responseRecorder.Code; status != http.StatusOK {
 		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",

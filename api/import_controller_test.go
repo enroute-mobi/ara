@@ -174,3 +174,80 @@ func Test_Serve(t *testing.T) {
 		t.Errorf("Handler returned wrong number of errors:\n got %v\n want 0", result3.Import["Errors"])
 	}
 }
+
+func Test_Serve_With_NoToken(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
+
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	// Save a new referential
+	referential := referentials.New("test")
+	referentials.Save(referential)
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+	// Create a request
+	//prepare the reader instances to encode
+	values := map[string]io.Reader{
+		"data":    mustOpen(t, "testdata/import.csv"),
+		"request": strings.NewReader("{\"force\": false}"),
+	}
+	request := prepareMultipart(t, values)
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+
+	// Test the result
+	if status := responseRecorder.Code; status == http.StatusOK {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", http.StatusUnauthorized, http.StatusOK)
+	}
+}
+
+func Test_Serve_With_ImportToken(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
+
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	// Save a new referential
+	referential := referentials.New("test")
+	referential.ImportTokens = []string{"testToken"}
+	referentials.Save(referential)
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+	// Create a request
+	//prepare the reader instances to encode
+	values := map[string]io.Reader{
+		"data":    mustOpen(t, "testdata/import.csv"),
+		"request": strings.NewReader("{\"force\": false}"),
+	}
+	request := prepareMultipart(t, values)
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+
+	// Test the result
+	if status := responseRecorder.Code; status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", status, http.StatusOK)
+	}
+
+	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
+		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v", contentType, "application/json")
+	}
+	expectedBody := `{"Import":{"Total":10,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":2},"Errors":{}}`
+	if responseRecorder.Body.String() != expectedBody {
+		t.Errorf("Handler returned wrong body:\n got %v\n want %v", responseRecorder.Body.String(), expectedBody)
+	}
+}
