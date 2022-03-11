@@ -204,7 +204,7 @@ func main() {
 }
 
 func checkStatus(url string, requestorRef string) error {
-	client := remote.NewHTTPClient(remote.HTTPClientUrls{Url: url}).SOAPClient()
+	client := remote.NewHTTPClient(remote.HTTPClientOptions{Urls: remote.HTTPClientUrls{Url: url}}).SOAPClient()
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      requestorRef,
 		RequestTimestamp:  clock.DefaultClock().Now(),

@@ -159,12 +159,12 @@ func (partner *Partner) GtfsCache() *cache.CacheTable {
 }
 
 func (partner *Partner) HTTPClient() *remote.HTTPClient {
-	urls := partner.HTTPClientURLs()
+	opts := partner.HTTPClientOptions()
 	if partner.httpClient == nil {
-		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, urls.Url)
-		partner.httpClient = remote.NewHTTPClient(urls)
-	} else if partner.httpClient.HTTPClientUrls != urls {
-		partner.httpClient.SetURLs(urls)
+		logger.Log.Debugf("Create a new http client in partner %s to %s", partner.Name, opts.Urls.Url)
+		partner.httpClient = remote.NewHTTPClient(opts)
+	} else if partner.httpClient.HTTPClientUrls != opts.Urls {
+		partner.httpClient.SetURLs(opts.Urls)
 	}
 	return partner.httpClient
 }
@@ -218,6 +218,7 @@ func (partner *Partner) Stop() {
 	}
 	partner.CancelSubscriptions()
 	partner.gtfsCache.Clear()
+	partner.httpClient = nil
 }
 
 func (partner *Partner) Start() {

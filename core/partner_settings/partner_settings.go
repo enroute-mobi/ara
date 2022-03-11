@@ -57,6 +57,10 @@ const (
 
 	CACHE_TIMEOUT = "cache_timeout"
 
+	OAUTH_CLIENT_ID     = "remote_authentication.oauth.client_id"
+	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
+	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
+
 	DEFAULT_GTFS_TTL = 30 * time.Second
 )
 
@@ -360,14 +364,33 @@ func (s *PartnerSettings) SetCollectSettings() {
 	}
 }
 
-func (s *PartnerSettings) HTTPClientURLs() remote.HTTPClientUrls {
+func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
 	defer s.m.RUnlock()
-	return remote.HTTPClientUrls{
-		Url:              s.s[REMOTE_URL],
-		SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
-		NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
+	opts = remote.HTTPClientOptions{
+		OAuth: s.httpClientOAuth(),
+		Urls: remote.HTTPClientUrls{
+			Url:              s.s[REMOTE_URL],
+			SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
+			NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
+		},
 	}
+	return
+}
+
+// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+func (s *PartnerSettings) httpClientOAuth() (opts *remote.HTTPClientOAuth) {
+	cid, ok1 := s.s[OAUTH_CLIENT_ID]
+	cs, ok2 := s.s[OAUTH_CLIENT_SECRET]
+	t, ok3 := s.s[OAUTH_TOKEN_URL]
+	if ok1 && ok2 && ok3 {
+		opts = &remote.HTTPClientOAuth{
+			ClientID:     cid,
+			ClientSecret: cs,
+			TokenURL:     t,
+		}
+	}
+	return
 }
 
 func trimedSlice(s string) (slc []string) {

@@ -10,10 +10,24 @@ import (
 	"strconv"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/version"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
+
+type HTTPClientOptions struct {
+	OAuth *HTTPClientOAuth
+	Urls  HTTPClientUrls
+}
+
+type HTTPClientOAuth struct {
+	ClientID     string
+	ClientSecret string
+	TokenURL     string
+}
 
 type HTTPClientUrls struct {
 	Url              string
@@ -28,7 +42,18 @@ type HTTPClient struct {
 	soapClient *SOAPClient
 }
 
-func NewHTTPClient(urls HTTPClientUrls) *HTTPClient {
+func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
+	c := &HTTPClient{
+		HTTPClientUrls: opts.Urls,
+		httpClient:     httpClient(opts),
+	}
+	sc := NewSOAPClient(c)
+	c.soapClient = sc
+
+	return c
+}
+
+func httpClient(opts HTTPClientOptions) (c *http.Client) {
 	// Customize the Transport based on DefaultTransport
 	// DefaultTransport for reference
 	// var DefaultTransport RoundTripper = &Transport{
@@ -50,19 +75,35 @@ func NewHTTPClient(urls HTTPClientUrls) *HTTPClient {
 	netTransport.TLSHandshakeTimeout = 5 * time.Second
 
 	// set a long default time for safety, but we use context for request specific timeouts
-	httpClient := &http.Client{
+	c = &http.Client{
 		Timeout:   60 * time.Second,
 		Transport: netTransport,
 	}
 
-	c := &HTTPClient{
-		HTTPClientUrls: urls,
-		httpClient:     httpClient,
+	if opts.OAuth == nil {
+		return c
 	}
-	sc := NewSOAPClient(c)
-	c.soapClient = sc
 
-	return c
+	oauthConfig := clientcredentials.Config{
+		ClientID:     opts.OAuth.ClientID,
+		ClientSecret: opts.OAuth.ClientSecret,
+		TokenURL:     opts.OAuth.TokenURL,
+	}
+
+	ctx := context.Background()
+	ctx = context.WithValue(
+		context.Background(),
+		oauth2.HTTPClient,
+		c,
+	)
+
+	_, err := oauthConfig.Token(ctx)
+	if err != nil {
+		logger.Log.Printf("Could not authenticate with OAuth: %s", err)
+		return c // Return default server if we can't authenticate with OAuth
+	}
+
+	return oauthConfig.Client(ctx)
 }
 
 func (c *HTTPClient) SetURLs(urls HTTPClientUrls) {

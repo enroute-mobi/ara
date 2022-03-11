@@ -43,7 +43,7 @@ func Test_SOAPClient_CheckStatus(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
 	client := httpClient.SOAPClient()
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      "Ara",
@@ -96,7 +96,7 @@ func Test_SOAPClient_CheckStatus_GzipResponse(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
 	client := httpClient.SOAPClient()
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      "Ara",
@@ -120,7 +120,7 @@ func Test_SOAPClient_StopMonitoring(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientUrls{Url: ts.URL})
+	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
 	client := httpClient.SOAPClient()
 	request := &siri.SIRIGetStopMonitoringRequest{
 		RequestorRef: "Ara",
