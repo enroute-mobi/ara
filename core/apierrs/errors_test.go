@@ -1,4 +1,4 @@
-package api_errors
+package apierrs
 
 import "testing"
 

@@ -7,7 +7,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -102,7 +101,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				stopAreasToRequest[messageIdentifier] = &saToRequest{
 					subId: subscription.id,
 					saId:  *(resource.Reference.ObjectId),
@@ -123,7 +122,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}

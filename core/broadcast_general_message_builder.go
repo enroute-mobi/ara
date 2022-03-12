@@ -2,7 +2,7 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -14,7 +14,7 @@ type BroadcastGeneralMessageBuilder struct {
 
 	tx                 *model.Transaction
 	partner            *Partner
-	referenceGenerator *ig.IdentifierGenerator
+	referenceGenerator *idgen.IdentifierGenerator
 	remoteObjectidKind string
 	lineRef            map[string]struct{}
 	stopPointRef       map[string]struct{}
@@ -26,7 +26,7 @@ func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, partner *Partner, 
 	return &BroadcastGeneralMessageBuilder{
 		tx:                 tx,
 		partner:            partner,
-		referenceGenerator: partner.IdentifierGenerator(ig.REFERENCE_IDENTIFIER),
+		referenceGenerator: partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
 		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),
@@ -73,11 +73,11 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		if !present {
 			return nil
 		}
-		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: "InfoMessage", Id: objectid.Value()})
+		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: objectid.Value()})
 	}
 
 	siriGeneralMessage := &siri.SIRIGeneralMessage{
-		ItemIdentifier:        builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
+		ItemIdentifier:        builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
 		InfoMessageIdentifier: infoMessageIdentifier,
 		InfoChannelRef:        situation.Channel,
 		InfoMessageVersion:    situation.Version,
@@ -160,7 +160,7 @@ func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model
 		return builder.resolveStopAreaRef(reference)
 	default:
 		kind := reference.Type
-		return builder.referenceGenerator.NewIdentifier(ig.IdentifierAttributes{Type: kind[:len(kind)-3], Id: reference.GetSha1()}), true
+		return builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: kind[:len(kind)-3], Id: reference.GetSha1()}), true
 	}
 }
 

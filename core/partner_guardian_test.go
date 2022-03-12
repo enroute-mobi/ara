@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	e "bitbucket.org/enroute-mobi/ara/core/api_errors"
+	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 

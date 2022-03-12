@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )

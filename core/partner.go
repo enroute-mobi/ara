@@ -11,8 +11,8 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/cache"
-	e "bitbucket.org/enroute-mobi/ara/core/api_errors"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"

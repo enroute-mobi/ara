@@ -5,7 +5,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -60,7 +59,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 	siriVehicleMonitoringRequest := &siri.SIRIGetVehicleMonitoringRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriVehicleMonitoringRequest.LineRef = objectid.Value()
 	siriVehicleMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 

@@ -7,7 +7,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -104,7 +103,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
 					subId:    subscription.id,
@@ -127,7 +126,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}

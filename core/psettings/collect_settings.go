@@ -1,4 +1,4 @@
-package partner_settings
+package psettings
 
 import "bitbucket.org/enroute-mobi/ara/logger"
 

@@ -6,7 +6,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -50,7 +49,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	// Check the request filter

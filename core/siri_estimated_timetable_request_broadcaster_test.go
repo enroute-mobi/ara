@@ -8,7 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"

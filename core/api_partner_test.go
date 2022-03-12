@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	e "bitbucket.org/enroute-mobi/ara/core/api_errors"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 )
 
 func Test_APIPartner_SetFactories(t *testing.T) {

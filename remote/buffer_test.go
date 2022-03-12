@@ -6,7 +6,7 @@ import (
 )
 
 func Test_SIRIBuffer_Read(t *testing.T) {
-	var r []byte = make([]byte, 512)
+	r := make([]byte, 512)
 	expected := `<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 <S:Body>

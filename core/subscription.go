@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -402,8 +402,8 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	defer manager.mutex.Unlock()
 
 	if subscription.Id() == "" {
-		generator := manager.partner.IdentifierGenerator(ig.SUBSCRIPTION_IDENTIFIER)
-		subscription.id = SubscriptionId(generator.NewIdentifier(ig.IdentifierAttributes{Id: manager.NewUUID()}))
+		generator := manager.partner.IdentifierGenerator(idgen.SUBSCRIPTION_IDENTIFIER)
+		subscription.id = SubscriptionId(generator.NewIdentifier(idgen.IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 
 	subscription.manager = manager

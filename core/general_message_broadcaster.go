@@ -8,7 +8,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -109,7 +108,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		notify := siri.SIRINotifyGeneralMessage{
 			Address:                   gmb.connector.Partner().Address(),
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+			ResponseMessageIdentifier: gmb.connector.Partner().NewResponseMessageIdentifier(),
 			SubscriberRef:             sub.SubscriberRef,
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),

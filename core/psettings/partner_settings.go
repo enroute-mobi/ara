@@ -1,4 +1,4 @@
-package partner_settings
+package psettings
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -73,7 +73,7 @@ type PartnerSettings struct {
 
 	s  map[string]string
 	cs *CollectSettings
-	g  map[string]*ig.IdentifierGenerator
+	g  map[string]*idgen.IdentifierGenerator
 }
 
 func NewPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
@@ -81,7 +81,7 @@ func NewPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
 		m:  &sync.RWMutex{},
 		ug: ug,
 		s:  make(map[string]string),
-		g:  make(map[string]*ig.IdentifierGenerator),
+		g:  make(map[string]*idgen.IdentifierGenerator),
 	}
 }
 
@@ -433,25 +433,33 @@ func (s *PartnerSettings) IdentifierGenerator(generatorName string) *IdentifierG
 	s.m.Lock()
 	generator, ok := s.g[generatorName]
 	if !ok {
-		generator = ig.NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.ug())
+		generator = idgen.NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.ug())
 		s.g[generatorName] = generator
 	}
 	s.m.Unlock()
 	return generator
 }
 
+func (s *PartnerSettings) NewMessageIdentifier() string {
+	return s.IdentifierGenerator(idgen.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+}
+
+func (s *PartnerSettings) NewResponseMessageIdentifier() string {
+	return s.IdentifierGenerator(idgen.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
+}
+
 func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {
 	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
 
 	if formatString == "" {
-		formatString = ig.DefaultIdentifierGenerator(generatorName)
+		formatString = idgen.DefaultIdentifierGenerator(generatorName)
 	}
 	return
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) refreshGenerators() {
-	s.g = make(map[string]*ig.IdentifierGenerator)
+	s.g = make(map[string]*idgen.IdentifierGenerator)
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling

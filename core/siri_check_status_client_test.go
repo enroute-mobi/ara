@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	ps "bitbucket.org/enroute-mobi/ara/core/partner_settings"
+	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 

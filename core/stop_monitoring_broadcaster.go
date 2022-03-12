@@ -8,7 +8,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -109,7 +108,7 @@ func (smb *SMBroadcaster) prepareNotMonitored() {
 				Address:                   smb.connector.Partner().Address(),
 				ProducerRef:               smb.connector.Partner().ProducerRef(),
 				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-				ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+				ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
 				ResponseTimestamp:         smb.connector.Clock().Now(),
 			}
 
@@ -159,7 +158,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			Address:                   smb.connector.Partner().Address(),
 			ProducerRef:               smb.connector.Partner().ProducerRef(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			ResponseMessageIdentifier: smb.connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+			ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
 			ResponseTimestamp:         smb.connector.Clock().Now(),
 		}
 		deliveries := make(map[string]*siri.SIRINotifyStopMonitoringDelivery)

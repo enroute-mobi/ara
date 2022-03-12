@@ -6,7 +6,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -38,7 +37,7 @@ func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatus
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
 		RequestMessageRef:         request.MessageIdentifier(),
-		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(ig.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 		Status:                    true,
 		ResponseTimestamp:         connector.Clock().Now(),
 		ServiceStartedTime:        connector.Partner().StartedAt(),

@@ -8,7 +8,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ig "bitbucket.org/enroute-mobi/ara/core/identifier_generator"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -183,7 +182,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().IdentifierGenerator(ig.MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
 
