@@ -33,7 +33,7 @@ func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
 	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSIRIBuffer()
 	soapEnvelope.WriteXML(fmt.Sprintf(`
   <S:Fault>
     <faultcode>S:%s</faultcode>

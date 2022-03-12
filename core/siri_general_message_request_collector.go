@@ -72,7 +72,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 
 	logSIRIGeneralMessageRequest(logStashEvent, message, siriGeneralMessageRequest)
 
-	xmlGeneralMessageResponse, err := connector.Partner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
+	xmlGeneralMessageResponse, err := connector.Partner().SIRIClient().SituationMonitoring(siriGeneralMessageRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

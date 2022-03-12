@@ -284,7 +284,7 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 
 	t := smb.Clock().Now()
 
-	err := smb.connector.Partner().SOAPClient().NotifyStopMonitoring(notify)
+	err := smb.connector.Partner().SIRIClient().NotifyStopMonitoring(notify)
 	message.ProcessingTime = smb.Clock().Since(t).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)

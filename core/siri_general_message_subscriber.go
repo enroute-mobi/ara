@@ -167,7 +167,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	message.SubscriptionIdentifiers = lineRefList
 
 	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SOAPClient().GeneralMessageSubscription(gmRequest)
+	response, err := subscriber.connector.Partner().SIRIClient().GeneralMessageSubscription(gmRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {

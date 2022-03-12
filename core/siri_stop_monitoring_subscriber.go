@@ -154,7 +154,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 
 	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+	response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {

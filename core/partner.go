@@ -169,8 +169,8 @@ func (partner *Partner) HTTPClient() *remote.HTTPClient {
 	return partner.httpClient
 }
 
-func (partner *Partner) SOAPClient() *remote.SOAPClient {
-	return partner.HTTPClient().SOAPClient()
+func (partner *Partner) SIRIClient() *remote.SIRIClient {
+	return partner.HTTPClient().SIRIClient()
 }
 
 func (partner *Partner) OperationnalStatus() OperationnalStatus {

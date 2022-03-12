@@ -38,7 +38,7 @@ func (handler *SIRIServiceRequestHandler) Respond(connector core.Connector, rw h
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSIRIBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
 	n, err := soapEnvelope.WriteTo(rw)

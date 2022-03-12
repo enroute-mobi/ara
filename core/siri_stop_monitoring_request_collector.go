@@ -92,7 +92,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logSIRIStopMonitoringRequest(logStashEvent, message, siriStopMonitoringRequest)
 
-	xmlStopMonitoringResponse, err := connector.Partner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	xmlStopMonitoringResponse, err := connector.Partner().SIRIClient().StopMonitoring(siriStopMonitoringRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

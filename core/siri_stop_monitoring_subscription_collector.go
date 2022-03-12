@@ -188,7 +188,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
 
 	startTime := connector.Clock().Now()
-	response, err := connector.Partner().SOAPClient().DeleteSubscription(request)
+	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
 	logStashEvent["responseTime"] = responseTime.String()

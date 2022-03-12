@@ -151,7 +151,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			audit.CurrentLogStash().WriteEvent(logStashEvent)
 			t := gmb.Clock().Now()
 
-			err := gmb.connector.Partner().SOAPClient().NotifyGeneralMessage(&notify)
+			err := gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
 			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
 			if err != nil {
 				event := gmb.newLogStashEvent()

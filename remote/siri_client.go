@@ -25,34 +25,40 @@ const (
 	SUBSCRIPTION
 	NOTIFICATION
 	CHECK_STATUS
+
+	SUBSCRIPTION_TIMEOUT = 30 * time.Second
+	CHECK_STATUS_TIMEOUT = 9 * time.Second
+	DEFAULT_TIMEOUT      = 5 * time.Second
 )
 
 type Request interface {
 	BuildXML() (string, error)
 }
 
-type SOAPClient struct {
-	httpClient *HTTPClient
+type SIRIClient struct {
+	httpClient       *HTTPClient
+	siriEnvelopeType string
 }
 
-type soapClientArguments struct {
+type siriClientArguments struct {
 	request          Request
 	requestType      requestType
 	expectedResponse string
 	acceptGzip       bool
 }
 
-func NewSOAPClient(c *HTTPClient) *SOAPClient {
-	return &SOAPClient{
-		httpClient: c,
+func NewSIRIClient(c *HTTPClient, set string) *SIRIClient {
+	return &SIRIClient{
+		httpClient:       c,
+		siriEnvelopeType: set,
 	}
 }
 
-func (client *SOAPClient) remoteClient() *http.Client {
+func (client *SIRIClient) remoteClient() *http.Client {
 	return client.httpClient.HTTPClient()
 }
 
-func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
+func (client *SIRIClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
 	r, _ := regexp.Compile("^text/xml;charset=([ -~]+)")
 	s := r.FindStringSubmatch(contentType)
 	if len(s) == 0 {
@@ -64,24 +70,24 @@ func (client *SOAPClient) responseFromFormat(body io.Reader, contentType string)
 	return body
 }
 
-func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.Node, error) {
+func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.Node, error) {
 	// Wrap the request XML
-	soapEnvelope := NewSOAPEnvelopeBuffer()
+	buffer := NewSIRIBuffer(client.siriEnvelopeType)
 	xml, err := args.request.BuildXML()
 	if err != nil {
 		return nil, err
 	}
 
-	soapEnvelope.WriteXML(xml)
+	buffer.WriteXML(xml)
 
 	// For tests
-	// logger.Log.Debugf("%v", soapEnvelope.String())
+	// logger.Log.Debugf("%v", buffer.String())
 
 	// Create http request
 	ctx, cncl := context.WithTimeout(context.Background(), getTimeOut(args.requestType))
 	defer cncl()
 
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, client.getURL(args.requestType), soapEnvelope)
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, client.getURL(args.requestType), buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +96,7 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
 	httpRequest.Header.Set("User-Agent", version.ApplicationName())
-	httpRequest.ContentLength = soapEnvelope.Length()
+	httpRequest.ContentLength = buffer.Length()
 
 	// Send http request
 	response, err := client.remoteClient().Do(httpRequest)
@@ -129,15 +135,15 @@ func (client *SOAPClient) prepareAndSendRequest(args soapClientArguments) (xml.N
 		responseReader = client.responseFromFormat(response.Body, response.Header.Get("Content-Type"))
 	}
 
-	// Create SOAPEnvelope and check body type
-	envelope, err := NewSOAPEnvelope(responseReader)
+	// Handle SOAP and check body type
+	envelope, err := NewSIRIEnvelope(responseReader, client.siriEnvelopeType)
 	if err != nil {
 		return nil, err
 	}
 	return envelope.BodyOrError(args.expectedResponse)
 }
 
-func (client *SOAPClient) getURL(requestType requestType) string {
+func (client *SIRIClient) getURL(requestType requestType) string {
 	switch requestType {
 	case SUBSCRIPTION:
 		if client.httpClient.SubscriptionsUrl != "" {
@@ -154,16 +160,16 @@ func (client *SOAPClient) getURL(requestType requestType) string {
 func getTimeOut(rt requestType) time.Duration {
 	switch rt {
 	case SUBSCRIPTION:
-		return 30 * time.Second
+		return SUBSCRIPTION_TIMEOUT
 	case CHECK_STATUS:
-		return 9 * time.Second
+		return CHECK_STATUS_TIMEOUT
 	default:
-		return 5 * time.Second
+		return DEFAULT_TIMEOUT
 	}
 }
 
-func (client *SOAPClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*siri.XMLCheckStatusResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*siri.XMLCheckStatusResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "CheckStatusResponse",
 		requestType:      CHECK_STATUS,
@@ -177,8 +183,8 @@ func (client *SOAPClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*si
 	return checkStatus, nil
 }
 
-func (client *SOAPClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryRequest) (*siri.XMLStopPointsDiscoveryResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryRequest) (*siri.XMLStopPointsDiscoveryResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "StopPointsDiscoveryResponse",
 		acceptGzip:       true,
@@ -191,8 +197,8 @@ func (client *SOAPClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryReq
 	return stopDiscovery, nil
 }
 
-func (client *SOAPClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*siri.XMLStopMonitoringResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*siri.XMLStopMonitoringResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetStopMonitoringResponse",
 		acceptGzip:       true,
@@ -205,8 +211,8 @@ func (client *SOAPClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequ
 	return stopMonitoring, nil
 }
 
-func (client *SOAPClient) SituationMonitoring(request *siri.SIRIGetGeneralMessageRequest) (*siri.XMLGeneralMessageResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessageRequest) (*siri.XMLGeneralMessageResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetGeneralMessageResponse",
 		acceptGzip:       true,
@@ -219,8 +225,8 @@ func (client *SOAPClient) SituationMonitoring(request *siri.SIRIGetGeneralMessag
 	return generalMessage, nil
 }
 
-func (client *SOAPClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*siri.XMLVehicleMonitoringResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*siri.XMLVehicleMonitoringResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetVehicleMonitoringResponse",
 		acceptGzip:       true,
@@ -233,8 +239,8 @@ func (client *SOAPClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitori
 	return vehicleMonitoring, nil
 }
 
-func (client *SOAPClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "SubscribeResponse",
@@ -247,8 +253,8 @@ func (client *SOAPClient) StopMonitoringSubscription(request *siri.SIRIStopMonit
 	return response, nil
 }
 
-func (client *SOAPClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "SubscribeResponse",
@@ -261,8 +267,8 @@ func (client *SOAPClient) GeneralMessageSubscription(request *siri.SIRIGeneralMe
 	return response, nil
 }
 
-func (client *SOAPClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*siri.XMLDeleteSubscriptionResponse, error) {
-	node, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*siri.XMLDeleteSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
 		expectedResponse: "DeleteSubscriptionResponse",
@@ -276,8 +282,8 @@ func (client *SOAPClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptio
 	return terminatedSub, nil
 }
 
-func (client *SOAPClient) NotifyStopMonitoring(request *siri.SIRINotifyStopMonitoring) error {
-	_, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) NotifyStopMonitoring(request *siri.SIRINotifyStopMonitoring) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,
 		requestType: NOTIFICATION,
 	})
@@ -287,8 +293,8 @@ func (client *SOAPClient) NotifyStopMonitoring(request *siri.SIRINotifyStopMonit
 	return nil
 }
 
-func (client *SOAPClient) NotifyGeneralMessage(request *siri.SIRINotifyGeneralMessage) error {
-	_, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) NotifyGeneralMessage(request *siri.SIRINotifyGeneralMessage) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,
 		requestType: NOTIFICATION,
 	})
@@ -298,8 +304,8 @@ func (client *SOAPClient) NotifyGeneralMessage(request *siri.SIRINotifyGeneralMe
 	return nil
 }
 
-func (client *SOAPClient) NotifyEstimatedTimeTable(request *siri.SIRINotifyEstimatedTimeTable) error {
-	_, err := client.prepareAndSendRequest(soapClientArguments{
+func (client *SIRIClient) NotifyEstimatedTimeTable(request *siri.SIRINotifyEstimatedTimeTable) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,
 		requestType: NOTIFICATION,
 	})

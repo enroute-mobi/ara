@@ -66,7 +66,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 
 	logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
 
-	xmlVehicleMonitoringResponse, err := connector.Partner().SOAPClient().VehicleMonitoring(siriVehicleMonitoringRequest)
+	xmlVehicleMonitoringResponse, err := connector.Partner().SIRIClient().VehicleMonitoring(siriVehicleMonitoringRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
 		e := fmt.Sprintf("Error during VehicleMonitoring request: %v", err)

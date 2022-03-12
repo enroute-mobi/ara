@@ -42,7 +42,7 @@ func (handler *SIRICheckStatusRequestHandler) Respond(connector core.Connector, 
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	soapEnvelope := remote.NewSIRIBuffer()
 	soapEnvelope.WriteXML(xmlResponse)
 
 	n, err := soapEnvelope.WriteTo(rw)

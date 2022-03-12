@@ -726,24 +726,24 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 	}
 }
 
-func Test_Partner_SOAPClient(t *testing.T) {
+func Test_Partner_SIRIClient(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
 	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
-	partner.SOAPClient()
+	partner.SIRIClient()
 	if partner.httpClient == nil {
-		t.Error("partner.SOAPClient() should set Partner httpClient")
+		t.Error("partner.SIRIClient() should set Partner httpClient")
 	}
 
 	partner.SetSetting(ps.REMOTE_URL, "remote_url")
-	partner.SOAPClient()
+	partner.SIRIClient()
 	if partner.httpClient.Url != "remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
 	}
 
 	partner.SetSetting(ps.SUBSCRIPTIONS_REMOTE_URL, "sub_remote_url")
-	partner.SOAPClient()
+	partner.SIRIClient()
 	if partner.httpClient.SubscriptionsUrl != "sub_remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
 	}

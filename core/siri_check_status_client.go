@@ -78,7 +78,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 
 	logSIRICheckStatusRequest(logStashEvent, message, request)
 
-	response, err := connector.Partner().SOAPClient().CheckStatus(request)
+	response, err := connector.Partner().SIRIClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

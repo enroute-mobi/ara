@@ -146,7 +146,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 	}
 
 	if xmlVehicleActivity.Coordinates() == "" {
-		e = fmt.Errorf("No coordinates")
+		e = fmt.Errorf("no coordinates")
 		return
 	}
 

@@ -354,7 +354,7 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTa
 
 	t := ett.Clock().Now()
 
-	err := ett.connector.Partner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+	err := ett.connector.Partner().SIRIClient().NotifyEstimatedTimeTable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
 	if err != nil {
 		event := ett.newLogStashEvent()

@@ -29,7 +29,7 @@ func NewSIRIHandler(referential *core.Referential) *SIRIHandler {
 	return &SIRIHandler{referential: referential}
 }
 
-func (handler *SIRIHandler) requestHandler(envelope *remote.SOAPEnvelope) SIRIRequestHandler {
+func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRequestHandler {
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
@@ -122,7 +122,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		requestReader = request.Body
 	}
 
-	envelope, err := remote.NewSOAPEnvelope(requestReader)
+	envelope, err := remote.NewSIRIEnvelope(requestReader)
 	if err != nil {
 		siriError("Client", fmt.Sprintf("Invalid Request: %v", err), string(handler.referential.Slug()), response)
 		return

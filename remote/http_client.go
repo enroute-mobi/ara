@@ -19,8 +19,9 @@ import (
 )
 
 type HTTPClientOptions struct {
-	OAuth *HTTPClientOAuth
-	Urls  HTTPClientUrls
+	SiriEnvelopeType string
+	OAuth            *HTTPClientOAuth
+	Urls             HTTPClientUrls
 }
 
 type HTTPClientOAuth struct {
@@ -39,7 +40,7 @@ type HTTPClient struct {
 	HTTPClientUrls
 
 	httpClient *http.Client
-	soapClient *SOAPClient
+	siriClient *SIRIClient
 }
 
 func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
@@ -47,8 +48,8 @@ func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
 		HTTPClientUrls: opts.Urls,
 		httpClient:     httpClient(opts),
 	}
-	sc := NewSOAPClient(c)
-	c.soapClient = sc
+	sc := NewSIRIClient(c, opts.SiriEnvelopeType)
+	c.siriClient = sc
 
 	return c
 }
@@ -90,12 +91,7 @@ func httpClient(opts HTTPClientOptions) (c *http.Client) {
 		TokenURL:     opts.OAuth.TokenURL,
 	}
 
-	ctx := context.Background()
-	ctx = context.WithValue(
-		context.Background(),
-		oauth2.HTTPClient,
-		c,
-	)
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, c)
 
 	_, err := oauthConfig.Token(ctx)
 	if err != nil {
@@ -110,8 +106,8 @@ func (c *HTTPClient) SetURLs(urls HTTPClientUrls) {
 	c.HTTPClientUrls = urls
 }
 
-func (c *HTTPClient) SOAPClient() *SOAPClient {
-	return c.soapClient
+func (c *HTTPClient) SIRIClient() *SIRIClient {
+	return c.siriClient
 }
 
 func (c *HTTPClient) HTTPClient() *http.Client {

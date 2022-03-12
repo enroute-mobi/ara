@@ -70,12 +70,12 @@ func siriHandler_PrepareServer() (*Server, *core.Referential) {
 	return server, referential
 }
 
-func siriHandler_Request(server *Server, soapEnvelope *remote.SOAPEnvelopeBuffer, t *testing.T) *httptest.ResponseRecorder {
+func siriHandler_Request(server *Server, siriBuffer remote.Buffer, t *testing.T) *httptest.ResponseRecorder {
 	clock.SetDefaultClock(clock.NewFakeClock())
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Create a request
-	request, err := http.NewRequest("POST", "/default/siri", soapEnvelope)
+	request, err := http.NewRequest("POST", "/default/siri", siriBuffer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,17 +103,17 @@ func siriHandler_Request(server *Server, soapEnvelope *remote.SOAPEnvelopeBuffer
 
 func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(request)
+	siriBuffer.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer()
-	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+	responseRecorder := siriHandler_Request(server, siriBuffer, t)
 
 	// Check the response body is what we expect.
 	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
@@ -194,7 +194,7 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"objectidValue",
 		"Ara",
@@ -202,7 +202,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(request)
+	siriBuffer.WriteXML(request)
 
 	server, referential := siriHandler_PrepareServer()
 	stopArea := referential.Model().StopAreas().New()
@@ -242,7 +242,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
 
-	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+	responseRecorder := siriHandler_Request(server, siriBuffer, t)
 
 	// Check the response body is what we expect.
 	response, err := siri.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
@@ -283,7 +283,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 func Test_SIRIHandler_SiriService(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")
 	if err != nil {
@@ -294,7 +294,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(string(content))
+	siriBuffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
 	stopArea := referential.Model().StopAreas().New()
@@ -364,10 +364,10 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	stopVisit4.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit4.Save()
 
-	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+	responseRecorder := siriHandler_Request(server, siriBuffer, t)
 
 	// responseRecorder.Body.String()
-	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -477,7 +477,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	// Generate the request Body
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 
 	file, err := os.Open("testdata/notify-stop-monitoring.xml")
 	if err != nil {
@@ -488,7 +488,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(string(content))
+	siriBuffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
 	partner := referential.Partners().FindAll()[0]
@@ -507,7 +507,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	stopArea2.SetObjectID(objectid2)
 	stopArea2.Save()
 
-	siriHandler_Request(server, soapEnvelope, t)
+	siriHandler_Request(server, siriBuffer, t)
 
 	// Some Tests
 
@@ -517,7 +517,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 }
 
 func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 
 	file, err := os.Open("../siri/testdata/notify-general-message.xml")
 	if err != nil {
@@ -528,7 +528,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(string(content))
+	siriBuffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
 	partner := referential.Partners().FindAll()[0]
@@ -537,7 +537,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
 	subscription.Save()
 
-	siriHandler_Request(server, soapEnvelope, t)
+	siriHandler_Request(server, siriBuffer, t)
 
 	if count := len(referential.Model().Situations().FindAll()); count != 2 {
 		t.Errorf("Notify should have created 2 Situation, got: %v", count)
@@ -545,7 +545,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 }
 
 func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 
 	file, err := os.Open("testdata/estimated_timetable_request.xml")
 	if err != nil {
@@ -556,7 +556,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(string(content))
+	siriBuffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
 
@@ -630,9 +630,9 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit3.Schedules.SetArrivalTime("expected", referential.Clock().Now().Add(1*time.Minute))
 	stopVisit3.Save()
 
-	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+	responseRecorder := siriHandler_Request(server, siriBuffer, t)
 
-	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -709,7 +709,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 }
 
 func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
+	siriBuffer := remote.NewSIRIBuffer()
 
 	file, err := os.Open("testdata/lines-discovery-request.xml")
 	if err != nil {
@@ -720,7 +720,7 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	soapEnvelope.WriteXML(string(content))
+	siriBuffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer()
 
@@ -739,9 +739,9 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	line3.Name = "lineName3"
 	line3.Save()
 
-	responseRecorder := siriHandler_Request(server, soapEnvelope, t)
+	responseRecorder := siriHandler_Request(server, siriBuffer, t)
 
-	envelope, err := remote.NewSOAPEnvelope(responseRecorder.Body)
+	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body)
 	if err != nil {
 		t.Fatal(err)
 	}

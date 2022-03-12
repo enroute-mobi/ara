@@ -61,6 +61,8 @@ const (
 	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
 
+	SIRI_ENVELOPE = "siri.envelope"
+
 	DEFAULT_GTFS_TTL = 30 * time.Second
 )
 
@@ -118,7 +120,6 @@ func (s *PartnerSettings) SetSettingsDefinition(m map[string]string) {
 	}
 	s.reloadSettings()
 	s.m.Unlock()
-	return
 }
 
 func (s *PartnerSettings) ToJson() ([]byte, error) {
@@ -366,15 +367,16 @@ func (s *PartnerSettings) SetCollectSettings() {
 
 func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
-	defer s.m.RUnlock()
 	opts = remote.HTTPClientOptions{
-		OAuth: s.httpClientOAuth(),
+		SiriEnvelopeType: strings.ToLower(s.s[SIRI_ENVELOPE]),
+		OAuth:            s.httpClientOAuth(),
 		Urls: remote.HTTPClientUrls{
 			Url:              s.s[REMOTE_URL],
 			SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
 			NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
 		},
 	}
+	s.m.RUnlock()
 	return
 }
 

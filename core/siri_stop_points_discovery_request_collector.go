@@ -73,7 +73,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 
 	logSIRIStopPointsDiscoveryRequest(logStashEvent, message, request)
 
-	response, err := connector.Partner().SOAPClient().StopDiscovery(request)
+	response, err := connector.Partner().SIRIClient().StopDiscovery(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {

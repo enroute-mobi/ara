@@ -7,7 +7,7 @@ import (
 
 type RemoteAddressHandler struct{}
 
-func (_ *RemoteAddressHandler) HandleRemoteAddress(r *http.Request) string {
+func (*RemoteAddressHandler) HandleRemoteAddress(r *http.Request) string {
 	if xff := r.Header.Get("X-Forwarded-For"); len(xff) > 0 {
 		return strings.Split(xff, ",")[0]
 	}
