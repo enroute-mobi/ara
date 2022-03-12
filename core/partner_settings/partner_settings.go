@@ -222,6 +222,17 @@ func (s *PartnerSettings) Address() string {
 	return s.s[LOCAL_URL]
 }
 
+func (s *PartnerSettings) SIRIEnvelopeType() (set string) {
+	s.m.RLock()
+	set = s.s[SIRI_ENVELOPE]
+	s.m.RUnlock()
+
+	if set == "" {
+		set = "soap"
+	}
+	return
+}
+
 func (s *PartnerSettings) MaximumChechstatusRetry() (i int) {
 	s.m.RLock()
 	i, _ = strconv.Atoi(s.s[PARTNER_MAX_RETRY])

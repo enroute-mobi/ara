@@ -14,7 +14,7 @@ test
 </S:Body>
 </S:Envelope>`
 
-	buffer := NewSIRIBuffer()
+	buffer := NewSIRIBuffer(SOAP_SIRI_ENVELOPE)
 	buffer.WriteXML("test")
 
 	readLength, err := buffer.Read(r)
@@ -46,7 +46,7 @@ test
 </S:Body>
 </S:Envelope>`
 
-	buffer := NewSIRIBuffer()
+	buffer := NewSIRIBuffer(SOAP_SIRI_ENVELOPE)
 	buffer.WriteXML("test")
 
 	_, err := buffer.WriteTo(&buf)

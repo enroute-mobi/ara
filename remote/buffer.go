@@ -13,14 +13,8 @@ type Buffer interface {
 	Length() int64
 }
 
-// Make argument optionnal to avoid modifying all the handlers for now
-func NewSIRIBuffer(envelopeType ...string) Buffer {
-	var et string
-	if len(envelopeType) != 0 {
-		et = envelopeType[0]
-	}
-
-	switch et {
+func NewSIRIBuffer(envelopeType string) Buffer {
+	switch envelopeType {
 	case RAW_SIRI_ENVELOPE:
 		return newRawBuffer()
 	case SOAP_SIRI_ENVELOPE:

@@ -23,27 +23,27 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) ConnectorType
 	return core.SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR
 }
 
-func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(params HandlerParams) {
 	logger.Log.Debugf("NotifyStopMonitoring %s\n", handler.xmlRequest.ResponseMessageIdentifier())
 
 	t := clock.DefaultClock().Now()
 
-	connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
+	params.connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
 
-	rw.WriteHeader(http.StatusOK)
+	params.rw.WriteHeader(http.StatusOK)
 
-	message.Type = "NotifyStopMonitoring"
-	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
-	message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
+	params.message.Type = "NotifyStopMonitoring"
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
+	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
 
 	subIds := make(map[string]struct{})
 	mRefs := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.StopMonitoringDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
 		if !delivery.Status() {
-			message.Status = "Error"
+			params.message.Status = "Error"
 		}
 		mRefs[delivery.MonitoringRef()] = struct{}{}
 	}
@@ -55,7 +55,7 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(conne
 	for k := range mRefs {
 		sas = append(sas, k)
 	}
-	message.SubscriptionIdentifiers = subs
-	message.StopAreas = sas
-	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	params.message.SubscriptionIdentifiers = subs
+	params.message.StopAreas = sas
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

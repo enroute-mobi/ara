@@ -23,20 +23,20 @@ func (handler *SIRINotifySubscriptionTerminatedHandler) ConnectorType() string {
 	return core.SIRI_SUBSCRIPTION_REQUEST_DISPATCHER
 }
 
-func (handler *SIRINotifySubscriptionTerminatedHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+func (handler *SIRINotifySubscriptionTerminatedHandler) Respond(params HandlerParams) {
 	logger.Log.Debugf("NotifySubscriptionTerminated %s to cancel subscription: %s", handler.xmlRequest.ResponseMessageIdentifier(), handler.xmlRequest.SubscriptionRef())
 
 	t := clock.DefaultClock().Now()
 
-	connector.(core.SubscriptionRequestDispatcher).HandleNotifySubscriptionTerminated(handler.xmlRequest)
+	params.connector.(core.SubscriptionRequestDispatcher).HandleNotifySubscriptionTerminated(handler.xmlRequest)
 
-	rw.WriteHeader(http.StatusOK)
+	params.rw.WriteHeader(http.StatusOK)
 
-	message.Type = "NotifySubscriptionTerminated"
-	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
-	message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
-	message.SubscriptionIdentifiers = []string{handler.xmlRequest.SubscriptionRef()}
-	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	params.message.Type = "NotifySubscriptionTerminated"
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
+	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
+	params.message.SubscriptionIdentifiers = []string{handler.xmlRequest.SubscriptionRef()}
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

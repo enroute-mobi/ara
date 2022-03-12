@@ -9,36 +9,25 @@ import (
 	"bitbucket.org/enroute-mobi/ara/remote"
 )
 
-type SiriErrorResponse struct {
-	response       http.ResponseWriter
-	errCode        string
-	errDescription string
-	request        string
+type SIRIError struct {
+	errCode         string
+	errDescription  string
+	referentialSlug string
+	request         string
+	envelopeType    string
+	response        http.ResponseWriter
 }
 
-func siriError(errCode, errDescription, referentialSlug string, response http.ResponseWriter) {
-	siriErrorWithRequest(errCode, errDescription, referentialSlug, "", response)
-}
-
-func siriErrorWithRequest(errCode, errDescription, referentialSlug, request string, response http.ResponseWriter) {
-	SiriErrorResponse{
-		response:       response,
-		errCode:        errCode,
-		errDescription: errDescription,
-		request:        request,
-	}.sendSiriError(referentialSlug)
-}
-
-func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
-	logger.Log.Debugf("Send SIRI error %v : %v", siriError.errCode, siriError.errDescription)
+func (e SIRIError) Send() {
+	logger.Log.Debugf("Send SIRI error %v : %v", e.errCode, e.errDescription)
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSIRIBuffer()
+	soapEnvelope := remote.NewSIRIBuffer(e.envelopeType)
 	soapEnvelope.WriteXML(fmt.Sprintf(`
   <S:Fault>
     <faultcode>S:%s</faultcode>
     <faultstring>%s</faultstring>
-  </S:Fault>`, siriError.errCode, siriError.errDescription))
+  </S:Fault>`, e.errCode, e.errDescription))
 
 	logStashEvent := make(audit.LogStashEvent)
 	logStashEvent["status"] = "false"
@@ -50,18 +39,18 @@ func (siriError SiriErrorResponse) sendSiriError(referentialSlug string) {
 		Direction: "received",
 		Status:    "Error",
 		// Type:         "siri-error",
-		ErrorDetails: fmt.Sprintf("%v: %v", siriError.errCode, siriError.errDescription),
+		ErrorDetails: fmt.Sprintf("%v: %v", e.errCode, e.errDescription),
 		// ResponseRawMessage: soapEnvelope.String(),
 	}
 
-	if siriError.request != "" {
-		logStashEvent["requestXML"] = siriError.request
-		// message.RequestRawMessage = siriError.request
+	if e.request != "" {
+		logStashEvent["requestXML"] = e.request
+		// message.RequestRawMessage = e.request
 	}
 
-	soapEnvelope.WriteTo(siriError.response)
+	soapEnvelope.WriteTo(e.response)
 	message.ResponseSize = soapEnvelope.Length()
 
 	audit.CurrentLogStash().WriteEvent(logStashEvent)
-	audit.CurrentBigQuery(referentialSlug).WriteEvent(message)
+	audit.CurrentBigQuery(e.referentialSlug).WriteEvent(message)
 }
