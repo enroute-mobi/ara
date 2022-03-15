@@ -49,6 +49,14 @@ Then(/^one Partner(?: in Referential "([^"]+)")? has the following attributes:$/
   expect(found_value).to include(parsed_attributes)
 end
 
+Then(/^the Partner "([^"]+)" in the Referential "([^"]+)" has the operational status (up|down|unknown)/) do |slug, referential, status|
+  response = RestClient.get partners_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response_array = api_attributes(response.body)
+  partner = response_array.find { |partner| partner['Slug'] == slug }
+  operational_status = partner['PartnerStatus']['OperationnalStatus']
+
+  expect(operational_status).to eq(status)
+end
 
 When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, attributes|
   path = partners_path(referential: referential) + "/" + getFirstPartner() + "/subscriptions"
