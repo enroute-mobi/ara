@@ -3,6 +3,7 @@ package remote
 import (
 	"bytes"
 	"io"
+	"strings"
 )
 
 type Buffer interface {
@@ -33,7 +34,8 @@ func newRawBuffer() *RawBuffer {
 }
 
 func (rb *RawBuffer) WriteXML(xml string) {
-	rb.b.WriteString(xml)
+	rb.b.WriteString("<?xml version='1.0' encoding='utf-8'?>\n")
+	rb.b.WriteString(strings.TrimSuffix(xml, "\n"))
 }
 
 func (rb *RawBuffer) Read(p []byte) (n int, err error) {
@@ -64,7 +66,7 @@ func newSOAPBuffer() *SOAPBuffer {
 
 func (sb *SOAPBuffer) WriteXML(xml string) {
 	sb.b.WriteString("<?xml version='1.0' encoding='utf-8'?>\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<S:Body>\n")
-	sb.b.WriteString(xml)
+	sb.b.WriteString(strings.TrimSuffix(xml, "\n"))
 	sb.b.WriteString("\n</S:Body>\n</S:Envelope>")
 }
 
