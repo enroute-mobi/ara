@@ -147,8 +147,12 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.Origin = event.Origin
 		vj.Name = event.Attributes()["VehicleJourneyName"]
 		vj.LineId = l.Id()
+	}
 
+	if vj.Attributes.IsEmpty() {
 		vj.Attributes = event.Attributes()
+	}
+	if vj.References.IsEmpty() {
 		vj.References = event.References()
 	}
 
@@ -158,7 +162,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	vj.References.SetObjectId("DestinationRef", NewObjectID(event.ObjectId.Kind(), event.DestinationRef))
 	vj.DestinationName = event.DestinationName
 
-	if event.Direction != "" {
+	if event.Direction != "" { // Only used for Push collector
 		vj.Attributes.Set("DirectionName", event.Direction)
 	}
 
@@ -211,10 +215,14 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			sv.Origin = event.Origin
 			sv.PassageOrder = event.PassageOrder
 			sv.DataFrameRef = event.DataFrameRef
-
-			sv.Attributes = event.Attributes()
-			sv.References = event.References()
 		}
+	}
+
+	if sv.Attributes.IsEmpty() {
+		sv.Attributes = event.Attributes()
+	}
+	if sv.References.IsEmpty() {
+		sv.References = event.References()
 	}
 
 	// Update StopArea Lines

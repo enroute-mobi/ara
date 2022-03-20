@@ -1,6 +1,13 @@
 package model
 
-import "testing"
+import (
+	"io/ioutil"
+	"os"
+	"testing"
+	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri"
+)
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
@@ -237,5 +244,79 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	}
 	if updatedStopVisit.collected {
 		t.Errorf("StopVisit Collected should be updated")
+	}
+}
+
+func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	// Insert Data in the test db
+	databaseVehicleJourney := DatabaseVehicleJourney{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "2017-01-01",
+		Name:            "vehicleJourney",
+		ObjectIDs:       `{"internal":"value"}`,
+		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Attributes:      "{}",
+		References:      `{}`,
+	}
+
+	Database.AddTableWithName(databaseVehicleJourney, "vehicle_journeys")
+	err := Database.Insert(&databaseVehicleJourney)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch data from the db
+	model := NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	vehicleJourneys := model.VehicleJourneys().(*MemoryVehicleJourneys)
+	err = vehicleJourneys.Load("referential")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vehicleJourneyId := VehicleJourneyId(databaseVehicleJourney.Id)
+	_, ok := vehicleJourneys.Find(vehicleJourneyId)
+	if !ok {
+		t.Fatal("Loaded VehicleJourneys should be found")
+	}
+
+	file, err := os.Open("testdata/stopmonitoring-response-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response, _ := siri.NewXMLStopMonitoringResponseFromContent(content)
+
+	manager := newUpdateManager(model)
+
+	objectid := NewObjectID("internal", "value")
+	event := &VehicleJourneyUpdateEvent{
+		ObjectidKind: "internal",
+		ObjectId:     objectid,
+		SiriXML:      &response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0].XMLMonitoredVehicleJourney,
+	}
+
+	manager.Update(event)
+
+	updatedVehicleJourney, _ := vehicleJourneys.Find(vehicleJourneyId)
+	if updatedVehicleJourney.Attributes.IsEmpty() {
+		t.Fatal("Attributes shouldn't be empty after update")
+	}
+
+	if updatedVehicleJourney.References.IsEmpty() {
+		t.Fatalf("References shouldn't be empty after update: %v", updatedVehicleJourney.References)
 	}
 }
