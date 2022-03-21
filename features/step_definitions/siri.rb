@@ -37,8 +37,11 @@ end
 
 Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
   name ||= "default"
-
-  SIRIServer.create(name, url, envelope).expect_request(message_type, response).start
+  if envelope == ""
+    SIRIServer.create(name, url).expect_request(message_type, response).start
+  else
+    SIRIServer.create(name, url, 'raw').expect_request(message_type, response).start
+  end
 end
 
 Given(/^the SIRI server (?:"([^"]*)" )?waits a (\S+) request to respond with$/) do |name, message_type, response|
