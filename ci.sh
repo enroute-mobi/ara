@@ -15,6 +15,9 @@ EOF
 
 cd $source_dir
 
+go install honnef.co/go/tools/cmd/staticcheck@latest
+staticcheck ./...
+
 go install -v ./...
 
 export ARA_ENV=test
