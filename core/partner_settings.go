@@ -27,6 +27,7 @@ const (
 
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
 	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
@@ -300,9 +301,10 @@ func (s *PartnerSettings) CollectSettings() *CollectSettings {
 func (s *PartnerSettings) setCollectSettings() {
 	s.cs = &CollectSettings{
 		UseDiscovered: s.s[COLLECT_USE_DISCOVERED_SA] != "",
-		includedSA:    trimedSlice(s.s[COLLECT_INCLUDE_STOP_AREAS]),
-		includedLines: trimedSlice(s.s[COLLECT_INCLUDE_LINES]),
-		excludedSA:    trimedSlice(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
+		includedSA:    toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
+		excludedSA:    toMap(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
+		includedLines: toMap(s.s[COLLECT_INCLUDE_LINES]),
+		excludedLines: toMap(s.s[COLLECT_EXCLUDE_LINES]),
 	}
 }
 
@@ -313,6 +315,18 @@ func trimedSlice(s string) (slc []string) {
 	slc = strings.Split(s, ",")
 	for i := range slc {
 		slc[i] = strings.TrimSpace(slc[i])
+	}
+	return
+}
+
+func toMap(s string) (m map[string]struct{}) {
+	m = make(map[string]struct{})
+	if s == "" {
+		return
+	}
+	t := strings.Split(s, ",")
+	for i := range t {
+		m[strings.TrimSpace(t[i])] = struct{}{}
 	}
 	return
 }
