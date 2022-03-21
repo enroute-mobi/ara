@@ -35,9 +35,13 @@ def save_siri_messages(messages = {})
   end
 end
 
-Given(/^a SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |name, message_type, url, response|
+Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
   name ||= "default"
-  SIRIServer.create(name, url).expect_request(message_type, response).start
+  if envelope == ""
+    SIRIServer.create(name, url).expect_request(message_type, response).start
+  else
+    SIRIServer.create(name, url, 'raw').expect_request(message_type, response).start
+  end
 end
 
 Given(/^the SIRI server (?:"([^"]*)" )?waits a (\S+) request to respond with$/) do |name, message_type, response|
@@ -142,6 +146,13 @@ end
 Then(/^the (?:"([^"]*)" )?SIRI server should have received (\d+) (GetStopMonitoring) request(?:s)?$/) do |name, count, message_type|
   name ||= "default"
   expect(SIRIServer.find(name).received_requests?(count.to_i)).to be_truthy
+end
+
+Then(/^the SIRI server should have received a CheckStatus request with the payload:$/) do |expected_xml|
+  name ||= "default"
+  last_siri_request = SIRIServer.find(name).requests.last.body
+
+  expect(normalized_xml(last_siri_request).strip).to eq(normalized_xml(expected_xml).strip)
 end
 
 Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with:$/) do |name, attributes|

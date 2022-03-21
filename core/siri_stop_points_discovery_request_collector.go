@@ -32,9 +32,8 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPointsDiscoveryRequestCollector {
@@ -66,14 +65,14 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	startTime := connector.Clock().Now()
 
 	request := &siri.SIRIStopPointsDiscoveryRequest{
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
 	}
 
 	logSIRIStopPointsDiscoveryRequest(logStashEvent, message, request)
 
-	response, err := connector.Partner().SOAPClient().StopDiscovery(request)
+	response, err := connector.Partner().SIRIClient().StopDiscovery(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
@@ -93,7 +92,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	stopPointRefs := []string{}
-	idKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
+	idKind := connector.partner.RemoteObjectIDKind()
 	partner := string(connector.Partner().Slug())
 
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {

@@ -16,7 +16,7 @@ import (
 type SIRIRequestHandler interface {
 	RequestorRef() string
 	ConnectorType() string
-	Respond(core.Connector, http.ResponseWriter, *audit.BigQueryMessage)
+	Respond(HandlerParams)
 }
 
 type SIRIHandler struct {
@@ -25,11 +25,18 @@ type SIRIHandler struct {
 	referential *core.Referential
 }
 
+type HandlerParams struct {
+	connector    core.Connector
+	rw           http.ResponseWriter
+	message      *audit.BigQueryMessage
+	envelopeType string
+}
+
 func NewSIRIHandler(referential *core.Referential) *SIRIHandler {
 	return &SIRIHandler{referential: referential}
 }
 
-func (handler *SIRIHandler) requestHandler(envelope *remote.SOAPEnvelope) SIRIRequestHandler {
+func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRequestHandler {
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
@@ -104,7 +111,11 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
 
 	if handler.referential == nil {
-		siriError("NotFound", "Referential not found", "", response)
+		SIRIError{
+			errCode:        "NotFound",
+			errDescription: "Referential not found",
+			response:       response,
+		}.Send()
 		return
 	}
 
@@ -113,7 +124,12 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 	if request.Header.Get("Content-Encoding") == "gzip" {
 		gzipReader, err := gzip.NewReader(request.Body)
 		if err != nil {
-			siriError("Client", "Can't unzip request", string(handler.referential.Slug()), response)
+			SIRIError{
+				errCode:         "Client",
+				errDescription:  "Can't unzip request",
+				referentialSlug: string(handler.referential.Slug()),
+				response:        response,
+			}.Send()
 			return
 		}
 		defer gzipReader.Close()
@@ -122,30 +138,59 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		requestReader = request.Body
 	}
 
-	envelope, err := remote.NewSOAPEnvelope(requestReader)
+	envelope, err := remote.NewAutodetectSIRIEnvelope(requestReader)
 	if err != nil {
-		siriError("Client", fmt.Sprintf("Invalid Request: %v", err), string(handler.referential.Slug()), response)
+		SIRIError{
+			errCode:         "Client",
+			errDescription:  fmt.Sprintf("Invalid Request: %v", err),
+			referentialSlug: string(handler.referential.Slug()),
+			response:        response,
+		}.Send()
 		return
 	}
 
 	requestHandler := handler.requestHandler(envelope)
 	if requestHandler == nil {
-		siriErrorWithRequest("NotSupported", fmt.Sprintf("SIRIRequest %v not supported", envelope.BodyType()), string(handler.referential.Slug()), envelope.Body().String(), response)
+		SIRIError{
+			errCode:         "NotSupported",
+			errDescription:  fmt.Sprintf("SIRIRequest %v not supported", envelope.BodyType()),
+			referentialSlug: string(handler.referential.Slug()),
+			request:         envelope.Body().String(),
+			response:        response,
+		}.Send()
 		return
 	}
 
 	if requestHandler.RequestorRef() == "" {
-		siriErrorWithRequest("UnknownCredential", "Can't have empty credentials", string(handler.referential.Slug()), envelope.Body().String(), response)
+		SIRIError{
+			errCode:         "UnknownCredential",
+			errDescription:  "Can't have empty credentials",
+			referentialSlug: string(handler.referential.Slug()),
+			request:         envelope.Body().String(),
+			response:        response,
+		}.Send()
 		return
 	}
 	partner, ok := handler.referential.Partners().FindByCredential(requestHandler.RequestorRef())
 	if !ok {
-		siriErrorWithRequest("UnknownCredential", fmt.Sprintf("RequestorRef Unknown '%s'", requestHandler.RequestorRef()), string(handler.referential.Slug()), envelope.Body().String(), response)
+		SIRIError{
+			errCode:         "UnknownCredential",
+			errDescription:  fmt.Sprintf("RequestorRef Unknown '%s'", requestHandler.RequestorRef()),
+			referentialSlug: string(handler.referential.Slug()),
+			request:         envelope.Body().String(),
+			response:        response,
+		}.Send()
 		return
 	}
 	connector, ok := partner.Connector(requestHandler.ConnectorType())
 	if !ok {
-		siriErrorWithRequest("NotFound", fmt.Sprintf("No Connectors for %v", envelope.BodyType()), string(handler.referential.Slug()), envelope.Body().String(), response)
+		SIRIError{
+			errCode:         "NotFound",
+			errDescription:  fmt.Sprintf("No Connectors for %v", envelope.BodyType()),
+			referentialSlug: string(handler.referential.Slug()),
+			request:         envelope.Body().String(),
+			response:        response,
+		}.Send()
 		return
 	}
 
@@ -158,5 +203,12 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		Status:      "OK",
 	}
 
-	requestHandler.Respond(connector, response, m)
+	params := HandlerParams{
+		connector:    connector,
+		rw:           response,
+		message:      m,
+		envelopeType: partner.SIRIEnvelopeType(),
+	}
+
+	requestHandler.Respond(params)
 }

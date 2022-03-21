@@ -12,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
+	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
@@ -69,8 +70,8 @@ type APIReferential struct {
 	id             ReferentialId
 	OrganisationId string            `json:",omitempty"`
 	Slug           ReferentialSlug   `json:"Slug,omitempty"`
-	Name           string            `json:"Name,omitempty"`
-	Errors         Errors            `json:"Errors,omitempty"`
+	Name           string            `json:",omitempty"`
+	Errors         e.Errors          `json:"Errors,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	Tokens         []string          `json:"Tokens,omitempty"`
 	ImportTokens   []string          `json:"ImportTokens,omitempty"`
@@ -83,23 +84,19 @@ func (referential *APIReferential) Id() ReferentialId {
 }
 
 func (referential *APIReferential) Validate() bool {
-	referential.Errors = NewErrors()
+	referential.Errors = e.NewErrors()
 
 	if referential.Slug == "" {
-		referential.Errors.Add("Slug", ERROR_BLANK)
+		referential.Errors.Add("Slug", e.ERROR_BLANK)
 	} else if !slugRegexp.MatchString(string(referential.Slug)) {
-		referential.Errors.Add("Slug", ERROR_SLUG_FORMAT)
+		referential.Errors.Add("Slug", e.ERROR_SLUG_FORMAT)
 	}
-
-	// if len(referential.Tokens) == 0 {
-	// 	referential.Errors.Add("Tokens", ERROR_BLANK)
-	// }
 
 	// Check Slug uniqueness
 	for _, existingReferential := range referential.manager.FindAll() {
 		if existingReferential.id != referential.Id() {
 			if referential.Slug == existingReferential.slug {
-				referential.Errors.Add("Slug", ERROR_UNIQUE)
+				referential.Errors.Add("Slug", e.ERROR_UNIQUE)
 			}
 		}
 	}
@@ -223,7 +220,7 @@ func (referential *Referential) Definition() *APIReferential {
 		Slug:           referential.slug,
 		Name:           referential.Name,
 		Settings:       settings,
-		Errors:         NewErrors(),
+		Errors:         e.NewErrors(),
 		manager:        referential.manager,
 		Tokens:         referential.Tokens,
 		ImportTokens:   referential.ImportTokens,

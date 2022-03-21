@@ -49,7 +49,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	siriGeneralMessageRequest := &siri.SIRIGetGeneralMessageRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriGeneralMessageRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriGeneralMessageRequest.RequestTimestamp = connector.Clock().Now()
 
 	// Check the request filter
@@ -65,13 +65,13 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	}
 
 	// Check the request version
-	if b, _ := strconv.ParseBool(connector.partner.Setting(GENEREAL_MESSAGE_REQUEST_2)); b {
+	if connector.partner.GeneralMessageRequestVersion22() {
 		siriGeneralMessageRequest.XsdInWsdl = true
 	}
 
 	logSIRIGeneralMessageRequest(logStashEvent, message, siriGeneralMessageRequest)
 
-	xmlGeneralMessageResponse, err := connector.Partner().SOAPClient().SituationMonitoring(siriGeneralMessageRequest)
+	xmlGeneralMessageResponse, err := connector.Partner().SIRIClient().SituationMonitoring(siriGeneralMessageRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
@@ -123,9 +123,8 @@ func (connector *SIRIGeneralMessageRequestCollector) newLogStashEvent() audit.Lo
 }
 
 func (factory *SIRIGeneralMessageRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partner *Partner) Connector {

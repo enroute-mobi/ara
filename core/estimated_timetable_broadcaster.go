@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -107,7 +108,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 			delivery := &siri.SIRINotifyEstimatedTimeTable{
 				Address:                   ett.connector.Partner().Address(),
 				ProducerRef:               ett.connector.Partner().ProducerRef(),
-				ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+				ResponseMessageIdentifier: ett.connector.Partner().NewResponseMessageIdentifier(),
 				SubscriberRef:             sub.SubscriberRef,
 				SubscriptionIdentifier:    sub.ExternalId(),
 				ResponseTimestamp:         ett.connector.Clock().Now(),
@@ -150,7 +151,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		delivery := &siri.SIRINotifyEstimatedTimeTable{
 			Address:                   ett.connector.Partner().Address(),
 			ProducerRef:               ett.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: ett.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+			ResponseMessageIdentifier: ett.connector.Partner().NewResponseMessageIdentifier(),
 			SubscriberRef:             sub.SubscriberRef,
 			SubscriptionIdentifier:    sub.ExternalId(),
 			ResponseTimestamp:         ett.connector.Clock().Now(),
@@ -223,8 +224,8 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ett.connector.Partner().IdentifierGenerator(REFERENCE_IDENTIFIER)
-					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+					referenceGenerator := ett.connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER)
+					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 				}
 
 				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
@@ -311,8 +312,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 				continue
 			}
 		}
-		generator := connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER)
-		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(IdentifierAttributes{Id: ref.GetSha1()}))
+		generator := connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER)
+		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
 		references[refType] = defaultObjectID.Value()
 	}
 
@@ -353,7 +354,7 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTa
 
 	t := ett.Clock().Now()
 
-	err := ett.connector.Partner().SOAPClient().NotifyEstimatedTimeTable(delivery)
+	err := ett.connector.Partner().SIRIClient().NotifyEstimatedTimeTable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
 	if err != nil {
 		event := ett.newLogStashEvent()

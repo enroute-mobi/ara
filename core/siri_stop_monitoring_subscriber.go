@@ -101,7 +101,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				stopAreasToRequest[messageIdentifier] = &saToRequest{
 					subId: subscription.id,
 					saId:  *(resource.Reference.ObjectId),
@@ -122,7 +122,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
@@ -153,7 +153,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
 
 	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SOAPClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+	response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {

@@ -73,7 +73,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			}
 			annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
 		}
-		if len(annotedStopPoint.Lines) == 0 && connector.ignoreStopWithoutLine() {
+		if len(annotedStopPoint.Lines) == 0 && connector.partner.IgnoreStopWithoutLine() {
 			continue
 		}
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
@@ -89,10 +89,6 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 	return response, nil
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) ignoreStopWithoutLine() bool {
-	return connector.partner.Setting(IGNORE_STOP_WITHOUT_LINE) != "false"
-}
-
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
 	event := connector.partner.NewLogStashEvent()
 	event["connector"] = "StopPointsDiscoveryRequestBroadcaster"
@@ -100,7 +96,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() a
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

@@ -44,7 +44,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 		return
 	}
 
-	objectidKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
+	objectidKind := connector.partner.RemoteObjectIDKind()
 	objectid, ok := line.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested line %v doesn't have and objectId of kind %v", request.LineId(), objectidKind)
@@ -59,13 +59,13 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 	siriVehicleMonitoringRequest := &siri.SIRIGetVehicleMonitoringRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriVehicleMonitoringRequest.LineRef = objectid.Value()
 	siriVehicleMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 
 	logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
 
-	xmlVehicleMonitoringResponse, err := connector.Partner().SOAPClient().VehicleMonitoring(siriVehicleMonitoringRequest)
+	xmlVehicleMonitoringResponse, err := connector.Partner().SIRIClient().VehicleMonitoring(siriVehicleMonitoringRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
 		e := fmt.Sprintf("Error during VehicleMonitoring request: %v", err)
@@ -127,9 +127,8 @@ func (connector *SIRIVehicleMonitoringRequestCollector) newBQEvent() *audit.BigQ
 }
 
 func (factory *SIRIVehicleMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRIVehicleMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {

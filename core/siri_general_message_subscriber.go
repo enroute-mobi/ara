@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -104,7 +103,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
 			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
 					subId:    subscription.id,
@@ -127,7 +126,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	gmRequest := &siri.SIRIGeneralMessageSubscriptionRequest{
 		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
@@ -149,7 +148,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			stopPointRefList = append(stopPointRefList, requestedResource.objectId.Value())
 		}
 
-		if b, _ := strconv.ParseBool(subscriber.connector.partner.Setting(GENEREAL_MESSAGE_REQUEST_2)); b {
+		if subscriber.connector.Partner().GeneralMessageRequestVersion22() {
 			entry.XsdInWsdl = true
 		}
 
@@ -167,7 +166,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	message.SubscriptionIdentifiers = lineRefList
 
 	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SOAPClient().GeneralMessageSubscription(gmRequest)
+	response, err := subscriber.connector.Partner().SIRIClient().GeneralMessageSubscription(gmRequest)
 	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {

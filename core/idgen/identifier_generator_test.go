@@ -1,4 +1,4 @@
-package core
+package idgen
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {
-	generator := NewIdentifierGenerator("%{type}:%{uuid}:%{default}:%{id}:%{uuid}:%{objectid}", uuid.NewUUIDConsumer(uuid.NewFakeUUIDGenerator()))
+	generator := NewIdentifierGenerator("%{type}:%{uuid}:%{default}:%{id}:%{uuid}:%{objectid}", uuid.NewFakeUUIDGenerator())
 	attributes := IdentifierAttributes{
 		Id:   "iD",
 		Type: "Tp",

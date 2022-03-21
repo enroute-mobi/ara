@@ -72,12 +72,12 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 
 	logSIRICheckStatusRequest(logStashEvent, message, request)
 
-	response, err := connector.Partner().SOAPClient().CheckStatus(request)
+	response, err := connector.Partner().SIRIClient().CheckStatus(request)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
@@ -119,8 +119,7 @@ func (connector *SIRICheckStatusClient) newLogStashEvent() audit.LogStashEvent {
 }
 
 func (factory *SIRICheckStatusClientFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) Connector {

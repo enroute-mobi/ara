@@ -23,32 +23,32 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) ConnectorType
 	return core.SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR
 }
 
-func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(params HandlerParams) {
 	logger.Log.Debugf("NotifyGeneralMessage: %s", handler.xmlRequest.ResponseMessageIdentifier())
 
 	t := clock.DefaultClock().Now()
 
-	connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
+	params.connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
 
-	rw.WriteHeader(http.StatusOK)
+	params.rw.WriteHeader(http.StatusOK)
 
-	message.Type = "NotifyGeneralMessage"
-	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
-	message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
+	params.message.Type = "NotifyGeneralMessage"
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
+	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
 
 	subIds := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.GeneralMessagesDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
 		if !delivery.Status() {
-			message.Status = "Error"
+			params.message.Status = "Error"
 		}
 	}
 	subs := make([]string, 0, len(subIds))
 	for k := range subIds {
 		subs = append(subs, k)
 	}
-	message.SubscriptionIdentifiers = subs
-	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	params.message.SubscriptionIdentifiers = subs
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

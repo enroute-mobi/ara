@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"net/http"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -25,32 +24,44 @@ func (handler *SIRIEstimatedTimetableRequestHandler) ConnectorType() string {
 	return core.SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER
 }
 
-func (handler *SIRIEstimatedTimetableRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+func (handler *SIRIEstimatedTimetableRequestHandler) Respond(params HandlerParams) {
 	logger.Log.Debugf("Estimated Timetable %s\n", handler.xmlRequest.MessageIdentifier())
 
 	t := clock.DefaultClock().Now()
 
-	response := connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, message)
+	response := params.connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, params.message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
+		SIRIError{
+			errCode:         "InternalServiceError",
+			errDescription:  fmt.Sprintf("Internal Error: %v", err),
+			referentialSlug: string(handler.referential.Slug()),
+			envelopeType:    params.envelopeType,
+			response:        params.rw,
+		}.Send()
 		return
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(xmlResponse)
+	buffer := remote.NewSIRIBuffer(params.envelopeType)
+	buffer.WriteXML(xmlResponse)
 
-	n, err := soapEnvelope.WriteTo(rw)
+	n, err := buffer.WriteTo(params.rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
+		SIRIError{
+			errCode:         "InternalServiceError",
+			errDescription:  fmt.Sprintf("Internal Error: %v", err),
+			referentialSlug: string(handler.referential.Slug()),
+			envelopeType:    params.envelopeType,
+			response:        params.rw,
+		}.Send()
 		return
 	}
 
-	message.Type = "EstimatedTimetableRequest"
-	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ResponseRawMessage = xmlResponse
-	message.ResponseSize = n
-	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	params.message.Type = "EstimatedTimetableRequest"
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.ResponseRawMessage = xmlResponse
+	params.message.ResponseSize = n
+	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

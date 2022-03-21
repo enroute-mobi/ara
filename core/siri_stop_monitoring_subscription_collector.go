@@ -40,9 +40,8 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
@@ -74,7 +73,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		return
 	}
 
-	objectidKind := connector.Partner().Setting(REMOTE_OBJECTID_KIND)
+	objectidKind := connector.Partner().RemoteObjectIDKind()
 	stopAreaObjectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
@@ -147,7 +146,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		if resource != nil {
 			originStopAreaObjectId = *resource.Reference.ObjectId
 		} else if delivery.MonitoringRef() != "" {
-			originStopAreaObjectId = model.NewObjectID(connector.Partner().Setting(REMOTE_OBJECTID_KIND), delivery.MonitoringRef())
+			originStopAreaObjectId = model.NewObjectID(connector.Partner().RemoteObjectIDKind(), delivery.MonitoringRef())
 		}
 
 		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaObjectId)
@@ -183,12 +182,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestTimestamp:  connector.Clock().Now(),
 		SubscriptionRef:   subId,
 		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
 
 	startTime := connector.Clock().Now()
-	response, err := connector.Partner().SOAPClient().DeleteSubscription(request)
+	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
 	logStashEvent["responseTime"] = responseTime.String()

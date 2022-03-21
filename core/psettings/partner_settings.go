@@ -1,4 +1,4 @@
-package core
+package psettings
 
 import (
 	"encoding/json"
@@ -9,6 +9,9 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
+	"bitbucket.org/enroute-mobi/ara/remote"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 const (
@@ -46,31 +49,39 @@ const (
 	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
-	GENEREAL_MESSAGE_REQUEST_2      = "generalMessageRequest.version2.2"
+	GENEREAL_MESSAGE_REQUEST_2_2    = "generalMessageRequest.version2.2"
 	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
 
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
 	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
 
 	CACHE_TIMEOUT = "cache_timeout"
+
+	OAUTH_CLIENT_ID     = "remote_authentication.oauth.client_id"
+	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
+	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
+
+	SIRI_ENVELOPE = "siri.envelope"
+
+	DEFAULT_GTFS_TTL = 30 * time.Second
 )
 
 type PartnerSettings struct {
 	m *sync.RWMutex
 
-	p *Partner
+	ug func() uuid.UUIDGenerator
 
 	s  map[string]string
 	cs *CollectSettings
-	g  map[string]*IdentifierGenerator
+	g  map[string]*idgen.IdentifierGenerator
 }
 
-func NewPartnerSettings(p *Partner) PartnerSettings {
+func NewPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
 	return PartnerSettings{
-		m: &sync.RWMutex{},
-		p: p,
-		s: make(map[string]string),
-		g: make(map[string]*IdentifierGenerator),
+		m:  &sync.RWMutex{},
+		ug: ug,
+		s:  make(map[string]string),
+		g:  make(map[string]*idgen.IdentifierGenerator),
 	}
 }
 
@@ -109,7 +120,6 @@ func (s *PartnerSettings) SetSettingsDefinition(m map[string]string) {
 	}
 	s.reloadSettings()
 	s.m.Unlock()
-	return
 }
 
 func (s *PartnerSettings) ToJson() ([]byte, error) {
@@ -130,11 +140,16 @@ func (s *PartnerSettings) Credentials() string {
 	return fmt.Sprintf("%v,%v", s.s[LOCAL_CREDENTIAL], s.s[LOCAL_CREDENTIALS])
 }
 
-func (s *PartnerSettings) RemoteObjectIDKind(connectorName string) string {
+func (s *PartnerSettings) RemoteObjectIDKind(connectorName ...string) string {
+	var cn string
+	if len(connectorName) != 0 {
+		cn = connectorName[0]
+	}
+
 	s.m.RLock()
 	defer s.m.RUnlock()
 
-	if setting := s.s[fmt.Sprintf("%s.%s", connectorName, REMOTE_OBJECTID_KIND)]; setting != "" {
+	if setting := s.s[fmt.Sprintf("%s.%s", cn, REMOTE_OBJECTID_KIND)]; setting != "" {
 		return setting
 	}
 	return s.s[REMOTE_OBJECTID_KIND]
@@ -207,12 +222,30 @@ func (s *PartnerSettings) Address() string {
 	return s.s[LOCAL_URL]
 }
 
+func (s *PartnerSettings) SIRIEnvelopeType() (set string) {
+	s.m.RLock()
+	set = s.s[SIRI_ENVELOPE]
+	s.m.RUnlock()
+
+	if set == "" {
+		set = "soap"
+	}
+	return
+}
+
 func (s *PartnerSettings) MaximumChechstatusRetry() (i int) {
 	s.m.RLock()
 	i, _ = strconv.Atoi(s.s[PARTNER_MAX_RETRY])
 	if i < 0 {
 		i = 0
 	}
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) SubscriptionMaximumResources() (i int) {
+	s.m.RLock()
+	i, _ = strconv.Atoi(s.s[SUBSCRIPTIONS_MAXIMUM_RESOURCES])
 	s.m.RUnlock()
 	return
 }
@@ -277,6 +310,41 @@ func (s *PartnerSettings) GzipGtfs() (r bool) {
 	return
 }
 
+func (s *PartnerSettings) GeneralMessageRequestVersion22() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[GENEREAL_MESSAGE_REQUEST_2_2])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) PersistentCollectSubscriptions() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[COLLECT_SUBSCRIPTIONS_PERSISTENT])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) PersistentBroadcastSubscriptions() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[BROADCAST_SUBSCRIPTIONS_PERSISTENT])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) CollectFilteredGeneralMessages() (r bool) {
+	s.m.RLock()
+	r, _ = strconv.ParseBool(s.s[COLLECT_FILTER_GENERAL_MESSAGES])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) IgnoreStopWithoutLine() (r bool) {
+	s.m.RLock()
+	r = s.s[IGNORE_STOP_WITHOUT_LINE] != "false"
+	s.m.RUnlock()
+	return
+}
+
 func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 	s.m.RLock()
 	d, _ = time.ParseDuration(s.s[DISCOVERY_INTERVAL])
@@ -290,7 +358,7 @@ func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 func (s *PartnerSettings) CollectSettings() *CollectSettings {
 	if s.cs == nil {
 		s.m.RLock()
-		s.setCollectSettings()
+		s.SetCollectSettings()
 		s.m.RUnlock()
 	}
 
@@ -298,7 +366,7 @@ func (s *PartnerSettings) CollectSettings() *CollectSettings {
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) setCollectSettings() {
+func (s *PartnerSettings) SetCollectSettings() {
 	s.cs = &CollectSettings{
 		UseDiscovered: s.s[COLLECT_USE_DISCOVERED_SA] != "",
 		includedSA:    toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
@@ -306,6 +374,36 @@ func (s *PartnerSettings) setCollectSettings() {
 		includedLines: toMap(s.s[COLLECT_INCLUDE_LINES]),
 		excludedLines: toMap(s.s[COLLECT_EXCLUDE_LINES]),
 	}
+}
+
+func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
+	s.m.RLock()
+	opts = remote.HTTPClientOptions{
+		SiriEnvelopeType: strings.ToLower(s.s[SIRI_ENVELOPE]),
+		OAuth:            s.httpClientOAuth(),
+		Urls: remote.HTTPClientUrls{
+			Url:              s.s[REMOTE_URL],
+			SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
+			NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
+		},
+	}
+	s.m.RUnlock()
+	return
+}
+
+// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+func (s *PartnerSettings) httpClientOAuth() (opts *remote.HTTPClientOAuth) {
+	cid, ok1 := s.s[OAUTH_CLIENT_ID]
+	cs, ok2 := s.s[OAUTH_CLIENT_SECRET]
+	t, ok3 := s.s[OAUTH_TOKEN_URL]
+	if ok1 && ok2 && ok3 {
+		opts = &remote.HTTPClientOAuth{
+			ClientID:     cid,
+			ClientSecret: cs,
+			TokenURL:     t,
+		}
+	}
+	return
 }
 
 func trimedSlice(s string) (slc []string) {
@@ -331,33 +429,41 @@ func toMap(s string) (m map[string]struct{}) {
 	return
 }
 
-func (s *PartnerSettings) IdentifierGenerator(generatorName string) *IdentifierGenerator {
+func (s *PartnerSettings) IdentifierGenerator(generatorName string) *idgen.IdentifierGenerator {
 	s.m.Lock()
 	generator, ok := s.g[generatorName]
 	if !ok {
-		generator = NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.p.UUIDConsumer)
+		generator = idgen.NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.ug())
 		s.g[generatorName] = generator
 	}
 	s.m.Unlock()
 	return generator
 }
 
+func (s *PartnerSettings) NewMessageIdentifier() string {
+	return s.IdentifierGenerator(idgen.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+}
+
+func (s *PartnerSettings) NewResponseMessageIdentifier() string {
+	return s.IdentifierGenerator(idgen.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
+}
+
 func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {
 	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
 
 	if formatString == "" {
-		formatString = DefaultIdentifierGenerator(generatorName)
+		formatString = idgen.DefaultIdentifierGenerator(generatorName)
 	}
 	return
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) refreshGenerators() {
-	s.g = make(map[string]*IdentifierGenerator)
+	s.g = make(map[string]*idgen.IdentifierGenerator)
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) reloadSettings() {
-	s.setCollectSettings()
+	s.SetCollectSettings()
 	s.refreshGenerators()
 }

@@ -108,7 +108,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		notify := siri.SIRINotifyGeneralMessage{
 			Address:                   gmb.connector.Partner().Address(),
 			ProducerRef:               gmb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: gmb.connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+			ResponseMessageIdentifier: gmb.connector.Partner().NewResponseMessageIdentifier(),
 			SubscriberRef:             sub.SubscriberRef,
 			SubscriptionIdentifier:    sub.ExternalId(),
 			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
@@ -150,7 +150,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			audit.CurrentLogStash().WriteEvent(logStashEvent)
 			t := gmb.Clock().Now()
 
-			err := gmb.connector.Partner().SOAPClient().NotifyGeneralMessage(&notify)
+			err := gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
 			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
 			if err != nil {
 				event := gmb.newLogStashEvent()

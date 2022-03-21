@@ -39,7 +39,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 	response := &siri.SIRIServiceResponse{
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 		Status:                    true,
 		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseTimestamp:         connector.Clock().Now(),
@@ -181,7 +181,7 @@ func (connector *SIRIServiceRequestBroadcaster) newLogStashEvent(connectorName s
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

@@ -22,7 +22,7 @@ func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectI
 	return StopMonitoringUpdateEventBuilder{
 		originStopAreaObjectId:     originStopAreaObjectId,
 		partner:                    partner,
-		remoteObjectidKind:         partner.Setting(REMOTE_OBJECTID_KIND),
+		remoteObjectidKind:         partner.RemoteObjectIDKind(),
 		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }

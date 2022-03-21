@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"net/http"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -25,33 +24,45 @@ func (handler *SIRIGeneralMessageRequestHandler) ConnectorType() string {
 	return core.SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER
 }
 
-func (handler *SIRIGeneralMessageRequestHandler) Respond(connector core.Connector, rw http.ResponseWriter, message *audit.BigQueryMessage) {
+func (handler *SIRIGeneralMessageRequestHandler) Respond(params HandlerParams) {
 	logger.Log.Debugf("General Message %s\n", handler.xmlRequest.MessageIdentifier())
 
 	t := clock.DefaultClock().Now()
 
-	tmp := connector.(*core.SIRIGeneralMessageRequestBroadcaster)
-	response, _ := tmp.Situations(handler.xmlRequest, message)
+	tmp := params.connector.(*core.SIRIGeneralMessageRequestBroadcaster)
+	response, _ := tmp.Situations(handler.xmlRequest, params.message)
 	xmlResponse, err := response.BuildXML()
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
+		SIRIError{
+			errCode:         "InternalServiceError",
+			errDescription:  fmt.Sprintf("Internal Error: %v", err),
+			referentialSlug: string(handler.referential.Slug()),
+			envelopeType:    params.envelopeType,
+			response:        params.rw,
+		}.Send()
 		return
 	}
 
 	// Wrap soap and send response
-	soapEnvelope := remote.NewSOAPEnvelopeBuffer()
-	soapEnvelope.WriteXML(xmlResponse)
+	buffer := remote.NewSIRIBuffer(params.envelopeType)
+	buffer.WriteXML(xmlResponse)
 
-	n, err := soapEnvelope.WriteTo(rw)
+	n, err := buffer.WriteTo(params.rw)
 	if err != nil {
-		siriError("InternalServiceError", fmt.Sprintf("Internal Error: %v", err), string(handler.referential.Slug()), rw)
+		SIRIError{
+			errCode:         "InternalServiceError",
+			errDescription:  fmt.Sprintf("Internal Error: %v", err),
+			referentialSlug: string(handler.referential.Slug()),
+			envelopeType:    params.envelopeType,
+			response:        params.rw,
+		}.Send()
 		return
 	}
 
-	message.Type = "GeneralMessageRequest"
-	message.RequestRawMessage = handler.xmlRequest.RawXML()
-	message.ResponseRawMessage = xmlResponse
-	message.ResponseSize = n
-	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	params.message.Type = "GeneralMessageRequest"
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.ResponseRawMessage = xmlResponse
+	params.message.ResponseSize = n
+	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
+	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
@@ -53,7 +54,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	siriLiteResponse = siri.NewSiriLiteResponse()
 	siriLiteResponse.Siri.ServiceDelivery.ResponseTimestamp = connector.Clock().Now()
 	siriLiteResponse.Siri.ServiceDelivery.ProducerRef = connector.Partner().ProducerRef()
-	siriLiteResponse.Siri.ServiceDelivery.ResponseMessageIdentifier = connector.Partner().IdentifierGenerator(RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriLiteResponse.Siri.ServiceDelivery.ResponseMessageIdentifier = connector.Partner().IdentifierGenerator(idgen.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
 	siriLiteResponse.Siri.ServiceDelivery.RequestMessageRef = filters.Get("MessageIdentifier")
 
 	response := siri.NewSiriLiteVehicleMonitoringDelivery()
@@ -111,7 +112,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 		modelDate := tx.Model().Date()
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
-			connector.Partner().IdentifierGenerator(DATA_FRAME_IDENTIFIER).NewIdentifier(IdentifierAttributes{Id: modelDate.String()})
+			connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
 
 		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vehicle.Longitude
@@ -143,7 +144,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourne
 			return "", false
 		}
 		dataVehicleJourneyRef =
-			connector.Partner().IdentifierGenerator(REFERENCE_IDENTIFIER).NewIdentifier(IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+			connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -174,7 +175,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef
 			return obj.Value()
 		}
 	}
-	return connector.Partner().IdentifierGenerator(REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(IdentifierAttributes{Id: reference.GetSha1()})
+	return connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
@@ -184,7 +185,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) newLogStashEvent()
 }
 
 func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

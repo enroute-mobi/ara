@@ -66,7 +66,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	objectidKind := connector.partner.Setting(REMOTE_OBJECTID_KIND)
+	objectidKind := connector.partner.RemoteObjectIDKind()
 	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
@@ -84,14 +84,14 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest := &siri.SIRIGetStopMonitoringRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().IdentifierGenerator(MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
 
 	logSIRIStopMonitoringRequest(logStashEvent, message, siriStopMonitoringRequest)
 
-	xmlStopMonitoringResponse, err := connector.Partner().SOAPClient().StopMonitoring(siriStopMonitoringRequest)
+	xmlStopMonitoringResponse, err := connector.Partner().SIRIClient().StopMonitoring(siriStopMonitoringRequest)
 	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
@@ -204,9 +204,8 @@ func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.Lo
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfSetting(REMOTE_OBJECTID_KIND)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_URL)
-	apiPartner.ValidatePresenceOfSetting(REMOTE_CREDENTIAL)
+	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partner *Partner) Connector {

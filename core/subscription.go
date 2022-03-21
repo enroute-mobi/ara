@@ -2,12 +2,12 @@ package core
 
 import (
 	"encoding/json"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -355,7 +355,7 @@ func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscri
 }
 
 func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
-	maxResource, _ := strconv.Atoi(manager.partner.Setting(SUBSCRIPTIONS_MAXIMUM_RESOURCES))
+	maxResource := manager.partner.SubscriptionMaximumResources()
 	if maxResource == 1 {
 		return manager.New(kind)
 	}
@@ -402,8 +402,8 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	defer manager.mutex.Unlock()
 
 	if subscription.Id() == "" {
-		generator := manager.partner.IdentifierGenerator(SUBSCRIPTION_IDENTIFIER)
-		subscription.id = SubscriptionId(generator.NewIdentifier(IdentifierAttributes{Id: manager.NewUUID()}))
+		generator := manager.partner.IdentifierGenerator(idgen.SUBSCRIPTION_IDENTIFIER)
+		subscription.id = SubscriptionId(generator.NewIdentifier(idgen.IdentifierAttributes{Id: manager.NewUUID()}))
 	}
 
 	subscription.manager = manager
