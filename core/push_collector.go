@@ -2,16 +2,13 @@ package core
 
 import (
 	"strconv"
-	"time"
 
-	external_models "bitbucket.org/enroute-mobi/ara-external-models"
+	em "bitbucket.org/enroute-mobi/ara-external-models"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type PushCollector struct {
@@ -53,7 +50,7 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 	}
 }
 
-func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalCompleteModel, message *audit.BigQueryMessage) {
+func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel, message *audit.BigQueryMessage) {
 	t := clock.DefaultClock().Now()
 
 	pc.handleStopAreas(model.GetStopAreas())
@@ -76,7 +73,7 @@ func (pc *PushCollector) HandlePushNotification(model *external_models.ExternalC
 	message.ProcessingTime = processingTime.Seconds()
 }
 
-func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea) (stopAreas []string) {
+func (pc *PushCollector) handleStopAreas(sas []*em.ExternalStopArea) (stopAreas []string) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().RemoteObjectIDKind()
 
@@ -98,7 +95,7 @@ func (pc *PushCollector) handleStopAreas(sas []*external_models.ExternalStopArea
 	return
 }
 
-func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) (lineIds []string) {
+func (pc *PushCollector) handleLines(lines []*em.ExternalLine) (lineIds []string) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().RemoteObjectIDKind()
 
@@ -117,7 +114,7 @@ func (pc *PushCollector) handleLines(lines []*external_models.ExternalLine) (lin
 	return
 }
 
-func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVehicleJourney) {
+func (pc *PushCollector) handleVehicleJourneys(vjs []*em.ExternalVehicleJourney) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().RemoteObjectIDKind()
 
@@ -138,7 +135,7 @@ func (pc *PushCollector) handleVehicleJourneys(vjs []*external_models.ExternalVe
 	}
 }
 
-func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVisit) {
+func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().RemoteObjectIDKind()
 
@@ -161,7 +158,7 @@ func (pc *PushCollector) handleStopVisits(svs []*external_models.ExternalStopVis
 	}
 }
 
-func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) (vehicles []string) {
+func (pc *PushCollector) handleVehicles(vs []*em.ExternalVehicle) (vehicles []string) {
 	partner := string(pc.Partner().Slug())
 	id_kind := pc.Partner().RemoteObjectIDKind()
 
@@ -183,18 +180,10 @@ func (pc *PushCollector) handleVehicles(vs []*external_models.ExternalVehicle) (
 	return
 }
 
-func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival *external_models.ExternalStopVisit_Times) {
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, convertProtoTimes(protoDeparture.GetAimed()), convertProtoTimes(protoArrival.GetAimed()))
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, convertProtoTimes(protoDeparture.GetActual()), convertProtoTimes(protoArrival.GetActual()))
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, convertProtoTimes(protoDeparture.GetExpected()), convertProtoTimes(protoArrival.GetExpected()))
-}
-
-func convertProtoTimes(protoTime *timestamp.Timestamp) time.Time {
-	t, err := ptypes.Timestamp(protoTime)
-	if err != nil {
-		t = time.Time{}
-	}
-	return t
+func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival *em.ExternalStopVisit_Times) {
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, protoDeparture.GetAimed().AsTime(), protoArrival.GetAimed().AsTime())
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, protoDeparture.GetActual().AsTime(), protoArrival.GetActual().AsTime())
+	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, protoDeparture.GetExpected().AsTime(), protoArrival.GetExpected().AsTime())
 }
 
 func (pc *PushCollector) newLogStashEvent() audit.LogStashEvent {
@@ -203,7 +192,7 @@ func (pc *PushCollector) newLogStashEvent() audit.LogStashEvent {
 	return event
 }
 
-func (pc *PushCollector) logPushNotification(logStashEvent audit.LogStashEvent, model *external_models.ExternalCompleteModel) {
+func (pc *PushCollector) logPushNotification(logStashEvent audit.LogStashEvent, model *em.ExternalCompleteModel) {
 	logStashEvent["type"] = "PushNotification"
 	logStashEvent["stopAreas"] = strconv.Itoa(len(model.GetStopAreas()))
 	logStashEvent["lines"] = strconv.Itoa(len(model.GetLines()))

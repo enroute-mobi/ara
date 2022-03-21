@@ -13,9 +13,10 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/version"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
-	"github.com/golang/protobuf/proto"
+	p "github.com/golang/protobuf/proto"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"google.golang.org/protobuf/proto"
 )
 
 type HTTPClientOptions struct {
@@ -169,7 +170,7 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 	}
 
 	feed := &gtfs.FeedMessage{}
-	err = proto.Unmarshal(content, feed)
+	err = proto.Unmarshal(content, p.MessageV2(feed))
 	if err != nil {
 		return nil, NewGtfsError(fmt.Sprintf("Error while unmarshalling: %v", err))
 	}

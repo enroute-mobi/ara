@@ -1,7 +1,6 @@
 package core
 
 import (
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -88,11 +87,11 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) RequestVehicleUpdat
 // 	}
 // }
 
-func (connector *SIRIVehicleMonitoringSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
-	return &audit.BigQueryMessage{
-		Protocol:  "siri",
-		Direction: "sent",
-		Partner:   string(connector.partner.Slug()),
-		Status:    "OK",
-	}
-}
+// func (connector *SIRIVehicleMonitoringSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
+// 	return &audit.BigQueryMessage{
+// 		Protocol:  "siri",
+// 		Direction: "sent",
+// 		Partner:   string(connector.partner.Slug()),
+// 		Status:    "OK",
+// 	}
+// }

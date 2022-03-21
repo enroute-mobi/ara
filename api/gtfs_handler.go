@@ -8,12 +8,13 @@ import (
 	"strconv"
 	"time"
 
-	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
+	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
-	"github.com/golang/protobuf/proto"
+	p "github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 type GtfsHandler struct {
@@ -134,7 +135,7 @@ func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit
 		gc[i].HandleGtfs(feed, logStashEvent)
 	}
 
-	return proto.Marshal(feed)
+	return proto.Marshal(p.MessageV2(feed))
 }
 
 func (handler *GtfsHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {

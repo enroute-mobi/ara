@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"time"
 
-	external_models "bitbucket.org/enroute-mobi/ara-external-models"
-	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
+	em "bitbucket.org/enroute-mobi/ara-external-models"
+	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 type PushHandler struct {
@@ -89,7 +89,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	externalModel := &external_models.ExternalCompleteModel{}
+	externalModel := &em.ExternalCompleteModel{}
 	err = proto.Unmarshal(content, externalModel)
 	if err != nil {
 		e := fmt.Sprintf("Error while unmarshalling body: %v", err)

@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	rah "bitbucket.org/enroute-mobi/ara/api/remote_address_handler"
+	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 )
