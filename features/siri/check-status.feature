@@ -113,7 +113,7 @@ Feature: Support SIRI CheckStatus
       | remote_url        | http://localhost:8090 |
       | remote_credential | Ara                   |
 
-    When a minute has passed
+    When 30 seconds have passed
     Then the SIRI server should have received a CheckStatus request with the payload:
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -121,9 +121,9 @@ Feature: Support SIRI CheckStatus
   <S:Body>
     <sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
     <Request>
-      <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+      <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>Ara</siri:RequestorRef>
-      <siri:MessageIdentifier>6ba7b814-9dad-11d1-3-00c04fd430c8</siri:MessageIdentifier>
+      <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
     </Request>
     <RequestExtension/>
     </sw:CheckStatus>
@@ -155,15 +155,15 @@ Feature: Support SIRI CheckStatus
       | remote_url        | http://localhost:8090 |
       | remote_credential | Ara                   |
       | siri.envelope     | raw                   |
-    When a minute has passed
+    When 30 seconds have passed
     Then the SIRI server should have received a CheckStatus request with the payload:
       """
 <?xml version='1.0' encoding='utf-8'?>
 <sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 <Request>
-      <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+      <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>Ara</siri:RequestorRef>
-      <siri:MessageIdentifier>6ba7b814-9dad-11d1-3-00c04fd430c8</siri:MessageIdentifier>
+      <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
       </Request>
       <RequestExtension/>
 </sw:CheckStatus>
