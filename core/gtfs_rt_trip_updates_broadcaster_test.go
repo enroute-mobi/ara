@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
 func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {

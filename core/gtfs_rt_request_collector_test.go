@@ -8,16 +8,15 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
-	p "github.com/golang/protobuf/proto"
 	"google.golang.org/protobuf/proto"
 )
 
 func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]model.UpdateEvent, *Partner) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		data, _ := proto.Marshal(p.MessageV2(feed))
+		data, _ := proto.Marshal(feed)
 		var buffer bytes.Buffer
 		buffer.Write(data)
 		// data := d.([]byte)

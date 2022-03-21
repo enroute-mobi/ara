@@ -11,9 +11,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
-	p "github.com/golang/protobuf/proto"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -135,7 +134,7 @@ func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit
 		gc[i].HandleGtfs(feed, logStashEvent)
 	}
 
-	return proto.Marshal(p.MessageV2(feed))
+	return proto.Marshal(feed)
 }
 
 func (handler *GtfsHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {

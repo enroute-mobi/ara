@@ -6,10 +6,10 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 )
 
 type GtfsRequestCollectorFactory struct{}
