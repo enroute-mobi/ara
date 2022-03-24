@@ -215,7 +215,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			estimatedVehicleJourney, ok := vehicleJourneys[vehicleJourney.Id()]
 			if !ok {
 				// Handle vehicleJourney Objectid
-				vehicleJourneyId, ok := vehicleJourney.ObjectID(ett.connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+				vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(ett.connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
 				var datedVehicleJourneyRef string
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()

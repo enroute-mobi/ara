@@ -115,6 +115,7 @@ func (objectid *ObjectID) UnmarshalJSON(data []byte) error {
 
 type ObjectIDConsumerInterface interface {
 	ObjectID(string) (ObjectID, bool)
+	ObjectIDWithFallback([]string) (ObjectID, bool)
 	ObjectIDs() ObjectIDs
 	ObjectIDsResponse() map[string]string
 	SetObjectID(ObjectID)
@@ -129,6 +130,16 @@ func (consumer *ObjectIDConsumer) ObjectID(kind string) (ObjectID, bool) {
 	objectid, ok := consumer.objectids[kind]
 	if ok {
 		return objectid, true
+	}
+	return ObjectID{}, false
+}
+
+func (consumer *ObjectIDConsumer) ObjectIDWithFallback(kinds []string) (ObjectID, bool) {
+	for i := range kinds {
+		objectid, ok := consumer.objectids[kinds[i]]
+		if ok {
+			return objectid, true
+		}
 	}
 	return ObjectID{}, false
 }

@@ -126,36 +126,37 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 			estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 			// SIRIEstimatedCall
-			for _, stopVisit := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id()) {
-				if !selector(stopVisit) {
+			svs := tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vehicleJourney.Id())
+			for i := range svs {
+				if !selector(&svs[i]) {
 					continue
 				}
 
 				// Handle StopPointRef
-				stopArea, stopAreaId, ok := connector.stopPointRef(stopVisit.StopAreaId, tx)
+				stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId, tx)
 				if !ok {
-					logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+					logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct ObjectID", svs[i].Id())
 					continue
 				}
 
-				connector.resolveOperatorRef(estimatedVehicleJourney.References, stopVisit, tx)
+				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i], tx)
 
 				monitoringRefs = append(monitoringRefs, stopAreaId)
 				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:      string(stopVisit.ArrivalStatus),
-					DepartureStatus:    string(stopVisit.DepartureStatus),
-					AimedArrivalTime:   stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					AimedDepartureTime: stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-					Order:              stopVisit.PassageOrder,
+					ArrivalStatus:      string(svs[i].ArrivalStatus),
+					DepartureStatus:    string(svs[i].DepartureStatus),
+					AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
+					AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
+					Order:              svs[i].PassageOrder,
 					StopPointRef:       stopAreaId,
 					StopPointName:      stopArea.Name,
-					DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
-					VehicleAtStop:      stopVisit.VehicleAtStop,
+					DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
+					VehicleAtStop:      svs[i].VehicleAtStop,
 				}
 
 				if stopArea.Monitored {
-					estimatedCall.ExpectedArrivalTime = stopVisit.Schedules.Schedule("expected").ArrivalTime()
-					estimatedCall.ExpectedDepartureTime = stopVisit.Schedules.Schedule("expected").DepartureTime()
+					estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
+					estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
 				} else if connector.Partner().SendProducerUnavailableError() {
 					delivery.Status = false
 					delivery.ErrorType = "OtherError"

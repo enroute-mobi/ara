@@ -21,16 +21,18 @@ type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 
 	connector
 
-	remoteObjectidKind        string
-	vehicleRemoteObjectidKind string
+	remoteObjectidKind         string
+	vjRemoteObjectidKinds      []string
+	vehicleRemoteObjectidKinds []string
 }
 
 type SIRILiteVehicleMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteVehicleMonitoringRequestBroadcaster {
 	siriVehicleMonitoringRequestBroadcaster := &SIRILiteVehicleMonitoringRequestBroadcaster{
-		remoteObjectidKind:        partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
-		vehicleRemoteObjectidKind: partner.VehicleRemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		remoteObjectidKind:         partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		vjRemoteObjectidKinds:      partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		vehicleRemoteObjectidKinds: partner.VehicleRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
 	}
 	siriVehicleMonitoringRequestBroadcaster.partner = partner
 	return siriVehicleMonitoringRequestBroadcaster
@@ -80,7 +82,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	var vehicleIds []string
 
 	for _, vehicle := range tx.Model().Vehicles().FindByLineId(line.Id()) {
-		vehicleId, ok := vehicle.ObjectID(connector.vehicleRemoteObjectidKind)
+		vehicleId, ok := vehicle.ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
 		if !ok {
 			continue
 		}
@@ -133,7 +135,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
-	vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.remoteObjectidKind)
+	vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
 
 	var dataVehicleJourneyRef string
 	if ok {
@@ -196,41 +198,3 @@ func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) CreateConnect
 func logSIRILiteVehicleMonitoringResponse(logStashEvent audit.LogStashEvent, siriLiteResponse *siri.SiriLiteResponse) {
 
 }
-
-// func logXMLVehicleMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLVehicleMonitoringRequest) {
-// 	logStashEvent["siriType"] = "VehicleMonitoringResponse"
-// 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-// 	logStashEvent["monitoringRef"] = request.MonitoringRef()
-// 	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
-// 	logStashEvent["lineRef"] = request.LineRef()
-// 	logStashEvent["maximumStopVisits"] = strconv.Itoa(request.MaximumStopVisits())
-// 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-// 	logStashEvent["startTime"] = request.StartTime().String()
-// 	logStashEvent["previewInterval"] = request.PreviewInterval().String()
-// 	logStashEvent["requestXML"] = request.RawXML()
-// }
-
-// func logSIRIVehicleMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIVehicleMonitoringDelivery) {
-// 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
-// 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
-// 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
-// 	if !delivery.Status {
-// 		logStashEvent["errorType"] = delivery.ErrorType
-// 		if delivery.ErrorType == "OtherError" {
-// 			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
-// 		}
-// 		logStashEvent["errorText"] = delivery.ErrorText
-// 	}
-// }
-
-// func logSIRIVehicleMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIVehicleMonitoringResponse) {
-// 	logStashEvent["address"] = response.Address
-// 	logStashEvent["producerRef"] = response.ProducerRef
-// 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-// 	xml, err := response.BuildXML()
-// 	if err != nil {
-// 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-// 		return
-// 	}
-// 	logStashEvent["responseXML"] = xml
-// }

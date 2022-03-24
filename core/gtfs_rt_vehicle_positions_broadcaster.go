@@ -56,10 +56,11 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 	trips := make(map[model.VehicleJourneyId]*gtfs.TripDescriptor)
 
 	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-	vehicleObjectidKind := connector.partner.VehicleRemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	vjObjectidKinds := connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	vehicleObjectidKinds := connector.partner.VehicleRemoteObjectIDKindWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 
 	for i := range vehicles {
-		vehicleId, ok := vehicles[i].ObjectID(vehicleObjectidKind)
+		vehicleId, ok := vehicles[i].ObjectIDWithFallback(vehicleObjectidKinds)
 		if !ok {
 			continue
 		}
@@ -72,7 +73,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectID(objectidKind)
+			vjId, ok := vj.ObjectIDWithFallback(vjObjectidKinds)
 			if !ok {
 				continue
 			}

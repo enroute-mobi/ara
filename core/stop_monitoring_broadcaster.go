@@ -186,7 +186,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			// Get the monitoredStopVisit
 			stopMonitoringBuilder.MonitoringRef = monitoringRef
-			if !smb.handledStopVisitAppend(stopVisit, delivery, stopMonitoringBuilder) {
+			if !smb.handledStopVisitAppend(&stopVisit, delivery, stopMonitoringBuilder) {
 				continue
 			}
 
@@ -246,7 +246,7 @@ func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscri
 	return "", nil, false
 }
 
-func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit *model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 
 	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return smb.handleCancelledStopVisit(stopVisit, delivery, stopMonitoringBuilder)
@@ -255,7 +255,7 @@ func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit model.StopVisit, deli
 	}
 }
 
-func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit *model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 	cancelledStopVisit := stopMonitoringBuilder.BuildCancelledStopVisit(stopVisit)
 	if cancelledStopVisit == nil {
 		return false
@@ -265,7 +265,7 @@ func (smb *SMBroadcaster) handleCancelledStopVisit(stopVisit model.StopVisit, de
 	return true
 }
 
-func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
+func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit *model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 	monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(stopVisit)
 	if monitoredStopVisit == nil {
 		return false

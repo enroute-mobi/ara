@@ -63,6 +63,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 
 	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	vjObjectidKinds := connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 
 	for i := range stopVisits {
 		sa, ok := tx.Model().StopAreas().Find(stopVisits[i].StopAreaId)
@@ -83,7 +84,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectID(objectidKind)
+			vjId, ok := vj.ObjectIDWithFallback(vjObjectidKinds)
 			if !ok {
 				continue
 			}

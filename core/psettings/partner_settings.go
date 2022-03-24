@@ -21,12 +21,13 @@ const (
 
 	PARTNER_MAX_RETRY = "partner.status.maximum_retry"
 
-	REMOTE_CREDENTIAL            = "remote_credential"
-	REMOTE_OBJECTID_KIND         = "remote_objectid_kind"
-	VEHICLE_REMOTE_OBJECTID_KIND = "vehicle_remote_objectid_kind"
-	REMOTE_URL                   = "remote_url"
-	NOTIFICATIONS_REMOTE_URL     = "notifications.remote_url"
-	SUBSCRIPTIONS_REMOTE_URL     = "subscriptions.remote_url"
+	REMOTE_CREDENTIAL                    = "remote_credential"
+	REMOTE_OBJECTID_KIND                 = "remote_objectid_kind"
+	VEHICLE_REMOTE_OBJECTID_KIND         = "vehicle_remote_objectid_kind"
+	VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND = "vehicle_journey_remote_objectid_kind"
+	REMOTE_URL                           = "remote_url"
+	NOTIFICATIONS_REMOTE_URL             = "notifications.remote_url"
+	SUBSCRIPTIONS_REMOTE_URL             = "subscriptions.remote_url"
 
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
@@ -156,14 +157,35 @@ func (s *PartnerSettings) RemoteObjectIDKind(connectorName ...string) string {
 	return s.s[REMOTE_OBJECTID_KIND]
 }
 
-func (s *PartnerSettings) VehicleRemoteObjectIDKind(connectorName string) string {
-	s.m.RLock()
-	defer s.m.RUnlock()
+func (s *PartnerSettings) VehicleRemoteObjectIDKindWithFallback(connectorName ...string) []string {
+	return s.remoteObjectIDKindWithFallback(VEHICLE_REMOTE_OBJECTID_KIND, connectorName...)
+}
 
-	if setting := s.s[fmt.Sprintf("%s.%s", connectorName, VEHICLE_REMOTE_OBJECTID_KIND)]; setting != "" {
-		return setting
+func (s *PartnerSettings) VehicleJourneyRemoteObjectIDKindWithFallback(connectorName ...string) []string {
+	return s.remoteObjectIDKindWithFallback(VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND, connectorName...)
+}
+
+func (s *PartnerSettings) remoteObjectIDKindWithFallback(settingName string, connectorName ...string) (k []string) {
+	var cn string
+	if len(connectorName) != 0 {
+		cn = connectorName[0]
 	}
-	return s.s[REMOTE_OBJECTID_KIND]
+
+	s.m.RLock()
+
+	if setting := s.s[fmt.Sprintf("%s.%s", cn, settingName)]; setting != "" {
+		k = append(k, trimedSlice(setting)...)
+	}
+	if setting := s.s[settingName]; setting != "" {
+		k = append(k, trimedSlice(setting)...)
+	}
+
+	if len(k) == 0 {
+		k = append(k, s.s[REMOTE_OBJECTID_KIND])
+	}
+
+	s.m.RUnlock()
+	return
 }
 
 func (s *PartnerSettings) GtfsTTL() (t time.Duration) {
