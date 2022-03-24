@@ -139,10 +139,10 @@ class SIRIServer
   end
 
   def received_specific_requests?(name, count = 1)
-    requests.select do |r|
+    requests.count do |r|
       document = REXML::Document.new(r.body)
       document.root.find_first_recursive {|node| node.name == name }
-    end.length == count
+    end == count
   end
 
   def start
