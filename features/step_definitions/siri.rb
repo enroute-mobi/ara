@@ -145,17 +145,17 @@ end
 
 Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (\S+) request$/) do |name, request_type|
   name ||= "default"
-  expect(SIRIServer.find(name).received_request?).to be_falsy
+  expect(SIRIServer.find(name).received_specific_requests?(request_type)).to be_falsy
 end
 
 Then(/^the (?:"([^"]*)" )?SIRI server should not have received (\d+) (\S+) request(?:s)?$/) do |name, count, request_type|
   name ||= "default"
-  expect(SIRIServer.find(name).received_requests?(count.to_i)).to be_falsy
+  expect(SIRIServer.find(name).received_specific_requests?(request_type, count.to_i)).to be_falsy
 end
 
 Then(/^the (?:"([^"]*)" )?SIRI server should have received (\d+) (\S+) request(?:s)?$/) do |name, count, message_type|
   name ||= "default"
-  expect(SIRIServer.find(name).received_requests?(count.to_i)).to be_truthy
+  expect(SIRIServer.find(name).received_specific_requests?(message_type, count.to_i)).to be_truthy
 end
 
 Then(/^the SIRI server should have received a CheckStatus request with the payload:$/) do |expected_xml|
