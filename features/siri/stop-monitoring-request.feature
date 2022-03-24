@@ -1321,6 +1321,7 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
 
+  @ARA-1010
   Scenario: Handle a SIRI StopMonitoring request with a not monitored StopArea and broadcast.send_producer_unavailable_error setting
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                          | test     |
