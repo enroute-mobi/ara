@@ -58,7 +58,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		ResponseTimestamp: connector.Clock().Now(),
 		MonitoringRef:     request.MonitoringRef(),
 	}
-	if !stopArea.Monitored {
+	if !stopArea.Monitored && connector.Partner().SendProducerUnavailableError() {
 		delivery.Status = false
 		delivery.ErrorType = "OtherError"
 		delivery.ErrorNumber = 1
