@@ -98,12 +98,13 @@ func httpClient(opts HTTPClientOptions) (c *http.Client) {
 	if err != nil {
 		logger.Log.Printf("Could not authenticate with OAuth: %s", err)
 		return c // Return default server if we can't authenticate with OAuth
-	} else {
-		logger.Log.Debugf("Authenticated to OAuth server url: %s, token_type: %s, expiring at: %s",
-			oauthConfig.TokenURL,
-			token.TokenType,
-			token.Expiry.UTC().Format(time.UnixDate))
 	}
+
+	logger.Log.Debugf("Authenticated to OAuth server url: %s, token: %s, token_type: %s, expiring at: %s",
+		oauthConfig.TokenURL,
+		token.AccessToken,
+		token.TokenType,
+		token.Expiry.UTC().Format(time.UnixDate))
 
 	return oauthConfig.Client(ctx)
 }

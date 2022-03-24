@@ -4,6 +4,8 @@ require 'uri'
 class SIRIServer
 
   @@servers = {}
+  @@authorized_tokens = []
+
   def self.each(&block)
     @@servers.values.each(&block)
   end
@@ -21,6 +23,10 @@ class SIRIServer
     @@servers.clear
   end
 
+  def self.authorized_tokens
+    @@authorized_tokens
+  end
+
   attr_accessor :url, :port, :path, :requests, :responses, :started
 
   def initialize(url, envelope)
@@ -36,29 +42,41 @@ class SIRIServer
 
   def proceed_request
     @http_server.mount_proc @uri.path do |req, res|
-      request_message_identifiers = req.body.scan(/MessageIdentifier>(.*)</).flatten
-
-      if checkstatus_response_standard?(req)
-        case @envelope
-        when 'SOAP'
-          res.body = soap_checkstatus_response(request_message_identifiers)
-        when 'raw'
-          res.body = raw_checkstatus_response(uri, request_message_identifiers)
-        else
-          raise "Unknown envelope #{@envelope}"
-        end
+      if need_authorization?(req) && !authorize?(req)
+        res.status = 401
+        res.body = 'Unauthorized request'
       else
-        puts 'Receive SIRI request: %s' % [req] if ENV["SIRI_DEBUG"]
-        requests << req
+        request_message_identifiers = req.body.scan(/MessageIdentifier>(.*)</).flatten
+        if checkstatus_response_standard?(req)
+          case @envelope
+          when 'SOAP'
+            res.body = soap_checkstatus_response(request_message_identifiers)
+          when 'raw'
+            res.body = raw_checkstatus_response(uri, request_message_identifiers)
+          else
+            raise "Unknown envelope #{@envelope}"
+          end
+        else
+          puts 'Receive SIRI request: %s' % [req] if ENV["SIRI_DEBUG"]
+          requests << req
 
-        request_body = @responses.shift
-        request_body.gsub!("{RequestMessageRef}", request_message_identifiers.first)
-        request_body.gsub!("{LastRequestMessageRef}", request_message_identifiers.last)
+          request_body = @responses.shift
+          request_body.gsub!("{RequestMessageRef}", request_message_identifiers.first)
+          request_body.gsub!("{LastRequestMessageRef}", request_message_identifiers.last)
 
-        res.body = request_body
+          res.body = request_body
+        end
       end
       res.content_type = 'text/xml'
     end
+  end
+
+  def need_authorization?(req)
+    !req.header['authorization'].empty?
+  end
+
+  def authorize?(req)
+    SIRIServer.authorized_tokens.include?(req.header['authorization'].first.split[1])
   end
 
   def expect_request(type, response)
