@@ -16,17 +16,28 @@ import (
 var Database *gorp.DbMap
 
 func InitDB(config config.DatabaseConfig) *gorp.DbMap {
-	if config.Host == "" {
-		config.Host = "localhost"
+	var dbinfo string
+
+	if config.Host == "" && config.User == "" && config.Password == "" {
+		dbinfo = fmt.Sprintf("postgresql:///%s?host=/var/run/postgresql",
+			config.Name,
+		)
+	} else {
+		if config.Host == "" {
+			config.Host = "localhost"
+		}
+
+		dbinfo = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			config.Host,
+			config.Port,
+			config.User,
+			config.Password,
+			config.Name,
+		)
 	}
 
-	dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Host,
-		config.Port,
-		config.User,
-		config.Password,
-		config.Name,
-	)
+	logger.Log.Debugf("Connecting to Database %s", dbinfo)
+
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
 		logger.Log.Panicf("Error while connecting to the database:\n%v", err)
