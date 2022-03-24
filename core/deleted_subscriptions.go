@@ -25,16 +25,16 @@ func NewDeletedSubscriptions() *DeletedSubscriptions {
 
 // Returns true if we send a DeleteSubscription request in the last 5 minutes
 // Otherwise register it
-func (cs *DeletedSubscriptions) AlreadySend(subID string) bool {
-	cs.RLock()
-	t, ok := cs.s[subID]
-	cs.RUnlock()
+func (ds *DeletedSubscriptions) AlreadySend(subID string) bool {
+	ds.RLock()
+	t, ok := ds.s[subID]
+	ds.RUnlock()
 	if ok && clock.DefaultClock().Now().Before(t.Add(DELETED_SUBSCRIPTION_TIMER)) {
 		return true
 	}
 
-	cs.Lock()
-	cs.s[subID] = clock.DefaultClock().Now()
-	cs.Unlock()
+	ds.Lock()
+	ds.s[subID] = clock.DefaultClock().Now()
+	ds.Unlock()
 	return false
 }

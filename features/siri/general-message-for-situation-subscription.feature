@@ -354,6 +354,7 @@ Feature: Support SIRI GeneralMessage by subscription
 # </S:Envelope>
 #       """
 
+  @ARA-957
   Scenario: Send DeleteSubscriptionRequests
     Given a SIRI server on "http://localhost:8090"
       And a Partner "test" exists with connectors [siri-general-message-subscription-collector] and the following settings:
