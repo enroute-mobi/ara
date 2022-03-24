@@ -181,7 +181,11 @@ func (s *PartnerSettings) remoteObjectIDKindWithFallback(settingName string, con
 	}
 
 	if len(k) == 0 {
-		k = append(k, s.s[REMOTE_OBJECTID_KIND])
+		if setting := s.s[fmt.Sprintf("%s.%s", cn, REMOTE_OBJECTID_KIND)]; setting != "" {
+			k = append(k, setting)
+		} else {
+			k = append(k, s.s[REMOTE_OBJECTID_KIND])
+		}
 	}
 
 	s.m.RUnlock()
