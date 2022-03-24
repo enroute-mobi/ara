@@ -20,9 +20,10 @@ type SIRIStopPointsDiscoveryRequestBroadcaster struct {
 type SIRIStopPointsDiscoveryRequestBroadcasterFactory struct{}
 
 func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDiscoveryRequestBroadcaster {
-	siriStopDiscoveryRequestBroadcaster := &SIRIStopPointsDiscoveryRequestBroadcaster{}
-	siriStopDiscoveryRequestBroadcaster.partner = partner
-	return siriStopDiscoveryRequestBroadcaster
+	connector := &SIRIStopPointsDiscoveryRequestBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
@@ -41,13 +42,12 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	annotedStopPointMap := make(map[string]struct{})
 
-	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 	for _, stopArea := range tx.Model().StopAreas().FindAll() {
 		if stopArea.Name == "" || !stopArea.CollectedAlways {
 			continue
 		}
 
-		objectID, ok := stopArea.ReferentOrSelfObjectId(objectIDKind)
+		objectID, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
 		if !ok || objectID.Value() == "" {
 			continue
 		}
@@ -67,7 +67,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			if line.Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			objectid, ok := line.ObjectID(objectIDKind)
+			objectid, ok := line.ObjectID(connector.remoteObjectidKind)
 			if !ok {
 				continue
 			}

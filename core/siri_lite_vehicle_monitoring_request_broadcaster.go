@@ -21,7 +21,6 @@ type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 
 	connector
 
-	remoteObjectidKind         string
 	vjRemoteObjectidKinds      []string
 	vehicleRemoteObjectidKinds []string
 }
@@ -29,13 +28,13 @@ type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 type SIRILiteVehicleMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteVehicleMonitoringRequestBroadcaster {
-	siriVehicleMonitoringRequestBroadcaster := &SIRILiteVehicleMonitoringRequestBroadcaster{
-		remoteObjectidKind:         partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+	connector := &SIRILiteVehicleMonitoringRequestBroadcaster{
 		vjRemoteObjectidKinds:      partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
 		vehicleRemoteObjectidKinds: partner.VehicleRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
 	}
-	siriVehicleMonitoringRequestBroadcaster.partner = partner
-	return siriVehicleMonitoringRequestBroadcaster
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {

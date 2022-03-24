@@ -34,8 +34,6 @@ type EstimatedTimeTableBroadcaster struct {
 
 type FakeEstimatedTimeTableBroadcaster struct {
 	ETTBroadcaster
-
-	clock.ClockConsumer
 }
 
 func NewFakeEstimatedTimeTableBroadcaster(connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) SIRIEstimatedTimeTableBroadcaster {
@@ -189,7 +187,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			if !ok {
 				continue
 			}
-			lineObjectId, ok := line.ObjectID(ett.connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+			lineObjectId, ok := line.ObjectID(ett.connector.remoteObjectidKind)
 			if !ok {
 				continue
 			}
@@ -215,7 +213,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			estimatedVehicleJourney, ok := vehicleJourneys[vehicleJourney.Id()]
 			if !ok {
 				// Handle vehicleJourney Objectid
-				vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(ett.connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+				vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(ett.connector.vjRemoteObjectidKinds)
 				var datedVehicleJourneyRef string
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()
@@ -279,13 +277,13 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 	if !ok {
 		return model.StopArea{}, "", false
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
 	if ok {
 		return stopPointRef, stopPointRefObjectId.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentObjectId, ok := referent.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+		referentObjectId, ok := referent.ObjectID(connector.remoteObjectidKind)
 		if ok {
 			return referent, referentObjectId.Value(), true
 		}
@@ -306,14 +304,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 			continue
 		}
 		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
-			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
 			if ok {
 				references[refType] = obj.Value()
 				continue
 			}
 		}
 		generator := connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER)
-		defaultObjectID := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER), generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
+		defaultObjectID := model.NewObjectID(connector.remoteObjectidKind, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
 		references[refType] = defaultObjectID.Value()
 	}
 
@@ -327,7 +325,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 		references["OperatorRef"] = operatorRef.ObjectId.Value()
 		return references
 	}
-	obj, ok := operator.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER))
+	obj, ok := operator.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		references["OperatorRef"] = operatorRef.ObjectId.Value()
 		return references

@@ -48,7 +48,8 @@ type GtfsConnector interface {
 }
 
 type connector struct {
-	partner *Partner
+	partner            *Partner
+	remoteObjectidKind string
 }
 
 func (c *connector) Partner() *Partner {

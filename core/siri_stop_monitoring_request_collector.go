@@ -49,6 +49,7 @@ func (factory *TestStopMonitoringRequestCollectorFactory) CreateConnector(partne
 
 func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {
 	connector := &SIRIStopMonitoringRequestCollector{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -66,7 +67,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	objectidKind := connector.partner.RemoteObjectIDKind()
+	objectidKind := connector.remoteObjectidKind
 	objectid, ok := stopArea.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)

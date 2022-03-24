@@ -20,6 +20,7 @@ type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 
 	connector
 
+	vjRemoteObjectidKinds         []string
 	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.StopVisitId
 	notMonitored                  map[SubscriptionId]map[string]struct{}
@@ -43,13 +44,15 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(ap
 }
 
 func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimeTableSubscriptionBroadcaster {
-	siriEstimatedTimeTableSubscriptionBroadcaster := &SIRIEstimatedTimeTableSubscriptionBroadcaster{}
-	siriEstimatedTimeTableSubscriptionBroadcaster.partner = partner
-	siriEstimatedTimeTableSubscriptionBroadcaster.mutex = &sync.Mutex{}
-	siriEstimatedTimeTableSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
+	connector := &SIRIEstimatedTimeTableSubscriptionBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.partner = partner
+	connector.mutex = &sync.Mutex{}
+	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
-	siriEstimatedTimeTableSubscriptionBroadcaster.estimatedTimeTableBroadcaster = NewSIRIEstimatedTimeTableBroadcaster(siriEstimatedTimeTableSubscriptionBroadcaster)
-	return siriEstimatedTimeTableSubscriptionBroadcaster
+	connector.estimatedTimeTableBroadcaster = NewSIRIEstimatedTimeTableBroadcaster(connector)
+	return connector
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
@@ -137,7 +140,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []SubscribedResource, lineIds []string) {
 	for _, lineId := range ett.Lines() {
-		lineObjectId := model.NewObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER), lineId)
+		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
 		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
 
 		if !ok {
@@ -208,7 +211,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	lineObj, ok := line.ObjectID(connector.Partner().RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+	lineObj, ok := line.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		return
 	}
@@ -243,7 +246,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(sub
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {
-	obj, ok := stopArea.ObjectID(connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER))
+	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		return
 	}

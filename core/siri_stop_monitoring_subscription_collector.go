@@ -48,6 +48,7 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartn
 
 func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonitoringSubscriptionCollector {
 	connector := &SIRIStopMonitoringSubscriptionCollector{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -75,10 +76,9 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		return
 	}
 
-	objectidKind := connector.Partner().RemoteObjectIDKind()
-	stopAreaObjectid, ok := stopArea.ObjectID(objectidKind)
+	stopAreaObjectid, ok := stopArea.ObjectID(connector.remoteObjectidKind)
 	if !ok {
-		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
+		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), connector.remoteObjectidKind)
 		return
 	}
 
@@ -150,7 +150,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		if resource != nil {
 			originStopAreaObjectId = *resource.Reference.ObjectId
 		} else if delivery.MonitoringRef() != "" {
-			originStopAreaObjectId = model.NewObjectID(connector.Partner().RemoteObjectIDKind(), delivery.MonitoringRef())
+			originStopAreaObjectId = model.NewObjectID(connector.remoteObjectidKind, delivery.MonitoringRef())
 		}
 
 		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaObjectId)

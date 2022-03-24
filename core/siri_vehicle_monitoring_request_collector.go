@@ -27,6 +27,7 @@ type SIRIVehicleMonitoringRequestCollectorFactory struct{}
 
 func NewSIRIVehicleMonitoringRequestCollector(partner *Partner) *SIRIVehicleMonitoringRequestCollector {
 	connector := &SIRIVehicleMonitoringRequestCollector{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -44,7 +45,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 		return
 	}
 
-	objectidKind := connector.partner.RemoteObjectIDKind()
+	objectidKind := connector.remoteObjectidKind
 	objectid, ok := line.ObjectID(objectidKind)
 	if !ok {
 		logger.Log.Debugf("Requested line %v doesn't have and objectId of kind %v", request.LineId(), objectidKind)

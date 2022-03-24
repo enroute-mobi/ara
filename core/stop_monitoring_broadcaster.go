@@ -237,7 +237,7 @@ func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStop
 }
 
 func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription, tx *model.Transaction) (string, *SubscribedResource, bool) {
-	for _, objectid := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.Partner().RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)) {
+	for _, objectid := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.remoteObjectidKind) {
 		resource := sub.Resource(objectid)
 		if resource != nil {
 			return objectid.Value(), resource, true
