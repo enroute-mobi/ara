@@ -206,6 +206,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	content, _ := ioutil.ReadAll(file)
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 
 	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(content)
 

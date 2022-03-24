@@ -35,6 +35,11 @@ def save_siri_messages(messages = {})
   end
 end
 
+Given(/^a SIRI server (?:"([^"]*)" )?on "([^"]*)"$/) do |name, url|
+  name ||= "default"
+  SIRIServer.create(name, url).start
+end
+
 Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
   name ||= "default"
   if envelope == ""
@@ -138,14 +143,19 @@ When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
   send_siri_request request
 end
 
-Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (GetStopMonitoring) request$/) do |name, request_type|
+Then(/^the (?:"([^"]*)" )?SIRI server should not have received a (\S+) request$/) do |name, request_type|
   name ||= "default"
-  expect(SIRIServer.find(name).received_request?).to be_falsy
+  expect(SIRIServer.find(name).received_specific_requests?(request_type)).to be_falsy
 end
 
-Then(/^the (?:"([^"]*)" )?SIRI server should have received (\d+) (GetStopMonitoring) request(?:s)?$/) do |name, count, message_type|
+Then(/^the (?:"([^"]*)" )?SIRI server should not have received (\d+) (\S+) request(?:s)?$/) do |name, count, request_type|
   name ||= "default"
-  expect(SIRIServer.find(name).received_requests?(count.to_i)).to be_truthy
+  expect(SIRIServer.find(name).received_specific_requests?(request_type, count.to_i)).to be_falsy
+end
+
+Then(/^the (?:"([^"]*)" )?SIRI server should have received (\d+) (\S+) request(?:s)?$/) do |name, count, message_type|
+  name ||= "default"
+  expect(SIRIServer.find(name).received_specific_requests?(message_type, count.to_i)).to be_truthy
 end
 
 Then(/^the SIRI server should have received a CheckStatus request with the payload:$/) do |expected_xml|

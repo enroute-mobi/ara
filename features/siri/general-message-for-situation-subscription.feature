@@ -353,3 +353,124 @@ Feature: Support SIRI GeneralMessage by subscription
 # </S:Body>
 # </S:Envelope>
 #       """
+
+  @ARA-957
+  Scenario: Send DeleteSubscriptionRequests
+    Given a SIRI server on "http://localhost:8090"
+      And a Partner "test" exists with connectors [siri-general-message-subscription-collector] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ns6:NotifyGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri"
+        xmlns:ns3="http://www.ifopt.org.uk/acsb"
+        xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+        xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+        xmlns:ns6="http://wsdl.siri.org.uk"
+        xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+            <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
+            <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
+            <ns2:RequestMessageRef>GeneralMessage:TestDelivery:0</ns2:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Notification>
+            <ns2:GeneralMessageDelivery version="1.3">
+              <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
+              <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
+              <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
+              <ns2:SubscriptionRef>6ba7b814-9dad-11d1-3-00c04fd430c8</ns2:SubscriptionRef>
+              <ns2:Status>true</ns2:Status>
+              <ns2:GeneralMessageCancellation>
+                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
+                <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
+                <ns2:InfoMessageIdentifier>2</ns2:InfoMessageIdentifier>
+              </ns2:GeneralMessageCancellation>
+            </ns2:GeneralMessageDelivery>
+          </Notification>
+          <SiriExtension />
+        </ns6:NotifyGeneralMessage>
+      </soap:Body>
+    </soap:Envelope>
+    """
+    Then the SIRI server should have received 1 DeleteSubscription request
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ns6:NotifyGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri"
+        xmlns:ns3="http://www.ifopt.org.uk/acsb"
+        xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+        xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+        xmlns:ns6="http://wsdl.siri.org.uk"
+        xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+            <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
+            <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
+            <ns2:RequestMessageRef>GeneralMessage:TestDelivery:0</ns2:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Notification>
+            <ns2:GeneralMessageDelivery version="1.3">
+              <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
+              <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
+              <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
+              <ns2:SubscriptionRef>6ba7b814-9dad-11d1-3-00c04fd430c8</ns2:SubscriptionRef>
+              <ns2:Status>true</ns2:Status>
+              <ns2:GeneralMessageCancellation>
+                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
+                <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
+                <ns2:InfoMessageIdentifier>2</ns2:InfoMessageIdentifier>
+              </ns2:GeneralMessageCancellation>
+            </ns2:GeneralMessageDelivery>
+          </Notification>
+          <SiriExtension />
+        </ns6:NotifyGeneralMessage>
+      </soap:Body>
+    </soap:Envelope>
+    """
+    Then the SIRI server should not have received 2 DeleteSubscription requests
+    When 6 minutes have passed
+      And I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <ns6:NotifyGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri"
+        xmlns:ns3="http://www.ifopt.org.uk/acsb"
+        xmlns:ns4="http://www.ifopt.org.uk/ifopt"
+        xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+        xmlns:ns6="http://wsdl.siri.org.uk"
+        xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+            <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
+            <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
+            <ns2:RequestMessageRef>GeneralMessage:TestDelivery:0</ns2:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Notification>
+            <ns2:GeneralMessageDelivery version="1.3">
+              <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
+              <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
+              <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
+              <ns2:SubscriptionRef>6ba7b814-9dad-11d1-3-00c04fd430c8</ns2:SubscriptionRef>
+              <ns2:Status>true</ns2:Status>
+              <ns2:GeneralMessageCancellation>
+                <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
+                <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
+                <ns2:InfoMessageIdentifier>2</ns2:InfoMessageIdentifier>
+              </ns2:GeneralMessageCancellation>
+            </ns2:GeneralMessageDelivery>
+          </Notification>
+          <SiriExtension />
+        </ns6:NotifyGeneralMessage>
+      </soap:Body>
+    </soap:Envelope>
+    """
+    Then the SIRI server should have received 2 DeleteSubscription requests

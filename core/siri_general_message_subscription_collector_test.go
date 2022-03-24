@@ -97,6 +97,7 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	content, _ := ioutil.ReadAll(file)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 
 	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(content)
 
