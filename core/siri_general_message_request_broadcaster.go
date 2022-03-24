@@ -76,8 +76,9 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 	builder.SetLineRef(request.LineRef())
 	builder.SetStopPointRef(request.StopPointRef())
 
-	for _, situation := range tx.Model().Situations().FindAll() {
-		siriGeneralMessage := builder.BuildGeneralMessage(situation)
+	situations := tx.Model().Situations().FindAll()
+	for i := range situations {
+		siriGeneralMessage := builder.BuildGeneralMessage(situations[i])
 		if siriGeneralMessage == nil {
 			continue
 		}

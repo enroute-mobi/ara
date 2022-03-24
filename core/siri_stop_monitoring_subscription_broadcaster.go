@@ -77,10 +77,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 			}
 		}
 	case "VehicleJourney":
-		for _, sv := range tx.Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId)) {
-			subsIds := connector.checkEvent(sv, tx)
+		svs := tx.Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId))
+		for i := range svs {
+			subsIds := connector.checkEvent(svs[i], tx)
 			if len(subsIds) != 0 {
-				connector.addStopVisit(subsIds, sv.Id())
+				connector.addStopVisit(subsIds, svs[i].Id())
 			}
 		}
 	case "StopArea":
@@ -264,21 +265,22 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	defer tx.Close()
 
 	for _, saId := range tx.Model().StopAreas().FindFamily(sa.Id()) {
-		for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(saId) {
-			if _, ok := res.LastState(string(sv.Id())); ok {
+		svs := tx.Model().StopVisits().FindFollowingByStopAreaId(saId)
+		for i := range svs {
+			if _, ok := res.LastState(string(svs[i].Id())); ok {
 				continue
 			}
 
 			// Handle LineRef filter
-			vj, _ := tx.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
+			vj, _ := tx.Model().VehicleJourneys().Find(svs[i].VehicleJourneyId)
 			if lineRef, ok := connector.lineRef(sub, tx); ok && lineRef != vj.LineId {
 				continue
 			}
 
 			smlc := &stopMonitoringLastChange{}
-			smlc.InitState(&sv, sub)
-			res.SetLastState(string(sv.Id()), smlc)
-			connector.addStopVisit([]SubscriptionId{sub.Id()}, sv.Id())
+			smlc.InitState(&svs[i], sub)
+			res.SetLastState(string(svs[i].Id()), smlc)
+			connector.addStopVisit([]SubscriptionId{sub.Id()}, svs[i].Id())
 		}
 	}
 }

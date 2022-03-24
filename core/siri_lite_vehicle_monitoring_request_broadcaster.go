@@ -80,13 +80,14 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 	var vehicleIds []string
 
-	for _, vehicle := range tx.Model().Vehicles().FindByLineId(line.Id()) {
-		vehicleId, ok := vehicle.ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
+	vs := tx.Model().Vehicles().FindByLineId(line.Id())
+	for i := range vs {
+		vehicleId, ok := vs[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
 		if !ok {
 			continue
 		}
 
-		vj := vehicle.VehicleJourney()
+		vj := vs[i].VehicleJourney()
 		if vj == nil {
 			continue
 		}
@@ -96,8 +97,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		}
 
 		activity := siri.NewSiriLiteVehicleActivity()
-		activity.RecordedAtTime = vehicle.RecordedAtTime
-		activity.ValidUntilTime = vehicle.RecordedAtTime
+		activity.RecordedAtTime = vs[i].RecordedAtTime
+		activity.ValidUntilTime = vs[i].RecordedAtTime
 		activity.VehicleMonitoringRef = vehicleId.Value()
 		activity.MonitoredVehicleJourney.LineRef = lineRef
 		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
@@ -105,7 +106,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.OriginName = vj.OriginName
 		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
-		activity.MonitoredVehicleJourney.Bearing = vehicle.Bearing
+		activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
 
 		refs := vj.References.Copy()
 		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef(tx, "OriginRef", vj.Origin, refs)
@@ -116,8 +117,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 			connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
 
-		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vehicle.Longitude
-		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vehicle.Latitude
+		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
+		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vs[i].Latitude
 
 		// Delay                   *time.Time `json:",omitempty"`
 

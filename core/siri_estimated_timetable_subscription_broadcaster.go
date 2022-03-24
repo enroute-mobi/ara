@@ -110,9 +110,9 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			}
 
 			// Init StopVisits LastChange
-			connector.addLineStopVisits(sub, &r, line.Id())
+			connector.addLineStopVisits(sub, r, line.Id())
 
-			sub.AddNewResource(r)
+			sub.AddNewResource(*r)
 		}
 		sub.Save()
 	}
@@ -127,18 +127,20 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	tx := connector.Partner().Referential().NewTransaction()
 	defer tx.Close()
 
-	for _, sa := range tx.Model().StopAreas().FindByLineId(lineId) {
+	sas := tx.Model().StopAreas().FindByLineId(lineId)
+	for i := range sas {
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
-		salc.InitState(&sa, sub)
-		res.SetLastState(string(sa.Id()), salc)
-		for _, sv := range tx.Model().StopVisits().FindFollowingByStopAreaId(sa.Id()) {
-			connector.addStopVisit(sub.Id(), sv.Id())
+		salc.InitState(&sas[i], sub)
+		res.SetLastState(string(sas[i].Id()), salc)
+		svs := tx.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
+		for i := range svs {
+			connector.addStopVisit(sub.Id(), svs[i].Id())
 		}
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []SubscribedResource, lineIds []string) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
 	for _, lineId := range ett.Lines() {
 		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
 		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
@@ -156,7 +158,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r := NewResource(ref)
 		r.SubscribedAt = connector.Clock().Now()
 		r.SubscribedUntil = ett.InitialTerminationTime()
-		resources = append(resources, r)
+		resources = append(resources, &r)
 	}
 	return resources, lineIds
 }

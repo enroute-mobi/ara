@@ -46,18 +46,19 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 
 	var annotedLineArray []string
 
-	for _, line := range tx.Model().Lines().FindAll() {
-		if line.Name == "" {
+	lines := tx.Model().Lines().FindAll()
+	for i := range lines {
+		if lines[i].Name == "" {
 			continue
 		}
 
-		objectID, ok := line.ObjectID(connector.remoteObjectidKind)
+		objectID, ok := lines[i].ObjectID(connector.remoteObjectidKind)
 		if !ok {
 			continue
 		}
 
 		annotedLine := &siri.SIRIAnnotatedLine{
-			LineName:  line.Name,
+			LineName:  lines[i].Name,
 			LineRef:   objectID.Value(),
 			Monitored: true,
 		}

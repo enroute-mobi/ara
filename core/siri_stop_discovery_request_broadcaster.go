@@ -42,12 +42,13 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	annotedStopPointMap := make(map[string]struct{})
 
-	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" || !stopArea.CollectedAlways {
+	sas := tx.Model().StopAreas().FindAll()
+	for i := range sas {
+		if sas[i].Name == "" || !sas[i].CollectedAlways {
 			continue
 		}
 
-		objectID, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		objectID, ok := sas[i].ReferentOrSelfObjectId(connector.remoteObjectidKind)
 		if !ok || objectID.Value() == "" {
 			continue
 		}
@@ -58,16 +59,17 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		annotedStopPointMap[objectID.Value()] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
-			StopName:     stopArea.Name,
+			StopName:     sas[i].Name,
 			StopPointRef: objectID.Value(),
 			Monitored:    true,
 			TimingPoint:  true,
 		}
-		for _, line := range stopArea.Lines() {
-			if line.Origin() == string(connector.partner.Slug()) {
+		lines := sas[i].Lines()
+		for i := range lines {
+			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			objectid, ok := line.ObjectID(connector.remoteObjectidKind)
+			objectid, ok := lines[i].ObjectID(connector.remoteObjectidKind)
 			if !ok {
 				continue
 			}
