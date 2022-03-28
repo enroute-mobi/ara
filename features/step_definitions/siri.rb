@@ -40,6 +40,13 @@ Given(/^a SIRI server (?:"([^"]*)" )?on "([^"]*)"$/) do |name, url|
   SIRIServer.create(name, url).start
 end
 
+Given(/^an OAuth server (?:"([^"]*)" )?waits request on "([^"]*)" and accepts client "([^"]*)" with$/) do |name, url, client_id, config|
+  name ||= "default"
+  config = config.rows_hash
+  config["client_id"] = client_id
+  OAUTHServer.create(name, url, config).start
+end
+
 Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
   name ||= "default"
   if envelope == ""

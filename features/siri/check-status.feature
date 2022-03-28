@@ -2,6 +2,56 @@ Feature: Support SIRI CheckStatus
   Background:
     Given a Referential "test" is created
 
+  @ARA-1023
+  Scenario: Use OAuth 2.0 token to perform a SIRI CheckStatus request
+    Given a SIRI server waits CheckStatus request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <CheckStatusAnswerInfo>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>Ara</siri:ProducerRef>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</siri:RequestMessageRef>
+          </CheckStatusAnswerInfo>
+          <Answer>
+            <siri:Status>true</siri:Status>
+            <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
+          </Answer>
+          <AnswerExtension/>
+          </sw:CheckStatusResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    And an OAuth server waits request on "http://localhost:8091" and accepts client "ara" with
+      | client_secret | oauth-secret            |
+      | access_token  | oauth-access-token-test |
+    And a Partner "test_partner" exists with connectors [siri-check-status-client] and the following settings:
+      | remote_credential                         | Ara                   |
+      | remote_authentication.oauth.client_id     | ara                   |
+      | remote_authentication.oauth.client_secret | oauth-secret          |
+      | remote_authentication.oauth.token_url     | http://localhost:8091 |
+      | remote_url                                | http://localhost:8090 |
+    When 30 seconds have passed
+    Then the SIRI server should have received a CheckStatus request with the payload:
+          """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+        <Request>
+          <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
+          <siri:RequestorRef>Ara</siri:RequestorRef>
+          <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+        </Request>
+        <RequestExtension/>
+        </sw:CheckStatus>
+      </S:Body>
+    </S:Envelope>
+          """
+
   Scenario: 2460 - Handle a SIRI Checkstatus SOAP request
     Given a SIRI Partner "test" exists with connectors [siri-check-status-server] and the following settings:
       | local_credential | test |
