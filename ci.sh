@@ -13,21 +13,21 @@ test:
   port: ${ARA_DB_PORT:-5432}
 EOF
 
-# go install honnef.co/go/tools/cmd/staticcheck@latest
-
 cd $source_dir
 
-# staticcheck ./...
+go install honnef.co/go/tools/cmd/staticcheck@latest
+go install github.com/schrej/godacov@latest
+rm -rf vendor/
 
-go install -mod=readonly -v ./...
+staticcheck ./...
+
+go install -v ./...
 
 export ARA_ENV=test
 export ARA_ROOT=$source_dir
 "$GOPATH/bin/ara" migrate up
 
-go install github.com/schrej/godacov@latest
-
-go test -mod=readonly -coverprofile=coverage.out -p 1 ./...
+go test -coverprofile=coverage.out -p 1 ./...
 
 if [ -n "$CODACY_PROJECT_TOKEN" ]; then
     $GOPATH/bin/godacov -t "$CODACY_PROJECT_TOKEN" -r ./coverage.out -c "$BITBUCKET_COMMIT"
