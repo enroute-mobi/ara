@@ -13,11 +13,11 @@ test:
   port: ${ARA_DB_PORT:-5432}
 EOF
 
-go install honnef.co/go/tools/cmd/staticcheck@latest
+# go install honnef.co/go/tools/cmd/staticcheck@latest
 
 cd $source_dir
 
-staticcheck ./...
+# staticcheck ./...
 
 go install -mod=readonly -v ./...
 
