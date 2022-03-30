@@ -16,6 +16,8 @@ EOF
 cd $source_dir
 
 go install honnef.co/go/tools/cmd/staticcheck@latest
+go install github.com/schrej/godacov@latest
+
 staticcheck ./...
 
 go install -v ./...
@@ -23,8 +25,6 @@ go install -v ./...
 export ARA_ENV=test
 export ARA_ROOT=$source_dir
 "$GOPATH/bin/ara" migrate up
-
-go get github.com/schrej/godacov
 
 go test -coverprofile=coverage.out -p 1 ./...
 
