@@ -28,7 +28,7 @@ definitions:
           - ln -s ${PWD} ${IMPORT_PATH}
           - cd ${IMPORT_PATH}
 
-          - bundle install --jobs 4 --deployment
+          - bundle install --jobs 4 --deployment --path=ruby/vendor/
 
           - export ARA_DB_NAME=ara ARA_DB_USER=ara ARA_DB_PASSWORD=ara ARA_DB_HOST=localhost
           - export ARA_CONFIG=$PWD/config

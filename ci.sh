@@ -17,7 +17,6 @@ cd $source_dir
 
 go install honnef.co/go/tools/cmd/staticcheck@latest
 go install github.com/schrej/godacov@latest
-rm -rf vendor/
 
 staticcheck ./...
 
