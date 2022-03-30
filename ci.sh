@@ -13,7 +13,10 @@ test:
   port: ${ARA_DB_PORT:-5432}
 EOF
 
-# go install honnef.co/go/tools/cmd/staticcheck@latest
+cd ..
+
+go install honnef.co/go/tools/cmd/staticcheck@latest
+go install github.com/schrej/godacov@latest
 
 cd $source_dir
 
@@ -24,8 +27,6 @@ go install -mod=readonly -v ./...
 export ARA_ENV=test
 export ARA_ROOT=$source_dir
 "$GOPATH/bin/ara" migrate up
-
-go install github.com/schrej/godacov@latest
 
 go test -coverprofile=coverage.out -p 1 ./...
 
