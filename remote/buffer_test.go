@@ -15,7 +15,9 @@ test
 </S:Envelope>`
 
 	expectedRaw := `<?xml version='1.0' encoding='utf-8'?>
-test`
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+test
+</Siri>`
 
 	buffer := NewSIRIBuffer(SOAP_SIRI_ENVELOPE)
 	buffer.WriteXML("test")
@@ -50,7 +52,9 @@ test
 </S:Envelope>`
 
 	expectedRaw := `<?xml version='1.0' encoding='utf-8'?>
-test`
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+test
+</Siri>`
 
 	buffer := NewSIRIBuffer(SOAP_SIRI_ENVELOPE)
 	buffer.WriteXML("test")

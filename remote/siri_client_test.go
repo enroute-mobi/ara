@@ -145,7 +145,7 @@ func Test_SIRIClient_SOAP_StopMonitoring(t *testing.T) {
 
 func Test_SIRIClient_Raw_CheckStatus(t *testing.T) {
 	// Create a test http server
-	ts := createHTTPServer(t, "checkstatus-response")
+	ts := createHTTPServer(t, "checkstatus-response-raw")
 	defer ts.Close()
 
 	// Create and send request
@@ -190,7 +190,7 @@ func Test_SIRIClient_Raw_CheckStatus(t *testing.T) {
 func Test_SIRIClient_Raw_CheckStatus_GzipResponse(t *testing.T) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("testdata/checkstatus-response.xml.gz")
+		file, err := os.Open("testdata/checkstatus-response-raw.xml.gz")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -222,7 +222,7 @@ func Test_SIRIClient_Raw_CheckStatus_GzipResponse(t *testing.T) {
 
 func Test_SIRIClient_Raw_StopMonitoring(t *testing.T) {
 	// Create a test http server
-	ts := createHTTPServer(t, "stopmonitoring-response")
+	ts := createHTTPServer(t, "stopmonitoring-response-raw")
 	defer ts.Close()
 
 	// Create and send request

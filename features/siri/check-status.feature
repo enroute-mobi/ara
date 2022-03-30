@@ -107,18 +107,21 @@ Feature: Support SIRI CheckStatus
     When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>
-  <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
-  <Request>
-    <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
-    <siri:RequestorRef>test</siri:RequestorRef>
-    <siri:MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</siri:MessageIdentifier>
-  </Request>
-  <RequestExtension />
-</sw:CheckStatus>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+  <CheckStatus>
+    <Request>
+      <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
+      <RequestorRef>test</RequestorRef>
+      <MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</MessageIdentifier>
+    </Request>
+    <RequestExtension/>
+  </CheckStatus>
+</Siri>
 """
    Then I should receive this SIRI response
       """
 <?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
 <sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
   <CheckStatusAnswerInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
@@ -132,6 +135,7 @@ Feature: Support SIRI CheckStatus
   </Answer>
   <AnswerExtension/>
 </sw:CheckStatusResponse>
+</Siri>
 """
 
   @ARA-1025
@@ -186,20 +190,17 @@ Feature: Support SIRI CheckStatus
   Scenario: Send SIRI CheckStatus request with raw envelope
     Given a raw SIRI server waits CheckStatus request on "http://localhost:8090" to respond with
       """
-    <?xml version="1.0" encoding="UTF-8"?>
-<sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-  <CheckStatusAnswerInfo>
-    <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-    <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8:</siri:ResponseMessageIdentifier>
-    <siri:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:RequestMessageRef>
-  </CheckStatusAnswerInfo>
-  <Answer>
-    <siri:Status>true</siri:Status>
-    <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
-  </Answer>
-  <AnswerExtension/>
-</sw:CheckStatusResponse>
+<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+<CheckStatusResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ProducerRef>test</ProducerRef>
+    <ResponseMessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8:</ResponseMessageIdentifier>
+    <RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</RequestMessageRef>
+    <Status>true</Status>
+    <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+</CheckStatusResponse>
+</Siri>
       """
     And a Partner "test_partner" exists with connectors [siri-check-status-client] and the following settings:
       | remote_url        | http://localhost:8090 |
@@ -209,14 +210,16 @@ Feature: Support SIRI CheckStatus
     Then the SIRI server should have received a CheckStatus request with the payload:
       """
 <?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
 <sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-<Request>
+   <Request>
       <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>Ara</siri:RequestorRef>
       <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
       </Request>
       <RequestExtension/>
-</sw:CheckStatus>
+  </sw:CheckStatus>
+</Siri>
       """
     Then the Partner "test_partner" in the Referential "test" has the operational status up
 

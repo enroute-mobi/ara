@@ -47,7 +47,7 @@ func NewSIRIEnvelope(body io.Reader, envelopeType string) (*SIRIEnvelope, error)
 }
 
 func newRawEnvelope(doc *xml.XmlDocument) (*SIRIEnvelope, error) {
-	return &SIRIEnvelope{body: doc.Root().XmlNode}, nil
+	return &SIRIEnvelope{body: doc.Root().XmlNode.FirstChild().NextSibling()}, nil
 }
 
 func newSOAPEnvelope(doc *xml.XmlDocument) (*SIRIEnvelope, error) {
@@ -84,7 +84,7 @@ func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 	}
 
 	if len(nodes) == 0 {
-		return &SIRIEnvelope{body: doc.Root().XmlNode}, nil
+		return &SIRIEnvelope{body: doc.Root().XmlNode.FirstChild().NextSibling()}, nil
 	}
 
 	return &SIRIEnvelope{body: nodes[0]}, nil
