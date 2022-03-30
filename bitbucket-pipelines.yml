@@ -28,9 +28,6 @@ definitions:
           - ln -s ${PWD} ${IMPORT_PATH}
           - cd ${IMPORT_PATH}
 
-          - export GO111MODULE="on"
-          - go get -d -v ./...
-
           - bundle install --jobs 4 --deployment
 
           - export ARA_DB_NAME=ara ARA_DB_USER=ara ARA_DB_PASSWORD=ara ARA_DB_HOST=localhost
