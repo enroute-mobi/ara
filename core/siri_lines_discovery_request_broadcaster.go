@@ -24,9 +24,10 @@ type SIRILinesDiscoveryRequestBroadcaster struct {
 type SIRILinesDiscoveryRequestBroadcasterFactory struct{}
 
 func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscoveryRequestBroadcaster {
-	siriLinesDiscoveryRequestBroadcaster := &SIRILinesDiscoveryRequestBroadcaster{}
-	siriLinesDiscoveryRequestBroadcaster.partner = partner
-	return siriLinesDiscoveryRequestBroadcaster
+	connector := &SIRILinesDiscoveryRequestBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
@@ -45,19 +46,19 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 
 	var annotedLineArray []string
 
-	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
-	for _, line := range tx.Model().Lines().FindAll() {
-		if line.Name == "" {
+	lines := tx.Model().Lines().FindAll()
+	for i := range lines {
+		if lines[i].Name == "" {
 			continue
 		}
 
-		objectID, ok := line.ObjectID(objectIDKind)
+		objectID, ok := lines[i].ObjectID(connector.remoteObjectidKind)
 		if !ok {
 			continue
 		}
 
 		annotedLine := &siri.SIRIAnnotatedLine{
-			LineName:  line.Name,
+			LineName:  lines[i].Name,
 			LineRef:   objectID.Value(),
 			Monitored: true,
 		}

@@ -16,7 +16,9 @@ type VehiclePositionBroadcaster struct {
 
 	connector
 
-	cache *cache.CachedItem
+	vjRemoteObjectidKinds      []string
+	vehicleRemoteObjectidKinds []string
+	cache                      *cache.CachedItem
 }
 
 type VehiclePositionBroadcasterFactory struct{}
@@ -31,6 +33,9 @@ func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartne
 
 func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster {
 	connector := &VehiclePositionBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	connector.vehicleRemoteObjectidKinds = partner.VehicleRemoteObjectIDKindWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	connector.partner = partner
 	connector.cache = cache.NewCachedItem("VehiclePositions", partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
@@ -55,11 +60,8 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	trips := make(map[model.VehicleJourneyId]*gtfs.TripDescriptor)
 
-	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-	vehicleObjectidKind := connector.partner.VehicleRemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-
 	for i := range vehicles {
-		vehicleId, ok := vehicles[i].ObjectID(vehicleObjectidKind)
+		vehicleId, ok := vehicles[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
 		if !ok {
 			continue
 		}
@@ -72,7 +74,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectID(objectidKind)
+			vjId, ok := vj.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
 			if !ok {
 				continue
 			}
@@ -84,7 +86,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 				if !ok {
 					continue
 				}
-				lineObjectid, ok = l.ObjectID(objectidKind)
+				lineObjectid, ok = l.ObjectID(connector.remoteObjectidKind)
 				if !ok {
 					continue
 				}

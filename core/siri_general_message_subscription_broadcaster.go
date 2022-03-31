@@ -165,15 +165,16 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *Subscription, r *SubscribedResource) {
-	for _, situation := range connector.partner.Model().Situations().FindAll() {
-		if situation.ValidUntil.Before(connector.Clock().Now()) {
+	situations := connector.partner.Model().Situations().FindAll()
+	for i := range situations {
+		if situations[i].ValidUntil.Before(connector.Clock().Now()) {
 			continue
 		}
 
 		gmlc := &generalMessageLastChange{}
-		gmlc.InitState(&situation, sub)
-		r.SetLastState(string(situation.Id()), gmlc)
-		connector.addSituation(sub.Id(), situation.Id())
+		gmlc.InitState(&situations[i], sub)
+		r.SetLastState(string(situations[i].Id()), gmlc)
+		connector.addSituation(sub.Id(), situations[i].Id())
 	}
 }
 

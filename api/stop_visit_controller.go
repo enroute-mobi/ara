@@ -63,7 +63,7 @@ func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopV
 
 	selector := model.CompositeStopVisitSelector(selectors)
 	for _, sv := range stopVisits {
-		if !selector(sv) {
+		if !selector(&sv) {
 			continue
 		}
 		filteredStopVisits = append(filteredStopVisits, sv)

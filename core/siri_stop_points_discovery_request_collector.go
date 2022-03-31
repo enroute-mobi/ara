@@ -38,6 +38,7 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartn
 
 func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPointsDiscoveryRequestCollector {
 	connector := &SIRIStopPointsDiscoveryRequestCollector{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.stopAreaUpdateSubscriber = manager.BroadcastUpdateEvent
@@ -92,7 +93,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	stopPointRefs := []string{}
-	idKind := connector.partner.RemoteObjectIDKind()
+	idKind := connector.remoteObjectidKind
 	partner := string(connector.Partner().Slug())
 
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {

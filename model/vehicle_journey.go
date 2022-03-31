@@ -90,8 +90,9 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	}
 
 	stopVisitIds := []StopVisitId{}
-	for _, stopVisit := range vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id) {
-		stopVisitIds = append(stopVisitIds, stopVisit.Id())
+	svs := vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id)
+	for i := range svs {
+		stopVisitIds = append(stopVisitIds, svs[i].Id())
 	}
 	if len(stopVisitIds) > 0 {
 		aux.StopVisits = stopVisitIds

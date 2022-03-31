@@ -11,11 +11,15 @@ type GeneralMessageUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner *Partner
+	partner            *Partner
+	remoteObjectidKind string
 }
 
 func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateEventBuilder {
-	return GeneralMessageUpdateEventBuilder{partner: partner}
+	return GeneralMessageUpdateEventBuilder{
+		partner:            partner,
+		remoteObjectidKind: partner.RemoteObjectIDKind(),
+	}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery, producerRef string) {
@@ -49,7 +53,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 		Origin:            string(builder.partner.Slug()),
 		CreatedAt:         builder.Clock().Now(),
 		RecordedAt:        xmlGeneralMessageEvent.RecordedAtTime(),
-		SituationObjectID: model.NewObjectID(builder.partner.RemoteObjectIDKind(), xmlGeneralMessageEvent.InfoMessageIdentifier()),
+		SituationObjectID: model.NewObjectID(builder.remoteObjectidKind, xmlGeneralMessageEvent.InfoMessageIdentifier()),
 		Version:           xmlGeneralMessageEvent.InfoMessageVersion(),
 		ProducerRef:       producerRef,
 	}
@@ -79,7 +83,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 	tx := builder.partner.Referential().NewTransaction()
 	defer tx.Close()
 
-	remoteObjectidKind := builder.partner.RemoteObjectIDKind()
+	remoteObjectidKind := builder.remoteObjectidKind
 
 	for _, lineref := range content.LineRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, lineref))

@@ -21,19 +21,20 @@ type SIRILiteVehicleMonitoringRequestBroadcaster struct {
 
 	connector
 
-	remoteObjectidKind        string
-	vehicleRemoteObjectidKind string
+	vjRemoteObjectidKinds      []string
+	vehicleRemoteObjectidKinds []string
 }
 
 type SIRILiteVehicleMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteVehicleMonitoringRequestBroadcaster {
-	siriVehicleMonitoringRequestBroadcaster := &SIRILiteVehicleMonitoringRequestBroadcaster{
-		remoteObjectidKind:        partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
-		vehicleRemoteObjectidKind: partner.VehicleRemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+	connector := &SIRILiteVehicleMonitoringRequestBroadcaster{
+		vjRemoteObjectidKinds:      partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
+		vehicleRemoteObjectidKinds: partner.VehicleRemoteObjectIDKindWithFallback(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER),
 	}
-	siriVehicleMonitoringRequestBroadcaster.partner = partner
-	return siriVehicleMonitoringRequestBroadcaster
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
@@ -79,13 +80,14 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 	var vehicleIds []string
 
-	for _, vehicle := range tx.Model().Vehicles().FindByLineId(line.Id()) {
-		vehicleId, ok := vehicle.ObjectID(connector.vehicleRemoteObjectidKind)
+	vs := tx.Model().Vehicles().FindByLineId(line.Id())
+	for i := range vs {
+		vehicleId, ok := vs[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
 		if !ok {
 			continue
 		}
 
-		vj := vehicle.VehicleJourney()
+		vj := vs[i].VehicleJourney()
 		if vj == nil {
 			continue
 		}
@@ -95,8 +97,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		}
 
 		activity := siri.NewSiriLiteVehicleActivity()
-		activity.RecordedAtTime = vehicle.RecordedAtTime
-		activity.ValidUntilTime = vehicle.RecordedAtTime
+		activity.RecordedAtTime = vs[i].RecordedAtTime
+		activity.ValidUntilTime = vs[i].RecordedAtTime
 		activity.VehicleMonitoringRef = vehicleId.Value()
 		activity.MonitoredVehicleJourney.LineRef = lineRef
 		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
@@ -104,7 +106,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.OriginName = vj.OriginName
 		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
-		activity.MonitoredVehicleJourney.Bearing = vehicle.Bearing
+		activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
 
 		refs := vj.References.Copy()
 		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef(tx, "OriginRef", vj.Origin, refs)
@@ -115,8 +117,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 			connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
 
-		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vehicle.Longitude
-		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vehicle.Latitude
+		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
+		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vs[i].Latitude
 
 		// Delay                   *time.Time `json:",omitempty"`
 
@@ -133,7 +135,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
-	vehicleJourneyId, ok := vehicleJourney.ObjectID(connector.remoteObjectidKind)
+	vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
 
 	var dataVehicleJourneyRef string
 	if ok {
@@ -196,41 +198,3 @@ func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) CreateConnect
 func logSIRILiteVehicleMonitoringResponse(logStashEvent audit.LogStashEvent, siriLiteResponse *siri.SiriLiteResponse) {
 
 }
-
-// func logXMLVehicleMonitoringRequest(logStashEvent audit.LogStashEvent, request *siri.XMLVehicleMonitoringRequest) {
-// 	logStashEvent["siriType"] = "VehicleMonitoringResponse"
-// 	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-// 	logStashEvent["monitoringRef"] = request.MonitoringRef()
-// 	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
-// 	logStashEvent["lineRef"] = request.LineRef()
-// 	logStashEvent["maximumStopVisits"] = strconv.Itoa(request.MaximumStopVisits())
-// 	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-// 	logStashEvent["startTime"] = request.StartTime().String()
-// 	logStashEvent["previewInterval"] = request.PreviewInterval().String()
-// 	logStashEvent["requestXML"] = request.RawXML()
-// }
-
-// func logSIRIVehicleMonitoringDelivery(logStashEvent audit.LogStashEvent, delivery siri.SIRIVehicleMonitoringDelivery) {
-// 	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef
-// 	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp.String()
-// 	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
-// 	if !delivery.Status {
-// 		logStashEvent["errorType"] = delivery.ErrorType
-// 		if delivery.ErrorType == "OtherError" {
-// 			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
-// 		}
-// 		logStashEvent["errorText"] = delivery.ErrorText
-// 	}
-// }
-
-// func logSIRIVehicleMonitoringResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIVehicleMonitoringResponse) {
-// 	logStashEvent["address"] = response.Address
-// 	logStashEvent["producerRef"] = response.ProducerRef
-// 	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-// 	xml, err := response.BuildXML()
-// 	if err != nil {
-// 		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-// 		return
-// 	}
-// 	logStashEvent["responseXML"] = xml
-// }

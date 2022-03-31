@@ -80,24 +80,25 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 
 	now := guardian.Clock().Now()
 
-	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.ParentId != "" {
-			parent, ok := stopArea.Parent()
+	sas := tx.Model().StopAreas().FindAll()
+	for i := range sas {
+		if sas[i].ParentId != "" {
+			parent, ok := sas[i].Parent()
 			if ok && !parent.CollectChildren {
 				continue
 			}
 		}
-		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
+		if !sas[i].CollectedAlways && !sas[i].CollectedUntil.After(now) {
 			continue
 		}
 
-		if !stopArea.NextCollectAt().Before(now) {
+		if !sas[i].NextCollectAt().Before(now) {
 			continue
 		}
 
 		stopAreaTx := guardian.referential.NewTransaction()
 
-		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(stopArea.Id())
+		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(sas[i].Id())
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
@@ -113,7 +114,7 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 		}
 		guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 
-		if stopArea.CollectGeneralMessages {
+		if sas[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(transactionnalStopArea.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
@@ -128,14 +129,15 @@ func (guardian *ModelGuardian) refreshLines() {
 
 	now := guardian.Clock().Now()
 
-	for _, line := range tx.Model().Lines().FindAll() {
-		if !line.NextCollectAt().Before(now) {
+	lines := tx.Model().Lines().FindAll()
+	for i := range lines {
+		if !lines[i].NextCollectAt().Before(now) {
 			continue
 		}
 
 		lineTx := guardian.referential.NewTransaction()
 
-		transactionnalLine, _ := lineTx.Model().Lines().Find(line.Id())
+		transactionnalLine, _ := lineTx.Model().Lines().Find(lines[i].Id())
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
@@ -144,7 +146,7 @@ func (guardian *ModelGuardian) refreshLines() {
 		lineTx.Commit()
 		lineTx.Close()
 
-		if line.CollectGeneralMessages {
+		if lines[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(transactionnalLine.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
@@ -177,15 +179,16 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 	tx := guardian.referential.NewTransaction()
 	defer tx.Close()
 
-	for _, stopVisit := range tx.Model().StopVisits().FindAll() {
-		if stopVisit.IsCollected() {
+	svs := tx.Model().StopVisits().FindAll()
+	for i := range svs {
+		if svs[i].IsCollected() {
 			continue
 		}
 
 		stopVisitTx := guardian.referential.NewTransaction()
 		defer stopVisitTx.Close()
 
-		transactionnalStopVisit, _ := tx.Model().StopVisits().Find(stopVisit.Id())
+		transactionnalStopVisit, _ := tx.Model().StopVisits().Find(svs[i].Id())
 		simulator := NewActualAttributesSimulator(&transactionnalStopVisit)
 		simulator.SetClock(guardian.Clock())
 		if simulator.Simulate() {

@@ -48,6 +48,7 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartn
 
 func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMessageSubscriptionCollector {
 	connector := &SIRIGeneralMessageSubscriptionCollector{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
@@ -189,7 +190,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 	}
 
 	for _, cancellation := range xmlGmCancellations {
-		obj := model.NewObjectID(connector.partner.RemoteObjectIDKind(), cancellation.InfoMessageIdentifier())
+		obj := model.NewObjectID(connector.remoteObjectidKind, cancellation.InfoMessageIdentifier())
 		situation, ok := tx.Model().Situations().FindByObjectId(obj)
 		if ok {
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())

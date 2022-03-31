@@ -23,7 +23,8 @@ type TripUpdatesBroadcaster struct {
 
 	connector
 
-	cache *cache.CachedItem
+	vjRemoteObjectidKinds []string
+	cache                 *cache.CachedItem
 }
 
 type TripUpdatesBroadcasterFactory struct{}
@@ -38,6 +39,8 @@ func (factory *TripUpdatesBroadcasterFactory) Validate(apiPartner *APIPartner) {
 
 func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	connector := &TripUpdatesBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.partner = partner
 	connector.cache = cache.NewCachedItem("TripUpdates", partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
@@ -62,15 +65,13 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 
-	objectidKind := connector.partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
-
 	for i := range stopVisits {
 		sa, ok := tx.Model().StopAreas().Find(stopVisits[i].StopAreaId)
 		if !ok { // Should never happen
 			logger.Log.Debugf("Can't find StopArea %v of StopVisit %v", stopVisits[i].StopAreaId, stopVisits[i].Id())
 			continue
 		}
-		saId, ok := sa.ObjectID(objectidKind)
+		saId, ok := sa.ObjectID(connector.remoteObjectidKind)
 		if !ok {
 			continue
 		}
@@ -83,7 +84,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectID(objectidKind)
+			vjId, ok := vj.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
 			if !ok {
 				continue
 			}
@@ -95,7 +96,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 				if !ok {
 					continue
 				}
-				lineObjectid, ok = l.ObjectID(objectidKind)
+				lineObjectid, ok = l.ObjectID(connector.remoteObjectidKind)
 				if !ok {
 					continue
 				}

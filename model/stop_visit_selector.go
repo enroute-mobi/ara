@@ -2,10 +2,10 @@ package model
 
 import "time"
 
-type StopVisitSelector func(StopVisit) bool
+type StopVisitSelector func(*StopVisit) bool
 
 func StopVisitSelectorByTime(startTime, endTime time.Time) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		if stopVisit.ReferenceTime().IsZero() || stopVisit.ReferenceTime().Before(startTime) || stopVisit.ReferenceTime().After(endTime) {
 			return false
 		}
@@ -14,7 +14,7 @@ func StopVisitSelectorByTime(startTime, endTime time.Time) StopVisitSelector {
 }
 
 func StopVisitSelectorAfterTime(startTime time.Time) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		if stopVisit.ReferenceTime().IsZero() || stopVisit.ReferenceTime().Before(startTime) {
 			return false
 		}
@@ -23,7 +23,7 @@ func StopVisitSelectorAfterTime(startTime time.Time) StopVisitSelector {
 }
 
 func StopVisitSelectorBeforeTime(endTime time.Time) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		if stopVisit.ReferenceTime().IsZero() || stopVisit.ReferenceTime().After(endTime) {
 			return false
 		}
@@ -32,13 +32,13 @@ func StopVisitSelectorBeforeTime(endTime time.Time) StopVisitSelector {
 }
 
 func StopVisitSelectByStopAreaId(stopAreaId StopAreaId) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		return stopVisit.StopAreaId == stopAreaId
 	}
 }
 
 func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		vehicleJourney := stopVisit.VehicleJourney()
 		if vehicleJourney == nil {
 			return false
@@ -56,7 +56,7 @@ func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
 }
 
 func CompositeStopVisitSelector(selectors []StopVisitSelector) StopVisitSelector {
-	return func(stopVisit StopVisit) bool {
+	return func(stopVisit *StopVisit) bool {
 		for _, selector := range selectors {
 			if !selector(stopVisit) {
 				return false

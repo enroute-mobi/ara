@@ -20,9 +20,10 @@ type SIRIStopPointsDiscoveryRequestBroadcaster struct {
 type SIRIStopPointsDiscoveryRequestBroadcasterFactory struct{}
 
 func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDiscoveryRequestBroadcaster {
-	siriStopDiscoveryRequestBroadcaster := &SIRIStopPointsDiscoveryRequestBroadcaster{}
-	siriStopDiscoveryRequestBroadcaster.partner = partner
-	return siriStopDiscoveryRequestBroadcaster
+	connector := &SIRIStopPointsDiscoveryRequestBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
@@ -41,13 +42,13 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	annotedStopPointMap := make(map[string]struct{})
 
-	objectIDKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
-	for _, stopArea := range tx.Model().StopAreas().FindAll() {
-		if stopArea.Name == "" || !stopArea.CollectedAlways {
+	sas := tx.Model().StopAreas().FindAll()
+	for i := range sas {
+		if sas[i].Name == "" || !sas[i].CollectedAlways {
 			continue
 		}
 
-		objectID, ok := stopArea.ReferentOrSelfObjectId(objectIDKind)
+		objectID, ok := sas[i].ReferentOrSelfObjectId(connector.remoteObjectidKind)
 		if !ok || objectID.Value() == "" {
 			continue
 		}
@@ -58,16 +59,17 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		annotedStopPointMap[objectID.Value()] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
-			StopName:     stopArea.Name,
+			StopName:     sas[i].Name,
 			StopPointRef: objectID.Value(),
 			Monitored:    true,
 			TimingPoint:  true,
 		}
-		for _, line := range stopArea.Lines() {
-			if line.Origin() == string(connector.partner.Slug()) {
+		lines := sas[i].Lines()
+		for i := range lines {
+			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			objectid, ok := line.ObjectID(objectIDKind)
+			objectid, ok := lines[i].ObjectID(connector.remoteObjectidKind)
 			if !ok {
 				continue
 			}

@@ -1,24 +1,23 @@
 package core
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_Factories_CreateConnector(t *testing.T) {
 	partners := createTestPartnerManager()
+	partner := partners.New("slug")
 
-	partner := &Partner{
-		ConnectorTypes: []string{
-			"siri-service-request-broadcaster",
-			"siri-stop-monitoring-request-collector",
-			"siri-stop-monitoring-request-broadcaster",
-			"siri-check-status-client",
-			"siri-check-status-server",
-			"test-validation-connector",
-			"siri-general-message-request-broadcaster",
-			"siri-estimated-timetable-request-broadcaster",
-			"siri-lines-discovery-request-broadcaster",
-		},
-		connectors: make(map[string]Connector),
-		manager:    partners,
+	partner.ConnectorTypes = []string{
+		"siri-service-request-broadcaster",
+		"siri-stop-monitoring-request-collector",
+		"siri-stop-monitoring-request-broadcaster",
+		"siri-check-status-client",
+		"siri-check-status-server",
+		"test-validation-connector",
+		"siri-general-message-request-broadcaster",
+		"siri-estimated-timetable-request-broadcaster",
+		"siri-lines-discovery-request-broadcaster",
 	}
 	partner.RefreshConnectors()
 

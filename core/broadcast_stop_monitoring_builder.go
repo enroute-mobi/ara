@@ -23,25 +23,27 @@ type BroadcastStopMonitoringBuilder struct {
 	stopAreareferenceGenerator    *idgen.IdentifierGenerator
 	dataFrameGenerator            *idgen.IdentifierGenerator
 	remoteObjectidKind            string
+	vjRemoteObjectidKinds         []string
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
 	rewriteJourneyPatternRef      bool
 }
 
-func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastStopMonitoringBuilder {
+func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		tx:                            tx,
 		referenceGenerator:            partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
 		stopAreareferenceGenerator:    partner.IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER),
 		dataFrameGenerator:            partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER),
-		remoteObjectidKind:            partner.RemoteObjectIDKind(connector),
+		remoteObjectidKind:            partner.RemoteObjectIDKind(connectorName),
+		vjRemoteObjectidKinds:         partner.VehicleJourneyRemoteObjectIDKindWithFallback(connectorName),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
 		rewriteJourneyPatternRef:      partner.RewriteJourneyPatternRef(),
 	}
 }
 
-func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit model.StopVisit) *siri.SIRICancelledStopVisit {
+func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit *model.StopVisit) *siri.SIRICancelledStopVisit {
 	vehicleJourney, ok := builder.tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 	if !ok {
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Vehiclejourney", stopVisit.Id())
@@ -58,12 +60,12 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		return nil
 	}
 
-	itemIdentifier, ok := builder.getItemIdentifier(&stopVisit)
+	itemIdentifier, ok := builder.getItemIdentifier(stopVisit)
 	if !ok {
 		return nil
 	}
 
-	dataVehicleJourneyRef, ok := builder.dataVehicleJourneyRef(vehicleJourney)
+	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(&vehicleJourney)
 	if !ok {
 		return nil
 	}
@@ -73,15 +75,15 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		ItemRef:                itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
 		LineRef:                lineObjectId.Value(),
-		DatedVehicleJourneyRef: dataVehicleJourneyRef,
-		DataFrameRef:           builder.dataFrameRef(&stopVisit, vehicleJourney.Origin),
+		DatedVehicleJourneyRef: datedVehicleJourneyRef,
+		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
 		PublishedLineName:      line.Name,
 	}
 
 	return cancelledStopVisit
 }
 
-func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit model.StopVisit) *siri.SIRIMonitoredStopVisit {
+func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit *model.StopVisit) *siri.SIRIMonitoredStopVisit {
 	stopPointRef, stopPointRefObjectId, ok := builder.stopPointRef(stopVisit.StopAreaId)
 	if !ok {
 		logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
@@ -104,12 +106,12 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	itemIdentifier, ok := builder.getItemIdentifier(&stopVisit)
+	itemIdentifier, ok := builder.getItemIdentifier(stopVisit)
 	if !ok {
 		return nil
 	}
 
-	dataVehicleJourneyRef, ok := builder.dataVehicleJourneyRef(vehicleJourney)
+	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(&vehicleJourney)
 	if !ok {
 		return nil
 	}
@@ -124,8 +126,8 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		DestinationName:        vehicleJourney.DestinationName,
 		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
-		DatedVehicleJourneyRef: dataVehicleJourneyRef,
-		DataFrameRef:           builder.dataFrameRef(&stopVisit, vehicleJourney.Origin),
+		DatedVehicleJourneyRef: datedVehicleJourneyRef,
+		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
 		RecordedAt:             stopVisit.RecordedAt,
 		PublishedLineName:      line.Name,
 		DepartureStatus:        string(stopVisit.DepartureStatus),
@@ -207,20 +209,20 @@ func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *mode
 	return itemIdentifier, true
 }
 
-func (builder *BroadcastStopMonitoringBuilder) dataVehicleJourneyRef(vehicleJourney model.VehicleJourney) (string, bool) {
-	vehicleJourneyId, ok := vehicleJourney.ObjectID(builder.remoteObjectidKind)
+func (builder *BroadcastStopMonitoringBuilder) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
+	vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(builder.vjRemoteObjectidKinds)
 
-	var dataVehicleJourneyRef string
+	var datedVehicleJourneyRef string
 	if ok {
-		dataVehicleJourneyRef = vehicleJourneyId.Value()
+		datedVehicleJourneyRef = vehicleJourneyId.Value()
 	} else {
 		defaultObjectID, ok := vehicleJourney.ObjectID("_default")
 		if !ok {
 			return "", false
 		}
-		dataVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+		datedVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
-	return dataVehicleJourneyRef, true
+	return datedVehicleJourneyRef, true
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.References) {

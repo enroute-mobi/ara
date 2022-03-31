@@ -26,14 +26,14 @@ type SIRIStopMonitoringRequestBroadcaster struct {
 type SIRIStopMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitoringRequestBroadcaster {
-	siriStopMonitoringRequestBroadcaster := &SIRIStopMonitoringRequestBroadcaster{}
-	siriStopMonitoringRequestBroadcaster.partner = partner
-	return siriStopMonitoringRequestBroadcaster
+	connector := &SIRIStopMonitoringRequestBroadcaster{}
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	connector.partner = partner
+	return connector
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
-	objectidKind := connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
-	objectid := model.NewObjectID(objectidKind, request.MonitoringRef())
+	objectid := model.NewObjectID(connector.remoteObjectidKind, request.MonitoringRef())
 	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
 		return siri.SIRIStopMonitoringDelivery{
@@ -68,7 +68,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Prepare StopVisit Selectors
 	selectors := []model.StopVisitSelector{}
 	if request.LineRef() != "" {
-		lineSelectorObjectid := model.NewObjectID(objectidKind, request.LineRef())
+		lineSelectorObjectid := model.NewObjectID(connector.remoteObjectidKind, request.LineRef())
 		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorObjectid))
 	}
 	if request.PreviewInterval() != 0 {
@@ -93,18 +93,19 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
 
 	// Fill StopVisits
-	for _, stopVisit := range tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas) {
-		if stopVisit.Origin == string(connector.Partner().Slug()) {
+	svs := tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas)
+	for i := range svs {
+		if svs[i].Origin == string(connector.Partner().Slug()) {
 			continue
 		}
 		if request.MaximumStopVisits() > 0 && len(stopVisitArray) >= request.MaximumStopVisits() {
 			break
 		}
-		if !selector(stopVisit) {
+		if !selector(&svs[i]) {
 			continue
 		}
 
-		monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(stopVisit)
+		monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(&svs[i])
 		if monitoredStopVisit == nil {
 			continue
 		}
