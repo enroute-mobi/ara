@@ -108,14 +108,11 @@ Feature: Support SIRI CheckStatus
       """
 <?xml version='1.0' encoding='utf-8'?>
 <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
-  <CheckStatus>
-    <Request>
+  <CheckStatusRequest>
       <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
       <RequestorRef>test</RequestorRef>
       <MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</MessageIdentifier>
-    </Request>
-    <RequestExtension/>
-  </CheckStatus>
+  </CheckStatusRequest>
 </Siri>
 """
    Then I should receive this SIRI response

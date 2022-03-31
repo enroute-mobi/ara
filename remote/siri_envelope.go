@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"github.com/jbowtie/gokogiri/xml"
@@ -94,7 +95,7 @@ func (envelope *SIRIEnvelope) BodyType() string {
 	if envelope.bodyType == "" {
 		envelope.bodyType = envelope.body.Name()
 	}
-	return envelope.bodyType
+	return strings.Replace(envelope.bodyType, "Request", "", -1)
 }
 
 func (envelope *SIRIEnvelope) Body() xml.Node {
