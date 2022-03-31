@@ -31,7 +31,7 @@ func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(params HandlerParam
 
 	response := params.connector.(core.SubscriptionRequestDispatcher).CancelSubscription(handler.xmlRequest, params.message)
 
-	xmlResponse, err := response.BuildXML()
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",

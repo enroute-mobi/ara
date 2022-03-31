@@ -119,19 +119,14 @@ Feature: Support SIRI CheckStatus
       """
 <?xml version='1.0' encoding='UTF-8'?>
 <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
-<sw:CheckStatusResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-  <CheckStatusAnswerInfo>
-    <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-    <siri:ProducerRef>Ara</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-    <siri:RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</siri:RequestMessageRef>
-  </CheckStatusAnswerInfo>
-  <Answer>
-    <siri:Status>true</siri:Status>
-    <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
-  </Answer>
-  <AnswerExtension/>
-</sw:CheckStatusResponse>
+<CheckStatusResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ProducerRef>Ara</ProducerRef>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</RequestMessageRef>
+    <Status>true</Status>
+    <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+</CheckStatusResponse>
 </Siri>
 """
 
@@ -208,14 +203,11 @@ Feature: Support SIRI CheckStatus
       """
 <?xml version='1.0' encoding='utf-8'?>
 <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
-<sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-   <Request>
-      <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
-      <siri:RequestorRef>Ara</siri:RequestorRef>
-      <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
-      </Request>
-      <RequestExtension/>
-  </sw:CheckStatus>
+<CheckStatusRequest>
+      <RequestTimestamp>2017-01-01T12:00:30.000Z</RequestTimestamp>
+      <RequestorRef>Ara</RequestorRef>
+      <MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
+  </CheckStatusRequest>
 </Siri>
       """
     Then the Partner "test_partner" in the Referential "test" has the operational status up

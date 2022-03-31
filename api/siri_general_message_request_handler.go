@@ -31,7 +31,7 @@ func (handler *SIRIGeneralMessageRequestHandler) Respond(params HandlerParams) {
 
 	tmp := params.connector.(*core.SIRIGeneralMessageRequestBroadcaster)
 	response, _ := tmp.Situations(handler.xmlRequest, params.message)
-	xmlResponse, err := response.BuildXML()
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",

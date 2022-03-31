@@ -30,7 +30,7 @@ func (handler *SIRIServiceRequestHandler) Respond(params HandlerParams) {
 	t := clock.DefaultClock().Now()
 
 	response := params.connector.(core.ServiceRequestBroadcaster).HandleRequests(handler.xmlRequest, params.message)
-	xmlResponse, err := response.BuildXML()
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",

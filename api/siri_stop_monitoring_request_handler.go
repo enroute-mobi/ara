@@ -30,7 +30,7 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(params HandlerParams) {
 	t := clock.DefaultClock().Now()
 
 	response := params.connector.(core.StopMonitoringRequestBroadcaster).RequestStopArea(handler.xmlRequest, params.message)
-	xmlResponse, err := response.BuildXML()
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",

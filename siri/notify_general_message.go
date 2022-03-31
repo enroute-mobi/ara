@@ -107,9 +107,20 @@ func (notify *SIRINotifyGeneralMessage) errorType() string {
 	return notify.ErrorType
 }
 
-func (notify *SIRINotifyGeneralMessage) BuildXML() (string, error) {
+func (notify *SIRINotifyGeneralMessage) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "general_message_notify.template", notify); err != nil {
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	} else {
+		envType = ""
+	}
+
+	templateName = fmt.Sprintf("general_message_notify%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, notify); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
