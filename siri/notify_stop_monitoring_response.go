@@ -34,9 +34,18 @@ type SIRINotifyStopMonitoringDelivery struct {
 	CancelledStopVisits []*SIRICancelledStopVisit
 }
 
-func (notify *SIRINotifyStopMonitoring) BuildXML() (string, error) {
+func (notify *SIRINotifyStopMonitoring) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "stop_monitoring_notify.template", notify); err != nil {
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	}
+
+	templateName = fmt.Sprintf("stop_monitoring_notify%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, notify); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}

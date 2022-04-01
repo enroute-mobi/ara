@@ -1,0 +1,15 @@
+<CheckStatusResponse>
+	<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+	<ProducerRef>{{.ProducerRef}}</ProducerRef>{{ if .Address }}
+	<Address>{{ .Address }}</siri:Address>{{ end }}
+	<ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ResponseMessageIdentifier>
+	<RequestMessageRef>{{.RequestMessageRef}}</RequestMessageRef>
+	<Status>{{.Status}}</Status>{{ if not .Status }}
+	<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+		<OtherError number="{{.ErrorNumber}}">{{ else }}
+		<{{.ErrorType}}>{{ end }}
+			<ErrorText>{{.ErrorText}}</siri:ErrorText>
+		</{{.ErrorType}}>
+	</ErrorCondition>{{ end }}
+	<ServiceStartedTime>{{.ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00"}}</ServiceStartedTime>
+</CheckStatusResponse>

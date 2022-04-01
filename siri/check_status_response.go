@@ -87,9 +87,18 @@ func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 }
 
 // TODO : Handle errors
-func (response *SIRICheckStatusResponse) BuildXML() (string, error) {
+func (response *SIRICheckStatusResponse) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "check_status_response.template", response); err != nil {
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	}
+
+	templateName = fmt.Sprintf("check_status_response%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, response); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}

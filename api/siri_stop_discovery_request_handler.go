@@ -31,7 +31,7 @@ func (handler *SIRIStopDiscoveryRequestHandler) Respond(params HandlerParams) {
 
 	tmp := params.connector.(*core.SIRIStopPointsDiscoveryRequestBroadcaster)
 	response, _ := tmp.StopAreas(handler.xmlRequest, params.message)
-	xmlResponse, err := response.BuildXML()
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",

@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"time"
 
@@ -156,9 +157,18 @@ func NewSIRIGeneralMessageRequest(
 	return request
 }
 
-func (request *SIRIGetGeneralMessageRequest) BuildXML() (string, error) {
+func (request *SIRIGetGeneralMessageRequest) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "get_general_message_request.template", request); err != nil {
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	}
+
+	templateName = fmt.Sprintf("get_general_message_request%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, request); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}

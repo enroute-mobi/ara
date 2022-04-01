@@ -35,7 +35,9 @@ func newRawBuffer() *RawBuffer {
 
 func (rb *RawBuffer) WriteXML(xml string) {
 	rb.b.WriteString("<?xml version='1.0' encoding='utf-8'?>\n")
+	rb.b.WriteString("<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>\n")
 	rb.b.WriteString(strings.TrimSuffix(xml, "\n"))
+	rb.b.WriteString("\n</Siri>")
 }
 
 func (rb *RawBuffer) Read(p []byte) (n int, err error) {

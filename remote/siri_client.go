@@ -32,7 +32,7 @@ const (
 )
 
 type Request interface {
-	BuildXML() (string, error)
+	BuildXML(...string) (string, error)
 }
 
 type SIRIClient struct {
@@ -73,7 +73,8 @@ func (client *SIRIClient) responseFromFormat(body io.Reader, contentType string)
 func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.Node, error) {
 	// Wrap the request XML
 	buffer := NewSIRIBuffer(client.siriEnvelopeType)
-	xml, err := args.request.BuildXML()
+
+	xml, err := args.request.BuildXML(client.siriEnvelopeType)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package siri
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"time"
 
@@ -29,9 +30,18 @@ func (a SIRIAnnotatedLineByLineRef) Less(i, j int) bool {
 	return strings.Compare(a[i].LineRef, a[j].LineRef) < 0
 }
 
-func (response *SIRILinesDiscoveryResponse) BuildXML() (string, error) {
+func (response *SIRILinesDiscoveryResponse) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
-	if err := templates.ExecuteTemplate(&buffer, "lines_discovery_response.template", response); err != nil {
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	}
+
+	templateName = fmt.Sprintf("lines_discovery_response%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, response); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}

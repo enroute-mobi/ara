@@ -413,7 +413,7 @@ func (s *PartnerSettings) SetCollectSettings() {
 func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
 	opts = remote.HTTPClientOptions{
-		SiriEnvelopeType: strings.ToLower(s.s[SIRI_ENVELOPE]),
+		SiriEnvelopeType: s.siriEnvelopeType(),
 		OAuth:            s.httpClientOAuth(),
 		Urls: remote.HTTPClientUrls{
 			Url:              s.s[REMOTE_URL],
@@ -423,6 +423,15 @@ func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	}
 	s.m.RUnlock()
 	return
+}
+
+func (s *PartnerSettings) siriEnvelopeType() (set string) {
+	set = s.s[SIRI_ENVELOPE]
+	if set == "" {
+		set = "soap"
+	}
+
+	return set
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling

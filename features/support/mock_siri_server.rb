@@ -95,7 +95,7 @@ class SIRIServer
   end
 
   def checkstatus_response_standard?(req)
-    req.body =~ /sw:CheckStatus/ && @responses.first !~ /sw:CheckStatus/
+    req.body =~ /CheckStatus/ && @responses.first !~ /CheckStatus/
   end
 
   def raw_checkstatus_response(request_message_identifiers)

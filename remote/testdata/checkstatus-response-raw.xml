@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+<CheckStatusResponse>
+    <ResponseTimestamp>2016-09-22T07:58:34.000+02:00</ResponseTimestamp>
+    <ProducerRef>NINOXE:default</ProducerRef>
+    <Address>http://appli.chouette.mobi/siri_france/siri</Address>
+    <ResponseMessageIdentifier>c464f588-5128-46c8-ac3f-8b8a465692ab</ResponseMessageIdentifier>
+     <RequestMessageRef>CheckStatus:Test:0</RequestMessageRef>
+     <Status>true</Status>
+     <ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ServiceStartedTime>
+  </CheckStatusResponse>
+</Siri>

@@ -102,7 +102,7 @@ func Test_RawEnvelope_Finalizer(t *testing.T) {
 }
 
 func Test_RawEnvelope_BodyType(t *testing.T) {
-	envelope, err := newSIRIEnvelopeFrom("checkstatus-response", RAW_SIRI_ENVELOPE)
+	envelope, err := newSIRIEnvelopeFrom("checkstatus-response-raw", RAW_SIRI_ENVELOPE)
 	if err != nil {
 		t.Fatal(err)
 	}

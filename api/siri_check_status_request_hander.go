@@ -40,7 +40,8 @@ func (handler *SIRICheckStatusRequestHandler) Respond(params HandlerParams) {
 		}.Send()
 		return
 	}
-	xmlResponse, err := response.BuildXML()
+
+	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{
 			errCode:         "InternalServiceError",
