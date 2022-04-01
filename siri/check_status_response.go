@@ -94,8 +94,6 @@ func (response *SIRICheckStatusResponse) BuildXML(envelopeType ...string) (strin
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("check_status_response%s.template", envType)

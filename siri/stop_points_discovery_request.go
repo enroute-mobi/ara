@@ -51,8 +51,6 @@ func (request *SIRIStopPointsDiscoveryRequest) BuildXML(envelopeType ...string) 
 
 	if len(envelopeType) != 0 && envelopeType[0] != "" && envelopeType[0] != "soap" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("stop_points_discovery_request%s.template", envType)

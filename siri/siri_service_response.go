@@ -31,8 +31,6 @@ func (response *SIRIServiceResponse) BuildXML(envelopeType ...string) (string, e
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("siri_service_response%s.template", envType)

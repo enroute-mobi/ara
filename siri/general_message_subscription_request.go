@@ -68,8 +68,6 @@ func (request *SIRIGeneralMessageSubscriptionRequest) BuildXML(envelopeType ...s
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("general_message_subscription_request%s.template", envType)

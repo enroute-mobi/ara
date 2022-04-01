@@ -43,8 +43,6 @@ func (notify *SIRINotifyEstimatedTimeTable) BuildXML(envelopeType ...string) (st
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("estimated_timetable_notify%s.template", envType)

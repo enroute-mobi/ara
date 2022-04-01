@@ -106,8 +106,6 @@ func (notify *SIRIDeleteSubscriptionResponse) BuildXML(envelopeType ...string) (
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("delete_subscription_response%s.template", envType)

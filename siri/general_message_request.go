@@ -164,8 +164,6 @@ func (request *SIRIGetGeneralMessageRequest) BuildXML(envelopeType ...string) (s
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("get_general_message_request%s.template", envType)

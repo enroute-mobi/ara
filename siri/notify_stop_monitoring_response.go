@@ -41,8 +41,6 @@ func (notify *SIRINotifyStopMonitoring) BuildXML(envelopeType ...string) (string
 
 	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
 		envType = "_" + envelopeType[0]
-	} else {
-		envType = ""
 	}
 
 	templateName = fmt.Sprintf("stop_monitoring_notify%s.template", envType)
