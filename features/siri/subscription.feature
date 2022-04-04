@@ -3,17 +3,17 @@ Feature: Support SIRI subscription
   Background:
     Given a Referential "test" is created
 
-  @wip
   Scenario: 4377 - Change status of subscription with termination request
-    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-broadcaster] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
       | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind      | StopMonitoring      |
-      | deleted   | false               |
-    And a minute has passed
+      | Kind              | StopMonitoringBroadcast                            |
+      | ExternalId        | ExternalId                                         |
+      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When I send this SIRI request
         """
         <?xml version='1.0' encoding='utf-8'?>
@@ -30,13 +30,11 @@ Feature: Support SIRI subscription
               <ns2:MessageIdentifier>TermSubReq:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
             <Request version="2.0:FR-IDF-2.4">
-              <ns5:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</ns5:SubscriptionRef>
+              <ns5:SubscriptionRef>ExternalId</ns5:SubscriptionRef>
             </Request>
             <RequestExtension/>
           </ns1:DeleteSubscription>
         </S:Body>
       </S:Envelope>
       """
-    Then a Subscription exist with the following attributes:
-      | Kind      | StopMonitoring      |
-      | deleted   | true                |
+    Then no Subscription exists

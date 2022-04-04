@@ -4,7 +4,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     Given a Referential "test" is created
 
   Scenario: 4234 - Handle a SIRI EstimatedTimeTable request for subscription
-    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-collector] and the following settings:
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
@@ -12,37 +12,33 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     And a minute has passed
     When I send this SIRI request
       """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-          xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
-        <SOAP-ENV:Header />
-        <S:Body>
-          <ns7:EstimatedTimetableSubscriptionRequest xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
-            <SubscriptionRequestInfo>
-              <ns2:RequestTimestamp>2017-01-01T12:01:00.000Z</ns2:RequestTimestamp>
-              <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
-              <ns2:MessageIdentifier>ETTSubscription:Test:0</ns2:MessageIdentifier>
-              <ns2:ConsumerAddress>https://ara-staging.af83.io/test/siri</ns2:ConsumerAddress>
-            </SubscriptionRequestInfo>
-            <Request version="2.0:FR-IDF-2.4">
-              <EstimatedTimetableSubscriptionRequest>
-                <ns2:RequestTimestamp>2017-01-01T12:01:00.000Z</ns2:RequestTimestamp>
-                <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-                <ns5:SubscriptionRef>NINOXE:Subscription::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ns5:SubscriptionRef>
-                <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
-                <ns5:InitialTerminationTime>2017-01-01T13:00:00.000Z</ns5:InitialTerminationTime>
-              </EstimatedTimetableSubscriptionRequest>
-            </Request>
-            <RequestExtension />
-          </ns7:EstimatedTimetableSubscriptionRequest>
-        </S:Body>
-      </S:Envelope>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ws:Subscribe xmlns:siri="http://www.siri.org.uk/siri" xmlns:ws="http://wsdl.siri.org.uk">
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+      </SubscriptionRequestInfo>
+      <Request>
+        <siri:EstimatedTimetableSubscriptionRequest>
+          <siri:SubscriptionIdentifier>NINOXE:default</siri:SubscriptionIdentifier>
+          <siri:InitialTerminationTime>2017-01-01T13:00:00.000Z</siri:InitialTerminationTime>
+          <siri:EstimatedTimetableRequest>
+            <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
+            <siri:PreviewInterval>PT23H</siri:PreviewInterval>
+          </siri:EstimatedTimetableRequest>
+          <siri:ChangeBeforeUpdates>PT3M</siri:ChangeBeforeUpdates>
+        </siri:EstimatedTimetableSubscriptionRequest>
+      </Request>
+      <RequestExtension/>
+    </ws:Subscribe>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
       """
-    Then a Subscription exist with the following attributes:
-      | Kind | EstimatedTimetable |
+    Then one Subscription exists with the following attributes:
+      | Kind | EstimatedTimeTableBroadcast |
 
 
   Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit

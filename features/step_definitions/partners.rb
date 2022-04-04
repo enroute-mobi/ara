@@ -60,10 +60,25 @@ end
 
 When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, attributes|
   path = partners_path(referential: referential) + "/" + getFirstPartner() + "/subscriptions"
-  RestClient.post path,  model_attributes(attributes).to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+  response = RestClient.post path,  model_attributes(attributes).to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
 
-  # Test
-  # puts RestClient.get path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  debug response.body
+end
+
+Then(/^one Subscription exists with the following attributes:$/) do |attributes|
+  path = partners_path + '/' + getFirstPartner() + '/subscriptions'
+  response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+  response_array = JSON.parse(response.body)
+
+  expect(response_array).to include(a_hash_including(attributes.rows_hash))
+end
+
+Then(/^no Subscription exists/) do
+  path = partners_path + '/' + getFirstPartner() + '/subscriptions'
+  response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+  response_array = JSON.parse(response.body)
+
+  expect(response_array).to eq([])
 end
 
 When(/^I wait that a Subscription has been created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, attributes|
