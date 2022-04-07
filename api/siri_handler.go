@@ -53,7 +53,7 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  siri.NewXMLDeleteSubscriptionRequest(envelope.Body()),
 			referential: handler.referential,
 		}
-	case "Subscribe":
+	case "Subscribe", "Subscription":
 		return &SIRISubscribeRequestHandler{
 			xmlRequest:  siri.NewXMLSubscriptionRequest(envelope.Body()),
 			referential: handler.referential,

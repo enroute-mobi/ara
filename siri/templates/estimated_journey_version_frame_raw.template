@@ -1,0 +1,26 @@
+<EstimatedJourneyVersionFrame>
+				<RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
+				<EstimatedVehicleJourney>
+					<LineRef>{{ .LineRef }}</LineRef>{{ if .Attributes.DirectionRef }}
+					<DirectionRef>{{ .Attributes.DirectionRef }}</DirectionRef>{{ else }}
+					<DirectionRef/>{{ end }}{{ if .References.OperatorRef }}
+					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ else }}
+					<OperatorRef/>{{ end }}
+					<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>{{ if ne (len .EstimatedCalls) 0 }}
+					<EstimatedCalls>{{ range .EstimatedCalls }}
+						<EstimatedCall>
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>
+							<Order>{{ .Order }}</Order>{{ if .StopPointName }}
+							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}
+							<VehicleAtStop>{{ .VehicleAtStop }}</VehicleAtStop>{{ if .DestinationDisplay }}
+							<DestinationDisplay>{{ .DestinationDisplay }}</DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
+							<ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
+							<ArrivalStatus>{{ .ArrivalStatus }}</ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
+							<AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
+							<ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
+							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
+						</EstimatedCall>{{ end }}
+					</EstimatedCalls>{{ end }}
+				</EstimatedVehicleJourney>{{ end }}
+			</EstimatedJourneyVersionFrame>

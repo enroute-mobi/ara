@@ -1,0 +1,21 @@
+<ServiceDelivery>
+	<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+	<ProducerRef>{{.ProducerRef}}</ProducerRef>{{ if .Address }}
+	<Address>{{ .Address }}</Address>{{ end }}
+	<ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ResponseMessageIdentifier>{{ if (ne .RequestMessageRef "") }}
+	<RequestMessageRef>{{ .RequestMessageRef }}</RequestMessageRef>{{ end }}
+	<EstimatedTimetableDelivery>
+		<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+		<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>{{ if (ne .RequestMessageRef "") }}
+		<RequestMessageRef>{{.RequestMessageRef}}</RequestMessageRef>{{ end }}
+		<SubscriptionRef>{{.SubscriptionIdentifier}}</SubscriptionRef>
+		<Status>{{ .Status }}</Status>{{ if not .Status }}
+		<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+			<OtherError number="{{.ErrorNumber}}">{{ else }}
+			<{{.ErrorType}}>{{ end }}
+				<ErrorText>{{.ErrorText}}</ErrorText>
+			</{{.ErrorType}}>
+		</ErrorCondition>{{ else }}{{ range .EstimatedJourneyVersionFrames }}
+		{{ .BuildEstimatedJourneyVersionFrameXMLRaw }}{{ end }}{{ end }}
+	</EstimatedTimetableDelivery>
+</ServiceDelivery>
