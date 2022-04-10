@@ -54,7 +54,7 @@ func (cs *CollectSettings) ExcludeStop(s string) bool {
 }
 
 func (cs *CollectSettings) CanCollectStop(s string) bool {
-	logger.Log.Printf("Can collect stop: %v %v", cs.IncludeStop(s), !cs.ExcludeStop(s))
+	// logger.Log.Printf("Can collect stop: %v %v", cs.IncludeStop(s), !cs.ExcludeStop(s))
 	return cs.IncludeStop(s) && !cs.ExcludeStop(s)
 }
 
