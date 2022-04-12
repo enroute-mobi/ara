@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -108,4 +109,23 @@ func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrame
 		return "", err
 	}
 	return buffer.String(), nil
+}
+
+func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "estimated_timetable_delivery_raw.template", delivery); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "estimated_journey_version_frame_raw.template", frame); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+
+	return strings.TrimSpace(buffer.String()), nil
 }
