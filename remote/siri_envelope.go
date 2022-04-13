@@ -73,6 +73,7 @@ func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 	if len(content) == 0 {
 		return nil, errors.New("empty body")
 	}
+
 	// Parse the XML and store the body
 	doc, err := xml.Parse(content, xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
 	if err != nil {
@@ -81,11 +82,19 @@ func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 
 	nodes, err := doc.Root().Search("//*[local-name()='Body']/*")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot search for `Body` tag: %s", err)
 	}
 
 	if len(nodes) == 0 {
-		return &SIRIEnvelope{body: doc.Root().XmlNode.FirstChild().NextSibling()}, nil
+		node := doc.Root().FirstChild()
+		// ensure we only get the first node
+		for node != nil && node.NodeType() != xml.XML_ELEMENT_NODE {
+			node = node.NextSibling()
+		}
+		if node == nil {
+			return nil, errors.New("invalid raw xml: cannot find body")
+		}
+		return &SIRIEnvelope{body: node}, nil
 	}
 
 	return &SIRIEnvelope{body: nodes[0]}, nil

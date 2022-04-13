@@ -13,6 +13,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/rubenv/sql-migrate v1.0.0
 	github.com/satori/uuid v1.2.0
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	golang.org/x/text v0.3.7
 	google.golang.org/api v0.64.0
@@ -24,12 +25,14 @@ require (
 require (
 	cloud.google.com/go/compute v0.1.0 // indirect
 	cloud.google.com/go/iam v0.1.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
@@ -38,4 +41,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220107163113-42d7afdf6368 // indirect
 	google.golang.org/grpc v1.43.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
