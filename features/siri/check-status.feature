@@ -130,6 +130,30 @@ Feature: Support SIRI CheckStatus
 </Siri>
 """
 
+  @ARA-1055
+  Scenario: Handle a SIRI Checkstatus request with raw envelope without special characters between tags
+    Given a SIRI Partner "test" exists with connectors [siri-check-status-server] and the following settings:
+      | local_credential | test |
+      | siri.envelope    | raw  |
+    When I send this SIRI request to the Referential "test"
+      """
+<?xml version='1.0' encoding='utf-8'?><Siri xmlns="http://www.siri.org.uk/siri" version="2.0"><CheckStatusRequest><RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp><RequestorRef>test</RequestorRef><MessageIdentifier>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</MessageIdentifier></CheckStatusRequest></Siri>
+"""
+   Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+<CheckStatusResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ProducerRef>Ara</ProducerRef>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-2-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <RequestMessageRef>RATPDev:ResponseMessage::d3f94aa2-7b76-449b-aa18-50caf78f9dc7:LOC</RequestMessageRef>
+    <Status>true</Status>
+    <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+</CheckStatusResponse>
+</Siri>
+"""
+
   @ARA-1025
   Scenario: Send SIRI CheckStatus request with SOAP
     Given a SIRI server waits CheckStatus request on "http://localhost:8090" to respond with
