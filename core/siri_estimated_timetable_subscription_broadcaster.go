@@ -74,11 +74,11 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 		lineIds = append(lineIds, ett.Lines()...)
 
-		resources, lineIds := connector.checkLines(ett)
-		if len(lineIds) != 0 {
-			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(lineIds, ","))
+		resources, unknownLineIds := connector.checkLines(ett)
+		if len(unknownLineIds) != 0 {
+			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(lineIds, ","))
+			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
 		} else {
 			rs.Status = true
 			rs.ValidUntil = ett.InitialTerminationTime()
@@ -89,7 +89,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-		if len(lineIds) != 0 {
+		// We do not want to create a subscription that will fail
+		if len(unknownLineIds) != 0 {
 			continue
 		}
 
