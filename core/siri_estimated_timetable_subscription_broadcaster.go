@@ -119,7 +119,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	}
 	message.Type = "EstimatedTimetableSubscriptionRequest"
 	message.SubscriptionIdentifiers = subIds
-	message.StopAreas = lineIds
+	message.Lines = lineIds
 
 	return resps
 }
