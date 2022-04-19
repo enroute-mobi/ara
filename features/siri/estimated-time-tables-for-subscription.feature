@@ -3,6 +3,119 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   Background:
     Given a Referential "test" is created
 
+  @ARA-1060
+  Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription for all existing lines in a referential having same remote_objectid_kind
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+       | siri.envelope        |  raw                  |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Name      | Ligne A Bus                     |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>test1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT3H0S</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+<SubscriptionResponse>
+        <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+        <ResponderRef>test</ResponderRef>
+        <ResponseStatus>
+            <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+            <SubscriptionRef>test1</SubscriptionRef>
+            <Status>true</Status>
+            <ValidUntil>2022-02-10T02:00:00.000Z</ValidUntil>
+        </ResponseStatus>
+        <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+</SubscriptionResponse>
+</Siri>
+      """
+    Then Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:3:LOC |
+      | internal | NINOXE:Line:A:BUS |
+
+  @ARA-1060
+  Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription for all existing lines in a referential only with same remote_objectid_kind
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+       | siri.envelope        | raw                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "another": "NINOXE:Line:3:LOC"  |
+      | Name      | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Name      | Ligne A Bus                     |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>test1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT3H0S</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+<SubscriptionResponse>
+        <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+        <ResponderRef>test</ResponderRef>
+        <ResponseStatus>
+            <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+            <SubscriptionRef>test1</SubscriptionRef>
+            <Status>true</Status>
+            <ValidUntil>2022-02-10T02:00:00.000Z</ValidUntil>
+        </ResponseStatus>
+        <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+</SubscriptionResponse>
+</Siri>
+      """
+    Then Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:A:BUS |
+    Then No Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:3:LOC |
+
   Scenario: 4234 - Handle a SOAP SIRI EstimatedTimeTable request for subscription
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |

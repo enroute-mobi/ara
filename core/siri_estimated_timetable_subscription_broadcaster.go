@@ -72,6 +72,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			ResponseTimestamp: connector.Clock().Now(),
 		}
 
+		// for logging
 		lineIds = append(lineIds, ett.Lines()...)
 
 		resources, unknownLineIds := connector.checkLines(ett)
@@ -142,17 +143,46 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+	var lids []string
+	// check for subscription to all lines
+	if len(ett.Lines()) == 0 {
+		var lv []string
+		//find all lines corresponding to the remoteObjectidKind
+		for _, line := range connector.Partner().Model().Lines().FindAll() {
+			for _, objectid := range line.ObjectIDs() {
+				if objectid.Kind() == connector.remoteObjectidKind {
+					lv = append(lv, objectid.Value())
+					break
+				}
+			}
+		}
+
+		for _, lineValue := range lv {
+			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
+			ref := model.Reference{
+				ObjectId: &lineObjectID,
+				Type:     "line",
+			}
+			r := NewResource(ref)
+			r.SubscribedAt = connector.Clock().Now()
+			r.SubscribedUntil = ett.InitialTerminationTime()
+			resources = append(resources, &r)
+		}
+		return resources, lids
+	}
+
 	for _, lineId := range ett.Lines() {
-		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
+
+		lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineId)
+		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
 
 		if !ok {
-			lineIds = append(lineIds, lineId)
+			lids = append(lids, lineId)
 			continue
 		}
 
 		ref := model.Reference{
-			ObjectId: &lineObjectId,
+			ObjectId: &lineObjectID,
 			Type:     "Line",
 		}
 
@@ -161,7 +191,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r.SubscribedUntil = ett.InitialTerminationTime()
 		resources = append(resources, &r)
 	}
-	return resources, lineIds
+	return resources, lids
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {

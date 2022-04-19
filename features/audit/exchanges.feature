@@ -285,3 +285,45 @@ Feature: Audit API exchanges
     Then an audit event should exist with these attributes:
       | Type               | CheckStatusRequest           |
       | Dataset            | cucumber_test_without_hyphen |
+
+  @ARA-1060
+  Scenario: Audit a recevied SIRI EstimatedTimetableSubscriptionRequest
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+       | siri.envelope        | raw                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Name      | Ligne A Bus                     |
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>test1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT3H0S</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                                 | EstimatedTimetableSubscriptionRequest   |
+      | Direction                            | received                                |
+      | Protocol                             | siri                                    |
+      | Partner                              | test                                    |
+      | Status                               | OK                                      |
+      | SubscriptionIdentifiers              | ["test1"]                               |
