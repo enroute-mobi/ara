@@ -161,7 +161,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
 			ref := model.Reference{
 				ObjectId: &lineObjectID,
-				Type:     "line",
+				Type:     "Line",
 			}
 			r := NewResource(ref)
 			r.SubscribedAt = connector.Clock().Now()
