@@ -149,11 +149,10 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		var lv []string
 		//find all lines corresponding to the remoteObjectidKind
 		for _, line := range connector.Partner().Model().Lines().FindAll() {
-			for _, objectid := range line.ObjectIDs() {
-				if objectid.Kind() == connector.remoteObjectidKind {
-					lv = append(lv, objectid.Value())
-					break
-				}
+			lineObjectID, ok := line.ObjectID(connector.remoteObjectidKind)
+			if ok {
+				lv = append(lv, lineObjectID.Value())
+				continue
 			}
 		}
 
