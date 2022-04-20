@@ -72,13 +72,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			ResponseTimestamp: connector.Clock().Now(),
 		}
 
+		// for logging
 		lineIds = append(lineIds, ett.Lines()...)
 
-		resources, lineIds := connector.checkLines(ett)
-		if len(lineIds) != 0 {
-			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(lineIds, ","))
+		resources, unknownLineIds := connector.checkLines(ett)
+		if len(unknownLineIds) != 0 {
+			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(lineIds, ","))
+			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
 		} else {
 			rs.Status = true
 			rs.ValidUntil = ett.InitialTerminationTime()
@@ -89,7 +90,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent, &rs)
 		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
-		if len(lineIds) != 0 {
+		// We do not want to create a subscription that will fail
+		if len(unknownLineIds) != 0 {
 			continue
 		}
 
@@ -118,7 +120,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	}
 	message.Type = "EstimatedTimetableSubscriptionRequest"
 	message.SubscriptionIdentifiers = subIds
-	message.StopAreas = lineIds
+	message.Lines = lineIds
 
 	return resps
 }
@@ -141,17 +143,45 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+	var lids []string
+	// check for subscription to all lines
+	if len(ett.Lines()) == 0 {
+		var lv []string
+		//find all lines corresponding to the remoteObjectidKind
+		for _, line := range connector.Partner().Model().Lines().FindAll() {
+			lineObjectID, ok := line.ObjectID(connector.remoteObjectidKind)
+			if ok {
+				lv = append(lv, lineObjectID.Value())
+				continue
+			}
+		}
+
+		for _, lineValue := range lv {
+			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
+			ref := model.Reference{
+				ObjectId: &lineObjectID,
+				Type:     "Line",
+			}
+			r := NewResource(ref)
+			r.SubscribedAt = connector.Clock().Now()
+			r.SubscribedUntil = ett.InitialTerminationTime()
+			resources = append(resources, &r)
+		}
+		return resources, lids
+	}
+
 	for _, lineId := range ett.Lines() {
-		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectId)
+
+		lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineId)
+		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
 
 		if !ok {
-			lineIds = append(lineIds, lineId)
+			lids = append(lids, lineId)
 			continue
 		}
 
 		ref := model.Reference{
-			ObjectId: &lineObjectId,
+			ObjectId: &lineObjectID,
 			Type:     "Line",
 		}
 
@@ -160,7 +190,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r.SubscribedUntil = ett.InitialTerminationTime()
 		resources = append(resources, &r)
 	}
-	return resources, lineIds
+	return resources, lids
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {

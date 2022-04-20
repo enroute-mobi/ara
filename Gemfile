@@ -10,6 +10,7 @@ group :test do
   gem 'rest-client'
   gem 'pg'
   gem 'gtfs-rt', en_route: 'gtfs-rt'
+  gem 'pry'
 end
 
 group :development do
