@@ -24,32 +24,26 @@ func NewLineController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *LineController) findLine(tx *model.Transaction, identifier string) (model.Line, bool) {
+func (controller *LineController) findLine(identifier string) (model.Line, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().Lines().FindByObjectId(objectid)
+		return controller.referential.Model().Lines().FindByObjectId(objectid)
 	}
-	return tx.Model().Lines().Find(model.LineId(identifier))
+	return controller.referential.Model().Lines().Find(model.LineId(identifier))
 }
 
 func (controller *LineController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Lines Index")
 
-	jsonBytes, _ := json.Marshal(tx.Model().Lines().FindAll())
+	jsonBytes, _ := json.Marshal(controller.referential.Model().Lines().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *LineController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	line, ok := controller.findLine(tx, identifier)
+	line, ok := controller.findLine(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
@@ -61,11 +55,7 @@ func (controller *LineController) Show(response http.ResponseWriter, identifier 
 }
 
 func (controller *LineController) Delete(response http.ResponseWriter, identifier string) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	line, ok := controller.findLine(tx, identifier)
+	line, ok := controller.findLine(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
@@ -73,22 +63,13 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 	logger.Log.Debugf("Delete line %s", identifier)
 
 	jsonBytes, _ := line.MarshalJSON()
-	tx.Model().Lines().Delete(&line)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Lines().Delete(&line)
+
 	response.Write(jsonBytes)
 }
 
 func (controller *LineController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	line, ok := controller.findLine(tx, identifier)
+	line, ok := controller.findLine(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)
 		return
@@ -103,32 +84,22 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 	}
 
 	for _, obj := range line.ObjectIDs() {
-		l, ok := tx.Model().Lines().FindByObjectId(obj)
+		l, ok := controller.referential.Model().Lines().FindByObjectId(obj)
 		if ok && l.Id() != line.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Lines().Save(&line)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Lines().Save(&line)
 	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }
 
 func (controller *LineController) Create(response http.ResponseWriter, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Create line: %s", string(body))
 
-	line := tx.Model().Lines().New()
+	line := controller.referential.Model().Lines().New()
 
 	err := json.Unmarshal(body, &line)
 	if err != nil {
@@ -142,20 +113,14 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 	}
 
 	for _, obj := range line.ObjectIDs() {
-		l, ok := tx.Model().Lines().FindByObjectId(obj)
+		l, ok := controller.referential.Model().Lines().FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Lines().Save(&line)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Lines().Save(&line)
 	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }

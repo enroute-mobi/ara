@@ -58,15 +58,12 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logS
 }
 
 func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	stopVisits := tx.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
+	stopVisits := connector.partner.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 
 	for i := range stopVisits {
-		sa, ok := tx.Model().StopAreas().Find(stopVisits[i].StopAreaId)
+		sa, ok := connector.partner.Model().StopAreas().Find(stopVisits[i].StopAreaId)
 		if !ok { // Should never happen
 			logger.Log.Debugf("Can't find StopArea %v of StopVisit %v", stopVisits[i].StopAreaId, stopVisits[i].Id())
 			continue
@@ -80,7 +77,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 		// If we don't already have a tripUpdate with the VehicleJourney we create one
 		if !ok {
 			// Fetch all needed models and objectids
-			vj, ok := tx.Model().VehicleJourneys().Find(stopVisits[i].VehicleJourneyId)
+			vj, ok := connector.partner.Model().VehicleJourneys().Find(stopVisits[i].VehicleJourneyId)
 			if !ok {
 				continue
 			}
@@ -92,7 +89,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			var routeId string
 			lineObjectid, ok := linesObjectId[vj.Id()]
 			if !ok {
-				l, ok := tx.Model().Lines().Find(vj.LineId)
+				l, ok := connector.partner.Model().Lines().Find(vj.LineId)
 				if !ok {
 					continue
 				}

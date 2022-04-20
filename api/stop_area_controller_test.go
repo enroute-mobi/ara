@@ -150,23 +150,23 @@ func Test_StopAreaController_Index(t *testing.T) {
 }
 
 func Test_StopAreaController_FindStopArea(t *testing.T) {
-	memoryModel := model.NewMemoryModel()
-	tx := model.NewTransaction(memoryModel)
-	defer tx.Close()
+	ref := core.NewMemoryReferentials().New("test")
 
-	stopArea := memoryModel.StopAreas().New()
+	stopArea := ref.Model().StopAreas().New()
 	objectid := model.NewObjectID("kind", "value")
 	stopArea.SetObjectID(objectid)
-	memoryModel.StopAreas().Save(&stopArea)
+	ref.Model().StopAreas().Save(&stopArea)
 
-	controller := &StopAreaController{}
+	controller := &StopAreaController{
+		referential: ref,
+	}
 
-	_, ok := controller.findStopArea(tx, "kind:value")
+	_, ok := controller.findStopArea("kind:value")
 	if !ok {
 		t.Error("Can't find StopArea by ObjectId")
 	}
 
-	_, ok = controller.findStopArea(tx, string(stopArea.Id()))
+	_, ok = controller.findStopArea(string(stopArea.Id()))
 	if !ok {
 		t.Error("Can't find StopArea by Id")
 	}

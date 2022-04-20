@@ -36,9 +36,6 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -51,7 +48,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 	}
 
-	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(tx, &request.XMLEstimatedTimetableRequest, logStashEvent)
+	response.SIRIEstimatedTimetableDelivery = connector.getEstimatedTimetableDelivery(&request.XMLEstimatedTimetableRequest, logStashEvent)
 
 	if !response.SIRIEstimatedTimetableDelivery.Status {
 		message.Status = "Error"
@@ -66,7 +63,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	return response
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(tx *model.Transaction, request *siri.XMLEstimatedTimetableRequest, logStashEvent audit.LogStashEvent) siri.SIRIEstimatedTimetableDelivery {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(request *siri.XMLEstimatedTimetableRequest, logStashEvent audit.LogStashEvent) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
 	monitoringRefs := []string{}
 	lineRefs := []string{}
@@ -92,7 +89,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 	// SIRIEstimatedJourneyVersionFrame
 	for _, lineId := range request.Lines() {
 		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		line, ok := tx.Model().Lines().FindByObjectId(lineObjectId)
+		line, ok := connector.partner.Model().Lines().FindByObjectId(lineObjectId)
 		if !ok {
 			logger.Log.Debugf("Cannot find requested line Estimated Time Table with id %v at %v", lineObjectId.String(), connector.Clock().Now())
 			continue
@@ -103,7 +100,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		}
 
 		// SIRIEstimatedVehicleJourney
-		vjs := tx.Model().VehicleJourneys().FindByLineId(line.Id())
+		vjs := connector.partner.Model().VehicleJourneys().FindByLineId(line.Id())
 		for i := range vjs {
 			// Handle vehicleJourney Objectid
 			vehicleJourneyId, ok := vjs[i].ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
@@ -127,24 +124,24 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				References:             make(map[string]string),
 			}
 			lineRefs = append(lineRefs, estimatedVehicleJourney.LineRef)
-			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], tx, vjs[i].Origin)
+			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], vjs[i].Origin)
 			estimatedVehicleJourney.Attributes = vjs[i].Attributes
 
 			// SIRIEstimatedCall
-			svs := tx.Model().StopVisits().FindFollowingByVehicleJourneyId(vjs[i].Id())
+			svs := connector.partner.Model().StopVisits().FindFollowingByVehicleJourneyId(vjs[i].Id())
 			for i := range svs {
 				if !selector(&svs[i]) {
 					continue
 				}
 
 				// Handle StopPointRef
-				stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId, tx)
+				stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId)
 				if !ok {
 					logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct ObjectID", svs[i].Id())
 					continue
 				}
 
-				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i], tx)
+				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
 
 				monitoringRefs = append(monitoringRefs, stopAreaId)
 				estimatedCall := &siri.SIRIEstimatedCall{
@@ -185,8 +182,8 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 	return delivery
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId, tx *model.Transaction) (model.StopArea, string, bool) {
-	stopPointRef, ok := tx.Model().StopAreas().Find(stopAreaId)
+func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+	stopPointRef, ok := connector.partner.Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return model.StopArea{}, "", false
 	}
@@ -204,7 +201,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 	return model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, tx *model.Transaction, origin string) map[string]string {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, origin string) map[string]string {
 	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -216,7 +213,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 			references[refType] = ref.ObjectId.Value()
 			continue
 		}
-		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
+		if foundStopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
 			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
 			if ok {
 				references[refType] = obj.Value()
@@ -240,7 +237,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(orig
 	return false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit model.StopVisit, tx *model.Transaction) {
+func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit model.StopVisit) {
 	if _, ok := refs["OperatorRef"]; ok {
 		return
 	}
@@ -249,7 +246,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[
 	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
 		return
 	}
-	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := connector.partner.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
 		refs["OperatorRef"] = operatorRef.ObjectId.Value()
 		return

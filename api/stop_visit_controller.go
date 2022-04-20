@@ -25,15 +25,15 @@ func NewStopVisitController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *StopVisitController) findStopVisit(tx *model.Transaction, identifier string) (model.StopVisit, bool) {
+func (controller *StopVisitController) findStopVisit(identifier string) (model.StopVisit, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().StopVisits().FindByObjectId(objectid)
+		return controller.referential.Model().StopVisits().FindByObjectId(objectid)
 	}
-	return tx.Model().StopVisits().Find(model.StopVisitId(identifier))
+	return controller.referential.Model().StopVisits().Find(model.StopVisitId(identifier))
 }
 
 func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopVisit, filters url.Values) []model.StopVisit {
@@ -73,10 +73,7 @@ func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopV
 }
 
 func (controller *StopVisitController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopVisits := tx.Model().StopVisits().FindAll()
+	stopVisits := controller.referential.Model().StopVisits().FindAll()
 	filteredStopVisits := controller.filterStopVisits(stopVisits, filters)
 
 	logger.Log.Debugf("StopVisits Index")
@@ -85,10 +82,7 @@ func (controller *StopVisitController) Index(response http.ResponseWriter, filte
 }
 
 func (controller *StopVisitController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopVisit, ok := controller.findStopVisit(tx, identifier)
+	stopVisit, ok := controller.findStopVisit(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
@@ -100,11 +94,7 @@ func (controller *StopVisitController) Show(response http.ResponseWriter, identi
 }
 
 func (controller *StopVisitController) Delete(response http.ResponseWriter, identifier string) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopVisit, ok := controller.findStopVisit(tx, identifier)
+	stopVisit, ok := controller.findStopVisit(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
@@ -112,22 +102,12 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
 
 	jsonBytes, _ := stopVisit.MarshalJSON()
-	tx.Model().StopVisits().Delete(&stopVisit)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().StopVisits().Delete(&stopVisit)
 	response.Write(jsonBytes)
 }
 
 func (controller *StopVisitController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopVisit, ok := controller.findStopVisit(tx, identifier)
+	stopVisit, ok := controller.findStopVisit(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)
 		return
@@ -142,34 +122,20 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
+		sv, ok := controller.referential.Model().StopVisits().FindByObjectId(obj)
 		if ok && sv.Id() != stopVisit.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().StopVisits().Save(&stopVisit)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
-
+	controller.referential.Model().StopVisits().Save(&stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
 func (controller *StopVisitController) Create(response http.ResponseWriter, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	//too verbose
-	//logger.Log.Debugf("Create stopVisit: %s", string(body))
-
-	stopVisit := tx.Model().StopVisits().New()
+	stopVisit := controller.referential.Model().StopVisits().New()
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
@@ -183,20 +149,14 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := tx.Model().StopVisits().FindByObjectId(obj)
+		sv, ok := controller.referential.Model().StopVisits().FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().StopVisits().Save(&stopVisit)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().StopVisits().Save(&stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }

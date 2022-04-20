@@ -80,9 +80,6 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *siri.IDFGeneralMessageStructure) {
-	tx := builder.partner.Referential().NewTransaction()
-	defer tx.Close()
-
 	remoteObjectidKind := builder.remoteObjectidKind
 
 	for _, lineref := range content.LineRef() {
@@ -116,11 +113,11 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 	}
 	for _, lineSection := range content.LineSections() {
-		builder.handleLineSection(tx, remoteObjectidKind, lineSection, event)
+		builder.handleLineSection(remoteObjectidKind, lineSection, event)
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) handleLineSection(tx *model.Transaction, remoteObjectidKind string, lineSection *siri.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
+func (builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *siri.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
 	references := model.NewReferences()
 
 	lineRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.LineRef()))

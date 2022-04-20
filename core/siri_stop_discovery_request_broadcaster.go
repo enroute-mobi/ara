@@ -27,9 +27,6 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -42,7 +39,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	annotedStopPointMap := make(map[string]struct{})
 
-	sas := tx.Model().StopAreas().FindAll()
+	sas := connector.partner.Model().StopAreas().FindAll()
 	for i := range sas {
 		if sas[i].Name == "" || !sas[i].CollectedAlways {
 			continue

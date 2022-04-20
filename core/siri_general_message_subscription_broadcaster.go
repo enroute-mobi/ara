@@ -73,10 +73,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituation(subId S
 }
 
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model.SituationId) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	situation, ok := tx.Model().Situations().Find(sId)
+	situation, ok := connector.partner.Model().Situations().Find(sId)
 	if !ok || situation.Origin == string(connector.partner.Slug()) {
 		return
 	}

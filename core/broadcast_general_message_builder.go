@@ -12,7 +12,6 @@ type BroadcastGeneralMessageBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	tx                 *model.Transaction
 	partner            *Partner
 	referenceGenerator *idgen.IdentifierGenerator
 	remoteObjectidKind string
@@ -22,9 +21,8 @@ type BroadcastGeneralMessageBuilder struct {
 	InfoChannelRef []string
 }
 
-func NewBroadcastGeneralMessageBuilder(tx *model.Transaction, partner *Partner, connector string) *BroadcastGeneralMessageBuilder {
+func NewBroadcastGeneralMessageBuilder(partner *Partner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
-		tx:                 tx,
 		partner:            partner,
 		referenceGenerator: partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
 		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
@@ -165,7 +163,7 @@ func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model
 }
 
 func (builder *BroadcastGeneralMessageBuilder) resolveLineRef(reference *model.Reference) (string, bool) {
-	line, ok := builder.tx.Model().Lines().FindByObjectId(*reference.ObjectId)
+	line, ok := builder.partner.Model().Lines().FindByObjectId(*reference.ObjectId)
 	if !ok {
 		return "", false
 	}
@@ -177,7 +175,7 @@ func (builder *BroadcastGeneralMessageBuilder) resolveLineRef(reference *model.R
 }
 
 func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(reference *model.Reference) (string, bool) {
-	stopArea, ok := builder.tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if !ok {
 		return "", false
 	}

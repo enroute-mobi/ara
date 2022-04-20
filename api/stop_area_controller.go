@@ -24,25 +24,22 @@ func NewStopAreaController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *StopAreaController) findStopArea(tx *model.Transaction, identifier string) (model.StopArea, bool) {
+func (controller *StopAreaController) findStopArea(identifier string) (model.StopArea, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().StopAreas().FindByObjectId(objectid)
+		return controller.referential.Model().StopAreas().FindByObjectId(objectid)
 	}
-	return tx.Model().StopAreas().Find(model.StopAreaId(identifier))
+	return controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
 }
 
 func (controller *StopAreaController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("StopAreas Index")
 
 	stime := controller.referential.Clock().Now()
-	sas := tx.Model().StopAreas().FindAll()
+	sas := controller.referential.Model().StopAreas().FindAll()
 	logger.Log.Debugf("StopAreaController FindAll time : %v", controller.referential.Clock().Since(stime))
 	stime = controller.referential.Clock().Now()
 	jsonBytes, _ := json.Marshal(sas)
@@ -51,10 +48,7 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, filter
 }
 
 func (controller *StopAreaController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopArea, ok := controller.findStopArea(tx, identifier)
+	stopArea, ok := controller.findStopArea(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), http.StatusNotFound)
 		return
@@ -66,11 +60,7 @@ func (controller *StopAreaController) Show(response http.ResponseWriter, identif
 }
 
 func (controller *StopAreaController) Delete(response http.ResponseWriter, identifier string) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopArea, ok := controller.findStopArea(tx, identifier)
+	stopArea, ok := controller.findStopArea(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), http.StatusNotFound)
 		return
@@ -78,22 +68,12 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete stopArea %s", identifier)
 
 	jsonBytes, _ := stopArea.MarshalJSON()
-	tx.Model().StopAreas().Delete(&stopArea)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().StopAreas().Delete(&stopArea)
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	stopArea, ok := controller.findStopArea(tx, identifier)
+	stopArea, ok := controller.findStopArea(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), http.StatusNotFound)
 		return
@@ -108,32 +88,22 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 	}
 
 	for _, obj := range stopArea.ObjectIDs() {
-		sa, ok := tx.Model().StopAreas().FindByObjectId(obj)
+		sa, ok := controller.referential.Model().StopAreas().FindByObjectId(obj)
 		if ok && sa.Id() != stopArea.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().StopAreas().Save(&stopArea)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().StopAreas().Save(&stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
 func (controller *StopAreaController) Create(response http.ResponseWriter, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Create stopArea: %s", string(body))
 
-	stopArea := tx.Model().StopAreas().New()
+	stopArea := controller.referential.Model().StopAreas().New()
 
 	err := json.Unmarshal(body, &stopArea)
 	if err != nil {
@@ -147,20 +117,14 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 	}
 
 	for _, obj := range stopArea.ObjectIDs() {
-		sa, ok := tx.Model().StopAreas().FindByObjectId(obj)
+		sa, ok := controller.referential.Model().StopAreas().FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().StopAreas().Save(&stopArea)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().StopAreas().Save(&stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }

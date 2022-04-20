@@ -75,12 +75,9 @@ func (guardian *ModelGuardian) checkReloadModel() bool {
 func (guardian *ModelGuardian) refreshStopAreas() {
 	defer monitoring.HandlePanic()
 
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
 	now := guardian.Clock().Now()
 
-	sas := tx.Model().StopAreas().FindAll()
+	sas := guardian.referential.Model().StopAreas().FindAll()
 	for i := range sas {
 		if sas[i].ParentId != "" {
 			parent, ok := sas[i].Parent()
@@ -96,26 +93,22 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 			continue
 		}
 
-		stopAreaTx := guardian.referential.NewTransaction()
-
-		transactionnalStopArea, _ := stopAreaTx.Model().StopAreas().Find(sas[i].Id())
+		stopArea, _ := guardian.referential.Model().StopAreas().Find(sas[i].Id())
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
-		transactionnalStopArea.NextCollect(now.Add(randNb))
-		transactionnalStopArea.Save()
-		stopAreaTx.Commit()
-		stopAreaTx.Close()
+		stopArea.NextCollect(now.Add(randNb))
+		stopArea.Save()
 
 		stopAreaUpdateRequest := &StopAreaUpdateRequest{
 			id:         StopAreaUpdateRequestId(guardian.NewUUID()),
-			stopAreaId: transactionnalStopArea.Id(),
+			stopAreaId: stopArea.Id(),
 			createdAt:  now,
 		}
 		guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 
 		if sas[i].CollectGeneralMessages {
-			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(transactionnalStopArea.Id()))
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 	}
@@ -124,34 +117,27 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 func (guardian *ModelGuardian) refreshLines() {
 	defer monitoring.HandlePanic()
 
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
 	now := guardian.Clock().Now()
 
-	lines := tx.Model().Lines().FindAll()
+	lines := guardian.referential.Model().Lines().FindAll()
 	for i := range lines {
 		if !lines[i].NextCollectAt().Before(now) {
 			continue
 		}
 
-		lineTx := guardian.referential.NewTransaction()
-
-		transactionnalLine, _ := lineTx.Model().Lines().Find(lines[i].Id())
+		line, _ := guardian.referential.Model().Lines().Find(lines[i].Id())
 
 		randNb := time.Duration(rand.Intn(20)+40) * time.Second
 
-		transactionnalLine.NextCollect(now.Add(randNb))
-		transactionnalLine.Save()
-		lineTx.Commit()
-		lineTx.Close()
+		line.NextCollect(now.Add(randNb))
+		line.Save()
 
 		if lines[i].CollectGeneralMessages {
-			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(transactionnalLine.Id()))
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(line.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 
-		vehicleUpdateRequest := NewVehicleUpdateRequest(transactionnalLine.Id())
+		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
 		guardian.referential.CollectManager().UpdateVehicle(vehicleUpdateRequest)
 	}
 }
@@ -176,26 +162,17 @@ func (guardian *ModelGuardian) requestSituations() {
 func (guardian *ModelGuardian) simulateActualAttributes() {
 	defer monitoring.HandlePanic()
 
-	tx := guardian.referential.NewTransaction()
-	defer tx.Close()
-
-	svs := tx.Model().StopVisits().FindAll()
+	svs := guardian.referential.Model().StopVisits().FindAll()
 	for i := range svs {
 		if svs[i].IsCollected() {
 			continue
 		}
 
-		stopVisitTx := guardian.referential.NewTransaction()
-		defer stopVisitTx.Close()
-
-		transactionnalStopVisit, _ := tx.Model().StopVisits().Find(svs[i].Id())
-		simulator := NewActualAttributesSimulator(&transactionnalStopVisit)
+		stopVisit, _ := guardian.referential.Model().StopVisits().Find(svs[i].Id())
+		simulator := NewActualAttributesSimulator(&stopVisit)
 		simulator.SetClock(guardian.Clock())
 		if simulator.Simulate() {
-			transactionnalStopVisit.Save()
-			stopVisitTx.Commit()
-		} else {
-			stopVisitTx.Rollback()
+			stopVisit.Save()
 		}
 	}
 }

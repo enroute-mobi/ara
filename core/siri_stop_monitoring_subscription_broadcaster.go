@@ -64,30 +64,27 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) Start() {
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoringBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	switch event.ModelType {
 	case "StopVisit":
-		sv, ok := tx.Model().StopVisits().Find(model.StopVisitId(event.ModelId))
+		sv, ok := connector.partner.Model().StopVisits().Find(model.StopVisitId(event.ModelId))
 		if ok {
-			subsIds := connector.checkEvent(sv, tx)
+			subsIds := connector.checkEvent(sv)
 			if len(subsIds) != 0 {
 				connector.addStopVisit(subsIds, sv.Id())
 			}
 		}
 	case "VehicleJourney":
-		svs := tx.Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId))
+		svs := connector.partner.Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId))
 		for i := range svs {
-			subsIds := connector.checkEvent(svs[i], tx)
+			subsIds := connector.checkEvent(svs[i])
 			if len(subsIds) != 0 {
 				connector.addStopVisit(subsIds, svs[i].Id())
 			}
 		}
 	case "StopArea":
-		sa, ok := tx.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
+		sa, ok := connector.partner.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			connector.checkStopAreaEvent(&sa, tx)
+			connector.checkStopAreaEvent(&sa)
 		}
 	default:
 		return
@@ -102,14 +99,14 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subsIds
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit, tx *model.Transaction) (subscriptionIds []SubscriptionId) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit) (subscriptionIds []SubscriptionId) {
 	if sv.Origin == string(connector.Partner().Slug()) {
 		return
 	}
 
-	vj, _ := tx.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
+	vj, _ := connector.partner.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
 
-	for _, stopAreaObjectId := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.remoteObjectidKind) {
+	for _, stopAreaObjectId := range connector.partner.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.remoteObjectidKind) {
 		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), "StopMonitoringBroadcast")
 
 		for _, sub := range subs {
@@ -119,7 +116,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 			}
 
 			// Handle LineRef filter
-			if lineRef, ok := connector.lineRef(sub, tx); ok && lineRef != vj.LineId {
+			if lineRef, ok := connector.lineRef(sub); ok && lineRef != vj.LineId {
 				continue
 			}
 
@@ -141,7 +138,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 	return
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
 	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		return
@@ -183,9 +180,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	var monitoringRefs, subIds []string
 
 	for _, sm := range request.XMLSubscriptionSMEntries() {
@@ -202,7 +196,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		monitoringRefs = append(monitoringRefs, sm.MonitoringRef())
 
 		objectid := model.NewObjectID(connector.remoteObjectidKind, sm.MonitoringRef())
-		sa, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+		sa, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
 		if !ok {
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
@@ -261,19 +255,16 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	for _, saId := range tx.Model().StopAreas().FindFamily(sa.Id()) {
-		svs := tx.Model().StopVisits().FindFollowingByStopAreaId(saId)
+	for _, saId := range connector.partner.Model().StopAreas().FindFamily(sa.Id()) {
+		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(saId)
 		for i := range svs {
 			if _, ok := res.LastState(string(svs[i].Id())); ok {
 				continue
 			}
 
 			// Handle LineRef filter
-			vj, _ := tx.Model().VehicleJourneys().Find(svs[i].VehicleJourneyId)
-			if lineRef, ok := connector.lineRef(sub, tx); ok && lineRef != vj.LineId {
+			vj, _ := connector.partner.Model().VehicleJourneys().Find(svs[i].VehicleJourneyId)
+			if lineRef, ok := connector.lineRef(sub); ok && lineRef != vj.LineId {
 				continue
 			}
 
@@ -301,7 +292,7 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 
 // Returns the LineId of the line defined in the LineRef subscription option
 // If LineRef isn't defined or with an incorrect format, returns false
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscription, tx *model.Transaction) (model.LineId, bool) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscription) (model.LineId, bool) {
 	lineRef := sub.SubscriptionOption("LineRef")
 	if lineRef == "" {
 		return "", false
@@ -311,7 +302,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscri
 		logger.Log.Debugf("The LineRef Setting hasn't been stored in the correct format: %v", lineRef)
 		return "", false
 	}
-	line, ok := tx.Model().Lines().FindByObjectId(model.NewObjectID(kindValue[0], kindValue[1]))
+	line, ok := connector.partner.Model().Lines().FindByObjectId(model.NewObjectID(kindValue[0], kindValue[1]))
 	if !ok {
 		return "", true
 	}

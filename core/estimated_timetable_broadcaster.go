@@ -130,9 +130,6 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 	ett.connector.mutex.Unlock()
 
-	tx := ett.connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	currentTime := ett.Clock().Now()
 
 	for subId, stopVisits := range events {
@@ -164,26 +161,26 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			}
 
 			// Find the StopVisit
-			stopVisit, ok := tx.Model().StopVisits().Find(stopVisitId)
+			stopVisit, ok := ett.connector.Partner().Model().StopVisits().Find(stopVisitId)
 			if !ok {
 				continue
 			}
 
 			// Handle StopPointRef
-			stopArea, stopAreaId, ok := ett.connector.stopPointRef(stopVisit.StopAreaId, tx)
+			stopArea, stopAreaId, ok := ett.connector.stopPointRef(stopVisit.StopAreaId)
 			if !ok {
 				logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
 				continue
 			}
 
 			// Find the VehicleJourney
-			vehicleJourney, ok := tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+			vehicleJourney, ok := ett.connector.Partner().Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 			if !ok {
 				return
 			}
 
 			// Find the Line
-			line, ok := tx.Model().Lines().Find(vehicleJourney.LineId)
+			line, ok := ett.connector.Partner().Model().Lines().Find(vehicleJourney.LineId)
 			if !ok {
 				continue
 			}
@@ -232,7 +229,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
-				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(&vehicleJourney, &stopVisit, tx)
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(&vehicleJourney, &stopVisit)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
@@ -272,8 +269,8 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId, tx *model.Transaction) (model.StopArea, string, bool) {
-	stopPointRef, ok := tx.Model().StopAreas().Find(stopAreaId)
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return model.StopArea{}, "", false
 	}
@@ -291,7 +288,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 	return model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit, tx *model.Transaction) map[string]string {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {
 	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -303,7 +300,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 			references[refType] = ref.ObjectId.Value()
 			continue
 		}
-		if foundStopArea, ok := tx.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
+		if foundStopArea, ok := connector.Partner().Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
 			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
 			if ok {
 				references[refType] = obj.Value()
@@ -320,7 +317,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
 		return references
 	}
-	operator, ok := tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := connector.Partner().Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
 		references["OperatorRef"] = operatorRef.ObjectId.Value()
 		return references

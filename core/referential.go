@@ -180,10 +180,6 @@ func (referential *Referential) Save() (ok bool) {
 	return
 }
 
-func (referential *Referential) NewTransaction() *model.Transaction {
-	return model.NewTransaction(referential.model)
-}
-
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	type Alias Referential
 	aux := struct {
@@ -348,8 +344,8 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 	}
 	referential.manager = manager
 	referential.model.SetReferential(string(referential.slug))
-	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential))
-	referential.collectManager.HandleUpdateEvent(model.NewUpdateManager(referential))
+	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential.Model()))
+	referential.collectManager.HandleUpdateEvent(model.NewUpdateManager(referential.Model()))
 	manager.byId[referential.id] = referential
 	return true
 }

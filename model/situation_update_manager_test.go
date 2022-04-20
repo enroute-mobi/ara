@@ -71,7 +71,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 
 	manager := newSituationUpdateManager(model)
 	event := completeEvent(objectid, testTime)
-	manager.UpdateSituation([]*SituationUpdateEvent{event})
+	manager.Update([]*SituationUpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 	if !checkSituation(updatedSituation, objectid, testTime) {
@@ -92,7 +92,7 @@ func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 
 	manager := newSituationUpdateManager(model)
 	event := completeEvent(objectid, testTime)
-	manager.UpdateSituation([]*SituationUpdateEvent{event})
+	manager.Update([]*SituationUpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 	if checkSituation(updatedSituation, objectid, testTime) {
@@ -111,7 +111,7 @@ func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
 
 	manager := newSituationUpdateManager(model)
 	event := completeEvent(objectid, testTime)
-	manager.UpdateSituation([]*SituationUpdateEvent{event})
+	manager.Update([]*SituationUpdateEvent{event})
 
 	situations := model.Situations().FindAll()
 	if len(situations) != 1 {

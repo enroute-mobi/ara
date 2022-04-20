@@ -24,32 +24,26 @@ func NewSituationController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *SituationController) findSituation(tx *model.Transaction, identifier string) (model.Situation, bool) {
+func (controller *SituationController) findSituation(identifier string) (model.Situation, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().Situations().FindByObjectId(objectid)
+		return controller.referential.Model().Situations().FindByObjectId(objectid)
 	}
-	return tx.Model().Situations().Find(model.SituationId(identifier))
+	return controller.referential.Model().Situations().Find(model.SituationId(identifier))
 }
 
 func (controller *SituationController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Situations Index")
 
-	jsonBytes, _ := json.Marshal(tx.Model().Situations().FindAll())
+	jsonBytes, _ := json.Marshal(controller.referential.Model().Situations().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *SituationController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	situation, ok := controller.findSituation(tx, identifier)
+	situation, ok := controller.findSituation(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
@@ -61,11 +55,7 @@ func (controller *SituationController) Show(response http.ResponseWriter, identi
 }
 
 func (controller *SituationController) Delete(response http.ResponseWriter, identifier string) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	situation, ok := controller.findSituation(tx, identifier)
+	situation, ok := controller.findSituation(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
@@ -73,22 +63,12 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete situation %s", identifier)
 
 	jsonBytes, _ := situation.MarshalJSON()
-	tx.Model().Situations().Delete(&situation)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Situations().Delete(&situation)
 	response.Write(jsonBytes)
 }
 
 func (controller *SituationController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	situation, ok := controller.findSituation(tx, identifier)
+	situation, ok := controller.findSituation(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
 		return
@@ -102,25 +82,15 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 		return
 	}
 
-	tx.Model().Situations().Save(&situation)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Situations().Save(&situation)
 	jsonBytes, _ := json.Marshal(&situation)
 	response.Write(jsonBytes)
 }
 
 func (controller *SituationController) Create(response http.ResponseWriter, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Create situation: %s", string(body))
 
-	situation := tx.Model().Situations().New()
+	situation := controller.referential.Model().Situations().New()
 
 	err := json.Unmarshal(body, &situation)
 	if err != nil {
@@ -133,13 +103,7 @@ func (controller *SituationController) Create(response http.ResponseWriter, body
 		return
 	}
 
-	tx.Model().Situations().Save(&situation)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Situations().Save(&situation)
 	jsonBytes, _ := json.Marshal(&situation)
 	response.Write(jsonBytes)
 }

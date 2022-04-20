@@ -32,9 +32,9 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 	return connector
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
 	objectid := model.NewObjectID(connector.remoteObjectidKind, request.MonitoringRef())
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(objectid)
+	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
 		return siri.SIRIStopMonitoringDelivery{
 			RequestMessageRef: request.MessageIdentifier(),
@@ -85,15 +85,15 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	var stopVisitArray []string
 
 	// Initialize builder
-	stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, connector.Partner(), SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(connector.Partner(), SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
 	stopMonitoringBuilder.StopVisitTypes = request.StopVisitTypes()
 	stopMonitoringBuilder.MonitoringRef = request.MonitoringRef()
 
 	// Find Descendants
-	stopAreas := tx.Model().StopAreas().FindFamily(stopArea.Id())
+	stopAreas := connector.partner.Model().StopAreas().FindFamily(stopArea.Id())
 
 	// Fill StopVisits
-	svs := tx.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas)
+	svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaIds(stopAreas)
 	for i := range svs {
 		if svs[i].Origin == string(connector.Partner().Slug()) {
 			continue
@@ -119,9 +119,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLGetStopMonitoring, message *audit.BigQueryMessage) *siri.SIRIStopMonitoringResponse {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -134,7 +131,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 	}
 
-	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(tx, logStashEvent, &request.XMLStopMonitoringRequest)
+	response.SIRIStopMonitoringDelivery = connector.getStopMonitoringDelivery(logStashEvent, &request.XMLStopMonitoringRequest)
 
 	if !response.SIRIStopMonitoringDelivery.Status {
 		message.Status = "Error"

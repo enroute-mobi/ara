@@ -24,25 +24,22 @@ func NewVehicleController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *VehicleController) findVehicle(tx *model.Transaction, identifier string) (model.Vehicle, bool) {
+func (controller *VehicleController) findVehicle(identifier string) (model.Vehicle, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().Vehicles().FindByObjectId(objectid)
+		return controller.referential.Model().Vehicles().FindByObjectId(objectid)
 	}
-	return tx.Model().Vehicles().Find(model.VehicleId(identifier))
+	return controller.referential.Model().Vehicles().Find(model.VehicleId(identifier))
 }
 
 func (controller *VehicleController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Vehicles Index")
 
 	stime := controller.referential.Clock().Now()
-	vehicles := tx.Model().Vehicles().FindAll()
+	vehicles := controller.referential.Model().Vehicles().FindAll()
 	logger.Log.Debugf("VehicleController FindAll time : %v", controller.referential.Clock().Since(stime))
 	stime = controller.referential.Clock().Now()
 	jsonBytes, _ := json.Marshal(vehicles)
@@ -51,10 +48,7 @@ func (controller *VehicleController) Index(response http.ResponseWriter, filters
 }
 
 func (controller *VehicleController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	vehicle, ok := controller.findVehicle(tx, identifier)
+	vehicle, ok := controller.findVehicle(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle not found: %s", identifier), http.StatusNotFound)
 		return
@@ -66,10 +60,7 @@ func (controller *VehicleController) Show(response http.ResponseWriter, identifi
 }
 
 func (controller *VehicleController) Delete(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	vehicle, ok := controller.findVehicle(tx, identifier)
+	vehicle, ok := controller.findVehicle(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle not found: %s", identifier), http.StatusNotFound)
 		return
@@ -77,21 +68,12 @@ func (controller *VehicleController) Delete(response http.ResponseWriter, identi
 	logger.Log.Debugf("Delete vehicle %s", identifier)
 
 	jsonBytes, _ := vehicle.MarshalJSON()
-	tx.Model().Vehicles().Delete(&vehicle)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Vehicles().Delete(&vehicle)
 	response.Write(jsonBytes)
 }
 
 func (controller *VehicleController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	vehicle, ok := controller.findVehicle(tx, identifier)
+	vehicle, ok := controller.findVehicle(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle not found: %s", identifier), http.StatusNotFound)
 		return
@@ -106,31 +88,22 @@ func (controller *VehicleController) Update(response http.ResponseWriter, identi
 	}
 
 	for _, obj := range vehicle.ObjectIDs() {
-		v, ok := tx.Model().Vehicles().FindByObjectId(obj)
+		v, ok := controller.referential.Model().Vehicles().FindByObjectId(obj)
 		if ok && v.Id() != vehicle.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have an objectid %v", v.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Vehicles().Save(&vehicle)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Vehicles().Save(&vehicle)
 	jsonBytes, _ := vehicle.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
 func (controller *VehicleController) Create(response http.ResponseWriter, body []byte) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Create vehicle: %s", string(body))
 
-	vehicle := tx.Model().Vehicles().New()
+	vehicle := controller.referential.Model().Vehicles().New()
 
 	err := json.Unmarshal(body, &vehicle)
 	if err != nil {
@@ -144,20 +117,14 @@ func (controller *VehicleController) Create(response http.ResponseWriter, body [
 	}
 
 	for _, obj := range vehicle.ObjectIDs() {
-		v, ok := tx.Model().Vehicles().FindByObjectId(obj)
+		v, ok := controller.referential.Model().Vehicles().FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have an objectid %v", v.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Vehicles().Save(&vehicle)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Vehicles().Save(&vehicle)
 	jsonBytes, _ := vehicle.MarshalJSON()
 	response.Write(jsonBytes)
 }

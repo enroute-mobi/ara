@@ -56,9 +56,6 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
@@ -126,16 +123,13 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	sas := tx.Model().StopAreas().FindByLineId(lineId)
+	sas := connector.partner.Model().StopAreas().FindByLineId(lineId)
 	for i := range sas {
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
 		salc.InitState(&sas[i], sub)
 		res.SetLastState(string(sas[i].Id()), salc)
-		svs := tx.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
+		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
 		for i := range svs {
 			connector.addStopVisit(sub.Id(), svs[i].Id())
 		}
@@ -211,23 +205,20 @@ func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscr
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	switch event.ModelType {
 	case "StopVisit":
-		connector.checkEvent(model.StopVisitId(event.ModelId), tx)
+		connector.checkEvent(model.StopVisitId(event.ModelId))
 	case "StopArea":
-		sa, ok := tx.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
+		sa, ok := connector.partner.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			connector.checkStopAreaEvent(&sa, tx)
+			connector.checkStopAreaEvent(&sa)
 		}
 	default:
 		return
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId, tx *model.Transaction) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId) {
 	sv, ok := connector.Partner().Model().StopVisits().Find(svId)
 	if !ok {
 		return
@@ -277,7 +268,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(sub
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea, tx *model.Transaction) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
 	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		return

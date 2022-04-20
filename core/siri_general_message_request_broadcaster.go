@@ -7,7 +7,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -31,9 +30,6 @@ func NewSIRIGeneralMessageRequestBroadcaster(partner *Partner) *SIRIGeneralMessa
 }
 
 func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGetGeneralMessage, message *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -46,7 +42,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 	}
 
-	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(tx, logStashEvent, &request.XMLGeneralMessageRequest)
+	response.SIRIGeneralMessageDelivery = connector.getGeneralMessageDelivery(logStashEvent, &request.XMLGeneralMessageRequest)
 
 	if !response.SIRIGeneralMessageDelivery.Status {
 		message.Status = "Error"
@@ -61,7 +57,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	return response, nil
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(tx *model.Transaction, logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
+func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(logStashEvent audit.LogStashEvent, request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
 	delivery := siri.SIRIGeneralMessageDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
 		Status:            true,
@@ -71,12 +67,12 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 	// Prepare Id Array
 	var messageArray []string
 
-	builder := NewBroadcastGeneralMessageBuilder(tx, connector.Partner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
+	builder := NewBroadcastGeneralMessageBuilder(connector.Partner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
 	builder.InfoChannelRef = request.InfoChannelRef()
 	builder.SetLineRef(request.LineRef())
 	builder.SetStopPointRef(request.StopPointRef())
 
-	situations := tx.Model().Situations().FindAll()
+	situations := connector.partner.Model().Situations().FindAll()
 	for i := range situations {
 		siriGeneralMessage := builder.BuildGeneralMessage(situations[i])
 		if siriGeneralMessage == nil {

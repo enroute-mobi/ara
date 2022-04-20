@@ -67,10 +67,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) Start() {
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	stopArea, ok := tx.Model().StopAreas().Find(request.StopAreaId())
+	stopArea, ok := connector.partner.Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoring SubscriptionCollector for unknown StopArea %v", request.StopAreaId())
 		return

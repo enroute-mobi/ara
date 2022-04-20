@@ -382,7 +382,6 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopV
 
 func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) (stopVisits []StopVisit) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	var ids []ModelId
 	for _, id := range stopAreaIds {
