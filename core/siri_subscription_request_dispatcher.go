@@ -150,7 +150,7 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	if !ok {
 		logger.Log.Debugf("Could not Unsubscribe to unknow subscription %v", r.SubscriptionRef())
 
-		responseStatus.ErrorType = "InvalidDataReferencesError"
+		responseStatus.ErrorType = "UnknownSubscriptionError"
 		responseStatus.ErrorText = fmt.Sprintf("Subscription not found: '%s'", r.SubscriptionRef())
 
 		message.Status = "Error"
