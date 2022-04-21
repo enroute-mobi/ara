@@ -78,7 +78,9 @@ Then(/^Subscriptions exist with the following attributes:$/) do |attributes|
   response = RestClient.get path, { content_type: :json, accept: :json, :Authorization => "Token token=#{$token}" }
   response_array = JSON.parse(response.body)
 
-  subscriptions = response_array.first['Resources'].map { |r| r['Reference']['ObjectId'] }
+  subscriptions = response_array.map { |s| s['Resources'] }
+                    .flatten
+                    .map { |r| r['Reference']['ObjectId'] }
 
   attributes.to_hash.map { |v| { v[0] => v[1] } }.each do |expected_subscription|
     expect(subscriptions).to include(expected_subscription)

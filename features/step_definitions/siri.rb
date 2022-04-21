@@ -35,9 +35,13 @@ def save_siri_messages(messages = {})
   end
 end
 
-Given(/^a SIRI server (?:"([^"]*)" )?on "([^"]*)"$/) do |name, url|
+Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?on "([^"]*)"$/) do |envelope, name, url|
   name ||= "default"
-  SIRIServer.create(name, url).start
+  if envelope == ""
+    SIRIServer.create(name, url).start
+  else
+    SIRIServer.create(name, url, 'raw').start
+  end
 end
 
 Given(/^an OAuth server (?:"([^"]*)" )?waits request on "([^"]*)" and accepts client "([^"]*)" with$/) do |name, url, client_id, config|

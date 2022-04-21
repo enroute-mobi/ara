@@ -38,3 +38,158 @@ Feature: Support SIRI subscription
       </S:Envelope>
       """
     Then no Subscription exists
+
+  @ARA-1066
+  Scenario: Remove all subscriptions at once with termination request using raw envelope
+    Given a raw SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | ara                   |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+      | siri.envelope        | raw                   |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | AnotherExternalId                     |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
+    When I send this SIRI request
+        """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <TerminateSubscriptionRequest>
+      <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <MessageIdentifier />
+      <All />
+   </TerminateSubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+  <TerminateSubscriptionResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ResponderRef>ara</ResponderRef>
+    <TerminationResponseStatus>
+      <SubscriptionRef>externalId</SubscriptionRef>
+      <Status>true</Status>
+    </TerminationResponseStatus>
+    <TerminationResponseStatus>
+      <SubscriptionRef>AnotherExternalId</SubscriptionRef>
+      <Status>true</Status>
+    </TerminationResponseStatus>
+  </TerminateSubscriptionResponse>
+</Siri>
+      """
+    Then no Subscription exists
+
+  @ARA-1066
+  Scenario: Remove one subscription with termination request using raw envelope
+    Given a raw SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | ara                   |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+      | siri.envelope        | raw                   |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+     And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | AnotherExternalId                     |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
+   When I send this SIRI request
+        """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <TerminateSubscriptionRequest>
+      <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <SubscriptionRef>externalId</SubscriptionRef>
+   </TerminateSubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+     """
+<?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+  <TerminateSubscriptionResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ResponderRef>ara</ResponderRef>
+    <TerminationResponseStatus>
+      <SubscriptionRef>externalId</SubscriptionRef>
+      <Status>true</Status>
+    </TerminationResponseStatus>
+  </TerminateSubscriptionResponse>
+</Siri>
+     """
+    Then No Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:3:LOC |
+    Then Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:A:BUS |
+
+  @ARA-1066
+  Scenario: Handle TerminateSubscriptionRequest on an unnown subscription using raw envelope
+    Given a raw SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | ara                   |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+      | siri.envelope        | raw                   |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast            |
+      | ExternalId        | externalId                             |
+      | SubscriberRef     | subscriber                             |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC"  |
+      | ReferenceArray[1] | Line, "internal": "NINOXE:Line:C:Tram" |
+     And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | AnotherExternalId                     |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
+   When I send this SIRI request
+        """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <TerminateSubscriptionRequest>
+      <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <SubscriptionRef>UnknownExternalId</SubscriptionRef>
+   </TerminateSubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+     """
+<?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+  <TerminateSubscriptionResponse>
+    <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+    <ResponderRef>ara</ResponderRef>
+    <TerminationResponseStatus>
+      <SubscriptionRef>UnknownExternalId</SubscriptionRef>
+      <Status>false</Status>
+      <ErrorCondition>
+        <InvalidDataReferencesError>
+          <ErrorText>Subscription not found: 'UnknownExternalId'</ErrorText>
+        </InvalidDataReferencesError>
+      </ErrorCondition>
+    </TerminationResponseStatus>
+  </TerminateSubscriptionResponse>
+</Siri>
+     """
+    Then Subscriptions exist with the following attributes:
+      | internal | NINOXE:Line:A:BUS  |
+      | internal | NINOXE:Line:3:LOC  |
+      | internal | NINOXE:Line:C:Tram |

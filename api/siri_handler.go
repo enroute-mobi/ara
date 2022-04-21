@@ -48,7 +48,7 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  siri.NewXMLGetStopMonitoring(envelope.Body()),
 			referential: handler.referential,
 		}
-	case "DeleteSubscription":
+	case "DeleteSubscription", "TerminateSubscription":
 		return &SIRIDeleteSubscriptionRequestHandler{
 			xmlRequest:  siri.NewXMLDeleteSubscriptionRequest(envelope.Body()),
 			referential: handler.referential,
