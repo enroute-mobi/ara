@@ -1,0 +1,14 @@
+   <TerminateSubscriptionResponse>
+      <ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>
+      <ResponderRef>{{ .ResponderRef }}</ResponderRef>{{ range .ResponseStatus }}
+		<TerminationResponseStatus>
+                        <SubscriptionRef>{{ .SubscriptionRef }}</SubscriptionRef>
+			<Status>{{ .Status }}</Status>{{ if not .Status }}
+			<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<OtherError number="{{.ErrorNumber}}">{{ else }}
+				<{{.ErrorType}}>{{ end }}
+					<ErrorText>{{.ErrorText}}</ErrorText>
+				</{{.ErrorType}}>
+			</ErrorCondition>{{ end }}
+		</TerminationResponseStatus>{{ end }}
+   </TerminateSubscriptionResponse>
