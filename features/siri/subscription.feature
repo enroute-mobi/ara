@@ -20,16 +20,16 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <ServiceRequestInfo
+            <DeleteSubscriptionInfo
              xmlns:ns2="http://www.ifopt.org.uk/acsb"
              xmlns:ns3="http://www.ifopt.org.uk/ifopt"
              xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
              xmlns:ns6="http://wsdl.siri.org.uk/siri">
-              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+              <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
-              <ns2:MessageIdentifier>TermSubReq:Test:0</ns2:MessageIdentifier>
-            </ServiceRequestInfo>
-            <Request version="2.0:FR-IDF-2.4">
+              <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
+            </DeleteSubscriptionInfo>
+            <Request>
               <ns5:SubscriptionRef>ExternalId</ns5:SubscriptionRef>
             </Request>
             <RequestExtension/>
@@ -57,16 +57,16 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <ServiceRequestInfo
+            <DeleteSubscriptionInfo
              xmlns:ns2="http://www.ifopt.org.uk/acsb"
              xmlns:ns3="http://www.ifopt.org.uk/ifopt"
              xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
              xmlns:ns6="http://wsdl.siri.org.uk/siri">
-              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+              <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
-              <ns2:MessageIdentifier>TermSubReq:Test:0</ns2:MessageIdentifier>
-            </ServiceRequestInfo>
-            <Request version="2.0:FR-IDF-2.4">
+              <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
+            </DeleteSubscriptionInfo>
+            <Request>
               <ns5:SubscriptionRef>UnknownExternalId</ns5:SubscriptionRef>
             </Request>
             <RequestExtension/>
