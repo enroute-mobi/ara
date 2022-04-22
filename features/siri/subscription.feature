@@ -128,6 +128,11 @@ Feature: Support SIRI subscription
       | ExternalId        | AnotherExternalId                     |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast            |
+      | ExternalId        | SpecialExternalId                      |
+      | SubscriberRef     | subscriber                             |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:C:Tram" |
     When I send this SIRI request
         """
 <?xml version='1.0' encoding='utf-8'?>
@@ -148,11 +153,15 @@ Feature: Support SIRI subscription
     <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
     <ResponderRef>ara</ResponderRef>
     <TerminationResponseStatus>
+      <SubscriptionRef>AnotherExternalId</SubscriptionRef>
+      <Status>true</Status>
+    </TerminationResponseStatus>
+    <TerminationResponseStatus>
       <SubscriptionRef>externalId</SubscriptionRef>
       <Status>true</Status>
     </TerminationResponseStatus>
     <TerminationResponseStatus>
-      <SubscriptionRef>AnotherExternalId</SubscriptionRef>
+      <SubscriptionRef>SpecialExternalId</SubscriptionRef>
       <Status>true</Status>
     </TerminationResponseStatus>
   </TerminateSubscriptionResponse>

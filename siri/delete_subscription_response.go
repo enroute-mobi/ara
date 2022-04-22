@@ -3,6 +3,8 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -109,6 +111,12 @@ func (notify *SIRIDeleteSubscriptionResponse) BuildXML(envelopeType ...string) (
 	}
 
 	templateName = fmt.Sprintf("delete_subscription_response%s.template", envType)
+
+	// order SubscriptionRef lexicographically
+	sort.Slice(notify.ResponseStatus, func(i, j int) bool {
+		return strings.ToLower(notify.ResponseStatus[i].SubscriptionRef) <
+			strings.ToLower(notify.ResponseStatus[j].SubscriptionRef)
+	})
 
 	if err := templates.ExecuteTemplate(&buffer, templateName, notify); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
