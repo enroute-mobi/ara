@@ -1,0 +1,16 @@
+	<ServiceDelivery>
+		<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+		<ProducerRef>{{.ProducerRef}}</ProducerRef>
+		<ProductionTimetableDelivery>
+			<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+			<SubscriptionRef>{{.SubscriptionIdentifier}}</SubscriptionRef>
+			<Status>{{ .Status }}</Status>{{ if not .Status }}
+			<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<OtherError number="{{.ErrorNumber}}">{{ else }}
+				<{{.ErrorType}}>{{ end }}
+					<ErrorText>{{.ErrorText}}</ErrorText>
+				</{{.ErrorType}}>
+			</ErrorCondition>{{ else }}{{ range .DatedTimetableVersionFrames }}
+			{{ .BuildDatedTimetableVersionFrameXMLRaw }}{{ end }}{{ end }}
+		</ProductionTimetableDelivery>
+	</ServiceDelivery>

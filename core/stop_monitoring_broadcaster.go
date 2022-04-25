@@ -6,6 +6,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -189,7 +190,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			// Get the Resource lastState for the StopVisit
 			lastStateInterface, _ := resource.LastState(string(stopVisitId))
-			lastState, ok := lastStateInterface.(*stopMonitoringLastChange)
+			lastState, ok := lastStateInterface.(*ls.StopMonitoringLastChange)
 			if !ok {
 				continue
 			}

@@ -1,0 +1,30 @@
+<DatedTimetableVersionFrame>
+				<RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</RecordedAtTime>
+				<LineRef>{{ .LineRef }}</LineRef>{{ if .Attributes.DirectionRef }}
+				<DirectionRef>{{ .Attributes.DirectionRef }}</DirectionRef>{{ else }}
+				<DirectionRef/>{{ end }}
+				<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
+				<DatedVehicleJourney>
+					<FramedVehicleJourneyRef>
+							<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
+							<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
+					</FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
+					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}
+					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ if .References.OperatorRef }}
+					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ else }}
+					<OperatorRef/>{{ end }}{{ if .Attributes.ProductCategoryRef }}
+					<ProductCategoryRef>{{ .Attributes.ProductCategoryRef }}</ProductCategoryRef>{{ end }}{{ if .Attributes.OriginDisplay }}
+					<OriginDisplay>{{ .Attributes.OriginDisplay }}</OriginDisplay>{{ end }}{{ if .Attributes.DestinationDisplay }}
+					<DestinationDisplay>{{ .Attributes.DestinationDisplay }}</DestinationDisplay>{{ end }}
+					<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
+					<DatedCalls>{{ range .DatedCalls }}
+						<DatedCall>
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .VisitNumber }}
+							<VisitNumber>{{ .VisitNumber }}</VisitNumber>{{ end }}{{ if .StopPointName }}
+							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .AimedDepartureTime.IsZero }}
+							<AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedDepartureTime>{{ end }}
+						</DatedCall>{{ end }}
+					</DatedCalls>{{ end }}
+				</DatedVehicleJourney>{{ end }}
+			</DatedTimetableVersionFrame>

@@ -165,7 +165,7 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	ref.Model().StopVisits().Save(stopVisit)
 
 	controller := &StopVisitController{
-		referential: ref,
+		svs: ref.Model().StopVisits(),
 	}
 
 	_, ok := controller.findStopVisit("kind:stif:value")

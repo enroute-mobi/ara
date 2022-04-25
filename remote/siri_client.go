@@ -315,3 +315,14 @@ func (client *SIRIClient) NotifyEstimatedTimeTable(request *siri.SIRINotifyEstim
 	}
 	return nil
 }
+
+func (client *SIRIClient) NotifyProductionTimeTable(request *siri.SIRINotifyProductionTimeTable) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

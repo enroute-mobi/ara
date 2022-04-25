@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+      <RequestorRef>ski-ddip-in-pt_test</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:50:00Z</InitialTerminationTime>
+         <ProductionTimetableRequest>
+            <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>

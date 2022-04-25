@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -255,12 +256,9 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
-				ettlc := &estimatedTimeTableLastChange{}
-				ettlc.InitState(stopVisit, sub)
-				resource.SetLastState(string(stopVisit.Id()), ettlc)
+				resource.SetLastState(string(stopVisit.Id()), ls.NewEstimatedTimeTableLastChange(stopVisit, sub))
 			} else {
-				lastState := lastStateInterface.(*estimatedTimeTableLastChange)
-				lastState.UpdateState(stopVisit)
+				lastStateInterface.(*ls.EstimatedTimeTableLastChange).UpdateState(stopVisit)
 			}
 		}
 		ett.sendDelivery(delivery)

@@ -86,6 +86,20 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 		return &response, nil
 	}
 
+	if len(request.XMLSubscriptionPTTEntries()) > 0 {
+		ptbc, ok := connector.Partner().Connector(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("no ProductionTableSubscriptionBroadcaster Connector")
+		}
+
+		response.ResponseStatus = ptbc.(*SIRIProductionTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+
+		logSIRISubscriptionResponse(logStashEvent, &response, "ProductionTimeTableSubscriptionBroadcaster")
+		logStashEvent["siriType"] = "ProductionTimetableSubscriptionRequest"
+		audit.CurrentLogStash().WriteEvent(logStashEvent)
+		return &response, nil
+	}
+
 	return nil, fmt.Errorf("subscription not supported")
 }
 

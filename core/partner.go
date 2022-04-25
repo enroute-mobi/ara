@@ -41,6 +41,7 @@ type Partners interface {
 	FindBySlug(PartnerSlug) (*Partner, bool)
 	FindByCredential(string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
+	FindAllWithConnector([]string) []*Partner
 	FindAll() []*Partner
 	Save(partner *Partner) bool
 	Delete(partner *Partner) bool
@@ -321,13 +322,35 @@ func (partner *Partner) hasSubscribers() bool {
 	if ok {
 		return true
 	}
+	_, ok = partner.connectors[SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
 	_, ok = partner.connectors[SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+
+	_, ok = partner.connectors[SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+
 	return ok
 }
 
 func (partner *Partner) Connector(connectorType string) (Connector, bool) {
 	connector, ok := partner.connectors[connectorType]
 	return connector, ok
+}
+
+func (partner *Partner) HaveAtLeastOneConnector(connectorTypes []string) bool {
+	for i := range connectorTypes {
+		if _, present := partner.connectors[connectorTypes[i]]; present {
+			return true
+		}
+	}
+	return false
 }
 
 func (partner *Partner) CreateSubscriptionRequestDispatcher() {
@@ -649,6 +672,17 @@ func (manager *PartnerManager) FindAllByCollectPriority() []*Partner {
 	partners := manager.FindAll()
 	sort.Sort(ByPriority(partners))
 	return partners
+}
+
+func (manager *PartnerManager) FindAllWithConnector(connectorTypes []string) (partners []*Partner) {
+	manager.mutex.RLock()
+	for _, partner := range manager.byId {
+		if partner.HaveAtLeastOneConnector(connectorTypes) {
+			partners = append(partners, partner)
+		}
+	}
+	manager.mutex.RUnlock()
+	return
 }
 
 func (manager *PartnerManager) Save(partner *Partner) bool {

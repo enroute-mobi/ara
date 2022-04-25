@@ -20,6 +20,7 @@ type Model interface {
 	Situations() Situations
 	StopAreas() StopAreas
 	StopVisits() StopVisits
+	ScheduledStopVisits() StopVisits
 	VehicleJourneys() VehicleJourneys
 	Operators() Operators
 	Vehicles() Vehicles
@@ -29,13 +30,14 @@ type MemoryModel struct {
 	date        Date
 	referential string
 
-	stopAreas       *MemoryStopAreas
-	stopVisits      *MemoryStopVisits
-	vehicleJourneys *MemoryVehicleJourneys
-	lines           *MemoryLines
-	vehicles        *MemoryVehicles
-	situations      *MemorySituations
-	operators       *MemoryOperators
+	stopAreas           *MemoryStopAreas
+	stopVisits          *MemoryStopVisits
+	scheduledStopVisits *MemoryStopVisits
+	vehicleJourneys     *MemoryVehicleJourneys
+	lines               *MemoryLines
+	vehicles            *MemoryVehicles
+	situations          *MemorySituations
+	operators           *MemoryOperators
 
 	SMEventsChan chan StopMonitoringBroadcastEvent
 	GMEventsChan chan GeneralMessageBroadcastEvent
@@ -69,6 +71,10 @@ func NewMemoryModel(referential ...string) *MemoryModel {
 	stopVisits.model = model
 	model.stopVisits = stopVisits
 	model.stopVisits.broadcastEvent = model.broadcastSMEvent
+
+	scheduledStopVisits := NewMemoryStopVisits()
+	scheduledStopVisits.model = model
+	model.scheduledStopVisits = scheduledStopVisits
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	vehicleJourneys.model = model
@@ -120,10 +126,7 @@ func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
 func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
 	model = NewMemoryModel()
 	model.date = NewDate(clock.DefaultClock().Now())
-	model.stopAreas.Load(referentialSlug)
-	model.lines.Load(referentialSlug)
-	model.operators.Load(referentialSlug)
-	model.vehicleJourneys.Load(referentialSlug)
+	model.Load(referentialSlug)
 	return model
 }
 
@@ -141,6 +144,10 @@ func (model *MemoryModel) StopAreas() StopAreas {
 
 func (model *MemoryModel) StopVisits() StopVisits {
 	return model.stopVisits
+}
+
+func (model *MemoryModel) ScheduledStopVisits() StopVisits {
+	return model.scheduledStopVisits
 }
 
 func (model *MemoryModel) VehicleJourneys() VehicleJourneys {
@@ -172,7 +179,7 @@ func (model *MemoryModel) Load(referentialSlug string) error {
 	if err != nil {
 		logger.Log.Debugf("Error while loading VehicleJourneys: %v", err)
 	}
-	err = model.stopVisits.Load(referentialSlug)
+	err = model.scheduledStopVisits.Load(referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopVisits: %v", err)
 	}
