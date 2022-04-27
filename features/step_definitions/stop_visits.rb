@@ -2,10 +2,18 @@ def stop_visits_path(attributes = {})
   url_for_model(attributes.merge(resource: 'stop_visit'))
 end
 
+def scheduled_stop_visit_path(attributes = {})
+  url_for_model(attributes.merge(resource: 'scheduled_stop_visit'))
+end
+
 def stop_visit_path(id, attributes = {})
   url_for_model(attributes.merge(resource: 'stop_visit', id: id))
 end
 
+Given(/^a ScheduledStopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
+  response = RestClient.post scheduled_stop_visit_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+  debug response.body
+end
 
 Given(/^a StopVisit exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_visit|
   response = RestClient.post stop_visits_path(referential: referential), model_attributes(stop_visit).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
