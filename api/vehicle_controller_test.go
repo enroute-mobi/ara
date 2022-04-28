@@ -152,23 +152,22 @@ func Test_VehicleController_Index(t *testing.T) {
 }
 
 func Test_VehicleController_FindVehicle(t *testing.T) {
-	memoryModel := model.NewMemoryModel()
-	tx := model.NewTransaction(memoryModel)
-	defer tx.Close()
-
-	vehicle := memoryModel.Vehicles().New()
+	ref := core.NewMemoryReferentials().New("test")
+	vehicle := ref.Model().Vehicles().New()
 	objectid := model.NewObjectID("kind", "value")
 	vehicle.SetObjectID(objectid)
-	memoryModel.Vehicles().Save(&vehicle)
+	ref.Model().Vehicles().Save(&vehicle)
 
-	controller := &VehicleController{}
+	controller := &VehicleController{
+		referential: ref,
+	}
 
-	_, ok := controller.findVehicle(tx, "kind:value")
+	_, ok := controller.findVehicle("kind:value")
 	if !ok {
 		t.Error("Can't find Vehicle by ObjectId")
 	}
 
-	_, ok = controller.findVehicle(tx, string(vehicle.Id()))
+	_, ok = controller.findVehicle(string(vehicle.Id()))
 	if !ok {
 		t.Error("Can't find Vehicle by Id")
 	}

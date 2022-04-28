@@ -36,10 +36,7 @@ func NewSIRIVehicleMonitoringRequestCollector(partner *Partner) *SIRIVehicleMoni
 }
 
 func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(request *VehicleUpdateRequest) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	line, ok := tx.Model().Lines().Find(request.LineId())
+	line, ok := connector.partner.Model().Lines().Find(request.LineId())
 	if !ok {
 		logger.Log.Debugf("VehicleUpdateRequest in VehicleMonitoringRequestCollector for unknown Line %v", request.LineId())
 		return

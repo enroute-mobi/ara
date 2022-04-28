@@ -15,10 +15,11 @@ type BroadcastStopMonitoringBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
+	partner *Partner
+
 	StopVisitTypes string
 	MonitoringRef  string
 
-	tx                            *model.Transaction
 	referenceGenerator            *idgen.IdentifierGenerator
 	stopAreareferenceGenerator    *idgen.IdentifierGenerator
 	dataFrameGenerator            *idgen.IdentifierGenerator
@@ -29,9 +30,9 @@ type BroadcastStopMonitoringBuilder struct {
 	rewriteJourneyPatternRef      bool
 }
 
-func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
+func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
-		tx:                            tx,
+		partner:                       partner,
 		referenceGenerator:            partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
 		stopAreareferenceGenerator:    partner.IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER),
 		dataFrameGenerator:            partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER),
@@ -44,12 +45,12 @@ func NewBroadcastStopMonitoringBuilder(tx *model.Transaction, partner *Partner, 
 }
 
 func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit *model.StopVisit) *siri.SIRICancelledStopVisit {
-	vehicleJourney, ok := builder.tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	vehicleJourney, ok := builder.partner.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 	if !ok {
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Vehiclejourney", stopVisit.Id())
 		return nil
 	}
-	line, ok := builder.tx.Model().Lines().Find(vehicleJourney.LineId)
+	line, ok := builder.partner.Model().Lines().Find(vehicleJourney.LineId)
 	if !ok {
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Line", stopVisit.Id())
 		return nil
@@ -90,12 +91,12 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	vehicleJourney, ok := builder.tx.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
+	vehicleJourney, ok := builder.partner.Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 	if !ok {
 		logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
 		return nil
 	}
-	line, ok := builder.tx.Model().Lines().Find(vehicleJourney.LineId)
+	line, ok := builder.partner.Model().Lines().Find(vehicleJourney.LineId)
 	if !ok {
 		logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
 		return nil
@@ -174,7 +175,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 }
 
 func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
-	stopPointRef, ok := builder.tx.Model().StopAreas().Find(stopAreaId)
+	stopPointRef, ok := builder.partner.Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return model.StopArea{}, "", false
 	}
@@ -230,7 +231,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 	if !ok {
 		return
 	}
-	operator, ok := builder.tx.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := builder.partner.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
 	if !ok {
 		return
 	}
@@ -263,7 +264,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *model.Reference) {
-	stopArea, ok := builder.tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if ok {
 		obj, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
 		if ok {
@@ -296,6 +297,6 @@ func (builder *BroadcastStopMonitoringBuilder) dataFrameRef(sv *model.StopVisit,
 	if sv.DataFrameRef != "" && builder.noDataFrameRefRewrite(origin) {
 		return sv.DataFrameRef
 	}
-	modelDate := builder.tx.Model().Date()
+	modelDate := builder.partner.Model().Date()
 	return builder.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }

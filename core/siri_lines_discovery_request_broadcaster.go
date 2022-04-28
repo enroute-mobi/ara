@@ -31,9 +31,6 @@ func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscove
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent()
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -46,7 +43,7 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 
 	var annotedLineArray []string
 
-	lines := tx.Model().Lines().FindAll()
+	lines := connector.partner.Model().Lines().FindAll()
 	for i := range lines {
 		if lines[i].Name == "" {
 			continue

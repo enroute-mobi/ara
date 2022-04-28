@@ -147,23 +147,23 @@ func Test_LineController_Index(t *testing.T) {
 }
 
 func Test_LineController_FindLine(t *testing.T) {
-	memoryModel := model.NewMemoryModel()
-	tx := model.NewTransaction(memoryModel)
-	defer tx.Close()
+	ref := core.NewMemoryReferentials().New("test")
 
-	line := memoryModel.Lines().New()
+	line := ref.Model().Lines().New()
 	objectid := model.NewObjectID("kind", "stif:value")
 	line.SetObjectID(objectid)
-	memoryModel.Lines().Save(&line)
+	ref.Model().Lines().Save(&line)
 
-	controller := &LineController{}
+	controller := &LineController{
+		referential: ref,
+	}
 
-	_, ok := controller.findLine(tx, "kind:stif:value")
+	_, ok := controller.findLine("kind:stif:value")
 	if !ok {
 		t.Error("Can't find Line by ObjectId")
 	}
 
-	_, ok = controller.findLine(tx, string(line.Id()))
+	_, ok = controller.findLine(string(line.Id()))
 	if !ok {
 		t.Error("Can't find Line by Id")
 	}

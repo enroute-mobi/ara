@@ -167,10 +167,6 @@ func (model *MemoryModel) Vehicles() Vehicles {
 	return model.vehicles
 }
 
-func (model *MemoryModel) NewTransaction() *Transaction {
-	return NewTransaction(model)
-}
-
 // TEMP: See what to do with errors
 func (model *MemoryModel) Load(referentialSlug string) error {
 	err := model.stopAreas.Load(referentialSlug)

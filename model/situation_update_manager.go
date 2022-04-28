@@ -5,47 +5,27 @@ import "bitbucket.org/enroute-mobi/ara/clock"
 type SituationUpdateManager struct {
 	clock.ClockConsumer
 
-	transactionProvider TransactionProvider
+	model Model
 }
 
-type SituationUpdater struct {
-	clock.ClockConsumer
-
-	tx     *Transaction
-	events []*SituationUpdateEvent
+func NewSituationUpdateManager(model Model) func([]*SituationUpdateEvent) {
+	manager := newSituationUpdateManager(model)
+	return manager.Update
 }
 
-func NewSituationUpdateManager(transactionProvider TransactionProvider) func([]*SituationUpdateEvent) {
-	manager := newSituationUpdateManager(transactionProvider)
-	return manager.UpdateSituation
+func newSituationUpdateManager(model Model) *SituationUpdateManager {
+	return &SituationUpdateManager{model: model}
 }
 
-func newSituationUpdateManager(transactionProvider TransactionProvider) *SituationUpdateManager {
-	return &SituationUpdateManager{transactionProvider: transactionProvider}
-}
-
-func (manager *SituationUpdateManager) UpdateSituation(events []*SituationUpdateEvent) {
-	tx := manager.transactionProvider.NewTransaction()
-	defer tx.Close()
-
-	NewSituationUpdater(tx, events).Update()
-
-	tx.Commit()
-}
-
-func NewSituationUpdater(tx *Transaction, events []*SituationUpdateEvent) *SituationUpdater {
-	return &SituationUpdater{tx: tx, events: events}
-}
-
-func (updater *SituationUpdater) Update() {
-	for _, event := range updater.events {
-		situation, ok := updater.tx.Model().Situations().FindByObjectId(event.SituationObjectID)
+func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
+	for _, event := range events {
+		situation, ok := manager.model.Situations().FindByObjectId(event.SituationObjectID)
 		if ok && situation.RecordedAt == event.RecordedAt {
-			return
+			continue
 		}
 
 		if !ok {
-			situation = updater.tx.Model().Situations().New()
+			situation = manager.model.Situations().New()
 			situation.Origin = event.Origin
 			situation.SetObjectID(event.SituationObjectID)
 			situation.SetObjectID(NewObjectID("_default", event.SituationObjectID.HashValue()))

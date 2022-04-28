@@ -24,32 +24,26 @@ func NewOperatorController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *OperatorController) findOperator(tx *model.Transaction, identifier string) (model.Operator, bool) {
+func (controller *OperatorController) findOperator(identifier string) (model.Operator, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return tx.Model().Operators().FindByObjectId(objectid)
+		return controller.referential.Model().Operators().FindByObjectId(objectid)
 	}
-	return tx.Model().Operators().Find(model.OperatorId(identifier))
+	return controller.referential.Model().Operators().Find(model.OperatorId(identifier))
 }
 
 func (controller *OperatorController) Index(response http.ResponseWriter, filters url.Values) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Operators Index")
 
-	jsonBytes, _ := json.Marshal(tx.Model().Operators().FindAll())
+	jsonBytes, _ := json.Marshal(controller.referential.Model().Operators().FindAll())
 	response.Write(jsonBytes)
 }
 
 func (controller *OperatorController) Show(response http.ResponseWriter, identifier string) {
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	operator, ok := controller.findOperator(tx, identifier)
+	operator, ok := controller.findOperator(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
@@ -61,11 +55,7 @@ func (controller *OperatorController) Show(response http.ResponseWriter, identif
 }
 
 func (controller *OperatorController) Delete(response http.ResponseWriter, identifier string) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	operator, ok := controller.findOperator(tx, identifier)
+	operator, ok := controller.findOperator(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
@@ -73,22 +63,12 @@ func (controller *OperatorController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete operator %s", identifier)
 
 	jsonBytes, _ := operator.MarshalJSON()
-	tx.Model().Operators().Delete(&operator)
-	err := tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Operators().Delete(&operator)
 	response.Write(jsonBytes)
 }
 
 func (controller *OperatorController) Update(response http.ResponseWriter, identifier string, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
-	operator, ok := controller.findOperator(tx, identifier)
+	operator, ok := controller.findOperator(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)
 		return
@@ -103,32 +83,22 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 	}
 
 	for _, obj := range operator.ObjectIDs() {
-		o, ok := tx.Model().Operators().FindByObjectId(obj)
+		o, ok := controller.referential.Model().Operators().FindByObjectId(obj)
 		if ok && o.Id() != operator.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Operators().Save(&operator)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Operators().Save(&operator)
 	jsonBytes, _ := json.Marshal(&operator)
 	response.Write(jsonBytes)
 }
 
 func (controller *OperatorController) Create(response http.ResponseWriter, body []byte) {
-	// New transaction
-	tx := controller.referential.NewTransaction()
-	defer tx.Close()
-
 	logger.Log.Debugf("Create operator: %s", string(body))
 
-	operator := tx.Model().Operators().New()
+	operator := controller.referential.Model().Operators().New()
 
 	err := json.Unmarshal(body, &operator)
 	if err != nil {
@@ -142,20 +112,14 @@ func (controller *OperatorController) Create(response http.ResponseWriter, body 
 	}
 
 	for _, obj := range operator.ObjectIDs() {
-		o, ok := tx.Model().Operators().FindByObjectId(obj)
+		o, ok := controller.referential.Model().Operators().FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	tx.Model().Operators().Save(&operator)
-	err = tx.Commit()
-	if err != nil {
-		logger.Log.Debugf("Transaction error: %v", err)
-		http.Error(response, "Internal error", http.StatusInternalServerError)
-		return
-	}
+	controller.referential.Model().Operators().Save(&operator)
 	jsonBytes, _ := json.Marshal(&operator)
 	response.Write(jsonBytes)
 }

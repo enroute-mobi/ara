@@ -58,10 +58,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	stopArea, ok := tx.Model().StopAreas().Find(request.StopAreaId())
+	stopArea, ok := connector.partner.Model().StopAreas().Find(request.StopAreaId())
 	if !ok {
 		logger.Log.Debugf("StopAreaUpdateRequest in StopMonitoringRequestCollector for unknown StopArea %v", request.StopAreaId())
 		return
@@ -133,12 +130,12 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	monitoredStopVisits := []model.ObjectID{}
 
 	for stopPointRef, events := range updateEvents.StopVisits {
-		sa, ok := tx.Model().StopAreas().FindByObjectId(model.NewObjectID(objectidKind, stopPointRef))
+		sa, ok := connector.partner.Model().StopAreas().FindByObjectId(model.NewObjectID(objectidKind, stopPointRef))
 		if !ok {
 			continue
 		}
 
-		svs := tx.Model().StopVisits().FindMonitoredByOriginByStopAreaId(sa.Id(), string(connector.Partner().Slug()))
+		svs := connector.partner.Model().StopVisits().FindMonitoredByOriginByStopAreaId(sa.Id(), string(connector.Partner().Slug()))
 		for i := range svs {
 			objectid, ok := svs[i].ObjectID(objectidKind)
 			if ok {

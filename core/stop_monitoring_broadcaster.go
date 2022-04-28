@@ -138,9 +138,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 	smb.connector.mutex.Unlock()
 
-	tx := smb.connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	for key, stopVisits := range events {
 		sub, ok := smb.connector.Partner().Subscriptions().Find(key)
 		if !ok {
@@ -148,7 +145,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		}
 
 		// Initialize builder
-		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(tx, smb.connector.Partner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+		stopMonitoringBuilder := NewBroadcastStopMonitoringBuilder(smb.connector.Partner(), SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		stopMonitoringBuilder.StopVisitTypes = sub.SubscriptionOption("StopVisitTypes")
 
 		// maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
@@ -170,13 +167,13 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 
 			// Find the StopVisit
-			stopVisit, ok := tx.Model().StopVisits().Find(stopVisitId)
+			stopVisit, ok := smb.connector.Partner().Model().StopVisits().Find(stopVisitId)
 			if !ok {
 				continue
 			}
 
 			// Find the Resource
-			monitoringRef, resource, ok := smb.findResource(stopVisit.StopAreaId, sub, tx)
+			monitoringRef, resource, ok := smb.findResource(stopVisit.StopAreaId, sub)
 			if !ok {
 				continue
 			}
@@ -236,8 +233,8 @@ func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStop
 	return
 }
 
-func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription, tx *model.Transaction) (string, *SubscribedResource, bool) {
-	for _, objectid := range tx.Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.remoteObjectidKind) {
+func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription) (string, *SubscribedResource, bool) {
+	for _, objectid := range smb.connector.Partner().Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.remoteObjectidKind) {
 		resource := sub.Resource(objectid)
 		if resource != nil {
 			return objectid.Value(), resource, true

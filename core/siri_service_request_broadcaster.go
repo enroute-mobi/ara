@@ -6,7 +6,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 )
 
@@ -29,9 +28,6 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 }
 
 func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
 	logStashEvent := connector.newLogStashEvent("")
 	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
@@ -47,13 +43,13 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 
 	var stopIds, lineIds []string
 	if smRequests := request.StopMonitoringRequests(); len(smRequests) != 0 {
-		stopIds = connector.handleStopMonitoringRequests(tx, smRequests, response)
+		stopIds = connector.handleStopMonitoringRequests(smRequests, response)
 	}
 	if gmRequests := request.GeneralMessageRequests(); len(gmRequests) != 0 {
-		connector.handleGeneralMessageRequests(tx, gmRequests, response)
+		connector.handleGeneralMessageRequests(gmRequests, response)
 	}
 	if ettRequests := request.EstimatedTimetableRequests(); len(ettRequests) != 0 {
-		lineIds = connector.handleEstimatedTimetableRequests(tx, ettRequests, response)
+		lineIds = connector.handleEstimatedTimetableRequests(ettRequests, response)
 	}
 
 	message.RequestIdentifier = request.MessageIdentifier()
@@ -69,7 +65,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	return response
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx *model.Transaction, requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
+func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
 	for _, stopMonitoringRequest := range requests {
 		SMLogStashEvent := connector.newLogStashEvent("StopMonitoringRequestBroadcaster")
 		logXMLStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
@@ -87,7 +83,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx 
 				ErrorText:         "Can't find a StopMonitoringRequestBroadcaster connector",
 			}
 		} else {
-			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(tx, SMLogStashEvent, stopMonitoringRequest)
+			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(SMLogStashEvent, stopMonitoringRequest)
 		}
 
 		if !delivery.Status {
@@ -104,7 +100,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(tx 
 	return
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx *model.Transaction, requests []*siri.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
+func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(requests []*siri.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
 	for _, generalMessageRequest := range requests {
 		GMLogStashEvent := connector.newLogStashEvent("GeneralMessageRequestBroadcaster")
 		logXMLGeneralMessageRequest(GMLogStashEvent, generalMessageRequest)
@@ -122,7 +118,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx 
 				ErrorText:         "Can't find a GeneralMessageRequestBroadcaster connector",
 			}
 		} else {
-			delivery = generalMessageConnector.(*SIRIGeneralMessageRequestBroadcaster).getGeneralMessageDelivery(tx, GMLogStashEvent, generalMessageRequest)
+			delivery = generalMessageConnector.(*SIRIGeneralMessageRequestBroadcaster).getGeneralMessageDelivery(GMLogStashEvent, generalMessageRequest)
 		}
 
 		if !delivery.Status {
@@ -136,7 +132,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(tx 
 	}
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(tx *model.Transaction, requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
+func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
 	for _, estimatedTimetableRequest := range requests {
 		ETTLogStashEvent := connector.newLogStashEvent("EstimatedTimetableRequestBroadcaster")
 		logXMLEstimatedTimetableRequest(ETTLogStashEvent, estimatedTimetableRequest)
@@ -154,7 +150,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 				ErrorText:         "Can't find a EstimatedTimetableBroadcaster connector",
 			}
 		} else {
-			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(tx, estimatedTimetableRequest, ETTLogStashEvent)
+			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(estimatedTimetableRequest, ETTLogStashEvent)
 		}
 
 		if !delivery.Status {

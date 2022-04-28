@@ -158,23 +158,22 @@ func Test_StopVisitController_Index(t *testing.T) {
 }
 
 func Test_StopVisitController_FindStopVisit(t *testing.T) {
-	memoryModel := model.NewMemoryModel()
-	tx := model.NewTransaction(memoryModel)
-	defer tx.Close()
-
-	stopVisit := memoryModel.StopVisits().New()
+	ref := core.NewMemoryReferentials().New("test")
+	stopVisit := ref.Model().StopVisits().New()
 	objectid := model.NewObjectID("kind", "stif:value")
 	stopVisit.SetObjectID(objectid)
-	memoryModel.StopVisits().Save(&stopVisit)
+	ref.Model().StopVisits().Save(&stopVisit)
 
-	controller := &StopVisitController{}
+	controller := &StopVisitController{
+		referential: ref,
+	}
 
-	_, ok := controller.findStopVisit(tx, "kind:stif:value")
+	_, ok := controller.findStopVisit("kind:stif:value")
 	if !ok {
 		t.Error("Can't find StopVisit by ObjectId")
 	}
 
-	_, ok = controller.findStopVisit(tx, string(stopVisit.Id()))
+	_, ok = controller.findStopVisit(string(stopVisit.Id()))
 	if !ok {
 		t.Error("Can't find StopVisit by Id")
 	}

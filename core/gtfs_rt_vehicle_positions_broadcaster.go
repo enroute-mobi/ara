@@ -53,10 +53,7 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, 
 }
 
 func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
-	tx := connector.Partner().Referential().NewTransaction()
-	defer tx.Close()
-
-	vehicles := tx.Model().Vehicles().FindAll()
+	vehicles := connector.partner.Model().Vehicles().FindAll()
 	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
 	trips := make(map[model.VehicleJourneyId]*gtfs.TripDescriptor)
 
@@ -70,7 +67,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		// If we don't already have a tripUpdate with the VehicleJourney we create one
 		if !ok {
 			// Fetch all needed models and objectids
-			vj, ok := tx.Model().VehicleJourneys().Find(vehicles[i].VehicleJourneyId)
+			vj, ok := connector.partner.Model().VehicleJourneys().Find(vehicles[i].VehicleJourneyId)
 			if !ok {
 				continue
 			}
@@ -82,7 +79,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			var routeId string
 			lineObjectid, ok := linesObjectId[vj.Id()]
 			if !ok {
-				l, ok := tx.Model().Lines().Find(vj.LineId)
+				l, ok := connector.partner.Model().Lines().Find(vj.LineId)
 				if !ok {
 					continue
 				}
@@ -103,7 +100,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 
 			// ARA-874
 			// // That part is really not optimized, we could cut it if we have performance problems as StartTime is optionnal
-			// stopVisits := tx.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
+			// stopVisits := connector.partner.Model().StopVisits().FindByVehicleJourneyId(vj.Id())
 			// if len(stopVisits) > 0 {
 			// 	sort.Slice(stopVisits, func(i, j int) bool {
 			// 		return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder

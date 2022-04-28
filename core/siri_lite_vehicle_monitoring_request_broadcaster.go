@@ -38,13 +38,8 @@ func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteV
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
-	tx := connector.Partner().Referential().NewTransaction()
-
 	logStashEvent := connector.newLogStashEvent()
-	defer func() {
-		tx.Close()
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
-	}()
+	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	lineRef := filters.Get("LineRef")
 
@@ -64,7 +59,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	siriLiteResponse.Siri.ServiceDelivery.VehicleMonitoringDelivery = response
 
 	objectid := model.NewObjectID(connector.remoteObjectidKind, lineRef)
-	line, ok := tx.Model().Lines().FindByObjectId(objectid)
+	line, ok := connector.partner.Model().Lines().FindByObjectId(objectid)
 	if !ok {
 		response.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
@@ -80,7 +75,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 	var vehicleIds []string
 
-	vs := tx.Model().Vehicles().FindByLineId(line.Id())
+	vs := connector.partner.Model().Vehicles().FindByLineId(line.Id())
 	for i := range vs {
 		vehicleId, ok := vs[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
 		if !ok {
@@ -109,10 +104,10 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
 
 		refs := vj.References.Copy()
-		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef(tx, "OriginRef", vj.Origin, refs)
-		activity.MonitoredVehicleJourney.DestinationRef = connector.handleRef(tx, "DestinationRef", vj.Origin, refs)
+		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef("OriginRef", vj.Origin, refs)
+		activity.MonitoredVehicleJourney.DestinationRef = connector.handleRef("DestinationRef", vj.Origin, refs)
 
-		modelDate := tx.Model().Date()
+		modelDate := connector.partner.Model().Date()
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
 			connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
@@ -151,12 +146,12 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourne
 	return dataVehicleJourneyRef, true
 }
 
-func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) handleRef(tx *model.Transaction, refType, origin string, references model.References) string {
+func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) handleRef(refType, origin string, references model.References) string {
 	reference, ok := references.Get(refType)
 	if !ok || reference.ObjectId == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
 		return ""
 	}
-	return connector.resolveStopAreaRef(tx, reference)
+	return connector.resolveStopAreaRef(reference)
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) noDestinationRefRewritingFrom(origin string) bool {
@@ -169,8 +164,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) noDestinationRefRe
 	return false
 }
 
-func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef(tx *model.Transaction, reference model.Reference) string {
-	stopArea, ok := tx.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef(reference model.Reference) string {
+	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if ok {
 		obj, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
 		if ok {
