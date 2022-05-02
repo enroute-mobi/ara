@@ -1,8 +1,6 @@
 package core
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -140,20 +138,13 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 		}
 		if len(notify.GeneralMessages) != 0 {
-			logStashEvent := gmb.newLogStashEvent()
 			message := gmb.newBQEvent()
 
-			logSIRIGeneralMessageNotify(logStashEvent, message, &notify)
-			audit.CurrentLogStash().WriteEvent(logStashEvent)
+			logSIRIGeneralMessageNotify(message, &notify)
 			t := gmb.Clock().Now()
 
-			err := gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
+			gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
 			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
-			if err != nil {
-				event := gmb.newLogStashEvent()
-				logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
-				audit.CurrentLogStash().WriteEvent(event)
-			}
 
 			audit.CurrentBigQuery(string(gmb.connector.Partner().Referential().Slug())).WriteEvent(message)
 		}
@@ -170,47 +161,19 @@ func (gmb *GMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func (gmb *GMBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := gmb.connector.partner.NewLogStashEvent()
-	event["connector"] = "GeneralMessageSubscriptionBroadcaster"
-	return event
-}
-
-func logSIRINotifyError(err, rmi string, logStashEvent audit.LogStashEvent) {
-	logStashEvent["siriType"] = "NotifyError"
-	logStashEvent["errorDescription"] = err
-	logStashEvent["status"] = "false"
-	logStashEvent["responseMessageIdentifier"] = rmi
-}
-
-func logSIRIGeneralMessageNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
+func logSIRIGeneralMessageNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
 	message.RequestIdentifier = response.RequestMessageRef
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
-	logStashEvent["siriType"] = "NotifyGeneralMessage"
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
 	if !response.Status {
 		message.Status = "Error"
-		logStashEvent["errorType"] = response.ErrorType
-		if response.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		}
-		logStashEvent["errorText"] = response.ErrorText
 		message.ErrorDetails = response.ErrorString()
 	}
 	xml, err := response.BuildXML()
 	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
 		return
 	}
-	logStashEvent["responseXML"] = xml
 	message.ResponseRawMessage = xml
 	message.ResponseSize = int64(len(xml))
 }

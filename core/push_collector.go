@@ -1,8 +1,6 @@
 package core
 
 import (
-	"strconv"
-
 	em "bitbucket.org/enroute-mobi/ara-external-models"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -66,10 +64,6 @@ func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel,
 	logger.Log.Debugf("PushCollector handled %v models in %v", total, processingTime)
 
 	pc.partner.Pushed()
-
-	logStashEvent := pc.newLogStashEvent()
-	pc.logPushNotification(logStashEvent, model)
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message.ProcessingTime = processingTime.Seconds()
 }
@@ -180,18 +174,4 @@ func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival 
 	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, protoDeparture.GetAimed().AsTime(), protoArrival.GetAimed().AsTime())
 	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, protoDeparture.GetActual().AsTime(), protoArrival.GetActual().AsTime())
 	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, protoDeparture.GetExpected().AsTime(), protoArrival.GetExpected().AsTime())
-}
-
-func (pc *PushCollector) newLogStashEvent() audit.LogStashEvent {
-	event := pc.partner.NewLogStashEvent()
-	event["connector"] = "PushCollector"
-	return event
-}
-
-func (pc *PushCollector) logPushNotification(logStashEvent audit.LogStashEvent, model *em.ExternalCompleteModel) {
-	logStashEvent["type"] = "PushNotification"
-	logStashEvent["stopAreas"] = strconv.Itoa(len(model.GetStopAreas()))
-	logStashEvent["lines"] = strconv.Itoa(len(model.GetLines()))
-	logStashEvent["vehicleJourneys"] = strconv.Itoa(len(model.GetVehicleJourneys()))
-	logStashEvent["StopVisits"] = strconv.Itoa(len(model.GetStopVisits()))
 }

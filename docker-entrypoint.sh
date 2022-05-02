@@ -46,10 +46,6 @@ if [ -n "$SENTRY_DSN" ]; then
     echo "sentry: ${SENTRY_DSN}" >> config/config.yml
 fi
 
-if [ -n "$ARA_LOGSTASH" ]; then
-    echo "logstash: ${ARA_LOGSTASH}" >> config/config.yml
-fi
-
 # echo "Current Ara config"
 # echo "---"
 # cat config/config.yml

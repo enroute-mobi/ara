@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -16,23 +15,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
-
-func Test_SIRIHandler_LogSIRIError(t *testing.T) {
-	logstash := audit.NewFakeLogStash()
-	audit.SetCurrentLogstash(logstash)
-	defer audit.SetCurrentLogstash(audit.NewNullLogStash())
-
-	SIRIError{
-		errCode:         "errCode",
-		errDescription:  "errDescription",
-		referentialSlug: "",
-		response:        httptest.NewRecorder(),
-	}.Send()
-
-	if len(logstash.Events()) != 1 {
-		t.Errorf("Logstash should have one event, got %d", len(logstash.Events()))
-	}
-}
 
 func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential) {
 	clock.SetDefaultClock(clock.NewFakeClock())

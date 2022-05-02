@@ -183,9 +183,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 	var monitoringRefs, subIds []string
 
 	for _, sm := range request.XMLSubscriptionSMEntries() {
-		logStashEvent := connector.newLogStashEvent()
-		logXMLStopMonitoringSubscriptionEntry(logStashEvent, sm)
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: sm.MessageIdentifier(),
 			SubscriberRef:     sm.SubscriberRef(),
@@ -201,9 +198,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
 			resps = append(resps, rs)
-
-			logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
-			audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 			message.Status = "Error"
 			continue
@@ -235,9 +229,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		rs.Status = true
 		rs.ValidUntil = sm.InitialTerminationTime()
 		resps = append(resps, rs)
-
-		logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent, &rs)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
@@ -307,39 +298,6 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscri
 		return "", true
 	}
 	return line.Id(), true
-}
-
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "StopMonitoringSubscriptionBroadcaster"
-	return event
-}
-
-func logXMLStopMonitoringSubscriptionEntry(logStashEvent audit.LogStashEvent, request *siri.XMLStopMonitoringSubscriptionRequestEntry) {
-	logStashEvent["siriType"] = "StopMonitoringSubscriptionEntry"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["monitoringRef"] = request.MonitoringRef()
-	logStashEvent["stopVisitTypes"] = request.StopVisitTypes()
-	logStashEvent["subscriberRef"] = request.SubscriberRef()
-	logStashEvent["subscriptionIdentifier"] = request.SubscriptionIdentifier()
-	logStashEvent["initialTerminationTime"] = request.InitialTerminationTime().String()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRIStopMonitoringSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, smEntry *siri.SIRIResponseStatus) {
-	logStashEvent["requestMessageRef"] = smEntry.RequestMessageRef
-	logStashEvent["subscriptionRef"] = smEntry.SubscriptionRef
-	logStashEvent["responseTimestamp"] = smEntry.ResponseTimestamp.String()
-	logStashEvent["validUntil"] = smEntry.ValidUntil.String()
-	logStashEvent["status"] = strconv.FormatBool(smEntry.Status)
-	if !smEntry.Status {
-		logStashEvent["errorType"] = smEntry.ErrorType
-		if smEntry.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(smEntry.ErrorNumber)
-		}
-		logStashEvent["errorText"] = smEntry.ErrorText
-	}
 }
 
 // START TEST

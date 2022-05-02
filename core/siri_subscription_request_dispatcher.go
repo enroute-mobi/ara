@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -44,10 +43,6 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error) {
-	logStashEvent := connector.newLogStashEvent()
-
-	logXMLSubscriptionRequest(logStashEvent, request)
-
 	response := siri.SIRISubscriptionResponse{
 		Address:            connector.Partner().Address(),
 		ResponderRef:       connector.Partner().RequestorRef(),
@@ -66,9 +61,6 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 
 		response.ResponseStatus = gmbc.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
-		logSIRISubscriptionResponse(logStashEvent, &response, "GeneralMessageSubscriptionBroadcaster")
-		logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 
@@ -80,9 +72,6 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 
 		response.ResponseStatus = smbc.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
-		logSIRISubscriptionResponse(logStashEvent, &response, "StopMonitoringSubscriptionBroadcaster")
-		logStashEvent["siriType"] = "StopMonitoringSubscriptionRequest"
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 
@@ -94,9 +83,6 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 
 		response.ResponseStatus = smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
-		logSIRISubscriptionResponse(logStashEvent, &response, "EstimatedTimeTableSubscriptionBroadcaster")
-		logStashEvent["siriType"] = "EstimatedTimetableSubscriptionRequest"
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 
@@ -104,11 +90,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest, message *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse {
-	logStashEvent := connector.newLogStashEvent()
-
 	message.RequestIdentifier = r.MessageIdentifier()
-
-	logXMLCancelSubscriptionRequest(logStashEvent, r)
 
 	currentTime := connector.Clock().Now()
 	resp := &siri.SIRIDeleteSubscriptionResponse{
@@ -116,11 +98,6 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 		RequestMessageRef: r.MessageIdentifier(),
 		ResponseTimestamp: currentTime,
 	}
-
-	defer func() {
-		logSIRICancelSubscriptionResponse(logStashEvent, resp)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
-	}()
 
 	if r.CancelAll() {
 		for _, subscription := range connector.Partner().Subscriptions().FindBroadcastSubscriptions() {
@@ -165,99 +142,10 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	return resp
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) HandleSubscriptionTerminatedNotification(response *siri.XMLSubscriptionTerminatedNotification) {
-	logStashEvent := make(audit.LogStashEvent)
-
-	logXMLSubscriptionTerminatedNotification(logStashEvent, response)
-
-	connector.partner.Subscriptions().DeleteById(SubscriptionId(response.SubscriptionRef()))
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
+func (connector *SIRISubscriptionRequestDispatcher) HandleSubscriptionTerminatedNotification(r *siri.XMLSubscriptionTerminatedNotification) {
+	connector.partner.Subscriptions().DeleteById(SubscriptionId(r.SubscriptionRef()))
 }
 
 func (connector *SIRISubscriptionRequestDispatcher) HandleNotifySubscriptionTerminated(r *siri.XMLNotifySubscriptionTerminated) {
-	logStashEvent := connector.newLogStashEvent()
-
-	logXMLNotifySubscriptionTerminated(logStashEvent, r)
-
 	connector.partner.Subscriptions().DeleteById(SubscriptionId(r.SubscriptionRef()))
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
-}
-
-func (connector *SIRISubscriptionRequestDispatcher) newLogStashEvent() audit.LogStashEvent {
-	return connector.partner.NewLogStashEvent()
-}
-
-func logXMLSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSubscriptionRequest) {
-	logStashEvent["consumerAddress"] = request.ConsumerAddress()
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRISubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRISubscriptionResponse, connector string) {
-	logStashEvent["connector"] = connector
-	logStashEvent["address"] = response.Address
-	logStashEvent["responderRef"] = response.ResponderRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["serviceStartedTime"] = response.ServiceStartedTime.String()
-	xml, err := response.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
-}
-
-func logXMLCancelSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.XMLDeleteSubscriptionRequest) {
-	logStashEvent["siriType"] = "DeleteSubscriptionResponse"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	if request.CancelAll() {
-		logStashEvent["subscriptionToCancel"] = "All"
-	} else {
-		logStashEvent["subscriptionToCancel"] = request.SubscriptionRef()
-	}
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRICancelSubscriptionResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIDeleteSubscriptionResponse) {
-	logStashEvent["responderRef"] = response.ResponderRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	xml, err := response.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
-}
-
-func logXMLNotifySubscriptionTerminated(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifySubscriptionTerminated) {
-	logStashEvent["siriType"] = "NotifySubscriptionTerminated"
-	logStashEvent["address"] = notify.Address()
-	logStashEvent["producerRef"] = notify.ProducerRef()
-	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
-	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
-	logStashEvent["subscriberRef"] = notify.SubscriberRef()
-	logStashEvent["subscriptionRef"] = notify.SubscriptionRef()
-	logStashEvent["responseXML"] = notify.RawXML()
-}
-
-func logXMLSubscriptionTerminatedNotification(logStashEvent audit.LogStashEvent, response *siri.XMLSubscriptionTerminatedNotification) {
-	logStashEvent["siriType"] = "TerminatedSubscriptionNotification"
-	logStashEvent["producerRef"] = response.ProducerRef()
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef()
-	logStashEvent["subscriptionRef"] = response.SubscriptionRef()
-	logStashEvent["responseXML"] = response.RawXML()
-
-	logStashEvent["errorType"] = response.ErrorType()
-	if response.ErrorType() == "OtherError" {
-		logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber())
-	}
-	logStashEvent["errorDescription"] = response.ErrorDescription()
 }

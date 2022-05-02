@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/cache"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
@@ -498,13 +497,6 @@ func (partner *Partner) CancelSubscriptions() {
 
 func (partner *Partner) CancelBroadcastSubscriptions() {
 	partner.subscriptionManager.CancelBroadcastSubscriptions()
-}
-
-func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
-	logStashEvent := make(audit.LogStashEvent)
-	logStashEvent["referential"] = string(partner.manager.Referential().Slug())
-	logStashEvent["partner"] = string(partner.slug)
-	return logStashEvent
 }
 
 func (partner *Partner) LastDiscovery() time.Time {

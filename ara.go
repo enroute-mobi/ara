@@ -13,7 +13,6 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"bitbucket.org/enroute-mobi/ara/api"
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -69,12 +68,6 @@ func main() {
 		}
 	}
 
-	// Configure logstash
-	if config.Config.LogStash != "" {
-		audit.SetCurrentLogstash(audit.NewTCPLogStash(config.Config.LogStash))
-		audit.CurrentLogStash().Start()
-		defer audit.CurrentLogStash().Stop()
-	}
 	// Configure Sentry
 	if config.Config.Sentry != "" {
 		err = sentry.Init(sentry.ClientOptions{
@@ -219,22 +212,6 @@ func checkStatus(url string, requestorRef string) error {
 	}
 
 	responseTime := time.Since(startTime)
-
-	// Logstash
-	logstashDatas := make(map[string]string)
-	xml, err := request.BuildXML()
-	if err != nil {
-		logstashDatas["requestXML"] = fmt.Sprintf("%v", err)
-		return err
-	}
-	logstashDatas["requestXML"] = xml
-	logstashDatas["responseXML"] = xmlResponse.RawXML()
-	logstashDatas["processingDuration"] = responseTime.String()
-
-	err = audit.CurrentLogStash().WriteEvent(logstashDatas)
-	if err != nil {
-		logger.Log.Panicf("Error while sending datas to Logstash: %v", err)
-	}
 
 	// Log
 	var logMessage []byte

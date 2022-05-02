@@ -54,9 +54,6 @@ const (
 	GENEREAL_MESSAGE_REQUEST_2_2    = "generalMessageRequest.version2.2"
 	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
 
-	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS = "logstash.log_deliveries_in_sm_collect_notifications"
-	LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS      = "logstash.log_deliveries_in_sm_collect_requests"
-
 	CACHE_TIMEOUT = "cache_timeout"
 
 	OAUTH_CLIENT_ID     = "remote_authentication.oauth.client_id"
@@ -312,20 +309,6 @@ func (s *PartnerSettings) NoDataFrameRefRewritingFrom() []string {
 func (s *PartnerSettings) RewriteJourneyPatternRef() (r bool) {
 	s.m.RLock()
 	r, _ = strconv.ParseBool(s.s[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
-	s.m.RUnlock()
-	return
-}
-
-func (s *PartnerSettings) LogSubscriptionStopMonitoringDeliveries() (l bool) {
-	s.m.RLock()
-	l, _ = strconv.ParseBool(s.s[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_NOTIFICATIONS])
-	s.m.RUnlock()
-	return
-}
-
-func (s *PartnerSettings) LogRequestStopMonitoringDeliveries() (l bool) {
-	s.m.RLock()
-	l, _ = strconv.ParseBool(s.s[LOGSTASH_LOG_DELIVERIES_IN_SM_COLLECT_REQUESTS])
 	s.m.RUnlock()
 	return
 }

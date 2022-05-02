@@ -3,10 +3,8 @@ package core
 import (
 	"fmt"
 	"sort"
-	"strconv"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
@@ -47,14 +45,13 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	return connector
 }
 
-func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage, logStashEvent audit.LogStashEvent) {
+func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
 	entities, _ := connector.cache.Value()
 	feedEntities := entities.([]*gtfs.FeedEntity)
 
 	for i := range feedEntities {
 		feed.Entity = append(feed.Entity, feedEntities[i])
 	}
-	logStashEvent["trip_update_quantity"] = strconv.Itoa(len(feedEntities))
 }
 
 func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {

@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -71,9 +69,6 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
@@ -87,31 +82,23 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
 
-	logSIRIStopMonitoringRequest(logStashEvent, message, siriStopMonitoringRequest)
+	logSIRIStopMonitoringRequest(message, siriStopMonitoringRequest)
 
 	xmlStopMonitoringResponse, err := connector.Partner().SIRIClient().StopMonitoring(siriStopMonitoringRequest)
-	logStashEvent["responseTime"] = connector.Clock().Since(startTime).String()
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
 		e := fmt.Sprintf("Error during StopMonitoring request: %v", err)
-		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = e
+
 		message.Status = "Error"
 		message.ErrorDetails = e
 		return
 	}
 
-	logXMLStopMonitoringResponse(logStashEvent, message, xmlStopMonitoringResponse)
+	logXMLStopMonitoringResponse(message, xmlStopMonitoringResponse)
 
 	builder := NewStopMonitoringUpdateEventBuilder(connector.partner, objectid)
 
 	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
-		if connector.Partner().LogRequestStopMonitoringDeliveries() {
-			deliveryLogStashEvent := connector.newLogStashEvent()
-			logXMLRequestStopMonitoringDelivery(deliveryLogStashEvent, xmlStopMonitoringResponse.ResponseMessageIdentifier(), delivery)
-			audit.CurrentLogStash().WriteEvent(deliveryLogStashEvent)
-		}
-
 		if !delivery.Status() {
 			continue
 		}
@@ -121,7 +108,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	updateEvents := builder.UpdateEvents()
 
 	// Log MonitoringRefs
-	logMonitoringRefs(logStashEvent, message, updateEvents.MonitoringRefs)
+	logMonitoringRefs(message, updateEvents.MonitoringRefs)
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)
@@ -196,12 +183,6 @@ func (connector *SIRIStopMonitoringRequestCollector) newBQEvent() *audit.BigQuer
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "StopMonitoringRequestCollector"
-	return event
-}
-
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
 	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
@@ -211,74 +192,35 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIStopMonitoringRequestCollector(partner)
 }
 
-func logSIRIStopMonitoringRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRIGetStopMonitoringRequest) {
-	logStashEvent["siriType"] = "StopMonitoringRequest"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["monitoringRef"] = request.MonitoringRef
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
+func logSIRIStopMonitoringRequest(message *audit.BigQueryMessage, request *siri.SIRIGetStopMonitoringRequest) {
+	message.RequestIdentifier = request.MessageIdentifier
+
 	xml, err := request.BuildXML()
 	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
 		return
 	}
-	logStashEvent["requestXML"] = xml
-
-	message.RequestIdentifier = request.MessageIdentifier
 	message.RequestRawMessage = xml
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLStopMonitoringResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLStopMonitoringResponse) {
-	logStashEvent["address"] = response.Address()
-	logStashEvent["producerRef"] = response.ProducerRef()
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier()
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = response.RawXML()
-	status := "true"
-	errorCount := 0
+func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *siri.XMLStopMonitoringResponse) {
 	for _, delivery := range response.StopMonitoringDeliveries() {
 		if !delivery.Status() {
 			message.Status = "Error"
-			status = "false"
-			errorCount++
 		}
 	}
-	logStashEvent["status"] = status
-	logStashEvent["errorCount"] = strconv.Itoa(errorCount)
-
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 }
 
-func logXMLRequestStopMonitoringDelivery(logStashEvent audit.LogStashEvent, parent string, delivery *siri.XMLStopMonitoringDelivery) {
-	logStashEvent["siriType"] = "StopMonitoringRequestDelivery"
-	logStashEvent["parentMessageIdentifier"] = parent
-	logStashEvent["monitoringRef"] = delivery.MonitoringRef()
-	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
-	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp().String()
-
-	logStashEvent["status"] = strconv.FormatBool(delivery.Status())
-	if !delivery.Status() {
-		logStashEvent["errorType"] = delivery.ErrorType()
-		if delivery.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber())
-		}
-		logStashEvent["errorText"] = delivery.ErrorText()
-		logStashEvent["errorDescription"] = delivery.ErrorDescription()
-	}
-}
-
-func logMonitoringRefs(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, refs map[string]struct{}) {
+func logMonitoringRefs(message *audit.BigQueryMessage, refs map[string]struct{}) {
 	refSlice := make([]string, len(refs))
 	i := 0
 	for monitoringRef := range refs {
 		refSlice[i] = monitoringRef
 		i++
 	}
-	logStashEvent["monitoringRefs"] = strings.Join(refSlice, ", ")
 
 	if message != nil {
 		message.StopAreas = refSlice

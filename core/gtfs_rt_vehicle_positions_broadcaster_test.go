@@ -60,8 +60,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 2 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 2", l)
@@ -153,8 +152,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 0 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 0", l)
@@ -211,8 +209,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 0 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 0", l)
@@ -269,8 +266,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 1 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
@@ -331,8 +327,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 1 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)
@@ -382,8 +377,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 
 	gtfsFeed := &gtfs.FeedMessage{}
 
-	l := partner.NewLogStashEvent()
-	connector.HandleGtfs(gtfsFeed, l)
+	connector.HandleGtfs(gtfsFeed)
 
 	if l := len(gtfsFeed.Entity); l != 1 {
 		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 1", l)

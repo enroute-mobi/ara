@@ -38,12 +38,8 @@ func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteV
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 	lineRef := filters.Get("LineRef")
 
-	logStashEvent["RequestURL"] = url
 	message.RequestIdentifier = filters.Get("MessageIdentifier")
 	message.Lines = []string{lineRef}
 
@@ -65,7 +61,6 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 			ErrorType: "InvalidDataReferencesError",
 			ErrorText: fmt.Sprintf("Line %v not found", objectid.Value()),
 		}
-		logSIRILiteVehicleMonitoringResponse(logStashEvent, siriLiteResponse)
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorCondition.ErrorText
 		return
@@ -124,8 +119,6 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 	message.Vehicles = vehicleIds
 
-	logSIRILiteVehicleMonitoringResponse(logStashEvent, siriLiteResponse)
-
 	return siriLiteResponse
 }
 
@@ -175,12 +168,6 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef
 	return connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
 }
 
-func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "VehicleMonitoringRequestBroadcaster"
-	return event
-}
-
 func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
 	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
@@ -188,8 +175,4 @@ func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiP
 
 func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRILiteVehicleMonitoringRequestBroadcaster(partner)
-}
-
-func logSIRILiteVehicleMonitoringResponse(logStashEvent audit.LogStashEvent, siriLiteResponse *siri.SiriLiteResponse) {
-
 }

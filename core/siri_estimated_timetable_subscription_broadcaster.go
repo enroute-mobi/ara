@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -59,9 +58,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
-		logStashEvent := connector.newLogStashEvent()
-		logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent, ett)
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
@@ -83,9 +79,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		}
 
 		resps = append(resps, rs)
-
-		logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent, &rs)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		// We do not want to create a subscription that will fail
 		if len(unknownLineIds) != 0 {
@@ -305,38 +298,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 	}
 
 	connector.mutex.Unlock()
-}
-
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
-	return event
-}
-
-func logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent audit.LogStashEvent, ettEntry *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
-	logStashEvent["siriType"] = "EstimatedTimeTableSubscriptionEntry"
-	logStashEvent["lineRefs"] = strings.Join(ettEntry.Lines(), ",")
-	logStashEvent["messageIdentifier"] = ettEntry.MessageIdentifier()
-	logStashEvent["subscriberRef"] = ettEntry.SubscriberRef()
-	logStashEvent["subscriptionIdentifier"] = ettEntry.SubscriptionIdentifier()
-	logStashEvent["initialTerminationTime"] = ettEntry.InitialTerminationTime().String()
-	logStashEvent["requestTimestamp"] = ettEntry.RequestTimestamp().String()
-	logStashEvent["requestXML"] = ettEntry.RawXML()
-}
-
-func logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, response *siri.SIRIResponseStatus) {
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["subscriptionRef"] = response.SubscriptionRef
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["validUntil"] = response.ValidUntil.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	if !response.Status {
-		logStashEvent["errorType"] = response.ErrorType
-		if response.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		}
-		logStashEvent["errorText"] = response.ErrorText
-	}
 }
 
 // START TEST

@@ -1,2 +1,1 @@
-#logstash: localhost:10000
 syslog:   true

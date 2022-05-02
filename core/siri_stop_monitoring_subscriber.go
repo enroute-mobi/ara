@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -94,7 +93,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	// MonitoringRef for Logstash
 	monitoringRefList := []string{}
 
 	stopAreasToRequest := make(map[string]*saToRequest)
@@ -113,9 +111,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	if len(stopAreasToRequest) == 0 {
 		return
 	}
-
-	logStashEvent := subscriber.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message := subscriber.newBQEvent()
 	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
@@ -149,18 +144,13 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	message.StopAreas = monitoringRefList
 	message.SubscriptionIdentifiers = subIds
 
-	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefList, ", ")
-	logSIRIStopMonitoringSubscriptionRequest(logStashEvent, siriStopMonitoringSubscriptionRequest)
-
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
-	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
-		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = e
+
 		subscriber.incrementRetryCountFromMap(stopAreasToRequest)
 
 		message.Status = "Error"
@@ -168,7 +158,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	logStashEvent["responseXML"] = response.RawXML()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
@@ -230,24 +219,4 @@ func (subscriber *SMSubscriber) newBQEvent() *audit.BigQueryMessage {
 		Partner:   string(subscriber.connector.partner.Slug()),
 		Status:    "OK",
 	}
-}
-
-func (subscriber *SMSubscriber) newLogStashEvent() audit.LogStashEvent {
-	event := subscriber.connector.partner.NewLogStashEvent()
-	event["connector"] = "StopMonitoringSubscriptionCollector"
-	return event
-}
-
-func logSIRIStopMonitoringSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIStopMonitoringSubscriptionRequest) {
-	logStashEvent["siriType"] = "StopMonitoringSubscriptionRequest"
-	logStashEvent["consumerAddress"] = request.ConsumerAddress
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	xml, err := request.BuildXML()
-	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["requestXML"] = xml
 }

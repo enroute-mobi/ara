@@ -1,9 +1,6 @@
 package core
 
 import (
-	"fmt"
-	"strconv"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -28,11 +25,6 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 }
 
 func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {
-	logStashEvent := connector.newLogStashEvent("")
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logXMLSiriServiceRequest(logStashEvent, request)
-
 	response := &siri.SIRIServiceResponse{
 		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
@@ -60,17 +52,11 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	message.StopAreas = stopIds
 	message.Lines = lineIds
 
-	logSIRIServiceResponse(logStashEvent, response)
-
 	return response
 }
 
 func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
 	for _, stopMonitoringRequest := range requests {
-		SMLogStashEvent := connector.newLogStashEvent("StopMonitoringRequestBroadcaster")
-		logXMLStopMonitoringRequest(SMLogStashEvent, stopMonitoringRequest)
-		SMLogStashEvent["siriType"] = "StopMonitoringDelivery for GetSiriServiceResponse"
-
 		var delivery siri.SIRIStopMonitoringDelivery
 
 		stopMonitoringConnector, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
@@ -83,15 +69,12 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(req
 				ErrorText:         "Can't find a StopMonitoringRequestBroadcaster connector",
 			}
 		} else {
-			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(SMLogStashEvent, stopMonitoringRequest)
+			delivery = stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).getStopMonitoringDelivery(stopMonitoringRequest)
 		}
 
 		if !delivery.Status {
 			response.Status = false
 		}
-
-		logSIRIStopMonitoringDelivery(SMLogStashEvent, delivery)
-		audit.CurrentLogStash().WriteEvent(SMLogStashEvent)
 
 		response.StopMonitoringDeliveries = append(response.StopMonitoringDeliveries, &delivery)
 
@@ -102,10 +85,6 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(req
 
 func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(requests []*siri.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
 	for _, generalMessageRequest := range requests {
-		GMLogStashEvent := connector.newLogStashEvent("GeneralMessageRequestBroadcaster")
-		logXMLGeneralMessageRequest(GMLogStashEvent, generalMessageRequest)
-		GMLogStashEvent["siriType"] = "GeneralMessageDelivery for GetSiriServiceResponse"
-
 		var delivery siri.SIRIGeneralMessageDelivery
 
 		generalMessageConnector, ok := connector.Partner().Connector(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
@@ -118,15 +97,12 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(req
 				ErrorText:         "Can't find a GeneralMessageRequestBroadcaster connector",
 			}
 		} else {
-			delivery = generalMessageConnector.(*SIRIGeneralMessageRequestBroadcaster).getGeneralMessageDelivery(GMLogStashEvent, generalMessageRequest)
+			delivery = generalMessageConnector.(*SIRIGeneralMessageRequestBroadcaster).getGeneralMessageDelivery(generalMessageRequest)
 		}
 
 		if !delivery.Status {
 			response.Status = false
 		}
-
-		logSIRIGeneralMessageDelivery(GMLogStashEvent, delivery)
-		audit.CurrentLogStash().WriteEvent(GMLogStashEvent)
 
 		response.GeneralMessageDeliveries = append(response.GeneralMessageDeliveries, &delivery)
 	}
@@ -134,10 +110,6 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(req
 
 func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
 	for _, estimatedTimetableRequest := range requests {
-		ETTLogStashEvent := connector.newLogStashEvent("EstimatedTimetableRequestBroadcaster")
-		logXMLEstimatedTimetableRequest(ETTLogStashEvent, estimatedTimetableRequest)
-		ETTLogStashEvent["siriType"] = "EstimatedTimetableDelivery for GetSiriServiceResponse"
-
 		var delivery siri.SIRIEstimatedTimetableDelivery
 
 		estimatedTimetabeConnector, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
@@ -150,30 +122,18 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 				ErrorText:         "Can't find a EstimatedTimetableBroadcaster connector",
 			}
 		} else {
-			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(estimatedTimetableRequest, ETTLogStashEvent)
+			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(estimatedTimetableRequest)
 		}
 
 		if !delivery.Status {
 			response.Status = false
 		}
 
-		audit.CurrentLogStash().WriteEvent(ETTLogStashEvent)
-
 		response.EstimatedTimetableDeliveries = append(response.EstimatedTimetableDeliveries, &delivery)
 
 		lineIds = append(lineIds, estimatedTimetableRequest.Lines()...)
 	}
 	return
-}
-
-func (connector *SIRIServiceRequestBroadcaster) newLogStashEvent(connectorName string) audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	if connectorName != "" {
-		event["connector"] = fmt.Sprintf("%v for SIRIServiceRequestBroadcaster", connectorName)
-		return event
-	}
-	event["connector"] = "SIRIServiceRequestBroadcaster"
-	return event
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
@@ -183,26 +143,4 @@ func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPar
 
 func (factory *SIRIServiceRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRIServiceRequestBroadcaster(partner)
-}
-
-func logXMLSiriServiceRequest(logStashEvent audit.LogStashEvent, request *siri.XMLSiriServiceRequest) {
-	logStashEvent["siriType"] = "GetSIRIServiceResponse"
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRIServiceResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIServiceResponse) {
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	xml, err := response.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
 }
