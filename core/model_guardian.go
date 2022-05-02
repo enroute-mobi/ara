@@ -169,7 +169,7 @@ func (guardian *ModelGuardian) simulateActualAttributes() {
 		}
 
 		stopVisit, _ := guardian.referential.Model().StopVisits().Find(svs[i].Id())
-		simulator := NewActualAttributesSimulator(&stopVisit)
+		simulator := NewActualAttributesSimulator(stopVisit)
 		simulator.SetClock(guardian.Clock())
 		if simulator.Simulate() {
 			stopVisit.Save()

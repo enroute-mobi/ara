@@ -24,7 +24,7 @@ func NewStopAreaController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *StopAreaController) findStopArea(identifier string) (model.StopArea, bool) {
+func (controller *StopAreaController) findStopArea(identifier string) (*model.StopArea, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
@@ -68,7 +68,7 @@ func (controller *StopAreaController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete stopArea %s", identifier)
 
 	jsonBytes, _ := stopArea.MarshalJSON()
-	controller.referential.Model().StopAreas().Delete(&stopArea)
+	controller.referential.Model().StopAreas().Delete(stopArea)
 	response.Write(jsonBytes)
 }
 
@@ -95,7 +95,7 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		}
 	}
 
-	controller.referential.Model().StopAreas().Save(&stopArea)
+	controller.referential.Model().StopAreas().Save(stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }
@@ -124,7 +124,7 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		}
 	}
 
-	controller.referential.Model().StopAreas().Save(&stopArea)
+	controller.referential.Model().StopAreas().Save(stopArea)
 	jsonBytes, _ := stopArea.MarshalJSON()
 	response.Write(jsonBytes)
 }

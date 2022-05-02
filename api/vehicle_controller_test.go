@@ -24,7 +24,7 @@ func checkVehicleResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 	}
 }
 
-func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicle model.Vehicle, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicle *model.Vehicle, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -40,7 +40,7 @@ func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *t
 	vehicle.Longitude = 1.2
 	vehicle.Latitude = 3.4
 	vehicle.Bearing = 5.6
-	referential.Model().Vehicles().Save(&vehicle)
+	referential.Model().Vehicles().Save(vehicle)
 
 	// Create a request
 	address := []byte("/default/vehicles")
@@ -156,7 +156,7 @@ func Test_VehicleController_FindVehicle(t *testing.T) {
 	vehicle := ref.Model().Vehicles().New()
 	objectid := model.NewObjectID("kind", "value")
 	vehicle.SetObjectID(objectid)
-	ref.Model().Vehicles().Save(&vehicle)
+	ref.Model().Vehicles().Save(vehicle)
 
 	controller := &VehicleController{
 		referential: ref,

@@ -49,7 +49,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	stopArea := partners.Model().StopAreas().New()
 	objectid := model.NewObjectID("test kind", "test value")
 	stopArea.SetObjectID(objectid)
-	partners.Model().StopAreas().Save(&stopArea)
+	partners.Model().StopAreas().Save(stopArea)
 
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
 

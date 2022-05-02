@@ -227,7 +227,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
-				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(&vehicleJourney, &stopVisit)
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
@@ -256,21 +256,21 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
 				ettlc := &estimatedTimeTableLastChange{}
-				ettlc.InitState(&stopVisit, sub)
+				ettlc.InitState(stopVisit, sub)
 				resource.SetLastState(string(stopVisit.Id()), ettlc)
 			} else {
 				lastState := lastStateInterface.(*estimatedTimeTableLastChange)
-				lastState.UpdateState(&stopVisit)
+				lastState.UpdateState(stopVisit)
 			}
 		}
 		ett.sendDelivery(delivery)
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
-		return model.StopArea{}, "", false
+		return &model.StopArea{}, "", false
 	}
 	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
 	if ok {
@@ -283,7 +283,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 			return referent, referentObjectId.Value(), true
 		}
 	}
-	return model.StopArea{}, "", false
+	return &model.StopArea{}, "", false
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {

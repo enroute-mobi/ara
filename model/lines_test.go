@@ -126,7 +126,7 @@ func Test_MemoryLines_Save(t *testing.T) {
 
 	line := lines.New()
 
-	if success := lines.Save(&line); !success {
+	if success := lines.Save(line); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -147,7 +147,7 @@ func Test_MemoryLines_Find(t *testing.T) {
 	lines := NewMemoryLines()
 
 	existingLine := lines.New()
-	lines.Save(&existingLine)
+	lines.Save(existingLine)
 
 	lineId := existingLine.Id()
 
@@ -165,7 +165,7 @@ func Test_MemoryLines_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingLine := lines.New()
-		lines.Save(&existingLine)
+		lines.Save(existingLine)
 	}
 
 	foundLines := lines.FindAll()
@@ -180,9 +180,9 @@ func Test_MemoryLines_Delete(t *testing.T) {
 	existingLine := lines.New()
 	objectid := NewObjectID("kind", "value")
 	existingLine.SetObjectID(objectid)
-	lines.Save(&existingLine)
+	lines.Save(existingLine)
 
-	lines.Delete(&existingLine)
+	lines.Delete(existingLine)
 
 	_, ok := lines.Find(existingLine.Id())
 	if ok {

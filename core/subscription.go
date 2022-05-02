@@ -42,8 +42,8 @@ type SubscribedResource struct {
 	resourcesOptions map[string]string
 }
 
-func NewResource(ref model.Reference) SubscribedResource {
-	return SubscribedResource{
+func NewResource(ref model.Reference) *SubscribedResource {
+	return &SubscribedResource{
 		Reference:        ref,
 		lastStates:       make(map[string]lastState),
 		resourcesOptions: make(map[string]string),
@@ -198,9 +198,9 @@ func (subscription *Subscription) Resources(now time.Time) (ressources []*Subscr
 	return ressources
 }
 
-func (subscription *Subscription) AddNewResource(resource SubscribedResource) {
+func (subscription *Subscription) AddNewResource(resource *SubscribedResource) {
 	subscription.Lock()
-	subscription.resourcesByObjectID[resource.Reference.ObjectId.String()] = &resource
+	subscription.resourcesByObjectID[resource.Reference.ObjectId.String()] = resource
 	subscription.Unlock()
 }
 

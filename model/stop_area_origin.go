@@ -11,8 +11,8 @@ type StopAreaOrigins struct {
 	partners map[string]bool
 }
 
-func NewStopAreaOrigins() StopAreaOrigins {
-	return StopAreaOrigins{partners: make(map[string]bool)}
+func NewStopAreaOrigins() *StopAreaOrigins {
+	return &StopAreaOrigins{partners: make(map[string]bool)}
 }
 
 func (origins *StopAreaOrigins) MarshalJSON() ([]byte, error) {
@@ -42,7 +42,7 @@ func (origins *StopAreaOrigins) Copy() *StopAreaOrigins {
 		cpy.partners[key] = value
 	}
 	origins.RUnlock()
-	return &cpy
+	return cpy
 }
 
 func (origins *StopAreaOrigins) Origin(partner string) (status bool, present bool) {

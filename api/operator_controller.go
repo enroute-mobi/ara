@@ -24,7 +24,7 @@ func NewOperatorController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *OperatorController) findOperator(identifier string) (model.Operator, bool) {
+func (controller *OperatorController) findOperator(identifier string) (*model.Operator, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
@@ -63,7 +63,7 @@ func (controller *OperatorController) Delete(response http.ResponseWriter, ident
 	logger.Log.Debugf("Delete operator %s", identifier)
 
 	jsonBytes, _ := operator.MarshalJSON()
-	controller.referential.Model().Operators().Delete(&operator)
+	controller.referential.Model().Operators().Delete(operator)
 	response.Write(jsonBytes)
 }
 
@@ -90,7 +90,7 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 		}
 	}
 
-	controller.referential.Model().Operators().Save(&operator)
+	controller.referential.Model().Operators().Save(operator)
 	jsonBytes, _ := json.Marshal(&operator)
 	response.Write(jsonBytes)
 }
@@ -119,7 +119,7 @@ func (controller *OperatorController) Create(response http.ResponseWriter, body 
 		}
 	}
 
-	controller.referential.Model().Operators().Save(&operator)
+	controller.referential.Model().Operators().Save(operator)
 	jsonBytes, _ := json.Marshal(&operator)
 	response.Write(jsonBytes)
 }

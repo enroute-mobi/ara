@@ -100,11 +100,11 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		if request.MaximumStopVisits() > 0 && len(stopVisitArray) >= request.MaximumStopVisits() {
 			break
 		}
-		if !selector(&svs[i]) {
+		if !selector(svs[i]) {
 			continue
 		}
 
-		monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(&svs[i])
+		monitoredStopVisit := stopMonitoringBuilder.BuildMonitoredStopVisit(svs[i])
 		if monitoredStopVisit == nil {
 			continue
 		}

@@ -84,7 +84,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 	case "StopArea":
 		sa, ok := connector.partner.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			connector.checkStopAreaEvent(&sa)
+			connector.checkStopAreaEvent(sa)
 		}
 	default:
 		return
@@ -99,7 +99,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopVisit(subsIds
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.StopVisit) (subscriptionIds []SubscriptionId) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model.StopVisit) (subscriptionIds []SubscriptionId) {
 	if sv.Origin == string(connector.Partner().Slug()) {
 		return
 	}
@@ -127,7 +127,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv model.
 
 			if !ok {
 				smlc := &stopMonitoringLastChange{}
-				smlc.InitState(&sv, sub)
+				smlc.InitState(sv, sub)
 				resource.SetLastState(string(sv.Id()), smlc)
 			}
 
@@ -232,7 +232,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
-		salc.InitState(&sa, sub)
+		salc.InitState(sa, sub)
 		r.SetLastState(string(sa.Id()), salc)
 		// Init StopVisits LastChange
 		connector.addStopAreaStopVisits(sa, sub, r)
@@ -245,7 +245,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 	return
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisits(sa model.StopArea, sub *Subscription, res *SubscribedResource) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisits(sa *model.StopArea, sub *Subscription, res *SubscribedResource) {
 	for _, saId := range connector.partner.Model().StopAreas().FindFamily(sa.Id()) {
 		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(saId)
 		for i := range svs {
@@ -260,7 +260,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 			}
 
 			smlc := &stopMonitoringLastChange{}
-			smlc.InitState(&svs[i], sub)
+			smlc.InitState(svs[i], sub)
 			res.SetLastState(string(svs[i].Id()), smlc)
 			connector.addStopVisit([]SubscriptionId{sub.Id()}, svs[i].Id())
 		}

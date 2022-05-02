@@ -181,7 +181,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			// Get the monitoredStopVisit
 			stopMonitoringBuilder.MonitoringRef = monitoringRef
-			if !smb.handledStopVisitAppend(&stopVisit, delivery, stopMonitoringBuilder) {
+			if !smb.handledStopVisitAppend(stopVisit, delivery, stopMonitoringBuilder) {
 				continue
 			}
 
@@ -201,7 +201,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			if !ok {
 				continue
 			}
-			lastState.UpdateState(&stopVisit)
+			lastState.UpdateState(stopVisit)
 		}
 
 		for _, delivery := range deliveries {

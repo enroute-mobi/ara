@@ -27,7 +27,7 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	model.StopVisits().SetUUIDGenerator(generator)
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-1-00c04fd430c8"
-	model.StopVisits().Save(&stopVisit)
+	model.StopVisits().Save(stopVisit)
 
 	// Create the vehicleJourney
 	model.VehicleJourneys().SetUUIDGenerator(generator)
@@ -144,7 +144,7 @@ func Test_MemoryVehicleJourneys_Save(t *testing.T) {
 
 	vehicleJourney := vehicleJourneys.New()
 
-	if success := vehicleJourneys.Save(&vehicleJourney); !success {
+	if success := vehicleJourneys.Save(vehicleJourney); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -165,7 +165,7 @@ func Test_MemoryVehicleJourneys_Find(t *testing.T) {
 	vehicleJourneys := NewMemoryVehicleJourneys()
 
 	existingVehicleJourney := vehicleJourneys.New()
-	vehicleJourneys.Save(&existingVehicleJourney)
+	vehicleJourneys.Save(existingVehicleJourney)
 
 	vehicleJourneyId := existingVehicleJourney.Id()
 
@@ -183,7 +183,7 @@ func Test_MemoryVehicleJourneys_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingVehicleJourney := vehicleJourneys.New()
-		vehicleJourneys.Save(&existingVehicleJourney)
+		vehicleJourneys.Save(existingVehicleJourney)
 	}
 
 	foundVehicleJourneys := vehicleJourneys.FindAll()
@@ -198,9 +198,9 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 	existingVehicleJourney := vehicleJourneys.New()
 	objectid := NewObjectID("kind", "value")
 	existingVehicleJourney.SetObjectID(objectid)
-	vehicleJourneys.Save(&existingVehicleJourney)
+	vehicleJourneys.Save(existingVehicleJourney)
 
-	vehicleJourneys.Delete(&existingVehicleJourney)
+	vehicleJourneys.Delete(existingVehicleJourney)
 
 	_, ok := vehicleJourneys.Find(existingVehicleJourney.Id())
 	if ok {

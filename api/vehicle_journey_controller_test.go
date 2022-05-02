@@ -24,7 +24,7 @@ func checkVehicleJourneyResponseStatus(responseRecorder *httptest.ResponseRecord
 	}
 }
 
-func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicleJourney model.VehicleJourney, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicleJourney *model.VehicleJourney, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -37,7 +37,7 @@ func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byt
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new vehicleJourney
 	vehicleJourney = referential.Model().VehicleJourneys().New()
-	referential.Model().VehicleJourneys().Save(&vehicleJourney)
+	referential.Model().VehicleJourneys().Save(vehicleJourney)
 
 	// Create a request
 	address := []byte("/default/vehicle_journeys")
@@ -148,7 +148,7 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 	vehicleJourney := ref.Model().VehicleJourneys().New()
 	objectid := model.NewObjectID("kind", "value")
 	vehicleJourney.SetObjectID(objectid)
-	ref.Model().VehicleJourneys().Save(&vehicleJourney)
+	ref.Model().VehicleJourneys().Save(vehicleJourney)
 
 	controller := &VehicleJourneyController{
 		referential: ref,

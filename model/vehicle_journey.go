@@ -62,7 +62,7 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 	if !ok {
 		return nil
 	}
-	return &line
+	return line
 }
 
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
@@ -140,9 +140,8 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (vehicleJourney *VehicleJourney) Save() (ok bool) {
-	ok = vehicleJourney.model.VehicleJourneys().Save(vehicleJourney)
-	return
+func (vehicleJourney *VehicleJourney) Save() bool {
+	return vehicleJourney.model.VehicleJourneys().Save(vehicleJourney)
 }
 
 type MemoryVehicleJourneys struct {
@@ -159,13 +158,13 @@ type MemoryVehicleJourneys struct {
 type VehicleJourneys interface {
 	uuid.UUIDInterface
 
-	New() VehicleJourney
-	Find(id VehicleJourneyId) (VehicleJourney, bool)
-	FindByObjectId(objectid ObjectID) (VehicleJourney, bool)
-	FindByLineId(id LineId) []VehicleJourney
-	FindAll() []VehicleJourney
-	Save(vehicleJourney *VehicleJourney) bool
-	Delete(vehicleJourney *VehicleJourney) bool
+	New() *VehicleJourney
+	Find(VehicleJourneyId) (*VehicleJourney, bool)
+	FindByObjectId(objectid ObjectID) (*VehicleJourney, bool)
+	FindByLineId(LineId) []*VehicleJourney
+	FindAll() []*VehicleJourney
+	Save(*VehicleJourney) bool
+	Delete(*VehicleJourney) bool
 }
 
 func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
@@ -179,55 +178,52 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	}
 }
 
-func (manager *MemoryVehicleJourneys) New() VehicleJourney {
-	vehicleJourney := NewVehicleJourney(manager.model)
-	return *vehicleJourney
+func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
+	return NewVehicleJourney(manager.model)
 }
 
-func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (VehicleJourney, bool) {
+func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
-
 	vehicleJourney, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
 	if ok {
-		manager.mutex.RUnlock()
-		return *(vehicleJourney.copy()), true
-	} else {
-		manager.mutex.RUnlock()
-		return VehicleJourney{}, false
+		return vehicleJourney.copy(), true
 	}
+	return &VehicleJourney{}, false
 }
 
-func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (VehicleJourney, bool) {
+func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		return *(manager.byIdentifier[VehicleJourneyId(id)].copy()), true
+		return manager.byIdentifier[VehicleJourneyId(id)].copy(), true
 	}
 
-	return VehicleJourney{}, false
+	return &VehicleJourney{}, false
 }
 
-func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []VehicleJourney) {
+func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byLine.Find(ModelId(id))
 
 	for _, id := range ids {
 		vj := manager.byIdentifier[VehicleJourneyId(id)]
-		vehicleJourneys = append(vehicleJourneys, *(vj.copy()))
+		vehicleJourneys = append(vehicleJourneys, vj.copy())
 	}
 
 	manager.mutex.RUnlock()
 	return
 }
 
-func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []VehicleJourney) {
+func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
 	for _, vehicleJourney := range manager.byIdentifier {
-		vehicleJourneys = append(vehicleJourneys, *(vehicleJourney.copy()))
+		vehicleJourneys = append(vehicleJourneys, vehicleJourney.copy())
 	}
 
 	manager.mutex.RUnlock()
@@ -307,7 +303,7 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 			vehicleJourney.objectids = NewObjectIDsFromMap(objectIdMap)
 		}
 
-		manager.Save(&vehicleJourney)
+		manager.Save(vehicleJourney)
 	}
 	return nil
 }

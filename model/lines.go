@@ -132,9 +132,8 @@ func (line *Line) Reference(key string) (Reference, bool) {
 	return value, present
 }
 
-func (line *Line) Save() (ok bool) {
-	ok = line.model.Lines().Save(line)
-	return
+func (line *Line) Save() bool {
+	return line.model.Lines().Save(line)
 }
 
 type MemoryLines struct {
@@ -150,12 +149,12 @@ type MemoryLines struct {
 type Lines interface {
 	uuid.UUIDInterface
 
-	New() Line
-	Find(id LineId) (Line, bool)
-	FindByObjectId(objectid ObjectID) (Line, bool)
-	FindAll() []Line
-	Save(line *Line) bool
-	Delete(line *Line) bool
+	New() *Line
+	Find(LineId) (*Line, bool)
+	FindByObjectId(ObjectID) (*Line, bool)
+	FindAll() []*Line
+	Save(*Line) bool
+	Delete(*Line) bool
 }
 
 func NewMemoryLines() *MemoryLines {
@@ -166,53 +165,38 @@ func NewMemoryLines() *MemoryLines {
 	}
 }
 
-func (manager *MemoryLines) Clone(model Model) *MemoryLines {
-	clone := NewMemoryLines()
-	clone.model = model
-
-	for _, line := range manager.byIdentifier {
-		cloneLine := *line
-		clone.Save(&cloneLine)
-	}
-
-	return clone
+func (manager *MemoryLines) New() *Line {
+	return NewLine(manager.model)
 }
 
-func (manager *MemoryLines) New() Line {
-	line := NewLine(manager.model)
-	return *line
-}
-
-func (manager *MemoryLines) Find(id LineId) (Line, bool) {
+func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
 	manager.mutex.RLock()
-
 	line, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
 	if ok {
-		manager.mutex.RUnlock()
-		return *(line.copy()), true
-	} else {
-		manager.mutex.RUnlock()
-		return Line{}, false
+		return line.copy(), true
 	}
+	return &Line{}, false
 }
 
-func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (Line, bool) {
+func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (*Line, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		return *(manager.byIdentifier[LineId(id)].copy()), true
+		return manager.byIdentifier[LineId(id)].copy(), true
 	}
 
-	return Line{}, false
+	return &Line{}, false
 }
 
-func (manager *MemoryLines) FindAll() (lines []Line) {
+func (manager *MemoryLines) FindAll() (lines []*Line) {
 	manager.mutex.RLock()
 
 	for _, line := range manager.byIdentifier {
-		lines = append(lines, *(line.copy()))
+		lines = append(lines, line.copy())
 	}
 
 	manager.mutex.RUnlock()
@@ -284,7 +268,7 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 			line.objectids = NewObjectIDsFromMap(objectIdMap)
 		}
 
-		manager.Save(&line)
+		manager.Save(line)
 	}
 	return nil
 }

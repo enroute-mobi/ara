@@ -19,7 +19,7 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 	referential.ModelGuardian().SetClock(fakeClock)
 
 	stopArea := referential.Model().StopAreas().New()
-	referential.Model().StopAreas().Save(&stopArea)
+	referential.Model().StopAreas().Save(stopArea)
 	stopAreaId := stopArea.Id()
 
 	// Advance time
@@ -50,7 +50,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	stopArea.CollectedAlways = false
 	stopArea.CollectedUntil = fakeClock.Now().Add(15 * time.Minute)
 	stopArea.NextCollect(fakeClock.Now())
-	referential.Model().StopAreas().Save(&stopArea)
+	referential.Model().StopAreas().Save(stopArea)
 
 	referential.modelGuardian.refreshStopAreas()
 

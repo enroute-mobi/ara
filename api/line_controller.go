@@ -24,7 +24,7 @@ func NewLineController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *LineController) findLine(identifier string) (model.Line, bool) {
+func (controller *LineController) findLine(identifier string) (*model.Line, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
@@ -63,7 +63,7 @@ func (controller *LineController) Delete(response http.ResponseWriter, identifie
 	logger.Log.Debugf("Delete line %s", identifier)
 
 	jsonBytes, _ := line.MarshalJSON()
-	controller.referential.Model().Lines().Delete(&line)
+	controller.referential.Model().Lines().Delete(line)
 
 	response.Write(jsonBytes)
 }
@@ -91,7 +91,7 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 		}
 	}
 
-	controller.referential.Model().Lines().Save(&line)
+	controller.referential.Model().Lines().Save(line)
 	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }
@@ -120,7 +120,7 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 		}
 	}
 
-	controller.referential.Model().Lines().Save(&line)
+	controller.referential.Model().Lines().Save(line)
 	jsonBytes, _ := json.Marshal(&line)
 	response.Write(jsonBytes)
 }

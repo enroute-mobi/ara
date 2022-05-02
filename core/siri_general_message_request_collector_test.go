@@ -52,7 +52,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	line := partners.Model().Lines().New()
 	lineObjectID := model.NewObjectID("test kind", "line value")
 	line.SetObjectID(lineObjectID)
-	partners.Model().Lines().Save(&line)
+	partners.Model().Lines().Save(line)
 
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
 

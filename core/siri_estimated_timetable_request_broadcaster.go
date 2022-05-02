@@ -121,7 +121,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 			// SIRIEstimatedCall
 			svs := connector.partner.Model().StopVisits().FindFollowingByVehicleJourneyId(vjs[i].Id())
 			for i := range svs {
-				if !selector(&svs[i]) {
+				if !selector(svs[i]) {
 					continue
 				}
 
@@ -170,10 +170,10 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 	return delivery
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.partner.Model().StopAreas().Find(stopAreaId)
 	if !ok {
-		return model.StopArea{}, "", false
+		return &model.StopArea{}, "", false
 	}
 	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
 	if ok {
@@ -186,10 +186,10 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 			return referent, referentObjectId.Value(), true
 		}
 	}
-	return model.StopArea{}, "", false
+	return &model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney model.VehicleJourney, origin string) map[string]string {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, origin string) map[string]string {
 	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -225,7 +225,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(orig
 	return false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit model.StopVisit) {
+func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {
 	if _, ok := refs["OperatorRef"]; ok {
 		return
 	}

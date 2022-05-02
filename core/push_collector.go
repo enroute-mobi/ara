@@ -143,7 +143,7 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		event.ArrivalStatus = model.StopVisitArrivalStatus(sv.GetArrivalStatus())
 		event.DepartureStatus = model.StopVisitDepartureStatus(sv.GetDepartureStatus())
 
-		handleSchedules(&event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
+		handleSchedules(event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
 
 		pc.broadcastUpdateEvent(event)
 	}

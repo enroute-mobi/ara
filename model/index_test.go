@@ -102,7 +102,7 @@ func Test_Index_Delete(t *testing.T) {
 	}
 }
 
-var benchmarkResult []StopVisit
+var benchmarkResult []*StopVisit
 var benchmarkResultId []ModelId
 
 func benchmarkFindWithoutIndex(sv int, b *testing.B) {
@@ -117,7 +117,7 @@ func benchmarkFindWithoutIndex(sv int, b *testing.B) {
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisit.Save()
 
-	var foundStopVisits []StopVisit
+	var foundStopVisits []*StopVisit
 	for n := 0; n < b.N; n++ {
 		foundStopVisits = model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	}
@@ -132,12 +132,12 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = VehicleJourneyId(uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
-		index.Index(&stopVisit)
+		index.Index(stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisit.Save()
-	index.Index(&stopVisit)
+	index.Index(stopVisit)
 
 	var foundStopVisits []ModelId
 	for n := 0; n < b.N; n++ {
@@ -154,15 +154,15 @@ func benchmarkIndexing(sv int, b *testing.B) {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 		stopVisit.Save()
-		index.Index(&stopVisit)
+		index.Index(stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	stopVisit.Save()
-	index.Index(&stopVisit)
+	index.Index(stopVisit)
 
 	for n := 0; n < b.N; n++ {
-		index.Index(&stopVisit)
+		index.Index(stopVisit)
 		index.Delete(ModelId(stopVisit.Id()))
 	}
 }

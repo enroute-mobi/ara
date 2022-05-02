@@ -104,7 +104,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			// Init StopVisits LastChange
 			connector.addLineStopVisits(sub, r, line.Id())
 
-			sub.AddNewResource(*r)
+			sub.AddNewResource(r)
 		}
 		sub.Save()
 	}
@@ -120,7 +120,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	for i := range sas {
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
-		salc.InitState(&sas[i], sub)
+		salc.InitState(sas[i], sub)
 		res.SetLastState(string(sas[i].Id()), salc)
 		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
 		for i := range svs {
@@ -152,7 +152,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 			r := NewResource(ref)
 			r.SubscribedAt = connector.Clock().Now()
 			r.SubscribedUntil = ett.InitialTerminationTime()
-			resources = append(resources, &r)
+			resources = append(resources, r)
 		}
 		return resources, lids
 	}
@@ -175,7 +175,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r := NewResource(ref)
 		r.SubscribedAt = connector.Clock().Now()
 		r.SubscribedUntil = ett.InitialTerminationTime()
-		resources = append(resources, &r)
+		resources = append(resources, r)
 	}
 	return resources, lids
 }
@@ -204,7 +204,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastE
 	case "StopArea":
 		sa, ok := connector.partner.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			connector.checkStopAreaEvent(&sa)
+			connector.checkStopAreaEvent(sa)
 		}
 	default:
 		return
@@ -241,13 +241,13 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(&sv) {
+		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
 			ettlc := &estimatedTimeTableLastChange{}
-			ettlc.InitState(&sv, sub)
+			ettlc.InitState(sv, sub)
 			r.SetLastState(string(sv.Id()), ettlc)
 		}
 

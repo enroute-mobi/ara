@@ -67,7 +67,7 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 
 	stopArea.Updated(manager.Clock().Now())
 
-	manager.model.StopAreas().Save(&stopArea)
+	manager.model.StopAreas().Save(stopArea)
 	if event.Origin != "" {
 		status, ok := stopArea.Origins.Origin(event.Origin)
 		if !status || !ok {
@@ -81,7 +81,7 @@ func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, par
 	for i := range ascendants {
 		stopArea := ascendants[i]
 		stopArea.SetPartnerStatus(partner, status)
-		manager.model.StopAreas().Save(&stopArea)
+		manager.model.StopAreas().Save(stopArea)
 	}
 }
 
@@ -106,7 +106,7 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 
 	line.Updated(manager.Clock().Now())
 
-	manager.model.Lines().Save(&line)
+	manager.model.Lines().Save(line)
 }
 
 func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEvent) {
@@ -152,7 +152,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 
 	vj.Monitored = event.Monitored
 
-	manager.model.VehicleJourneys().Save(&vj)
+	manager.model.VehicleJourneys().Save(vj)
 }
 
 func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
@@ -166,8 +166,8 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		return
 	}
 
-	var sa StopArea
-	var sv StopVisit
+	var sa *StopArea
+	var sv *StopVisit
 	if event.StopAreaObjectId.Value() == "" {
 		sv, ok = manager.model.StopVisits().FindByObjectId(event.ObjectId)
 		if !ok {
@@ -175,6 +175,10 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			return
 		}
 		sa = sv.StopArea()
+		if sa == nil {
+			logger.Log.Printf("StopVisit in memory without a StopArea: %v", sv.Id())
+			return
+		}
 	} else {
 		sa, ok = manager.model.StopAreas().FindByObjectId(event.StopAreaObjectId)
 		if !ok {
@@ -212,18 +216,18 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		referent, ok := manager.model.StopAreas().Find(sa.ReferentId)
 		if ok {
 			referent.LineIds.Add(l.Id())
-			manager.model.StopAreas().Save(&referent)
+			manager.model.StopAreas().Save(referent)
 		}
-		manager.model.StopAreas().Save(&sa)
+		manager.model.StopAreas().Save(sa)
 	}
 
 	if !event.RecordedAt.IsZero() {
 		sv.RecordedAt = event.RecordedAt
-	} else if !sv.Schedules.Include(&event.Schedules) {
+	} else if !sv.Schedules.Include(event.Schedules) {
 		sv.RecordedAt = manager.Clock().Now()
 	}
 
-	sv.Schedules.Merge(&event.Schedules)
+	sv.Schedules.Merge(event.Schedules)
 	if event.DepartureStatus != "" {
 		sv.DepartureStatus = event.DepartureStatus
 	}
@@ -235,7 +239,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	if event.Monitored != vj.Monitored {
 		vj.Monitored = event.Monitored
-		manager.model.VehicleJourneys().Save(&vj)
+		manager.model.VehicleJourneys().Save(vj)
 	}
 
 	if event.Origin != "" {
@@ -245,7 +249,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		}
 	}
 
-	manager.model.StopVisits().Save(&sv)
+	manager.model.StopVisits().Save(sv)
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
@@ -275,7 +279,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		vehicle.LineId = line.Id()
 	}
 
-	manager.model.Vehicles().Save(&vehicle)
+	manager.model.Vehicles().Save(vehicle)
 }
 
 func (manager *UpdateManager) updateStatus(event *StatusUpdateEvent) {
@@ -283,7 +287,7 @@ func (manager *UpdateManager) updateStatus(event *StatusUpdateEvent) {
 	for i := range ascendants {
 		stopArea := ascendants[i]
 		stopArea.SetPartnerStatus(event.Partner, event.Status)
-		manager.model.StopAreas().Save(&stopArea)
+		manager.model.StopAreas().Save(stopArea)
 	}
 }
 
@@ -295,7 +299,7 @@ func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent)
 	}
 
 	stopVisit.NotCollected()
-	manager.model.StopVisits().Save(&stopVisit)
+	manager.model.StopVisits().Save(stopVisit)
 
 	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.ObjectId)
 }

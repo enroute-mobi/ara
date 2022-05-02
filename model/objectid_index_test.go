@@ -123,7 +123,7 @@ func Test_ObjectIDIndex_Delete(t *testing.T) {
 	}
 }
 
-var benchmarkObjectIDResult StopVisit
+var benchmarkObjectIDResult *StopVisit
 var benchmarkObjectIDResultId ModelId
 
 func benchmarkObjectIDFindWithoutIndex(sv int, b *testing.B) {
@@ -140,7 +140,7 @@ func benchmarkObjectIDFindWithoutIndex(sv int, b *testing.B) {
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
 
-	var foundStopVisit StopVisit
+	var foundStopVisit *StopVisit
 	for n := 0; n < b.N; n++ {
 		foundStopVisit, _ = model.StopVisits().FindByObjectId(objectid)
 	}
@@ -156,13 +156,13 @@ func benchmarkObjectIDFindWithIndex(sv int, b *testing.B) {
 		objectid := NewObjectID("kind", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetObjectID(objectid)
 		stopVisit.Save()
-		index.Index(&stopVisit)
+		index.Index(stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
 	objectid := NewObjectID("kind", "value")
 	stopVisit.SetObjectID(objectid)
 	stopVisit.Save()
-	index.Index(&stopVisit)
+	index.Index(stopVisit)
 
 	var foundStopVisit ModelId
 	for n := 0; n < b.N; n++ {
