@@ -192,7 +192,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
-				datedVehicleJourney.References["OperatorRef"] = ptt.connector.operatorRef(&stopVisit)
+				datedVehicleJourney.References["OperatorRef"] = ptt.connector.operatorRef(stopVisit)
 				datedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				datedTTVersionFrame.DatedVehicleJourneys = append(datedTTVersionFrame.DatedVehicleJourneys, datedVehicleJourney)
@@ -216,20 +216,20 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
-				resource.SetLastState(string(stopVisit.Id()), ls.NewProductionTimeTableLastChange(&stopVisit, sub))
+				resource.SetLastState(string(stopVisit.Id()), ls.NewProductionTimeTableLastChange(stopVisit, sub))
 			} else {
 				lastState := lastStateInterface.(*ls.ProductionTimeTableLastChange)
-				lastState.UpdateState(&stopVisit)
+				lastState.UpdateState(stopVisit)
 			}
 		}
 		ptt.sendDelivery(delivery)
 	}
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
-		return model.StopArea{}, "", false
+		return &model.StopArea{}, "", false
 	}
 	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
 	if ok {
@@ -242,7 +242,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(st
 			return referent, referentObjectId.Value(), true
 		}
 	}
-	return model.StopArea{}, "", false
+	return &model.StopArea{}, "", false
 }
 
 func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) dataFrameRef() string {

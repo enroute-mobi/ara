@@ -94,9 +94,6 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 
 		response.ResponseStatus = ptbc.(*SIRIProductionTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
-		logSIRISubscriptionResponse(logStashEvent, &response, "ProductionTimeTableSubscriptionBroadcaster")
-		logStashEvent["siriType"] = "ProductionTimetableSubscriptionRequest"
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 		return &response, nil
 	}
 

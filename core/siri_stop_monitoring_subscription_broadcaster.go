@@ -69,7 +69,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 	case "StopVisit":
 		sv, ok := connector.partner.Model().StopVisits().Find(model.StopVisitId(event.ModelId))
 		if ok {
-			subsIds := connector.checkEvent(&sv)
+			subsIds := connector.checkEvent(sv)
 			if len(subsIds) != 0 {
 				connector.addStopVisit(subsIds, sv.Id())
 			}
@@ -77,7 +77,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleStopMonitoring
 	case "VehicleJourney":
 		svs := connector.partner.Model().StopVisits().FindFollowingByVehicleJourneyId(model.VehicleJourneyId(event.ModelId))
 		for i := range svs {
-			subsIds := connector.checkEvent(&svs[i])
+			subsIds := connector.checkEvent(svs[i])
 			if len(subsIds) != 0 {
 				connector.addStopVisit(subsIds, svs[i].Id())
 			}

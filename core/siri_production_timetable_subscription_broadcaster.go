@@ -118,7 +118,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 			// Init StopVisits LastChange
 			connector.addLineStopVisits(sub, r, line.Id())
 
-			sub.AddNewResource(*r)
+			sub.AddNewResource(r)
 		}
 		sub.Save()
 	}
@@ -151,7 +151,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt 
 			r := NewResource(ref)
 			r.SubscribedAt = connector.Clock().Now()
 			r.SubscribedUntil = ptt.InitialTerminationTime()
-			resources = append(resources, &r)
+			resources = append(resources, r)
 		}
 		return resources, lineIds
 	}
@@ -174,7 +174,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt 
 		r := NewResource(ref)
 		r.SubscribedAt = connector.Clock().Now()
 		r.SubscribedUntil = ptt.InitialTerminationTime()
-		resources = append(resources, &r)
+		resources = append(resources, r)
 	}
 	return resources, lineIds
 }
@@ -229,12 +229,12 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkEvent(svId
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*ls.ProductionTimeTableLastChange).Haschanged(&sv) {
+		if ok && !lastState.(*ls.ProductionTimeTableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
-			r.SetLastState(string(sv.Id()), ls.NewProductionTimeTableLastChange(&sv, sub))
+			r.SetLastState(string(sv.Id()), ls.NewProductionTimeTableLastChange(sv, sub))
 		}
 
 		connector.addStopVisit(sub.Id(), svId)
