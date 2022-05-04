@@ -187,14 +187,6 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			monitoredStopVisits[stopVisitId] = struct{}{}
 
-			// See what to do about the MaximumStopVisits #10333
-			// // Refresh delivery
-			// if maximumStopVisits != 0 && (len(delivery.MonitoredStopVisits)+len(delivery.CancelledStopVisits)) >= maximumStopVisits {
-			// 	smb.sendNotification(delivery)
-			// 	delivery.MonitoredStopVisits = []*siri.SIRIMonitoredStopVisit{}
-			// 	delivery.CancelledStopVisits = []*siri.SIRICancelledStopVisit{}
-			// }
-
 			// Get the Resource lastState for the StopVisit
 			lastStateInterface, _ := resource.LastState(string(stopVisitId))
 			lastState, ok := lastStateInterface.(*stopMonitoringLastChange)

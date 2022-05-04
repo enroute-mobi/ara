@@ -151,22 +151,6 @@ func (xmlStruct *XMLStructure) findNodeWithNamespace(localName string) xml.Node 
 	return nodes[0]
 }
 
-// func (xmlStruct *XMLStructure) findXMLNode(localName string) XMLNode {
-// 	xpath := fmt.Sprintf(".//*[local-name()='%s']", localName)
-// 	nodes, err := xmlStruct.node.NativeNode().Search(xpath)
-// 	if err != nil {
-// 		return nil
-// 	}
-// 	if len(nodes) == 0 {
-// 		return nil
-// 	}
-
-// 	subNode := NewSubXMLNode(nodes[0])
-// 	subNode.parent = xmlStruct.node
-
-// 	return subNode
-// }
-
 func (xmlStruct *XMLStructure) findNode(localName string) xml.Node {
 	xpath := fmt.Sprintf(".//%s", localName)
 
@@ -232,7 +216,6 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 		return time.Time{}
 	}
 	t, err := time.Parse("2006-01-02T15:04:05Z07:00", strings.TrimSpace(node.Content()))
-	// t, err := time.Parse(time.RFC3339, strings.TrimSpace(node.Content()))
 	if err != nil {
 		return time.Time{}
 	}

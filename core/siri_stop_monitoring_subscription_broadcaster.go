@@ -308,7 +308,6 @@ type TestStopMonitoringSubscriptionBroadcaster struct {
 	uuid.UUIDConsumer
 
 	events []*model.StopMonitoringBroadcastEvent
-	// stopMonitoringBroadcaster SIRIStopMonitoringBroadcaster
 }
 
 func NewTestStopMonitoringSubscriptionBroadcaster() *TestStopMonitoringSubscriptionBroadcaster {

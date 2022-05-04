@@ -1,8 +1,6 @@
 package model
 
 type StatusUpdateEvent struct {
-	// Origin string
-
 	StopAreaId StopAreaId
 	Partner    string
 	Status     bool

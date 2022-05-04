@@ -23,8 +23,6 @@ type Vehicle struct {
 	LineId           LineId           `json:",omitempty"`
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
-	// SRSName     string  `json:",omitempty"`
-	// Coordinates string  `json:",omitempty"`
 	Longitude float64 `json:",omitempty"`
 	Latitude  float64 `json:",omitempty"`
 

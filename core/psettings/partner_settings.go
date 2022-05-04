@@ -234,13 +234,7 @@ func (s *PartnerSettings) RequestorRef() string {
 	return s.ProducerRef()
 }
 
-// Ref Issue #4300
 func (s *PartnerSettings) Address() string {
-	// address := s.s("local_url")
-	// if address == "" {
-	// 	address = config.Config.DefaultAddress
-	// }
-	// return address
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.s[LOCAL_URL]

@@ -69,10 +69,7 @@ type SIRIMonitoredStopVisit struct {
 	ExpectedDepartureTime time.Time
 	ActualDepartureTime   time.Time
 
-	// Attributes
 	Attributes map[string]map[string]string
-
-	// Références
 	References map[string]map[string]string
 }
 

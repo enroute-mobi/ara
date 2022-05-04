@@ -21,29 +21,22 @@ type SIRIError struct {
 func (e SIRIError) Send() {
 	logger.Log.Debugf("Send SIRI error %v : %v", e.errCode, e.errDescription)
 
-	// Wrap soap and send response
-	soapEnvelope := remote.NewSIRIBuffer(e.envelopeType)
-	soapEnvelope.WriteXML(fmt.Sprintf(`
+	buffer := remote.NewSIRIBuffer(e.envelopeType)
+	buffer.WriteXML(fmt.Sprintf(`
   <S:Fault>
     <faultcode>S:%s</faultcode>
     <faultstring>%s</faultstring>
   </S:Fault>`, e.errCode, e.errDescription))
 
 	message := &audit.BigQueryMessage{
-		Protocol:  "siri",
-		Direction: "received",
-		Status:    "Error",
-		// Type:         "siri-error",
+		Protocol:     "siri",
+		Direction:    "received",
+		Status:       "Error",
 		ErrorDetails: fmt.Sprintf("%v: %v", e.errCode, e.errDescription),
-		// ResponseRawMessage: soapEnvelope.String(),
 	}
 
-	// if e.request != "" {
-	// 	message.RequestRawMessage = e.request
-	// }
-
-	soapEnvelope.WriteTo(e.response)
-	message.ResponseSize = soapEnvelope.Length()
+	buffer.WriteTo(e.response)
+	message.ResponseSize = buffer.Length()
 
 	audit.CurrentBigQuery(e.referentialSlug).WriteEvent(message)
 }

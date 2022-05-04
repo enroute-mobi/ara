@@ -170,11 +170,6 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	if len(partner.Subscriptions().FindAll()) != 0 {
 		t.Errorf("Subscriptions should not be found \n")
 	}
-
-	// stopVisit = referential.Model().StopVisits().FindByStopAreaId(stopArea.Id())[0]
-	// if stopVisit.IsCollected() != false {
-	// 	t.Errorf("stopVisit should be false but got %v\n", stopVisit.IsCollected())
-	// }
 }
 
 func Test_Partner_MarshalJSON(t *testing.T) {

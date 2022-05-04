@@ -56,8 +56,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 
 func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(request *siri.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
-	// monitoringRefs := []string{}
-	// lineRefs := []string{}
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
@@ -114,7 +112,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				Attributes:             make(map[string]string),
 				References:             make(map[string]string),
 			}
-			// lineRefs = append(lineRefs, estimatedVehicleJourney.LineRef)
 			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], vjs[i].Origin)
 			estimatedVehicleJourney.Attributes = vjs[i].Attributes
 
@@ -134,7 +131,6 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
 
-				// monitoringRefs = append(monitoringRefs, stopAreaId)
 				estimatedCall := &siri.SIRIEstimatedCall{
 					ArrivalStatus:      string(svs[i].ArrivalStatus),
 					DepartureStatus:    string(svs[i].DepartureStatus),

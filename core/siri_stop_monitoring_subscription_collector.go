@@ -244,6 +244,4 @@ func logXMLDeleteSubscriptionResponse(message *audit.BigQueryMessage, response *
 	}
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-	// TODO no ResponseMessageIdentifier() method in XMLDeleteSubscriptionResponse
-	// message.ResponseIdentifier = response.ResponseMessageIdentifier()
 }

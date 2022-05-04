@@ -51,9 +51,6 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 		ResponseTimestamp: connector.Clock().Now(),
 	}
 
-	// Prepare Id Array
-	// var messageArray []string
-
 	builder := NewBroadcastGeneralMessageBuilder(connector.Partner(), SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER)
 	builder.InfoChannelRef = request.InfoChannelRef()
 	builder.SetLineRef(request.LineRef())
@@ -65,7 +62,6 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery
 		if siriGeneralMessage == nil {
 			continue
 		}
-		// messageArray = append(messageArray, siriGeneralMessage.InfoMessageIdentifier)
 		delivery.GeneralMessages = append(delivery.GeneralMessages, siriGeneralMessage)
 	}
 

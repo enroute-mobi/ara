@@ -19,7 +19,6 @@ func Test_VehicleJourney_Id(t *testing.T) {
 	}
 }
 
-// WIP: Determine what to return in JSON
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	model := NewMemoryModel()
 	generator := uuid.NewFakeUUIDGenerator()

@@ -264,8 +264,6 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	}
 
 	vehicle.VehicleJourneyId = vj.Id()
-	// vehicle.SRSName = event.SRSName
-	// vehicle.Coordinates = event.Coordinates
 	vehicle.DriverRef = event.DriverRef
 	vehicle.Longitude = event.Longitude
 	vehicle.Latitude = event.Latitude

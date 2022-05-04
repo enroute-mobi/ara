@@ -247,7 +247,6 @@ func (loader *Loader) handleStopArea(record []string) error {
 	}
 
 	var err error
-	// parseErrors := make(map[string]string)
 	parseErrors := ComplexError{}
 
 	var collectedAlways bool

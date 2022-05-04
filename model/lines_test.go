@@ -17,7 +17,6 @@ func Test_Line_Id(t *testing.T) {
 	}
 }
 
-// WIP: Determine what to return in JSON
 func Test_Line_MarshalJSON(t *testing.T) {
 	line := Line{
 		Name: "Line",
