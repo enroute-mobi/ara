@@ -6,6 +6,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -88,14 +89,12 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 
 		lastState, ok := resource.LastState(string(situation.Id()))
 
-		if ok && !lastState.(*generalMessageLastChange).Haschanged(&situation) {
+		if ok && !lastState.(*ls.GeneralMessageLastChange).Haschanged(&situation) {
 			continue
 		}
 
 		if !ok {
-			gmlc := &generalMessageLastChange{}
-			gmlc.InitState(&situation, sub)
-			resource.SetLastState(string(situation.Id()), gmlc)
+			resource.SetLastState(string(situation.Id()), ls.NewGeneralMessageLastChange(&situation, sub))
 		}
 		connector.addSituation(sub.Id(), sId)
 	}
@@ -161,9 +160,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *S
 			continue
 		}
 
-		gmlc := &generalMessageLastChange{}
-		gmlc.InitState(&situations[i], sub)
-		r.SetLastState(string(situations[i].Id()), gmlc)
+		r.SetLastState(string(situations[i].Id()), ls.NewGeneralMessageLastChange(&situations[i], sub))
 		connector.addSituation(sub.Id(), situations[i].Id())
 	}
 }

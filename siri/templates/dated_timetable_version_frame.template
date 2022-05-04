@@ -1,0 +1,30 @@
+<siri:DatedTimetableVersionFrame>
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
+				<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
+				<siri:DirectionRef>{{ .Attributes.DirectionRef }}</siri:DirectionRef>{{ else }}
+				<siri:DirectionRef/>{{ end }}
+				<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
+				<siri:DatedVehicleJourney>
+					<siri:FramedVehicleJourneyRef>
+							<siri:DataFrameRef>{{ .DataFrameRef }}</siri:DataFrameRef>
+							<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>
+					</siri:FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
+					<siri:VehicleMode>{{ .Attributes.VehicleMode }}</siri:VehicleMode>{{ end }}
+					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ if .References.OperatorRef }}
+					<siri:OperatorRef>{{ .References.OperatorRef }}</siri:OperatorRef>{{ else }}
+					<siri:OperatorRef/>{{ end }}{{ if .Attributes.ProductCategoryRef }}
+					<siri:ProductCategoryRef>{{ .Attributes.ProductCategoryRef }}</siri:ProductCategoryRef>{{ end }}{{ if .Attributes.OriginDisplay }}
+					<siri:OriginDisplay>{{ .Attributes.OriginDisplay }}</siri:OriginDisplay>{{ end }}{{ if .Attributes.DestinationDisplay }}
+					<siri:DestinationDisplay>{{ .Attributes.DestinationDisplay }}</siri:DestinationDisplay>{{ end }}
+					<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
+					<siri:DatedCalls>{{ range .DatedCalls }}
+						<siri:DatedCall>
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .VisitNumber }}
+							<siri:VisitNumber>{{ .VisitNumber }}</siri:VisitNumber>{{ end }}{{ if .StopPointName }}
+							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .AimedDepartureTime.IsZero }}
+							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}
+						</siri:DatedCall>{{ end }}
+					</siri:DatedCalls>{{ end }}
+			 </siri:DatedVehicleJourney>{{ end }}
+			</siri:DatedTimetableVersionFrame>

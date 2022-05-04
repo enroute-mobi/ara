@@ -14,13 +14,21 @@ import (
 )
 
 type StopVisitController struct {
-	referential *core.Referential
+	svs model.StopVisits
 }
 
 func NewStopVisitController(referential *core.Referential) ControllerInterface {
 	return &Controller{
 		restfulResource: &StopVisitController{
-			referential: referential,
+			svs: referential.Model().StopVisits(),
+		},
+	}
+}
+
+func NewScheduledStopVisitController(referential *core.Referential) ControllerInterface {
+	return &Controller{
+		restfulResource: &StopVisitController{
+			svs: referential.Model().ScheduledStopVisits(),
 		},
 	}
 }
@@ -31,9 +39,9 @@ func (controller *StopVisitController) findStopVisit(identifier string) (*model.
 	foundStrings := pattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().StopVisits().FindByObjectId(objectid)
+		return controller.svs.FindByObjectId(objectid)
 	}
-	return controller.referential.Model().StopVisits().Find(model.StopVisitId(identifier))
+	return controller.svs.Find(model.StopVisitId(identifier))
 }
 
 func (controller *StopVisitController) filterStopVisits(stopVisits []*model.StopVisit, filters url.Values) []*model.StopVisit {
@@ -73,7 +81,7 @@ func (controller *StopVisitController) filterStopVisits(stopVisits []*model.Stop
 }
 
 func (controller *StopVisitController) Index(response http.ResponseWriter, filters url.Values) {
-	stopVisits := controller.referential.Model().StopVisits().FindAll()
+	stopVisits := controller.svs.FindAll()
 	filteredStopVisits := controller.filterStopVisits(stopVisits, filters)
 
 	logger.Log.Debugf("StopVisits Index")
@@ -102,7 +110,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
 
 	jsonBytes, _ := stopVisit.MarshalJSON()
-	controller.referential.Model().StopVisits().Delete(stopVisit)
+	controller.svs.Delete(stopVisit)
 	response.Write(jsonBytes)
 }
 
@@ -122,20 +130,20 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := controller.referential.Model().StopVisits().FindByObjectId(obj)
+		sv, ok := controller.svs.FindByObjectId(obj)
 		if ok && sv.Id() != stopVisit.Id() {
 			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	controller.referential.Model().StopVisits().Save(stopVisit)
+	controller.svs.Save(stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }
 
 func (controller *StopVisitController) Create(response http.ResponseWriter, body []byte) {
-	stopVisit := controller.referential.Model().StopVisits().New()
+	stopVisit := controller.svs.New()
 
 	err := json.Unmarshal(body, &stopVisit)
 	if err != nil {
@@ -149,14 +157,14 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 	}
 
 	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := controller.referential.Model().StopVisits().FindByObjectId(obj)
+		sv, ok := controller.svs.FindByObjectId(obj)
 		if ok {
 			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
 
-	controller.referential.Model().StopVisits().Save(stopVisit)
+	controller.svs.Save(stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }

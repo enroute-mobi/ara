@@ -38,25 +38,6 @@ func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan mode
 	return manager.gmbEventChan
 }
 
-func (manager *BroadcastManager) GetPartnersWithConnector(connectorTypes []string) []*Partner {
-	partners := []*Partner{}
-
-	for _, partner := range manager.Referential.Partners().FindAll() {
-		ok := false
-		for _, connectorType := range connectorTypes {
-			if _, present := partner.Connector(connectorType); !present {
-				continue
-			}
-			ok = true
-		}
-		if !ok {
-			continue
-		}
-		partners = append(partners, partner)
-	}
-	return partners
-}
-
 func (manager *BroadcastManager) Start() {
 	logger.Log.Debugf("BroadcastManager start")
 
@@ -82,7 +63,7 @@ func (manager *BroadcastManager) run() {
 
 func (manager *BroadcastManager) smsbEvent_handler(event model.StopMonitoringBroadcastEvent) {
 	connectorTypes := []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
-	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
 		connector, ok := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*SIRIStopMonitoringSubscriptionBroadcaster).HandleStopMonitoringBroadcastEvent(&event)
@@ -100,7 +81,7 @@ func (manager *BroadcastManager) smsbEvent_handler(event model.StopMonitoringBro
 
 func (manager *BroadcastManager) ettsbEvent_handler(event model.StopMonitoringBroadcastEvent) {
 	connectorTypes := []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER, TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
-	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
 		connector, ok := partner.Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleBroadcastEvent(&event)
@@ -117,7 +98,7 @@ func (manager *BroadcastManager) ettsbEvent_handler(event model.StopMonitoringBr
 
 func (manager *BroadcastManager) gmsbEvent_handler(event model.GeneralMessageBroadcastEvent) {
 	connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
-	for _, partner := range manager.GetPartnersWithConnector(connectorTypes) {
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
 		connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*SIRIGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)

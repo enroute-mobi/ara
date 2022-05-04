@@ -15,15 +15,16 @@ var newControllerMap = map[string](func(*Server) ControllerInterface){
 }
 
 var newWithReferentialControllerMap = map[string](func(*core.Referential) ControllerInterface){
-	"stop_areas":       NewStopAreaController,
-	"partners":         NewPartnerController,
-	"lines":            NewLineController,
-	"stop_visits":      NewStopVisitController,
-	"vehicle_journeys": NewVehicleJourneyController,
-	"situations":       NewSituationController,
-	"operators":        NewOperatorController,
-	"vehicles":         NewVehicleController,
-	"import":           NewImportController,
+	"stop_areas":            NewStopAreaController,
+	"partners":              NewPartnerController,
+	"lines":                 NewLineController,
+	"stop_visits":           NewStopVisitController,
+	"scheduled_stop_visits": NewScheduledStopVisitController,
+	"vehicle_journeys":      NewVehicleJourneyController,
+	"situations":            NewSituationController,
+	"operators":             NewOperatorController,
+	"vehicles":              NewVehicleController,
+	"import":                NewImportController,
 }
 
 type RestfulResource interface {

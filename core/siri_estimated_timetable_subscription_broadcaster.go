@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -119,9 +120,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	sas := connector.partner.Model().StopAreas().FindByLineId(lineId)
 	for i := range sas {
 		// Init SA LastChange
-		salc := &stopAreaLastChange{}
-		salc.InitState(sas[i], sub)
-		res.SetLastState(string(sas[i].Id()), salc)
+		res.SetLastState(string(sas[i].Id()), ls.NewStopAreaLastChange(sas[i], sub))
 		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
 		for i := range svs {
 			connector.addStopVisit(sub.Id(), svs[i].Id())
@@ -130,7 +129,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
-	var lids []string
 	// check for subscription to all lines
 	if len(ett.Lines()) == 0 {
 		var lv []string
@@ -154,7 +152,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 			r.SubscribedUntil = ett.InitialTerminationTime()
 			resources = append(resources, r)
 		}
-		return resources, lids
+		return resources, lineIds
 	}
 
 	for _, lineId := range ett.Lines() {
@@ -163,7 +161,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
 
 		if !ok {
-			lids = append(lids, lineId)
+			lineIds = append(lineIds, lineId)
 			continue
 		}
 
@@ -177,7 +175,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r.SubscribedUntil = ett.InitialTerminationTime()
 		resources = append(resources, r)
 	}
-	return resources, lids
+	return resources, lineIds
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {
@@ -241,14 +239,12 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(sv) {
+		if ok && !lastState.(*ls.EstimatedTimeTableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
-			ettlc := &estimatedTimeTableLastChange{}
-			ettlc.InitState(sv, sub)
-			r.SetLastState(string(sv.Id()), ettlc)
+			r.SetLastState(string(sv.Id()), ls.NewEstimatedTimeTableLastChange(sv, sub))
 		}
 
 		connector.addStopVisit(sub.Id(), svId)
@@ -278,7 +274,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 
 		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
-			partners, ok := lastState.(*stopAreaLastChange).Haschanged(stopArea)
+			partners, ok := lastState.(*ls.StopAreaLastChange).Haschanged(stopArea)
 			if ok {
 				nm, ok := connector.notMonitored[sub.Id()]
 				if !ok {
@@ -289,11 +285,9 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 					nm[partner] = struct{}{}
 				}
 			}
-			lastState.(*stopAreaLastChange).UpdateState(stopArea)
+			lastState.(*ls.StopAreaLastChange).UpdateState(stopArea)
 		} else { // Should not happen
-			salc := &stopAreaLastChange{}
-			salc.InitState(stopArea, sub)
-			resource.SetLastState(string(stopArea.Id()), salc)
+			resource.SetLastState(string(stopArea.Id()), ls.NewStopAreaLastChange(stopArea, sub))
 		}
 	}
 

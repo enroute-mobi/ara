@@ -16,6 +16,7 @@ type XMLSubscriptionRequest struct {
 	smEntries  []*XMLStopMonitoringSubscriptionRequestEntry
 	gmEntries  []*XMLGeneralMessageSubscriptionRequestEntry
 	ettEntries []*XMLEstimatedTimetableSubscriptionRequestEntry
+	pttEntries []*XMLProductionTimetableSubscriptionRequestEntry
 }
 
 func NewXMLSubscriptionRequestFromContent(content []byte) (*XMLSubscriptionRequest, error) {
@@ -53,6 +54,17 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionETTEntries() []*XMLEstimat
 		request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
 	}
 	return request.ettEntries
+}
+
+func (request *XMLSubscriptionRequest) XMLSubscriptionPTTEntries() []*XMLProductionTimetableSubscriptionRequestEntry {
+	if len(request.pttEntries) != 0 {
+		return request.pttEntries
+	}
+	nodes := request.findNodes("ProductionTimetableSubscriptionRequest")
+	for _, ett := range nodes {
+		request.pttEntries = append(request.pttEntries, NewXMLProductionTimetableSubscriptionRequestEntry(ett))
+	}
+	return request.pttEntries
 }
 
 func (request *XMLSubscriptionRequest) XMLSubscriptionGMEntries() []*XMLGeneralMessageSubscriptionRequestEntry {

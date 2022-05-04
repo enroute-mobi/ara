@@ -33,9 +33,9 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find VehicleJourney: %v", model.VehicleJourneys().FindAll())
 	}
-	_, ok = model.StopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
-		t.Errorf("Can't find StopVisit: %v", model.StopVisits().FindAll())
+		t.Errorf("Can't find StopVisit: %v", model.ScheduledStopVisits().FindAll())
 	}
 	_, ok = model.Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
@@ -62,9 +62,9 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find VehicleJourney: %v", model.VehicleJourneys().FindAll())
 	}
-	_, ok = model.StopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
-		t.Errorf("Can't find StopVisit: %v", model.StopVisits().FindAll())
+		t.Errorf("Can't find StopVisit: %v", model.ScheduledStopVisits().FindAll())
 	}
 	_, ok = model.Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {

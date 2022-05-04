@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -38,14 +39,14 @@ type SubscribedResource struct {
 	RetryCount       int
 	SubscribedAt     time.Time
 	SubscribedUntil  time.Time
-	lastStates       map[string]lastState
+	lastStates       map[string]ls.LastState
 	resourcesOptions map[string]string
 }
 
 func NewResource(ref model.Reference) *SubscribedResource {
 	return &SubscribedResource{
 		Reference:        ref,
-		lastStates:       make(map[string]lastState),
+		lastStates:       make(map[string]ls.LastState),
 		resourcesOptions: make(map[string]string),
 	}
 }
@@ -54,14 +55,14 @@ func (sr *SubscribedResource) ResourcesOptions() map[string]string {
 	return sr.resourcesOptions
 }
 
-func (sr *SubscribedResource) LastState(state string) (l lastState, ok bool) {
+func (sr *SubscribedResource) LastState(state string) (l ls.LastState, ok bool) {
 	sr.RLock()
 	l, ok = sr.lastStates[state]
 	sr.RUnlock()
 	return
 }
 
-func (sr *SubscribedResource) SetLastState(s string, l lastState) {
+func (sr *SubscribedResource) SetLastState(s string, l ls.LastState) {
 	sr.Lock()
 	sr.lastStates[s] = l
 	sr.Unlock()
@@ -210,7 +211,7 @@ func (subscription *Subscription) CreateAddNewResource(reference model.Reference
 	resource := SubscribedResource{
 		Reference:        reference,
 		SubscribedUntil:  subscription.Clock().Now().Add(2 * time.Minute),
-		lastStates:       make(map[string]lastState),
+		lastStates:       make(map[string]ls.LastState),
 		resourcesOptions: make(map[string]string),
 	}
 	subscription.Lock()

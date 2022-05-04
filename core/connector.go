@@ -27,17 +27,19 @@ const (
 	SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER      = "siri-estimated-timetable-request-broadcaster"
 	SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster"
 	TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster-test"
-	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR         = "siri-vehicle-monitoring-request-collector"
-	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER              = "siri-subscription-request-dispatcher"
-	SIRI_CHECK_STATUS_CLIENT_TYPE                     = "siri-check-status-client"
-	TEST_CHECK_STATUS_CLIENT_TYPE                     = "test-check-status-client"
-	SIRI_CHECK_STATUS_SERVER_TYPE                     = "siri-check-status-server"
-	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER  = "siri-lite-vehicle-monitoring-request-broadcaster"
-	TEST_VALIDATION_CONNECTOR                         = "test-validation-connector"
-	TEST_STARTABLE_CONNECTOR                          = "test-startable-connector-connector"
-	GTFS_RT_REQUEST_COLLECTOR                         = "gtfs-rt-request-collector"
-	GTFS_RT_TRIP_UPDATES_BROADCASTER                  = "gtfs-rt-trip-updates-broadcaster"
-	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER             = "gtfs-rt-vehicle-positions-broadcaster"
+	// SIRI_PRODUCTION_TIMETABLE_REQUEST_BROADCASTER      = "siri-production-timetable-request-broadcaster"
+	SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-production-timetable-subscription-broadcaster"
+	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR          = "siri-vehicle-monitoring-request-collector"
+	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER               = "siri-subscription-request-dispatcher"
+	SIRI_CHECK_STATUS_CLIENT_TYPE                      = "siri-check-status-client"
+	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
+	SIRI_CHECK_STATUS_SERVER_TYPE                      = "siri-check-status-server"
+	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER   = "siri-lite-vehicle-monitoring-request-broadcaster"
+	TEST_VALIDATION_CONNECTOR                          = "test-validation-connector"
+	TEST_STARTABLE_CONNECTOR                           = "test-startable-connector-connector"
+	GTFS_RT_REQUEST_COLLECTOR                          = "gtfs-rt-request-collector"
+	GTFS_RT_TRIP_UPDATES_BROADCASTER                   = "gtfs-rt-trip-updates-broadcaster"
+	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER              = "gtfs-rt-vehicle-positions-broadcaster"
 )
 
 type Connector interface{}
@@ -100,6 +102,10 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIEstimatedTimetableSubscriptionBroadcasterFactory{}
 	case TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER:
 		return &TestSIRIETTSubscriptionBroadcasterFactory{}
+	// case SIRI_PRODUCTION_TIMETABLE_REQUEST_BROADCASTER:
+	// 	return &SIRIProductionTimetableSubscriptionBroadcasterFactory{}
+	case SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER:
+		return &SIRIProductionTimetableSubscriptionBroadcasterFactory{}
 	case SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIVehicleMonitoringRequestCollectorFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:

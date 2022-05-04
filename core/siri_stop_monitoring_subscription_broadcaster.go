@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
@@ -121,14 +122,12 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model
 			}
 
 			lastState, ok := resource.LastState(string(sv.Id()))
-			if ok && !lastState.(*stopMonitoringLastChange).Haschanged(sv) {
+			if ok && !lastState.(*ls.StopMonitoringLastChange).Haschanged(sv) {
 				continue
 			}
 
 			if !ok {
-				smlc := &stopMonitoringLastChange{}
-				smlc.InitState(sv, sub)
-				resource.SetLastState(string(sv.Id()), smlc)
+				resource.SetLastState(string(sv.Id()), ls.NewStopMonitoringLastChange(sv, sub))
 			}
 
 			subscriptionIds = append(subscriptionIds, sub.Id())
@@ -155,7 +154,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 
 		lastState, ok := resource.LastState(string(stopArea.Id()))
 		if ok {
-			partners, ok := lastState.(*stopAreaLastChange).Haschanged(stopArea)
+			partners, ok := lastState.(*ls.StopAreaLastChange).Haschanged(stopArea)
 			if ok {
 				nm, ok := connector.notMonitored[sub.Id()]
 				if !ok {
@@ -168,11 +167,9 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 					}
 				}
 			}
-			lastState.(*stopAreaLastChange).UpdateState(stopArea)
+			lastState.(*ls.StopAreaLastChange).UpdateState(stopArea)
 		} else { // Should not happen
-			salc := &stopAreaLastChange{}
-			salc.InitState(stopArea, sub)
-			resource.SetLastState(string(stopArea.Id()), salc)
+			resource.SetLastState(string(stopArea.Id()), ls.NewStopAreaLastChange(stopArea, sub))
 		}
 	}
 
@@ -231,9 +228,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		resps = append(resps, rs)
 
 		// Init SA LastChange
-		salc := &stopAreaLastChange{}
-		salc.InitState(sa, sub)
-		r.SetLastState(string(sa.Id()), salc)
+		r.SetLastState(string(sa.Id()), ls.NewStopAreaLastChange(sa, sub))
 		// Init StopVisits LastChange
 		connector.addStopAreaStopVisits(sa, sub, r)
 	}
@@ -259,9 +254,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 				continue
 			}
 
-			smlc := &stopMonitoringLastChange{}
-			smlc.InitState(svs[i], sub)
-			res.SetLastState(string(svs[i].Id()), smlc)
+			res.SetLastState(string(svs[i].Id()), ls.NewStopMonitoringLastChange(svs[i], sub))
 			connector.addStopVisit([]SubscriptionId{sub.Id()}, svs[i].Id())
 		}
 	}
