@@ -1,7 +1,6 @@
 package core
 
 import (
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 )
 
@@ -44,7 +43,7 @@ const (
 type Connector interface{}
 
 type GtfsConnector interface {
-	HandleGtfs(*gtfs.FeedMessage, audit.LogStashEvent)
+	HandleGtfs(*gtfs.FeedMessage)
 }
 
 type connector struct {

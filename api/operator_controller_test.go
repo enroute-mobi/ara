@@ -24,7 +24,7 @@ func checkOperatorResponseStatus(responseRecorder *httptest.ResponseRecorder, t 
 	}
 }
 
-func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (operator model.Operator, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (operator *model.Operator, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -37,7 +37,7 @@ func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new operator
 	operator = referential.Model().Operators().New()
-	referential.Model().Operators().Save(&operator)
+	referential.Model().Operators().Save(operator)
 
 	// Create a request
 	address := []byte("/default/operators")

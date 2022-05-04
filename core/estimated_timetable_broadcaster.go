@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -229,7 +227,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
-				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(&vehicleJourney, &stopVisit)
+				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
@@ -258,21 +256,21 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
 				ettlc := &estimatedTimeTableLastChange{}
-				ettlc.InitState(&stopVisit, sub)
+				ettlc.InitState(stopVisit, sub)
 				resource.SetLastState(string(stopVisit.Id()), ettlc)
 			} else {
 				lastState := lastStateInterface.(*estimatedTimeTableLastChange)
-				lastState.UpdateState(&stopVisit)
+				lastState.UpdateState(stopVisit)
 			}
 		}
 		ett.sendDelivery(delivery)
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
-		return model.StopArea{}, "", false
+		return &model.StopArea{}, "", false
 	}
 	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
 	if ok {
@@ -285,7 +283,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 			return referent, referentObjectId.Value(), true
 		}
 	}
-	return model.StopArea{}, "", false
+	return &model.StopArea{}, "", false
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {
@@ -341,21 +339,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRef
 }
 
 func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {
-	logStashEvent := ett.newLogStashEvent()
 	message := ett.newBQEvent()
 
-	logSIRIEstimatedTimeTableNotify(logStashEvent, message, delivery)
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
+	logSIRIEstimatedTimeTableNotify(message, delivery)
 
 	t := ett.Clock().Now()
 
-	err := ett.connector.Partner().SIRIClient().NotifyEstimatedTimeTable(delivery)
+	ett.connector.Partner().SIRIClient().NotifyEstimatedTimeTable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
-	if err != nil {
-		event := ett.newLogStashEvent()
-		logSIRINotifyError(err.Error(), delivery.ResponseMessageIdentifier, event)
-		audit.CurrentLogStash().WriteEvent(event)
-	}
 
 	audit.CurrentBigQuery(string(ett.connector.Partner().Referential().Slug())).WriteEvent(message)
 }
@@ -370,13 +361,7 @@ func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func (smb *ETTBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := smb.connector.partner.NewLogStashEvent()
-	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
-	return event
-}
-
-func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
+func logSIRIEstimatedTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {
@@ -398,32 +383,14 @@ func logSIRIEstimatedTimeTableNotify(logStashEvent audit.LogStashEvent, message 
 	message.StopAreas = monitoringRefs
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
-	logStashEvent["siriType"] = "NotifyEstimatedTimetable"
-	logStashEvent["producerRef"] = response.ProducerRef
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = response.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["subscriberRef"] = response.SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = response.SubscriptionIdentifier
-	logStashEvent["lineRefs"] = strings.Join(lineRefs, ",")
-	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-
 	if !response.Status {
 		message.Status = "Error"
-		logStashEvent["errorType"] = response.ErrorType
-		if response.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		}
-		logStashEvent["errorText"] = response.ErrorText
 		message.ErrorDetails = response.ErrorString()
 	}
 	xml, err := response.BuildXML()
 	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
 		return
 	}
-	logStashEvent["responseXML"] = xml
 	message.ResponseRawMessage = xml
 	message.ResponseSize = int64(len(xml))
 }

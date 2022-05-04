@@ -33,9 +33,7 @@ In broadcast only:
 
 Outsource, process and store in real time all exchanges managed by Ara :
 
-* Send real time exchange data to LogStash processing
-* High performance storage for consultation and statistics via ElasticSearch
-* Visualization of historical data via Kibana
+* Send real time exchange data to BigQuery
 
 ## More Information
 

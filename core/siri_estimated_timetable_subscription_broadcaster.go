@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -59,9 +58,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
-		logStashEvent := connector.newLogStashEvent()
-		logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent, ett)
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
@@ -83,9 +79,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		}
 
 		resps = append(resps, rs)
-
-		logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent, &rs)
-		audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 		// We do not want to create a subscription that will fail
 		if len(unknownLineIds) != 0 {
@@ -111,7 +104,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			// Init StopVisits LastChange
 			connector.addLineStopVisits(sub, r, line.Id())
 
-			sub.AddNewResource(*r)
+			sub.AddNewResource(r)
 		}
 		sub.Save()
 	}
@@ -127,7 +120,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	for i := range sas {
 		// Init SA LastChange
 		salc := &stopAreaLastChange{}
-		salc.InitState(&sas[i], sub)
+		salc.InitState(sas[i], sub)
 		res.SetLastState(string(sas[i].Id()), salc)
 		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
 		for i := range svs {
@@ -159,7 +152,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 			r := NewResource(ref)
 			r.SubscribedAt = connector.Clock().Now()
 			r.SubscribedUntil = ett.InitialTerminationTime()
-			resources = append(resources, &r)
+			resources = append(resources, r)
 		}
 		return resources, lids
 	}
@@ -182,7 +175,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 		r := NewResource(ref)
 		r.SubscribedAt = connector.Clock().Now()
 		r.SubscribedUntil = ett.InitialTerminationTime()
-		resources = append(resources, &r)
+		resources = append(resources, r)
 	}
 	return resources, lids
 }
@@ -211,7 +204,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastE
 	case "StopArea":
 		sa, ok := connector.partner.Model().StopAreas().Find(model.StopAreaId(event.ModelId))
 		if ok {
-			connector.checkStopAreaEvent(&sa)
+			connector.checkStopAreaEvent(sa)
 		}
 	default:
 		return
@@ -248,13 +241,13 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(&sv) {
+		if ok && !lastState.(*estimatedTimeTableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
 			ettlc := &estimatedTimeTableLastChange{}
-			ettlc.InitState(&sv, sub)
+			ettlc.InitState(sv, sub)
 			r.SetLastState(string(sv.Id()), ettlc)
 		}
 
@@ -305,38 +298,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 	}
 
 	connector.mutex.Unlock()
-}
-
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "EstimatedTimeTableSubscriptionBroadcaster"
-	return event
-}
-
-func logSIRIEstimatedTimeTableSubscriptionEntry(logStashEvent audit.LogStashEvent, ettEntry *siri.XMLEstimatedTimetableSubscriptionRequestEntry) {
-	logStashEvent["siriType"] = "EstimatedTimeTableSubscriptionEntry"
-	logStashEvent["lineRefs"] = strings.Join(ettEntry.Lines(), ",")
-	logStashEvent["messageIdentifier"] = ettEntry.MessageIdentifier()
-	logStashEvent["subscriberRef"] = ettEntry.SubscriberRef()
-	logStashEvent["subscriptionIdentifier"] = ettEntry.SubscriptionIdentifier()
-	logStashEvent["initialTerminationTime"] = ettEntry.InitialTerminationTime().String()
-	logStashEvent["requestTimestamp"] = ettEntry.RequestTimestamp().String()
-	logStashEvent["requestXML"] = ettEntry.RawXML()
-}
-
-func logSIRIEstimatedTimeTableSubscriptionResponseEntry(logStashEvent audit.LogStashEvent, response *siri.SIRIResponseStatus) {
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef
-	logStashEvent["subscriptionRef"] = response.SubscriptionRef
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["validUntil"] = response.ValidUntil.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	if !response.Status {
-		logStashEvent["errorType"] = response.ErrorType
-		if response.ErrorType == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(response.ErrorNumber)
-		}
-		logStashEvent["errorText"] = response.ErrorText
-	}
 }
 
 // START TEST

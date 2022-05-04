@@ -135,7 +135,7 @@ func Test_MemoryVehicles_Save(t *testing.T) {
 
 	vehicle := vehicles.New()
 
-	if success := vehicles.Save(&vehicle); !success {
+	if success := vehicles.Save(vehicle); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -156,7 +156,7 @@ func Test_MemoryVehicles_Find(t *testing.T) {
 	vehicles := NewMemoryVehicles()
 
 	existingVehicle := vehicles.New()
-	vehicles.Save(&existingVehicle)
+	vehicles.Save(existingVehicle)
 
 	vehicleId := existingVehicle.Id()
 
@@ -174,7 +174,7 @@ func Test_MemoryVehicles_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingVehicle := vehicles.New()
-		vehicles.Save(&existingVehicle)
+		vehicles.Save(existingVehicle)
 	}
 
 	foundVehicles := vehicles.FindAll()
@@ -189,9 +189,9 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 	existingVehicle := vehicles.New()
 	objectid := NewObjectID("kind", "value")
 	existingVehicle.SetObjectID(objectid)
-	vehicles.Save(&existingVehicle)
+	vehicles.Save(existingVehicle)
 
-	vehicles.Delete(&existingVehicle)
+	vehicles.Delete(existingVehicle)
 
 	_, ok := vehicles.Find(existingVehicle.Id())
 	if ok {
@@ -214,7 +214,7 @@ func Test_Save_BiqQuery(t *testing.T) {
 	objectid := NewObjectID("kind", "value")
 	v.SetObjectID(objectid)
 	v.Latitude = 1.0
-	vehicles.Save(&v)
+	vehicles.Save(v)
 
 	if len(f.VehicleEvents()) != 1 {
 		t.Error("New VehicleJourney save should have send a BQ message")
@@ -222,14 +222,14 @@ func Test_Save_BiqQuery(t *testing.T) {
 
 	v2, _ := vehicles.Find(v.id)
 	v2.Latitude = 2.0
-	vehicles.Save(&v2)
+	vehicles.Save(v2)
 
 	if len(f.VehicleEvents()) != 2 {
 		t.Error("VehicleJourney modification save should have send a BQ message")
 	}
 
 	v3, _ := vehicles.Find(v.id)
-	vehicles.Save(&v3)
+	vehicles.Save(v3)
 
 	if len(f.VehicleEvents()) != 2 {
 		t.Error("VehicleJourney save without modifications should not have send a BQ message")

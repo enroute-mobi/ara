@@ -25,7 +25,6 @@ type config struct {
 
 	ApiKey                string
 	Debug                 bool
-	LogStash              string
 	BigQueryProjectID     string
 	BigQueryDatasetPrefix string
 	BigQueryTest          string

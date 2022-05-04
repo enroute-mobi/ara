@@ -38,7 +38,7 @@ type StopVisit struct {
 	DepartureStatus StopVisitDepartureStatus `json:",omitempty"`
 	DataFrameRef    string                   `json:",omitempty"`
 	RecordedAt      time.Time
-	Schedules       StopVisitSchedules
+	Schedules       *StopVisitSchedules
 	VehicleAtStop   bool
 	PassageOrder    int `json:",omitempty"`
 }
@@ -59,11 +59,25 @@ func (stopVisit *StopVisit) modelId() ModelId {
 }
 
 func (stopVisit *StopVisit) copy() *StopVisit {
-	s := *stopVisit
-	s.Attributes = stopVisit.Attributes.Copy()
-	s.References = stopVisit.References.Copy()
-	s.Schedules = *(stopVisit.Schedules.Copy())
-	return &s
+	return &StopVisit{
+		ObjectIDConsumer: stopVisit.ObjectIDConsumer.Clone(),
+		model:            stopVisit.model,
+		Origin:           stopVisit.Origin,
+		id:               stopVisit.id,
+		collected:        stopVisit.collected,
+		collectedAt:      stopVisit.collectedAt,
+		StopAreaId:       stopVisit.StopAreaId,
+		VehicleJourneyId: stopVisit.VehicleJourneyId,
+		Attributes:       stopVisit.Attributes.Copy(),
+		References:       stopVisit.References.Copy(),
+		ArrivalStatus:    stopVisit.ArrivalStatus,
+		DepartureStatus:  stopVisit.DepartureStatus,
+		DataFrameRef:     stopVisit.DataFrameRef,
+		RecordedAt:       stopVisit.RecordedAt,
+		Schedules:        stopVisit.Schedules.Copy(),
+		VehicleAtStop:    stopVisit.VehicleAtStop,
+		PassageOrder:     stopVisit.PassageOrder,
+	}
 }
 
 func (stopVisit *StopVisit) IsCollected() bool {
@@ -89,7 +103,7 @@ func (stopVisit *StopVisit) Id() StopVisitId {
 	return stopVisit.id
 }
 
-func (stopVisit *StopVisit) StopArea() StopArea {
+func (stopVisit *StopVisit) StopArea() *StopArea {
 	stopArea, _ := stopVisit.model.StopAreas().Find(stopVisit.StopAreaId)
 	return stopArea
 }
@@ -99,7 +113,7 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 	if !ok {
 		return nil
 	}
-	return &vehicleJourney
+	return vehicleJourney
 }
 
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
@@ -187,9 +201,8 @@ func (stopVisit *StopVisit) Attribute(key string) (string, bool) {
 	return value, present
 }
 
-func (stopVisit *StopVisit) Save() (ok bool) {
-	ok = stopVisit.model.StopVisits().Save(stopVisit)
-	return
+func (stopVisit *StopVisit) Save() bool {
+	return stopVisit.model.StopVisits().Save(stopVisit)
 }
 
 func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
@@ -222,7 +235,7 @@ func (stopVisit *StopVisit) ReferenceDepartureTime() time.Time {
 	return time.Time{}
 }
 
-type ByTime []StopVisit
+type ByTime []*StopVisit
 
 func (a ByTime) Len() int           { return len(a) }
 func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -246,17 +259,17 @@ type MemoryStopVisits struct {
 type StopVisits interface {
 	uuid.UUIDInterface
 
-	New() StopVisit
-	Find(StopVisitId) (StopVisit, bool)
-	FindByObjectId(ObjectID) (StopVisit, bool)
-	FindByVehicleJourneyId(VehicleJourneyId) []StopVisit
-	FindFollowingByVehicleJourneyId(VehicleJourneyId) []StopVisit
-	FindByStopAreaId(StopAreaId) []StopVisit
-	FindMonitoredByOriginByStopAreaId(StopAreaId, string) []StopVisit
-	FindFollowingByStopAreaId(StopAreaId) []StopVisit
-	FindFollowingByStopAreaIds([]StopAreaId) []StopVisit
-	FindAll() []StopVisit
-	FindAllAfter(time.Time) []StopVisit
+	New() *StopVisit
+	Find(StopVisitId) (*StopVisit, bool)
+	FindByObjectId(ObjectID) (*StopVisit, bool)
+	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
+	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
+	FindByStopAreaId(StopAreaId) []*StopVisit
+	FindMonitoredByOriginByStopAreaId(StopAreaId, string) []*StopVisit
+	FindFollowingByStopAreaId(StopAreaId) []*StopVisit
+	FindFollowingByStopAreaIds([]StopAreaId) []*StopVisit
+	FindAll() []*StopVisit
+	FindAllAfter(time.Time) []*StopVisit
 	Save(*StopVisit) bool
 	Delete(*StopVisit) bool
 }
@@ -274,52 +287,48 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 	}
 }
 
-func (manager *MemoryStopVisits) New() StopVisit {
-	stopVisit := NewStopVisit(manager.model)
-	return *stopVisit
+func (manager *MemoryStopVisits) New() *StopVisit {
+	return NewStopVisit(manager.model)
 }
 
-func (manager *MemoryStopVisits) Find(id StopVisitId) (StopVisit, bool) {
+func (manager *MemoryStopVisits) Find(id StopVisitId) (*StopVisit, bool) {
 	manager.mutex.RLock()
-
 	stopVisit, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
 
 	if ok {
-		manager.mutex.RUnlock()
-		return *(stopVisit.copy()), true
-	} else {
-		manager.mutex.RUnlock()
-		return StopVisit{}, false
+		return stopVisit.copy(), true
 	}
+	return &StopVisit{}, false
 }
 
-func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (StopVisit, bool) {
+func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (*StopVisit, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	id, ok := manager.byObjectId.Find(objectid)
 	if ok {
-		return *(manager.byIdentifier[StopVisitId(id)].copy()), true
+		return manager.byIdentifier[StopVisitId(id)].copy(), true
 	}
 
-	return StopVisit{}, false
+	return &StopVisit{}, false
 }
 
-func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
-		stopVisits = append(stopVisits, *(sv.copy()))
+		stopVisits = append(stopVisits, sv.copy())
 	}
 
 	manager.mutex.RUnlock()
 	return
 }
 
-func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
@@ -327,7 +336,7 @@ func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourn
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *(sv.copy()))
+			stopVisits = append(stopVisits, sv.copy())
 		}
 	}
 
@@ -336,26 +345,26 @@ func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourn
 	return
 }
 
-func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byStopArea.Find(ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
-		stopVisits = append(stopVisits, *(sv.copy()))
+		stopVisits = append(stopVisits, sv.copy())
 	}
 
 	manager.mutex.RUnlock()
 	return
 }
 
-func (manager *MemoryStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId, origin string) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId, origin string) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.StopAreaId == id && stopVisit.collected && stopVisit.Origin == origin {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
+			stopVisits = append(stopVisits, stopVisit.copy())
 		}
 	}
 
@@ -363,7 +372,7 @@ func (manager *MemoryStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId
 	return
 }
 
-func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byStopArea.Find(ModelId(id))
@@ -371,7 +380,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopV
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *(sv.copy()))
+			stopVisits = append(stopVisits, sv.copy())
 		}
 	}
 
@@ -380,7 +389,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopV
 	return
 }
 
-func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAreaId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	var ids []ModelId
@@ -392,7 +401,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAr
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
 		if sv.ReferenceTime().After(manager.Clock().Now()) {
-			stopVisits = append(stopVisits, *(sv.copy()))
+			stopVisits = append(stopVisits, sv.copy())
 		}
 	}
 
@@ -401,23 +410,23 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAr
 	return
 }
 
-func (manager *MemoryStopVisits) FindAll() (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindAll() (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	for _, stopVisit := range manager.byIdentifier {
-		stopVisits = append(stopVisits, *(stopVisit.copy()))
+		stopVisits = append(stopVisits, stopVisit.copy())
 	}
 
 	manager.mutex.RUnlock()
 	return
 }
 
-func (manager *MemoryStopVisits) FindAllAfter(t time.Time) (stopVisits []StopVisit) {
+func (manager *MemoryStopVisits) FindAllAfter(t time.Time) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	for _, stopVisit := range manager.byIdentifier {
 		if stopVisit.ReferenceTime().After(t) {
-			stopVisits = append(stopVisits, *(stopVisit.copy()))
+			stopVisits = append(stopVisits, stopVisit.copy())
 		}
 	}
 
@@ -518,7 +527,7 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 			}
 		}
 
-		manager.Save(&stopVisit)
+		manager.Save(stopVisit)
 	}
 	return nil
 }

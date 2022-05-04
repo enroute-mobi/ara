@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -183,19 +181,11 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 
 			// Get the monitoredStopVisit
 			stopMonitoringBuilder.MonitoringRef = monitoringRef
-			if !smb.handledStopVisitAppend(&stopVisit, delivery, stopMonitoringBuilder) {
+			if !smb.handledStopVisitAppend(stopVisit, delivery, stopMonitoringBuilder) {
 				continue
 			}
 
 			monitoredStopVisits[stopVisitId] = struct{}{}
-
-			// See what to do about the MaximumStopVisits #10333
-			// // Refresh delivery
-			// if maximumStopVisits != 0 && (len(delivery.MonitoredStopVisits)+len(delivery.CancelledStopVisits)) >= maximumStopVisits {
-			// 	smb.sendNotification(delivery)
-			// 	delivery.MonitoredStopVisits = []*siri.SIRIMonitoredStopVisit{}
-			// 	delivery.CancelledStopVisits = []*siri.SIRICancelledStopVisit{}
-			// }
 
 			// Get the Resource lastState for the StopVisit
 			lastStateInterface, _ := resource.LastState(string(stopVisitId))
@@ -203,7 +193,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			if !ok {
 				continue
 			}
-			lastState.UpdateState(&stopVisit)
+			lastState.UpdateState(stopVisit)
 		}
 
 		for _, delivery := range deliveries {
@@ -272,11 +262,9 @@ func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit *model.StopVisit, d
 }
 
 func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring) {
-	logStashEvent := smb.newLogStashEvent()
 	message := smb.newBQEvent()
 
-	logSIRIStopMonitoringNotify(logStashEvent, message, notify)
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
+	logSIRIStopMonitoringNotify(message, notify)
 
 	t := smb.Clock().Now()
 
@@ -284,9 +272,6 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 	message.ProcessingTime = smb.Clock().Since(t).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
-		event := smb.newLogStashEvent()
-		logSIRINotifyError(err.Error(), notify.ResponseMessageIdentifier, event)
-		audit.CurrentLogStash().WriteEvent(event)
 	}
 
 	audit.CurrentBigQuery(string(smb.connector.Partner().Referential().Slug())).WriteEvent(message)
@@ -302,13 +287,7 @@ func (smb *SMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func (smb *SMBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := smb.connector.partner.NewLogStashEvent()
-	event["connector"] = "StopMonitoringSubscriptionBroadcaster"
-	return event
-}
-
-func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
+func logSIRIStopMonitoringNotify(message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
 	monitoringRefs := []string{}
 	cancelledMonitoringRefs := []string{}
 
@@ -325,37 +304,19 @@ func logSIRIStopMonitoringNotify(logStashEvent audit.LogStashEvent, message *aud
 	message.ResponseIdentifier = notification.ResponseMessageIdentifier
 	message.StopAreas = append(monitoringRefs, cancelledMonitoringRefs...)
 
-	logStashEvent["siriType"] = "NotifyStopMonitoring"
-	logStashEvent["producerRef"] = notification.ProducerRef
-	logStashEvent["requestMessageRef"] = notification.RequestMessageRef
-	logStashEvent["responseMessageIdentifier"] = notification.ResponseMessageIdentifier
-	logStashEvent["responseTimestamp"] = notification.ResponseTimestamp.String()
-
-	logStashEvent["monitoringRefs"] = strings.Join(monitoringRefs, ",")
-	logStashEvent["cancelledMonitoringRefs"] = strings.Join(cancelledMonitoringRefs, ",")
-
 	delivery := notification.Deliveries[0]
 
 	message.SubscriptionIdentifiers = []string{delivery.SubscriptionIdentifier}
 
-	logStashEvent["subscriberRef"] = delivery.SubscriberRef
-	logStashEvent["subscriptionIdentifier"] = delivery.SubscriptionIdentifier
-	logStashEvent["status"] = strconv.FormatBool(delivery.Status)
 	if !delivery.Status {
 		message.Status = "Error"
 		message.ErrorDetails = delivery.ErrorString()
-
-		logStashEvent["errorType"] = delivery.ErrorType
-		logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber)
-		logStashEvent["errorText"] = delivery.ErrorText
 	}
 
 	xml, err := notification.BuildXML()
 	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
 		return
 	}
-	logStashEvent["responseXML"] = xml
 	message.ResponseRawMessage = xml
 	message.ResponseSize = int64(len(xml))
 }

@@ -66,7 +66,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		return nil
 	}
 
-	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(&vehicleJourney)
+	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(vehicleJourney)
 	if !ok {
 		return nil
 	}
@@ -112,7 +112,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		return nil
 	}
 
-	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(&vehicleJourney)
+	datedVehicleJourneyRef, ok := builder.datedVehicleJourneyRef(vehicleJourney)
 	if !ok {
 		return nil
 	}
@@ -174,10 +174,10 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	return monitoredStopVisit
 }
 
-func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.StopAreaId) (model.StopArea, string, bool) {
+func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := builder.partner.Model().StopAreas().Find(stopAreaId)
 	if !ok {
-		return model.StopArea{}, "", false
+		return &model.StopArea{}, "", false
 	}
 	stopPointRefObjectId, ok := stopPointRef.ObjectID(builder.remoteObjectidKind)
 	if ok {
@@ -190,7 +190,7 @@ func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.Sto
 			return referent, referentObjectId.Value(), true
 		}
 	}
-	return model.StopArea{}, "", false
+	return &model.StopArea{}, "", false
 }
 
 func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *model.StopVisit) (string, bool) {

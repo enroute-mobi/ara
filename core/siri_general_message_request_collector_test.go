@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -23,7 +22,6 @@ func (fb *fakeSituationBroadcaster) FakeBroadcaster(events []*model.SituationUpd
 }
 
 func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath string) []*model.SituationUpdateEvent {
-	audit.SetCurrentLogstash(audit.NewFakeLogStash())
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -54,7 +52,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	line := partners.Model().Lines().New()
 	lineObjectID := model.NewObjectID("test kind", "line value")
 	line.SetObjectID(lineObjectID)
-	partners.Model().Lines().Save(&line)
+	partners.Model().Lines().Save(line)
 
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
 

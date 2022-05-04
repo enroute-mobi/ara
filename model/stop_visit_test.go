@@ -19,7 +19,8 @@ func Test_StopVisit_Id(t *testing.T) {
 
 func Test_StopVisit_MarshalJSON(t *testing.T) {
 	stopVisit := StopVisit{
-		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		id:        "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		Schedules: NewStopVisitSchedules(),
 	}
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false,"Origin":"","VehicleAtStop":false}`
 	jsonBytes, err := stopVisit.MarshalJSON()
@@ -144,7 +145,7 @@ func Test_MemoryStopVisits_Save(t *testing.T) {
 
 	stopVisit := stopVisits.New()
 
-	if success := stopVisits.Save(&stopVisit); !success {
+	if success := stopVisits.Save(stopVisit); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -165,7 +166,7 @@ func Test_MemoryStopVisits_Find(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 
 	existingStopVisit := stopVisits.New()
-	stopVisits.Save(&existingStopVisit)
+	stopVisits.Save(existingStopVisit)
 
 	stopVisitId := existingStopVisit.Id()
 
@@ -183,7 +184,7 @@ func Test_MemoryStopVisits_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingStopVisit := stopVisits.New()
-		stopVisits.Save(&existingStopVisit)
+		stopVisits.Save(existingStopVisit)
 	}
 
 	foundStopVisits := stopVisits.FindAll()
@@ -199,7 +200,7 @@ func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		sv := stopVisits.New()
 		sv.Schedules.SetArrivalTime(STOP_VISIT_SCHEDULE_ACTUAL, time.Now().Add(-time.Duration(i)*time.Minute))
-		stopVisits.Save(&sv)
+		stopVisits.Save(sv)
 	}
 
 	foundStopVisits := stopVisits.FindAllAfter(time.Now().Add(-150 * time.Second))
@@ -214,9 +215,9 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 	existingStopVisit := stopVisits.New()
 	objectid := NewObjectID("kind", "value")
 	existingStopVisit.SetObjectID(objectid)
-	stopVisits.Save(&existingStopVisit)
+	stopVisits.Save(existingStopVisit)
 
-	stopVisits.Delete(&existingStopVisit)
+	stopVisits.Delete(existingStopVisit)
 
 	_, ok := stopVisits.Find(existingStopVisit.Id())
 	if ok {
@@ -301,7 +302,7 @@ func benchmarkStopVisitsMarshal10000(sv int, b *testing.B) {
 	for i := 0; i != sv; i++ {
 		stopVisit := stopVisits.New()
 		stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
-		stopVisits.Save(&stopVisit)
+		stopVisits.Save(stopVisit)
 	}
 
 	for n := 0; n < b.N; n++ {

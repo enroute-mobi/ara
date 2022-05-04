@@ -16,7 +16,7 @@ type lastState interface {
 type stopAreaLastChange struct {
 	subscription *Subscription
 
-	origins model.StopAreaOrigins
+	origins *model.StopAreaOrigins
 }
 
 func (salc *stopAreaLastChange) InitState(sa *model.StopArea, sub *Subscription) {
@@ -29,13 +29,13 @@ func (salc *stopAreaLastChange) SetSubscription(sub *Subscription) {
 }
 
 func (salc *stopAreaLastChange) UpdateState(stopArea *model.StopArea) bool {
-	salc.origins = *(stopArea.Origins.Copy())
+	salc.origins = stopArea.Origins.Copy()
 
 	return true
 }
 
 func (salc *stopAreaLastChange) Haschanged(stopArea *model.StopArea) ([]string, bool) {
-	return salc.origins.PartnersLost(&(stopArea.Origins))
+	return salc.origins.PartnersLost(stopArea.Origins)
 }
 
 type stopMonitoringLastChange struct {
@@ -44,7 +44,7 @@ type stopMonitoringLastChange struct {
 
 	subscription *Subscription
 
-	schedules       model.StopVisitSchedules
+	schedules       *model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 }
@@ -59,14 +59,14 @@ func (smlc *stopMonitoringLastChange) SetSubscription(sub *Subscription) {
 }
 
 func (smlc *stopMonitoringLastChange) UpdateState(stopVisit *model.StopVisit) bool {
-	smlc.schedules = *(stopVisit.Schedules.Copy())
+	smlc.schedules = stopVisit.Schedules.Copy()
 	smlc.arrivalStatuts = stopVisit.ArrivalStatus
 	smlc.departureStatus = stopVisit.DepartureStatus
 
 	return true
 }
 
-func (smlc *stopMonitoringLastChange) Haschanged(stopVisit model.StopVisit) bool {
+func (smlc *stopMonitoringLastChange) Haschanged(stopVisit *model.StopVisit) bool {
 	// Don't send info on cancelled or departed SV
 	if smlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED || smlc.departureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || smlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_CANCELLED {
 		return false
@@ -105,7 +105,7 @@ type estimatedTimeTableLastChange struct {
 
 	subscription *Subscription
 
-	schedules       model.StopVisitSchedules
+	schedules       *model.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 	vehicleAtStop   bool
@@ -122,7 +122,7 @@ func (ettlc *estimatedTimeTableLastChange) SetSubscription(sub *Subscription) {
 
 func (ettlc *estimatedTimeTableLastChange) UpdateState(sv *model.StopVisit) {
 	ettlc.vehicleAtStop = sv.VehicleAtStop
-	ettlc.schedules = *(sv.Schedules.Copy())
+	ettlc.schedules = sv.Schedules.Copy()
 	ettlc.departureStatus = sv.DepartureStatus
 	ettlc.arrivalStatuts = sv.ArrivalStatus
 }

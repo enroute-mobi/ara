@@ -162,7 +162,7 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	stopVisit := ref.Model().StopVisits().New()
 	objectid := model.NewObjectID("kind", "stif:value")
 	stopVisit.SetObjectID(objectid)
-	ref.Model().StopVisits().Save(&stopVisit)
+	ref.Model().StopVisits().Save(stopVisit)
 
 	controller := &StopVisitController{
 		referential: ref,

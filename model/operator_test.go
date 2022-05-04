@@ -111,7 +111,7 @@ func Test_MemoryOperators_Save(t *testing.T) {
 
 	operator := operators.New()
 
-	if success := operators.Save(&operator); !success {
+	if success := operators.Save(operator); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -132,7 +132,7 @@ func Test_MemoryOperators_Find(t *testing.T) {
 	operators := NewMemoryOperators()
 
 	existingOperator := operators.New()
-	operators.Save(&existingOperator)
+	operators.Save(existingOperator)
 
 	operatorId := existingOperator.Id()
 
@@ -150,7 +150,7 @@ func Test_MemoryOperators_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingOperator := operators.New()
-		operators.Save(&existingOperator)
+		operators.Save(existingOperator)
 	}
 
 	foundOperators := operators.FindAll()
@@ -165,9 +165,9 @@ func Test_MemoryOperators_Delete(t *testing.T) {
 	existingOperator := operators.New()
 	objectid := NewObjectID("kind", "value")
 	existingOperator.SetObjectID(objectid)
-	operators.Save(&existingOperator)
+	operators.Save(existingOperator)
 
-	operators.Delete(&existingOperator)
+	operators.Delete(existingOperator)
 
 	_, ok := operators.Find(existingOperator.Id())
 	if ok {

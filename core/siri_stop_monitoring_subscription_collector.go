@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -110,21 +108,11 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	monitoringRefMap := make(map[string]struct{})
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
-	logXMLNotifyStopMonitoring(logStashEvent, notify)
-
 	for _, delivery := range notify.StopMonitoringDeliveries() {
-		if connector.Partner().LogSubscriptionStopMonitoringDeliveries() {
-			deliveryLogStashEvent := connector.newLogStashEvent()
-			logXMLSubscriptionStopMonitoringDelivery(deliveryLogStashEvent, notify.ResponseMessageIdentifier(), delivery)
-			audit.CurrentLogStash().WriteEvent(deliveryLogStashEvent)
-		}
-
 		subscriptionId := delivery.SubscriptionRef()
 
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
@@ -163,19 +151,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
-	logMonitoringRefsFromMap(logStashEvent, monitoringRefMap)
-	if len(subscriptionErrors) != 0 {
-		logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
-	}
-
 	for subId := range subToDelete {
 		connector.cancelSubscription(subId)
 	}
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(subId string) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
@@ -185,25 +166,23 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestorRef:      connector.partner.ProducerRef(),
 		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
-	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "StopMonitoringSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(message, request, "StopMonitoringSubscriptionCollector")
 
 	startTime := connector.Clock().Now()
 	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
-	logStashEvent["responseTime"] = responseTime.String()
 	message.ProcessingTime = responseTime.Seconds()
 
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
 		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
-		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = e
+
 		message.Status = "Error"
 		message.ErrorDetails = e
 		return
 	}
-	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
+	logXMLDeleteSubscriptionResponse(message, response)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
@@ -229,12 +208,6 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(
 	}
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "StopMonitoringSubscriptionCollector"
-	return event
-}
-
 func (connector *SIRIStopMonitoringSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
 		Protocol:  "siri",
@@ -244,84 +217,26 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newBQEvent() *audit.Bi
 	}
 }
 
-func logSIRIDeleteSubscriptionRequest(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
-	logStashEvent["siriType"] = "DeleteSubscriptionRequest" // This function is also used on GM delete subscription
-	logStashEvent["connector"] = subType
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	logStashEvent["subscriptionRef"] = request.SubscriptionRef
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
+func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
+	message.Type = "DeleteSubscriptionRequest"
+	message.RequestIdentifier = request.MessageIdentifier
+	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
 
 	xml, err := request.BuildXML()
 	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
 		return
 	}
-	logStashEvent["requestXML"] = xml
-
-	message.Type = "DeleteSubscriptionRequest"
-	message.RequestIdentifier = request.MessageIdentifier
 	message.RequestRawMessage = xml
 	message.RequestSize = int64(len(xml))
-
-	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
 }
 
-func logXMLNotifyStopMonitoring(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyStopMonitoring) {
-	logStashEvent["siriType"] = "CollectedNotifyStopMonitoring"
-	logStashEvent["producerRef"] = notify.ProducerRef()
-	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
-	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = notify.RawXML()
-
-	status := "true"
-	errorCount := 0
-	for _, delivery := range notify.StopMonitoringDeliveries() {
-		if !delivery.Status() {
-			status = "false"
-			errorCount++
-		}
-	}
-	logStashEvent["status"] = status
-	logStashEvent["errorCount"] = strconv.Itoa(errorCount)
-}
-
-func logXMLSubscriptionStopMonitoringDelivery(logStashEvent audit.LogStashEvent, parent string, delivery *siri.XMLNotifyStopMonitoringDelivery) {
-	logStashEvent["siriType"] = "CollectedNotifyStopMonitoringDelivery"
-	logStashEvent["parentMessageIdentifier"] = parent
-	logStashEvent["monitoringRef"] = delivery.MonitoringRef()
-	logStashEvent["requestMessageRef"] = delivery.RequestMessageRef()
-	logStashEvent["subscriberRef"] = delivery.SubscriberRef()
-	logStashEvent["subscriptionRef"] = delivery.SubscriptionRef()
-	logStashEvent["responseTimestamp"] = delivery.ResponseTimestamp().String()
-
-	logStashEvent["status"] = strconv.FormatBool(delivery.Status())
-	if !delivery.Status() {
-		logStashEvent["errorType"] = delivery.ErrorType()
-		if delivery.ErrorType() == "OtherError" {
-			logStashEvent["errorNumber"] = strconv.Itoa(delivery.ErrorNumber())
-		}
-		logStashEvent["errorText"] = delivery.ErrorText()
-		logStashEvent["errorDescription"] = delivery.ErrorDescription()
-	}
-}
-
-func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage, response *siri.XMLDeleteSubscriptionResponse) {
-	logStashEvent["responderRef"] = response.ResponderRef()
-	logStashEvent["requestMessageRef"] = response.RequestMessageRef()
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = response.RawXML()
-
-	var subscriptionIds []string
+func logXMLDeleteSubscriptionResponse(message *audit.BigQueryMessage, response *siri.XMLDeleteSubscriptionResponse) {
 	var i int
 	for _, responseStatus := range response.ResponseStatus() {
-		subscriptionIds = append(subscriptionIds, responseStatus.SubscriptionRef())
 		if !responseStatus.Status() {
 			i++
 		}
 	}
-	logStashEvent["subscriptionRefs"] = strings.Join(subscriptionIds, ", ")
 
 	if i > 0 {
 		message.Status = "Error"
@@ -329,20 +244,4 @@ func logXMLDeleteSubscriptionResponse(logStashEvent audit.LogStashEvent, message
 	}
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-	// TODO no ResponseMessageIdentifier() method in XMLDeleteSubscriptionResponse
-	// message.ResponseIdentifier = response.ResponseMessageIdentifier()
-}
-
-func logMonitoringRefsFromMap(logStashEvent audit.LogStashEvent, refs map[string]struct{}) {
-	logMonitoringRefs(logStashEvent, nil, refs)
-}
-
-func logSubscriptionErrorsFromMap(logStashEvent audit.LogStashEvent, errors map[string]string) {
-	errSlice := make([]string, len(errors))
-	i := 0
-	for subId, err := range errors {
-		errSlice[i] = fmt.Sprintf(err, subId)
-		i++
-	}
-	logStashEvent["notificationErrors"] = strings.Join(errSlice, ", ")
 }

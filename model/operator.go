@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -27,13 +28,21 @@ func NewOperator(model Model) *Operator {
 	return operator
 }
 
+func (operator *Operator) modelId() ModelId {
+	return ModelId(operator.id)
+}
+
+func (operator *Operator) copy() *Operator {
+	o := *operator
+	return &o
+}
+
 func (operator *Operator) Id() OperatorId {
 	return operator.id
 }
 
-func (operator *Operator) Save() (ok bool) {
-	ok = operator.model.Operators().Save(operator)
-	return
+func (operator *Operator) Save() bool {
+	return operator.model.Operators().Save(operator)
 }
 
 func (operator *Operator) MarshalJSON() ([]byte, error) {
@@ -79,72 +88,90 @@ type MemoryOperators struct {
 	uuid.UUIDConsumer
 
 	model *MemoryModel
+	mutex *sync.RWMutex
 
 	byIdentifier map[OperatorId]*Operator
+	byObjectId   *ObjectIdIndex
 }
 
 type Operators interface {
 	uuid.UUIDInterface
 
-	New() Operator
-	Find(id OperatorId) (Operator, bool)
-	FindByObjectId(objectid ObjectID) (Operator, bool)
-	FindAll() []Operator
-	Save(operator *Operator) bool
-	Delete(operator *Operator) bool
+	New() *Operator
+	Find(OperatorId) (*Operator, bool)
+	FindByObjectId(ObjectID) (*Operator, bool)
+	FindAll() []*Operator
+	Save(*Operator) bool
+	Delete(*Operator) bool
 }
 
 func NewMemoryOperators() *MemoryOperators {
 	return &MemoryOperators{
+		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[OperatorId]*Operator),
+		byObjectId:   NewObjectIdIndex(),
 	}
 }
 
-func (manager *MemoryOperators) New() Operator {
-	operator := NewOperator(manager.model)
-	return *operator
+func (manager *MemoryOperators) New() *Operator {
+	return NewOperator(manager.model)
 }
 
-func (manager *MemoryOperators) Find(id OperatorId) (Operator, bool) {
+func (manager *MemoryOperators) Find(id OperatorId) (*Operator, bool) {
+	manager.mutex.RLock()
 	operator, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
 	if ok {
-		return *operator, true
-	} else {
-		return Operator{}, false
+		return operator.copy(), true
 	}
+	return &Operator{}, false
 }
 
-func (manager *MemoryOperators) FindAll() (operators []Operator) {
-	if len(manager.byIdentifier) == 0 {
-		return []Operator{}
-	}
+func (manager *MemoryOperators) FindAll() (operators []*Operator) {
+	manager.mutex.RLock()
+
 	for _, operator := range manager.byIdentifier {
-		operators = append(operators, *operator)
+		operators = append(operators, operator.copy())
 	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
-func (manager *MemoryOperators) FindByObjectId(objectid ObjectID) (Operator, bool) {
-	for _, operator := range manager.byIdentifier {
-		operatorObjectId, _ := operator.ObjectID(objectid.Kind())
-		if operatorObjectId.Value() == objectid.Value() {
-			return *operator, true
-		}
+func (manager *MemoryOperators) FindByObjectId(objectid ObjectID) (*Operator, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	id, ok := manager.byObjectId.Find(objectid)
+	if ok {
+		return manager.byIdentifier[OperatorId(id)].copy(), true
 	}
-	return Operator{}, false
+
+	return &Operator{}, false
 }
 
 func (manager *MemoryOperators) Save(operator *Operator) bool {
+	manager.mutex.Lock()
+
 	if operator.Id() == "" {
 		operator.id = OperatorId(manager.NewUUID())
 	}
 	operator.model = manager.model
 	manager.byIdentifier[operator.Id()] = operator
+	manager.byObjectId.Index(operator)
+
+	manager.mutex.Unlock()
 	return true
 }
 
 func (manager *MemoryOperators) Delete(operator *Operator) bool {
+	manager.mutex.Lock()
+
 	delete(manager.byIdentifier, operator.Id())
+	manager.byObjectId.Delete(ModelId(operator.id))
+
+	manager.mutex.Unlock()
 	return true
 }
 
@@ -174,7 +201,7 @@ func (manager *MemoryOperators) Load(referentialSlug string) error {
 
 			operator.objectids = NewObjectIDsFromMap(objectIdMap)
 		}
-		manager.Save(&operator)
+		manager.Save(operator)
 	}
 	return nil
 }

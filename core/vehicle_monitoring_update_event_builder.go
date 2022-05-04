@@ -115,13 +115,11 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Origin:                 origin,
 			ObjectId:               vObjectId,
 			VehicleJourneyObjectId: vjObjectId,
-			// SRSName:                xmlVehicleActivity.SRSName(),
-			// Coordinates:            xmlVehicleActivity.Coordinates(),
-			DriverRef:      xmlVehicleActivity.DriverRef(),
-			Bearing:        bearing,
-			LinkDistance:   linkDistance,
-			Percentage:     percentage,
-			ValidUntilTime: xmlVehicleActivity.ValidUntilTime(),
+			DriverRef:              xmlVehicleActivity.DriverRef(),
+			Bearing:                bearing,
+			LinkDistance:           linkDistance,
+			Percentage:             percentage,
+			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
 		}
 
 		coord, err := builder.handleCoordinates(xmlVehicleActivity)

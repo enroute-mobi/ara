@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -104,12 +103,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
-
-	logXMLGeneralMessageDelivery(logStashEvent, notify)
 
 	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
 	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
@@ -135,9 +130,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 
 		builder.SetGeneralMessageDeliveryUpdateEvents(situationUpdateEvents, delivery, notify.ProducerRef())
 
-		if len(subscriptionErrors) != 0 {
-			logSubscriptionErrorsFromMap(logStashEvent, subscriptionErrors)
-		}
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
 
@@ -147,8 +139,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(subId string) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
@@ -159,25 +149,23 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 
-	logSIRIDeleteSubscriptionRequest(logStashEvent, message, request, "GeneralMessageSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(message, request, "GeneralMessageSubscriptionCollector")
 	startTime := connector.Clock().Now()
 	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
 
 	responseTime := connector.Clock().Since(startTime)
-	logStashEvent["responseTime"] = responseTime.String()
 	message.ProcessingTime = responseTime.Seconds()
 
 	if err != nil {
 		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
 		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
-		logStashEvent["status"] = "false"
-		logStashEvent["response"] = e
+
 		message.Status = "Error"
 		message.ErrorDetails = e
 		return
 	}
 
-	logXMLDeleteSubscriptionResponse(logStashEvent, message, response)
+	logXMLDeleteSubscriptionResponse(message, response)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
@@ -211,12 +199,6 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpda
 	}
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "GeneralMessageSubscriptionCollector"
-	return event
-}
-
 func (connector *SIRIGeneralMessageSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
 		Protocol:  "siri",
@@ -224,25 +206,4 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) newBQEvent() *audit.Bi
 		Partner:   string(connector.partner.Slug()),
 		Status:    "OK",
 	}
-}
-
-func logXMLGeneralMessageDelivery(logStashEvent audit.LogStashEvent, notify *siri.XMLNotifyGeneralMessage) {
-	logStashEvent["siriType"] = "CollectedNotifyGeneralMessage"
-	logStashEvent["address"] = notify.Address()
-	logStashEvent["producerRef"] = notify.ProducerRef()
-	logStashEvent["requestMessageRef"] = notify.RequestMessageRef()
-	logStashEvent["responseMessageIdentifier"] = notify.ResponseMessageIdentifier()
-	logStashEvent["responseTimestamp"] = notify.ResponseTimestamp().String()
-	logStashEvent["responseXML"] = notify.RawXML()
-
-	status := "true"
-	errorCount := 0
-	for _, delivery := range notify.GeneralMessagesDeliveries() {
-		if !delivery.Status() {
-			status = "false"
-			errorCount++
-		}
-	}
-	logStashEvent["status"] = status
-	logStashEvent["errorCount"] = strconv.Itoa(errorCount)
 }

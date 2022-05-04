@@ -127,14 +127,6 @@ func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
 	return model
 }
 
-func (model *MemoryModel) Clone() *MemoryModel {
-	clone := NewMemoryModel()
-	clone.stopAreas = model.stopAreas.Clone(clone)
-	clone.lines = model.lines.Clone(clone)
-	clone.date = NewDate(clock.DefaultClock().Now())
-	return clone
-}
-
 func (model *MemoryModel) Date() Date {
 	return model.date
 }
@@ -167,7 +159,6 @@ func (model *MemoryModel) Vehicles() Vehicles {
 	return model.vehicles
 }
 
-// TEMP: See what to do with errors
 func (model *MemoryModel) Load(referentialSlug string) error {
 	err := model.stopAreas.Load(referentialSlug)
 	if err != nil {

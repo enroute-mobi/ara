@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -95,7 +94,6 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		return
 	}
 
-	// LineRef for Logstash
 	lineRefList := []string{}
 	stopPointRefList := []string{}
 
@@ -117,9 +115,6 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	if len(resourcesToRequest) == 0 {
 		return
 	}
-
-	logStashEvent := subscriber.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
 
 	message := subscriber.newBQEvent()
 	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
@@ -155,10 +150,6 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		gmRequest.Entries = append(gmRequest.Entries, entry)
 	}
 
-	logStashEvent["lineRefs"] = strings.Join(lineRefList, ", ")
-	logStashEvent["stopPointRefs"] = strings.Join(stopPointRefList, ", ")
-	logSIRIGeneralMessageSubscriptionRequest(logStashEvent, gmRequest)
-
 	message.RequestIdentifier = gmRequest.MessageIdentifier
 	message.RequestRawMessage, _ = gmRequest.BuildXML()
 	message.RequestSize = int64(len(message.RequestRawMessage))
@@ -167,13 +158,10 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.Partner().SIRIClient().GeneralMessageSubscription(gmRequest)
-	logStashEvent["responseTime"] = subscriber.Clock().Since(startTime).String()
 	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		e := fmt.Sprintf("Error during GeneralMessageSubscriptionRequest: %v", err)
-		logStashEvent["status"] = "false"
-		logStashEvent["errorDescription"] = e
 		subscriber.incrementRetryCountFromMap(resourcesToRequest)
 
 		message.Status = "Error"
@@ -181,7 +169,6 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		return
 	}
 
-	logStashEvent["responseXML"] = response.RawXML()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 
@@ -242,24 +229,4 @@ func (subscriber *GMSubscriber) newBQEvent() *audit.BigQueryMessage {
 		Partner:   string(subscriber.connector.partner.Slug()),
 		Status:    "OK",
 	}
-}
-
-func (smb *GMSubscriber) newLogStashEvent() audit.LogStashEvent {
-	event := smb.connector.partner.NewLogStashEvent()
-	event["connector"] = "GeneralMessageSubscriptionCollector"
-	return event
-}
-
-func logSIRIGeneralMessageSubscriptionRequest(logStashEvent audit.LogStashEvent, request *siri.SIRIGeneralMessageSubscriptionRequest) {
-	logStashEvent["siriType"] = "GeneralMessageSubscriptionRequest"
-	logStashEvent["consumerAddress"] = request.ConsumerAddress
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier
-	logStashEvent["requestorRef"] = request.RequestorRef
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp.String()
-	xml, err := request.BuildXML()
-	if err != nil {
-		logStashEvent["requestXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["requestXML"] = xml
 }

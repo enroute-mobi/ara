@@ -24,7 +24,7 @@ func NewVehicleController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *VehicleController) findVehicle(identifier string) (model.Vehicle, bool) {
+func (controller *VehicleController) findVehicle(identifier string) (*model.Vehicle, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
@@ -68,7 +68,7 @@ func (controller *VehicleController) Delete(response http.ResponseWriter, identi
 	logger.Log.Debugf("Delete vehicle %s", identifier)
 
 	jsonBytes, _ := vehicle.MarshalJSON()
-	controller.referential.Model().Vehicles().Delete(&vehicle)
+	controller.referential.Model().Vehicles().Delete(vehicle)
 	response.Write(jsonBytes)
 }
 
@@ -95,7 +95,7 @@ func (controller *VehicleController) Update(response http.ResponseWriter, identi
 		}
 	}
 
-	controller.referential.Model().Vehicles().Save(&vehicle)
+	controller.referential.Model().Vehicles().Save(vehicle)
 	jsonBytes, _ := vehicle.MarshalJSON()
 	response.Write(jsonBytes)
 }
@@ -124,7 +124,7 @@ func (controller *VehicleController) Create(response http.ResponseWriter, body [
 		}
 	}
 
-	controller.referential.Model().Vehicles().Save(&vehicle)
+	controller.referential.Model().Vehicles().Save(vehicle)
 	jsonBytes, _ := vehicle.MarshalJSON()
 	response.Write(jsonBytes)
 }

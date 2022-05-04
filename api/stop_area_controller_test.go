@@ -24,7 +24,7 @@ func checkStopAreaResponseStatus(responseRecorder *httptest.ResponseRecorder, t 
 	}
 }
 
-func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea *model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -38,7 +38,7 @@ func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *
 	// Save a new stopArea
 	stopArea = referential.Model().StopAreas().New()
 	stopArea.Name = "First StopArea"
-	referential.Model().StopAreas().Save(&stopArea)
+	referential.Model().StopAreas().Save(stopArea)
 
 	// Create a request
 	address := []byte("/default/stop_areas")
@@ -155,7 +155,7 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 	stopArea := ref.Model().StopAreas().New()
 	objectid := model.NewObjectID("kind", "value")
 	stopArea.SetObjectID(objectid)
-	ref.Model().StopAreas().Save(&stopArea)
+	ref.Model().StopAreas().Save(stopArea)
 
 	controller := &StopAreaController{
 		referential: ref,

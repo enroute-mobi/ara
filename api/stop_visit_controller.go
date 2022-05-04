@@ -25,7 +25,7 @@ func NewStopVisitController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *StopVisitController) findStopVisit(identifier string) (model.StopVisit, bool) {
+func (controller *StopVisitController) findStopVisit(identifier string) (*model.StopVisit, bool) {
 	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
 	pattern := regexp.MustCompile(idRegexp)
 	foundStrings := pattern.FindStringSubmatch(identifier)
@@ -36,9 +36,9 @@ func (controller *StopVisitController) findStopVisit(identifier string) (model.S
 	return controller.referential.Model().StopVisits().Find(model.StopVisitId(identifier))
 }
 
-func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopVisit, filters url.Values) []model.StopVisit {
+func (controller *StopVisitController) filterStopVisits(stopVisits []*model.StopVisit, filters url.Values) []*model.StopVisit {
 	selectors := []model.StopVisitSelector{}
-	filteredStopVisits := []model.StopVisit{}
+	filteredStopVisits := []*model.StopVisit{}
 
 	for key, value := range filters {
 		switch key {
@@ -63,7 +63,7 @@ func (controller *StopVisitController) filterStopVisits(stopVisits []model.StopV
 
 	selector := model.CompositeStopVisitSelector(selectors)
 	for _, sv := range stopVisits {
-		if !selector(&sv) {
+		if !selector(sv) {
 			continue
 		}
 		filteredStopVisits = append(filteredStopVisits, sv)
@@ -102,7 +102,7 @@ func (controller *StopVisitController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete stopVisit %s", identifier)
 
 	jsonBytes, _ := stopVisit.MarshalJSON()
-	controller.referential.Model().StopVisits().Delete(&stopVisit)
+	controller.referential.Model().StopVisits().Delete(stopVisit)
 	response.Write(jsonBytes)
 }
 
@@ -129,7 +129,7 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 		}
 	}
 
-	controller.referential.Model().StopVisits().Save(&stopVisit)
+	controller.referential.Model().StopVisits().Save(stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }
@@ -156,7 +156,7 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 		}
 	}
 
-	controller.referential.Model().StopVisits().Save(&stopVisit)
+	controller.referential.Model().StopVisits().Save(stopVisit)
 	jsonBytes, _ := stopVisit.MarshalJSON()
 	response.Write(jsonBytes)
 }

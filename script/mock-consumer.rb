@@ -15,13 +15,6 @@ OptionParser.new do |parser|
     end
     options[:listen] = URI.parse(url)
   end
-
-  parser.on("--logstash=URL", "Logstash address") do |url|
-    unless url[/\Ahttps?:\/\//]
-      url = "http://#{url}"
-    end
-    options[:logstash] = URI.parse(url)
-  end
 end.parse!
 
 if options.length < 2
@@ -64,10 +57,6 @@ http_server.mount_proc options[:listen].path do |req, res|
   else
     res.status = 200
   end
-  # Log to Logstash
-  logstash = TCPSocket.new options[:logstash].host, options[:logstash].port
-  logstash.write(log)
-  logstash.close
 end
 
 http_server.start

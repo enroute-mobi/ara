@@ -1,10 +1,7 @@
 package core
 
 import (
-	"fmt"
 	"sort"
-	"strconv"
-	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -27,11 +24,6 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logXMLStopPointDiscoveryRequest(logStashEvent, request)
-
 	response := &siri.SIRIStopPointsDiscoveryResponse{
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
@@ -82,16 +74,9 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	message.RequestIdentifier = request.MessageIdentifier()
 
-	logAnnotatedStopPoints(annotedStopPointMap, logStashEvent, message)
-	logSIRIStopPointDiscoveryResponse(logStashEvent, response)
+	logAnnotatedStopPoints(annotedStopPointMap, message)
 
 	return response, nil
-}
-
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "StopPointsDiscoveryRequestBroadcaster"
-	return event
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
@@ -103,7 +88,7 @@ func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) CreateConnector
 	return NewSIRIStopDiscoveryRequestBroadcaster(partner)
 }
 
-func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEvent audit.LogStashEvent, message *audit.BigQueryMessage) {
+func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, message *audit.BigQueryMessage) {
 	keys := make([]string, len(annotedStopPointMap))
 	i := 0
 	for key := range annotedStopPointMap {
@@ -111,25 +96,5 @@ func logAnnotatedStopPoints(annotedStopPointMap map[string]struct{}, logStashEve
 		i++
 	}
 
-	logStashEvent["annotedStopPoints"] = strings.Join(keys, ", ")
 	message.StopAreas = keys
-}
-
-func logXMLStopPointDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLStopPointsDiscoveryRequest) {
-	logStashEvent["siriType"] = "StopPointsDiscoveryResponse"
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRIStopPointDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.SIRIStopPointsDiscoveryResponse) {
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	xml, err := response.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
 }

@@ -51,7 +51,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	line := partners.Model().Lines().New()
 	lineObjectID := model.NewObjectID("test_kind", "line value")
 	line.SetObjectID(lineObjectID)
-	partners.Model().Lines().Save(&line)
+	partners.Model().Lines().Save(line)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.SetGeneralMessageSubscriber(NewFakeGeneralMessageSubscriber(connector))

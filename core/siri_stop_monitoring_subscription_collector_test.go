@@ -9,7 +9,6 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -214,18 +213,5 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 
 	if expected := "Subscription::6ba7b814-9dad-11d1-0-00c04fd430c8::LOC"; request.SubscriptionRef() != expected {
 		t.Errorf("Wrong SubscriptionRef want : %v  got %v :", expected, request.SubscriptionRef())
-	}
-}
-
-func Test_LogSubscriptionErrorsFromMap(t *testing.T) {
-	logStashEvent := make(audit.LogStashEvent)
-	errors := make(map[string]string)
-	errors["1234"] = "Non existant subscription of id %s"
-
-	logSubscriptionErrorsFromMap(logStashEvent, errors)
-
-	expected := "Non existant subscription of id 1234"
-	if logStashEvent["notificationErrors"] != expected {
-		t.Errorf("Wrong log of errors\n got: %v\n want: %v", logStashEvent["notificationErrors"], expected)
 	}
 }

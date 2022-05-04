@@ -17,7 +17,7 @@ type StopVisitUpdateEvent struct {
 	PassageOrder    int
 	Monitored       bool
 	VehicleAtStop   bool
-	Schedules       StopVisitSchedules
+	Schedules       *StopVisitSchedules
 	DepartureStatus StopVisitDepartureStatus
 	ArrivalStatus   StopVisitArrivalStatus
 	RecordedAt      time.Time

@@ -158,14 +158,13 @@ func (manager *MemorySituations) New() Situation {
 
 func (manager *MemorySituations) Find(id SituationId) (Situation, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
-
 	situation, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
 	if ok {
 		return *situation, true
-	} else {
-		return Situation{}, false
 	}
+	return Situation{}, false
 }
 
 func (manager *MemorySituations) FindAll() (situations []Situation) {

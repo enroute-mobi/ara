@@ -36,19 +36,6 @@ func (handler *SIRILiteHandler) requestHandler(requestData *SIRIRequestData) SIR
 			referential: handler.referential,
 		}
 	}
-	// case "CheckStatus":
-	// case "GetStopMonitoring":
-	// case "DeleteSubscription":
-	// case "Subscribe":
-	// case "NotifyStopMonitoring":
-	// case "NotifyGeneralMessage":
-	// case "SubscriptionTerminatedNotification":
-	// case "StopPointsDiscovery":
-	// case "LinesDiscovery":
-	// case "GetSiriService":
-	// case "GetGeneralMessage":
-	// case "GetEstimatedTimetable":
-	// }
 	return nil
 }
 

@@ -1,4 +1,3 @@
-#logstash: localhost:10000
 # example config for BQ
 bigqueryprojectid: "test-edouard"
 bigquerydatasetprefix: "ara_test"

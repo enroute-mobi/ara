@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/api/rah"
@@ -40,10 +39,6 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 
 	startTime := handler.referential.Clock().Now()
 
-	logStashEvent := partner.NewLogStashEvent()
-	logStashEvent["connector"] = "GtfsHandler"
-	logStashEvent["resource"] = "resource"
-
 	message := handler.newBQMessage(string(partner.Slug()), handler.HandleRemoteAddress(request))
 	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
 
@@ -74,7 +69,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc, logStashEvent) })
+	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc) })
 
 	if err != nil {
 		handler.logError(message, startTime, "%v", err)
@@ -104,10 +99,6 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	responseSize := buffer.Len()
 	processingTime := handler.referential.Clock().Since(startTime)
 
-	logStashEvent["protobuf_size"] = strconv.Itoa(responseSize)
-	logStashEvent["response_time"] = processingTime.String()
-	audit.CurrentLogStash().WriteEvent(logStashEvent)
-
 	message.ResponseSize = int64(responseSize)
 	message.ProcessingTime = processingTime.Seconds()
 
@@ -119,7 +110,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	response.Write(buffer.Bytes())
 }
 
-func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit.LogStashEvent) ([]byte, error) {
+func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector) ([]byte, error) {
 	version := "2.0"
 	timestamp := uint64(handler.referential.Clock().Now().Unix())
 	incrementality := gtfs.FeedHeader_FULL_DATASET
@@ -131,7 +122,7 @@ func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector, logStashEvent audit
 	feed.Header.Timestamp = &timestamp
 
 	for i := range gc {
-		gc[i].HandleGtfs(feed, logStashEvent)
+		gc[i].HandleGtfs(feed)
 	}
 
 	return proto.Marshal(feed)

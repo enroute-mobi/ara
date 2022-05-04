@@ -33,6 +33,7 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 		VehicleJourneyObjectId: objectid,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -83,6 +84,7 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 		VehicleJourneyObjectId: objectid,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -128,6 +130,7 @@ func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 		VehicleJourneyObjectId: objectid,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -168,6 +171,7 @@ func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 		VehicleJourneyObjectId: objectid,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)

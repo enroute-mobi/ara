@@ -155,7 +155,7 @@ func Test_MemoryStopAreas_Save(t *testing.T) {
 
 	stopArea := stopAreas.New()
 
-	if success := stopAreas.Save(&stopArea); !success {
+	if success := stopAreas.Save(stopArea); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -176,7 +176,7 @@ func Test_MemoryStopAreas_Find(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 
 	existingStopArea := stopAreas.New()
-	stopAreas.Save(&existingStopArea)
+	stopAreas.Save(existingStopArea)
 
 	stopAreaId := existingStopArea.Id()
 
@@ -194,7 +194,7 @@ func Test_MemoryStopAreas_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingStopArea := stopAreas.New()
-		stopAreas.Save(&existingStopArea)
+		stopAreas.Save(existingStopArea)
 	}
 
 	foundStopAreas := stopAreas.FindAll()
@@ -209,9 +209,9 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	existingStopArea := stopAreas.New()
 	objectid := NewObjectID("kind", "value")
 	existingStopArea.SetObjectID(objectid)
-	stopAreas.Save(&existingStopArea)
+	stopAreas.Save(existingStopArea)
 
-	stopAreas.Delete(&existingStopArea)
+	stopAreas.Delete(existingStopArea)
 
 	_, ok := stopAreas.Find(existingStopArea.Id())
 	if ok {
@@ -226,15 +226,15 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 func Test_MemoryStopAreas_FindAscendants(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	stopArea := stopAreas.New()
-	stopAreas.Save(&stopArea)
+	stopAreas.Save(stopArea)
 
 	stopArea1 := stopAreas.New()
 	stopArea1.ParentId = stopArea.id
-	stopAreas.Save(&stopArea1)
+	stopAreas.Save(stopArea1)
 
 	stopArea2 := stopAreas.New()
 	stopArea2.ParentId = stopArea1.id
-	stopAreas.Save(&stopArea2)
+	stopAreas.Save(stopArea2)
 
 	foundStopAreas := stopAreas.FindAscendants(stopArea2.Id())
 	if len(foundStopAreas) != 3 {
@@ -245,34 +245,34 @@ func Test_MemoryStopAreas_FindAscendants(t *testing.T) {
 func Test_MemoryStopAreas_FindFamily(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	stopArea := stopAreas.New()
-	stopAreas.Save(&stopArea)
+	stopAreas.Save(stopArea)
 
 	stopArea1 := stopAreas.New()
 	stopArea1.ParentId = stopArea.id
-	stopAreas.Save(&stopArea1)
+	stopAreas.Save(stopArea1)
 
 	stopArea2 := stopAreas.New()
 	stopArea2.ParentId = stopArea1.id
-	stopAreas.Save(&stopArea2)
+	stopAreas.Save(stopArea2)
 
 	stopArea3 := stopAreas.New()
 	stopArea3.ParentId = stopArea2.id
-	stopAreas.Save(&stopArea3)
+	stopAreas.Save(stopArea3)
 
 	stopArea4 := stopAreas.New()
 	stopArea4.ParentId = stopArea1.id
-	stopAreas.Save(&stopArea4)
+	stopAreas.Save(stopArea4)
 
 	stopArea5 := stopAreas.New()
 	stopArea5.ParentId = stopArea.id
-	stopAreas.Save(&stopArea5)
+	stopAreas.Save(stopArea5)
 
 	stopArea6 := stopAreas.New()
 	stopArea6.ParentId = stopArea5.id
-	stopAreas.Save(&stopArea6)
+	stopAreas.Save(stopArea6)
 
 	stopArea7 := stopAreas.New()
-	stopAreas.Save(&stopArea7)
+	stopAreas.Save(stopArea7)
 
 	if len(stopAreas.FindFamily(stopArea.id)) != 7 {
 		t.Errorf("FindFamily should find 6 StopAreas, got: %v", len(stopAreas.FindFamily(stopArea.id)))

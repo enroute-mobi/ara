@@ -126,6 +126,16 @@ type ObjectIDConsumer struct {
 	objectids ObjectIDs
 }
 
+func (consumer *ObjectIDConsumer) Clone() ObjectIDConsumer {
+	o := ObjectIDConsumer{
+		objectids: make(ObjectIDs),
+	}
+	for k, v := range consumer.objectids {
+		o.objectids[k] = v
+	}
+	return o
+}
+
 func (consumer *ObjectIDConsumer) ObjectID(kind string) (ObjectID, bool) {
 	objectid, ok := consumer.objectids[kind]
 	if ok {

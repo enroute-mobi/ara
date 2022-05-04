@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/cache"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
@@ -80,7 +79,6 @@ type Partner struct {
 	PartnerStatus PartnerStatus
 
 	ConnectorTypes []string
-	// Settings       map[string]string
 
 	connectors             map[string]Connector
 	discoveredStopAreas    map[string]struct{}
@@ -336,17 +334,13 @@ func (partner *Partner) CreateSubscriptionRequestDispatcher() {
 	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = NewSIRISubscriptionRequestDispatcher(partner)
 }
 
-func (partner *Partner) CheckStatusClient() CheckStatusClient {
-	// WIP
-	client, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]
-	if ok {
-		return client.(CheckStatusClient)
+func (partner *Partner) CheckStatusClient() (csc CheckStatusClient) {
+	c, ok := partner.connectors[SIRI_CHECK_STATUS_CLIENT_TYPE]
+	if !ok {
+		c = partner.connectors[TEST_CHECK_STATUS_CLIENT_TYPE]
 	}
-	client, ok = partner.connectors[TEST_CHECK_STATUS_CLIENT_TYPE]
-	if ok {
-		return client.(CheckStatusClient)
-	}
-	return nil
+	csc, _ = c.(CheckStatusClient)
+	return
 }
 
 func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
@@ -364,7 +358,6 @@ func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
 }
 
 func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCollector {
-	// WIP
 	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR]
 	if ok {
 		return client.(GeneralMessageRequestCollector)
@@ -373,7 +366,6 @@ func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCo
 }
 
 func (partner *Partner) GeneralMessageSubscriptionCollector() GeneralMessageSubscriptionCollector {
-	// WIP
 	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR]
 	if ok {
 		return client.(GeneralMessageSubscriptionCollector)
@@ -382,7 +374,6 @@ func (partner *Partner) GeneralMessageSubscriptionCollector() GeneralMessageSubs
 }
 
 func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubscriptionCollector {
-	// WIP
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR]
 	if ok {
 		return client.(StopMonitoringSubscriptionCollector)
@@ -390,21 +381,16 @@ func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubs
 	return nil
 }
 
-func (partner *Partner) StopMonitoringRequestCollector() StopMonitoringRequestCollector {
-	// WIP
-	client, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
-	if ok {
-		return client.(StopMonitoringRequestCollector)
+func (partner *Partner) StopMonitoringRequestCollector() (smrc StopMonitoringRequestCollector) {
+	c, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
+	if !ok {
+		c = partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR]
 	}
-	client, ok = partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR]
-	if ok {
-		return client.(StopMonitoringRequestCollector)
-	}
-	return nil
+	smrc, _ = c.(StopMonitoringRequestCollector)
+	return
 }
 
 func (partner *Partner) VehicleMonitoringRequestCollector() VehicleMonitoringRequestCollector {
-	// WIP
 	client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR]
 	if ok {
 		return client.(VehicleMonitoringRequestCollector)
@@ -413,7 +399,7 @@ func (partner *Partner) VehicleMonitoringRequestCollector() VehicleMonitoringReq
 }
 
 func (partner *Partner) VehicleMonitoringSubscriptionCollector() VehicleMonitoringSubscriptionCollector {
-	// WIP
+	// To be implemented
 	// client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR]
 	// if ok {
 	// 	return client.(VehicleMonitoringSubscriptionCollector)
@@ -500,19 +486,13 @@ func (partner *Partner) CancelBroadcastSubscriptions() {
 	partner.subscriptionManager.CancelBroadcastSubscriptions()
 }
 
-func (partner *Partner) NewLogStashEvent() audit.LogStashEvent {
-	logStashEvent := make(audit.LogStashEvent)
-	logStashEvent["referential"] = string(partner.manager.Referential().Slug())
-	logStashEvent["partner"] = string(partner.slug)
-	return logStashEvent
-}
-
 func (partner *Partner) LastDiscovery() time.Time {
 	return partner.lastDiscovery
 }
 
 func (partner *Partner) Discover() {
 	partner.lastDiscovery = partner.manager.Referential().Clock().Now()
+	// To be implemented
 	// partner.lineDiscovery()
 	partner.stopDiscovery()
 }

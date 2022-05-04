@@ -1,10 +1,7 @@
 package core
 
 import (
-	"fmt"
 	"sort"
-	"strconv"
-	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -31,11 +28,6 @@ func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscove
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
-	logStashEvent := connector.newLogStashEvent()
-	defer audit.CurrentLogStash().WriteEvent(logStashEvent)
-
-	logXMLLineDiscoveryRequest(logStashEvent, request)
-
 	response := &siri.SIRILinesDiscoveryResponse{
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
@@ -68,16 +60,7 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLi
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.Lines = annotedLineArray
 
-	logStashEvent["annotedLines"] = strings.Join(annotedLineArray, ", ")
-	logSIRILineDiscoveryResponse(logStashEvent, response)
-
 	return response, nil
-}
-
-func (connector *SIRILinesDiscoveryRequestBroadcaster) newLogStashEvent() audit.LogStashEvent {
-	event := connector.partner.NewLogStashEvent()
-	event["connector"] = "LinesDiscoveryRequestBroadcaster"
-	return event
 }
 
 func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
@@ -87,23 +70,4 @@ func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) Validate(apiPartner 
 
 func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
 	return NewSIRILinesDiscoveryRequestBroadcaster(partner)
-}
-
-func logXMLLineDiscoveryRequest(logStashEvent audit.LogStashEvent, request *siri.XMLLinesDiscoveryRequest) {
-	logStashEvent["siriType"] = "LinesDiscoveryResponse"
-	logStashEvent["requestorRef"] = request.RequestorRef()
-	logStashEvent["messageIdentifier"] = request.MessageIdentifier()
-	logStashEvent["requestTimestamp"] = request.RequestTimestamp().String()
-	logStashEvent["requestXML"] = request.RawXML()
-}
-
-func logSIRILineDiscoveryResponse(logStashEvent audit.LogStashEvent, response *siri.SIRILinesDiscoveryResponse) {
-	logStashEvent["responseTimestamp"] = response.ResponseTimestamp.String()
-	logStashEvent["status"] = strconv.FormatBool(response.Status)
-	xml, err := response.BuildXML()
-	if err != nil {
-		logStashEvent["responseXML"] = fmt.Sprintf("%v", err)
-		return
-	}
-	logStashEvent["responseXML"] = xml
 }

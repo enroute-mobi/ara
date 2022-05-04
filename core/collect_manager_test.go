@@ -6,45 +6,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
-// Already tested by siriStopMonitoringRequestCollectorTest
-// func Test_CollectManager_UpdateStopArea(t *testing.T) {
-// 	referentials := NewMemoryReferentials()
-// 	referential := referentials.New("referential")
-//
-// 	partners := referential.Partners()
-// 	collectManager := &CollectManager{
-// 		referential:               referential,
-// 		StopAreaUpdateSubscribers: make([]StopAreaUpdateSubscriber, 0),
-// 	}
-//
-// 	stopArea := referential.Model().StopAreas().New()
-// 	stopArea.SetObjectID(model.NewObjectID("internal", "boarle"))
-// 	stopArea.Save()
-//
-// 	partner := partners.New("partner")
-// 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
-// 	partner.RefreshConnectors()
-// 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
-// 	partner.Settings["remote_objectid_kind"] = "internal"
-//
-// 	partners.Save(partner)
-//
-// 	testManager := &TestCollectManager{}
-// 	collectManager.HandleLegacyStopAreaUpdateEvent(testManager.TestStopAreaUpdateSubscriber)
-//
-// 	if len(collectManager.StopAreaUpdateSubscribers) != 1 {
-// 		t.Error("CollectManager should have a subscriber after HandleLegacyStopVisitUpdateEvent call")
-// 	}
-//
-// 	request := NewStopAreaUpdateRequest(stopArea.Id())
-// 	collectManager.UpdateStopArea(request)
-//
-// 	time.Sleep(50 * time.Millisecond)
-// 	if len(testManager.StopVisitEvents) != 1 {
-// 		t.Errorf("Subscriber should be called by CollectManager UpdateStopArea %v", len(testManager.StopVisitEvents))
-// 	}
-// }
-
 func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
@@ -75,6 +36,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 		VehicleJourneyObjectId: vjObjectid,
 		DepartureStatus:        model.STOP_VISIT_DEPARTURE_ONTIME,
 		ArrivalStatus:          model.STOP_VISIT_ARRIVAL_ARRIVED,
+		Schedules:              model.NewStopVisitSchedules(),
 	}
 	referential.collectManager.BroadcastUpdateEvent(event)
 

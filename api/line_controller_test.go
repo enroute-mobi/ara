@@ -24,7 +24,7 @@ func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *tes
 	}
 }
 
-func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -37,7 +37,7 @@ func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *test
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new line
 	line = referential.Model().Lines().New()
-	referential.Model().Lines().Save(&line)
+	referential.Model().Lines().Save(line)
 
 	// Create a request
 	address := []byte("/default/lines")
@@ -152,7 +152,7 @@ func Test_LineController_FindLine(t *testing.T) {
 	line := ref.Model().Lines().New()
 	objectid := model.NewObjectID("kind", "stif:value")
 	line.SetObjectID(objectid)
-	ref.Model().Lines().Save(&line)
+	ref.Model().Lines().Save(line)
 
 	controller := &LineController{
 		referential: ref,

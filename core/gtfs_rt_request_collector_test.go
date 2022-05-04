@@ -19,7 +19,6 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]mo
 		data, _ := proto.Marshal(feed)
 		var buffer bytes.Buffer
 		buffer.Write(data)
-		// data := d.([]byte)
 		w.Header().Set("Content-Type", "application/x-protobuf")
 		w.Write(buffer.Bytes())
 	}))
