@@ -253,6 +253,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
+	sa, _ := manager.model.StopAreas().FindByObjectId(event.StopAreaObjectId)
 	vj, _ := manager.model.VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
 	line := vj.Line()
 
@@ -263,6 +264,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		vehicle.SetObjectID(event.ObjectId)
 	}
 
+	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
 	vehicle.DriverRef = event.DriverRef
 	vehicle.Longitude = event.Longitude

@@ -21,6 +21,7 @@ type Vehicle struct {
 
 	id               VehicleId
 	LineId           LineId           `json:",omitempty"`
+	StopAreaId       StopAreaId       `json:",omitempty"`
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
 	Longitude float64 `json:",omitempty"`
