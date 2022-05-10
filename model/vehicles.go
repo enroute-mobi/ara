@@ -33,11 +33,14 @@ type Vehicle struct {
 	ValidUntilTime time.Time `json:",omitempty"`
 
 	RecordedAtTime time.Time
+
+	Attributes Attributes
 }
 
 func NewVehicle(model Model) *Vehicle {
 	vehicle := &Vehicle{
-		model: model,
+		model:      model,
+		Attributes: NewAttributes(),
 	}
 	vehicle.objectids = make(ObjectIDs)
 	return vehicle
@@ -48,8 +51,22 @@ func (vehicle *Vehicle) modelId() ModelId {
 }
 
 func (vehicle *Vehicle) copy() *Vehicle {
-	v := *vehicle
-	return &v
+	return &Vehicle{
+		ObjectIDConsumer: vehicle.ObjectIDConsumer.Clone(),
+		model:            vehicle.model,
+		id:               vehicle.id,
+		LineId:           vehicle.LineId,
+		VehicleJourneyId: vehicle.VehicleJourneyId,
+		Longitude:        vehicle.Longitude,
+		Latitude:         vehicle.Latitude,
+		Bearing:          vehicle.Bearing,
+		LinkDistance:     vehicle.LinkDistance,
+		Percentage:       vehicle.Percentage,
+		DriverRef:        vehicle.DriverRef,
+		ValidUntilTime:   vehicle.ValidUntilTime,
+		RecordedAtTime:   vehicle.RecordedAtTime,
+		Attributes:       vehicle.Attributes.Copy(),
+	}
 }
 
 func (vehicle *Vehicle) Id() VehicleId {
@@ -71,8 +88,9 @@ func (vehicle *Vehicle) VehicleJourney() *VehicleJourney {
 func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	type Alias Vehicle
 	aux := struct {
-		Id        VehicleId
-		ObjectIDs ObjectIDs `json:",omitempty"`
+		Id         VehicleId
+		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		Attributes Attributes `json:",omitempty"`
 		*Alias
 	}{
 		Id:    vehicle.id,
@@ -81,6 +99,9 @@ func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 
 	if !vehicle.ObjectIDs().Empty() {
 		aux.ObjectIDs = vehicle.ObjectIDs()
+	}
+	if !vehicle.Attributes.IsEmpty() {
+		aux.Attributes = vehicle.Attributes
 	}
 
 	return json.Marshal(&aux)

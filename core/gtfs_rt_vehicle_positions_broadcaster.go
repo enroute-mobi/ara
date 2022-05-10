@@ -130,6 +130,14 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			},
 		}
 
+		if o, ok := vehicles[i].Attributes["Occupancy"]; ok {
+			vp, ok := gtfs.VehiclePosition_OccupancyStatus_value[o]
+			if ok {
+				status := gtfs.VehiclePosition_OccupancyStatus(vp)
+				feedEntity.Vehicle.OccupancyStatus = &status
+			}
+		}
+
 		entities = append(entities, feedEntity)
 	}
 	return

@@ -181,6 +181,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 			Latitude:               float64(p.GetLatitude()),
 			Bearing:                float64(p.GetBearing()),
 		}
+		event.Attributes().Set("Occupancy", v.GetOccupancyStatus().String())
 
 		events.Vehicles[vid] = event
 	}

@@ -181,3 +181,8 @@ def has_attributes(response_array, attributes)
 
   expect(found_value).to include(parsed_attributes)
 end
+
+def gtfs_attributes(table)
+  attributes = table.rows_hash
+  attributes.each { |k, v| attributes[k] = eval("GTFS::Realtime::VehiclePosition::OccupancyStatus::#{v}") if k == "occupancy_status" }
+end
