@@ -3,6 +3,8 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -42,6 +44,16 @@ func (notify *SIRINotifyProductionTimeTable) BuildXML(envelopeType ...string) (s
 	}
 
 	templateName = fmt.Sprintf("production_timetable_notify%s.template", envType)
+
+	// order StopPointRef lexicographically inside DatedCalls
+	for _, dtvf := range notify.DatedTimetableVersionFrames {
+		for _, dvj := range dtvf.DatedVehicleJourneys {
+			sort.Slice(dvj.DatedCalls, func(i, j int) bool {
+				return strings.ToLower(dvj.DatedCalls[i].StopPointRef) <
+					strings.ToLower(dvj.DatedCalls[j].StopPointRef)
+			})
+		}
+	}
 
 	if err := templates.ExecuteTemplate(&buffer, templateName, notify); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
