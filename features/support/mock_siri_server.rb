@@ -46,6 +46,8 @@ class SIRIServer
         res.status = 401
         res.body = 'Unauthorized request'
       else
+        Siri::Validator.create(req.body,"server request").log
+
         request_message_identifiers = req.body.scan(/MessageIdentifier>(.*)</).flatten
         if checkstatus_response_standard?(req)
           case @envelope
@@ -66,6 +68,8 @@ class SIRIServer
 
           res.body = request_body
         end
+
+        Siri::Validator.create(res.body,"server response").log
       end
       res.content_type = 'text/xml'
     end

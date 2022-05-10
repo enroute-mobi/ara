@@ -7,8 +7,13 @@ def siri_path(attributes = {})
 end
 
 def send_siri_request(request, attributes = {})
+  Siri::Validator.create(request,"client request").log
+
   response = RestClient.post siri_path(attributes), request, {content_type: :xml}
   save_siri_messages request: request, response: response.body
+
+  Siri::Validator.create(response.body, "response sent to client").log
+
   @last_siri_request = request
   @last_siri_response = response.body
 end

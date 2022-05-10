@@ -11,6 +11,7 @@ group :test do
   gem 'pg'
   gem 'gtfs-rt', en_route: 'gtfs-rt'
   gem 'pry'
+  gem 'siri-xsd', en_route: 'siri-xsd'
 end
 
 group :development do
