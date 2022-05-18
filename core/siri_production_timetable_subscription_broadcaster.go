@@ -47,7 +47,7 @@ func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) Validate(a
 
 func newSIRIProductionTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIProductionTimeTableSubscriptionBroadcaster {
 	connector := &SIRIProductionTimeTableSubscriptionBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.noDataFrameRefRewritingFrom = partner.NoDataFrameRefRewritingFrom()
 	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)

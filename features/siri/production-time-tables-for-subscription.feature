@@ -188,7 +188,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::10:LOC"                                    |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T17:00:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
