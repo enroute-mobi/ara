@@ -16,9 +16,8 @@ Then('I should not receive a GTFS-RT but an unauthorized client error status') d
 end
 
 Then('this GTFS-RT response should contain a Vehicle Position with these attributes:') do |vehicle_position_attributes|
-  vehicle_position_attributes = vehicle_position_attributes.rows_hash
   debug @gtfs_response.vehicle_positions.inspect
-  expect(@gtfs_response.vehicle_positions).to include(an_object_having_attributes(vehicle_position_attributes))
+  expect(@gtfs_response.vehicle_positions).to include(an_object_having_attributes(gtfs_attributes(vehicle_position_attributes)))
 end
 
 Then('this GTFS-RT response should not contain Vehicle Positions') do

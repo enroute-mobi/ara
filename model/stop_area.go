@@ -154,9 +154,9 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (stopArea *StopArea) Attribute(key string) (string, bool) {
-	value, present := stopArea.Attributes[key]
-	return value, present
+func (stopArea *StopArea) Attribute(key string) (value string, present bool) {
+	value, present = stopArea.Attributes[key]
+	return
 }
 
 func (stopArea *StopArea) Reference(key string) (Reference, bool) {

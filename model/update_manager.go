@@ -272,6 +272,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	vehicle.Percentage = event.Percentage
 	vehicle.ValidUntilTime = event.ValidUntilTime
 	vehicle.RecordedAtTime = manager.Clock().Now()
+	vehicle.Attributes.Set("Occupancy", event.Attributes()["Occupancy"])
 
 	if line != nil {
 		vehicle.LineId = line.Id()

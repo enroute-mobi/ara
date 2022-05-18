@@ -14,12 +14,23 @@ type VehicleUpdateEvent struct {
 	Latitude               float64
 	Bearing                float64
 	ValidUntilTime         time.Time
+
+	attributes Attributes
 }
 
 func NewVehicleUpdateEvent() *VehicleUpdateEvent {
-	return &VehicleUpdateEvent{}
+	return &VehicleUpdateEvent{
+		attributes: NewAttributes(),
+	}
 }
 
 func (ue *VehicleUpdateEvent) EventKind() EventKind {
 	return VEHICLE_EVENT
+}
+
+func (ue *VehicleUpdateEvent) Attributes() Attributes {
+	if ue.attributes == nil {
+		ue.attributes = NewAttributes()
+	}
+	return ue.attributes
 }
