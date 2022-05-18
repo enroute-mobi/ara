@@ -53,7 +53,7 @@ func (vehicle *Vehicle) modelId() ModelId {
 
 func (vehicle *Vehicle) copy() *Vehicle {
 	return &Vehicle{
-		ObjectIDConsumer: vehicle.ObjectIDConsumer.Clone(),
+		ObjectIDConsumer: vehicle.ObjectIDConsumer.Copy(),
 		model:            vehicle.model,
 		id:               vehicle.id,
 		LineId:           vehicle.LineId,
