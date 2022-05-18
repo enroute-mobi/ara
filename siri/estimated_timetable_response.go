@@ -44,6 +44,7 @@ type SIRIEstimatedVehicleJourney struct {
 	References map[string]string
 
 	EstimatedCalls []*SIRIEstimatedCall
+	RecordedCalls  []*SIRIRecordedCall
 }
 
 type SIRIEstimatedCall struct {
@@ -54,6 +55,22 @@ type SIRIEstimatedCall struct {
 	DestinationDisplay string
 
 	VehicleAtStop bool
+
+	Order int
+
+	AimedArrivalTime    time.Time
+	ExpectedArrivalTime time.Time
+
+	AimedDepartureTime    time.Time
+	ExpectedDepartureTime time.Time
+}
+
+type SIRIRecordedCall struct {
+	ArrivalStatus      string
+	DepartureStatus    string
+	StopPointRef       string
+	StopPointName      string
+	DestinationDisplay string
 
 	Order int
 
@@ -99,7 +116,7 @@ func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryX
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }
 
 func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXML() (string, error) {
@@ -108,7 +125,7 @@ func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrame
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }
 
 func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryXMLRaw() (string, error) {
@@ -117,7 +134,7 @@ func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryX
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }
 
 func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXMLRaw() (string, error) {

@@ -272,6 +272,194 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </S:Envelope>
       """
 
+  @ARA-1062 
+  Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                        | http://localhost:8090 |
+       | remote_credential                 | test                  |
+       | local_credential                  | NINOXE:default        |
+       | remote_objectid_kind              | internal              |
+       | broadcast.recorded_calls.duration | 1h                    |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[OriginName]              | Le début                                |
+      | Attribute[DestinationName]         | La fin.                                 |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T12:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And 10 seconds have passed
+    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus              | Delayed                  |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <ServiceDeliveryInfo>
+    <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+    <siri:ProducerRef>test</siri:ProducerRef>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:RequestMessageRef></siri:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Notification>
+    <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+      <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+      <siri:RequestMessageRef></siri:RequestMessageRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+      <siri:Status>true</siri:Status>
+      <siri:EstimatedJourneyVersionFrame>
+        <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
+        <siri:EstimatedVehicleJourney>
+          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+          <siri:DirectionRef>Aller</siri:DirectionRef>
+          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+          <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:EstimatedCalls>
+            <siri:EstimatedCall>
+              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+              <siri:Order>4</siri:Order>
+              <siri:StopPointName>Test</siri:StopPointName>
+              <siri:VehicleAtStop>false</siri:VehicleAtStop>
+              <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
+              <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            </siri:EstimatedCall>
+          </siri:EstimatedCalls>
+        </siri:EstimatedVehicleJourney>
+      </siri:EstimatedJourneyVersionFrame>
+    </siri:EstimatedTimetableDelivery>
+  </Notification>
+  <NotifyExtension />
+</sw:NotifyEstimatedTimetable>
+</S:Body>
+</S:Envelope>
+      """
+    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+      | Schedule[expected]#Arrival   | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus                | arrived                  |
+      | DepartureStatus              | departed                 |
+      | Schedule[expected]#Departure | 2017-01-01T15:01:11.000Z |
+    And 20 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <ServiceDeliveryInfo>
+    <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+    <siri:ProducerRef>test</siri:ProducerRef>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:RequestMessageRef></siri:RequestMessageRef>
+  </ServiceDeliveryInfo>
+  <Notification>
+    <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
+      <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+      <siri:RequestMessageRef></siri:RequestMessageRef>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+      <siri:Status>true</siri:Status>
+      <siri:EstimatedJourneyVersionFrame>
+        <siri:RecordedAtTime>2017-01-01T12:00:40.000Z</siri:RecordedAtTime>
+        <siri:EstimatedVehicleJourney>
+          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+          <siri:DirectionRef>Aller</siri:DirectionRef>
+          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+          <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:RecordedCalls>
+            <siri:RecordedCall>
+              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+              <siri:Order>4</siri:Order>
+              <siri:StopPointName>Test</siri:StopPointName>
+              <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
+              <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
+              <siri:ExpectedDepartureTime>2017-01-01T15:01:11.000Z</siri:ExpectedDepartureTime>
+              <siri:DepartureStatus>departed</siri:DepartureStatus>
+            </siri:RecordedCall>
+          </siri:RecordedCalls>
+        </siri:EstimatedVehicleJourney>
+      </siri:EstimatedJourneyVersionFrame>
+    </siri:EstimatedTimetableDelivery>
+  </Notification>
+  <NotifyExtension />
+</sw:NotifyEstimatedTimetable>
+</S:Body>
+</S:Envelope>
+      """
+
+  @ARA-1062 
+  Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time oustide the broadcast.recorded_calls.duration
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                        | http://localhost:8090 |
+       | remote_credential                 | test                  |
+       | local_credential                  | NINOXE:default        |
+       | remote_objectid_kind              | internal              |
+       | broadcast.recorded_calls.duration | 1h                    |
+    Given a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimeTableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[OriginName]              | Le début                                |
+      | Attribute[DestinationName]         | La fin.                                 |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T01:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T01:10:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+      | Schedule[expected]#Departure    | 2017-01-01T01:20:00.000Z                                             |
+    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+      | ArrivalStatus   | arrived  |
+      | DepartureStatus | departed |
+    And 10 seconds have passed
+    Then the SIRI server should not have received a NotifyEstimatedTimetable request
+
   @ARA-1025
   Scenario: Manage a raw ETT Notify after modification of a StopVisit
     Given a SIRI server on "http://localhost:8090"

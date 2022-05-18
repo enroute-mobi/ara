@@ -235,22 +235,39 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 				vehicleJourneys[vehicleJourney.Id()] = estimatedVehicleJourney
 			}
 
-			// EstimatedCall
-			estimatedCall := &siri.SIRIEstimatedCall{
-				ArrivalStatus:         string(stopVisit.ArrivalStatus),
-				DepartureStatus:       string(stopVisit.DepartureStatus),
-				AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-				ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-				AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-				ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-				Order:                 stopVisit.PassageOrder,
-				StopPointRef:          stopAreaId,
-				StopPointName:         stopArea.Name,
-				DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
-				VehicleAtStop:         stopVisit.VehicleAtStop,
-			}
+			if stopVisit.IsRecordable() && ett.connector.Partner().RecordedCallsDuration() != 0 {
+				// recordedCall
+				recordedCall := &siri.SIRIRecordedCall{
+					ArrivalStatus:         string(stopVisit.ArrivalStatus),
+					DepartureStatus:       string(stopVisit.DepartureStatus),
+					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+					Order:                 stopVisit.PassageOrder,
+					StopPointRef:          stopAreaId,
+					StopPointName:         stopArea.Name,
+					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
+				}
 
-			estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+				estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
+			} else {
+				// EstimatedCall
+				estimatedCall := &siri.SIRIEstimatedCall{
+					ArrivalStatus:         string(stopVisit.ArrivalStatus),
+					DepartureStatus:       string(stopVisit.DepartureStatus),
+					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
+					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
+					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
+					Order:                 stopVisit.PassageOrder,
+					StopPointRef:          stopAreaId,
+					StopPointName:         stopArea.Name,
+					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
+					VehicleAtStop:         stopVisit.VehicleAtStop,
+				}
+				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+			}
 
 			processedStopVisits[stopVisitId] = struct{}{}
 

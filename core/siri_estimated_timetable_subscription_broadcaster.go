@@ -246,9 +246,20 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		if !ok {
 			r.SetLastState(string(sv.Id()), ls.NewEstimatedTimeTableLastChange(sv, sub))
 		}
-
-		connector.addStopVisit(sub.Id(), svId)
+		connector.addFilteredStopVisit(sub.Id(), sv)
 	}
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addFilteredStopVisit(subId SubscriptionId, sv *model.StopVisit) {
+	connector.mutex.Lock()
+	// ignore stopVist before the RecordedCallsDuration if any
+	if sv.IsRecordable() &&
+		connector.Partner().RecordedCallsDuration() != 0 &&
+		sv.ReferenceDepartureTime().Before(connector.Clock().Now().Add(-connector.Partner().RecordedCallsDuration())) {
+		return
+	}
+	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], sv.Id())
+	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {

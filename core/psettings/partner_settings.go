@@ -43,6 +43,7 @@ const (
 	DISCOVERY_INTERVAL = "discovery_interval"
 
 	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
+	BROADCAST_RECORDED_CALLS_DURATION          = "broadcast.recorded_calls.duration"
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
 	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
@@ -196,6 +197,14 @@ func (s *PartnerSettings) GtfsTTL() (t time.Duration) {
 	if t < DEFAULT_GTFS_TTL {
 		t = DEFAULT_GTFS_TTL
 	}
+
+	return
+}
+
+func (s *PartnerSettings) RecordedCallsDuration() (t time.Duration) {
+	s.m.RLock()
+	t, _ = time.ParseDuration(s.s[BROADCAST_RECORDED_CALLS_DURATION])
+	s.m.RUnlock()
 
 	return
 }

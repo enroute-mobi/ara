@@ -84,6 +84,11 @@ func (stopVisit *StopVisit) IsCollected() bool {
 	return stopVisit.collected
 }
 
+func (stopVisit *StopVisit) IsRecordable() bool {
+	return stopVisit.ArrivalStatus.Arrived() &&
+		stopVisit.DepartureStatus.Departed()
+}
+
 func (stopVisit *StopVisit) NotCollected() {
 	stopVisit.collected = false
 	stopVisit.ArrivalStatus = STOP_VISIT_ARRIVAL_CANCELLED
