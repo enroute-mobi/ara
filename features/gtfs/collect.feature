@@ -223,7 +223,7 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_url           | http://localhost:8090 |
       | remote_objectid_kind | internal              |
     When a minute has passed
-    And one Vehicle has the following attributes:
+    Then one Vehicle has the following attributes:
       | ObjectIDs            | "internal": "bus-234"             |
       | VehicleJourneyId     | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Attribute[Occupancy] | FEW_SEATS_AVAILABLE               |

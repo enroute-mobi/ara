@@ -133,7 +133,6 @@ func deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool) bool {
 			t2 := v2.Interface().(ObjectIDConsumer)
 			return deepValueEqual(reflect.ValueOf(t1.ObjectIDs()), reflect.ValueOf(t2.ObjectIDs()), visited)
 		} else if v1.Type() == objectIDType {
-			// Special case for time - we ignore the time zone.
 			t1 := v1.Interface().(ObjectID)
 			t2 := v2.Interface().(ObjectID)
 			return t1.kind == t2.Kind() && t1.Value() == t2.Value()
