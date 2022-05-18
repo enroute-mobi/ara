@@ -57,6 +57,7 @@ func (vehicle *Vehicle) copy() *Vehicle {
 		model:            vehicle.model,
 		id:               vehicle.id,
 		LineId:           vehicle.LineId,
+		StopAreaId:       vehicle.StopAreaId,
 		VehicleJourneyId: vehicle.VehicleJourneyId,
 		Longitude:        vehicle.Longitude,
 		Latitude:         vehicle.Latitude,
