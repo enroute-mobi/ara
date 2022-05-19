@@ -53,6 +53,12 @@ func NewMemoryModel(referential ...string) *MemoryModel {
 		model.referential = referential[0]
 	}
 
+	model.refresh()
+
+	return model
+}
+
+func (model *MemoryModel) refresh() {
 	lines := NewMemoryLines()
 	lines.model = model
 	model.lines = lines
@@ -87,8 +93,6 @@ func NewMemoryModel(referential ...string) *MemoryModel {
 	vehicles := NewMemoryVehicles()
 	vehicles.model = model
 	model.vehicles = vehicles
-
-	return model
 }
 
 func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
@@ -124,7 +128,7 @@ func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
 }
 
 func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
-	model = NewMemoryModel()
+	model.refresh()
 	model.date = NewDate(clock.DefaultClock().Now())
 	model.Load(referentialSlug)
 	return model
