@@ -2,6 +2,7 @@ package core
 
 import (
 	"io/ioutil"
+	"math"
 	"os"
 	"testing"
 
@@ -39,12 +40,17 @@ func Test_Coordinates_Transform(t *testing.T) {
 		t.Errorf("Error while converting: %v", err)
 	}
 
-	if e := 7.276192074052043; coord.X != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, coord.X)
+	if e := 7.2761920740520; round(coord.X) != e {
+		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, round(coord.X))
 	}
-	if e := 43.70347861870634; coord.Y != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, coord.Y)
+	if e := 43.703478618706; round(coord.Y) != e {
+		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, round(coord.Y))
 	}
+}
+
+func round(n float64) float64 {
+	r := math.Pow(10, 12)
+	return math.Round((n * r)) / r
 }
 
 func Test_Coordinates_WithLonLat(t *testing.T) {
