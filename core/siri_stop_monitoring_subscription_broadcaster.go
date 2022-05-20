@@ -108,7 +108,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model
 	vj, _ := connector.partner.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
 
 	for _, stopAreaObjectId := range connector.partner.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.remoteObjectidKind) {
-		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), "StopMonitoringBroadcast")
+		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), StopMonitoringBroadcast)
 
 		for _, sub := range subs {
 			resource := sub.Resource(stopAreaObjectId)
@@ -145,7 +145,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 
 	connector.mutex.Lock()
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "StopMonitoringBroadcast")
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), StopMonitoringBroadcast)
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
 		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
@@ -204,9 +204,18 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("StopMonitoringBroadcast")
+			sub = connector.Partner().Subscriptions().New(StopMonitoringBroadcast)
 			sub.SubscriberRef = sm.SubscriberRef()
 			sub.SetExternalId(sm.SubscriptionIdentifier())
+		} else if sub.Kind() != StopMonitoringBroadcast {
+			logger.Log.Debugf("StopMonitoring subscription request with a duplicated Id: %v", sm.SubscriptionIdentifier())
+			rs.ErrorType = "OtherError"
+			rs.ErrorNumber = 2
+			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", sm.SubscriptionIdentifier())
+			resps = append(resps, rs)
+
+			message.Status = "Error"
+			continue
 		}
 
 		ref := model.Reference{

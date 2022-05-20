@@ -59,6 +59,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
+		var failedSubscription bool
+
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
@@ -74,23 +76,32 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
-		} else {
-			rs.Status = true
-			rs.ValidUntil = ett.InitialTerminationTime()
+			failedSubscription = true
 		}
 
-		resps = append(resps, rs)
+		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
+		if ok && sub.Kind() != EstimatedTimetableBroadcast {
+			logger.Log.Debugf("EstimatedTimeTable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
+			rs.ErrorType = "OtherError"
+			rs.ErrorNumber = 2
+			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ett.SubscriptionIdentifier())
+			failedSubscription = true
+		}
 
 		// We do not want to create a subscription that will fail
-		if len(unknownLineIds) != 0 {
+		if failedSubscription {
+			resps = append(resps, rs)
 			continue
 		}
 
+		rs.Status = true
+		rs.ValidUntil = ett.InitialTerminationTime()
+		resps = append(resps, rs)
+
 		subIds = append(subIds, ett.SubscriptionIdentifier())
 
-		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("EstimatedTimeTableBroadcast")
+			sub = connector.Partner().Subscriptions().New(EstimatedTimetableBroadcast)
 			sub.SubscriberRef = ett.SubscriberRef()
 			sub.SetExternalId(ett.SubscriptionIdentifier())
 			connector.fillOptions(sub, request)
@@ -230,7 +241,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	subs := connector.Partner().Subscriptions().FindByResourceId(lineObj.String(), "EstimatedTimeTableBroadcast")
+	subs := connector.Partner().Subscriptions().FindByResourceId(lineObj.String(), EstimatedTimetableBroadcast)
 
 	for _, sub := range subs {
 		r := sub.Resource(lineObj)
@@ -276,7 +287,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 
 	connector.mutex.Lock()
 
-	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), "EstimatedTimeTableBroadcast")
+	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), EstimatedTimetableBroadcast)
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
 		if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {

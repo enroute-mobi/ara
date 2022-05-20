@@ -1,12 +1,14 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -79,7 +81,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	}
 
 	obj := model.NewObjectID("SituationResource", "Situation")
-	subs := connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageBroadcast")
+	subs := connector.partner.Subscriptions().FindSubscriptionsByKind(GeneralMessageBroadcast)
 
 	for _, sub := range subs {
 		resource := sub.Resource(obj)
@@ -119,10 +121,20 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("GeneralMessageBroadcast")
+			sub = connector.Partner().Subscriptions().New(GeneralMessageBroadcast)
 			sub.SubscriberRef = gm.SubscriberRef()
 			sub.SetExternalId(gm.SubscriptionIdentifier())
+		} else if sub.Kind() != GeneralMessageBroadcast {
+			logger.Log.Debugf("GeneralMessage subscription request with a duplicated Id: %v", gm.SubscriptionIdentifier())
+			rs.Status = false
+			rs.ErrorType = "OtherError"
+			rs.ErrorNumber = 2
+			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", gm.SubscriptionIdentifier())
+			resps = append(resps, rs)
+			continue
 		}
+
+		resps = append(resps, rs)
 
 		sub.SetSubscriptionOption("InfoChannelRef", strings.Join(gm.InfoChannelRef(), ","))
 		sub.SetSubscriptionOption("LineRef", strings.Join(gm.LineRef(), ","))
@@ -144,7 +156,6 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.Save()
 
 		connector.addSituations(sub, r)
-		resps = append(resps, rs)
 	}
 
 	message.Type = "GeneralMessageSubscriptionRequest"
