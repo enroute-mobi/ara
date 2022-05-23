@@ -131,6 +131,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 			rs.ErrorNumber = 2
 			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", gm.SubscriptionIdentifier())
 			resps = append(resps, rs)
+			message.Status = "Error"
 			continue
 		}
 

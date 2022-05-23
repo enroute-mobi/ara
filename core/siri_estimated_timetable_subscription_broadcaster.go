@@ -91,6 +91,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 		// We do not want to create a subscription that will fail
 		if failedSubscription {
 			resps = append(resps, rs)
+			message.Status = "Error"
 			continue
 		}
 
