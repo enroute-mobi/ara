@@ -21,6 +21,7 @@ type Vehicle struct {
 
 	id               VehicleId
 	LineId           LineId           `json:",omitempty"`
+	StopAreaId       StopAreaId       `json:",omitempty"`
 	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 
 	Longitude float64 `json:",omitempty"`
@@ -52,10 +53,11 @@ func (vehicle *Vehicle) modelId() ModelId {
 
 func (vehicle *Vehicle) copy() *Vehicle {
 	return &Vehicle{
-		ObjectIDConsumer: vehicle.ObjectIDConsumer.Clone(),
+		ObjectIDConsumer: vehicle.ObjectIDConsumer.Copy(),
 		model:            vehicle.model,
 		id:               vehicle.id,
 		LineId:           vehicle.LineId,
+		StopAreaId:       vehicle.StopAreaId,
 		VehicleJourneyId: vehicle.VehicleJourneyId,
 		Longitude:        vehicle.Longitude,
 		Latitude:         vehicle.Latitude,

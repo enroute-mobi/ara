@@ -60,7 +60,7 @@ func (stopVisit *StopVisit) modelId() ModelId {
 
 func (stopVisit *StopVisit) copy() *StopVisit {
 	return &StopVisit{
-		ObjectIDConsumer: stopVisit.ObjectIDConsumer.Clone(),
+		ObjectIDConsumer: stopVisit.ObjectIDConsumer.Copy(),
 		model:            stopVisit.model,
 		Origin:           stopVisit.Origin,
 		id:               stopVisit.id,

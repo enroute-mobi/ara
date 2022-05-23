@@ -6,6 +6,7 @@ type VehicleUpdateEvent struct {
 	Origin string
 
 	ObjectId               ObjectID
+	StopAreaObjectId       ObjectID
 	VehicleJourneyObjectId ObjectID
 	DriverRef              string
 	LinkDistance           float64

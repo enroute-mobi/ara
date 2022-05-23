@@ -62,7 +62,7 @@ func (stopArea *StopArea) copy() *StopArea {
 			nextCollectAt: stopArea.nextCollectAt,
 			collectedAt:   stopArea.collectedAt,
 		},
-		ObjectIDConsumer:       stopArea.ObjectIDConsumer.Clone(),
+		ObjectIDConsumer:       stopArea.ObjectIDConsumer.Copy(),
 		model:                  stopArea.model,
 		id:                     stopArea.id,
 		ParentId:               stopArea.ParentId,

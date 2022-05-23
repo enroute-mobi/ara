@@ -126,7 +126,7 @@ type ObjectIDConsumer struct {
 	objectids ObjectIDs
 }
 
-func (consumer *ObjectIDConsumer) Clone() ObjectIDConsumer {
+func (consumer *ObjectIDConsumer) Copy() ObjectIDConsumer {
 	o := ObjectIDConsumer{
 		objectids: make(ObjectIDs),
 	}

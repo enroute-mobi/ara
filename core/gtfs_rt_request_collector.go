@@ -176,6 +176,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 		p := v.GetPosition()
 		event := &model.VehicleUpdateEvent{
 			ObjectId:               vObjectId,
+			StopAreaObjectId:       model.NewObjectID(connector.remoteObjectidKind, v.GetStopId()),
 			VehicleJourneyObjectId: vjObjectId,
 			Longitude:              float64(p.GetLongitude()),
 			Latitude:               float64(p.GetLatitude()),

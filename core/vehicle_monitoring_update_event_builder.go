@@ -114,6 +114,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		vEvent := &model.VehicleUpdateEvent{
 			Origin:                 origin,
 			ObjectId:               vObjectId,
+			StopAreaObjectId:       stopAreaObjectId,
 			VehicleJourneyObjectId: vjObjectId,
 			DriverRef:              xmlVehicleActivity.DriverRef(),
 			Bearing:                bearing,

@@ -138,6 +138,16 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			}
 		}
 
+		// Fill StopId, but as it's uptionnal we just fill it if we can find it
+		sa, ok := connector.partner.Model().StopAreas().Find(vehicles[i].StopAreaId)
+		if ok {
+			saId, ok := sa.ObjectID(connector.remoteObjectidKind)
+			if ok {
+				id := saId.Value()
+				feedEntity.Vehicle.StopId = &id
+			}
+		}
+
 		entities = append(entities, feedEntity)
 	}
 	return
