@@ -71,6 +71,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 	var lineIds, subIds []string
 
 	for _, ptt := range request.XMLSubscriptionPTTEntries() {
+		var failedSubscription bool
 
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ptt.MessageIdentifier(),
@@ -87,23 +88,32 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 			logger.Log.Debugf("ProductionTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
-		} else {
-			rs.Status = true
-			rs.ValidUntil = ptt.InitialTerminationTime()
+			failedSubscription = true
 		}
 
-		resps = append(resps, rs)
+		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ptt.SubscriptionIdentifier())
+		if ok && sub.Kind() != ProductionTimetableBroadcast {
+			logger.Log.Debugf("ProductionTimeTable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
+			rs.ErrorType = "OtherError"
+			rs.ErrorNumber = 2
+			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ptt.SubscriptionIdentifier())
+			failedSubscription = true
+		}
 
 		// We do not want to create a subscription that will fail
-		if len(unknownLineIds) != 0 {
+		if failedSubscription {
+			resps = append(resps, rs)
 			continue
 		}
 
+		rs.Status = true
+		rs.ValidUntil = ptt.InitialTerminationTime()
+		resps = append(resps, rs)
+
 		subIds = append(subIds, ptt.SubscriptionIdentifier())
 
-		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ptt.SubscriptionIdentifier())
 		if !ok {
-			sub = connector.Partner().Subscriptions().New("ProductionTimeTableBroadcast")
+			sub = connector.Partner().Subscriptions().New(ProductionTimetableBroadcast)
 			sub.SubscriberRef = ptt.SubscriberRef()
 			sub.SetExternalId(ptt.SubscriptionIdentifier())
 			sub.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
@@ -220,7 +230,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkEvent(svId
 		return
 	}
 
-	subs := connector.Partner().Subscriptions().FindByResourceId(lineObj.String(), "ProductionTimeTableBroadcast")
+	subs := connector.Partner().Subscriptions().FindByResourceId(lineObj.String(), ProductionTimetableBroadcast)
 
 	for _, sub := range subs {
 		r := sub.Resource(lineObj)

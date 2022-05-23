@@ -67,7 +67,7 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 		Type:     "Line",
 	}
 
-	subscription := partner.Subscriptions().New("EstimatedTimeTableBroadcast")
+	subscription := partner.Subscriptions().New(EstimatedTimetableBroadcast)
 	subscription.SubscriberRef = "subscriber"
 	subscription.SetExternalId("externalId")
 	subscription.CreateAddNewResource(reference)

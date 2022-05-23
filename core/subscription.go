@@ -14,6 +14,13 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
+const (
+	EstimatedTimetableBroadcast  = "EstimatedTimetableBroadcast"
+	GeneralMessageBroadcast      = "GeneralMessageBroadcast"
+	ProductionTimetableBroadcast = "ProductionTimetableBroadcast"
+	StopMonitoringBroadcast      = "StopMonitoringBroadcast"
+)
+
 type SubscriptionId string
 
 type Subscription struct {

@@ -151,7 +151,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </SOAP-ENV:Envelope>
       """
     Then one Subscription exists with the following attributes:
-      | Kind | EstimatedTimeTableBroadcast |
+      | Kind | EstimatedTimetableBroadcast |
 
   @ARA-1025
   Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription
@@ -182,7 +182,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </Siri>
       """
     Then one Subscription exists with the following attributes:
-      | Kind | EstimatedTimeTableBroadcast |
+      | Kind | EstimatedTimetableBroadcast |
 
   Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
     Given a SIRI server on "http://localhost:8090"
@@ -192,7 +192,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | local_credential     | NINOXE:default        |
        | remote_objectid_kind | internal              |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
@@ -282,7 +282,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind              | internal              |
        | broadcast.recorded_calls.duration | 1h                    |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
@@ -425,7 +425,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind              | internal              |
        | broadcast.recorded_calls.duration | 1h                    |
     Given a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
@@ -470,7 +470,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind | internal              |
        | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
@@ -586,7 +586,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        | remote_objectid_kind                       | internal              |
        | broadcast.no_destinationref_rewriting_from | NoRewriteOrigin       |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | SubscriberRef     | subscriber                            |
       | ExternalId        | externalId                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
@@ -666,3 +666,81 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </S:Body>
 </S:Envelope>
       """
+
+  @ARA-1086
+  Scenario: Handle a raw SIRI error if subscriptions are made using same ExternalId
+    Given a raw SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | ara                   |
+       | local_credential                   | test                  |
+       | remote_objectid_kind               | internal              |
+       | siri.envelope                      | raw                   |
+       | broadcast.subscriptions.persistent | true                  |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 24                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 25                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | Attribute[DirectionRef]            | Aller                                   |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableBroadcast            |
+      | ExternalId        | SpecialExternalId                      |
+      | SubscriberRef     | subscriber                             |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC"  |
+    When a minute has passed
+    And I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+      <RequestorRef>test</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>SpecialExternalId</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:50:00Z</InitialTerminationTime>
+         <ProductionTimetableRequest>
+            <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='UTF-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+  <SubscriptionResponse>
+    <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+    <ResponderRef>ara</ResponderRef>
+    <ResponseStatus>
+      <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+      <SubscriptionRef>SpecialExternalId</SubscriptionRef>
+      <Status>false</Status>
+      <ErrorCondition>
+        <OtherError number="2">
+          <ErrorText>[BAD_REQUEST] Subscription Id SpecialExternalId already exists</ErrorText>
+        </OtherError>
+      </ErrorCondition>
+    </ResponseStatus>
+    <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
+  </SubscriptionResponse>
+</Siri>
+      """
+    And one Subscription exists with the following attributes:
+      | Kind | EstimatedTimetableBroadcast |
