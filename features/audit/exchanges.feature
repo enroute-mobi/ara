@@ -3,6 +3,21 @@ Feature: Audit API exchanges
   Background:
     Given a Referential "test" is created
 
+  @ARA-1096
+  Scenario: Audit a Partner status changed to up
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
+      | remote_url            | http://localhost:8090      |
+      | remote_credential     | test                       |
+      | remote_objectid_kind  | internal                   |
+    When a minute has passed
+    Then an audit event should exist with these attributes:
+      | NewStatus   | up            |
+      | PartnerUUID | /{test-uuid}/ |
+      | Slug        | test          |
+
   Scenario: Audit a received SIRI CheckStatus Request
     Given a Partner "test" exists with connectors [siri-check-status-server] and the following settings:
       | local_credential | test |

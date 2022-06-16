@@ -94,6 +94,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		partnerEvent := &audit.BigQueryPartnerEvent{
 			Timestamp:                guardian.Clock().Now(),
 			Slug:                     string(partner.Slug()),
+			PartnerUUID:              string(partner.Id()),
 			PreviousStatus:           string(partner.PartnerStatus.OperationnalStatus),
 			PreviousServiceStartedAt: civil.DateTimeOf(partner.PartnerStatus.ServiceStartedAt),
 			NewStatus:                string(partnerStatus.OperationnalStatus),
