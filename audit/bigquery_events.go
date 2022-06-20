@@ -73,6 +73,7 @@ type BigQueryPartnerEvent struct {
 	UUID                     string         `bigquery:"uuid"`
 	Timestamp                time.Time      `bigquery:"timestamp"`
 	Slug                     string         `bigquery:"slug"`
+	PartnerUUID              string         `bigquery:"partner_uuid"`
 	PreviousStatus           string         `bigquery:"previous_status"`
 	PreviousServiceStartedAt civil.DateTime `bigquery:"previous_service_started_at"`
 	NewStatus                string         `bigquery:"new_status"`
@@ -87,6 +88,7 @@ var bqPartnerSchema = bigquery.Schema{
 	{Name: "uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "slug", Required: false, Type: bigquery.StringFieldType},
+	{Name: "partner_uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "previous_status", Required: false, Type: bigquery.StringFieldType},
 	{Name: "previous_service_started_at", Required: false, Type: bigquery.DateTimeFieldType},
 	{Name: "new_status", Required: false, Type: bigquery.StringFieldType},
