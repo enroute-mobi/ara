@@ -41,10 +41,12 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		if !ok || objectID.Value() == "" {
 			continue
 		}
+
 		_, ok = annotedStopPointMap[objectID.Value()]
-		if ok {
+		if ok || !ok && sas[i].ReferentId != "" {
 			continue
 		}
+
 		annotedStopPointMap[objectID.Value()] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{

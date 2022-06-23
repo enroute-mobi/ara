@@ -178,14 +178,13 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	if response.Status != true {
 		t.Errorf("Response status wrong:\n got: %v\n want: true", response.Status)
 	}
-	if len(response.AnnotatedStopPoints) != 2 {
+
+	// firstStopArea has voluntarily a wrong kind so it should not appear in the list
+	if len(response.AnnotatedStopPoints) != 1 {
 		t.Fatalf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2\n%v", len(response.AnnotatedStopPoints), response.AnnotatedStopPoints)
 	}
 
 	if response.AnnotatedStopPoints[0].StopPointRef != secondObjectID.Value() {
 		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
-	}
-	if response.AnnotatedStopPoints[1].StopPointRef != fourthObjectID.Value() {
-		t.Errorf("AnnotatedStopPoints StopPointRef 2 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[1].StopPointRef, secondObjectID.Value())
 	}
 }
