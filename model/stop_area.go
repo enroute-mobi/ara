@@ -197,6 +197,25 @@ func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (ObjectID,
 	return ObjectID{}, false
 }
 
+/* Returns true if we need to send the StopArea in a SPD
+   We only send the StopArea if it has no referent with a correct objectIDKind.
+   If that's the case, we'll send the Referent instead
+*/
+func (stopArea *StopArea) SPDObjectId(objectIDKind string) (ObjectID, bool) {
+	ref, ok := stopArea.Referent()
+	if ok {
+		_, ok := ref.ObjectID(objectIDKind)
+		if ok {
+			return ObjectID{}, false
+		}
+	}
+	objectID, ok := stopArea.ObjectID(objectIDKind)
+	if ok {
+		return objectID, true
+	}
+	return ObjectID{}, false
+}
+
 func (stopArea *StopArea) SetPartnerStatus(partner string, status bool) {
 	stopArea.Origins.SetPartnerStatus(partner, status)
 	stopArea.Monitored = stopArea.Origins.Monitored()

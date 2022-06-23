@@ -37,22 +37,8 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			continue
 		}
 
-		objectID, ok := sas[i].ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		objectID, ok := sas[i].SPDObjectId(connector.remoteObjectidKind)
 		if !ok || objectID.Value() == "" {
-			continue
-		}
-
-		stopAreaObjectId, _ := sas[i].ObjectID(connector.remoteObjectidKind)
-		if stopAreaObjectId == objectID && objectID.Kind() != connector.remoteObjectidKind {
-			continue
-		}
-
-		if stopAreaObjectId != objectID && sas[i].ReferentId != "" {
-			continue
-		}
-
-		_, ok = annotedStopPointMap[objectID.Value()]
-		if ok {
 			continue
 		}
 
