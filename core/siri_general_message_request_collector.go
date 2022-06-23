@@ -63,7 +63,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 		siriGeneralMessageRequest.XsdInWsdl = true
 	}
 
-	logSIRIGeneralMessageRequest(message, siriGeneralMessageRequest)
+	connector.logSIRIGeneralMessageRequest(message, siriGeneralMessageRequest)
 
 	xmlGeneralMessageResponse, err := connector.Partner().SIRIClient().SituationMonitoring(siriGeneralMessageRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
@@ -116,8 +116,8 @@ func (factory *SIRIGeneralMessageRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIGeneralMessageRequestCollector(partner)
 }
 
-func logSIRIGeneralMessageRequest(message *audit.BigQueryMessage, request *siri.SIRIGetGeneralMessageRequest) {
-	xml, err := request.BuildXML()
+func (connector *SIRIGeneralMessageRequestCollector) logSIRIGeneralMessageRequest(message *audit.BigQueryMessage, request *siri.SIRIGetGeneralMessageRequest) {
+	xml, err := request.BuildXML(connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

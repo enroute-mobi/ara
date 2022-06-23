@@ -265,7 +265,7 @@ func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit *model.StopVisit, d
 func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring) {
 	message := smb.newBQEvent()
 
-	logSIRIStopMonitoringNotify(message, notify)
+	smb.logSIRIStopMonitoringNotify(message, notify)
 
 	t := smb.Clock().Now()
 
@@ -288,7 +288,7 @@ func (smb *SMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func logSIRIStopMonitoringNotify(message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
+func (smb *SMBroadcaster) logSIRIStopMonitoringNotify(message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
 	monitoringRefs := []string{}
 	cancelledMonitoringRefs := []string{}
 
@@ -314,7 +314,7 @@ func logSIRIStopMonitoringNotify(message *audit.BigQueryMessage, notification *s
 		message.ErrorDetails = delivery.ErrorString()
 	}
 
-	xml, err := notification.BuildXML()
+	xml, err := notification.BuildXML(smb.connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

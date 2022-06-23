@@ -138,7 +138,7 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 		if len(notify.GeneralMessages) != 0 {
 			message := gmb.newBQEvent()
 
-			logSIRIGeneralMessageNotify(message, &notify)
+			gmb.logSIRIGeneralMessageNotify(message, &notify)
 			t := gmb.Clock().Now()
 
 			gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
@@ -154,12 +154,12 @@ func (gmb *GMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 		Type:      "NotifyGeneralMessage",
 		Protocol:  "siri",
 		Direction: "sent",
-		Partner:   string(gmb.connector.partner.Slug()),
+		Partner:   string(gmb.connector.Partner().Slug()),
 		Status:    "OK",
 	}
 }
 
-func logSIRIGeneralMessageNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
+func (gmb *GMBroadcaster) logSIRIGeneralMessageNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
 	message.RequestIdentifier = response.RequestMessageRef
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
@@ -168,7 +168,7 @@ func logSIRIGeneralMessageNotify(message *audit.BigQueryMessage, response *siri.
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorString()
 	}
-	xml, err := response.BuildXML()
+	xml, err := response.BuildXML(gmb.connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

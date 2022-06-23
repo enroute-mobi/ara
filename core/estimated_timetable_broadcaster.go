@@ -356,7 +356,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRef
 func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {
 	message := ett.newBQEvent()
 
-	logSIRIEstimatedTimeTableNotify(message, delivery)
+	ett.logSIRIEstimatedTimeTableNotify(message, delivery)
 
 	t := ett.Clock().Now()
 
@@ -371,12 +371,12 @@ func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 		Type:      "NotifyEstimatedTimetable",
 		Protocol:  "siri",
 		Direction: "sent",
-		Partner:   string(ett.connector.partner.Slug()),
+		Partner:   string(ett.connector.Partner().Slug()),
 		Status:    "OK",
 	}
 }
 
-func logSIRIEstimatedTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
+func (ett *ETTBroadcaster) logSIRIEstimatedTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {
@@ -402,7 +402,7 @@ func logSIRIEstimatedTimeTableNotify(message *audit.BigQueryMessage, response *s
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorString()
 	}
-	xml, err := response.BuildXML()
+	xml, err := response.BuildXML(ett.connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

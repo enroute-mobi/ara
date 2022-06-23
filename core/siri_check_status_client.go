@@ -71,7 +71,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 
-	logSIRICheckStatusRequest(message, request)
+	connector.logSIRICheckStatusRequest(message, request)
 
 	response, err := connector.Partner().SIRIClient().CheckStatus(request)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
@@ -113,8 +113,8 @@ func (factory *SIRICheckStatusClientFactory) CreateConnector(partner *Partner) C
 	return NewSIRICheckStatusClient(partner)
 }
 
-func logSIRICheckStatusRequest(message *audit.BigQueryMessage, request *siri.SIRICheckStatusRequest) {
-	xml, err := request.BuildXML()
+func (connector *SIRICheckStatusClient) logSIRICheckStatusRequest(message *audit.BigQueryMessage, request *siri.SIRICheckStatusRequest) {
+	xml, err := request.BuildXML(connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

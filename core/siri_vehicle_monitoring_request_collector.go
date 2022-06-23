@@ -61,7 +61,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 	siriVehicleMonitoringRequest.LineRef = objectid.Value()
 	siriVehicleMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 
-	logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
+	connector.logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
 
 	xmlVehicleMonitoringResponse, err := connector.Partner().SIRIClient().VehicleMonitoring(siriVehicleMonitoringRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
@@ -133,10 +133,10 @@ func (factory *SIRIVehicleMonitoringRequestCollectorFactory) CreateConnector(par
 	return NewSIRIVehicleMonitoringRequestCollector(partner)
 }
 
-func logSIRIVehicleMonitoringRequest(message *audit.BigQueryMessage, request *siri.SIRIGetVehicleMonitoringRequest) {
+func (connector *SIRIVehicleMonitoringRequestCollector) logSIRIVehicleMonitoringRequest(message *audit.BigQueryMessage, request *siri.SIRIGetVehicleMonitoringRequest) {
 	message.RequestIdentifier = request.MessageIdentifier
 
-	xml, err := request.BuildXML()
+	xml, err := request.BuildXML(connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

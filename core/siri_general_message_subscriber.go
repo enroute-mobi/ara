@@ -151,7 +151,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	}
 
 	message.RequestIdentifier = gmRequest.MessageIdentifier
-	message.RequestRawMessage, _ = gmRequest.BuildXML()
+	message.RequestRawMessage, _ = gmRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
 	message.StopAreas = stopPointRefList
 	message.SubscriptionIdentifiers = lineRefList

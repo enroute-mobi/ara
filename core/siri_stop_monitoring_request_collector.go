@@ -82,7 +82,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
 
-	logSIRIStopMonitoringRequest(message, siriStopMonitoringRequest)
+	connector.logSIRIStopMonitoringRequest(message, siriStopMonitoringRequest)
 
 	xmlStopMonitoringResponse, err := connector.Partner().SIRIClient().StopMonitoring(siriStopMonitoringRequest)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
@@ -192,10 +192,10 @@ func (factory *SIRIStopMonitoringRequestCollectorFactory) CreateConnector(partne
 	return NewSIRIStopMonitoringRequestCollector(partner)
 }
 
-func logSIRIStopMonitoringRequest(message *audit.BigQueryMessage, request *siri.SIRIGetStopMonitoringRequest) {
+func (connector *SIRIStopMonitoringRequestCollector) logSIRIStopMonitoringRequest(message *audit.BigQueryMessage, request *siri.SIRIGetStopMonitoringRequest) {
 	message.RequestIdentifier = request.MessageIdentifier
 
-	xml, err := request.BuildXML()
+	xml, err := request.BuildXML(connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}
