@@ -66,7 +66,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 		RequestTimestamp:  startTime,
 	}
 
-	logSIRIStopPointsDiscoveryRequest(message, request)
+	connector.logSIRIStopPointsDiscoveryRequest(message, request)
 
 	response, err := connector.Partner().SIRIClient().StopDiscovery(request)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
@@ -114,10 +114,10 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) newBQEvent() *audit.Bi
 	}
 }
 
-func logSIRIStopPointsDiscoveryRequest(message *audit.BigQueryMessage, request *siri.SIRIStopPointsDiscoveryRequest) {
+func (connector *SIRIStopPointsDiscoveryRequestCollector) logSIRIStopPointsDiscoveryRequest(message *audit.BigQueryMessage, request *siri.SIRIStopPointsDiscoveryRequest) {
 	message.RequestIdentifier = request.MessageIdentifier
 
-	xml, err := request.BuildXML()
+	xml, err := request.BuildXML(connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

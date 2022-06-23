@@ -270,7 +270,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) operatorRef(sto
 func (ptt *PTTBroadcaster) sendDelivery(delivery *siri.SIRINotifyProductionTimeTable) {
 	message := ptt.newBQEvent()
 
-	logSIRIProductionTimeTableNotify(message, delivery)
+	ptt.logSIRIProductionTimeTableNotify(message, delivery)
 
 	t := ptt.Clock().Now()
 
@@ -289,12 +289,12 @@ func (ptt *PTTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 		Type:      "NotifyProductionTimetable",
 		Protocol:  "siri",
 		Direction: "sent",
-		Partner:   string(ptt.connector.partner.Slug()),
+		Partner:   string(ptt.connector.Partner().Slug()),
 		Status:    "OK",
 	}
 }
 
-func logSIRIProductionTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyProductionTimeTable) {
+func (ptt *PTTBroadcaster) logSIRIProductionTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyProductionTimeTable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, dttvf := range response.DatedTimetableVersionFrames {
@@ -318,7 +318,7 @@ func logSIRIProductionTimeTableNotify(message *audit.BigQueryMessage, response *
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorString()
 	}
-	xml, err := response.BuildXML()
+	xml, err := response.BuildXML(ptt.connector.Partner().SIRIEnvelopeType())
 	if err != nil {
 		return
 	}

@@ -166,7 +166,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(sub
 		RequestorRef:      connector.partner.ProducerRef(),
 		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
-	logSIRIDeleteSubscriptionRequest(message, request, "StopMonitoringSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(message, request, "StopMonitoringSubscriptionCollector", connector.Partner().SIRIEnvelopeType())
 
 	startTime := connector.Clock().Now()
 	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
@@ -217,12 +217,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) newBQEvent() *audit.Bi
 	}
 }
 
-func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType string) {
+func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType, envelopeType string) {
 	message.Type = "DeleteSubscriptionRequest"
 	message.RequestIdentifier = request.MessageIdentifier
 	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
 
-	xml, err := request.BuildXML()
+	xml, err := request.BuildXML(envelopeType)
 	if err != nil {
 		return
 	}

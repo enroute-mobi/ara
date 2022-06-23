@@ -139,7 +139,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	}
 
 	message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
-	message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML()
+	message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
 	message.StopAreas = monitoringRefList
 	message.SubscriptionIdentifiers = subIds

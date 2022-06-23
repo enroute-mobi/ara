@@ -149,7 +149,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
 	}
 
-	logSIRIDeleteSubscriptionRequest(message, request, "GeneralMessageSubscriptionCollector")
+	logSIRIDeleteSubscriptionRequest(message, request, "GeneralMessageSubscriptionCollector", connector.Partner().SIRIEnvelopeType())
 	startTime := connector.Clock().Now()
 	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
 
