@@ -5,8 +5,8 @@
 	<ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ResponseMessageIdentifier>{{ if (ne .RequestMessageRef "") }}
 	<RequestMessageRef>{{ .RequestMessageRef }}</RequestMessageRef>{{ end }}
 	<EstimatedTimetableDelivery>
-		<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
-		<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>{{ if (ne .RequestMessageRef "") }}
+		<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>{{ if .SubscriberRef }}
+		<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>{{ end }}{{ if (ne .RequestMessageRef "") }}
 		<RequestMessageRef>{{.RequestMessageRef}}</RequestMessageRef>{{ end }}
 		<SubscriptionRef>{{.SubscriptionIdentifier}}</SubscriptionRef>
 		<Status>{{ .Status }}</Status>{{ if not .Status }}
