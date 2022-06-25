@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -14,6 +13,8 @@ type CheckStatusClient interface {
 }
 
 type TestCheckStatusClient struct {
+	connector
+
 	partnerStatus PartnerStatus
 	Done          chan bool
 }
@@ -21,8 +22,6 @@ type TestCheckStatusClient struct {
 type TestCheckStatusClientFactory struct{}
 
 type SIRICheckStatusClient struct {
-	clock.ClockConsumer
-
 	connector
 }
 

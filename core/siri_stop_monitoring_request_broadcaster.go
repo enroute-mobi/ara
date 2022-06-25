@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
@@ -18,8 +17,6 @@ type StopMonitoringRequestBroadcaster interface {
 }
 
 type SIRIStopMonitoringRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 

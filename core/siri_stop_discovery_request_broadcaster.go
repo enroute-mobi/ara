@@ -4,14 +4,11 @@ import (
 	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 

@@ -498,7 +498,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	subscription.Save()
 
 	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
@@ -541,7 +541,7 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	subscription.Save()
 
 	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {

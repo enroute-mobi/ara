@@ -6,19 +6,14 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
@@ -183,7 +178,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *S
 type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 
 type TestGeneralMessageSubscriptionBroadcaster struct {
-	uuid.UUIDConsumer
+	connector
 
 	events []*model.GeneralMessageBroadcastEvent
 	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster

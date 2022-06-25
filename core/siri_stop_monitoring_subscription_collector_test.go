@@ -58,7 +58,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	deliveries := sxml.NewXMLNotifyStopMonitoring(doc.Root())
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	subscription.Save()
 
 	connector.HandleNotifyStopMonitoring(deliveries)
@@ -107,7 +107,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 
 	if subscription.ResourcesLen() != 1 {
 		t.Errorf("Response should have 1 ressource but got %v\n", subscription.ResourcesLen())
@@ -164,7 +164,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
 	connector.stopMonitoringSubscriber.Start()
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)

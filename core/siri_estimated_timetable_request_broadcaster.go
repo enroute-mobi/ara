@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -18,8 +17,6 @@ type EstimatedTimetableBroadcaster interface {
 }
 
 type SIRIEstimatedTimetableBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 
 	vjRemoteObjectidKinds []string

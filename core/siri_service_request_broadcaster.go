@@ -2,7 +2,6 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -12,8 +11,6 @@ type ServiceRequestBroadcaster interface {
 }
 
 type SIRIServiceRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 

@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SubscriptionRequestDispatcher interface {
@@ -21,9 +19,6 @@ type SubscriptionRequestDispatcher interface {
 type SIRISubscriptionRequestDispatcherFactory struct{}
 
 type SIRISubscriptionRequestDispatcher struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 }
 

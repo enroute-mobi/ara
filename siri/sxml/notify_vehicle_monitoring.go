@@ -14,9 +14,22 @@ type XMLNotifyVehicleMonitoring struct {
 type XMLNotifyVehicleMonitoringDelivery struct {
 	SubscriptionDeliveryXMLStructure
 
-	monitoringRef string
+	vehicleActivities []*XMLVehicleActivity
+}
 
-	monitoredStopVisits []*XMLMonitoredStopVisit
+func NewXMLNotifyVehicleMonitoring(node xml.Node) *XMLNotifyVehicleMonitoring {
+	xmlVehicleMonitoringResponse := &XMLNotifyVehicleMonitoring{}
+	xmlVehicleMonitoringResponse.node = NewXMLNode(node)
+	return xmlVehicleMonitoringResponse
+}
+
+func NewXMLNotifyVehicleMonitoringFromContent(content []byte) (*XMLNotifyVehicleMonitoring, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	response := NewXMLNotifyVehicleMonitoring(doc.Root().XmlNode)
+	return response, nil
 }
 
 func NewXMLNotifyVehicleMonitoringDelivery(node XMLNode) *XMLNotifyVehicleMonitoringDelivery {
@@ -37,36 +50,14 @@ func (notify *XMLNotifyVehicleMonitoring) VehicleMonitoringDeliveries() []*XMLNo
 	return notify.deliveries
 }
 
-func (delivery *XMLNotifyVehicleMonitoringDelivery) MonitoringRef() string {
-	if delivery.monitoringRef == "" {
-		delivery.monitoringRef = delivery.findStringChildContent("MonitoringRef")
-	}
-	return delivery.monitoringRef
-}
-
-func (delivery *XMLNotifyVehicleMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
-	if delivery.monitoredStopVisits == nil {
-		stopVisits := []*XMLMonitoredStopVisit{}
-		nodes := delivery.findNodes("MonitoredStopVisit")
+func (delivery *XMLNotifyVehicleMonitoringDelivery) VehicleActivities() []*XMLVehicleActivity {
+	if delivery.vehicleActivities == nil {
+		vas := []*XMLVehicleActivity{}
+		nodes := delivery.findNodes("VehicleActivity")
 		for _, node := range nodes {
-			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
+			vas = append(vas, NewXMLVehicleActivity(node))
 		}
-		delivery.monitoredStopVisits = stopVisits
+		delivery.vehicleActivities = vas
 	}
-	return delivery.monitoredStopVisits
-}
-
-func NewXMLNotifyVehicleMonitoring(node xml.Node) *XMLNotifyVehicleMonitoring {
-	xmlVehicleMonitoringResponse := &XMLNotifyVehicleMonitoring{}
-	xmlVehicleMonitoringResponse.node = NewXMLNode(node)
-	return xmlVehicleMonitoringResponse
-}
-
-func NewXMLNotifyVehicleMonitoringFromContent(content []byte) (*XMLNotifyVehicleMonitoring, error) {
-	doc, err := gokogiri.ParseXml(content)
-	if err != nil {
-		return nil, err
-	}
-	response := NewXMLNotifyVehicleMonitoring(doc.Root().XmlNode)
-	return response, nil
+	return delivery.vehicleActivities
 }

@@ -2,10 +2,8 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type GeneralMessageRequestBroadcaster interface {
@@ -13,8 +11,6 @@ type GeneralMessageRequestBroadcaster interface {
 }
 
 type SIRIGeneralMessageRequestBroadcaster struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
 	connector
 }
 

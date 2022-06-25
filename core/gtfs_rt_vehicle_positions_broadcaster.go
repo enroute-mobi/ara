@@ -4,14 +4,11 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 type VehiclePositionBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 
 	vjRemoteObjectidKinds      []string

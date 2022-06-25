@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type VehicleMonitoringRequestCollector interface {
@@ -16,9 +14,6 @@ type VehicleMonitoringRequestCollector interface {
 }
 
 type SIRIVehicleMonitoringRequestCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	updateSubscriber UpdateSubscriber
@@ -86,7 +81,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 
 	updateEvents := builder.UpdateEvents()
 
-	// Log MonitoringRefs
+	// Log VehicleRefs
 	logVehicleRefs(message, updateEvents.VehicleRefs)
 
 	// Broadcast all events

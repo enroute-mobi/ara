@@ -88,7 +88,7 @@ func (subscriber *GeneralMessageSubscriber) Stop() {
 }
 
 func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
-	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind("GeneralMessageCollect")
+	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind(GeneralMessageCollect)
 	if len(subscriptions) == 0 {
 		logger.Log.Debugf("GeneralMessageSubscriber visit without GeneralMessageCollect subscriptions")
 		return

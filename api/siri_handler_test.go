@@ -579,7 +579,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(core.StopMonitoringCollect)
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
@@ -619,7 +619,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(core.GeneralMessageCollect)
 	subscription.Save()
 
 	siriHandler_Request(server, buffer, t)

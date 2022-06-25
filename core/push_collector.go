@@ -6,13 +6,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type PushCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	subscriber UpdateSubscriber

@@ -16,8 +16,6 @@ type XMLVehicleMonitoringResponse struct {
 type XMLVehicleMonitoringDelivery struct {
 	DeliveryXMLStructure
 
-	monitoringRef string
-
 	vehicleActivities []*XMLVehicleActivity
 }
 
@@ -69,13 +67,6 @@ func (response *XMLVehicleMonitoringResponse) VehicleMonitoringDeliveries() []*X
 		response.deliveries = deliveries
 	}
 	return response.deliveries
-}
-
-func (delivery *XMLVehicleMonitoringDelivery) MonitoringRef() string {
-	if delivery.monitoringRef == "" {
-		delivery.monitoringRef = delivery.findStringChildContent("MonitoringRef")
-	}
-	return delivery.monitoringRef
 }
 
 func (delivery *XMLVehicleMonitoringDelivery) VehicleActivities() []*XMLVehicleActivity {

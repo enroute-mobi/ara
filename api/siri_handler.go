@@ -68,6 +68,11 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLNotifyGeneralMessage(envelope.Body()),
 			referential: handler.referential,
 		}
+	case "NotifyVehicleMonitoring":
+		return &SIRIVehicleMonitoringRequestDeliveriesResponseHandler{
+			xmlRequest:  sxml.NewXMLNotifyVehicleMonitoring(envelope.Body()),
+			referential: handler.referential,
+		}
 	case "NotifySubscriptionTerminated":
 		return &SIRINotifySubscriptionTerminatedHandler{
 			xmlRequest:  sxml.NewXMLNotifySubscriptionTerminated(envelope.Body()),

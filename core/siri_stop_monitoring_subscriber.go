@@ -87,7 +87,7 @@ func (subscriber *StopMonitoringSubscriber) Stop() {
 }
 
 func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
-	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind("StopMonitoringCollect")
+	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind(StopMonitoringCollect)
 	if len(subscriptions) == 0 {
 		logger.Log.Debugf("StopMonitoringSubscriber visit without StopMonitoringCollect subscriptions")
 		return

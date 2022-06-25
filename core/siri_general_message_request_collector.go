@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type GeneralMessageRequestCollector interface {
@@ -18,9 +16,6 @@ type GeneralMessageRequestCollector interface {
 type SIRIGeneralMessageRequestCollectorFactory struct{}
 
 type SIRIGeneralMessageRequestCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	situationUpdateSubscriber SituationUpdateSubscriber
