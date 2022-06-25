@@ -8,11 +8,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIDeleteSubscriptionRequestHandler struct {
-	xmlRequest  *siri.XMLDeleteSubscriptionRequest
+	xmlRequest  *sxml.XMLDeleteSubscriptionRequest
 	referential *core.Referential
 }
 

@@ -3,7 +3,7 @@ package core
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -22,7 +22,7 @@ func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateE
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageDelivery, producerRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageDelivery, producerRef string) {
 	xmlGeneralMessageEvents := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessageEvents) == 0 {
 		return
@@ -33,7 +33,7 @@ func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdate
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageResponse) {
+func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageResponse) {
 	xmlGeneralMessageEvents := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessageEvents) == 0 {
 		return
@@ -44,7 +44,7 @@ func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdate
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(event *[]*model.SituationUpdateEvent, xmlGeneralMessageEvent *siri.XMLGeneralMessage, producerRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(event *[]*model.SituationUpdateEvent, xmlGeneralMessageEvent *sxml.XMLGeneralMessage, producerRef string) {
 	if xmlGeneralMessageEvent.Content() == nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	situationEvent.SituationAttributes.Channel = xmlGeneralMessageEvent.InfoChannelRef()
 	situationEvent.SituationAttributes.ValidUntil = xmlGeneralMessageEvent.ValidUntilTime()
 
-	content := xmlGeneralMessageEvent.Content().(siri.IDFGeneralMessageStructure)
+	content := xmlGeneralMessageEvent.Content().(sxml.IDFGeneralMessageStructure)
 	for _, xmlMessage := range content.Messages() {
 		message := &model.Message{
 			Content:             xmlMessage.MessageText(),
@@ -79,7 +79,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	*event = append(*event, situationEvent)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *siri.IDFGeneralMessageStructure) {
+func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 	remoteObjectidKind := builder.remoteObjectidKind
 
 	for _, lineref := range content.LineRef() {
@@ -117,7 +117,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *siri.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
+func (builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *sxml.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
 	references := model.NewReferences()
 
 	lineRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.LineRef()))

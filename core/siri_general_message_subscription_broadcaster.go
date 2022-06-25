@@ -10,7 +10,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -102,7 +103,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	}
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) []siri.SIRIResponseStatus {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) []siri.SIRIResponseStatus {
 	resps := []siri.SIRIResponseStatus{}
 
 	var subIds []string

@@ -5,11 +5,12 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type LinesDiscoveryRequestBroadcaster interface {
-	Lines(*siri.XMLLinesDiscoveryRequest, *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error)
+	Lines(*sxml.XMLLinesDiscoveryRequest, *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error)
 }
 
 type SIRILinesDiscoveryRequestBroadcaster struct {
@@ -27,7 +28,7 @@ func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscove
 	return connector
 }
 
-func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *siri.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
+func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
 	response := &siri.SIRILinesDiscoveryResponse{
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),

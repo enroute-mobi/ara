@@ -10,7 +10,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -55,7 +56,7 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	return connector
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
@@ -140,7 +141,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *siri.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *sxml.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
 	// check for subscription to all lines
 	if len(ett.Lines()) == 0 {
 		var lv []string
@@ -198,7 +199,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Start() {
 	connector.estimatedTimeTableBroadcaster.Start()
 }
 
-func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *siri.XMLSubscriptionRequest) {
+func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *sxml.XMLSubscriptionRequest) {
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
@@ -302,7 +302,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, _ := siri.NewXMLStopMonitoringResponseFromContent(content)
+	response, _ := sxml.NewXMLStopMonitoringResponseFromContent(content)
 
 	manager := newUpdateManager(model)
 

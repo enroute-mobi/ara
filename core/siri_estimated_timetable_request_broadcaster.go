@@ -9,11 +9,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type EstimatedTimetableBroadcaster interface {
-	RequestLine(*siri.XMLGetEstimatedTimetable, *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse
+	RequestLine(*sxml.XMLGetEstimatedTimetable, *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse
 }
 
 type SIRIEstimatedTimetableBroadcaster struct {
@@ -34,7 +35,7 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 	return connector
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse {
+func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *sxml.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse {
 	response := &siri.SIRIEstimatedTimeTableResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
@@ -54,7 +55,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *siri.XM
 	return response
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(request *siri.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
+func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(request *sxml.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{

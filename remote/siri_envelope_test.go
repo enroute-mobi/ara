@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -132,7 +132,7 @@ func Test_SOAPEnvelope_Finalizer(t *testing.T) {
 	runtime.SetFinalizer(envelope, finalizer)
 
 	// Create a CheckStatusResponse and destroy envelope
-	response := siri.NewXMLCheckStatusResponse(envelope.body)
+	response := sxml.NewXMLCheckStatusResponse(envelope.body)
 	envelope = nil
 	runtime.GC()
 	<-done
@@ -173,7 +173,7 @@ func Test_RawEnvelope_Finalizer(t *testing.T) {
 	runtime.SetFinalizer(envelope, finalizer)
 
 	// Create a CheckStatusResponse and destroy envelope
-	response := siri.NewXMLCheckStatusResponse(envelope.body)
+	response := sxml.NewXMLCheckStatusResponse(envelope.body)
 	envelope = nil
 	runtime.GC()
 	<-done

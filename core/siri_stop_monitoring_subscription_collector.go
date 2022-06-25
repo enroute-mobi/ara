@@ -8,7 +8,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -18,7 +19,7 @@ type StopMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
-	HandleNotifyStopMonitoring(delivery *siri.XMLNotifyStopMonitoring)
+	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -107,7 +108,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) {
 	monitoringRefMap := make(map[string]struct{})
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
@@ -230,7 +231,7 @@ func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *s
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLDeleteSubscriptionResponse(message *audit.BigQueryMessage, response *siri.XMLDeleteSubscriptionResponse) {
+func logXMLDeleteSubscriptionResponse(message *audit.BigQueryMessage, response *sxml.XMLDeleteSubscriptionResponse) {
 	var i int
 	for _, responseStatus := range response.ResponseStatus() {
 		if !responseStatus.Status() {

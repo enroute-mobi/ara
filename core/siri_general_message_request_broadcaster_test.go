@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -44,7 +44,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetGeneralMessageFromContent(content)
+	request, err := sxml.NewXMLGetGeneralMessageFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetGeneralMessageFromContent(content)
+	request, err := sxml.NewXMLGetGeneralMessageFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +155,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetGeneralMessageFromContent(content)
+	request, err := sxml.NewXMLGetGeneralMessageFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

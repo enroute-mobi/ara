@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type StopVisitUpdateEvent struct {
@@ -23,7 +23,7 @@ type StopVisitUpdateEvent struct {
 	RecordedAt      time.Time
 
 	ObjectidKind string
-	SiriXML      *siri.XMLMonitoredStopVisit
+	SiriXML      *sxml.XMLMonitoredStopVisit
 	attributes   Attributes
 	references   *References
 }

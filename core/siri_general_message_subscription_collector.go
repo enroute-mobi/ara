@@ -8,7 +8,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -19,7 +20,7 @@ type GeneralMessageSubscriptionCollector interface {
 
 	RequestAllSituationsUpdate()
 	RequestSituationUpdate(kind string, requestedId model.ObjectID)
-	HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage)
+	HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage)
 }
 
 type SIRIGeneralMessageSubscriptionCollector struct {
@@ -102,7 +103,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	newSubscription.CreateAddNewResource(ref)
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
@@ -168,7 +169,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(sub
 	logXMLDeleteSubscriptionResponse(message, response)
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *sxml.XMLGeneralMessageDelivery) {
 	xmlGmCancellations := xmlResponse.XMLGeneralMessagesCancellations()
 
 	if len(xmlGmCancellations) == 0 {

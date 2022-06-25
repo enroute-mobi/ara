@@ -8,7 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -43,7 +43,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLLinesDiscoveryRequestFromContent(content)
+	request, err := sxml.NewXMLLinesDiscoveryRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

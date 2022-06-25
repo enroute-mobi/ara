@@ -7,7 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/everystreet/go-proj/v6/proj"
 )
@@ -48,7 +48,7 @@ func newVehicleMonitoringUpdateEvents() *VehicleMonitoringUpdateEvents {
 	}
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicleActivity *siri.XMLVehicleActivity) {
+func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicleActivity *sxml.XMLVehicleActivity) {
 	origin := string(builder.partner.Slug())
 
 	// StopAreas
@@ -134,7 +134,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *siri.XMLVehicleActivity) (xy proj.XY, e error) {
+func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (xy proj.XY, e error) {
 	longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
 	latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
 
@@ -183,7 +183,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs 
 	return "EPSG:" + srs
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities []*siri.XMLVehicleActivity) {
+func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities []*sxml.XMLVehicleActivity) {
 	for _, xmlVehicleActivity := range activities {
 		builder.buildUpdateEvents(xmlVehicleActivity)
 	}

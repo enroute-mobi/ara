@@ -7,7 +7,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -203,7 +204,7 @@ func (connector *SIRIStopMonitoringRequestCollector) logSIRIStopMonitoringReques
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *siri.XMLStopMonitoringResponse) {
+func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *sxml.XMLStopMonitoringResponse) {
 	for _, delivery := range response.StopMonitoringDeliveries() {
 		if !delivery.Status() {
 			message.Status = "Error"

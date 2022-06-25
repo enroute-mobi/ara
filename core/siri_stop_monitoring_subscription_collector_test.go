@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -55,7 +55,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		t.Fatal(err)
 	}
 
-	deliveries := siri.NewXMLNotifyStopMonitoring(doc.Root())
+	deliveries := sxml.NewXMLNotifyStopMonitoring(doc.Root())
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
@@ -116,7 +116,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 
-	request := &siri.XMLSubscriptionRequest{}
+	request := &sxml.XMLSubscriptionRequest{}
 	// Create a test http server
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +124,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 			t.Errorf("Request ContentLength should be zero")
 		}
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLSubscriptionRequestFromContent(body)
+		request, _ = sxml.NewXMLSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 
@@ -177,11 +177,11 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 }
 
 func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
-	request := &siri.XMLDeleteSubscriptionRequest{}
+	request := &sxml.XMLDeleteSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLDeleteSubscriptionRequestFromContent(body)
+		request, _ = sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 
@@ -207,7 +207,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 	connector.deletedSubscriptions = NewDeletedSubscriptions()
 
-	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(content)
+	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(content)
 
 	connector.HandleNotifyStopMonitoring(notify)
 

@@ -9,7 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
@@ -273,7 +273,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 
-	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(response)
+	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
 	delivery := notify.StopMonitoringDeliveries()
 
 	if len(delivery) != 2 {

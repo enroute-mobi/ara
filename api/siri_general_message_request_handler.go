@@ -8,11 +8,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIGeneralMessageRequestHandler struct {
-	xmlRequest  *siri.XMLGetGeneralMessage
+	xmlRequest  *sxml.XMLGetGeneralMessage
 	referential *core.Referential
 }
 

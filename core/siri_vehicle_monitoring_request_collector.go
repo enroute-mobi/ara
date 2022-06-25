@@ -6,7 +6,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -144,7 +145,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) logSIRIVehicleMonitoring
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *siri.XMLVehicleMonitoringResponse) {
+func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *sxml.XMLVehicleMonitoringResponse) {
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))

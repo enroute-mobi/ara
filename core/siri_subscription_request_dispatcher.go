@@ -6,15 +6,16 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SubscriptionRequestDispatcher interface {
-	Dispatch(*siri.XMLSubscriptionRequest, *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error)
-	CancelSubscription(*siri.XMLDeleteSubscriptionRequest, *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse
-	HandleSubscriptionTerminatedNotification(*siri.XMLSubscriptionTerminatedNotification)
-	HandleNotifySubscriptionTerminated(*siri.XMLNotifySubscriptionTerminated)
+	Dispatch(*sxml.XMLSubscriptionRequest, *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error)
+	CancelSubscription(*sxml.XMLDeleteSubscriptionRequest, *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse
+	HandleSubscriptionTerminatedNotification(*sxml.XMLSubscriptionTerminatedNotification)
+	HandleNotifySubscriptionTerminated(*sxml.XMLNotifySubscriptionTerminated)
 }
 
 type SIRISubscriptionRequestDispatcherFactory struct{}
@@ -42,7 +43,7 @@ func NewSIRISubscriptionRequestDispatcher(partner *Partner) *SIRISubscriptionReq
 	return siriSubscriptionRequest
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error) {
+func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (*siri.SIRISubscriptionResponse, error) {
 	response := siri.SIRISubscriptionResponse{
 		Address:            connector.Partner().Address(),
 		ResponderRef:       connector.Partner().RequestorRef(),
@@ -100,7 +101,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *siri.XMLSu
 	return nil, fmt.Errorf("subscription not supported")
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.XMLDeleteSubscriptionRequest, message *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse {
+func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *sxml.XMLDeleteSubscriptionRequest, message *audit.BigQueryMessage) *siri.SIRIDeleteSubscriptionResponse {
 	message.RequestIdentifier = r.MessageIdentifier()
 
 	currentTime := connector.Clock().Now()
@@ -153,10 +154,10 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *siri.X
 	return resp
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) HandleSubscriptionTerminatedNotification(r *siri.XMLSubscriptionTerminatedNotification) {
+func (connector *SIRISubscriptionRequestDispatcher) HandleSubscriptionTerminatedNotification(r *sxml.XMLSubscriptionTerminatedNotification) {
 	connector.partner.Subscriptions().DeleteById(SubscriptionId(r.SubscriptionRef()))
 }
 
-func (connector *SIRISubscriptionRequestDispatcher) HandleNotifySubscriptionTerminated(r *siri.XMLNotifySubscriptionTerminated) {
+func (connector *SIRISubscriptionRequestDispatcher) HandleNotifySubscriptionTerminated(r *sxml.XMLNotifySubscriptionTerminated) {
 	connector.partner.Subscriptions().DeleteById(SubscriptionId(r.SubscriptionRef()))
 }

@@ -9,7 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
@@ -105,7 +105,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
 
-	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(response)
+	notify, _ := sxml.NewXMLNotifyGeneralMessageFromContent(response)
 	delivery := notify.GeneralMessagesDeliveries()
 
 	if len(delivery) != 1 {

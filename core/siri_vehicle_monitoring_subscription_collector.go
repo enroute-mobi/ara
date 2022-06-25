@@ -11,7 +11,7 @@ type VehicleMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestVehicleUpdate(request *VehicleUpdateRequest)
-	// HandleNotifyVehicleMonitoring(delivery *siri.XMLNotifyVehicleMonitoring)
+	// HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring)
 }
 
 type SIRIVehicleMonitoringSubscriptionCollector struct {
@@ -61,7 +61,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) RequestVehicleUpdat
 // 	connector.vehicleMonitoringSubscriber = vehicleMonitoringSubscriber
 // }
 
-// func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *siri.XMLNotifyVehicleMonitoring) {
+// func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) {
 // }
 
 // func (connector *SIRIVehicleMonitoringSubscriptionCollector) broadcastUpdateEvents(events *VehicleMonitoringUpdateEvents) {

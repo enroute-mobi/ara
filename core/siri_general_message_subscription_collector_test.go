@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
-	request := &siri.XMLSubscriptionRequest{}
+	request := &sxml.XMLSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -20,7 +20,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 		}
 		body, _ := ioutil.ReadAll(r.Body)
 		var err error
-		request, err = siri.NewXMLSubscriptionRequestFromContent(body)
+		request, err = sxml.NewXMLSubscriptionRequestFromContent(body)
 		if err != nil {
 			t.Fatalf("%v", err)
 		}
@@ -69,11 +69,11 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 }
 
 func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
-	request := &siri.XMLDeleteSubscriptionRequest{}
+	request := &sxml.XMLDeleteSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
-		request, _ = siri.NewXMLDeleteSubscriptionRequestFromContent(body)
+		request, _ = sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
 
@@ -93,13 +93,13 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	file, _ := os.Open("../siri/testdata/notify-general-message.xml")
+	file, _ := os.Open("testdata/notify-general-message.xml")
 	content, _ := ioutil.ReadAll(file)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.deletedSubscriptions = NewDeletedSubscriptions()
 
-	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(content)
+	notify, _ := sxml.NewXMLNotifyGeneralMessageFromContent(content)
 
 	connector.HandleNotifyGeneralMessage(notify)
 

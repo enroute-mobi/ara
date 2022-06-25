@@ -8,11 +8,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIEstimatedTimetableRequestHandler struct {
-	xmlRequest  *siri.XMLGetEstimatedTimetable
+	xmlRequest  *sxml.XMLGetEstimatedTimetable
 	referential *core.Referential
 }
 

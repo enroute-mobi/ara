@@ -11,7 +11,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -176,7 +177,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(s
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	var monitoringRefs, subIds []string
 
 	for _, sm := range request.XMLSubscriptionSMEntries() {
@@ -270,7 +271,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 }
 
 // WIP Need to do something about this method Refs #6338
-func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *siri.XMLSubscriptionRequest, sm *siri.XMLStopMonitoringSubscriptionRequestEntry) {
+func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *sxml.XMLSubscriptionRequest, sm *sxml.XMLStopMonitoringSubscriptionRequestEntry) {
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"

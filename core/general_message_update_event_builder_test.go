@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *testing.T) {
@@ -20,7 +20,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 		t.Fatal(err)
 	}
 
-	response, _ := siri.NewXMLGeneralMessageResponseFromContent(content)
+	response, _ := sxml.NewXMLGeneralMessageResponseFromContent(content)
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
