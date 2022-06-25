@@ -244,7 +244,6 @@ Feature: Support SIRI ProductionTimeTable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef/>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
