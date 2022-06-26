@@ -115,7 +115,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		lon := float32(vehicles[i].Longitude)
 		bearing := float32(vehicles[i].Bearing)
 		timestamp := uint64(vehicles[i].RecordedAtTime.Unix())
-		occupancy := gtfs.VehiclePosition_OccupancyStatus(vehicles[i].Occupancy)
+		occupancy := model.OccupancyCode(vehicles[i].Occupancy)
 		feedEntity := &gtfs.FeedEntity{
 			Id: &newId,
 			Vehicle: &gtfs.VehiclePosition{

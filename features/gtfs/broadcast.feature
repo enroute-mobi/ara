@@ -201,7 +201,7 @@ Feature: Support GTFS-RT feeds
     Given a Vehicle exists with the following attributes:
       | ObjectIDs        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Occupancy        | 2                                 |
+      | Occupancy        | FEW_SEATS_AVAILABLE               |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential     | secret   |
       | remote_objectid_kind | internal |

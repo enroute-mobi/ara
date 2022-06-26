@@ -14,8 +14,8 @@ type VehicleJourneyUpdateEvent struct {
 	DestinationRef  string
 	DestinationName string
 	Direction       string
+	Occupancy       string
 	Monitored       bool
-	Occupancy       int32
 
 	ObjectidKind string
 	SiriXML      *sxml.XMLMonitoredVehicleJourney

@@ -164,7 +164,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 	if trip == nil || v.GetVehicle() == nil {
 		return
 	}
-	occupancy := int32(v.GetOccupancyStatus())
+	occupancy := v.GetOccupancyStatus()
 	vjObjectId := connector.handleTrip(events, trip, occupancy) // returns the vj objectid
 
 	vid := v.GetVehicle().GetId()
@@ -179,7 +179,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 			Longitude:              float64(p.GetLongitude()),
 			Latitude:               float64(p.GetLatitude()),
 			Bearing:                float64(p.GetBearing()),
-			Occupancy:              occupancy,
+			Occupancy:              model.OccupancyName(occupancy),
 		}
 
 		events.Vehicles[vid] = event
@@ -187,7 +187,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 }
 
 // returns the vj objectid
-func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...int32) model.ObjectID {
+func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...gtfs.VehiclePosition_OccupancyStatus) model.ObjectID {
 	rid := trip.GetRouteId()
 	tid := trip.GetTripId()
 	lineObjectId := model.NewObjectID(connector.remoteObjectidKind, rid)
@@ -213,7 +213,7 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 			Monitored:    true,
 		}
 		if len(occupancy) != 0 {
-			vjEvent.Occupancy = occupancy[0]
+			vjEvent.Occupancy = model.OccupancyName(occupancy[0])
 		}
 
 		events.VehicleJourneys[tid] = vjEvent

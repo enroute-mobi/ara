@@ -31,9 +31,8 @@ type Vehicle struct {
 	LinkDistance   float64   `json:",omitempty"`
 	Percentage     float64   `json:",omitempty"`
 	DriverRef      string    `json:",omitempty"`
+	Occupancy      string    `json:",omitempty"`
 	ValidUntilTime time.Time `json:",omitempty"`
-
-	Occupancy int32 `json:",omitempty"`
 
 	RecordedAtTime time.Time
 

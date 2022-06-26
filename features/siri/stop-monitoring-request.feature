@@ -447,7 +447,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
       | LineId                                 | 6ba7b814-9dad-11d1-6-00c04fd430c8               |
       | Monitored                              | true                                            |
-      | Occupancy                              | 1                                               |
+      | Occupancy                              | MANY_SEATS_AVAILABLE                            |
       | Attribute[Bearing]                     | N                                               |
       | Attribute[Delay]                       | 30                                              |
       | DestinationName                        | Cimetière des Sauvages                          |
@@ -685,7 +685,6 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney                                           | first                                                                | VehicleJourney#Attribute[FirstOrLastJourney]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored                                                    | true                                                                 | VehicleJourney#Attribute[Monitored]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError                                              | false                                                                | VehicleJourney#Attribute[MonitoringError]             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | seatsAvailable                                                       | VehicleJourney#Attribute[Occupancy]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                                                        | 30                                                                   | VehicleJourney#Attribute[Delay]                       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Bearing                                                      | N                                                                    | VehicleJourney#Attribute[Bearing]                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InPanic                                                      | false                                                                | VehicleJourney#Attribute[InPanic]                     |
