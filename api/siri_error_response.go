@@ -16,6 +16,7 @@ type SIRIError struct {
 	request         string
 	envelopeType    string
 	response        http.ResponseWriter
+	message         *audit.BigQueryMessage
 }
 
 func (e SIRIError) Send() {
@@ -28,15 +29,18 @@ func (e SIRIError) Send() {
     <faultstring>%s</faultstring>
   </S:Fault>`, e.errCode, e.errDescription))
 
-	message := &audit.BigQueryMessage{
-		Protocol:     "siri",
-		Direction:    "received",
-		Status:       "Error",
-		ErrorDetails: fmt.Sprintf("%v: %v", e.errCode, e.errDescription),
+	if e.message == nil {
+		e.message = &audit.BigQueryMessage{
+			Protocol:          "siri",
+			Direction:         "received",
+			RequestRawMessage: e.request,
+		}
 	}
+	e.message.Status = "Error"
+	e.message.ErrorDetails = fmt.Sprintf("%v: %v", e.errCode, e.errDescription)
 
 	buffer.WriteTo(e.response)
-	message.ResponseSize = buffer.Length()
+	e.message.ResponseSize = buffer.Length()
 
-	audit.CurrentBigQuery(e.referentialSlug).WriteEvent(message)
+	audit.CurrentBigQuery(e.referentialSlug).WriteEvent(e.message)
 }
