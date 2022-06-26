@@ -22,6 +22,6 @@ cucumber:
 	bundle exec cucumber -t 'not @wip'
 
 gen_gtfsrt_bindings:
-	wget https://developers.google.com/transit/gtfs-realtime/gtfs-realtime.proto
+	wget https://raw.githubusercontent.com/google/transit/master/gtfs-realtime/proto/gtfs-realtime.proto
 	protoc --go_out=. --go_opt=Mgtfs-realtime.proto=gtfs/ gtfs-realtime.proto
 	rm gtfs-realtime.proto

@@ -34,8 +34,8 @@
 					<siri:DestinationAimedArrivalTime>{{.Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}</siri:DestinationAimedArrivalTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}
 					<siri:FirstOrLastJourney>{{.Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}</siri:FirstOrLastJourney>{{end}}
 					<siri:Monitored>{{.Monitored}}</siri:Monitored>{{ if .Attributes.VehicleJourneyAttributes.MonitoringError}}
-					<siri:MonitoringError>{{.Attributes.VehicleJourneyAttributes.MonitoringError}}</siri:MonitoringError>{{end}}{{ if .Attributes.VehicleJourneyAttributes.Occupancy }}
-					<siri:Occupancy>{{.Attributes.VehicleJourneyAttributes.Occupancy}}</siri:Occupancy>{{end}}{{if .Attributes.VehicleJourneyAttributes.Delay}}
+					<siri:MonitoringError>{{.Attributes.VehicleJourneyAttributes.MonitoringError}}</siri:MonitoringError>{{end}}{{ if .Occupancy }}
+					<siri:Occupancy>{{.Occupancy}}</siri:Occupancy>{{end}}{{if .Attributes.VehicleJourneyAttributes.Delay}}
 					<siri:Delay>{{.Attributes.VehicleJourneyAttributes.Delay}}</siri:Delay>{{end}}{{if .Attributes.VehicleJourneyAttributes.Bearing}}
 					<siri:Bearing>{{.Attributes.VehicleJourneyAttributes.Bearing}}</siri:Bearing>{{end}}{{ if .Attributes.VehicleJourneyAttributes.InPanic }}
 					<siri:InPanic>{{.Attributes.VehicleJourneyAttributes.InPanic}}</siri:InPanic>{{end}}{{ if .Attributes.VehicleJourneyAttributes.InCongestion }}

@@ -33,6 +33,8 @@ type Vehicle struct {
 	DriverRef      string    `json:",omitempty"`
 	ValidUntilTime time.Time `json:",omitempty"`
 
+	Occupancy int32 `json:",omitempty"`
+
 	RecordedAtTime time.Time
 
 	Attributes Attributes
@@ -66,6 +68,7 @@ func (vehicle *Vehicle) copy() *Vehicle {
 		Percentage:       vehicle.Percentage,
 		DriverRef:        vehicle.DriverRef,
 		ValidUntilTime:   vehicle.ValidUntilTime,
+		Occupancy:        vehicle.Occupancy,
 		RecordedAtTime:   vehicle.RecordedAtTime,
 		Attributes:       vehicle.Attributes.Copy(),
 	}

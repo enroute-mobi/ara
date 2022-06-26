@@ -115,11 +115,13 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		lon := float32(vehicles[i].Longitude)
 		bearing := float32(vehicles[i].Bearing)
 		timestamp := uint64(vehicles[i].RecordedAtTime.Unix())
+		occupancy := gtfs.VehiclePosition_OccupancyStatus(vehicles[i].Occupancy)
 		feedEntity := &gtfs.FeedEntity{
 			Id: &newId,
 			Vehicle: &gtfs.VehiclePosition{
-				Trip:    trip,
-				Vehicle: &gtfs.VehicleDescriptor{Id: &vId},
+				Trip:            trip,
+				Vehicle:         &gtfs.VehicleDescriptor{Id: &vId},
+				OccupancyStatus: &occupancy,
 				Position: &gtfs.Position{
 					Latitude:  &lat,
 					Longitude: &lon,
@@ -127,14 +129,6 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 				},
 				Timestamp: &timestamp,
 			},
-		}
-
-		if o, ok := vehicles[i].Attributes["Occupancy"]; ok {
-			vp, ok := gtfs.VehiclePosition_OccupancyStatus_value[o]
-			if ok {
-				status := gtfs.VehiclePosition_OccupancyStatus(vp)
-				feedEntity.Vehicle.OccupancyStatus = &status
-			}
 		}
 
 		// Fill StopId, but as it's uptionnal we just fill it if we can find it

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type VehicleUpdateEvent struct {
 	Origin string
@@ -16,6 +18,7 @@ type VehicleUpdateEvent struct {
 	Bearing                float64
 	ValidUntilTime         time.Time
 	RecordedAt             time.Time
+	Occupancy              int32
 
 	attributes Attributes
 }

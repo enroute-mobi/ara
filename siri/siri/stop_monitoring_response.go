@@ -54,6 +54,7 @@ type SIRIMonitoredStopVisit struct {
 	DestinationName        string
 	StopAreaObjectId       string
 	DataFrameRef           string
+	Occupancy              string
 
 	VehicleAtStop bool
 	Monitored     bool
