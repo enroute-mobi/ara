@@ -17,13 +17,14 @@ Feature: Support SIRI VehicleMonitoring
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs                | "internal": "Test:Vehicle:201123:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId         | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-      | Longitude                | 1.234                                 |
-      | Latitude                 | 5.678                                 |
-      | Bearing                  | 123                                   |
-      | RecordedAtTime           | 2017-01-01T13:00:00.000Z              |
+      | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+      | Longitude        | 1.234                                 |
+      | Latitude         | 5.678                                 |
+      | Bearing          | 123                                   |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -44,7 +45,7 @@ Feature: Support SIRI VehicleMonitoring
         "Status": true,
         "VehicleActivity": [{
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:201123:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
@@ -96,6 +97,7 @@ Feature: Support SIRI VehicleMonitoring
       | Latitude         | 5.678                             |
       | Bearing          | 123                               |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
       | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
@@ -104,6 +106,7 @@ Feature: Support SIRI VehicleMonitoring
       | Latitude         | 5.789                             |
       | Bearing          | 456                               |
       | RecordedAtTime   | 2017-01-01T14:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:2:LOC |
@@ -124,7 +127,7 @@ Feature: Support SIRI VehicleMonitoring
         "Status": true,
         "VehicleActivity": [{
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:2:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:2:LOC",
@@ -174,6 +177,7 @@ Feature: Support SIRI VehicleMonitoring
       | Latitude         | 5.678                             |
       | Bearing          | 123                               |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
       | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -182,6 +186,7 @@ Feature: Support SIRI VehicleMonitoring
       | Latitude         | 5.678                             |
       | Bearing          | 123                               |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
       | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -190,6 +195,7 @@ Feature: Support SIRI VehicleMonitoring
       | Latitude         | 5.678                             |
       | Bearing          | 123                               |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -210,7 +216,7 @@ Feature: Support SIRI VehicleMonitoring
         "Status": true,
         "VehicleActivity": [{
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:1:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
@@ -229,7 +235,7 @@ Feature: Support SIRI VehicleMonitoring
         },
         {
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:2:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
@@ -248,7 +254,7 @@ Feature: Support SIRI VehicleMonitoring
         },
         {
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:3:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
@@ -286,13 +292,14 @@ Feature: Support SIRI VehicleMonitoring
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | ObjectIDs                | "other": "Test:Vehicle:201123:LOC"    |
-     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-     | VehicleJourneyId         | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-     | Longitude                | 1.234                                 |
-     | Latitude                 | 5.678                                 |
-     | Bearing                  | 123                                   |
-     | RecordedAtTime           | 2017-01-01T13:00:00.000Z              |
+     | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+     | Longitude        | 1.234                              |
+     | Latitude         | 5.678                              |
+     | Bearing          | 123                                |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
    When I send a vehicle-monitoring SIRI Lite request with the following parameters
      | Token             | test            |
      | LineRef           | Test:Line:3:LOC |
@@ -339,13 +346,14 @@ Feature: Support SIRI VehicleMonitoring
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs                | "other": "Test:Vehicle:201123:LOC"    |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId         | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-      | Longitude                | 1.234                                 |
-      | Latitude                 | 5.678                                 |
-      | Bearing                  | 123                                   |
-      | RecordedAtTime           | 2017-01-01T13:00:00.000Z              |
+      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | Longitude        | 1.234                              |
+      | Latitude         | 5.678                              |
+      | Bearing          | 123                                |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -366,7 +374,7 @@ Feature: Support SIRI VehicleMonitoring
         "Status": true,
         "VehicleActivity": [{
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:201123:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
@@ -397,22 +405,23 @@ Feature: Support SIRI VehicleMonitoring
       | remote_objectid_kind                                                  | internal |
       | siri-lite-vehicle-monitoring-request-broadcaster.remote_objectid_kind | other    |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "other": "Test:Line:3:LOC"    |
-      | Name      | Ligne 3 Metro                 |
+      | ObjectIDs | "other": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                |
-      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC"    |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                | true                                      |
-      | Attribute[DirectionName] | Direction Name                            |
+      | Name                     | Passage 32                             |
+      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
+      | Monitored                | true                                   |
+      | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs                | "other": "Test:Vehicle:201123:LOC"    |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId         | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-      | Longitude                | 1.234                                 |
-      | Latitude                 | 5.678                                 |
-      | Bearing                  | 123                                   |
-      | RecordedAtTime           | 2017-01-01T13:00:00.000Z              |
+      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | Longitude        | 1.234                              |
+      | Latitude         | 5.678                              |
+      | Bearing          | 123                                |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -433,7 +442,7 @@ Feature: Support SIRI VehicleMonitoring
         "Status": true,
         "VehicleActivity": [{
           "RecordedAtTime": "2017-01-01T13:00:00Z",
-          "ValidUntilTime": "2017-01-01T13:00:00Z",
+          "ValidUntilTime": "2017-01-01T14:00:00Z",
           "VehicleMonitoringRef": "Test:Vehicle:201123:LOC",
           "MonitoredVehicleJourney": {
             "LineRef": "Test:Line:3:LOC",
