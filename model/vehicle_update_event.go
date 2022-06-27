@@ -15,6 +15,7 @@ type VehicleUpdateEvent struct {
 	Latitude               float64
 	Bearing                float64
 	ValidUntilTime         time.Time
+	RecordedAt             time.Time
 
 	attributes Attributes
 }

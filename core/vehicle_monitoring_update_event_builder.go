@@ -121,6 +121,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			LinkDistance:           linkDistance,
 			Percentage:             percentage,
 			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
+			RecordedAt:             xmlVehicleActivity.RecordedAtTime(),
 		}
 
 		coord, err := builder.handleCoordinates(xmlVehicleActivity)

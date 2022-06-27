@@ -1,5 +1,5 @@
-bitbucket.org/enroute-mobi/ara-external-models v0.0.8 h1:1JG2Xlk3qb2oWjkGFm7yVuSLXNMuZ191/6axEPE/egU=
-bitbucket.org/enroute-mobi/ara-external-models v0.0.8/go.mod h1:EXKNHGUaMYcZ83bHCoJJWjgCQelWTwW95oRV1vzKNnw=
+bitbucket.org/enroute-mobi/ara-external-models v0.0.9 h1:KRg4uG5DJyMsn56V1MWgF7qOhRAlUxChuorlO0SGOuo=
+bitbucket.org/enroute-mobi/ara-external-models v0.0.9/go.mod h1:EXKNHGUaMYcZ83bHCoJJWjgCQelWTwW95oRV1vzKNnw=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=

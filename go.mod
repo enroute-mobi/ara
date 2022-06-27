@@ -3,7 +3,7 @@ module bitbucket.org/enroute-mobi/ara
 go 1.18
 
 require (
-	bitbucket.org/enroute-mobi/ara-external-models v0.0.8
+	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
 	cloud.google.com/go v0.101.1
 	cloud.google.com/go/bigquery v1.31.0
 	github.com/everystreet/go-proj/v6 v6.0.0

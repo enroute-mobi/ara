@@ -117,6 +117,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		lat := float32(vehicles[i].Latitude)
 		lon := float32(vehicles[i].Longitude)
 		bearing := float32(vehicles[i].Bearing)
+		timestamp := uint64(vehicles[i].RecordedAtTime.Unix())
 		feedEntity := &gtfs.FeedEntity{
 			Id: &newId,
 			Vehicle: &gtfs.VehiclePosition{
@@ -127,6 +128,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 					Longitude: &lon,
 					Bearing:   &bearing,
 				},
+				Timestamp: &timestamp,
 			},
 		}
 

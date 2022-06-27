@@ -88,7 +88,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 		activity := siri.NewSiriLiteVehicleActivity()
 		activity.RecordedAtTime = vs[i].RecordedAtTime
-		activity.ValidUntilTime = vs[i].RecordedAtTime
+		activity.ValidUntilTime = vs[i].ValidUntilTime
 		activity.VehicleMonitoringRef = vehicleId.Value()
 		activity.MonitoredVehicleJourney.LineRef = lineRef
 		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
