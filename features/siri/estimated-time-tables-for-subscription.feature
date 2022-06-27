@@ -501,7 +501,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     And 10 seconds have passed
     When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -521,17 +521,16 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>Aller</DirectionRef>
-      <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+      <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
-        <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
-	<Order>4</Order>
+          <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+	  <Order>4</Order>
           <StopPointName>Test</StopPointName>
-          <VehicleAtStop>false</VehicleAtStop>
           <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
-          <ArrivalStatus>Delayed</ArrivalStatus>
-	</EstimatedCall>
+          <ArrivalStatus>delayed</ArrivalStatus>
+        </EstimatedCall>
       </EstimatedCalls>
     </EstimatedVehicleJourney>
   </EstimatedJourneyVersionFrame>
