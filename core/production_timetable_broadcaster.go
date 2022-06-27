@@ -161,7 +161,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 				datedTTVersionFrame = &siri.SIRIDatedTimetableVersionFrame{
 					LineRef:        lineObjectId.Value(),
 					RecordedAtTime: currentTime,
-					Attributes:     line.Attributes,
+					Attributes:     vehicleJourney.Attributes,
 				}
 
 				delivery.DatedTimetableVersionFrames = append(delivery.DatedTimetableVersionFrames, datedTTVersionFrame)
