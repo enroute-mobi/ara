@@ -12,7 +12,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -104,7 +105,7 @@ func Test_SIRIHandler_SOAP(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
-	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
+	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +176,7 @@ func Test_SIRIHandler_Raw(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
-	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
+	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +201,7 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
-	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
+	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -266,7 +267,7 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	response, err := siri.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
+	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -329,7 +330,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
-	response, err := siri.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
+	response, err := sxml.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -578,7 +579,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(core.StopMonitoringCollect)
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
@@ -603,7 +604,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 
-	file, err := os.Open("../siri/testdata/notify-general-message.xml")
+	file, err := os.Open("testdata/notify-general-message.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -618,7 +619,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(core.GeneralMessageCollect)
 	subscription.Save()
 
 	siriHandler_Request(server, buffer, t)

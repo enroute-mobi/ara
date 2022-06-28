@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -109,7 +109,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetEstimatedTimetableFromContent(content)
+	request, err := sxml.NewXMLGetEstimatedTimetableFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +246,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetEstimatedTimetableFromContent(content)
+	request, err := sxml.NewXMLGetEstimatedTimetableFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

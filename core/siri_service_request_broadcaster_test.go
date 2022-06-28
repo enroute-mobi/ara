@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -33,7 +33,7 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
+	request, err := sxml.NewXMLSiriServiceRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +139,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
+	request, err := sxml.NewXMLSiriServiceRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,7 +220,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLSiriServiceRequestFromContent(content)
+	request, err := sxml.NewXMLSiriServiceRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

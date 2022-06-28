@@ -6,19 +6,15 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIProductionTimeTableSubscriptionBroadcaster struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	dataFrameGenerator             *idgen.IdentifierGenerator
@@ -67,7 +63,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) Stop() {
 	connector.productionTimeTableBroadcaster.Stop()
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	var lineIds, subIds []string
 
 	for _, ptt := range request.XMLSubscriptionPTTEntries() {
@@ -140,7 +136,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 	return resps
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt *siri.XMLProductionTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt *sxml.XMLProductionTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
 	// check for subscription to all lines
 	if len(ptt.Lines()) == 0 {
 		var lv []string

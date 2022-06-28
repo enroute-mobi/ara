@@ -1,7 +1,7 @@
 package model
 
 import (
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type VehicleJourneyUpdateEvent struct {
@@ -17,7 +17,7 @@ type VehicleJourneyUpdateEvent struct {
 	Monitored       bool
 
 	ObjectidKind string
-	SiriXML      *siri.XMLMonitoredVehicleJourney
+	SiriXML      *sxml.XMLMonitoredVehicleJourney
 	attributes   Attributes
 	references   *References
 }

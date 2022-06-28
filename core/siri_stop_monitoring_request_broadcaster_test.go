@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -98,7 +98,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	request, err := sxml.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -199,7 +199,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	request, err := sxml.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -291,7 +291,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	request, err := sxml.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -357,7 +357,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	request, err := sxml.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -389,7 +389,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLGetStopMonitoringFromContent(content)
+	request, err := sxml.NewXMLGetStopMonitoringFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

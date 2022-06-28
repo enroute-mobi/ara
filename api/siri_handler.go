@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIRequestHandler interface {
@@ -40,67 +40,72 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
-			xmlRequest:  siri.NewXMLCheckStatusRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLCheckStatusRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "GetStopMonitoring":
 		return &SIRIStopMonitoringRequestHandler{
-			xmlRequest:  siri.NewXMLGetStopMonitoring(envelope.Body()),
+			xmlRequest:  sxml.NewXMLGetStopMonitoring(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "DeleteSubscription", "TerminateSubscription":
 		return &SIRIDeleteSubscriptionRequestHandler{
-			xmlRequest:  siri.NewXMLDeleteSubscriptionRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLDeleteSubscriptionRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "Subscribe", "Subscription":
 		return &SIRISubscribeRequestHandler{
-			xmlRequest:  siri.NewXMLSubscriptionRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLSubscriptionRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "NotifyStopMonitoring":
 		return &SIRIStopMonitoringRequestDeliveriesResponseHandler{
-			xmlRequest:  siri.NewXMLNotifyStopMonitoring(envelope.Body()),
+			xmlRequest:  sxml.NewXMLNotifyStopMonitoring(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "NotifyGeneralMessage":
 		return &SIRIGeneralMessageRequestDeliveriesResponseHandler{
-			xmlRequest:  siri.NewXMLNotifyGeneralMessage(envelope.Body()),
+			xmlRequest:  sxml.NewXMLNotifyGeneralMessage(envelope.Body()),
+			referential: handler.referential,
+		}
+	case "NotifyVehicleMonitoring":
+		return &SIRIVehicleMonitoringRequestDeliveriesResponseHandler{
+			xmlRequest:  sxml.NewXMLNotifyVehicleMonitoring(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "NotifySubscriptionTerminated":
 		return &SIRINotifySubscriptionTerminatedHandler{
-			xmlRequest:  siri.NewXMLNotifySubscriptionTerminated(envelope.Body()),
+			xmlRequest:  sxml.NewXMLNotifySubscriptionTerminated(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "SubscriptionTerminatedNotification":
 		return &SIRISubscriptionTerminatedNotificationHandler{
-			xmlRequest:  siri.NewXMLSubscriptionTerminatedNotification(envelope.Body()),
+			xmlRequest:  sxml.NewXMLSubscriptionTerminatedNotification(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "StopPointsDiscovery":
 		return &SIRIStopDiscoveryRequestHandler{
-			xmlRequest:  siri.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "LinesDiscovery":
 		return &SIRILinesDiscoveryRequestHandler{
-			xmlRequest:  siri.NewXMLLinesDiscoveryRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLLinesDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "GetSiriService":
 		return &SIRIServiceRequestHandler{
-			xmlRequest:  siri.NewXMLSiriServiceRequest(envelope.Body()),
+			xmlRequest:  sxml.NewXMLSiriServiceRequest(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "GetGeneralMessage":
 		return &SIRIGeneralMessageRequestHandler{
-			xmlRequest:  siri.NewXMLGetGeneralMessage(envelope.Body()),
+			xmlRequest:  sxml.NewXMLGetGeneralMessage(envelope.Body()),
 			referential: handler.referential,
 		}
 	case "GetEstimatedTimetable":
 		return &SIRIEstimatedTimetableRequestHandler{
-			xmlRequest:  siri.NewXMLGetEstimatedTimetable(envelope.Body()),
+			xmlRequest:  sxml.NewXMLGetEstimatedTimetable(envelope.Body()),
 			referential: handler.referential,
 		}
 	}

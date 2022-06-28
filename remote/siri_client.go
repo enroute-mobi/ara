@@ -12,7 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/version"
 	"github.com/jbowtie/gokogiri/xml"
 	"golang.org/x/text/encoding/charmap"
@@ -169,7 +170,7 @@ func getTimeOut(rt requestType) time.Duration {
 	}
 }
 
-func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*siri.XMLCheckStatusResponse, error) {
+func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*sxml.XMLCheckStatusResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "CheckStatusResponse",
@@ -180,11 +181,11 @@ func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*si
 		return nil, err
 	}
 
-	checkStatus := siri.NewXMLCheckStatusResponse(node)
+	checkStatus := sxml.NewXMLCheckStatusResponse(node)
 	return checkStatus, nil
 }
 
-func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryRequest) (*siri.XMLStopPointsDiscoveryResponse, error) {
+func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryRequest) (*sxml.XMLStopPointsDiscoveryResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "StopPointsDiscoveryResponse",
@@ -194,11 +195,11 @@ func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryReq
 		return nil, err
 	}
 
-	stopDiscovery := siri.NewXMLStopPointsDiscoveryResponse(node)
+	stopDiscovery := sxml.NewXMLStopPointsDiscoveryResponse(node)
 	return stopDiscovery, nil
 }
 
-func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*siri.XMLStopMonitoringResponse, error) {
+func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*sxml.XMLStopMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetStopMonitoringResponse",
@@ -208,11 +209,11 @@ func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequ
 		return nil, err
 	}
 
-	stopMonitoring := siri.NewXMLStopMonitoringResponse(node)
+	stopMonitoring := sxml.NewXMLStopMonitoringResponse(node)
 	return stopMonitoring, nil
 }
 
-func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessageRequest) (*siri.XMLGeneralMessageResponse, error) {
+func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessageRequest) (*sxml.XMLGeneralMessageResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetGeneralMessageResponse",
@@ -222,11 +223,11 @@ func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessag
 		return nil, err
 	}
 
-	generalMessage := siri.NewXMLGeneralMessageResponse(node)
+	generalMessage := sxml.NewXMLGeneralMessageResponse(node)
 	return generalMessage, nil
 }
 
-func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*siri.XMLVehicleMonitoringResponse, error) {
+func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*sxml.XMLVehicleMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		expectedResponse: "GetVehicleMonitoringResponse",
@@ -236,11 +237,11 @@ func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitori
 		return nil, err
 	}
 
-	vehicleMonitoring := siri.NewXMLVehicleMonitoringResponse(node)
+	vehicleMonitoring := sxml.NewXMLVehicleMonitoringResponse(node)
 	return vehicleMonitoring, nil
 }
 
-func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
+func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
@@ -250,11 +251,11 @@ func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonit
 	if err != nil {
 		return nil, err
 	}
-	response := siri.NewXMLSubscriptionResponse(node)
+	response := sxml.NewXMLSubscriptionResponse(node)
 	return response, nil
 }
 
-func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*siri.XMLSubscriptionResponse, error) {
+func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
@@ -264,11 +265,25 @@ func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMe
 	if err != nil {
 		return nil, err
 	}
-	response := siri.NewXMLSubscriptionResponse(node)
+	response := sxml.NewXMLSubscriptionResponse(node)
 	return response, nil
 }
 
-func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*siri.XMLDeleteSubscriptionResponse, error) {
+func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicleMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:          request,
+		requestType:      SUBSCRIPTION,
+		expectedResponse: "SubscribeResponse",
+		acceptGzip:       true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := sxml.NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
+func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*sxml.XMLDeleteSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
 		requestType:      SUBSCRIPTION,
@@ -279,7 +294,7 @@ func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptio
 		return nil, err
 	}
 
-	terminatedSub := siri.NewXMLDeleteSubscriptionResponse(node)
+	terminatedSub := sxml.NewXMLDeleteSubscriptionResponse(node)
 	return terminatedSub, nil
 }
 

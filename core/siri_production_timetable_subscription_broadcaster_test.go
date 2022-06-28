@@ -5,7 +5,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -56,7 +56,7 @@ func Test_PTT_checklines(t *testing.T) {
 		"   </SubscriptionRequest>" +
 		"</Siri>")
 
-	subs, err := siri.NewXMLSubscriptionRequestFromContent(request)
+	subs, err := sxml.NewXMLSubscriptionRequestFromContent(request)
 	if err != nil {
 		t.Errorf("cannot parse xml: %s", err)
 	}
@@ -86,7 +86,7 @@ func Test_PTT_checklines(t *testing.T) {
 		"   </SubscriptionRequest>" +
 		"</Siri>")
 
-	subs1, err1 := siri.NewXMLSubscriptionRequestFromContent(request1)
+	subs1, err1 := sxml.NewXMLSubscriptionRequestFromContent(request1)
 	if err1 != nil {
 		t.Errorf("cannot parse xml: %s", err1)
 	}
@@ -116,7 +116,7 @@ func Test_PTT_checklines(t *testing.T) {
 		"   </SubscriptionRequest>" +
 		"</Siri>")
 
-	subs2, err2 := siri.NewXMLSubscriptionRequestFromContent(request2)
+	subs2, err2 := sxml.NewXMLSubscriptionRequestFromContent(request2)
 	if err2 != nil {
 		t.Errorf("cannot parse xml: %s", err2)
 	}

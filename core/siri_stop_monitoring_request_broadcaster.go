@@ -6,19 +6,17 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type StopMonitoringRequestBroadcaster interface {
-	RequestStopArea(*siri.XMLGetStopMonitoring, *audit.BigQueryMessage) *siri.SIRIStopMonitoringResponse
+	RequestStopArea(*sxml.XMLGetStopMonitoring, *audit.BigQueryMessage) *siri.SIRIStopMonitoringResponse
 }
 
 type SIRIStopMonitoringRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 
@@ -31,7 +29,7 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 	return connector
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(request *siri.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
+func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(request *sxml.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
 	objectid := model.NewObjectID(connector.remoteObjectidKind, request.MonitoringRef())
 	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
@@ -115,7 +113,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	return delivery
 }
 
-func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *siri.XMLGetStopMonitoring, message *audit.BigQueryMessage) *siri.SIRIStopMonitoringResponse {
+func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *sxml.XMLGetStopMonitoring, message *audit.BigQueryMessage) *siri.SIRIStopMonitoringResponse {
 	response := &siri.SIRIStopMonitoringResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),

@@ -7,7 +7,8 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"github.com/jbowtie/gokogiri/xml"
 )
 
@@ -116,7 +117,7 @@ func (envelope *SIRIEnvelope) BodyOrError(expectedResponse string) (xml.Node, er
 		return envelope.body, nil
 	}
 	if envelope.BodyType() == "Fault" {
-		se := siri.NewXMLSiriError(envelope.body)
+		se := sxml.NewXMLSiriError(envelope.body)
 		return nil, siri.NewSiriError(fmt.Sprintf("SIRI Error: %v", se.Error()))
 	}
 	return nil, siri.NewSiriError(fmt.Sprintf("SIRI CRITICAL: Wrong xml from server: %v", envelope.BodyType()))

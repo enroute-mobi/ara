@@ -2,18 +2,15 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type GeneralMessageRequestBroadcaster interface {
-	Situations(*siri.XMLGetGeneralMessage, *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error)
+	Situations(*sxml.XMLGetGeneralMessage, *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error)
 }
 
 type SIRIGeneralMessageRequestBroadcaster struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
 	connector
 }
 
@@ -25,7 +22,7 @@ func NewSIRIGeneralMessageRequestBroadcaster(partner *Partner) *SIRIGeneralMessa
 	return siriGeneralMessageRequestBroadcaster
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.XMLGetGeneralMessage, message *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error) {
+func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *sxml.XMLGetGeneralMessage, message *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error) {
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
@@ -44,7 +41,7 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *siri.
 	return response, nil
 }
 
-func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(request *siri.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
+func (connector *SIRIGeneralMessageRequestBroadcaster) getGeneralMessageDelivery(request *sxml.XMLGeneralMessageRequest) siri.SIRIGeneralMessageDelivery {
 	delivery := siri.SIRIGeneralMessageDelivery{
 		RequestMessageRef: request.MessageIdentifier(),
 		Status:            true,

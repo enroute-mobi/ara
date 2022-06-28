@@ -2,17 +2,15 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type CheckStatusServer interface {
-	CheckStatus(*siri.XMLCheckStatusRequest, *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error)
+	CheckStatus(*sxml.XMLCheckStatusRequest, *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error)
 }
 
 type SIRICheckStatusServer struct {
-	clock.ClockConsumer
-
 	connector
 }
 
@@ -24,7 +22,7 @@ func NewSIRICheckStatusServer(partner *Partner) *SIRICheckStatusServer {
 	return siriCheckStatusServer
 }
 
-func (connector *SIRICheckStatusServer) CheckStatus(request *siri.XMLCheckStatusRequest, message *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error) {
+func (connector *SIRICheckStatusServer) CheckStatus(request *sxml.XMLCheckStatusRequest, message *audit.BigQueryMessage) (*siri.SIRICheckStatusResponse, error) {
 	response := &siri.SIRICheckStatusResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),

@@ -3,7 +3,7 @@ package core
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -27,7 +27,7 @@ func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectI
 	}
 }
 
-func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitEvent *siri.XMLMonitoredStopVisit) {
+func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitEvent *sxml.XMLMonitoredStopVisit) {
 	origin := string(builder.partner.Slug())
 
 	// StopAreas
@@ -127,14 +127,14 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	}
 }
 
-func (builder *StopMonitoringUpdateEventBuilder) SetUpdateEvents(stopVisits []*siri.XMLMonitoredStopVisit) {
+func (builder *StopMonitoringUpdateEventBuilder) SetUpdateEvents(stopVisits []*sxml.XMLMonitoredStopVisit) {
 	for _, xmlStopVisitEvent := range stopVisits {
 		builder.buildUpdateEvents(xmlStopVisitEvent)
 	}
 }
 
 // Used only in StopMonitoringSubscriptionCollector
-func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(delivery *siri.XMLNotifyStopMonitoringDelivery) {
+func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(delivery *sxml.XMLNotifyStopMonitoringDelivery) {
 	for _, xmlStopVisitCancellationEvent := range delivery.XMLMonitoredStopVisitCancellations() {
 		builder.stopMonitoringUpdateEvents.MonitoringRefs[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
 

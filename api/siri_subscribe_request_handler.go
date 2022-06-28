@@ -7,11 +7,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/remote"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRISubscribeRequestHandler struct {
-	xmlRequest  *siri.XMLSubscriptionRequest
+	xmlRequest  *sxml.XMLSubscriptionRequest
 	referential *core.Referential
 }
 

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -17,8 +16,6 @@ const (
 )
 
 type TripUpdatesBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 
 	vjRemoteObjectidKinds []string

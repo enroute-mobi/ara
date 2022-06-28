@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -24,8 +23,6 @@ func (factory *GtfsRequestCollectorFactory) CreateConnector(partner *Partner) Co
 }
 
 type GtfsRequestCollector struct {
-	clock.ClockConsumer
-
 	connector
 
 	remoteObjectidKind string

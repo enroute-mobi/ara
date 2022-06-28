@@ -2,17 +2,15 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type ServiceRequestBroadcaster interface {
-	HandleRequests(*siri.XMLSiriServiceRequest, *audit.BigQueryMessage) *siri.SIRIServiceResponse
+	HandleRequests(*sxml.XMLSiriServiceRequest, *audit.BigQueryMessage) *siri.SIRIServiceResponse
 }
 
 type SIRIServiceRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 
@@ -24,7 +22,7 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	return siriServiceRequestBroadcaster
 }
 
-func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {
+func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *sxml.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {
 	response := &siri.SIRIServiceResponse{
 		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
@@ -55,7 +53,7 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *siri.XML
 	return response
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(requests []*siri.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
+func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(requests []*sxml.XMLStopMonitoringRequest, response *siri.SIRIServiceResponse) (stopIds []string) {
 	for _, stopMonitoringRequest := range requests {
 		var delivery siri.SIRIStopMonitoringDelivery
 
@@ -83,7 +81,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(req
 	return
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(requests []*siri.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
+func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(requests []*sxml.XMLGeneralMessageRequest, response *siri.SIRIServiceResponse) {
 	for _, generalMessageRequest := range requests {
 		var delivery siri.SIRIGeneralMessageDelivery
 
@@ -108,7 +106,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(req
 	}
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*siri.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
+func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*sxml.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
 	for _, estimatedTimetableRequest := range requests {
 		var delivery siri.SIRIEstimatedTimetableDelivery
 

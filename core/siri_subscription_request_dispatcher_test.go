@@ -11,7 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -37,7 +37,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 
 	file, _ := os.Open("testdata/estimatedtimetable-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 
@@ -76,7 +76,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 
 	file, _ := os.Open("testdata/productiontimetable-request.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	if err != nil {
@@ -115,7 +115,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	if err != nil {
@@ -158,7 +158,7 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	if err != nil {
@@ -204,7 +204,7 @@ func Test_CancelSubscription(t *testing.T) {
 
 	file, _ := os.Open("testdata/terminated_subscription_request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request, &audit.BigQueryMessage{})
@@ -248,7 +248,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 
 	file, _ := os.Open("testdata/terminated_subscription_request_all-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLDeleteSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 	response := connector.(*SIRISubscriptionRequestDispatcher).CancelSubscription(request, &audit.BigQueryMessage{})
@@ -337,7 +337,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 
@@ -345,7 +345,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	connector2.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 	time.Sleep(10 * time.Millisecond)
 
-	notify, _ := siri.NewXMLNotifyStopMonitoringFromContent(response)
+	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
 	delivery := notify.StopMonitoringDeliveries()
 
 	if len(delivery) != 1 {
@@ -442,14 +442,14 @@ func Test_ReceiveStateGM(t *testing.T) {
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
 	body, _ := ioutil.ReadAll(file)
-	request, _ := siri.NewXMLSubscriptionRequestFromContent(body)
+	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 	time.Sleep(10 * time.Millisecond)
 
 	connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
 	connector2.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
 	time.Sleep(10 * time.Millisecond)
 
-	notify, _ := siri.NewXMLNotifyGeneralMessageFromContent(response)
+	notify, _ := sxml.NewXMLNotifyGeneralMessageFromContent(response)
 	delivery := notify.GeneralMessagesDeliveries()
 
 	if len(delivery) != 1 {
@@ -461,7 +461,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 		t.Errorf("Should have received 1 GeneralMessage but got == %v", len(gms))
 	}
 
-	content := gms[0].Content().(siri.IDFGeneralMessageStructure)
+	content := gms[0].Content().(sxml.IDFGeneralMessageStructure)
 
 	messages := content.Messages()
 
@@ -472,7 +472,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 }
 
 func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
-	file, err := os.Open("../siri/testdata/subscription_terminated_notification-soap.xml")
+	file, err := os.Open("testdata/subscription_terminated_notification-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -482,7 +482,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, _ := siri.NewXMLSubscriptionTerminatedNotificationFromContent(content)
+	response, _ := sxml.NewXMLSubscriptionTerminatedNotificationFromContent(content)
 
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
@@ -498,7 +498,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	subscription.Save()
 
 	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {
@@ -513,7 +513,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 }
 
 func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
-	file, err := os.Open("../siri/testdata/notify-subscription-terminated-soap.xml")
+	file, err := os.Open("testdata/notify-subscription-terminated-soap.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -523,7 +523,7 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response, _ := siri.NewXMLNotifySubscriptionTerminatedFromContent(content)
+	response, _ := sxml.NewXMLNotifySubscriptionTerminatedFromContent(content)
 
 	partners := createTestPartnerManager()
 
@@ -541,7 +541,7 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	subscription := partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	subscription := partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	subscription.Save()
 
 	if _, ok := partner.Subscriptions().Find("6ba7b814-9dad-11d1-0-00c04fd430c8"); !ok {

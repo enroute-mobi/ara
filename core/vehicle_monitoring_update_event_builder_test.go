@@ -6,10 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
-func getvm(t *testing.T, filePath string) *siri.XMLVehicleMonitoringResponse {
+func getvm(t *testing.T, filePath string) *sxml.XMLVehicleMonitoringResponse {
 	file, err := os.Open(filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -19,7 +19,7 @@ func getvm(t *testing.T, filePath string) *siri.XMLVehicleMonitoringResponse {
 	if err != nil {
 		t.Fatal(err)
 	}
-	response, err := siri.NewXMLVehicleMonitoringResponseFromContent(content)
+	response, err := sxml.NewXMLVehicleMonitoringResponseFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

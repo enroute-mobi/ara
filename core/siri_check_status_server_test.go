@@ -8,7 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -34,7 +34,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLCheckStatusRequestFromContent(content)
+	request, err := sxml.NewXMLCheckStatusRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

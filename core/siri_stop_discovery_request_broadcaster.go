@@ -4,13 +4,11 @@ import (
 	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
-	clock.ClockConsumer
-
 	connector
 }
 
@@ -23,7 +21,7 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 	return connector
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *siri.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *sxml.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
 	response := &siri.SIRIStopPointsDiscoveryResponse{
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),

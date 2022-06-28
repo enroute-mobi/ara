@@ -8,7 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -66,7 +66,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopPointsDiscoveryRequestFromContent(content)
+	request, err := sxml.NewXMLStopPointsDiscoveryRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +165,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	if err != nil {
 		t.Fatal(err)
 	}
-	request, err := siri.NewXMLStopPointsDiscoveryRequestFromContent(content)
+	request, err := sxml.NewXMLStopPointsDiscoveryRequestFromContent(content)
 	if err != nil {
 		t.Fatal(err)
 	}

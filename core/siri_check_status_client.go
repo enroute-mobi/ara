@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type CheckStatusClient interface {
@@ -13,6 +13,8 @@ type CheckStatusClient interface {
 }
 
 type TestCheckStatusClient struct {
+	connector
+
 	partnerStatus PartnerStatus
 	Done          chan bool
 }
@@ -20,8 +22,6 @@ type TestCheckStatusClient struct {
 type TestCheckStatusClientFactory struct{}
 
 type SIRICheckStatusClient struct {
-	clock.ClockConsumer
-
 	connector
 }
 
@@ -124,7 +124,7 @@ func (connector *SIRICheckStatusClient) logSIRICheckStatusRequest(message *audit
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLCheckStatusResponse(message *audit.BigQueryMessage, response *siri.XMLCheckStatusResponse) {
+func logXMLCheckStatusResponse(message *audit.BigQueryMessage, response *sxml.XMLCheckStatusResponse) {
 	if !response.Status() {
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorString()

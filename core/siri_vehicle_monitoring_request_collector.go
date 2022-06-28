@@ -4,10 +4,9 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type VehicleMonitoringRequestCollector interface {
@@ -15,9 +14,6 @@ type VehicleMonitoringRequestCollector interface {
 }
 
 type SIRIVehicleMonitoringRequestCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	updateSubscriber UpdateSubscriber
@@ -85,7 +81,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 
 	updateEvents := builder.UpdateEvents()
 
-	// Log MonitoringRefs
+	// Log VehicleRefs
 	logVehicleRefs(message, updateEvents.VehicleRefs)
 
 	// Broadcast all events
@@ -144,7 +140,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) logSIRIVehicleMonitoring
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *siri.XMLVehicleMonitoringResponse) {
+func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *sxml.XMLVehicleMonitoringResponse) {
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))

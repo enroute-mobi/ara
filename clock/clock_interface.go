@@ -45,6 +45,11 @@ func NewFakeClock() clockwork.FakeClock {
 	return NewFakeClockAt(FAKE_CLOCK_INITIAL_DATE)
 }
 
+type ClockInterface interface {
+	SetClock(clockwork.Clock)
+	Clock() clockwork.Clock
+}
+
 type ClockConsumer struct {
 	clock clockwork.Clock
 }

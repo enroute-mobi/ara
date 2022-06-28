@@ -1,7 +1,9 @@
 package core
 
 import (
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 const (
@@ -30,6 +32,7 @@ const (
 	// SIRI_PRODUCTION_TIMETABLE_REQUEST_BROADCASTER      = "siri-production-timetable-request-broadcaster"
 	SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-production-timetable-subscription-broadcaster"
 	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR          = "siri-vehicle-monitoring-request-collector"
+	SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR     = "siri-vehicle-monitoring-subscription-collector"
 	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER               = "siri-subscription-request-dispatcher"
 	SIRI_CHECK_STATUS_CLIENT_TYPE                      = "siri-check-status-client"
 	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
@@ -42,13 +45,21 @@ const (
 	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER              = "gtfs-rt-vehicle-positions-broadcaster"
 )
 
-type Connector interface{}
+type Connector interface {
+	clock.ClockInterface
+	uuid.UUIDInterface
+
+	Partner() *Partner
+}
 
 type GtfsConnector interface {
 	HandleGtfs(*gtfs.FeedMessage)
 }
 
 type connector struct {
+	uuid.UUIDConsumer
+	clock.ClockConsumer
+
 	partner            *Partner
 	remoteObjectidKind string
 }
@@ -108,6 +119,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIProductionTimetableSubscriptionBroadcasterFactory{}
 	case SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIVehicleMonitoringRequestCollectorFactory{}
+	case SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR:
+		return &SIRIVehicleMonitoringSubscriptionCollectorFactory{}
 	case SIRI_CHECK_STATUS_CLIENT_TYPE:
 		return &SIRICheckStatusClientFactory{}
 	case SIRI_SUBSCRIPTION_REQUEST_DISPATCHER:
@@ -134,7 +147,9 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 }
 
 type TestValidationFactory struct{}
-type TestValidationConnector struct{}
+type TestValidationConnector struct {
+	connector
+}
 
 func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) {
 	if apiPartner.Slug == PartnerSlug("invalid_slug") {
@@ -148,6 +163,8 @@ func (factory *TestValidationFactory) CreateConnector(partner *Partner) Connecto
 
 type TestStartableFactory struct{}
 type TestStartableConnector struct {
+	connector
+
 	started bool
 }
 

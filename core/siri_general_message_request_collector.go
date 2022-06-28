@@ -4,10 +4,9 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type GeneralMessageRequestCollector interface {
@@ -17,9 +16,6 @@ type GeneralMessageRequestCollector interface {
 type SIRIGeneralMessageRequestCollectorFactory struct{}
 
 type SIRIGeneralMessageRequestCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	situationUpdateSubscriber SituationUpdateSubscriber
@@ -82,7 +78,7 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *siri.XMLGeneralMessageResponse) {
+func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageResponse) {
 	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
 	builder.SetGeneralMessageResponseUpdateEvents(situationEvents, xmlResponse)
 }
@@ -127,7 +123,7 @@ func (connector *SIRIGeneralMessageRequestCollector) logSIRIGeneralMessageReques
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLGeneralMessageResponse(message *audit.BigQueryMessage, response *siri.XMLGeneralMessageResponse) {
+func logXMLGeneralMessageResponse(message *audit.BigQueryMessage, response *sxml.XMLGeneralMessageResponse) {
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
 	if !response.Status() {

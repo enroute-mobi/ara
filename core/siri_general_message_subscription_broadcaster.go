@@ -6,18 +6,14 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIGeneralMessageSubscriptionBroadcaster struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	generalMessageBroadcaster SIRIGeneralMessageBroadcaster
@@ -102,7 +98,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 	}
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *siri.XMLSubscriptionRequest, message *audit.BigQueryMessage) []siri.SIRIResponseStatus {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) []siri.SIRIResponseStatus {
 	resps := []siri.SIRIResponseStatus{}
 
 	var subIds []string
@@ -182,7 +178,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *S
 type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 
 type TestGeneralMessageSubscriptionBroadcaster struct {
-	uuid.UUIDConsumer
+	connector
 
 	events []*model.GeneralMessageBroadcastEvent
 	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster

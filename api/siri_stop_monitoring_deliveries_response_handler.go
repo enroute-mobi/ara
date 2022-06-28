@@ -7,11 +7,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIStopMonitoringRequestDeliveriesResponseHandler struct {
-	xmlRequest  *siri.XMLNotifyStopMonitoring
+	xmlRequest  *sxml.XMLNotifyStopMonitoring
 	referential *core.Referential
 }
 

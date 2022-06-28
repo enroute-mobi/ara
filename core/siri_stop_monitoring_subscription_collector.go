@@ -1,16 +1,12 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopMonitoringSubscriptionCollector interface {
@@ -18,13 +14,10 @@ type StopMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
-	HandleNotifyStopMonitoring(delivery *siri.XMLNotifyStopMonitoring)
+	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring)
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	deletedSubscriptions     *DeletedSubscriptions
@@ -78,7 +71,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectid.String(), "StopMonitoringCollect")
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectid.String(), StopMonitoringCollect)
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
 			resource := subscription.Resource(stopAreaObjectid)
@@ -94,7 +87,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	}
 
 	// Else we find or create a subscription to add the resource
-	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind("StopMonitoringCollect")
+	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	ref := model.Reference{
 		ObjectId: &stopAreaObjectid,
 		Type:     "StopArea",
@@ -107,8 +100,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *siri.XMLNotifyStopMonitoring) {
-	monitoringRefMap := make(map[string]struct{})
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
@@ -124,7 +116,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			}
 			continue
 		}
-		if subscription.Kind() != "StopMonitoringCollect" {
+		if subscription.Kind() != StopMonitoringCollect {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
@@ -143,46 +135,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		builder.SetStopVisitCancellationEvents(delivery)
 		updateEvents := builder.UpdateEvents()
 
-		// Copy MonitoringRefs for global log
-		for k := range updateEvents.MonitoringRefs {
-			monitoringRefMap[k] = struct{}{}
-		}
-
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
 	for subId := range subToDelete {
-		connector.cancelSubscription(subId)
+		CancelSubscription(subId, "StopMonitoringSubscriptionCollector", connector)
 	}
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) cancelSubscription(subId string) {
-	message := connector.newBQEvent()
-	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
-
-	request := &siri.SIRIDeleteSubscriptionRequest{
-		RequestTimestamp:  connector.Clock().Now(),
-		SubscriptionRef:   subId,
-		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
-	}
-	logSIRIDeleteSubscriptionRequest(message, request, "StopMonitoringSubscriptionCollector", connector.Partner().SIRIEnvelopeType())
-
-	startTime := connector.Clock().Now()
-	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
-
-	responseTime := connector.Clock().Since(startTime)
-	message.ProcessingTime = responseTime.Seconds()
-
-	if err != nil {
-		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
-		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
-
-		message.Status = "Error"
-		message.ErrorDetails = e
-		return
-	}
-	logXMLDeleteSubscriptionResponse(message, response)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
@@ -206,42 +164,4 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(
 	for _, e := range events.Cancellations {
 		connector.updateSubscriber(e)
 	}
-}
-
-func (connector *SIRIStopMonitoringSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
-	return &audit.BigQueryMessage{
-		Protocol:  "siri",
-		Direction: "sent",
-		Partner:   string(connector.partner.Slug()),
-		Status:    "OK",
-	}
-}
-
-func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType, envelopeType string) {
-	message.Type = "DeleteSubscriptionRequest"
-	message.RequestIdentifier = request.MessageIdentifier
-	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
-
-	xml, err := request.BuildXML(envelopeType)
-	if err != nil {
-		return
-	}
-	message.RequestRawMessage = xml
-	message.RequestSize = int64(len(xml))
-}
-
-func logXMLDeleteSubscriptionResponse(message *audit.BigQueryMessage, response *siri.XMLDeleteSubscriptionResponse) {
-	var i int
-	for _, responseStatus := range response.ResponseStatus() {
-		if !responseStatus.Status() {
-			i++
-		}
-	}
-
-	if i > 0 {
-		message.Status = "Error"
-		message.ErrorDetails = fmt.Sprintf("%d ResponseStatus returned false", i)
-	}
-	message.ResponseRawMessage = response.RawXML()
-	message.ResponseSize = int64(len(message.ResponseRawMessage))
 }

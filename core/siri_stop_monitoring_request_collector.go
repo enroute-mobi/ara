@@ -4,11 +4,10 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
-	"bitbucket.org/enroute-mobi/ara/uuid"
+	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type StopMonitoringRequestCollector interface {
@@ -16,15 +15,12 @@ type StopMonitoringRequestCollector interface {
 }
 
 type TestStopMonitoringRequestCollector struct {
-	uuid.UUIDConsumer
+	connector
 }
 
 type TestStopMonitoringRequestCollectorFactory struct{}
 
 type SIRIStopMonitoringRequestCollector struct {
-	clock.ClockConsumer
-	uuid.UUIDConsumer
-
 	connector
 
 	updateSubscriber UpdateSubscriber
@@ -203,7 +199,7 @@ func (connector *SIRIStopMonitoringRequestCollector) logSIRIStopMonitoringReques
 	message.RequestSize = int64(len(xml))
 }
 
-func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *siri.XMLStopMonitoringResponse) {
+func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *sxml.XMLStopMonitoringResponse) {
 	for _, delivery := range response.StopMonitoringDeliveries() {
 		if !delivery.Status() {
 			message.Status = "Error"

@@ -1,16 +1,12 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"bitbucket.org/enroute-mobi/ara/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type GeneralMessageSubscriptionCollector interface {
@@ -19,13 +15,10 @@ type GeneralMessageSubscriptionCollector interface {
 
 	RequestAllSituationsUpdate()
 	RequestSituationUpdate(kind string, requestedId model.ObjectID)
-	HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage)
+	HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage)
 }
 
 type SIRIGeneralMessageSubscriptionCollector struct {
-	uuid.UUIDConsumer
-	clock.ClockConsumer
-
 	connector
 
 	deletedSubscriptions      *DeletedSubscriptions
@@ -72,7 +65,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUp
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedObjectId model.ObjectID) {
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByResourceId(requestedObjectId.String(), "GeneralMessageCollect")
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(requestedObjectId.String(), GeneralMessageCollect)
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
 			resource := subscription.Resource(requestedObjectId)
@@ -88,7 +81,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	}
 
 	// Else we find or create a subscription to add the resource
-	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind("GeneralMessageCollect")
+	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(GeneralMessageCollect)
 	ref := model.Reference{
 		ObjectId: &requestedObjectId,
 	}
@@ -102,7 +95,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	newSubscription.CreateAddNewResource(ref)
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *siri.XMLNotifyGeneralMessage) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
@@ -121,7 +114,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 			continue
 		}
 
-		if subscription.Kind() != "GeneralMessageCollect" {
+		if subscription.Kind() != GeneralMessageCollect {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
@@ -134,41 +127,11 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	}
 
 	for subId := range subToDelete {
-		connector.cancelSubscription(subId)
+		CancelSubscription(subId, "GeneralMessageSubscriptionCollector", connector)
 	}
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) cancelSubscription(subId string) {
-	message := connector.newBQEvent()
-	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
-
-	request := &siri.SIRIDeleteSubscriptionRequest{
-		RequestTimestamp:  connector.Clock().Now(),
-		SubscriptionRef:   subId,
-		RequestorRef:      connector.partner.ProducerRef(),
-		MessageIdentifier: connector.Partner().NewMessageIdentifier(),
-	}
-
-	logSIRIDeleteSubscriptionRequest(message, request, "GeneralMessageSubscriptionCollector", connector.Partner().SIRIEnvelopeType())
-	startTime := connector.Clock().Now()
-	response, err := connector.Partner().SIRIClient().DeleteSubscription(request)
-
-	responseTime := connector.Clock().Since(startTime)
-	message.ProcessingTime = responseTime.Seconds()
-
-	if err != nil {
-		logger.Log.Debugf("Error while terminating subcription with id : %v error : %v", subId, err.Error())
-		e := fmt.Sprintf("Error during DeleteSubscription: %v", err)
-
-		message.Status = "Error"
-		message.ErrorDetails = e
-		return
-	}
-
-	logXMLDeleteSubscriptionResponse(message, response)
-}
-
-func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *siri.XMLGeneralMessageDelivery) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *sxml.XMLGeneralMessageDelivery) {
 	xmlGmCancellations := xmlResponse.XMLGeneralMessagesCancellations()
 
 	if len(xmlGmCancellations) == 0 {
@@ -196,14 +159,5 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) SetSituationUpdateSubs
 func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 	if connector.situationUpdateSubscriber != nil {
 		connector.situationUpdateSubscriber(event)
-	}
-}
-
-func (connector *SIRIGeneralMessageSubscriptionCollector) newBQEvent() *audit.BigQueryMessage {
-	return &audit.BigQueryMessage{
-		Protocol:  "siri",
-		Direction: "sent",
-		Partner:   string(connector.partner.Slug()),
-		Status:    "OK",
 	}
 }
