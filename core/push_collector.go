@@ -158,6 +158,7 @@ func (pc *PushCollector) handleVehicles(vs []*em.ExternalVehicle) (vehicles []st
 		event.Longitude = v.GetLongitude()
 		event.Latitude = v.GetLatitude()
 		event.Bearing = v.GetBearing()
+		event.RecordedAt = v.GetRecordedAt().AsTime()
 
 		vehicles = append(vehicles, v.GetObjectid())
 

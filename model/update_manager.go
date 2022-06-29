@@ -273,7 +273,12 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	vehicle.LinkDistance = event.LinkDistance
 	vehicle.Percentage = event.Percentage
 	vehicle.ValidUntilTime = event.ValidUntilTime
-	vehicle.RecordedAtTime = manager.Clock().Now()
+	if event.RecordedAt.IsZero() {
+		vehicle.RecordedAtTime = manager.Clock().Now()
+	} else {
+		vehicle.RecordedAtTime = event.RecordedAt
+	}
+
 	vehicle.Attributes.Set("Occupancy", event.Attributes()["Occupancy"])
 
 	if line != nil {
