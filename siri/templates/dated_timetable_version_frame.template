@@ -1,7 +1,7 @@
 <siri:DatedTimetableVersionFrame>
 				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
-				<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionRef }}
-				<siri:DirectionRef>{{ .Attributes.DirectionRef }}</siri:DirectionRef>{{ else }}
+				<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Attributes.DirectionType }}
+				<siri:DirectionRef>{{ .Attributes.DirectionType }}</siri:DirectionRef>{{ else }}
 				<siri:DirectionRef/>{{ end }}
 				<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
 				<siri:DatedVehicleJourney>

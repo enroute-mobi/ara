@@ -63,6 +63,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ModelName:       "2017-01-01",
 		Name:            "vehicleJourney",
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		DirectionType:   "",
 		ObjectIDs:       "{}",
 		Attributes:      "{}",
 		References:      "{}",

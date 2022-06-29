@@ -25,7 +25,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionType]           | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
@@ -172,7 +172,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Retour                                  |
+      | Attribute[DirectionType]           | Retour                                  |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
@@ -296,7 +296,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionType]           | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a minute has passed
     And I send this SIRI request
@@ -375,7 +375,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "didok": "NINOXE:VehicleJourney:201"    |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionType]           | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "internal": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
     # "6ba7b814-9dad-11d1-6-00c04fd430c8"
@@ -486,7 +486,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionType]           | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a minute has passed
     And I send this SIRI request

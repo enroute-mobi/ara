@@ -119,6 +119,7 @@ type DatabaseVehicleJourney struct {
 	LineId          string `db:"line_id"`
 	OriginName      string `db:"origin_name"`
 	DestinationName string `db:"destination_name"`
+	DirectionType   string `db:"direction_type"`
 	Attributes      string `db:"attributes"`
 	References      string `db:"siri_references"`
 }

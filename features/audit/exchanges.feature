@@ -368,7 +368,7 @@ Feature: Audit API exchanges
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionType]           | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast            |

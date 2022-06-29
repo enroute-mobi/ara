@@ -14,6 +14,7 @@ type VehicleJourneyUpdateEvent struct {
 	DestinationRef  string
 	DestinationName string
 	Direction       string
+	DirectionType   string
 	Occupancy       string
 	Monitored       bool
 
@@ -41,6 +42,8 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 		return ue.attributes
 	}
 
+	ue.DirectionType = ue.SiriXML.DirectionRef()
+
 	ue.attributes.Set("Delay", ue.SiriXML.Delay())
 	ue.attributes.Set("Bearing", ue.SiriXML.Bearing())
 	ue.attributes.Set("InPanic", ue.SiriXML.InPanic())
@@ -61,7 +64,6 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set("VehicleMode", ue.SiriXML.VehicleMode())
 	ue.attributes.Set("ViaPlaceName", ue.SiriXML.ViaPlaceName())
 	ue.attributes.Set("VehicleJourneyName", ue.SiriXML.VehicleJourneyName())
-	ue.attributes.Set("DirectionRef", ue.SiriXML.DirectionRef())
 	ue.attributes.Set("DestinationName", ue.SiriXML.DestinationName())
 	ue.attributes.Set("OriginName", ue.SiriXML.OriginName())
 

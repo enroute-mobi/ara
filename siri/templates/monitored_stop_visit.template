@@ -3,8 +3,8 @@
 				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
 				<siri:MonitoringRef>{{ .MonitoringRef }}</siri:MonitoringRef>
 				<siri:MonitoredVehicleJourney>{{ if .LineRef }}
-					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DirectionRef }}
-					<siri:DirectionRef>{{ .Attributes.VehicleJourneyAttributes.DirectionRef }}</siri:DirectionRef>{{ end }}{{ if or .DatedVehicleJourneyRef .DataFrameRef }}
+					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DirectionType }}
+					<siri:DirectionRef>{{ .Attributes.VehicleJourneyAttributes.DirectionType }}</siri:DirectionRef>{{ end }}{{ if or .DatedVehicleJourneyRef .DataFrameRef }}
 					<siri:FramedVehicleJourneyRef>{{ if .DataFrameRef }}
 						<siri:DataFrameRef>{{ .DataFrameRef }}</siri:DataFrameRef>{{ end }}{{ if .DatedVehicleJourneyRef }}
 						<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ end }}

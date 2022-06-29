@@ -452,7 +452,7 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[Delay]                       | 30                                              |
       | DestinationName                        | Cimetière des Sauvages                          |
       | Attribute[DirectionName]               | Mago-Cime OMNI                                  |
-      | Attribute[DirectionRef]                | Aller                                           |
+      | Attribute[DirectionType]               | Aller                                           |
       | Attribute[FirstOrLastJourney]          | first                                           |
       | Attribute[HeadwayService]              | false                                           |
       | Attribute[InCongestion]                | false                                           |
@@ -509,7 +509,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3      | StopVisit#ObjectID                                    |
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                  | StopArea#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                           | Line#ObjectID                                         |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                       | VehicleJourney#Attribute[DirectionRef]                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                       | VehicleJourney#Attribute[DirectionType]               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                           | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                   | VehicleJourney#ObjectID                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                           | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
@@ -600,7 +600,7 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[Delay]                       | 30                                              |
       | DestinationName                        | Cimetière des Sauvages                          |
       | Attribute[DirectionName]               | Mago-Cime OMNI                                  |
-      | Attribute[DirectionRef]                | Aller                                           |
+      | Attribute[DirectionType]               | Aller                                           |
       | Attribute[FirstOrLastJourney]          | first                                           |
       | Attribute[HeadwayService]              | false                                           |
       | Attribute[InCongestion]                | false                                           |
@@ -658,7 +658,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3               | StopVisit#ObjectID                                    |
       | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                           | StopArea#ObjectID                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                                    | Line#ObjectID                                         |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                | VehicleJourney#Attribute[DirectionRef]                |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                | VehicleJourney#Attribute[DirectionType]               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                    | Model#Date                                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                            | VehicleJourney#ObjectID                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
