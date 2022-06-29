@@ -150,6 +150,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.Attributes.Set("DirectionName", event.Direction)
 	}
 
+	vj.Occupancy = event.Occupancy
 	vj.Monitored = event.Monitored
 
 	manager.model.VehicleJourneys().Save(vj)
@@ -278,8 +279,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	} else {
 		vehicle.RecordedAtTime = event.RecordedAt
 	}
-
-	vehicle.Attributes.Set("Occupancy", event.Attributes()["Occupancy"])
+	vehicle.Occupancy = event.Occupancy
 
 	if line != nil {
 		vehicle.LineId = line.Id()

@@ -129,6 +129,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
+		Occupancy:              vehicleJourney.Occupancy,
 		RecordedAt:             stopVisit.RecordedAt,
 		PublishedLineName:      line.Name,
 		DepartureStatus:        string(stopVisit.DepartureStatus),

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type VehicleUpdateEvent struct {
 	Origin string
@@ -9,6 +11,7 @@ type VehicleUpdateEvent struct {
 	StopAreaObjectId       ObjectID
 	VehicleJourneyObjectId ObjectID
 	DriverRef              string
+	Occupancy              string
 	LinkDistance           float64
 	Percentage             float64
 	Longitude              float64
@@ -16,23 +19,12 @@ type VehicleUpdateEvent struct {
 	Bearing                float64
 	ValidUntilTime         time.Time
 	RecordedAt             time.Time
-
-	attributes Attributes
 }
 
 func NewVehicleUpdateEvent() *VehicleUpdateEvent {
-	return &VehicleUpdateEvent{
-		attributes: NewAttributes(),
-	}
+	return &VehicleUpdateEvent{}
 }
 
 func (ue *VehicleUpdateEvent) EventKind() EventKind {
 	return VEHICLE_EVENT
-}
-
-func (ue *VehicleUpdateEvent) Attributes() Attributes {
-	if ue.attributes == nil {
-		ue.attributes = NewAttributes()
-	}
-	return ue.attributes
 }

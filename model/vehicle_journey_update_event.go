@@ -14,6 +14,7 @@ type VehicleJourneyUpdateEvent struct {
 	DestinationRef  string
 	DestinationName string
 	Direction       string
+	Occupancy       string
 	Monitored       bool
 
 	ObjectidKind string
@@ -51,7 +52,6 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set("JourneyNote", ue.SiriXML.JourneyNote())
 	ue.attributes.Set("JourneyPatternName", ue.SiriXML.JourneyPatternName())
 	ue.attributes.Set("MonitoringError", ue.SiriXML.MonitoringError())
-	ue.attributes.Set("Occupancy", ue.SiriXML.Occupancy())
 	ue.attributes.Set("OriginAimedDepartureTime", ue.SiriXML.OriginAimedDepartureTime())
 	ue.attributes.Set("DestinationAimedArrivalTime", ue.SiriXML.DestinationAimedArrivalTime())
 	ue.attributes.Set("ProductCategoryRef", ue.SiriXML.ProductCategoryRef())

@@ -447,6 +447,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
       | LineId                                 | 6ba7b814-9dad-11d1-6-00c04fd430c8               |
       | Monitored                              | true                                            |
+      | Occupancy                              | MANY_SEATS_AVAILABLE                            |
       | Attribute[Bearing]                     | N                                               |
       | Attribute[Delay]                       | 30                                              |
       | DestinationName                        | Cimetière des Sauvages                          |
@@ -459,7 +460,6 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[JourneyNote]                 | Note de test                                    |
       | Attribute[JourneyPatternName]          | TEST                                            |
       | Attribute[MonitoringError]             | false                                           |
-      | Attribute[Occupancy]                   | seatsAvailable                                  |
       | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:54:52.977Z                        |
       | Attribute[DestinationAimedArrivalTime] | 2016-09-22T09:54:52.977Z                        |
       | OriginName                             | Magicien Noir                                   |
@@ -536,7 +536,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney                                           | first                                                       | VehicleJourney#Attribute[FirstOrLastJourney]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored                                                    | true                                                        | VehicleJourney#Attribute[Monitored]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError                                              | false                                                       | VehicleJourney#Attribute[MonitoringError]             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | seatsAvailable                                              | VehicleJourney#Attribute[Occupancy]                   |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | MANY_SEATS_AVAILABLE                                        | VehicleJourney#Occupancy                              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                                                        | 30                                                          | VehicleJourney#Attribute[Delay]                       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Bearing                                                      | N                                                           | VehicleJourney#Attribute[Bearing]                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InPanic                                                      | false                                                       | VehicleJourney#Attribute[InPanic]                     |
@@ -685,7 +685,6 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney                                           | first                                                                | VehicleJourney#Attribute[FirstOrLastJourney]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored                                                    | true                                                                 | VehicleJourney#Attribute[Monitored]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError                                              | false                                                                | VehicleJourney#Attribute[MonitoringError]             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | seatsAvailable                                                       | VehicleJourney#Attribute[Occupancy]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                                                        | 30                                                                   | VehicleJourney#Attribute[Delay]                       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Bearing                                                      | N                                                                    | VehicleJourney#Attribute[Bearing]                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InPanic                                                      | false                                                                | VehicleJourney#Attribute[InPanic]                     |
@@ -1438,20 +1437,20 @@ Feature: Support SIRI StopMonitoring by request
   @ARA-1044
   Scenario: Handle a SIRI StopMonitoring request with unmatching objectid kind
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | local_credential     | test     |
-      | remote_objectid_kind | wrong    |
+      | local_credential     | test  |
+      | remote_objectid_kind | wrong |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                  |
+      | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Monitored | true                                  |
+      | Monitored | true                                     |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                |
+      | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                           |
+      | Name      | Passage 32                              |
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
-      | Monitored | true                                 |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "other": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                 |
@@ -1597,12 +1596,12 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder                    | 4                                                                 |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                 |
-      | VehicleAtStop                   | true                                                              |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                          |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1638,8 +1637,8 @@ Feature: Support SIRI StopMonitoring by request
   @ARA-1044
   Scenario: Handle a SIRI StopMonitoring request with multiple connector setting siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | local_credential                                                              | test     |
-      | remote_objectid_kind                                                          | internal |
+      | local_credential                                                              | test          |
+      | remote_objectid_kind                                                          | internal      |
       | siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind | other, other2 |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -1655,12 +1654,12 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | PassageOrder                    | 4                                                                 |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                 |
-      | VehicleAtStop                   | true                                                              |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                |
-      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                          |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1700,12 +1699,12 @@ Feature: Support SIRI StopMonitoring by request
       | remote_objectid_kind                                          | internal |
       | siri-stop-monitoring-request-broadcaster.remote_objectid_kind | other    |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | ObjectIDs | "other": "NINOXE:StopPoint:SP:24:LOC"    |
-      | Monitored | true                                     |
+      | Name      | Test                                  |
+      | ObjectIDs | "other": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                  |
     And a Line exists with the following attributes:
-      | ObjectIDs | "other": "NINOXE:Line:3:LOC"    |
-      | Name      | Ligne 3 Metro                   |
+      | ObjectIDs | "other": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                           |
       | ObjectIDs | "other": "NINOXE:VehicleJourney:201" |

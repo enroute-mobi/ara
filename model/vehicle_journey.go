@@ -22,6 +22,7 @@ type VehicleJourney struct {
 	Name            string `json:",omitempty"`
 	OriginName      string `json:",omitempty"`
 	DestinationName string `json:",omitempty"`
+	Occupancy       string `json:",omitempty"`
 
 	Monitored bool
 

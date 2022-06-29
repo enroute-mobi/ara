@@ -224,9 +224,12 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_objectid_kind | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | ObjectIDs            | "internal": "bus-234"             |
-      | VehicleJourneyId     | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Attribute[Occupancy] | FEW_SEATS_AVAILABLE               |
+      | ObjectIDs        | "internal": "bus-234"             |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Occupancy        | FEW_SEATS_AVAILABLE               |
+    And one VehicleJourney has the following attributes:
+      | ObjectIDs | "internal": "270856" |
+      | Occupancy | FEW_SEATS_AVAILABLE  |
 
   @ARA-1047
   Scenario: Collect GTFS VehiclePosition (with stop_id)

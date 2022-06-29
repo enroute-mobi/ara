@@ -31,6 +31,7 @@ type Vehicle struct {
 	LinkDistance   float64   `json:",omitempty"`
 	Percentage     float64   `json:",omitempty"`
 	DriverRef      string    `json:",omitempty"`
+	Occupancy      string    `json:",omitempty"`
 	ValidUntilTime time.Time `json:",omitempty"`
 
 	RecordedAtTime time.Time
@@ -66,6 +67,7 @@ func (vehicle *Vehicle) copy() *Vehicle {
 		Percentage:       vehicle.Percentage,
 		DriverRef:        vehicle.DriverRef,
 		ValidUntilTime:   vehicle.ValidUntilTime,
+		Occupancy:        vehicle.Occupancy,
 		RecordedAtTime:   vehicle.RecordedAtTime,
 		Attributes:       vehicle.Attributes.Copy(),
 	}
