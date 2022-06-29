@@ -314,7 +314,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | Delayed                  |
-    And 10 seconds have passed
+    And 5 seconds have passed
     Then the SIRI server should receive this response
       """
       <?xml version='1.0' encoding='utf-8'?>
@@ -322,20 +322,20 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 <S:Body>
 <sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
   <ServiceDeliveryInfo>
-    <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+    <siri:ResponseTimestamp>2017-01-01T12:00:15.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
     <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-      <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+      <siri:ResponseTimestamp>2017-01-01T12:00:15.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
-        <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
+        <siri:RecordedAtTime>2017-01-01T12:00:15.000Z</siri:RecordedAtTime>
         <siri:EstimatedVehicleJourney>
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
@@ -366,7 +366,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | ArrivalStatus                | arrived                  |
       | DepartureStatus              | departed                 |
       | Schedule[expected]#Departure | 2017-01-01T15:01:11.000Z |
-    And 20 seconds have passed
+    And 5 seconds have passed
     Then the SIRI server should receive this response
       """
       <?xml version='1.0' encoding='utf-8'?>
@@ -374,20 +374,20 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 <S:Body>
 <sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
   <ServiceDeliveryInfo>
-    <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+    <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
     <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-      <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
+      <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
-        <siri:RecordedAtTime>2017-01-01T12:00:40.000Z</siri:RecordedAtTime>
+        <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
         <siri:EstimatedVehicleJourney>
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
