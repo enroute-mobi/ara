@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 
 	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -115,11 +116,20 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "text/xml; charset=utf-8")
 
+	m := &audit.BigQueryMessage{
+		Protocol:    "siri",
+		Direction:   "received",
+		IPAddress:   handler.HandleRemoteAddress(request),
+		RequestSize: request.ContentLength,
+	}
+
 	if handler.referential == nil {
 		SIRIError{
 			errCode:        "NotFound",
 			errDescription: "Referential not found",
+			request:        dumpRequest(request),
 			response:       response,
+			message:        m,
 		}.Send()
 		return
 	}
@@ -133,7 +143,9 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 				errCode:         "Client",
 				errDescription:  "Can't unzip request",
 				referentialSlug: string(handler.referential.Slug()),
+				request:         dumpRequest(request),
 				response:        response,
+				message:         m,
 			}.Send()
 			return
 		}
@@ -149,7 +161,9 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 			errCode:         "Client",
 			errDescription:  fmt.Sprintf("Invalid Request: %v", err),
 			referentialSlug: string(handler.referential.Slug()),
+			request:         dumpRequest(request),
 			response:        response,
+			message:         m,
 		}.Send()
 		return
 	}
@@ -162,6 +176,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 			referentialSlug: string(handler.referential.Slug()),
 			request:         envelope.Body().String(),
 			response:        response,
+			message:         m,
 		}.Send()
 		return
 	}
@@ -173,6 +188,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 			referentialSlug: string(handler.referential.Slug()),
 			request:         envelope.Body().String(),
 			response:        response,
+			message:         m,
 		}.Send()
 		return
 	}
@@ -184,9 +200,13 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 			referentialSlug: string(handler.referential.Slug()),
 			request:         envelope.Body().String(),
 			response:        response,
+			message:         m,
 		}.Send()
 		return
 	}
+
+	m.Partner = string(partner.Slug())
+
 	connector, ok := partner.Connector(requestHandler.ConnectorType())
 	if !ok {
 		SIRIError{
@@ -195,18 +215,12 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 			referentialSlug: string(handler.referential.Slug()),
 			request:         envelope.Body().String(),
 			response:        response,
+			message:         m,
 		}.Send()
 		return
 	}
 
-	m := &audit.BigQueryMessage{
-		Protocol:    "siri",
-		Direction:   "received",
-		Partner:     string(partner.Slug()),
-		IPAddress:   handler.HandleRemoteAddress(request),
-		RequestSize: request.ContentLength,
-		Status:      "OK",
-	}
+	m.Status = "OK"
 
 	params := HandlerParams{
 		connector:    connector,
@@ -216,4 +230,12 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	requestHandler.Respond(params)
+}
+
+func dumpRequest(r *http.Request) string {
+	d, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		return ""
+	}
+	return string(d)
 }
