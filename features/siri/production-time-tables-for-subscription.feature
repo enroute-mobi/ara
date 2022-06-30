@@ -172,7 +172,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      # | Attribute[DirectionRef]            | Aller                                   |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
@@ -244,7 +244,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>Aller</DirectionRef>
+        <DirectionRef>unknown</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
