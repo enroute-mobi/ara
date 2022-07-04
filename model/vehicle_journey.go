@@ -81,6 +81,9 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(vehicleJourney),
 	}
 
+	if vehicleJourney.DirectionType != "" {
+		aux.DirectionType = vehicleJourney.DirectionType
+	}
 	if !vehicleJourney.ObjectIDs().Empty() {
 		aux.ObjectIDs = vehicleJourney.ObjectIDs()
 	}
@@ -281,6 +284,9 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 		}
 		if vj.DestinationName.Valid {
 			vehicleJourney.DestinationName = vj.DestinationName.String
+		}
+		if vj.DirectionType.Valid {
+			vehicleJourney.DirectionType = vj.DirectionType.String
 		}
 
 		if vj.Attributes.Valid && len(vj.Attributes.String) > 0 {
