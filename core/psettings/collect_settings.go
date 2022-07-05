@@ -3,7 +3,8 @@ package psettings
 import "bitbucket.org/enroute-mobi/ara/logger"
 
 type CollectSettings struct {
-	UseDiscovered bool
+	UseDiscoveredSA    bool
+	UseDiscoveredLines bool
 
 	includedSA    collection
 	excludedSA    collection
@@ -39,7 +40,7 @@ func (c collection) atLeastOneNotInCollection(m map[string]struct{}) bool {
 }
 
 func (cs *CollectSettings) Empty() bool {
-	return len(cs.includedSA) == 0 && len(cs.excludedSA) == 0 && len(cs.includedLines) == 0 && len(cs.excludedLines) == 0 && !cs.UseDiscovered
+	return len(cs.includedSA) == 0 && len(cs.excludedSA) == 0 && len(cs.includedLines) == 0 && len(cs.excludedLines) == 0 && !cs.UseDiscoveredSA && !cs.UseDiscoveredLines
 }
 
 func (cs *CollectSettings) IncludeStop(s string) bool {

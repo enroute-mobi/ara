@@ -199,6 +199,20 @@ func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryReq
 	return stopDiscovery, nil
 }
 
+func (client *SIRIClient) LineDiscovery(request *siri.SIRILinesDiscoveryRequest) (*sxml.XMLLinesDiscoveryResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:          request,
+		expectedResponse: "LinesDiscoveryResponse",
+		acceptGzip:       true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	stopDiscovery := sxml.NewXMLLinesDiscoveryResponse(node)
+	return stopDiscovery, nil
+}
+
 func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*sxml.XMLStopMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,

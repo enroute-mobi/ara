@@ -1,9 +1,9 @@
-Feature: Support SIRI StopLinesDiscovery
+Feature: Support SIRI LinesDiscovery
 
   Background:
     Given a Referential "test" is created
 
-  Scenario: 4397 - Handle a SIRI StopLinesDiscovery request
+  Scenario: 4397 - Handle a SIRI LinesDiscovery request
     Given a Partner "test" exists with connectors [siri-lines-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
@@ -67,3 +67,40 @@ Feature: Support SIRI StopLinesDiscovery
         </S:Body>
       </S:Envelope>
       """
+
+  Scenario: LinesDiscovery collect
+    Given a SIRI server waits LinesDiscovery request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+      <siri:Status>true</siri:Status>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:6:LOC</siri:LineRef>
+          <siri:Monitored>true</siri:Monitored>
+          <siri:LineName>Test</siri:LineName>
+        </siri:AnnotatedLineRef>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:7:LOC</siri:LineRef>
+          <siri:Monitored>true</siri:Monitored>
+          <siri:LineName>Test 3</siri:LineName>
+          <siri:Lines>
+            <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
+          </siri:Lines>
+        </siri:AnnotatedLineRef>
+      </Answer>
+      <AnswerExtension/>
+    </sw:LinesDiscoveryResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-lines-discovery-request-collector] and the following settings:
+      | remote_url                 | http://localhost:8090      |
+      | remote_credential          | test                       |
+      | remote_objectid_kind       | internal                   |
+    And a minute has passed
+    Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
+    And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist

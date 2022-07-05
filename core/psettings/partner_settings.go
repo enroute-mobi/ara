@@ -35,6 +35,7 @@ const (
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
 	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
+	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
@@ -388,11 +389,12 @@ func (s *PartnerSettings) CollectSettings() *CollectSettings {
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) SetCollectSettings() {
 	s.cs = &CollectSettings{
-		UseDiscovered: s.s[COLLECT_USE_DISCOVERED_SA] != "",
-		includedSA:    toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
-		excludedSA:    toMap(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
-		includedLines: toMap(s.s[COLLECT_INCLUDE_LINES]),
-		excludedLines: toMap(s.s[COLLECT_EXCLUDE_LINES]),
+		UseDiscoveredSA:    s.s[COLLECT_USE_DISCOVERED_SA] != "",
+		UseDiscoveredLines: s.s[COLLECT_USE_DISCOVERED_LINES] != "",
+		includedSA:         toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
+		excludedSA:         toMap(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
+		includedLines:      toMap(s.s[COLLECT_INCLUDE_LINES]),
+		excludedLines:      toMap(s.s[COLLECT_EXCLUDE_LINES]),
 	}
 }
 
