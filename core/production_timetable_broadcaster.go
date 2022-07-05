@@ -242,6 +242,14 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(st
 			return referent, referentObjectId.Value(), true
 		}
 	}
+	parent, ok := stopPointRef.Parent()
+	if ok {
+		parentObjectId, ok := parent.ObjectID(connector.remoteObjectidKind)
+		if ok {
+			return parent, parentObjectId.Value(), true
+		}
+	}
+
 	return &model.StopArea{}, "", false
 }
 
