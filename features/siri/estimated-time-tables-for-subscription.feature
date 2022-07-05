@@ -484,7 +484,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      # | Attribute[DirectionRef]            | Aller                                   |
+      | Attribute[DirectionRef]            | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
@@ -520,7 +520,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
-      <DirectionRef>unknown</DirectionRef>
+      <DirectionRef>ch:1:Direction:H</DirectionRef>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
