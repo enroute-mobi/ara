@@ -79,6 +79,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			DestinationRef:  xmlStopVisitEvent.DestinationRef(),
 			DestinationName: xmlStopVisitEvent.DestinationName(),
 			Monitored:       xmlStopVisitEvent.Monitored(),
+			Occupancy:       model.NormalizedOccupancyName(xmlStopVisitEvent.Occupancy()),
 
 			ObjectidKind: builder.remoteObjectidKind,
 			SiriXML:      &xmlStopVisitEvent.XMLMonitoredVehicleJourney,
