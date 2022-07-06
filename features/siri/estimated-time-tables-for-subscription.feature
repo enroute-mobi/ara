@@ -490,7 +490,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Name                               | Passage 32                           |
       | ObjectIDs                          | "didok": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8    |
-      | DirectionType                      | Aller                                |
+      | DirectionType                      | outbound                             |
       | Attribute[OriginName]              | Le début                             |
       | Attribute[DestinationName]         | La fin.                              |
       | Reference[DestinationRef]#ObjectId | "internal": "ThisIsTheEnd"           |
@@ -568,7 +568,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | DirectionType                      | Aller                                   |
+      | DirectionType                      | outbound                                |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
