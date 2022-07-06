@@ -47,7 +47,7 @@ Feature: Support SIRI GetSIRI
       | Monitored                             | true                                          |
       | DestinationName                       | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
-      | Attribute[DirectionType]              | cladebr                                       |
+      | DirectionType                         | cladebr                                       |
       | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
@@ -227,7 +227,7 @@ Feature: Support SIRI GetSIRI
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Attribute[DestinationName]            | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
-      | Attribute[DirectionType]              | cladebr                                       |
+      | DirectionType                         | cladebr                                       |
       | Attribute[Monitored]                  | true                                          |
       | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |

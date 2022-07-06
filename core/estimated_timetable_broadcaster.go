@@ -224,6 +224,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
 					LineRef:                lineObjectId.Value(),
+					DirectionType:          vehicleJourney.DirectionType,
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),

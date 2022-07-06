@@ -52,6 +52,7 @@ type SIRIMonitoredStopVisit struct {
 	VehicleJourneyName     string
 	OriginName             string
 	DestinationName        string
+	DirectionType          string
 	StopAreaObjectId       string
 	DataFrameRef           string
 	Occupancy              string

@@ -463,7 +463,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ObjectIDs                             | "internal": "NINOXE:VehicleJourney:201"         |
       | LineId                                | 6ba7b814-9dad-11d1-5-00c04fd430c8               |
       | Monitored                             | true                                            |
-      | Attribute[DirectionType]              | Aller                                           |
+      | DirectionType                         | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
       | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
@@ -632,7 +632,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs                             | "internal": "NINOXE:VehicleJourney:201"         |
       | LineId                                | 6ba7b814-9dad-11d1-5-00c04fd430c8               |
       | Monitored                             | true                                            |
-      | Attribute[DirectionType]              | Aller                                           |
+      | DirectionType                         | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
       | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
@@ -802,7 +802,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
       | Monitored                          | true                                    |
-      | Attribute[DirectionType]           | Aller                                   |
+      | DirectionType                      | Aller                                   |
       | OriginName                         | Le début                                |
       | DestinationName                    | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
@@ -968,7 +968,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
       | Monitored                          | true                                    |
-      | Attribute[DirectionType]           | Aller                                   |
+      | DirectionType                      | Aller                                   |
       | OriginName                         | Le début                                |
       | DestinationName                    | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
@@ -1132,7 +1132,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | ObjectIDs                             | "internal": "NINOXE:VehicleJourney:201"         |
       | LineId                                | 6ba7b814-9dad-11d1-5-00c04fd430c8               |
       | Monitored                             | true                                            |
-      | Attribute[DirectionType]              | Aller                                           |
+      | DirectionType                         | Aller                                           |
       | OriginName                            | Le début                                        |
       | DestinationName                       | La fin.                                         |
       | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |

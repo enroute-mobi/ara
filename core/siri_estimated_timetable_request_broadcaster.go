@@ -106,6 +106,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 
 			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
 				LineRef:                lineObjectId.Value(),
+				DirectionType:          vjs[i].DirectionType,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				Attributes:             make(map[string]string),
 				References:             make(map[string]string),

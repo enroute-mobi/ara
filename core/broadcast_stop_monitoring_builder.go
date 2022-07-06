@@ -125,6 +125,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		VehicleJourneyName:     vehicleJourney.Name,
 		OriginName:             vehicleJourney.OriginName,
 		DestinationName:        vehicleJourney.DestinationName,
+		DirectionType:          vehicleJourney.DirectionType,
 		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
