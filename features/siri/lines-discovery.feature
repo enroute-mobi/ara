@@ -80,16 +80,13 @@ Feature: Support SIRI LinesDiscovery
       <siri:Status>true</siri:Status>
         <siri:AnnotatedLineRef>
           <siri:LineRef>NINOXE:Line:BP:6:LOC</siri:LineRef>
-          <siri:Monitored>true</siri:Monitored>
           <siri:LineName>Test</siri:LineName>
+          <siri:Monitored>true</siri:Monitored>
         </siri:AnnotatedLineRef>
         <siri:AnnotatedLineRef>
           <siri:LineRef>NINOXE:Line:BP:7:LOC</siri:LineRef>
-          <siri:Monitored>true</siri:Monitored>
           <siri:LineName>Test 3</siri:LineName>
-          <siri:Lines>
-            <siri:LineRef>STIF:Line::C00274:</siri:LineRef>
-          </siri:Lines>
+          <siri:Monitored>true</siri:Monitored>
         </siri:AnnotatedLineRef>
       </Answer>
       <AnswerExtension/>

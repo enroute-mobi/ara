@@ -1,7 +1,5 @@
 package psettings
 
-import "bitbucket.org/enroute-mobi/ara/logger"
-
 type CollectSettings struct {
 	UseDiscoveredSA    bool
 	UseDiscoveredLines bool
@@ -88,7 +86,5 @@ func (cs *CollectSettings) canCollectLines(ls map[string]struct{}) bool {
 
 // Return true if we can collect the lines and don't exclude at least one
 func (cs *CollectSettings) CanCollectLines(ls map[string]struct{}) bool {
-	logger.Log.Printf("Can collect lines: %v %v", cs.canCollectLines(ls), cs.excludedLines.atLeastOneNotInCollection(ls))
-
 	return cs.canCollectLines(ls) && !cs.ExcludeAllLines(ls)
 }

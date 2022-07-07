@@ -119,6 +119,7 @@ func NewPartner() *Partner {
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
+		discoveredLines:     make(map[string]struct{}),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
@@ -547,7 +548,6 @@ func (partner *Partner) LastDiscovery() time.Time {
 
 func (partner *Partner) Discover() {
 	partner.lastDiscovery = partner.manager.Referential().Clock().Now()
-	// To be implemented
 	partner.lineDiscovery()
 	partner.stopDiscovery()
 }
