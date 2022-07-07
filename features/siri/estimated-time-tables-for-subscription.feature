@@ -525,7 +525,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
-      <DirectionRef>Aller</DirectionRef>
+      <DirectionRef>ch:1:Direction:H</DirectionRef>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
