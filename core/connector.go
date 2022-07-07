@@ -13,6 +13,7 @@ const (
 	PUSH_COLLECTOR                                    = "push-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR      = "siri-stop-points-discovery-request-collector"
 	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER    = "siri-stop-points-discovery-request-broadcaster"
+	SIRI_LINES_DISCOVERY_REQUEST_COLLECTOR            = "siri-lines-discovery-request-collector"
 	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER          = "siri-lines-discovery-request-broadcaster"
 	SIRI_SERVICE_REQUEST_BROADCASTER                  = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR            = "siri-stop-monitoring-request-collector"
@@ -81,6 +82,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIStopPointsDiscoveryRequestCollectorFactory{}
 	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER:
 		return &SIRIStopPointsDiscoveryRequestBroadcasterFactory{}
+	case SIRI_LINES_DISCOVERY_REQUEST_COLLECTOR:
+		return &SIRILinesDiscoveryRequestCollectorFactory{}
 	case SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER:
 		return &SIRILinesDiscoveryRequestBroadcasterFactory{}
 	case SIRI_SERVICE_REQUEST_BROADCASTER:

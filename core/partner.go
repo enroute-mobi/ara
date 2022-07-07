@@ -83,6 +83,7 @@ type Partner struct {
 
 	connectors             map[string]Connector
 	discoveredStopAreas    map[string]struct{}
+	discoveredLines        map[string]struct{}
 	startedAt              time.Time
 	lastDiscovery          time.Time
 	alternativeStatusCheck PartnerStatusCheck
@@ -118,6 +119,7 @@ func NewPartner() *Partner {
 		ConnectorTypes:      []string{},
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
+		discoveredLines:     make(map[string]struct{}),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
@@ -244,7 +246,7 @@ func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) b
 		return true
 	}
 
-	if partner.CollectSettings().UseDiscovered {
+	if partner.CollectSettings().UseDiscoveredSA || partner.CollectSettings().UseDiscoveredLines {
 		return partner.checkDiscovered(stopId, lineIds) // Check excluded stops and lines
 	}
 
@@ -252,15 +254,46 @@ func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) b
 }
 
 func (partner *Partner) CanCollectLine(lineId string) bool { // Used for vehicle collect
+	if partner.CollectSettings().UseDiscoveredLines {
+		return partner.checkDiscoveredLine(lineId)
+	}
+
 	return partner.CollectSettings().CanCollectLine(lineId)
 }
 
 func (partner *Partner) checkDiscovered(stopId string, lineIds map[string]struct{}) (ok bool) {
 	// Return false if we exclude the stop or all the associated lines
 	if partner.CollectSettings().ExcludeStop(stopId) || partner.CollectSettings().ExcludeAllLines(lineIds) {
-		return false
+		return
 	}
-	_, ok = partner.discoveredStopAreas[stopId]
+
+	partner.mutex.RLock()
+	defer partner.mutex.RUnlock()
+
+	if partner.CollectSettings().UseDiscoveredLines {
+		for l := range lineIds {
+			_, ok = partner.discoveredLines[l]
+			if ok {
+				return
+			}
+		}
+	}
+	if partner.CollectSettings().UseDiscoveredSA {
+		_, ok = partner.discoveredStopAreas[stopId]
+	}
+
+	return
+}
+
+func (partner *Partner) checkDiscoveredLine(lineId string) (ok bool) {
+	if partner.CollectSettings().ExcludeLine(lineId) {
+		return
+	}
+
+	partner.mutex.RLock()
+	_, ok = partner.discoveredLines[lineId]
+	partner.mutex.RUnlock()
+
 	return
 }
 
@@ -515,8 +548,7 @@ func (partner *Partner) LastDiscovery() time.Time {
 
 func (partner *Partner) Discover() {
 	partner.lastDiscovery = partner.manager.Referential().Clock().Now()
-	// To be implemented
-	// partner.lineDiscovery()
+	partner.lineDiscovery()
 	partner.stopDiscovery()
 }
 
@@ -532,6 +564,18 @@ func (partner *Partner) stopDiscovery() {
 	c.(StopPointsDiscoveryRequestCollector).RequestStopPoints()
 }
 
+func (partner *Partner) lineDiscovery() {
+	logger.Log.Debugf("LineDiscovery for partner '%s'", partner.slug)
+
+	c, ok := partner.connectors[SIRI_LINES_DISCOVERY_REQUEST_COLLECTOR]
+	if !ok {
+		logger.Log.Debugf("No SiriLinesDiscoveryRequestCollector found for partner '%s'", partner.slug)
+		return
+	}
+
+	c.(LinesDiscoveryRequestCollector).RequestLines()
+}
+
 func (partner *Partner) Pushed() {
 	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
 }
@@ -542,7 +586,7 @@ func (partner *Partner) GtfsStatus(s OperationnalStatus) {
 }
 
 func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
-	if !partner.CollectSettings().UseDiscovered {
+	if !partner.CollectSettings().UseDiscoveredSA {
 		return
 	}
 
@@ -550,6 +594,20 @@ func (partner *Partner) RegisterDiscoveredStopAreas(stops []string) {
 
 	for i := range stops {
 		partner.discoveredStopAreas[stops[i]] = struct{}{}
+	}
+
+	partner.mutex.Unlock()
+}
+
+func (partner *Partner) RegisterDiscoveredLines(lines []string) {
+	if !partner.CollectSettings().UseDiscoveredLines {
+		return
+	}
+
+	partner.mutex.Lock()
+
+	for i := range lines {
+		partner.discoveredLines[lines[i]] = struct{}{}
 	}
 
 	partner.mutex.Unlock()
@@ -595,6 +653,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		manager:             manager,
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
+		discoveredLines:     make(map[string]struct{}),
 		PartnerStatus: PartnerStatus{
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},

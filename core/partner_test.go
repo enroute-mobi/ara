@@ -245,8 +245,7 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrue(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
@@ -260,7 +259,6 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.discoveredStopAreas = make(map[string]struct{})
 	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
@@ -268,8 +266,7 @@ func Test_Partner_CanCollectTrue(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrueLine(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
 	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
@@ -284,7 +281,6 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.discoveredStopAreas = make(map[string]struct{})
 	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
@@ -292,8 +288,7 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
@@ -308,8 +303,7 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 }
 
 func Test_Partner_CanCollectFalse(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "BAD_VALUE"
 	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
@@ -319,8 +313,7 @@ func Test_Partner_CanCollectFalse(t *testing.T) {
 }
 
 func Test_Partner_CanCollectFalseLine(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "BAD_VALUE"
 	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
 	partner.SetCollectSettings()
@@ -330,8 +323,7 @@ func Test_Partner_CanCollectFalseLine(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
@@ -346,7 +338,6 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.discoveredStopAreas = make(map[string]struct{})
 	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
@@ -354,8 +345,7 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 }
 
 func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
@@ -372,9 +362,7 @@ func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 }
 
 func Test_Partner_CanCollectFalseSPD(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
-	partner.discoveredStopAreas = make(map[string]struct{})
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
@@ -384,9 +372,7 @@ func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrueSPD(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
-	partner.discoveredStopAreas = make(map[string]struct{})
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
@@ -397,15 +383,43 @@ func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 }
 
 func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
-	partner := &Partner{}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
-	partner.discoveredStopAreas = make(map[string]struct{})
+	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
 	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
+		t.Errorf("Partner can collect should return false")
+	}
+}
+
+func Test_Partner_CanCollectFalseLD(t *testing.T) {
+	partner := NewPartner()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.SetCollectSettings()
+	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
+		t.Errorf("Partner can collect should return false")
+	}
+}
+
+func Test_Partner_CanCollectTrueLD(t *testing.T) {
+	partner := NewPartner()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
+	partner.SetCollectSettings()
+	if !partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
+		t.Fatal("Partner can collect should return true")
+	}
+}
+
+func Test_Partner_CanCollectTrueLDButExcluded(t *testing.T) {
+	partner := NewPartner()
+	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
+	partner.SetSetting(ps.COLLECT_EXCLUDE_LINES, "NINOXE:Line:SP:24:LOC")
+	partner.SetCollectSettings()
+	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
 		t.Errorf("Partner can collect should return false")
 	}
 }
