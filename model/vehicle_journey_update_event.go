@@ -42,8 +42,6 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 		return ue.attributes
 	}
 
-	ue.DirectionType = ue.SiriXML.DirectionRef()
-
 	ue.attributes.Set("Delay", ue.SiriXML.Delay())
 	ue.attributes.Set("Bearing", ue.SiriXML.Bearing())
 	ue.attributes.Set("InPanic", ue.SiriXML.InPanic())
