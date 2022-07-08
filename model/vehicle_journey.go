@@ -81,9 +81,6 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(vehicleJourney),
 	}
 
-	if vehicleJourney.DirectionType != "" {
-		aux.DirectionType = vehicleJourney.DirectionType
-	}
 	if !vehicleJourney.ObjectIDs().Empty() {
 		aux.ObjectIDs = vehicleJourney.ObjectIDs()
 	}
