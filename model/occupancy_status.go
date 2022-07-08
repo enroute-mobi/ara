@@ -18,48 +18,60 @@ import (
 8: "NOT_BOARDABLE",
 */
 
+const (
+	empty                   = "EMPTY"
+	manySeatsAvailable      = "MANY_SEATS_AVAILABLE"
+	fewSeatsAvailable       = "FEW_SEATS_AVAILABLE"
+	standingRoomOnly        = "STANDING_ROOM_ONLY"
+	crushedStandingRoomOnly = "CRUSHED_STANDING_ROOM_ONLY"
+	full                    = "FULL"
+	notAcceptingPassengers  = "NOT_ACCEPTING_PASSENGERS"
+	noDataAvailable         = "NO_DATA_AVAILABLE"
+	notBoardable            = "NOT_BOARDABLE"
+)
+
 func NormalizedOccupancyName(occupancy string) string { // Doesn't do mutch for now, but it felt faster this way
 	switch strings.TrimSpace(occupancy) {
 	case "":
 		return ""
-	case "EMPTY":
-		return "EMPTY"
-	case "MANY_SEATS_AVAILABLE":
-		return "MANY_SEATS_AVAILABLE"
-	case "FEW_SEATS_AVAILABLE":
-		return "FEW_SEATS_AVAILABLE"
-	case "STANDING_ROOM_ONLY":
-		return "STANDING_ROOM_ONLY"
-	case "CRUSHED_STANDING_ROOM_ONLY":
-		return "CRUSHED_STANDING_ROOM_ONLY"
-	case "FULL":
-		return "FULL"
-	case "NOT_ACCEPTING_PASSENGERS":
-		return "NOT_ACCEPTING_PASSENGERS"
-	case "NOT_BOARDABLE":
-		return "NOT_BOARDABLE"
-	default: // NO_DATA_AVAILABLE
-		return "NO_DATA_AVAILABLE"
+	case empty:
+		return empty
+	case manySeatsAvailable:
+		return manySeatsAvailable
+	case fewSeatsAvailable:
+		return fewSeatsAvailable
+	case standingRoomOnly:
+		return standingRoomOnly
+	case crushedStandingRoomOnly:
+		return crushedStandingRoomOnly
+	case full:
+		return full
+	case notAcceptingPassengers:
+		return notAcceptingPassengers
+	case notBoardable:
+		return notBoardable
+	default:
+		return noDataAvailable
 	}
 }
 
 func OccupancyCode(occupancy string) gtfs.VehiclePosition_OccupancyStatus {
 	switch occupancy {
-	case "EMPTY":
+	case empty:
 		return gtfs.VehiclePosition_OccupancyStatus(0)
-	case "MANY_SEATS_AVAILABLE":
+	case manySeatsAvailable:
 		return gtfs.VehiclePosition_OccupancyStatus(1)
-	case "FEW_SEATS_AVAILABLE":
+	case fewSeatsAvailable:
 		return gtfs.VehiclePosition_OccupancyStatus(2)
-	case "STANDING_ROOM_ONLY":
+	case standingRoomOnly:
 		return gtfs.VehiclePosition_OccupancyStatus(3)
-	case "CRUSHED_STANDING_ROOM_ONLY":
+	case crushedStandingRoomOnly:
 		return gtfs.VehiclePosition_OccupancyStatus(4)
-	case "FULL":
+	case full:
 		return gtfs.VehiclePosition_OccupancyStatus(5)
-	case "NOT_ACCEPTING_PASSENGERS":
+	case notAcceptingPassengers:
 		return gtfs.VehiclePosition_OccupancyStatus(6)
-	case "NOT_BOARDABLE":
+	case notBoardable:
 		return gtfs.VehiclePosition_OccupancyStatus(8)
 	default: // NO_DATA_AVAILABLE
 		return gtfs.VehiclePosition_OccupancyStatus(7)
@@ -69,22 +81,22 @@ func OccupancyCode(occupancy string) gtfs.VehiclePosition_OccupancyStatus {
 func OccupancyName(occupancy gtfs.VehiclePosition_OccupancyStatus) string {
 	switch occupancy {
 	case 0:
-		return "EMPTY"
+		return empty
 	case 1:
-		return "MANY_SEATS_AVAILABLE"
+		return manySeatsAvailable
 	case 2:
-		return "FEW_SEATS_AVAILABLE"
+		return fewSeatsAvailable
 	case 3:
-		return "STANDING_ROOM_ONLY"
+		return standingRoomOnly
 	case 4:
-		return "CRUSHED_STANDING_ROOM_ONLY"
+		return crushedStandingRoomOnly
 	case 5:
-		return "FULL"
+		return full
 	case 6:
-		return "NOT_ACCEPTING_PASSENGERS"
+		return notAcceptingPassengers
 	case 8:
-		return "NOT_BOARDABLE"
-	default: // 7
-		return "NO_DATA_AVAILABLE"
+		return notBoardable
+	default:
+		return noDataAvailable
 	}
 }
