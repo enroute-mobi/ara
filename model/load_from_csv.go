@@ -18,7 +18,7 @@ import (
 operator,Id,ModelName,Name,ObjectIDs
 stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
-vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References
+vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References,DirectionType
 stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 
 Comments are '#'
@@ -418,13 +418,19 @@ func (loader *Loader) insertLines() {
 }
 
 func (loader *Loader) handleVehicleJourney(record []string) error {
-	if len(record) != 11 {
-		return fmt.Errorf("wrong number of entries, expected 11 got %v", len(record))
+	var directionType string
+
+	if len(record) < 10 {
+		return fmt.Errorf("wrong number of entries, expected 10 minimun got %v", len(record))
 	}
 
 	err := loader.handleForce(VEHICLE_JOURNEY, record[2])
 	if err != nil {
 		return err
+	}
+
+	if len(record) == 11 {
+		directionType = record[10]
 	}
 
 	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
@@ -438,8 +444,9 @@ func (loader *Loader) handleVehicleJourney(record []string) error {
 		record[7],
 		record[8],
 		record[9],
-		record[10],
+		directionType,
 	)
+
 	loader.vehicleJourneys = append(loader.vehicleJourneys, values...)
 	loader.bulkCounter[VEHICLE_JOURNEY]++
 
@@ -461,6 +468,7 @@ func (loader *Loader) insertVehicleJourneys() {
 	}()
 
 	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,object_ids,line_id,origin_name,destination_name,attributes,siri_references, direction_type) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
+
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("vehicleJourneys", err)

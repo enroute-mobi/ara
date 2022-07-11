@@ -6,6 +6,7 @@ import (
 )
 
 func Test_LoadFromCSVFile(t *testing.T) {
+	var vj *VehicleJourney
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
@@ -29,9 +30,12 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find Line: %v", model.Lines().FindAll())
 	}
-	_, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find VehicleJourney: %v", model.VehicleJourneys().FindAll())
+	}
+	if vj.DirectionType != "outbound" {
+		t.Errorf("Wrong direction_type for VehicleJourney: expected \"outbound\", got: %v", vj.DirectionType)
 	}
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
@@ -58,9 +62,12 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find Line: %v", model.Lines().FindAll())
 	}
-	_, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find VehicleJourney: %v", model.VehicleJourneys().FindAll())
+	}
+	if vj.DirectionType != "inbound" {
+		t.Errorf("Wrong direction_type for VehicleJourney: expected \"inbound\", got: %v", vj.DirectionType)
 	}
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
@@ -69,6 +76,22 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	_, ok = model.Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find Operator: %v", model.Operators().FindAll())
+	}
+
+	model = NewMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   3,
+	}
+	model.Load("referential")
+
+	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	if !ok {
+		t.Errorf("Can't find VehicleJourney: %v", model.VehicleJourneys().FindAll())
+	}
+	if vj.DirectionType != "" {
+		t.Errorf("Wrong direction_type for VehicleJourney: expected \"\", got: %v", vj.DirectionType)
 	}
 }
 
