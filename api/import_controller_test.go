@@ -104,7 +104,7 @@ func Test_Serve(t *testing.T) {
 	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
 		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v", contentType, "application/json")
 	}
-	expectedBody := `{"Import":{"Total":10,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":2},"Errors":{}}`
+	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 	if responseRecorder.Body.String() != expectedBody {
 		t.Errorf("Handler returned wrong body:\n got %v\n want %v", responseRecorder.Body.String(), expectedBody)
 	}
@@ -246,7 +246,7 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
 		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v", contentType, "application/json")
 	}
-	expectedBody := `{"Import":{"Total":10,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":2},"Errors":{}}`
+	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 	if responseRecorder.Body.String() != expectedBody {
 		t.Errorf("Handler returned wrong body:\n got %v\n want %v", responseRecorder.Body.String(), expectedBody)
 	}

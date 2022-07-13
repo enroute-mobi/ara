@@ -75,6 +75,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			LineObjectId:    lineObjectId,
 			OriginRef:       xmlStopVisitEvent.OriginRef(),
 			OriginName:      xmlStopVisitEvent.OriginName(),
+			DirectionType:   xmlStopVisitEvent.DirectionRef(),
 			DestinationRef:  xmlStopVisitEvent.DestinationRef(),
 			DestinationName: xmlStopVisitEvent.DestinationName(),
 			Monitored:       xmlStopVisitEvent.Monitored(),

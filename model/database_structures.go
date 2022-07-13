@@ -119,6 +119,7 @@ type DatabaseVehicleJourney struct {
 	LineId          string `db:"line_id"`
 	OriginName      string `db:"origin_name"`
 	DestinationName string `db:"destination_name"`
+	DirectionType   string `db:"direction_type"`
 	Attributes      string `db:"attributes"`
 	References      string `db:"siri_references"`
 }
@@ -132,6 +133,7 @@ type SelectVehicleJourney struct {
 	LineId          sql.NullString `db:"line_id"`
 	OriginName      sql.NullString `db:"origin_name"`
 	DestinationName sql.NullString `db:"destination_name"`
+	DirectionType   sql.NullString `db:"direction_type"`
 	Attributes      sql.NullString
 	References      sql.NullString `db:"siri_references"`
 }

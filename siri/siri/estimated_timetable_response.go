@@ -39,6 +39,7 @@ type SIRIEstimatedJourneyVersionFrame struct {
 type SIRIEstimatedVehicleJourney struct {
 	LineRef                string
 	DatedVehicleJourneyRef string
+	DirectionType          string
 
 	Attributes map[string]string
 	References map[string]string

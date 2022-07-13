@@ -136,8 +136,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	vehicleJourney1 := &siri.SIRIEstimatedVehicleJourney{
 		LineRef:                "line1",
 		DatedVehicleJourneyRef: "dvjref1",
+		DirectionType:          "direction1",
 		Attributes: map[string]string{
-			"DirectionRef":    "direction1",
 			"OriginName":      "origin 1",
 			"DestinationName": "destination 1",
 		},
@@ -151,8 +151,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	vehicleJourney2 := &siri.SIRIEstimatedVehicleJourney{
 		LineRef:                "line2",
 		DatedVehicleJourneyRef: "dvjref2",
+		DirectionType:          "direction2",
 		Attributes: map[string]string{
-			"DirectionRef":    "direction2",
 			"OriginName":      "origin 2",
 			"DestinationName": "destination 2",
 		},
@@ -166,8 +166,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	vehicleJourney3 := &siri.SIRIEstimatedVehicleJourney{
 		LineRef:                "line3",
 		DatedVehicleJourneyRef: "dvjref3",
+		DirectionType:          "direction3",
 		Attributes: map[string]string{
-			"DirectionRef":    "direction3",
 			"OriginName":      "origin 3",
 			"DestinationName": "destination 3",
 		},
@@ -242,8 +242,8 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
 	vehicleJourney1 := &siri.SIRIEstimatedVehicleJourney{
 		LineRef:                "line1",
 		DatedVehicleJourneyRef: "dvjref1",
+		DirectionType:          "direction1",
 		Attributes: map[string]string{
-			"DirectionRef":    "direction1",
 			"OriginName":      "origin 1",
 			"DestinationName": "destination 1",
 		},

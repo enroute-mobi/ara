@@ -23,6 +23,7 @@ type VehicleJourney struct {
 	OriginName      string `json:",omitempty"`
 	DestinationName string `json:",omitempty"`
 	Occupancy       string `json:",omitempty"`
+	DirectionType   string `json:",omitempty"`
 
 	Monitored bool
 
@@ -280,6 +281,9 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 		}
 		if vj.DestinationName.Valid {
 			vehicleJourney.DestinationName = vj.DestinationName.String
+		}
+		if vj.DirectionType.Valid {
+			vehicleJourney.DirectionType = vj.DirectionType.String
 		}
 
 		if vj.Attributes.Valid && len(vj.Attributes.String) > 0 {

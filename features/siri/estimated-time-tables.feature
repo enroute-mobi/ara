@@ -30,7 +30,7 @@ Feature: Support SIRI EstimatedTimeTable
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-6-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | DirectionType                      | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
@@ -221,7 +221,7 @@ Feature: Support SIRI EstimatedTimeTable
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-6-00c04fd430c8       |
-      | Attribute[DirectionRef]            | Aller                                   |
+      | DirectionType                      | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |

@@ -1,7 +1,7 @@
 <DatedTimetableVersionFrame>
 				<RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</RecordedAtTime>
 				<LineRef>{{ .LineRef }}</LineRef>
-				<DirectionRef>{{ if (eq .Attributes.DirectionRef "Aller")}}ch:1:Direction:H{{ else if (eq .Attributes.DirectionRef "Retour")}}ch:1:Direction:R{{ else }}unknown{{ end }}</DirectionRef>
+				<DirectionRef>{{ if (eq .DirectionType "outbound")}}ch:1:Direction:H{{ else if (eq .DirectionType "inbound")}}ch:1:Direction:R{{ else }}unknown{{ end }}</DirectionRef>
 				<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
 				<DatedVehicleJourney>
 					<FramedVehicleJourneyRef>

@@ -10,6 +10,7 @@ import (
 
 type SIRIDatedTimetableVersionFrame struct {
 	LineRef        string
+	DirectionType  string
 	RecordedAtTime time.Time
 
 	Attributes map[string]string

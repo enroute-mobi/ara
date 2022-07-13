@@ -160,6 +160,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 			if !ok {
 				datedTTVersionFrame = &siri.SIRIDatedTimetableVersionFrame{
 					LineRef:        lineObjectId.Value(),
+					DirectionType:  vehicleJourney.DirectionType,
 					RecordedAtTime: currentTime,
 					Attributes:     vehicleJourney.Attributes,
 				}

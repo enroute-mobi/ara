@@ -93,6 +93,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			OriginRef:       xmlVehicleActivity.OriginRef(),
 			OriginName:      xmlVehicleActivity.OriginName(),
 			DestinationRef:  xmlVehicleActivity.DestinationRef(),
+			DirectionType:   xmlVehicleActivity.DirectionRef(),
 			DestinationName: xmlVehicleActivity.DestinationName(),
 			Monitored:       xmlVehicleActivity.Monitored(),
 			Occupancy:       xmlVehicleActivity.Occupancy(),
