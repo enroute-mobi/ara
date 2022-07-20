@@ -96,7 +96,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			DirectionType:   xmlVehicleActivity.DirectionRef(),
 			DestinationName: xmlVehicleActivity.DestinationName(),
 			Monitored:       xmlVehicleActivity.Monitored(),
-			Occupancy:       xmlVehicleActivity.Occupancy(),
+			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 
 			ObjectidKind: builder.remoteObjectidKind,
 			SiriXML:      &xmlVehicleActivity.XMLMonitoredVehicleJourney,
@@ -124,7 +124,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Percentage:             percentage,
 			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
 			RecordedAt:             xmlVehicleActivity.RecordedAtTime(),
-			Occupancy:              xmlVehicleActivity.Occupancy(),
+			Occupancy:              model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 		}
 
 		coord, err := builder.handleCoordinates(xmlVehicleActivity)
