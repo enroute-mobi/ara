@@ -174,6 +174,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -251,6 +252,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
             <DataFrameRef>2017-01-01</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
+          <VehicleMode>bus</VehicleMode>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
           <FirstOrLastJourney>unspecified</FirstOrLastJourney>
