@@ -334,6 +334,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        <EstimatedVehicleJourney>
          <LineRef>NINOXE:Line:3:LOC</LineRef>
          <DirectionRef>unknown</DirectionRef>
+         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -375,6 +376,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
         <EstimatedVehicleJourney>
           <LineRef>NINOXE:Line:3:LOC</LineRef>
           <DirectionRef>unknown</DirectionRef>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
           <RecordedCalls>
@@ -696,6 +698,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
+      <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
@@ -777,6 +780,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
       <VehicleMode>bus</VehicleMode>
+      <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>

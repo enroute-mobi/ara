@@ -226,6 +226,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					LineRef:                lineObjectId.Value(),
 					DirectionType:          vehicleJourney.DirectionType,
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
+					PublishedLineName:      line.Name,
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
