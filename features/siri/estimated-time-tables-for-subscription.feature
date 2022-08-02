@@ -742,6 +742,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
       | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Attribute[VehicleMode]             | bus                                     |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
@@ -775,6 +776,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
+      <VehicleMode>bus</VehicleMode>
       <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
