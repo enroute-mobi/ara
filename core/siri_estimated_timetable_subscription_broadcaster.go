@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -16,6 +17,7 @@ import (
 type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
 	connector
 
+	dataFrameGenerator            *idgen.IdentifierGenerator
 	vjRemoteObjectidKinds         []string
 	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.StopVisitId
@@ -43,6 +45,7 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	connector := &SIRIEstimatedTimeTableSubscriptionBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)

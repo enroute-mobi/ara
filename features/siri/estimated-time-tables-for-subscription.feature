@@ -334,8 +334,11 @@ Feature: Support SIRI EstimatedTimeTable by subscription
        <EstimatedVehicleJourney>
          <LineRef>NINOXE:Line:3:LOC</LineRef>
          <DirectionRef>unknown</DirectionRef>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
-         <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -374,10 +377,13 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       <EstimatedJourneyVersionFrame>
         <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
         <EstimatedVehicleJourney>
-          <LineRef>NINOXE:Line:3:LOC</LineRef>
-          <DirectionRef>unknown</DirectionRef>
+         <LineRef>NINOXE:Line:3:LOC</LineRef>
+         <DirectionRef>unknown</DirectionRef>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
-          <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
           <RecordedCalls>
             <RecordedCall>
@@ -698,8 +704,11 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
+      <FramedVehicleJourneyRef>
+        <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+        <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+      </FramedVehicleJourneyRef>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
-      <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
@@ -780,8 +789,11 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
       <VehicleMode>bus</VehicleMode>
+      <FramedVehicleJourneyRef>
+        <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+        <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+      </FramedVehicleJourneyRef>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
-      <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
