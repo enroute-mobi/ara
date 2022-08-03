@@ -24,7 +24,8 @@
 							<ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
 							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
 						</EstimatedCall>{{ end }}
-					</EstimatedCalls>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
+					</EstimatedCalls>
+					<IsCompleteStopSequence>false</IsCompleteStopSequence>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
 					<RecordedCalls>{{ range .RecordedCalls }}
 						<RecordedCall>
 							<StopPointRef>{{ .StopPointRef }}</StopPointRef>

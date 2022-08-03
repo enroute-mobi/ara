@@ -349,6 +349,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
              <ArrivalStatus>Delayed</ArrivalStatus>
            </EstimatedCall>
          </EstimatedCalls>
+         <IsCompleteStopSequence>false</IsCompleteStopSequence>
        </EstimatedVehicleJourney>
      </EstimatedJourneyVersionFrame>
    </EstimatedTimetableDelivery>
@@ -719,6 +720,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
           <ArrivalStatus>delayed</ArrivalStatus>
         </EstimatedCall>
       </EstimatedCalls>
+      <IsCompleteStopSequence>false</IsCompleteStopSequence>
     </EstimatedVehicleJourney>
   </EstimatedJourneyVersionFrame>
 </EstimatedTimetableDelivery>
@@ -804,6 +806,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
           <ArrivalStatus>delayed</ArrivalStatus>
         </EstimatedCall>
       </EstimatedCalls>
+      <IsCompleteStopSequence>false</IsCompleteStopSequence>
     </EstimatedVehicleJourney>
   </EstimatedJourneyVersionFrame>
 </EstimatedTimetableDelivery>
