@@ -37,6 +37,9 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if vj.DirectionType != "outbound" {
 		t.Errorf("Wrong direction_type for VehicleJourney: expected \"outbound\", got: %v", vj.DirectionType)
 	}
+	if vj.Attributes["VehicleMode"] != "bus" {
+		t.Errorf("Wrong Attributes for VehicleJourney: expected \"bus\", got: %v", vj.Attributes["VehicleMode"])
+	}
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find StopVisit: %v", model.ScheduledStopVisits().FindAll())

@@ -40,6 +40,7 @@ type SIRIEstimatedVehicleJourney struct {
 	LineRef                string
 	DatedVehicleJourneyRef string
 	DirectionType          string
+	PublishedLineName      string
 
 	Attributes map[string]string
 	References map[string]string

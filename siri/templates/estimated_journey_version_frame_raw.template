@@ -2,7 +2,9 @@
 				<RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</RecordedAtTime>{{ range .EstimatedVehicleJourneys }}
 				<EstimatedVehicleJourney>
 					<LineRef>{{ .LineRef }}</LineRef>
-					<DirectionRef>{{ if (eq .DirectionType "outbound")}}ch:1:Direction:H{{ else if (eq .DirectionType "inbound")}}ch:1:Direction:R{{ else }}unknown{{ end }}</DirectionRef>
+					<DirectionRef>{{ if (eq .DirectionType "outbound")}}ch:1:Direction:H{{ else if (eq .DirectionType "inbound")}}ch:1:Direction:R{{ else }}unknown{{ end }}</DirectionRef>{{ if .Attributes.VehicleMode }}
+					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}{{ if .PublishedLineName }}
+					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}
 					<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>{{ if .References.OperatorRef }}
 					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ else }}
 					<OperatorRef/>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
