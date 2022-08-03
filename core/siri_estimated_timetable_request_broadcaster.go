@@ -108,6 +108,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				LineRef:                lineObjectId.Value(),
 				DirectionType:          vjs[i].DirectionType,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
+				PublishedLineName:      line.Name,
 				Attributes:             make(map[string]string),
 				References:             make(map[string]string),
 			}
