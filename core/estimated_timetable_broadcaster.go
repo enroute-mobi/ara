@@ -226,6 +226,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					LineRef:                lineObjectId.Value(),
 					DirectionType:          vehicleJourney.DirectionType,
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
+					DataFrameRef:           ett.connector.dataFrameRef(),
 					PublishedLineName:      line.Name,
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
@@ -351,6 +352,11 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 	}
 	references["OperatorRef"] = obj.Value()
 	return references
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) dataFrameRef() string {
+	modelDate := connector.partner.Model().Date()
+	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
