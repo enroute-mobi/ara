@@ -19,6 +19,7 @@ type EstimatedTimetableBroadcaster interface {
 type SIRIEstimatedTimetableBroadcaster struct {
 	connector
 
+	dataFrameGenerator    *idgen.IdentifierGenerator
 	vjRemoteObjectidKinds []string
 }
 
@@ -27,6 +28,7 @@ type SIRIEstimatedTimetableBroadcasterFactory struct{}
 func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimetableBroadcaster {
 	connector := &SIRIEstimatedTimetableBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 	connector.partner = partner
 	return connector
@@ -108,6 +110,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				LineRef:                lineObjectId.Value(),
 				DirectionType:          vjs[i].DirectionType,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
+				DataFrameRef:           connector.dataFrameRef(),
 				PublishedLineName:      line.Name,
 				Attributes:             make(map[string]string),
 				References:             make(map[string]string),
@@ -219,6 +222,11 @@ func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(orig
 		}
 	}
 	return false
+}
+
+func (connector *SIRIEstimatedTimetableBroadcaster) dataFrameRef() string {
+	modelDate := connector.partner.Model().Date()
+	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {
