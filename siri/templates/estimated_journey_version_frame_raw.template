@@ -5,8 +5,8 @@
 					<DirectionRef>{{ if (eq .DirectionType "outbound")}}ch:1:Direction:H{{ else if (eq .DirectionType "inbound")}}ch:1:Direction:R{{ else }}unknown{{ end }}</DirectionRef>{{ if .Attributes.VehicleMode }}
 					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}
 					<FramedVehicleJourneyRef>
-							<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
-							<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
+						<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
+						<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
 					</FramedVehicleJourneyRef>{{ if .PublishedLineName }}
 					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}{{ if .References.OperatorRef }}
 					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ else }}

@@ -5,8 +5,8 @@
 				<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
 				<DatedVehicleJourney>
 					<FramedVehicleJourneyRef>
-							<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
-							<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
+						<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
+						<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
 					</FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
 					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}
 					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ if .References.OperatorRef }}
