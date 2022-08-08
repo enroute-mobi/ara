@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
@@ -25,7 +24,7 @@ type SIRIEnvelope struct {
 
 func NewSIRIEnvelope(body io.Reader, envelopeType string) (*SIRIEnvelope, error) {
 	// Attempt to read the body
-	content, err := ioutil.ReadAll(body)
+	content, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func newSOAPEnvelope(doc *xml.XmlDocument) (*SIRIEnvelope, error) {
 
 func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 	// Attempt to read the body
-	content, err := ioutil.ReadAll(body)
+	content, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}

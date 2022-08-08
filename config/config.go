@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -185,7 +184,7 @@ func getConfigFileContent(path, file string) ([]byte, error) {
 	// Check file at location
 	filePath := strings.Join([]string{path, file}, "/")
 	if _, err := os.Stat(filePath); err == nil {
-		data, err := ioutil.ReadFile(filePath)
+		data, err := os.ReadFile(filePath)
 		if err != nil {
 			return nil, err
 		}

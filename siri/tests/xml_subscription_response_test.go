@@ -1,7 +1,7 @@
 package siri_tests
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 	"time"
@@ -16,7 +16,7 @@ func getXMLSubscriptionResponse(t *testing.T) *sxml.XMLSubscriptionResponse {
 	}
 	defer file.Close()
 
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

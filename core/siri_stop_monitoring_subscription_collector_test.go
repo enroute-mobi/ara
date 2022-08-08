@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -45,7 +44,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +122,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 		if r.ContentLength <= 0 {
 			t.Errorf("Request ContentLength should be zero")
 		}
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		request, _ = sxml.NewXMLSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
@@ -180,7 +179,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	request := &sxml.XMLDeleteSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		request, _ = sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
@@ -202,7 +201,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	partners.Save(partner)
 
 	file, _ := os.Open("testdata/notify-stop-monitoring.xml")
-	content, _ := ioutil.ReadAll(file)
+	content, _ := io.ReadAll(file)
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 	connector.deletedSubscriptions = NewDeletedSubscriptions()

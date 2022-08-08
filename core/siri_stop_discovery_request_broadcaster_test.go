@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -62,7 +62,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

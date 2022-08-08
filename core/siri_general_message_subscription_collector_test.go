@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -18,7 +18,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 		if r.ContentLength <= 0 {
 			t.Errorf("Request ContentLength should be zero")
 		}
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		var err error
 		request, err = sxml.NewXMLSubscriptionRequestFromContent(body)
 		if err != nil {
@@ -72,7 +72,7 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	request := &sxml.XMLDeleteSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		request, _ = sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 	}))
 	defer ts.Close()
@@ -94,7 +94,7 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	partners.Save(partner)
 
 	file, _ := os.Open("testdata/notify-general-message.xml")
-	content, _ := ioutil.ReadAll(file)
+	content, _ := io.ReadAll(file)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.deletedSubscriptions = NewDeletedSubscriptions()

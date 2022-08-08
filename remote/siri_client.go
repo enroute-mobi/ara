@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -106,7 +105,7 @@ func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.N
 		return nil, err
 	}
 	defer func() {
-		io.Copy(ioutil.Discard, response.Body)
+		io.Copy(io.Discard, response.Body)
 		response.Body.Close()
 	}()
 

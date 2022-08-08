@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"math"
 	"os"
 	"testing"
@@ -15,7 +15,7 @@ func getvm(t *testing.T, filePath string) *sxml.XMLVehicleMonitoringResponse {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
