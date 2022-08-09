@@ -23,6 +23,7 @@ type Line struct {
 	CollectGeneralMessages bool
 
 	Name       string `json:",omitempty"`
+	Number     string `json:",omitempty"`
 	Attributes Attributes
 	References References
 }
@@ -246,6 +247,9 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 			line.CollectGeneralMessages = sl.CollectGeneralMessages.Bool
 		}
 
+		if sl.Number.Valid {
+			line.Number = sl.Number.String
+		}
 		if sl.Attributes.Valid && len(sl.Attributes.String) > 0 {
 			if err = json.Unmarshal([]byte(sl.Attributes.String), &line.Attributes); err != nil {
 				return err

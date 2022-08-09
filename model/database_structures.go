@@ -104,6 +104,7 @@ type SelectLine struct {
 	ReferentialSlug        string `db:"referential_slug"`
 	ModelName              string `db:"model_name"`
 	Name                   sql.NullString
+	Number                 sql.NullString `db:"number"`
 	ObjectIDs              sql.NullString `db:"object_ids"`
 	Attributes             sql.NullString
 	References             sql.NullString `db:"siri_references"`

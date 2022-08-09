@@ -18,7 +18,7 @@ import (
 operator,Id,ModelName,Name,ObjectIDs
 stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
 line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
-vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References,DirectionType
+vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
 stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 
 Comments are '#'
@@ -348,8 +348,10 @@ func (loader *Loader) insertStopAreas() {
 }
 
 func (loader *Loader) handleLine(record []string) error {
-	if len(record) != 8 {
-		return fmt.Errorf("wrong number of entries, expected 8 got %v", len(record))
+	var number string
+
+	if len(record) < 8 {
+		return fmt.Errorf("wrong number of entries, expected at least 8 got %v", len(record))
 	}
 
 	var err error
@@ -363,6 +365,10 @@ func (loader *Loader) handleLine(record []string) error {
 		}
 	}
 
+	if len(record) == 9 {
+		number = record[8]
+	}
+
 	if parseErrors.ErrorCount() != 0 {
 		return parseErrors
 	}
@@ -372,7 +378,7 @@ func (loader *Loader) handleLine(record []string) error {
 		return err
 	}
 
-	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v),",
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v,$$%v$$),",
 		loader.referentialSlug,
 		record[1],
 		record[2],
@@ -381,6 +387,7 @@ func (loader *Loader) handleLine(record []string) error {
 		record[5],
 		record[6],
 		collectGeneralMessages,
+		number,
 	)
 	loader.lines = append(loader.lines, values...)
 	loader.bulkCounter[LINE]++
@@ -402,7 +409,7 @@ func (loader *Loader) insertLines() {
 		loader.bulkCounter[LINE] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_general_messages) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_general_messages, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("lines", err)
