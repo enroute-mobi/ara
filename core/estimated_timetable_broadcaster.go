@@ -227,7 +227,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					DirectionType:          vehicleJourney.DirectionType,
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           ett.connector.dataFrameRef(),
-					PublishedLineName:      line.Name,
+					PublishedLineName:      ett.connector.publishedLineName(line),
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
@@ -309,6 +309,23 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 		}
 	}
 	return &model.StopArea{}, "", false
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
+	var pln string
+
+	switch connector.Partner().PartnerSettings.SIRILinePublishedName() {
+	case "number":
+		if line.Number != "" {
+			pln = line.Number
+		} else {
+			pln = line.Name
+		}
+	default:
+		pln = line.Name
+	}
+
+	return pln
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {

@@ -251,15 +251,10 @@ func (s *PartnerSettings) Address() string {
 	return s.s[LOCAL_URL]
 }
 
-func (s *PartnerSettings) SIRILinePublishedName() (publishedName string) {
+func (s *PartnerSettings) SIRILinePublishedName() string {
 	s.m.RLock()
-	publishedName = s.s[SIRI_LINE_PUBLISHED_NAME]
-	s.m.RUnlock()
-
-	if publishedName == "" {
-		publishedName = "name"
-	}
-	return publishedName
+	defer s.m.RUnlock()
+	return s.s[SIRI_LINE_PUBLISHED_NAME]
 }
 
 func (s *PartnerSettings) SIRIEnvelopeType() (set string) {
