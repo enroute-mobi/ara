@@ -7,6 +7,8 @@ import (
 
 func Test_LoadFromCSVFile(t *testing.T) {
 	var vj *VehicleJourney
+	var li *Line
+
 	InitTestDb(t)
 	defer CleanTestDb(t)
 
@@ -26,9 +28,12 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find StopArea: %v", model.StopAreas().FindAll())
 	}
-	_, ok = model.Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	li, ok = model.Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find Line: %v", model.Lines().FindAll())
+	}
+	if li.Number != "L1" {
+		t.Errorf("Wrong number for Line: expected \"L1\", got: %v", li.Number)
 	}
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
@@ -61,9 +66,12 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	if !ok {
 		t.Errorf("Can't find StopArea: %v", model.StopAreas().FindAll())
 	}
-	_, ok = model.Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	li, ok = model.Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {
 		t.Errorf("Can't find Line: %v", model.Lines().FindAll())
+	}
+	if li.Number != "" {
+		t.Errorf("Wrong number for Line: expected \"\", got: %v", li.Number)
 	}
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	if !ok {

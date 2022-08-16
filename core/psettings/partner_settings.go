@@ -62,7 +62,8 @@ const (
 	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
 
-	SIRI_ENVELOPE = "siri.envelope"
+	SIRI_ENVELOPE            = "siri.envelope"
+	SIRI_LINE_PUBLISHED_NAME = "siri.line.published_name"
 
 	DEFAULT_GTFS_TTL = 30 * time.Second
 )
@@ -248,6 +249,12 @@ func (s *PartnerSettings) Address() string {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.s[LOCAL_URL]
+}
+
+func (s *PartnerSettings) SIRILinePublishedName() string {
+	s.m.RLock()
+	defer s.m.RUnlock()
+	return s.s[SIRI_LINE_PUBLISHED_NAME]
 }
 
 func (s *PartnerSettings) SIRIEnvelopeType() (set string) {

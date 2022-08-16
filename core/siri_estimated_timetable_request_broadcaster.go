@@ -111,7 +111,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 				DirectionType:          vjs[i].DirectionType,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				DataFrameRef:           connector.dataFrameRef(),
-				PublishedLineName:      line.Name,
+				PublishedLineName:      connector.publishedLineName(line),
 				Attributes:             make(map[string]string),
 				References:             make(map[string]string),
 			}
@@ -186,6 +186,23 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 		}
 	}
 	return &model.StopArea{}, "", false
+}
+
+func (connector *SIRIEstimatedTimetableBroadcaster) publishedLineName(line *model.Line) string {
+	var pln string
+
+	switch connector.partner.PartnerSettings.SIRILinePublishedName() {
+	case "number":
+		if line.Number != "" {
+			pln = line.Number
+		} else {
+			pln = line.Name
+		}
+	default:
+		pln = line.Name
+	}
+
+	return pln
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, origin string) map[string]string {
