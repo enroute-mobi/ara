@@ -64,8 +64,8 @@ const (
 
 	SIRI_ENVELOPE            = "siri.envelope"
 	SIRI_LINE_PUBLISHED_NAME = "siri.line.published_name"
-
-	DEFAULT_GTFS_TTL = 30 * time.Second
+	SIRI_PASSAGE_ORDER       = "siri.passage_order"
+	DEFAULT_GTFS_TTL         = 30 * time.Second
 )
 
 type PartnerSettings struct {
@@ -255,6 +255,12 @@ func (s *PartnerSettings) SIRILinePublishedName() string {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.s[SIRI_LINE_PUBLISHED_NAME]
+}
+
+func (s *PartnerSettings) SIRIPassageOrder() string {
+	s.m.RLock()
+	defer s.m.RUnlock()
+	return s.s[SIRI_PASSAGE_ORDER]
 }
 
 func (s *PartnerSettings) SIRIEnvelopeType() (set string) {
