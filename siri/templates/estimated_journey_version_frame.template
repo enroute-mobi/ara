@@ -11,8 +11,9 @@
 					<siri:DestinationRef>{{ .References.DestinationRef }}</siri:DestinationRef>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
 					<siri:EstimatedCalls>{{ range .EstimatedCalls }}
 						<siri:EstimatedCall>
-							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
-							<siri:Order>{{ .Order }}</siri:Order>{{ if .StopPointName }}
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .UseVisitNumber }}
+							<siri:VisitNumber>{{ .Order }}</siri:VisitNumber>{{ else }}
+							<siri:Order>{{ .Order }}</siri:Order>{{ end }}{{ if .StopPointName }}
 							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}
 							<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{ if .DestinationDisplay }}
 							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}

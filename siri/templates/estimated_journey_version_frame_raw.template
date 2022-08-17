@@ -13,8 +13,9 @@
 					<OperatorRef/>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
 					<EstimatedCalls>{{ range .EstimatedCalls }}
 						<EstimatedCall>
-							<StopPointRef>{{ .StopPointRef }}</StopPointRef>
-							<Order>{{ .Order }}</Order>{{ if .StopPointName }}
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
+							<VisitNumber>{{ .Order }}</VisitNumber>{{ else }}
+							<Order>{{ .Order }}</Order>{{ end }}{{ if .StopPointName }}
 							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if .DestinationDisplay }}
 							<DestinationDisplay>{{ .DestinationDisplay }}</DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
 							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
@@ -28,8 +29,9 @@
 					<IsCompleteStopSequence>false</IsCompleteStopSequence>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
 					<RecordedCalls>{{ range .RecordedCalls }}
 						<RecordedCall>
-							<StopPointRef>{{ .StopPointRef }}</StopPointRef>
-							<Order>{{ .Order }}</Order>{{ if .StopPointName }}
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
+							<VisitNumber>{{ .Order }}</VisitNumber>{{ else }}
+							<Order>{{ .Order }}</Order>{{ end }}{{ if .StopPointName }}
 							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if .DestinationDisplay }}
 							<DestinationDisplay>{{ .DestinationDisplay }}</DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
 							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
