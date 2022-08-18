@@ -60,7 +60,8 @@ type SIRIMonitoredStopVisit struct {
 	VehicleAtStop bool
 	Monitored     bool
 
-	Order int
+	Order          int
+	UseVisitNumber bool
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time
