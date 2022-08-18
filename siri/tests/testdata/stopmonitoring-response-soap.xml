@@ -96,7 +96,7 @@
               <ns3:VehicleRef>NINOXE:Vehicle:22:LOC</ns3:VehicleRef>
               <ns3:MonitoredCall>
                 <ns3:StopPointRef>NINOXE:StopPoint:Q:51:LOC</ns3:StopPointRef>
-                <ns3:Order>5</ns3:Order>
+                <ns3:VisitNumber>5</ns3:VisitNumber>
                 <ns3:StopPointName>Elf Sylvain - Métro (A)</ns3:StopPointName>
                 <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
                 <ns3:AimedArrivalTime>2016-09-22T07:56:00.000+02:00</ns3:AimedArrivalTime>
