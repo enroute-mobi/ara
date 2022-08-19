@@ -116,6 +116,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	if !ok {
 		return nil
 	}
+	var useVisitNumber = builder.useVisitNumber()
 
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 		ItemIdentifier:         itemIdentifier,
@@ -140,6 +141,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		Attributes:             make(map[string]map[string]string),
 		References:             make(map[string]map[string]string),
 	}
+
+	monitoredStopVisit.UseVisitNumber = useVisitNumber
+
 	if !stopPointRef.Monitored {
 		monitoredStopVisit.Monitored = false
 	}
@@ -174,6 +178,15 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 
 	return monitoredStopVisit
+}
+
+func (builder *BroadcastStopMonitoringBuilder) useVisitNumber() bool {
+	switch builder.partner.PartnerSettings.SIRIPassageOrder() {
+	case "visit_number":
+		return true
+	default:
+		return false
+	}
 }
 
 func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {

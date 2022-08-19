@@ -238,6 +238,8 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 				vehicleJourneys[vehicleJourney.Id()] = estimatedVehicleJourney
 			}
 
+			var useVisitNumber = ett.connector.UseVisitNumber()
+
 			if stopVisit.IsRecordable() && ett.connector.Partner().RecordedCallsDuration() != 0 {
 				// recordedCall
 				recordedCall := &siri.SIRIRecordedCall{
@@ -252,6 +254,8 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					StopPointName:         stopArea.Name,
 					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
 				}
+
+				recordedCall.UseVisitNumber = useVisitNumber
 
 				estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
 			} else {
@@ -269,6 +273,9 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
 					VehicleAtStop:         stopVisit.VehicleAtStop,
 				}
+
+				estimatedCall.UseVisitNumber = useVisitNumber
+
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 			}
 
@@ -282,6 +289,15 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 			}
 		}
 		ett.sendDelivery(delivery)
+	}
+}
+
+func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) UseVisitNumber() bool {
+	switch connector.Partner().PartnerSettings.SIRIPassageOrder() {
+	case "visit_number":
+		return true
+	default:
+		return false
 	}
 }
 

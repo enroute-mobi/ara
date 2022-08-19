@@ -3,6 +3,142 @@ Feature: Support SIRI ProductionTimeTable by subscription
   Background:
     Given a Referential "test" is created
 
+  @ARA-1139
+  Scenario: Handle a SOAP SIRI ProductionTimeTable subscription to all lines with partner setting siri.passage_order set to visit_number should use VisitNumber tag instead of Order
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | ara                   |
+       | local_credential     | test                  |
+       | remote_objectid_kind | internal              |
+       | siri.passage_order   | visit_number          |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 24                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 25                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32                              |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | DirectionType                      | Aller                                   |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+    And a minute has passed
+    And I send this SIRI request
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+  <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
+    <SubscriptionRequestInfo>
+      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>      
+      <siri:RequestorRef>test</siri:RequestorRef>
+      <siri:MessageIdentifier>1</siri:MessageIdentifier>
+    </SubscriptionRequestInfo>
+    <Request>
+      <siri:ProductionTimetableSubscriptionRequest>
+        <siri:SubscriberRef>test</siri:SubscriberRef>
+        <siri:SubscriptionIdentifier>1</siri:SubscriptionIdentifier>
+        <siri:InitialTerminationTime>2017-01-03T12:01:05.000Z</siri:InitialTerminationTime>
+        <siri:ProductionTimetableRequest>
+          <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>
+        </siri:ProductionTimetableRequest>
+      </siri:ProductionTimetableSubscriptionRequest>
+    </Request>
+    <RequestExtension/>
+  </sw:Subscribe>
+</S:Body>
+</S:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+<S:Body>
+<sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+    <SubscriptionAnswerInfo>
+        <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+        <siri:Address></siri:Address>
+        <siri:ResponderRef>ara</siri:ResponderRef>
+        <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">1</siri:RequestMessageRef>
+    </SubscriptionAnswerInfo>
+    <Answer>
+        <siri:ResponseStatus>
+            <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+            <siri:RequestMessageRef></siri:RequestMessageRef>
+            <siri:SubscriberRef>test</siri:SubscriberRef>
+            <siri:SubscriptionRef>1</siri:SubscriptionRef>
+            <siri:Status>true</siri:Status>
+            <siri:ValidUntil>2017-01-03T12:01:05.000Z</siri:ValidUntil>
+        </siri:ResponseStatus>
+        <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
+    </Answer>
+<AnswerExtension />
+</sw:SubscribeResponse>
+</S:Body>
+</S:Envelope>
+      """
+    And 2 minutes have passed
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+  <S:Body>
+    <sw:NotifyProductionTimetable xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2017-01-01T12:03:00.000Z</siri:ResponseTimestamp>
+        <siri:ProducerRef>ara</siri:ProducerRef>
+      </ServiceDeliveryInfo>
+      <Notification>
+        <siri:ProductionTimetableDelivery version='2.0:FR-IDF-2.4'>
+          <siri:ResponseTimestamp>2017-01-01T12:03:00.000Z</siri:ResponseTimestamp>
+          <siri:SubscriptionRef>1</siri:SubscriptionRef>
+          <siri:Status>true</siri:Status>
+          <siri:DatedTimetableVersionFrame>
+            <siri:RecordedAtTime>2017-01-01T12:03:00.000Z</siri:RecordedAtTime>
+            <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+            <siri:DirectionRef>Aller</siri:DirectionRef>
+            <siri:FirstOrLastJourney>unspecified</siri:FirstOrLastJourney>
+            <siri:DatedVehicleJourney>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>2017-01-01</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+              <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+              <siri:FirstOrLastJourney>unspecified</siri:FirstOrLastJourney>
+              <siri:DatedCalls>
+                <siri:DatedCall>
+                  <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                  <siri:VisitNumber>4</siri:VisitNumber>
+                  <siri:StopPointName>Test 24</siri:StopPointName>
+                  <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
+                </siri:DatedCall>
+              </siri:DatedCalls>
+            </siri:DatedVehicleJourney>
+          </siri:DatedTimetableVersionFrame>
+        </siri:ProductionTimetableDelivery>
+      </Notification>
+      <NotifyExtension/>
+    </sw:NotifyProductionTimetable>
+  </S:Body>
+</S:Envelope>
+      """
+
   Scenario: Handle a SOAP SIRI ProductionTimeTable subscription to all lines
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
@@ -37,7 +173,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
-      | PassageOrder                    | 4                                                                    |
+      | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
@@ -130,11 +266,13 @@ Feature: Support SIRI ProductionTimeTable by subscription
               <siri:DatedCalls>
                 <siri:DatedCall>
                   <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                  <siri:Order>4</siri:Order>
                   <siri:StopPointName>Test 24</siri:StopPointName>
                   <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                 </siri:DatedCall>
                 <siri:DatedCall>
                   <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
+                  <siri:Order>5</siri:Order>
                   <siri:StopPointName>Test 25</siri:StopPointName>
                   <siri:AimedArrivalTime>2017-01-01T17:00:00.000Z</siri:AimedArrivalTime>
                 </siri:DatedCall>
@@ -185,7 +323,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
-      | PassageOrder                    | 4                                                                    |
+      | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
@@ -259,11 +397,13 @@ Feature: Support SIRI ProductionTimeTable by subscription
           <DatedCalls>
             <DatedCall>
               <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+              <Order>4</Order>
               <StopPointName>Test 24</StopPointName>
               <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
             </DatedCall>
             <DatedCall>
               <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>5</Order>
               <StopPointName>Test 25</StopPointName>
               <AimedArrivalTime>2017-01-01T17:00:00.000Z</AimedArrivalTime>
             </DatedCall>
@@ -454,6 +594,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
           <DatedCalls>
             <DatedCall>
               <StopPointRef>fr:1:StopPlace:OURA2:StopArea:log351672</StopPointRef>
+              <Order>4</Order>
               <StopPointName>Parent</StopPointName>
               <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
             </DatedCall>

@@ -59,7 +59,8 @@ type SIRIEstimatedCall struct {
 
 	VehicleAtStop bool
 
-	Order int
+	Order          int
+	UseVisitNumber bool
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time
@@ -75,7 +76,8 @@ type SIRIRecordedCall struct {
 	StopPointName      string
 	DestinationDisplay string
 
-	Order int
+	Order          int
+	UseVisitNumber bool
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time

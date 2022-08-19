@@ -17,8 +17,9 @@
 					<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
 					<DatedCalls>{{ range .DatedCalls }}
 						<DatedCall>
-							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .VisitNumber }}
-							<VisitNumber>{{ .VisitNumber }}</VisitNumber>{{ end }}{{ if .StopPointName }}
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
+							<VisitNumber>{{ .Order }}</VisitNumber>{{ else }}
+							<Order>{{ .Order }}</Order>{{ end }}{{ if .StopPointName }}
 							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
 							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .AimedDepartureTime.IsZero }}
 							<AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedDepartureTime>{{ end }}

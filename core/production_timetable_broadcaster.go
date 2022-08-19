@@ -201,15 +201,16 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 			}
 
 			// DatedCall
-			vn, _ := stopVisit.Attribute("VisitNumber")
 			datedCall := &siri.SIRIDatedCall{
 				AimedArrivalTime:   stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
 				AimedDepartureTime: stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-				VisitNumber:        vn,
+				Order:              stopVisit.PassageOrder,
 				StopPointRef:       stopAreaId,
 				StopPointName:      stopArea.Name,
 				DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
 			}
+
+			datedCall.UseVisitNumber = ptt.connector.useVisitNumber()
 
 			datedVehicleJourney.DatedCalls = append(datedVehicleJourney.DatedCalls, datedCall)
 
@@ -224,6 +225,14 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 			}
 		}
 		ptt.sendDelivery(delivery)
+	}
+}
+func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) useVisitNumber() bool {
+	switch connector.Partner().PartnerSettings.SIRIPassageOrder() {
+	case "visit_number":
+		return true
+	default:
+		return false
 	}
 }
 

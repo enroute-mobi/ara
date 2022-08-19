@@ -19,8 +19,9 @@
 					<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
 					<siri:DatedCalls>{{ range .DatedCalls }}
 						<siri:DatedCall>
-							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .VisitNumber }}
-							<siri:VisitNumber>{{ .VisitNumber }}</siri:VisitNumber>{{ end }}{{ if .StopPointName }}
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .UseVisitNumber }}
+							<siri:VisitNumber>{{ .Order }}</siri:VisitNumber>{{ else }}
+							<siri:Order>{{ .Order }}</siri:Order>{{ end }}{{ if .StopPointName }}
 							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
 							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .AimedDepartureTime.IsZero }}
 							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}

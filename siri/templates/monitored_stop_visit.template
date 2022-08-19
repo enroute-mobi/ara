@@ -45,8 +45,8 @@
 					</siri:TrainNumber>{{ end }}{{ if .Attributes.VehicleJourneyAttributes.SituationRef }}
 					<siri:SituationRef>{{.Attributes.VehicleJourneyAttributes.SituationRef}}</siri:SituationRef>{{end}}
 					<siri:MonitoredCall>{{if .StopPointRef}}
-						<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{end}}{{if .Order}}
-						<siri:Order>{{ .Order }}</siri:Order>{{end}}{{if .StopPointName}}
+						<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{end}}{{ if .Order }}
+						{{ if .UseVisitNumber }}<siri:VisitNumber>{{ .Order }}</siri:VisitNumber>{{ else }}<siri:Order>{{ .Order }}</siri:Order>{{ end }}{{ end }}{{ if .StopPointName }}
 						<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{end}}
 						<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{if .Attributes.StopVisitAttributes.PlatformTraversal }}
 						<siri:PlatformTraversal>{{ .Attributes.StopVisitAttributes.PlatformTraversal }}</siri:PlatformTraversal>{{end}}{{if .Attributes.StopVisitAttributes.DestinationDisplay }}

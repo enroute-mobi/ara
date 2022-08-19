@@ -146,6 +146,8 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 					VehicleAtStop:      svs[i].VehicleAtStop,
 				}
 
+				estimatedCall.UseVisitNumber = connector.UseVisitNumber()
+
 				if stopArea.Monitored {
 					estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
 					estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
@@ -167,6 +169,15 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 		}
 	}
 	return delivery
+}
+
+func (connector *SIRIEstimatedTimetableBroadcaster) UseVisitNumber() bool {
+	switch connector.partner.PartnerSettings.SIRIPassageOrder() {
+	case "visit_number":
+		return true
+	default:
+		return false
+	}
 }
 
 func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {

@@ -282,8 +282,14 @@ func (vj *XMLMonitoredVehicleJourney) ArrivalStatus() string {
 
 func (vj *XMLMonitoredVehicleJourney) Order() int {
 	if vj.order == 0 {
-		vj.order = vj.findIntChildContent("Order")
+		if vj.findNode("Order") != nil {
+			vj.order = vj.findIntChildContent("Order")
+
+		} else {
+			vj.order = vj.findIntChildContent("VisitNumber")
+		}
 	}
+
 	return vj.order
 }
 

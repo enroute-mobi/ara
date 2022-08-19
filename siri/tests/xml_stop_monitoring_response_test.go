@@ -71,6 +71,7 @@ func Test_XMLStopMonitoringResponse_XMLMonitoredStopVisit(t *testing.T) {
 func Test_XMLMonitoredStopVisit(t *testing.T) {
 	response := getXMLStopMonitoringResponse(t)
 	monitoredStopVisit := response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0]
+	othetMonitoredStopVisit := response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[1]
 
 	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; monitoredStopVisit.ItemIdentifier() != expected {
 		t.Errorf("Incorrect ItemIdentifier for stopVisit:\n expected: %v\n got: %v", expected, monitoredStopVisit.ItemIdentifier())
@@ -98,6 +99,9 @@ func Test_XMLMonitoredStopVisit(t *testing.T) {
 	}
 	if expected := 4; monitoredStopVisit.Order() != expected {
 		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.Order())
+	}
+	if expected := 5; othetMonitoredStopVisit.Order() != expected {
+		t.Errorf("Incorrect Order for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, othetMonitoredStopVisit.Order())
 	}
 	if expected := "NINOXE:Company:15563880:LOC"; monitoredStopVisit.OperatorRef() != expected {
 		t.Errorf("Incorrect OperatorRef for stopVisit:\n expected: \"%v\"\n got: \"%v\"", expected, monitoredStopVisit.OperatorRef())

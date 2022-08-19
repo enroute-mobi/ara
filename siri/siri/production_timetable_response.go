@@ -33,7 +33,8 @@ type SIRIDatedCall struct {
 	StopPointRef       string
 	StopPointName      string
 	DestinationDisplay string
-	VisitNumber        string
+	Order              int
+	UseVisitNumber     bool
 
 	AimedArrivalTime   time.Time
 	AimedDepartureTime time.Time
