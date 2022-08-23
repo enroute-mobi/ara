@@ -189,7 +189,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 				datedVehicleJourney = &siri.SIRIDatedVehicleJourney{
 					DataFrameRef:           ptt.connector.dataFrameRef(),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
-					PublishedLineName:      line.Name,
+					PublishedLineName:      ptt.connector.publishedLineName(line),
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
@@ -234,6 +234,23 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) useVisitNumber(
 	default:
 		return false
 	}
+}
+
+func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
+	var pln string
+
+	switch connector.partner.PartnerSettings.SIRILinePublishedName() {
+	case "number":
+		if line.Number != "" {
+			pln = line.Number
+		} else {
+			pln = line.Name
+		}
+	default:
+		pln = line.Name
+	}
+
+	return pln
 }
 
 func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
