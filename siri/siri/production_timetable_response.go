@@ -40,6 +40,17 @@ type SIRIDatedCall struct {
 	AimedDepartureTime time.Time
 }
 
+type SIRIDatedCalls []*SIRIDatedCall
+
+func (a SIRIDatedCalls) Len() int      { return len(a) }
+func (a SIRIDatedCalls) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type SortByStopPointOrder struct{ SIRIDatedCalls }
+
+func (s SortByStopPointOrder) Less(i, j int) bool {
+	return s.SIRIDatedCalls[i].Order < s.SIRIDatedCalls[j].Order
+}
+
 func (frame *SIRIDatedTimetableVersionFrame) BuildDatedTimetableVersionFrameXML() (string, error) {
 	var buffer bytes.Buffer
 	if err := templates.ExecuteTemplate(&buffer, "dated_timetable_version_frame.template", frame); err != nil {
