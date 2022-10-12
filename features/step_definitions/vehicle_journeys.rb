@@ -11,6 +11,12 @@ Given(/^a VehicleJourney exists (?:in Referential "([^"]+)" )?with the following
   debug response.body
 end
 
+Then(/^the VehicleJourney "([^"]*)" has the following attributes:$/) do |identifier, attributes|
+  response = RestClient.get vehicle_journey_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
+  vehicleJourneyAttributes = api_attributes(response.body)
+  expect(vehicleJourneyAttributes).to include(model_attributes(attributes))
+end
+
 Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
 	response = RestClient.get vehicle_journeys_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = JSON.parse(response.body)
