@@ -4,6 +4,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+
+	"golang.org/x/exp/maps"
 )
 
 type UpdateManager struct {
@@ -133,9 +135,8 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.LineId = l.Id()
 	}
 
-	if vj.Attributes.IsEmpty() {
-		vj.Attributes = event.Attributes()
-	}
+	maps.Copy(vj.Attributes, event.Attributes())
+
 	if vj.References.IsEmpty() {
 		vj.References = event.References()
 	}

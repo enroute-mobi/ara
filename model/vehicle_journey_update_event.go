@@ -65,6 +65,13 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set("DestinationName", ue.SiriXML.DestinationName())
 	ue.attributes.Set("OriginName", ue.SiriXML.OriginName())
 
+	// filter empty attributes
+	for k := range ue.attributes {
+		if ue.attributes[k] == "" {
+			delete(ue.attributes, k)
+		}
+	}
+
 	return ue.attributes
 }
 
