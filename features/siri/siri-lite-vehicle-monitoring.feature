@@ -23,6 +23,7 @@ Feature: Support SIRI VehicleMonitoring
       | Longitude        | 1.234                                 |
       | Latitude         | 5.678                                 |
       | Bearing          | 123                                   |
+      | Occupancy        | seatsAvailable                        |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
@@ -60,7 +61,8 @@ Feature: Support SIRI VehicleMonitoring
             "VehicleLocation": {
               "Longitude": 1.234,
               "Latitude": 5.678
-            }
+            },
+            "Occupancy": "seatsAvailable"
           }
         }]
       }

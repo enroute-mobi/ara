@@ -33,6 +33,7 @@ type MonitoredVehicleJourney struct {
 	Delay                   *time.Time `json:",omitempty"`
 	Bearing                 float64
 	VehicleLocation         *VehicleLocation
+	Occupancy               string `json:",omitempty"`
 }
 
 type FramedVehicleJourneyRef struct {
