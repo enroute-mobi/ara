@@ -124,6 +124,7 @@ class SIRIServer
       <ns3:Status>true</ns3:Status>
       <ns3:ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ns3:ServiceStartedTime>
     </Answer>
+    <AnswerExtension/>
   </ns8:CheckStatusResponse>)
   end
 
@@ -149,6 +150,7 @@ class SIRIServer
         <ns3:Status>true</ns3:Status>
         <ns3:ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ns3:ServiceStartedTime>
       </Answer>
+      <AnswerExtension/>
     </ns8:CheckStatusResponse>
   </S:Body>
 </S:Envelope>)

@@ -37,7 +37,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -91,7 +91,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -112,17 +112,17 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a minute has passed
     When I send this SIRI request
       """
+      <?xml version='1.0' encoding='utf-8'?>
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
           <ns6:NotifyVehicleMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
           xmlns:ns3="http://www.ifopt.org.uk/acsb"
           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
+          xmlns:ns5="http://www.siri.org.uk/siri"
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>VehicleMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -130,7 +130,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
             <Notification>
               <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns5:ResponseTimestamp>2022-06-25T15:08:14.940+02:00</ns5:ResponseTimestamp>
-                <ns5:RequestMessageRef>b19593b2-bf2d-43e6-9b20-41914064b0e8</ns5:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns5:Status>true</ns5:Status>
