@@ -455,11 +455,10 @@ func (partner *Partner) VehicleMonitoringRequestCollector() VehicleMonitoringReq
 }
 
 func (partner *Partner) VehicleMonitoringSubscriptionCollector() VehicleMonitoringSubscriptionCollector {
-	// To be implemented
-	// client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR]
-	// if ok {
-	// 	return client.(VehicleMonitoringSubscriptionCollector)
-	// }
+	client, ok := partner.connectors[SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR]
+	if ok {
+		return client.(VehicleMonitoringSubscriptionCollector)
+	}
 	return nil
 }
 

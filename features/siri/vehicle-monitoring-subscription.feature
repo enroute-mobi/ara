@@ -3,6 +3,60 @@ Feature: Support SIRI VehicleMonitoring by subscription
   Background:
       Given a Referential "test" is created
 
+  Scenario: Create Vehicle Monitoring subscription by Line
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+  <?xml version='1.0' encoding='utf-8'?>
+  <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+      <SubscriptionAnswerInfo
+        xmlns:ns2="http://www.ifopt.org.uk/acsb"
+        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+        xmlns:ns5="http://www.siri.org.uk/siri"
+        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+        <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+        <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+        <ns5:RequestMessageRef>response</ns5:RequestMessageRef>
+      </SubscriptionAnswerInfo>
+      <Answer
+        xmlns:ns2="http://www.ifopt.org.uk/acsb"
+        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+        xmlns:ns5="http://www.siri.org.uk/siri"
+        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        <ns5:ResponseStatus>
+            <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+            <ns5:RequestMessageRef>{LastRequestMessageRef}</ns5:RequestMessageRef>
+            <ns5:SubscriberRef>test</ns5:SubscriberRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+            <ns5:Status>true</ns5:Status>
+            <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
+        </ns5:ResponseStatus>
+        <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
+      </Answer>
+      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+    </ns1:SubscribeResponse>
+  </S:Body>
+  </S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-vehicle-monitoring-subscription-collector] and the following settings:
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | NINOXE:default                 |
+      | remote_objectid_kind               | internal                       |
+    And a Line exists with the following attributes:
+      | Name      | Test                   |
+      | ObjectIDs | "internal": "testLine" |
+    When a minute has passed
+    And a minute has passed
+    And a minute has passed
+    Then one Subscription exists with the following attributes:
+      | Kind                      | VehicleMonitoringCollect |
+      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z     |
+
   Scenario: Update a Vehicle after a VehicleMonitoringDelivery in a subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -138,3 +192,5 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | ObjectIDs | "internal": "108"                 |
       | LineId    | 6ba7b814-9dad-11d1-a-00c04fd430c8 |
       | Bearing   | 171.0                             |
+      | Latitude  | 48.99927561424598                 |
+      | Longitude | 1.6770970859674874                |

@@ -50,6 +50,7 @@ class SIRIServer
 
         request_message_identifiers = req.body.scan(/MessageIdentifier>(.*)</).flatten
         if checkstatus_response_standard?(req)
+          puts "[#{url}] Response to CheckStatus request" if ENV["SIRI_DEBUG"]
           case @envelope
           when 'SOAP'
             res.body = soap_checkstatus_response(request_message_identifiers)
@@ -59,7 +60,7 @@ class SIRIServer
             raise "Unknown envelope #{@envelope}"
           end
         else
-          puts 'Receive SIRI request: %s' % [req] if ENV["SIRI_DEBUG"]
+          puts "[#{url}] Receive SIRI request:\n#{req}" if ENV["SIRI_DEBUG"]
           requests << req
 
           request_body = @responses.shift
@@ -67,6 +68,7 @@ class SIRIServer
           request_body.gsub!("{LastRequestMessageRef}", request_message_identifiers.last)
 
           res.body = request_body
+          puts "[#{url}] Send SIRI response:\n#{res.body}" if ENV["SIRI_DEBUG"]
         end
 
         Siri::Validator.create(res.body,"server response").log

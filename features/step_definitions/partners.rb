@@ -70,7 +70,16 @@ Then(/^one Subscription exists with the following attributes:$/) do |attributes|
   response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
   response_array = JSON.parse(response.body)
 
-  expect(response_array).to include(a_hash_including(attributes.rows_hash))
+  attributes = attributes.rows_hash
+  # TODO: build complex matcher from attributes ...
+  if (subscribed_at = attributes.delete("Resources[0]/SubscribedAt"))
+    if %r{^> (.*)$} =~ subscribed_at
+      subscribed_at = (a_value > $1)
+    end
+    attributes["Resources"] = a_collection_including(a_hash_including("SubscribedAt" => subscribed_at))
+  end
+
+  expect(response_array).to include(a_hash_including(attributes))
 end
 
 Then(/^Subscriptions exist with the following attributes:$/) do |attributes|
