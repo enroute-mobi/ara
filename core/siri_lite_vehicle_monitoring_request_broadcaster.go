@@ -107,6 +107,8 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
 		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vs[i].Latitude
 
+		activity.MonitoredVehicleJourney.Occupancy = vs[i].Occupancy
+
 		response.VehicleActivity = append(response.VehicleActivity, activity)
 
 		vehicleIds = append(vehicleIds, vehicleId.Value())
