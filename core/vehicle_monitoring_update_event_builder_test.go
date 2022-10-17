@@ -34,17 +34,17 @@ func Test_Coordinates_Transform(t *testing.T) {
 	vm := getvm(t, "testdata/vm_response_soap.xml")
 	va := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0]
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err != nil {
 		t.Errorf("Error while converting: %v", err)
 	}
 
-	if e := 7.2761920740520; round(coord.X) != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, round(coord.X))
+	if e := 7.2761920740520; round(lon) != e {
+		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, round(lon))
 	}
-	if e := 43.703478618706; round(coord.Y) != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, round(coord.Y))
+	if e := 43.703478617764; round(lat) != e {
+		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, round(lat))
 	}
 }
 
@@ -63,17 +63,17 @@ func Test_Coordinates_WithLonLat(t *testing.T) {
 	va.SetLongitude("1.1234")
 	va.SetLatitude("2.3456")
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err != nil {
 		t.Errorf("Error while converting: %v", err)
 	}
 
-	if e := 1.1234; coord.X != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, coord.X)
+	if e := 1.1234; lon != e {
+		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, lon)
 	}
-	if e := 2.3456; coord.Y != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, coord.Y)
+	if e := 2.3456; lat != e {
+		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, lat)
 	}
 }
 
@@ -86,17 +86,17 @@ func Test_Coordinates_WithLongitude(t *testing.T) {
 
 	va.SetLongitude("1.1234")
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err != nil {
 		t.Errorf("Error while converting: %v", err)
 	}
 
-	if e := 1.1234; coord.X != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, coord.X)
+	if e := 1.1234; lon != e {
+		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, lon)
 	}
-	if e := 0.0; coord.Y != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, coord.Y)
+	if e := 0.0; lat != e {
+		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, lat)
 	}
 }
 
@@ -109,17 +109,17 @@ func Test_Coordinates_WithLatitude(t *testing.T) {
 
 	va.SetLatitude("2.3456")
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err != nil {
 		t.Errorf("Error while converting: %v", err)
 	}
 
-	if e := 0.0; coord.X != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, coord.X)
+	if e := 0.0; lon != e {
+		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, lon)
 	}
-	if e := 2.3456; coord.Y != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, coord.Y)
+	if e := 2.3456; lat != e {
+		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, lat)
 	}
 }
 
@@ -132,10 +132,10 @@ func Test_Coordinates_InvalidSRS(t *testing.T) {
 
 	va.SetSRSName("invalid srs name")
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err == nil {
-		t.Errorf("Converting coordinates should return an error, got nothing and the following coordinates: %v", coord)
+		t.Errorf("Converting coordinates should return an error, got nothing and the following coordinates: %v, %v", lon, lat)
 	}
 }
 
@@ -148,9 +148,9 @@ func Test_Coordinates_InvalidCoordinates(t *testing.T) {
 
 	va.SetCoordinates("invalid")
 
-	coord, err := builder.handleCoordinates(va)
+	lon, lat, err := builder.handleCoordinates(va)
 
 	if err == nil {
-		t.Errorf("Converting coordinates should return an error, got nothing and the following coordinates: %v", coord)
+		t.Errorf("Converting coordinates should return an error, got nothing and the following coordinates: %v, %v", lon, lat)
 	}
 }

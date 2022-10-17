@@ -6,7 +6,6 @@ require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
 	cloud.google.com/go v0.104.0
 	cloud.google.com/go/bigquery v1.40.0
-	github.com/everystreet/go-proj/v6 v6.0.0
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
 	github.com/jonboulle/clockwork v0.3.0
@@ -14,6 +13,7 @@ require (
 	github.com/rubenv/sql-migrate v1.2.0
 	github.com/satori/uuid v1.2.0
 	github.com/stretchr/testify v1.7.0
+	github.com/wroge/wgs84 v1.1.6
 	golang.org/x/exp v0.0.0-20221012112151-59b0eab1532e
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	golang.org/x/text v0.3.7
@@ -28,13 +28,13 @@ require (
 	cloud.google.com/go/iam v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
-	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.5.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
