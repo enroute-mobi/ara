@@ -9,7 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"github.com/everystreet/go-proj/v6/proj"
+	"github.com/wroge/wgs84"
 )
 
 type VehicleMonitoringUpdateEventBuilder struct {
@@ -127,10 +127,10 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Occupancy:              model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 		}
 
-		coord, err := builder.handleCoordinates(xmlVehicleActivity)
+		longitude, latitude, err := builder.handleCoordinates(xmlVehicleActivity)
 		if err == nil {
-			vEvent.Longitude = coord.X
-			vEvent.Latitude = coord.Y
+			vEvent.Longitude = longitude
+			vEvent.Latitude = latitude
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
@@ -138,14 +138,12 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (xy proj.XY, e error) {
+func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (lon, lat float64, e error) {
 	longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
 	latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
 
 	if latitude != 0 || longitude != 0 {
-		xy.X = longitude
-		xy.Y = latitude
-		return
+		return longitude, latitude, nil
 	}
 
 	if xmlVehicleActivity.Coordinates() == "" {
@@ -164,27 +162,37 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 		return
 	}
 
-	xy.X = x
-	xy.Y = y
+	var formatSRSName int
+	formatSRSName, e = builder.formatSRSNameWithDefaut(xmlVehicleActivity.SRSName())
+	if e != nil {
+		return lon, lat, e
+	}
 
-	e = proj.CRSToCRS(
-		builder.formatSRSNameWithDefaut(xmlVehicleActivity.SRSName()),
-		"+proj=latlong",
-		func(pj proj.Projection) {
-			proj.TransformForward(pj, &xy)
-		})
+	epsg := wgs84.EPSG()
+	lon, lat, _, e = epsg.SafeTransform(formatSRSName, 4326)(x, y, 0)
 
-	return
+	return lon, lat, e
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs string) string {
+func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs string) (int, error) {
 	if srs == "" {
-		return builder.partner.DefaultSRSName()
+		return convertSRSNameToValue(strings.TrimPrefix(builder.partner.DefaultSRSName(), "EPSG:"))
 	}
+
 	if strings.HasPrefix(srs, "EPSG:") {
-		return srs
+		return convertSRSNameToValue(strings.TrimPrefix(srs, "EPSG:"))
 	}
-	return "EPSG:" + srs
+
+	return convertSRSNameToValue(srs)
+}
+
+func convertSRSNameToValue(srs string) (int, error) {
+	srsValue, err := strconv.Atoi(srs)
+	if err != nil {
+		return 0, err
+	}
+
+	return srsValue, nil
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities []*sxml.XMLVehicleActivity) {
