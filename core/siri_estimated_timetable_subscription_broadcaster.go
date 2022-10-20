@@ -263,6 +263,8 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addFilteredStopVisit(subId SubscriptionId, sv *model.StopVisit) {
 	connector.mutex.Lock()
+	defer connector.mutex.Unlock()
+
 	// ignore stopVist before the RecordedCallsDuration if any
 	if sv.IsRecordable() &&
 		connector.Partner().RecordedCallsDuration() != 0 &&
@@ -270,13 +272,13 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addFilteredStopV
 		return
 	}
 	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], sv.Id())
-	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
 	connector.mutex.Lock()
+	defer connector.mutex.Unlock()
+
 	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], svId)
-	connector.mutex.Unlock()
 }
 
 func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
@@ -286,6 +288,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 	}
 
 	connector.mutex.Lock()
+	defer connector.mutex.Unlock()
 
 	subs := connector.partner.Subscriptions().FindByResourceId(obj.String(), EstimatedTimetableBroadcast)
 	for _, sub := range subs {
@@ -312,8 +315,6 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEve
 			resource.SetLastState(string(stopArea.Id()), ls.NewStopAreaLastChange(stopArea, sub))
 		}
 	}
-
-	connector.mutex.Unlock()
 }
 
 // START TEST
