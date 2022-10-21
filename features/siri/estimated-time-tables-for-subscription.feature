@@ -931,6 +931,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Attribute[OriginName]              | Le début                             |
       | Attribute[DestinationName]         | La fin.                              |
       | Reference[DestinationRef]#ObjectId | "internal": "ThisIsTheEnd"           |
+      | Attributes[VehicleMode]            | bus                                  |
     And a StopVisit exists with the following attributes:
       | PassageOrder                    | 4                                 |
       | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
@@ -1048,11 +1049,11 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     <EstimatedVehicleJourney>
       <LineRef>NINOXE:Line:3:LOC</LineRef>
       <DirectionRef>ch:1:Direction:H</DirectionRef>
-      <VehicleMode>bus</VehicleMode>
       <FramedVehicleJourneyRef>
         <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
         <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       </FramedVehicleJourneyRef>
+      <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
