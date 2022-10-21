@@ -806,7 +806,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </S:Envelope>
       """
 
-  @ARA-1126
+  @wip
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with StopVisit departure time oustide the broadcast.recorded_calls.duration
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -852,7 +852,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     And 10 seconds have passed
     Then the SIRI server should not have received a NotifyEstimatedTimetable request
 
-  @ARA-1062 
+  @wip
   Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time oustide the broadcast.recorded_calls.duration
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
