@@ -14,6 +14,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/state"
 )
 
+type LineDirection struct {
+	Id        model.LineId
+	Direction string
+}
+
 type SIRIProductionTimeTableBroadcaster interface {
 	state.Stopable
 	state.Startable
@@ -104,7 +109,8 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 		}
 
 		processedStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
-		lines := make(map[model.LineId]*siri.SIRIDatedTimetableVersionFrame)
+
+		lines := make(map[LineDirection]*siri.SIRIDatedTimetableVersionFrame)
 		vehicleJourneys := make(map[model.VehicleJourneyId]*siri.SIRIDatedVehicleJourney)
 
 		delivery := &siri.SIRINotifyProductionTimeTable{
@@ -156,7 +162,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 			}
 
 			// Get the DatedTimetableVersionFrame
-			datedTTVersionFrame, ok := lines[line.Id()]
+			datedTTVersionFrame, ok := lines[LineDirection{Id: line.Id(), Direction: vehicleJourney.DirectionType}]
 			if !ok {
 				datedTTVersionFrame = &siri.SIRIDatedTimetableVersionFrame{
 					LineRef:        lineObjectId.Value(),
@@ -166,7 +172,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 				}
 
 				delivery.DatedTimetableVersionFrames = append(delivery.DatedTimetableVersionFrames, datedTTVersionFrame)
-				lines[line.Id()] = datedTTVersionFrame
+				lines[LineDirection{Id: line.Id(), Direction: vehicleJourney.DirectionType}] = datedTTVersionFrame
 			}
 
 			// Get the DatedVehicleJourney
