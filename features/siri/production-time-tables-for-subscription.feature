@@ -6,11 +6,12 @@ Feature: Support SIRI ProductionTimeTable by subscription
   Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines with 2 VehicleJourney having different DirectionType
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | ara                   |
-       | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
-       | siri.envelope        | raw                   |
+       | remote_url            | http://localhost:8090 |
+       | remote_credential     | ara                   |
+       | local_credential      | test                  |
+       | remote_objectid_kind  | internal              |
+       | siri.envelope         | raw                   |
+       | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -323,10 +324,11 @@ Feature: Support SIRI ProductionTimeTable by subscription
   Scenario: Handle a SOAP SIRI ProductionTimeTable subscription to all lines
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | ara                   |
-       | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
+       | remote_url            | http://localhost:8090 |
+       | remote_credential     | ara                   |
+       | local_credential      | test                  |
+       | remote_objectid_kind  | internal              |
+       | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -587,11 +589,12 @@ Feature: Support SIRI ProductionTimeTable by subscription
   Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | ara                   |
-       | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
-       | siri.envelope        | raw                   |
+       | remote_url            | http://localhost:8090 |
+       | remote_credential     | ara                   |
+       | local_credential      | test                  |
+       | remote_objectid_kind  | internal              |
+       | siri.envelope         | raw                   |
+       | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |

@@ -20,6 +20,8 @@ type SIRINotifyProductionTimeTable struct {
 	ErrorText         string
 
 	DatedTimetableVersionFrames []*SIRIDatedTimetableVersionFrame
+
+	SortForTests bool
 }
 
 func (notify *SIRINotifyProductionTimeTable) ErrorString() string {
@@ -43,6 +45,10 @@ func (notify *SIRINotifyProductionTimeTable) BuildXML(envelopeType ...string) (s
 	}
 
 	templateName = fmt.Sprintf("production_timetable_notify%s.template", envType)
+
+	if notify.SortForTests {
+		sort.Sort(SortByDirectionType{notify.DatedTimetableVersionFrames})
+	}
 
 	for _, dtvf := range notify.DatedTimetableVersionFrames {
 		for _, dvj := range dtvf.DatedVehicleJourneys {
