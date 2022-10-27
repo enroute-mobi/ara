@@ -135,22 +135,22 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 	}
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
-	if connector.updateSubscriber == nil {
-		return
-	}
-	for _, e := range events.StopAreas {
-		connector.updateSubscriber(e)
-	}
-	for _, e := range events.Lines {
-		connector.updateSubscriber(e)
-	}
-	for _, e := range events.VehicleJourneys {
-		connector.updateSubscriber(e)
-	}
-	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
-		for _, e := range es {
-			connector.updateSubscriber(e)
-		}
-	}
-}
+// func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
+// 	if connector.updateSubscriber == nil {
+// 		return
+// 	}
+// 	for _, e := range events.StopAreas {
+// 		connector.updateSubscriber(e)
+// 	}
+// 	for _, e := range events.Lines {
+// 		connector.updateSubscriber(e)
+// 	}
+// 	for _, e := range events.VehicleJourneys {
+// 		connector.updateSubscriber(e)
+// 	}
+// 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
+// 		for _, e := range es {
+// 			connector.updateSubscriber(e)
+// 		}
+// 	}
+// }

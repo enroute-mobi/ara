@@ -16,8 +16,8 @@ type XMLNotifyEstimatedTimetableDelivery struct {
 
 	lineRef string
 
-	monitoredStopVisits             []*XMLMonitoredStopVisit
-	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
+	// monitoredStopVisits             []*XMLMonitoredStopVisit
+	// monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
 }
 
 func NewXMLNotifyEstimatedTimetableDelivery(node XMLNode) *XMLNotifyEstimatedTimetableDelivery {
