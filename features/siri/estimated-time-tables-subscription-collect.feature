@@ -53,68 +53,15 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test                   |
       | ObjectIDs | "internal": "testLine" |
     And a minute has passed
+    And a minute has passed
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
-
-  @ARA-1152
-  Scenario: Audit a received SIRI EstimatedTimetable Notification
-    Given a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | test                  |
-      | remote_objectid_kind | internal              |
-    When I send this SIRI request to the Referential "test"
-      """
-<?xml version='1.0' encoding='utf-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-<S:Body>
-<sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-  <ServiceDeliveryInfo>
-    <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-    <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-    <siri:RequestMessageRef>enRoute:Message::test</siri:RequestMessageRef>
-  </ServiceDeliveryInfo>
-  <Notification>
-    <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
-      <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
-      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:Status>true</siri:Status>
-      <siri:EstimatedJourneyVersionFrame>
-        <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
-        <siri:EstimatedVehicleJourney>
-          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-          <siri:DirectionRef>Aller</siri:DirectionRef>
-          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
-          <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
-          <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
-          <siri:EstimatedCalls>
-            <siri:EstimatedCall>
-              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
-              <siri:Order>4</siri:Order>
-              <siri:StopPointName>Test</siri:StopPointName>
-              <siri:VehicleAtStop>false</siri:VehicleAtStop>
-              <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-              <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
-            </siri:EstimatedCall>
-          </siri:EstimatedCalls>
-        </siri:EstimatedVehicleJourney>
-      </siri:EstimatedJourneyVersionFrame>
-    </siri:EstimatedTimetableDelivery>
-  </Notification>
-  <NotifyExtension/>
-</sw:NotifyEstimatedTimetable>
-</S:Body>
-</S:Envelope>
-      """
-    Then an audit event should exist with these attributes:
-      | Type              | NotifyEstimatedTimetable |
-      | Direction         | received                 |
-      | Protocol          | siri                     |
-      | Partner           | test                     |
-      | RequestIdentifier | enRoute:Message::test    |
+    And  an audit event should exist with these attributes:
+      | Type      | EstimatedTimetableSubscriptionRequest |
+      | Direction | sent                                  |
+      | Protocol  | siri                                  |
+      | Partner   | test                                  |
+      | Status    | OK                                    |
 
 #   @ARA-1152
 #   Scenario: Update ara models after a EstimatedTimetableNotify in a subscription
