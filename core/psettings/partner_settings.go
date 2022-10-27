@@ -66,6 +66,8 @@ const (
 	SIRI_LINE_PUBLISHED_NAME = "siri.line.published_name"
 	SIRI_PASSAGE_ORDER       = "siri.passage_order"
 	DEFAULT_GTFS_TTL         = 30 * time.Second
+
+	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
 )
 
 type PartnerSettings struct {
@@ -226,6 +228,13 @@ func (s *PartnerSettings) GtfsCacheTimeout() (t time.Duration) {
 func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
 	s.m.RLock()
 	t, _ = time.ParseDuration(s.s[fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) SortForTests() (sort bool) {
+	s.m.RLock()
+	sort, _ = strconv.ParseBool(s.s[SORT_PAYLOAD_FOR_TEST])
 	s.m.RUnlock()
 	return
 }

@@ -51,6 +51,19 @@ func (s SortByStopPointOrder) Less(i, j int) bool {
 	return s.SIRIDatedCalls[i].Order < s.SIRIDatedCalls[j].Order
 }
 
+type SIRIDatedTimetableVersionFrames []*SIRIDatedTimetableVersionFrame
+
+func (a SIRIDatedTimetableVersionFrames) Len() int      { return len(a) }
+func (a SIRIDatedTimetableVersionFrames) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type SortByDirectionType struct {
+	SIRIDatedTimetableVersionFrames
+}
+
+func (s SortByDirectionType) Less(i, j int) bool {
+	return s.SIRIDatedTimetableVersionFrames[i].DirectionType < s.SIRIDatedTimetableVersionFrames[j].DirectionType
+}
+
 func (frame *SIRIDatedTimetableVersionFrame) BuildDatedTimetableVersionFrameXML() (string, error) {
 	var buffer bytes.Buffer
 	if err := templates.ExecuteTemplate(&buffer, "dated_timetable_version_frame.template", frame); err != nil {
