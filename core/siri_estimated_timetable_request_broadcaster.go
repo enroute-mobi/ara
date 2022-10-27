@@ -12,21 +12,21 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
-type EstimatedTimetableBroadcaster interface {
-	RequestLine(*sxml.XMLGetEstimatedTimetable, *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse
+type EstimatedTimetableRequestBroadcaster interface {
+	RequestLine(*sxml.XMLGetEstimatedTimetable, *audit.BigQueryMessage) *siri.SIRIEstimatedTimetableResponse
 }
 
-type SIRIEstimatedTimetableBroadcaster struct {
+type SIRIEstimatedTimetableRequestBroadcaster struct {
 	connector
 
 	dataFrameGenerator    *idgen.IdentifierGenerator
 	vjRemoteObjectidKinds []string
 }
 
-type SIRIEstimatedTimetableBroadcasterFactory struct{}
+type SIRIEstimatedTimetableRequestBroadcasterFactory struct{}
 
-func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimetableBroadcaster {
-	connector := &SIRIEstimatedTimetableBroadcaster{}
+func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimatedTimetableRequestBroadcaster {
+	connector := &SIRIEstimatedTimetableRequestBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
@@ -34,8 +34,8 @@ func NewSIRIEstimatedTimetableBroadcaster(partner *Partner) *SIRIEstimatedTimeta
 	return connector
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *sxml.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimeTableResponse {
-	response := &siri.SIRIEstimatedTimeTableResponse{
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) RequestLine(request *sxml.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimetableResponse {
+	response := &siri.SIRIEstimatedTimetableResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
 		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
@@ -54,7 +54,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) RequestLine(request *sxml.XM
 	return response
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDelivery(request *sxml.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetableDelivery(request *sxml.XMLEstimatedTimetableRequest) siri.SIRIEstimatedTimetableDelivery {
 	currentTime := connector.Clock().Now()
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{
@@ -171,7 +171,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedTimetableDeliver
 	return delivery
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) UseVisitNumber() bool {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) UseVisitNumber() bool {
 	switch connector.partner.PartnerSettings.SIRIPassageOrder() {
 	case "visit_number":
 		return true
@@ -180,7 +180,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) UseVisitNumber() bool {
 	}
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.partner.Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return &model.StopArea{}, "", false
@@ -199,7 +199,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) stopPointRef(stopAreaId mode
 	return &model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) publishedLineName(line *model.Line) string {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) publishedLineName(line *model.Line) string {
 	var pln string
 
 	switch connector.partner.PartnerSettings.SIRILinePublishedName() {
@@ -216,7 +216,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) publishedLineName(line *mode
 	return pln
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, origin string) map[string]string {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, origin string) map[string]string {
 	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -243,7 +243,7 @@ func (connector *SIRIEstimatedTimetableBroadcaster) getEstimatedVehicleJourneyRe
 	return references
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(origin string) bool {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) noDestinationRefRewrite(origin string) bool {
 	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
 		if origin == strings.TrimSpace(o) {
 			return true
@@ -252,12 +252,12 @@ func (connector *SIRIEstimatedTimetableBroadcaster) noDestinationRefRewrite(orig
 	return false
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) dataFrameRef() string {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
 	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }
 
-func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {
 	if _, ok := refs["OperatorRef"]; ok {
 		return
 	}
@@ -279,11 +279,11 @@ func (connector *SIRIEstimatedTimetableBroadcaster) resolveOperatorRef(refs map[
 	refs["OperatorRef"] = obj.Value()
 }
 
-func (factory *SIRIEstimatedTimetableBroadcasterFactory) Validate(apiPartner *APIPartner) {
+func (factory *SIRIEstimatedTimetableRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
 	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
-func (factory *SIRIEstimatedTimetableBroadcasterFactory) CreateConnector(partner *Partner) Connector {
-	return NewSIRIEstimatedTimetableBroadcaster(partner)
+func (factory *SIRIEstimatedTimetableRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
+	return NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 }

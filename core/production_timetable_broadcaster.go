@@ -19,7 +19,7 @@ type LineDirection struct {
 	Direction string
 }
 
-type SIRIProductionTimeTableBroadcaster interface {
+type SIRIProductionTimetableBroadcaster interface {
 	state.Stopable
 	state.Startable
 }
@@ -27,46 +27,46 @@ type SIRIProductionTimeTableBroadcaster interface {
 type PTTBroadcaster struct {
 	clock.ClockConsumer
 
-	connector *SIRIProductionTimeTableSubscriptionBroadcaster
+	connector *SIRIProductionTimetableSubscriptionBroadcaster
 }
 
-type ProductionTimeTableBroadcaster struct {
+type ProductionTimetableBroadcaster struct {
 	PTTBroadcaster
 
 	stop chan struct{}
 }
 
-type FakeProductionTimeTableBroadcaster struct {
+type FakeProductionTimetableBroadcaster struct {
 	PTTBroadcaster
 }
 
-func NewFakeProductionTimeTableBroadcaster(connector *SIRIProductionTimeTableSubscriptionBroadcaster) SIRIProductionTimeTableBroadcaster {
-	broadcaster := &FakeProductionTimeTableBroadcaster{}
+func NewFakeProductionTimetableBroadcaster(connector *SIRIProductionTimetableSubscriptionBroadcaster) SIRIProductionTimetableBroadcaster {
+	broadcaster := &FakeProductionTimetableBroadcaster{}
 	broadcaster.connector = connector
 	return broadcaster
 }
 
-func (broadcaster *FakeProductionTimeTableBroadcaster) Start() {
-	broadcaster.prepareSIRIProductionTimeTable()
+func (broadcaster *FakeProductionTimetableBroadcaster) Start() {
+	broadcaster.prepareSIRIProductionTimetable()
 }
 
-func (broadcaster *FakeProductionTimeTableBroadcaster) Stop() {}
+func (broadcaster *FakeProductionTimetableBroadcaster) Stop() {}
 
-func NewSIRIProductionTimeTableBroadcaster(connector *SIRIProductionTimeTableSubscriptionBroadcaster) SIRIProductionTimeTableBroadcaster {
-	broadcaster := &ProductionTimeTableBroadcaster{}
+func NewSIRIProductionTimetableBroadcaster(connector *SIRIProductionTimetableSubscriptionBroadcaster) SIRIProductionTimetableBroadcaster {
+	broadcaster := &ProductionTimetableBroadcaster{}
 	broadcaster.connector = connector
 
 	return broadcaster
 }
 
-func (ptt *ProductionTimeTableBroadcaster) Start() {
-	logger.Log.Debugf("Start ProductionTimeTableBroadcaster")
+func (ptt *ProductionTimetableBroadcaster) Start() {
+	logger.Log.Debugf("Start ProductionTimetableBroadcaster")
 
 	ptt.stop = make(chan struct{})
 	go ptt.run()
 }
 
-func (ptt *ProductionTimeTableBroadcaster) run() {
+func (ptt *ProductionTimetableBroadcaster) run() {
 	c := ptt.Clock().After(5 * time.Second)
 
 	for {
@@ -76,22 +76,22 @@ func (ptt *ProductionTimeTableBroadcaster) run() {
 
 			return
 		case <-c:
-			logger.Log.Debugf("SIRIProductionTimeTableBroadcaster visit")
+			logger.Log.Debugf("SIRIProductionTimetableBroadcaster visit")
 
-			ptt.prepareSIRIProductionTimeTable()
+			ptt.prepareSIRIProductionTimetable()
 
 			c = ptt.Clock().After(5 * time.Second)
 		}
 	}
 }
 
-func (ptt *ProductionTimeTableBroadcaster) Stop() {
+func (ptt *ProductionTimetableBroadcaster) Stop() {
 	if ptt.stop != nil {
 		close(ptt.stop)
 	}
 }
 
-func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
+func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 	ptt.connector.mutex.Lock()
 
 	events := ptt.connector.toBroadcast
@@ -113,7 +113,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 		lines := make(map[LineDirection]*siri.SIRIDatedTimetableVersionFrame)
 		vehicleJourneys := make(map[model.VehicleJourneyId]*siri.SIRIDatedVehicleJourney)
 
-		delivery := &siri.SIRINotifyProductionTimeTable{
+		delivery := &siri.SIRINotifyProductionTimetable{
 			ProducerRef:            ptt.connector.Partner().ProducerRef(),
 			SubscriptionIdentifier: sub.ExternalId(),
 			ResponseTimestamp:      ptt.connector.Clock().Now(),
@@ -225,16 +225,16 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimeTable() {
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
-				resource.SetLastState(string(stopVisit.Id()), ls.NewProductionTimeTableLastChange(stopVisit, sub))
+				resource.SetLastState(string(stopVisit.Id()), ls.NewProductionTimetableLastChange(stopVisit, sub))
 			} else {
-				lastState := lastStateInterface.(*ls.ProductionTimeTableLastChange)
+				lastState := lastStateInterface.(*ls.ProductionTimetableLastChange)
 				lastState.UpdateState(stopVisit)
 			}
 		}
 		ptt.sendDelivery(delivery)
 	}
 }
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) useVisitNumber() bool {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) useVisitNumber() bool {
 	switch connector.Partner().PartnerSettings.SIRIPassageOrder() {
 	case "visit_number":
 		return true
@@ -243,7 +243,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) useVisitNumber(
 	}
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
 	var pln string
 
 	switch connector.partner.PartnerSettings.SIRILinePublishedName() {
@@ -260,7 +260,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) publishedLineNa
 	return pln
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return &model.StopArea{}, "", false
@@ -287,12 +287,12 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) stopPointRef(st
 	return &model.StopArea{}, "", false
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) dataFrameRef() string {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
 	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) operatorRef(stopVisit *model.StopVisit) string {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) operatorRef(stopVisit *model.StopVisit) string {
 	operatorRef, ok := stopVisit.Reference("OperatorRef")
 	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
 		return ""
@@ -309,14 +309,14 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) operatorRef(sto
 	return obj.Value()
 }
 
-func (ptt *PTTBroadcaster) sendDelivery(delivery *siri.SIRINotifyProductionTimeTable) {
+func (ptt *PTTBroadcaster) sendDelivery(delivery *siri.SIRINotifyProductionTimetable) {
 	message := ptt.newBQEvent()
 
-	ptt.logSIRIProductionTimeTableNotify(message, delivery)
+	ptt.logSIRIProductionTimetableNotify(message, delivery)
 
 	t := ptt.Clock().Now()
 
-	err := ptt.connector.Partner().SIRIClient().NotifyProductionTimeTable(delivery)
+	err := ptt.connector.Partner().SIRIClient().NotifyProductionTimetable(delivery)
 	message.ProcessingTime = ptt.Clock().Since(t).Seconds()
 	if err != nil {
 		message.Status = "Error"
@@ -336,7 +336,7 @@ func (ptt *PTTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func (ptt *PTTBroadcaster) logSIRIProductionTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyProductionTimeTable) {
+func (ptt *PTTBroadcaster) logSIRIProductionTimetableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyProductionTimetable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, dttvf := range response.DatedTimetableVersionFrames {

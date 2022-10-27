@@ -1,10 +1,10 @@
-Feature: Support SIRI EstimatedTimeTable
+Feature: Support SIRI EstimatedTimetable
 
   Background:
       Given a Referential "test" is created
 
   @ARA-1139
-  Scenario: Handle a SIRI EstimatedTimeTable request with partner setting siri.passage_order set to visit_number should display the VisitNumber tag instead of Order tag
+  Scenario: Handle a SIRI EstimatedTimetable request with partner setting siri.passage_order set to visit_number should display the VisitNumber tag instead of Order tag
     Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential     | test         |
       | remote_objectid_kind | internal     |
@@ -122,7 +122,7 @@ Feature: Support SIRI EstimatedTimeTable
       </S:Envelope>
       """
 
-  Scenario: 3950 - Handle a SIRI EstimatedTimeTable request
+  Scenario: 3950 - Handle a SIRI EstimatedTimetable request
     Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential     | test     |
       | remote_objectid_kind | internal |
@@ -311,7 +311,7 @@ Feature: Support SIRI EstimatedTimeTable
       </S:Envelope>
       """
 
-  Scenario: 3950 - Handle a SIRI EstimatedTimeTable request with the no rewrite setting
+  Scenario: 3950 - Handle a SIRI EstimatedTimetable request with the no rewrite setting
     Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
       | local_credential                           | test            |
       | remote_objectid_kind                       | internal        |

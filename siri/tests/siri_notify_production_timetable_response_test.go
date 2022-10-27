@@ -10,11 +10,11 @@ import (
 
 var benchmarkResult string // Store benchmark result to avoid complilator optimisation
 
-// Fill a single SIRINotifyProductionTimeTable with a variable number of RecordedCalls
+// Fill a single SIRINotifyProductionTimetable with a variable number of RecordedCalls
 func benchmarkPTTNotifyBuildXML(pc int, b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 
-	ptt := &siri.SIRINotifyProductionTimeTable{
+	ptt := &siri.SIRINotifyProductionTimetable{
 		ProducerRef:            "ProducerRef",
 		SubscriptionIdentifier: "SubscriptionIdentifier",
 		ResponseTimestamp:      time.Now(),

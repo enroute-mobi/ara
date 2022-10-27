@@ -12,7 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
+func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	// logger.Log.Debug = true
 
 	fakeClock := clock.NewFakeClock()
@@ -46,9 +46,9 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 
 	connector, _ := partner.Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 
-	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).Partner().SetUUIDGenerator(uuidGenerator)
-	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).SetClock(fakeClock)
-	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).estimatedTimeTableBroadcaster = NewFakeEstimatedTimeTableBroadcaster(connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster))
+	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).Partner().SetUUIDGenerator(uuidGenerator)
+	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).SetClock(fakeClock)
+	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).estimatedTimetableBroadcaster = NewFakeSIRIEstimatedTimetableBroadcaster(connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster))
 
 	referential.Model().Lines().SetUUIDGenerator(uuidGenerator)
 	referential.Model().StopAreas().SetUUIDGenerator(uuidGenerator)
@@ -106,11 +106,11 @@ func Test_EstimatedTimeTableBroadcaster_Receive_Notify(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 
-	if l := len(connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).toBroadcast); l != 1 {
+	if l := len(connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).toBroadcast); l != 1 {
 		t.Errorf("should have 1 line to broadcast got : %v", l)
 	}
 
-	connector.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).estimatedTimeTableBroadcaster.Start()
+	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).estimatedTimetableBroadcaster.Start()
 
 	expected := `<?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">

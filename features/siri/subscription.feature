@@ -119,17 +119,17 @@ Feature: Support SIRI subscription
       | remote_objectid_kind | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | AnotherExternalId                     |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast            |
+      | Kind              | EstimatedTimetableBroadcast            |
       | ExternalId        | SpecialExternalId                      |
       | SubscriberRef     | subscriber                             |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:C:Tram" |
@@ -179,12 +179,12 @@ Feature: Support SIRI subscription
       | remote_objectid_kind | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
      And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | AnotherExternalId                     |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |
@@ -228,13 +228,13 @@ Feature: Support SIRI subscription
       | remote_objectid_kind | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast            |
+      | Kind              | EstimatedTimetableBroadcast            |
       | ExternalId        | externalId                             |
       | SubscriberRef     | subscriber                             |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC"  |
       | ReferenceArray[1] | Line, "internal": "NINOXE:Line:C:Tram" |
      And a Subscription exist with the following attributes:
-      | Kind              | EstimatedTimeTableBroadcast           |
+      | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | AnotherExternalId                     |
       | SubscriberRef     | subscriber                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:BUS" |

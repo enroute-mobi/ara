@@ -120,7 +120,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 				ErrorText:         "Can't find a EstimatedTimetableBroadcaster connector",
 			}
 		} else {
-			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableBroadcaster).getEstimatedTimetableDelivery(estimatedTimetableRequest)
+			delivery = estimatedTimetabeConnector.(*SIRIEstimatedTimetableRequestBroadcaster).getEstimatedTimetableDelivery(estimatedTimetableRequest)
 		}
 
 		if !delivery.Status {

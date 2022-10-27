@@ -10,24 +10,26 @@ const (
 	SIRI_PARTNER = "siri-partner"
 
 	// Connectors
-	PUSH_COLLECTOR                                    = "push-collector"
-	SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR      = "siri-stop-points-discovery-request-collector"
-	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER    = "siri-stop-points-discovery-request-broadcaster"
-	SIRI_LINES_DISCOVERY_REQUEST_COLLECTOR            = "siri-lines-discovery-request-collector"
-	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER          = "siri-lines-discovery-request-broadcaster"
-	SIRI_SERVICE_REQUEST_BROADCASTER                  = "siri-service-request-broadcaster"
-	SIRI_STOP_MONITORING_REQUEST_COLLECTOR            = "siri-stop-monitoring-request-collector"
-	TEST_STOP_MONITORING_REQUEST_COLLECTOR            = "test-stop-monitoring-request-collector"
-	SIRI_STOP_MONITORING_REQUEST_BROADCASTER          = "siri-stop-monitoring-request-broadcaster"
-	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR       = "siri-stop-monitoring-subscription-collector"
-	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER     = "siri-stop-monitoring-subscription-broadcaster"
-	TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER     = "siri-stop-monitoring-subscription-broadcaster-test"
-	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR            = "siri-general-message-request-collector"
-	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER          = "siri-general-message-request-broadcaster"
-	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR       = "siri-general-message-subscription-collector"
-	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster"
-	TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER     = "siri-general-message-subscription-broadcaster-test"
+	PUSH_COLLECTOR                                 = "push-collector"
+	SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR   = "siri-stop-points-discovery-request-collector"
+	SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER = "siri-stop-points-discovery-request-broadcaster"
+	SIRI_LINES_DISCOVERY_REQUEST_COLLECTOR         = "siri-lines-discovery-request-collector"
+	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER       = "siri-lines-discovery-request-broadcaster"
+	SIRI_SERVICE_REQUEST_BROADCASTER               = "siri-service-request-broadcaster"
+	SIRI_STOP_MONITORING_REQUEST_COLLECTOR         = "siri-stop-monitoring-request-collector"
+	TEST_STOP_MONITORING_REQUEST_COLLECTOR         = "test-stop-monitoring-request-collector"
+	SIRI_STOP_MONITORING_REQUEST_BROADCASTER       = "siri-stop-monitoring-request-broadcaster"
+	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR    = "siri-stop-monitoring-subscription-collector"
+	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monitoring-subscription-broadcaster"
+	TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monitoring-subscription-broadcaster-test"
+	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "siri-general-message-request-collector"
+	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER       = "siri-general-message-request-broadcaster"
+	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR    = "siri-general-message-subscription-collector"
+	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER  = "siri-general-message-subscription-broadcaster"
+	TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER  = "siri-general-message-subscription-broadcaster-test"
+	// SIRI_ESTIMATED_TIMETABLE_REQUEST_COLLECTOR        = "siri-estimated-timetable-request-collector"
 	SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER      = "siri-estimated-timetable-request-broadcaster"
+	SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_COLLECTOR   = "siri-estimated-timetable-subscription-collector"
 	SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster"
 	TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-estimated-timetable-subscription-broadcaster-test"
 	// SIRI_PRODUCTION_TIMETABLE_REQUEST_BROADCASTER      = "siri-production-timetable-request-broadcaster"
@@ -110,8 +112,12 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIGeneralMessageSubscriptionBroadcasterFactory{}
 	case TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER:
 		return &TestSIRIGeneralMessageSubscriptionBroadcasterFactory{}
+	// case SIRI_ESTIMATED_TIMETABLE_REQUEST_COLLECTOR:
+	// 	return &SIRIEstimatedTimetableRequestCollectorFactory{}
 	case SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER:
-		return &SIRIEstimatedTimetableBroadcasterFactory{}
+		return &SIRIEstimatedTimetableRequestBroadcasterFactory{}
+	case SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_COLLECTOR:
+		return &SIRIEstimatedTimetableSubscriptionCollectorFactory{}
 	case SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER:
 		return &SIRIEstimatedTimetableSubscriptionBroadcasterFactory{}
 	case TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER:

@@ -1,4 +1,4 @@
-Feature: Support SIRI ProductionTimeTable by subscription
+Feature: Support SIRI ProductionTimetable by subscription
 
   Background:
     Given a Referential "test" is created
@@ -186,7 +186,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       """
 
   @ARA-1139
-  Scenario: Handle a SOAP SIRI ProductionTimeTable subscription to all lines with partner setting siri.passage_order set to visit_number should use VisitNumber tag instead of Order
+  Scenario: Handle a SOAP SIRI ProductionTimetable subscription to all lines with partner setting siri.passage_order set to visit_number should use VisitNumber tag instead of Order
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -321,7 +321,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
 </S:Envelope>
       """
 
-  Scenario: Handle a SOAP SIRI ProductionTimeTable subscription to all lines
+  Scenario: Handle a SOAP SIRI ProductionTimetable subscription to all lines
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url            | http://localhost:8090 |
@@ -470,7 +470,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
 </S:Envelope>
       """
 
-  Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines with settings siri.line.published_name set to number
+  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with settings siri.line.published_name set to number
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url               | http://localhost:8090 |
@@ -586,7 +586,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
 </Siri>
       """
 
-  Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines
+  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url            | http://localhost:8090 |
@@ -715,7 +715,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
 </Siri>
       """
 
-  Scenario: Handle a raw SIRI ProductionTimeTable subscription on an unknown line
+  Scenario: Handle a raw SIRI ProductionTimetable subscription on an unknown line
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -790,7 +790,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
       """
 
   @ARA-1107
-  Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines with StopArea having a Parent with Partner ObjectiId
+  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with StopArea having a Parent with Partner ObjectiId
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -906,7 +906,7 @@ Feature: Support SIRI ProductionTimeTable by subscription
 </Siri>
       """
 
-  Scenario: Handle a raw SIRI ProductionTimeTable subscription on a specific line
+  Scenario: Handle a raw SIRI ProductionTimetable subscription on a specific line
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |

@@ -14,12 +14,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
-type SIRIEstimatedTimeTableSubscriptionBroadcaster struct {
+type SIRIEstimatedTimetableSubscriptionBroadcaster struct {
 	connector
 
 	dataFrameGenerator            *idgen.IdentifierGenerator
 	vjRemoteObjectidKinds         []string
-	estimatedTimeTableBroadcaster SIRIEstimatedTimeTableBroadcaster
+	estimatedTimetableBroadcaster EstimatedTimetableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.StopVisitId
 	notMonitored                  map[SubscriptionId]map[string]struct{}
 
@@ -32,7 +32,7 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) CreateConne
 	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
 		partner.CreateSubscriptionRequestDispatcher()
 	}
-	return newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner)
+	return newSIRIEstimatedTimetableSubscriptionBroadcaster(partner)
 }
 
 func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
@@ -41,8 +41,8 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(ap
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
-func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimeTableSubscriptionBroadcaster {
-	connector := &SIRIEstimatedTimeTableSubscriptionBroadcaster{}
+func newSIRIEstimatedTimetableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimetableSubscriptionBroadcaster {
+	connector := &SIRIEstimatedTimetableSubscriptionBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
@@ -50,11 +50,11 @@ func newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIEst
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
-	connector.estimatedTimeTableBroadcaster = NewSIRIEstimatedTimeTableBroadcaster(connector)
+	connector.estimatedTimetableBroadcaster = NewSIRIEstimatedTimetableBroadcaster(connector)
 	return connector
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
@@ -72,7 +72,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 		resources, unknownLineIds := connector.checkLines(ett)
 		if len(unknownLineIds) != 0 {
-			logger.Log.Debugf("EstimatedTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
+			logger.Log.Debugf("EstimatedTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
 			failedSubscription = true
@@ -80,7 +80,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if ok && sub.Kind() != EstimatedTimetableBroadcast {
-			logger.Log.Debugf("EstimatedTimeTable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
+			logger.Log.Debugf("EstimatedTimetable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
 			rs.ErrorType = "OtherError"
 			rs.ErrorNumber = 2
 			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ett.SubscriptionIdentifier())
@@ -127,7 +127,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleSubscripti
 	return resps
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
 	sas := connector.partner.Model().StopAreas().FindByLineId(lineId)
 	for i := range sas {
 		// Init SA LastChange
@@ -139,7 +139,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addLineStopVisit
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *sxml.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *sxml.XMLEstimatedTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
 	// check for subscription to all lines
 	if len(ett.Lines()) == 0 {
 		var lv []string
@@ -189,15 +189,15 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkLines(ett *
 	return resources, lineIds
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Stop() {
-	connector.estimatedTimeTableBroadcaster.Stop()
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) Stop() {
+	connector.estimatedTimetableBroadcaster.Stop()
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) Start() {
-	connector.estimatedTimeTableBroadcaster.Start()
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) Start() {
+	connector.estimatedTimetableBroadcaster.Start()
 }
 
-func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscription, request *sxml.XMLSubscriptionRequest) {
+func (ettb *SIRIEstimatedTimetableSubscriptionBroadcaster) fillOptions(s *Subscription, request *sxml.XMLSubscriptionRequest) {
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"
@@ -206,7 +206,7 @@ func (ettb *SIRIEstimatedTimeTableSubscriptionBroadcaster) fillOptions(s *Subscr
 	s.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	switch event.ModelType {
 	case "StopVisit":
 		connector.checkEvent(model.StopVisitId(event.ModelId))
@@ -220,7 +220,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) HandleBroadcastE
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId) {
 	sv, ok := connector.Partner().Model().StopVisits().Find(svId)
 	if !ok {
 		return
@@ -250,18 +250,18 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkEvent(svId 
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*ls.EstimatedTimeTableLastChange).Haschanged(sv) {
+		if ok && !lastState.(*ls.EstimatedTimetableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
-			r.SetLastState(string(sv.Id()), ls.NewEstimatedTimeTableLastChange(sv, sub))
+			r.SetLastState(string(sv.Id()), ls.NewEstimatedTimetableLastChange(sv, sub))
 		}
 		connector.addFilteredStopVisit(sub.Id(), sv)
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addFilteredStopVisit(subId SubscriptionId, sv *model.StopVisit) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) addFilteredStopVisit(subId SubscriptionId, sv *model.StopVisit) {
 	connector.mutex.Lock()
 	defer connector.mutex.Unlock()
 
@@ -274,14 +274,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addFilteredStopV
 	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], sv.Id())
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
 	connector.mutex.Lock()
 	defer connector.mutex.Unlock()
 
 	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], svId)
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
 	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
 	if !ok {
 		return

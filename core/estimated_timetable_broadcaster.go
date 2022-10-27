@@ -14,7 +14,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/state"
 )
 
-type SIRIEstimatedTimeTableBroadcaster interface {
+type EstimatedTimetableBroadcaster interface {
 	state.Stopable
 	state.Startable
 }
@@ -22,46 +22,46 @@ type SIRIEstimatedTimeTableBroadcaster interface {
 type ETTBroadcaster struct {
 	clock.ClockConsumer
 
-	connector *SIRIEstimatedTimeTableSubscriptionBroadcaster
+	connector *SIRIEstimatedTimetableSubscriptionBroadcaster
 }
 
-type EstimatedTimeTableBroadcaster struct {
+type SIRIEstimatedTimetableBroadcaster struct {
 	ETTBroadcaster
 
 	stop chan struct{}
 }
 
-type FakeEstimatedTimeTableBroadcaster struct {
+type FakeSIRIEstimatedTimetableBroadcaster struct {
 	ETTBroadcaster
 }
 
-func NewFakeEstimatedTimeTableBroadcaster(connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) SIRIEstimatedTimeTableBroadcaster {
-	broadcaster := &FakeEstimatedTimeTableBroadcaster{}
+func NewFakeSIRIEstimatedTimetableBroadcaster(connector *SIRIEstimatedTimetableSubscriptionBroadcaster) EstimatedTimetableBroadcaster {
+	broadcaster := &FakeSIRIEstimatedTimetableBroadcaster{}
 	broadcaster.connector = connector
 	return broadcaster
 }
 
-func (broadcaster *FakeEstimatedTimeTableBroadcaster) Start() {
-	broadcaster.prepareSIRIEstimatedTimeTable()
+func (broadcaster *FakeSIRIEstimatedTimetableBroadcaster) Start() {
+	broadcaster.prepareSIRIEstimatedTimetable()
 }
 
-func (broadcaster *FakeEstimatedTimeTableBroadcaster) Stop() {}
+func (broadcaster *FakeSIRIEstimatedTimetableBroadcaster) Stop() {}
 
-func NewSIRIEstimatedTimeTableBroadcaster(connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) SIRIEstimatedTimeTableBroadcaster {
-	broadcaster := &EstimatedTimeTableBroadcaster{}
+func NewSIRIEstimatedTimetableBroadcaster(connector *SIRIEstimatedTimetableSubscriptionBroadcaster) EstimatedTimetableBroadcaster {
+	broadcaster := &SIRIEstimatedTimetableBroadcaster{}
 	broadcaster.connector = connector
 
 	return broadcaster
 }
 
-func (ett *EstimatedTimeTableBroadcaster) Start() {
-	logger.Log.Debugf("Start EstimatedTimeTableBroadcaster")
+func (ett *SIRIEstimatedTimetableBroadcaster) Start() {
+	logger.Log.Debugf("Start SIRIEstimatedTimetableBroadcaster")
 
 	ett.stop = make(chan struct{})
 	go ett.run()
 }
 
-func (ett *EstimatedTimeTableBroadcaster) run() {
+func (ett *SIRIEstimatedTimetableBroadcaster) run() {
 	c := ett.Clock().After(5 * time.Second)
 
 	for {
@@ -71,9 +71,9 @@ func (ett *EstimatedTimeTableBroadcaster) run() {
 
 			return
 		case <-c:
-			logger.Log.Debugf("SIRIEstimatedTimeTableBroadcaster visit")
+			logger.Log.Debugf("SIRISIRIEstimatedTimetableBroadcaster visit")
 
-			ett.prepareSIRIEstimatedTimeTable()
+			ett.prepareSIRIEstimatedTimetable()
 			ett.prepareNotMonitored()
 
 			c = ett.Clock().After(5 * time.Second)
@@ -81,7 +81,7 @@ func (ett *EstimatedTimeTableBroadcaster) run() {
 	}
 }
 
-func (ett *EstimatedTimeTableBroadcaster) Stop() {
+func (ett *SIRIEstimatedTimetableBroadcaster) Stop() {
 	if ett.stop != nil {
 		close(ett.stop)
 	}
@@ -102,7 +102,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 		}
 
 		for producer := range producers {
-			delivery := &siri.SIRINotifyEstimatedTimeTable{
+			delivery := &siri.SIRINotifyEstimatedTimetable{
 				Address:                   ett.connector.Partner().Address(),
 				ProducerRef:               ett.connector.Partner().ProducerRef(),
 				ResponseMessageIdentifier: ett.connector.Partner().NewResponseMessageIdentifier(),
@@ -121,7 +121,7 @@ func (ett *ETTBroadcaster) prepareNotMonitored() {
 	}
 }
 
-func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
+func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 	ett.connector.mutex.Lock()
 
 	events := ett.connector.toBroadcast
@@ -142,7 +142,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 		lines := make(map[model.LineId]*siri.SIRIEstimatedJourneyVersionFrame)
 		vehicleJourneys := make(map[model.VehicleJourneyId]*siri.SIRIEstimatedVehicleJourney)
 
-		delivery := &siri.SIRINotifyEstimatedTimeTable{
+		delivery := &siri.SIRINotifyEstimatedTimetable{
 			Address:                   ett.connector.Partner().Address(),
 			ProducerRef:               ett.connector.Partner().ProducerRef(),
 			ResponseMessageIdentifier: ett.connector.Partner().NewResponseMessageIdentifier(),
@@ -283,16 +283,16 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimeTable() {
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
-				resource.SetLastState(string(stopVisit.Id()), ls.NewEstimatedTimeTableLastChange(stopVisit, sub))
+				resource.SetLastState(string(stopVisit.Id()), ls.NewEstimatedTimetableLastChange(stopVisit, sub))
 			} else {
-				lastStateInterface.(*ls.EstimatedTimeTableLastChange).UpdateState(stopVisit)
+				lastStateInterface.(*ls.EstimatedTimetableLastChange).UpdateState(stopVisit)
 			}
 		}
 		ett.sendDelivery(delivery)
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) UseVisitNumber() bool {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) UseVisitNumber() bool {
 	switch connector.Partner().PartnerSettings.SIRIPassageOrder() {
 	case "visit_number":
 		return true
@@ -301,7 +301,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) UseVisitNumber()
 	}
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
 	stopPointRef, ok := connector.Partner().Model().StopAreas().Find(stopAreaId)
 	if !ok {
 		return &model.StopArea{}, "", false
@@ -327,7 +327,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) stopPointRef(sto
 	return &model.StopArea{}, "", false
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) publishedLineName(line *model.Line) string {
 	var pln string
 
 	switch connector.Partner().PartnerSettings.SIRILinePublishedName() {
@@ -344,7 +344,7 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) publishedLineNam
 	return pln
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) getEstimatedVehicleJourneyReferences(vehicleJourney *model.VehicleJourney, stopVisit *model.StopVisit) map[string]string {
 	references := make(map[string]string)
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
@@ -387,12 +387,12 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) getEstimatedVehi
 	return references
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) dataFrameRef() string {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
 	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 }
 
-func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
 	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
 		if origin == o {
 			return true
@@ -401,14 +401,14 @@ func (connector *SIRIEstimatedTimeTableSubscriptionBroadcaster) noDestinationRef
 	return false
 }
 
-func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeTable) {
+func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimetable) {
 	message := ett.newBQEvent()
 
-	ett.logSIRIEstimatedTimeTableNotify(message, delivery)
+	ett.logSIRIEstimatedTimetableNotify(message, delivery)
 
 	t := ett.Clock().Now()
 
-	ett.connector.Partner().SIRIClient().NotifyEstimatedTimeTable(delivery)
+	ett.connector.Partner().SIRIClient().NotifyEstimatedTimetable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
 
 	audit.CurrentBigQuery(string(ett.connector.Partner().Referential().Slug())).WriteEvent(message)
@@ -424,7 +424,7 @@ func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	}
 }
 
-func (ett *ETTBroadcaster) logSIRIEstimatedTimeTableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimeTable) {
+func (ett *ETTBroadcaster) logSIRIEstimatedTimetableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimetable) {
 	lineRefs := []string{}
 	mr := make(map[string]struct{})
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {

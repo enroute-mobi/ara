@@ -187,9 +187,10 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
+      And I see ara vehicles
       Then one Vehicle has the following attributes:
       | ObjectIDs | "internal": "108"                 |
-      | LineId    | 6ba7b814-9dad-11d1-a-00c04fd430c8 |
+      | LineId    | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
       | Bearing   | 171.0                             |
       | Latitude  | 48.99927561424598                 |
       | Longitude | 1.6770970859674874                |

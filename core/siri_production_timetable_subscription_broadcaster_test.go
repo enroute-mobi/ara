@@ -19,7 +19,7 @@ func Test_PTT_checklines(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetSetting("local_url", "http://ara")
 	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	connector := newSIRIProductionTimeTableSubscriptionBroadcaster(partner)
+	connector := newSIRIProductionTimetableSubscriptionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 

@@ -13,6 +13,7 @@ type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
 
 	UpdateStopArea(request *StopAreaUpdateRequest)
+	UpdateLine(request *LineUpdateRequest)
 	UpdateVehicle(request *VehicleUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
@@ -66,7 +67,7 @@ func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)     
 func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
 func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 }
-
+func (manager *TestCollectManager) UpdateLine(*LineUpdateRequest)       {}
 func (manager *TestCollectManager) UpdateVehicle(*VehicleUpdateRequest) {}
 
 // TEST END
@@ -147,6 +148,51 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			requestCollector.RequestStopAreaUpdate(request)
 			return
 		}
+	}
+}
+
+func (manager *CollectManager) UpdateLine(request *LineUpdateRequest) {
+	line, ok := manager.referential.Model().Lines().Find(request.LineId())
+	if !ok {
+		logger.Log.Debugf("Can't find Line %v in Collect Manager", request.LineId())
+		return
+	}
+
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		subscriptionCollector := partner.EstimatedTimetableSubscriptionCollector()
+		// requestCollector := partner.EstimatedTimetableRequestCollector()
+
+		// if subscriptionCollector == nil && requestCollector == nil {
+		if subscriptionCollector == nil {
+			continue
+		}
+
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
+				continue
+			}
+		}
+
+		partnerKind := partner.RemoteObjectIDKind()
+
+		lineObjectID, ok := line.ObjectID(partnerKind)
+		if !ok {
+			continue
+		}
+
+		if !partner.CanCollectLine(lineObjectID.Value()) {
+			continue
+		}
+		logger.Log.Debugf("RequestLineUpdate with LineId %v", request.LineId())
+
+		// if subscriptionCollector != nil {
+		// 	subscriptionCollector.RequestLineUpdate(request)
+		// 	return
+		// }
+		// requestCollector.RequestLineUpdate(request)
+		// return
+		subscriptionCollector.RequestLineUpdate(request)
+		return
 	}
 }
 

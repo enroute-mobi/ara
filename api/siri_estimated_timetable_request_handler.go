@@ -29,7 +29,7 @@ func (handler *SIRIEstimatedTimetableRequestHandler) Respond(params HandlerParam
 
 	t := clock.DefaultClock().Now()
 
-	response := params.connector.(core.EstimatedTimetableBroadcaster).RequestLine(handler.xmlRequest, params.message)
+	response := params.connector.(core.EstimatedTimetableRequestBroadcaster).RequestLine(handler.xmlRequest, params.message)
 	xmlResponse, err := response.BuildXML(params.envelopeType)
 	if err != nil {
 		SIRIError{

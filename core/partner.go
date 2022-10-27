@@ -429,6 +429,15 @@ func (partner *Partner) GeneralMessageSubscriptionCollector() GeneralMessageSubs
 	return nil
 }
 
+func (partner *Partner) StopMonitoringRequestCollector() (smrc StopMonitoringRequestCollector) {
+	c, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
+	if !ok {
+		c = partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR]
+	}
+	smrc, _ = c.(StopMonitoringRequestCollector)
+	return
+}
+
 func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubscriptionCollector {
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR]
 	if ok {
@@ -437,13 +446,20 @@ func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubs
 	return nil
 }
 
-func (partner *Partner) StopMonitoringRequestCollector() (smrc StopMonitoringRequestCollector) {
-	c, ok := partner.connectors[SIRI_STOP_MONITORING_REQUEST_COLLECTOR]
-	if !ok {
-		c = partner.connectors[TEST_STOP_MONITORING_REQUEST_COLLECTOR]
+// func (partner *Partner) EstimatedTimetableRequestCollector() (smrc EstimatedTimetableRequestCollector) {
+// 	client, ok := partner.connectors[SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_COLLECTOR]
+// 	if ok {
+// 		return client.(EstimatedTimetableRequestCollector)
+// 	}
+// 	return nil
+// }
+
+func (partner *Partner) EstimatedTimetableSubscriptionCollector() EstimatedTimetableSubscriptionCollector {
+	client, ok := partner.connectors[SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_COLLECTOR]
+	if ok {
+		return client.(EstimatedTimetableSubscriptionCollector)
 	}
-	smrc, _ = c.(StopMonitoringRequestCollector)
-	return
+	return nil
 }
 
 func (partner *Partner) VehicleMonitoringRequestCollector() VehicleMonitoringRequestCollector {
