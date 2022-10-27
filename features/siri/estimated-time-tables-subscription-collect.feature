@@ -53,15 +53,8 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test                   |
       | ObjectIDs | "internal": "testLine" |
     And a minute has passed
-    And a minute has passed
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
-    And  an audit event should exist with these attributes:
-      | Type      | EstimatedTimetableSubscriptionRequest |
-      | Direction | sent                                  |
-      | Protocol  | siri                                  |
-      | Partner   | test                                  |
-      | Status    | OK                                    |
 
 #   @ARA-1152
 #   Scenario: Update ara models after a EstimatedTimetableNotify in a subscription

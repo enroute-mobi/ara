@@ -109,7 +109,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
-			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
 				subToDelete[subscriptionId] = struct{}{}
@@ -117,7 +117,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 			continue
 		}
 		if subscription.Kind() != EstimatedTimetableCollect {
-			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind EstimatedTimetableCollect"
 			continue
 		}
