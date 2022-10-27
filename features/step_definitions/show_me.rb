@@ -3,11 +3,11 @@ def show_me(model_type, referential = "test")
   puts JSON.pretty_generate(JSON.parse(response))
 end
 
-Given(/^I see ara (vehicle_journeys|stop_areas|stop_visits|lines|partners|operators|scheduled_stop_visits)$/) do |model_type|
+Given(/^I see ara (vehicle_journeys|stop_areas|stop_visits|lines|vehicles|partners|operators|scheduled_stop_visits)$/) do |model_type|
   show_me model_type
 end
 
-Then(/^show me ara (vehicle_journeys|stop_areas|stop_visits|lines|partners|operators|scheduled_stop_visits)$/) do |model_type|
+Then(/^show me ara (vehicle_journeys|stop_areas|stop_visits|lines|vehicles|partners|operators|scheduled_stop_visits)$/) do |model_type|
   show_me model_type
 end
 

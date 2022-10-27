@@ -7,7 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 )
 
-func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
+func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 	expectedXML := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
@@ -188,7 +188,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 		EstimatedVehicleJourneys: []*siri.SIRIEstimatedVehicleJourney{vehicleJourney2, vehicleJourney3},
 	}
 
-	response := &siri.SIRIEstimatedTimeTableResponse{
+	response := &siri.SIRIEstimatedTimetableResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
 		ResponseMessageIdentifier: "response",
@@ -207,7 +207,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML(t *testing.T) {
 	}
 }
 
-func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
+func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 	expectedXML := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
@@ -259,7 +259,7 @@ func Test_SIRIEstimatedTimeTableResponse_BuildXML_EmptyCalls(t *testing.T) {
 		EstimatedVehicleJourneys: []*siri.SIRIEstimatedVehicleJourney{vehicleJourney1},
 	}
 
-	response := &siri.SIRIEstimatedTimeTableResponse{
+	response := &siri.SIRIEstimatedTimetableResponse{
 		Address:                   "address",
 		ProducerRef:               "producer",
 		ResponseMessageIdentifier: "response",

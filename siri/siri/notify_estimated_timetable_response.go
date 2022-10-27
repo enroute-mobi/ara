@@ -8,7 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-type SIRINotifyEstimatedTimeTable struct {
+type SIRINotifyEstimatedTimetable struct {
 	Address                   string
 	RequestMessageRef         string
 	ProducerRef               string
@@ -25,18 +25,18 @@ type SIRINotifyEstimatedTimeTable struct {
 	EstimatedJourneyVersionFrames []*SIRIEstimatedJourneyVersionFrame
 }
 
-func (notify *SIRINotifyEstimatedTimeTable) ErrorString() string {
+func (notify *SIRINotifyEstimatedTimetable) ErrorString() string {
 	return fmt.Sprintf("%v: %v", notify.errorType(), notify.ErrorText)
 }
 
-func (notify *SIRINotifyEstimatedTimeTable) errorType() string {
+func (notify *SIRINotifyEstimatedTimetable) errorType() string {
 	if notify.ErrorType == "OtherError" {
 		return fmt.Sprintf("%v %v", notify.ErrorType, notify.ErrorNumber)
 	}
 	return notify.ErrorType
 }
 
-func (notify *SIRINotifyEstimatedTimeTable) BuildXML(envelopeType ...string) (string, error) {
+func (notify *SIRINotifyEstimatedTimetable) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
 	var envType string
 	var templateName string

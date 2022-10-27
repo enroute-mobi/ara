@@ -20,9 +20,10 @@ const (
 	ProductionTimetableBroadcast = "ProductionTimetableBroadcast"
 	StopMonitoringBroadcast      = "StopMonitoringBroadcast"
 
-	GeneralMessageCollect    = "GeneralMessageCollect"
-	StopMonitoringCollect    = "StopMonitoringCollect"
-	VehicleMonitoringCollect = "VehicleMonitoringCollect"
+	EstimatedTimetableCollect = "EstimatedTimetableCollect"
+	GeneralMessageCollect     = "GeneralMessageCollect"
+	StopMonitoringCollect     = "StopMonitoringCollect"
+	VehicleMonitoringCollect  = "VehicleMonitoringCollect"
 )
 
 type SubscriptionId string

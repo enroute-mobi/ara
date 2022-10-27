@@ -136,7 +136,7 @@ Feature: Audit API exchanges
       | RequestIdentifier       | /{test-uuid}/                         |
       | ResponseIdentifier      | c464f588-5128-46c8-ac3f-8b8a465692ab  |
       | ProcessingTime          | 0                                     |
-      | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-5-00c04fd430c8"] |
+      | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
       | StopAreas               | ["enRoute:StopPoint:SP:24:LOC"]       |
 
   @ARA-888

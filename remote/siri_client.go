@@ -283,6 +283,20 @@ func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMe
 	return response, nil
 }
 
+func (client *SIRIClient) EstimatedTimetableSubscription(request *siri.SIRIEstimatedTimetableSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:          request,
+		requestType:      SUBSCRIPTION,
+		expectedResponse: "SubscribeResponse",
+		acceptGzip:       true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := sxml.NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
 func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicleMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:          request,
@@ -334,7 +348,7 @@ func (client *SIRIClient) NotifyGeneralMessage(request *siri.SIRINotifyGeneralMe
 	return nil
 }
 
-func (client *SIRIClient) NotifyEstimatedTimeTable(request *siri.SIRINotifyEstimatedTimeTable) error {
+func (client *SIRIClient) NotifyEstimatedTimetable(request *siri.SIRINotifyEstimatedTimetable) error {
 	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,
 		requestType: NOTIFICATION,
@@ -345,7 +359,7 @@ func (client *SIRIClient) NotifyEstimatedTimeTable(request *siri.SIRINotifyEstim
 	return nil
 }
 
-func (client *SIRIClient) NotifyProductionTimeTable(request *siri.SIRINotifyProductionTimeTable) error {
+func (client *SIRIClient) NotifyProductionTimetable(request *siri.SIRINotifyProductionTimetable) error {
 	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,
 		requestType: NOTIFICATION,

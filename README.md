@@ -15,7 +15,7 @@
 In collection and broadcast (both subscription and request)
 
 * StopMonitoring
-* EstimatedTimeTable
+* EstimatedTimetable
 * Situational Management
 
 In broadcast only:

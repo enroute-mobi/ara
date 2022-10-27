@@ -74,10 +74,10 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSu
 	if len(request.XMLSubscriptionETTEntries()) > 0 {
 		smbc, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 		if !ok {
-			return nil, fmt.Errorf("no EstimatedTimeTableSubscriptionBroadcaster Connector")
+			return nil, fmt.Errorf("no EstimatedTimetableSubscriptionBroadcaster Connector")
 		}
 
-		response.ResponseStatus = smbc.(*SIRIEstimatedTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+		response.ResponseStatus = smbc.(*SIRIEstimatedTimetableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
 		return &response, nil
 	}
@@ -88,7 +88,7 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSu
 			return nil, fmt.Errorf("no ProductionTableSubscriptionBroadcaster Connector")
 		}
 
-		response.ResponseStatus = ptbc.(*SIRIProductionTimeTableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+		response.ResponseStatus = ptbc.(*SIRIProductionTimetableSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
 
 		return &response, nil
 	}

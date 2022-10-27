@@ -1,10 +1,10 @@
-Feature: Support SIRI EstimatedTimeTable by subscription
+Feature: Support SIRI EstimatedTimetable by subscription
 
   Background:
     Given a Referential "test" is created
 
   @ARA-1060
-  Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription for all existing lines in a referential having same remote_objectid_kind
+  Scenario: Handle a raw SIRI EstimatedTimetable request for subscription for all existing lines in a referential having same remote_objectid_kind
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -60,7 +60,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | internal | NINOXE:Line:A:BUS |
 
   @ARA-1060
-  Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription for all existing lines in a referential only with same remote_objectid_kind
+  Scenario: Handle a raw SIRI EstimatedTimetable request for subscription for all existing lines in a referential only with same remote_objectid_kind
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
@@ -116,7 +116,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
     Then No Subscriptions exist with the following attributes:
       | internal | NINOXE:Line:3:LOC |
 
-  Scenario: 4234 - Handle a SOAP SIRI EstimatedTimeTable request for subscription
+  Scenario: 4234 - Handle a SOAP SIRI EstimatedTimetable request for subscription
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
@@ -154,7 +154,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       | Kind | EstimatedTimetableBroadcast |
 
   @ARA-1025
-  Scenario: Handle a raw SIRI EstimatedTimeTable request for subscription
+  Scenario: Handle a raw SIRI EstimatedTimetable request for subscription
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
@@ -234,7 +234,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -271,7 +271,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 </S:Body>
 </S:Envelope>
       """
-  
+
   @ARA-1134
   Scenario: Manage a raw ETT notify after modification of a StopVisit broadcasting the PublishedLineName as line number
     Given a SIRI server on "http://localhost:8090"
@@ -325,7 +325,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
  <ServiceDelivery>
    <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
-   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
@@ -411,7 +411,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
  <ServiceDelivery>
    <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
-   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
@@ -496,7 +496,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
  <ServiceDelivery>
    <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
-   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
@@ -581,7 +581,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
  <ServiceDelivery>
    <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
-   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
@@ -627,7 +627,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   <ServiceDelivery>
     <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
     <ProducerRef>test</ProducerRef>
-    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
     <EstimatedTimetableDelivery>
       <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
       <SubscriberRef>subscriber</SubscriberRef>
@@ -663,7 +663,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
       """
 
 
-  @ARA-1062 
+  @ARA-1062
   Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -715,7 +715,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:15.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -767,7 +767,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>
@@ -953,7 +953,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 <ServiceDelivery>
   <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
   <ProducerRef>test</ProducerRef>
-  <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ResponseMessageIdentifier>
+  <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
   <EstimatedTimetableDelivery>
     <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
     <SubscriberRef>subscriber</SubscriberRef>
@@ -1038,7 +1038,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
 <ServiceDelivery>
   <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
   <ProducerRef>test</ProducerRef>
-  <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+  <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
   <EstimatedTimetableDelivery>
     <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
     <SubscriberRef>subscriber</SubscriberRef>
@@ -1162,7 +1162,7 @@ Feature: Support SIRI EstimatedTimeTable by subscription
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
     <siri:ProducerRef>test</siri:ProducerRef>
-    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+    <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
   <Notification>

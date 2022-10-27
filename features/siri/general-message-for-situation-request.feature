@@ -358,7 +358,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -439,11 +439,11 @@ Feature: Support SIRI GeneralMessage for Situation
     <ServiceRequestInfo>
       <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>test</siri:RequestorRef>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
     </ServiceRequestInfo>
     <Request version='2.0:FR-IDF-2.4'>
       <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
       <siri:Extensions>
         <sws:IDFGeneralMessageRequestFilter>
           <siri:LineRef>1234</siri:LineRef>
@@ -482,11 +482,11 @@ Feature: Support SIRI GeneralMessage for Situation
     <ServiceRequestInfo>
       <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>test</siri:RequestorRef>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
     </ServiceRequestInfo>
     <Request version='2.0:FR-IDF-2.4'>
       <siri:RequestTimestamp>2017-01-01T12:00:40.000Z</siri:RequestTimestamp>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
       <siri:Extensions>
         <sws:IDFGeneralMessageRequestFilter>
           <siri:StopPointRef>1234</siri:StopPointRef>

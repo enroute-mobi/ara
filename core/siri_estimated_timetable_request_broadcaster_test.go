@@ -21,7 +21,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	partner.SetSetting("local_url", "http://ara")
 	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
-	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
+	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
@@ -182,7 +182,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	partner.SetSetting("local_url", "http://ara")
 	partner.SetSetting("remote_objectid_kind", "objectidKind")
 	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
-	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
+	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
@@ -326,7 +326,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing
 	partner.SetSetting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind", "Kind1")
 	partner.SetSetting("remote_objectid_kind", "Kind2")
 
-	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
+	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 
 	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind1" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
@@ -339,7 +339,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.
 	partner.SetSetting("siri-estimated-timetable-request-broadcaster.remote_objectid_kind", "")
 	partner.SetSetting("remote_objectid_kind", "Kind2")
 
-	connector := NewSIRIEstimatedTimetableBroadcaster(partner)
+	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 
 	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind2" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind2")

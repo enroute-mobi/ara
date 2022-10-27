@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type SituationUpdateRequestId string
@@ -16,7 +15,6 @@ const (
 )
 
 type SituationUpdateRequest struct {
-	id          SituationUpdateRequestId
 	kind        string
 	requestedId string
 	createdAt   time.Time
@@ -24,15 +22,10 @@ type SituationUpdateRequest struct {
 
 func NewSituationUpdateRequest(kind, requestedId string) *SituationUpdateRequest {
 	return &SituationUpdateRequest{
-		id:          SituationUpdateRequestId(uuid.DefaultUUIDGenerator().NewUUID()),
 		kind:        kind,
 		requestedId: requestedId,
 		createdAt:   clock.DefaultClock().Now(),
 	}
-}
-
-func (situationUpdateRequest *SituationUpdateRequest) Id() SituationUpdateRequestId {
-	return situationUpdateRequest.id
 }
 
 func (situationUpdateRequest *SituationUpdateRequest) Kind() string {

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_EstimatedTimeTableBroadcaster_Create_Events(t *testing.T) {
+func Test_EstimatedTimetableBroadcaster_Create_Events(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
 	referentials := NewMemoryReferentials()
@@ -48,7 +48,7 @@ func Test_EstimatedTimeTableBroadcaster_Create_Events(t *testing.T) {
 	sv := referential.Model().StopVisits().New()
 	sv.VehicleJourneyId = vj.Id()
 
-	subs := partner.Subscriptions().New("EstimatedTimeTable")
+	subs := partner.Subscriptions().New("EstimatedTimetable")
 	subs.Save()
 	subs.CreateAddNewResource(reference)
 	subs.SetExternalId("externalId")
@@ -74,7 +74,7 @@ func Test_checklines(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetSetting("local_url", "http://ara")
 	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	connector := newSIRIEstimatedTimeTableSubscriptionBroadcaster(partner)
+	connector := newSIRIEstimatedTimetableSubscriptionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 

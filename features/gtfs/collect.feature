@@ -65,25 +65,22 @@ Feature: Collect realtime data via GTFS-RT feeds
       | ObjectIDs | "internal": "Line:1" |
     And one VehicleJourney has the following attributes:
       | ObjectIDs | "internal": "Trip:A"              |
-      | LineId    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | LineId    | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And one StopVisit has the following attributes:
       | ObjectIDs                    | "internal": "Trip:A-1"    |
       | PassageOrder                 | 1                         |
       | Schedule[expected]#Departure | 2017-01-01T13:00:00+01:00 |
       | Schedule[expected]#Arrival   | 2017-01-01T13:00:00+01:00 |
-      # | StopAreaId                   | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And one StopVisit has the following attributes:
       | ObjectIDs                    | "internal": "Trip:A-2"    |
       | PassageOrder                 | 2                         |
       | Schedule[expected]#Arrival   | 2017-01-01T13:01:00+01:00 |
       | Schedule[expected]#Departure | 2017-01-01T13:01:30+01:00 |
-      # | StopAreaId                   | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And one StopVisit has the following attributes:
       | ObjectIDs                    | "internal": "Trip:A-3"    |
       | PassageOrder                 | 3                         |
       | Schedule[expected]#Arrival   | 2017-01-01T13:02:30+01:00 |
       | Schedule[expected]#Departure | 2017-01-01T13:02:30+01:00 |
-      # | StopAreaId                   | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
 
   @ARA-878
   Scenario: Collect GTFS TripUpdate (without stop_id)

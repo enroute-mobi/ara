@@ -9,7 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-type SIRIEstimatedTimeTableResponse struct {
+type SIRIEstimatedTimetableResponse struct {
 	SIRIEstimatedTimetableDelivery
 
 	Address                   string
@@ -86,7 +86,7 @@ type SIRIRecordedCall struct {
 	ExpectedDepartureTime time.Time
 }
 
-func (response *SIRIEstimatedTimeTableResponse) BuildXML(envelopeType ...string) (string, error) {
+func (response *SIRIEstimatedTimetableResponse) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
 	var envType string
 	var templateName string

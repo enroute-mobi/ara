@@ -101,7 +101,6 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 		stopArea.Save()
 
 		stopAreaUpdateRequest := &StopAreaUpdateRequest{
-			id:         StopAreaUpdateRequestId(guardian.NewUUID()),
 			stopAreaId: stopArea.Id(),
 			createdAt:  now,
 		}
@@ -137,6 +136,9 @@ func (guardian *ModelGuardian) refreshLines() {
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 
+		lineUpdateRequest := NewLineUpdateRequest(line.Id())
+		guardian.referential.CollectManager().UpdateLine(lineUpdateRequest)
+
 		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
 		guardian.referential.CollectManager().UpdateVehicle(vehicleUpdateRequest)
 	}
@@ -152,7 +154,6 @@ func (guardian *ModelGuardian) requestSituations() {
 	guardian.gmTimer = guardian.gmTimer.Add(1 * time.Minute)
 
 	situationUpdateRequest := &SituationUpdateRequest{
-		id:        SituationUpdateRequestId(guardian.NewUUID()),
 		kind:      SITUATION_UPDATE_REQUEST_ALL,
 		createdAt: guardian.Clock().Now(),
 	}

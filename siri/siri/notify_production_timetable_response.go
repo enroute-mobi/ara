@@ -9,7 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-type SIRINotifyProductionTimeTable struct {
+type SIRINotifyProductionTimetable struct {
 	ProducerRef            string
 	SubscriptionIdentifier string
 
@@ -24,18 +24,18 @@ type SIRINotifyProductionTimeTable struct {
 	SortForTests bool
 }
 
-func (notify *SIRINotifyProductionTimeTable) ErrorString() string {
+func (notify *SIRINotifyProductionTimetable) ErrorString() string {
 	return fmt.Sprintf("%v: %v", notify.errorType(), notify.ErrorText)
 }
 
-func (notify *SIRINotifyProductionTimeTable) errorType() string {
+func (notify *SIRINotifyProductionTimetable) errorType() string {
 	if notify.ErrorType == "OtherError" {
 		return fmt.Sprintf("%v %v", notify.ErrorType, notify.ErrorNumber)
 	}
 	return notify.ErrorType
 }
 
-func (notify *SIRINotifyProductionTimeTable) BuildXML(envelopeType ...string) (string, error) {
+func (notify *SIRINotifyProductionTimetable) BuildXML(envelopeType ...string) (string, error) {
 	var buffer bytes.Buffer
 	var envType string
 	var templateName string

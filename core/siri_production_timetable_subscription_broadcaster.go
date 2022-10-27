@@ -14,13 +14,13 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
-type SIRIProductionTimeTableSubscriptionBroadcaster struct {
+type SIRIProductionTimetableSubscriptionBroadcaster struct {
 	connector
 
 	dataFrameGenerator             *idgen.IdentifierGenerator
 	noDataFrameRefRewritingFrom    []string
 	vjRemoteObjectidKinds          []string
-	productionTimeTableBroadcaster SIRIProductionTimeTableBroadcaster
+	productionTimetableBroadcaster SIRIProductionTimetableBroadcaster
 	toBroadcast                    map[SubscriptionId][]model.StopVisitId
 
 	mutex *sync.Mutex //protect the map
@@ -32,7 +32,7 @@ func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) CreateConn
 	if _, ok := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER); !ok {
 		partner.CreateSubscriptionRequestDispatcher()
 	}
-	return newSIRIProductionTimeTableSubscriptionBroadcaster(partner)
+	return newSIRIProductionTimetableSubscriptionBroadcaster(partner)
 }
 
 func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
@@ -41,8 +41,8 @@ func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) Validate(a
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
-func newSIRIProductionTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIProductionTimeTableSubscriptionBroadcaster {
-	connector := &SIRIProductionTimeTableSubscriptionBroadcaster{}
+func newSIRIProductionTimetableSubscriptionBroadcaster(partner *Partner) *SIRIProductionTimetableSubscriptionBroadcaster {
+	connector := &SIRIProductionTimetableSubscriptionBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.noDataFrameRefRewritingFrom = partner.NoDataFrameRefRewritingFrom()
@@ -51,19 +51,19 @@ func newSIRIProductionTimeTableSubscriptionBroadcaster(partner *Partner) *SIRIPr
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
 
-	connector.productionTimeTableBroadcaster = NewSIRIProductionTimeTableBroadcaster(connector)
+	connector.productionTimetableBroadcaster = NewSIRIProductionTimetableBroadcaster(connector)
 	return connector
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) Start() {
-	connector.productionTimeTableBroadcaster.Start()
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) Start() {
+	connector.productionTimetableBroadcaster.Start()
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) Stop() {
-	connector.productionTimeTableBroadcaster.Stop()
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) Stop() {
+	connector.productionTimetableBroadcaster.Stop()
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
 	var lineIds, subIds []string
 
 	for _, ptt := range request.XMLSubscriptionPTTEntries() {
@@ -81,7 +81,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 
 		resources, unknownLineIds := connector.checkLines(ptt)
 		if len(unknownLineIds) != 0 {
-			logger.Log.Debugf("ProductionTimeTable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
+			logger.Log.Debugf("ProductionTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
 			rs.ErrorType = "InvalidDataReferencesError"
 			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
 			failedSubscription = true
@@ -89,7 +89,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ptt.SubscriptionIdentifier())
 		if ok && sub.Kind() != ProductionTimetableBroadcast {
-			logger.Log.Debugf("ProductionTimeTable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
+			logger.Log.Debugf("ProductionTimetable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
 			rs.ErrorType = "OtherError"
 			rs.ErrorNumber = 2
 			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ptt.SubscriptionIdentifier())
@@ -136,7 +136,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleSubscript
 	return resps
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt *sxml.XMLProductionTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt *sxml.XMLProductionTimetableSubscriptionRequestEntry) (resources []*SubscribedResource, lineIds []string) {
 	// check for subscription to all lines
 	if len(ptt.Lines()) == 0 {
 		var lv []string
@@ -186,7 +186,7 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkLines(ptt 
 	return resources, lineIds
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
 	sas := connector.partner.Model().StopAreas().FindByLineId(lineId)
 	for i := range sas {
 		svs := connector.partner.Model().ScheduledStopVisits().FindByStopAreaId(sas[i].Id())
@@ -196,17 +196,17 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) addLineStopVisi
 	}
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) addStopVisit(subId SubscriptionId, svId model.StopVisitId) {
 	connector.mutex.Lock()
 	connector.toBroadcast[SubscriptionId(subId)] = append(connector.toBroadcast[SubscriptionId(subId)], svId)
 	connector.mutex.Unlock()
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleBroadcastEvent(event *model.StopMonitoringBroadcastEvent) {
 	connector.checkEvent(model.StopVisitId(event.ModelId))
 }
 
-func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId) {
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkEvent(svId model.StopVisitId) {
 	sv, ok := connector.Partner().Model().ScheduledStopVisits().Find(svId)
 	if !ok {
 		return
@@ -236,12 +236,12 @@ func (connector *SIRIProductionTimeTableSubscriptionBroadcaster) checkEvent(svId
 		}
 
 		lastState, ok := r.LastState(string(svId))
-		if ok && !lastState.(*ls.ProductionTimeTableLastChange).Haschanged(sv) {
+		if ok && !lastState.(*ls.ProductionTimetableLastChange).Haschanged(sv) {
 			continue
 		}
 
 		if !ok {
-			r.SetLastState(string(sv.Id()), ls.NewProductionTimeTableLastChange(sv, sub))
+			r.SetLastState(string(sv.Id()), ls.NewProductionTimetableLastChange(sv, sub))
 		}
 
 		connector.addStopVisit(sub.Id(), svId)
