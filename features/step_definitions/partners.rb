@@ -68,7 +68,6 @@ end
 Then(/^one Subscription exists with the following attributes:$/) do |attributes|
   path = partners_path + '/' + getFirstPartner() + '/subscriptions'
   response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
-  puts response
   response_array = JSON.parse(response.body)
 
   attributes = attributes.rows_hash
