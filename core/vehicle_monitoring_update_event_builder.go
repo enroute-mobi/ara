@@ -93,7 +93,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			OriginRef:       xmlVehicleActivity.OriginRef(),
 			OriginName:      xmlVehicleActivity.OriginName(),
 			DestinationRef:  xmlVehicleActivity.DestinationRef(),
-			DirectionType:   xmlVehicleActivity.DirectionRef(),
+			DirectionType:   builder.directionRef(xmlVehicleActivity.DirectionRef()),
 			DestinationName: xmlVehicleActivity.DestinationName(),
 			Monitored:       xmlVehicleActivity.Monitored(),
 			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
@@ -136,6 +136,27 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
 		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.StopPointRef()] = struct{}{}
 	}
+}
+
+func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction string) string {
+	var dir string
+
+	_, _, err := builder.partner.PartnerSettings.SIRIDirectionType()
+	if !err {
+
+		switch strings.ToLower(direction) {
+		case "aller":
+			dir = model.VEHICLE_DIRECTION_INBOUND
+		case "retour":
+			dir = model.VEHICLE_DIRECTION_OUTBOUND
+		default:
+			dir = direction
+		}
+	} else {
+		dir = direction
+	}
+
+	return dir
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (lon, lat float64, e error) {
