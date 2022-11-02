@@ -126,7 +126,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		VehicleJourneyName:     vehicleJourney.Name,
 		OriginName:             vehicleJourney.OriginName,
 		DestinationName:        vehicleJourney.DestinationName,
-		DirectionType:          vehicleJourney.DirectionType,
+		DirectionType:          builder.directionType(vehicleJourney.DirectionType),
 		Monitored:              vehicleJourney.Monitored,
 		LineRef:                lineObjectId.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
@@ -178,6 +178,26 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 
 	return monitoredStopVisit
+}
+
+func (builder *BroadcastStopMonitoringBuilder) directionType(direction string) string {
+	var dir string
+
+	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
+	if err {
+		return direction
+	}
+
+	switch direction {
+	case model.VEHICLE_DIRECTION_INBOUND:
+		dir = in
+	case model.VEHICLE_DIRECTION_OUTBOUND:
+		dir = out
+	default:
+		dir = direction
+	}
+
+	return dir
 }
 
 func (builder *BroadcastStopMonitoringBuilder) useVisitNumber() bool {

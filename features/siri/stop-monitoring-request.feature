@@ -1749,3 +1749,41 @@ Feature: Support SIRI StopMonitoring by request
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#ObjectID |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                  | Passage 32                | VehicleJourney#Name     |
+
+  @ARA-1101
+  Scenario: Handle a SIRI StopMonitoring request with partner setting siri.direction_type should broadcast the DirectionRef with setting value
+    Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
+      | local_credential     | test                              |
+      | remote_objectid_kind | internal                          |
+      | siri.direction_type  | ch:1:Direction:R,ch:1:Direction:H |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Monitored | true                                     |
+    And a Line exists with the following attributes:
+      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
+      | Name         | Ligne 3 Metro                             |
+      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
+    And a VehicleJourney exists with the following attributes:
+      | ObjectIDs                              | "internal": "NINOXE:VehicleJourney:201"         |
+      | Name                                   | Magicien Noir - Cimetière (OMNI)                |
+      | LineId                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8               |
+      | Monitored                              | true                                            |
+      | Occupancy                              | MANY_SEATS_AVAILABLE                            |
+      | Attribute[DirectionName]               | Mago-Cime OMNI                                  |
+      | DirectionType                          | inbound                                    |
+    And a StopVisit exists with the following attributes:
+      | ArrivalStatus                        | onTime                                                               |
+      | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | PassageOrder                         | 4                                                                    |
+      | RecordedAt                           | 2017-01-01T11:00:00.000Z                                             |
+      | Schedule[expected]#Departure         | 2017-01-01T13:02:00.000Z                                             |
+      | StopAreaId                           | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                     | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleAtStop                        | true                                                                 |
+      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
+    When I send a SIRI GetStopMonitoring request with
+      | RequestorRef  | test                       |
+      | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
+    Then I should receive a SIRI GetStopMonitoringResponse with
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef | ch:1:Direction:R | VehicleJourney#DirectionType |
