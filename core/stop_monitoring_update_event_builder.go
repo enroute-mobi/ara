@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strings"
+
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
@@ -75,7 +77,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			LineObjectId:    lineObjectId,
 			OriginRef:       xmlStopVisitEvent.OriginRef(),
 			OriginName:      xmlStopVisitEvent.OriginName(),
-			DirectionType:   xmlStopVisitEvent.DirectionRef(),
+			DirectionType:   builder.directionRef(xmlStopVisitEvent.DirectionRef()),
 			DestinationRef:  xmlStopVisitEvent.DestinationRef(),
 			DestinationName: xmlStopVisitEvent.DestinationName(),
 			Monitored:       xmlStopVisitEvent.Monitored(),
@@ -127,6 +129,27 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 		builder.stopMonitoringUpdateEvents.StopVisits[xmlStopVisitEvent.StopPointRef()][xmlStopVisitEvent.ItemIdentifier()] = svEvent
 
 	}
+}
+
+func (builder *StopMonitoringUpdateEventBuilder) directionRef(direction string) string {
+	var dir string
+
+	_, _, err := builder.partner.PartnerSettings.SIRIDirectionType()
+	if !err {
+
+		switch strings.ToLower(direction) {
+		case "aller":
+			dir = model.VEHICLE_DIRECTION_INBOUND
+		case "retour":
+			dir = model.VEHICLE_DIRECTION_OUTBOUND
+		default:
+			dir = direction
+		}
+	} else {
+		dir = direction
+	}
+
+	return dir
 }
 
 func (builder *StopMonitoringUpdateEventBuilder) SetUpdateEvents(stopVisits []*sxml.XMLMonitoredStopVisit) {
