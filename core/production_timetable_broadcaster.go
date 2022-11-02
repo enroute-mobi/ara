@@ -167,7 +167,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			if !ok {
 				datedTTVersionFrame = &siri.SIRIDatedTimetableVersionFrame{
 					LineRef:        lineObjectId.Value(),
-					DirectionType:  vehicleJourney.DirectionType,
+					DirectionType:  ptt.connector.directionType(vehicleJourney.DirectionType),
 					RecordedAtTime: currentTime,
 					Attributes:     vehicleJourney.Attributes,
 				}
@@ -258,6 +258,26 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) publishedLineNa
 	}
 
 	return pln
+}
+
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) directionType(direction string) string {
+	var dir string
+
+	in, out, err := connector.partner.PartnerSettings.SIRIDirectionType()
+	if err {
+		return direction
+	}
+
+	switch direction {
+	case model.VEHICLE_DIRECTION_INBOUND:
+		dir = in
+	case model.VEHICLE_DIRECTION_OUTBOUND:
+		dir = out
+	default:
+		dir = direction
+	}
+
+	return dir
 }
 
 func (connector *SIRIProductionTimetableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {

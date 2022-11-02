@@ -123,7 +123,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>ch:1:Direction:R</DirectionRef>
+        <DirectionRef>inbound</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
@@ -153,7 +153,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>ch:1:Direction:H</DirectionRef>
+        <DirectionRef>outbound</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
@@ -560,7 +560,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>ch:1:Direction:R</DirectionRef>
+        <DirectionRef>inbound</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
@@ -683,7 +683,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>ch:1:Direction:R</DirectionRef>
+        <DirectionRef>inbound</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
@@ -881,7 +881,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       <DatedTimetableVersionFrame>
         <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
         <LineRef>NINOXE:Line:3:LOC</LineRef>
-        <DirectionRef>ch:1:Direction:H</DirectionRef>
+        <DirectionRef>outbound</DirectionRef>
         <FirstOrLastJourney>unspecified</FirstOrLastJourney>
         <DatedVehicleJourney>
           <FramedVehicleJourneyRef>
@@ -974,4 +974,171 @@ Feature: Support SIRI ProductionTimetable by subscription
     <ServiceStartedTime>2017-01-01T12:00:00.000Z</ServiceStartedTime>
   </SubscriptionResponse>
 </Siri>
+      """
+
+  @ARA-1101
+  Scenario: Handle a raw SIRI ProductionTimeTable subscription to all lines with partner setting siri.direction_type should broadcast the DirectionRef with setting value
+    Given a raw SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
+       | remote_url            | http://localhost:8090             |
+       | remote_credential     | ara                               |
+       | local_credential      | test                              |
+       | remote_objectid_kind  | internal                          |
+       | siri.envelope         | raw                               |
+       | sort_payload_for_test | true                              |
+       | siri.direction_type   | ch:1:Direction:R,ch:1:Direction:H |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 24                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a StopArea exists with the following attributes:
+      | Name      | Test 25                                  |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32 inbound                      |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | DirectionType                      | inbound                                 |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Attribute[VehicleMode]             | bus                                     | 
+    And a VehicleJourney exists with the following attributes:
+      | Name                               | Passage 32 outbound                     |
+      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:202" |
+      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | DirectionType                      | outbound                                |
+      | Reference[DestinationRef]#ObjectId | "external": "ThisAnotherTheEnd"         |
+      | Attribute[VehicleMode]             | bus                                     |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 1                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 2                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:20:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 1                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:30:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 2                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T15:40:00.000Z                                             |
+    And a minute has passed
+    And I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+      <RequestorRef>test</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:50:00Z</InitialTerminationTime>
+         <ProductionTimetableRequest>
+            <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    And 2 minutes have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+      <ServiceDelivery>
+      <ResponseTimestamp>2017-01-01T12:03:00.000Z</ResponseTimestamp>
+      <ProducerRef>ara</ProducerRef>
+      <ProductionTimetableDelivery>
+      <ResponseTimestamp>2017-01-01T12:03:00.000Z</ResponseTimestamp>
+      <SubscriptionRef>1</SubscriptionRef>
+      <Status>true</Status>
+      <DatedTimetableVersionFrame>
+        <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
+        <LineRef>NINOXE:Line:3:LOC</LineRef>
+        <DirectionRef>ch:1:Direction:H</DirectionRef>
+        <FirstOrLastJourney>unspecified</FirstOrLastJourney>
+        <DatedVehicleJourney>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>2017-01-01</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
+          <VehicleMode>bus</VehicleMode>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+          <FirstOrLastJourney>unspecified</FirstOrLastJourney>
+          <DatedCalls>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>1</Order>
+              <StopPointName>Test 25</StopPointName>
+              <AimedArrivalTime>2017-01-01T15:30:00.000Z</AimedArrivalTime>
+            </DatedCall>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+              <Order>2</Order>
+              <StopPointName>Test 24</StopPointName>
+              <AimedArrivalTime>2017-01-01T15:40:00.000Z</AimedArrivalTime>
+            </DatedCall>
+          </DatedCalls>
+        </DatedVehicleJourney>
+      </DatedTimetableVersionFrame>
+      <DatedTimetableVersionFrame>
+        <RecordedAtTime>2017-01-01T12:03:00.000Z</RecordedAtTime>
+        <LineRef>NINOXE:Line:3:LOC</LineRef>
+        <DirectionRef>ch:1:Direction:R</DirectionRef>
+        <FirstOrLastJourney>unspecified</FirstOrLastJourney>
+        <DatedVehicleJourney>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>2017-01-01</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
+          <VehicleMode>bus</VehicleMode>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+          <FirstOrLastJourney>unspecified</FirstOrLastJourney>
+          <DatedCalls>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+              <Order>1</Order>
+              <StopPointName>Test 24</StopPointName>
+              <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
+            </DatedCall>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>2</Order>
+              <StopPointName>Test 25</StopPointName>
+              <AimedArrivalTime>2017-01-01T15:20:00.000Z</AimedArrivalTime>
+            </DatedCall>
+          </DatedCalls>
+        </DatedVehicleJourney>
+      </DatedTimetableVersionFrame>
+      </ProductionTimetableDelivery>
+      </ServiceDelivery>
+      </Siri>
       """
