@@ -971,7 +971,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       <EstimatedCalls>
         <EstimatedCall>
           <StopPointRef>fr:1:StopPlace:OURA2:StopArea:log351672</StopPointRef>
-	  <Order>4</Order>
+	        <Order>4</Order>
           <StopPointName>Parent</StopPointName>
           <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
           <ArrivalStatus>delayed</ArrivalStatus>
@@ -985,7 +985,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
 </Siri>
       """
 
-  @ARA-1025
+  @ARA-1025 @siri-valid
   Scenario: Manage a raw ETT Notify after modification of a StopVisit
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -1057,7 +1057,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       <EstimatedCalls>
         <EstimatedCall>
           <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
-	  <Order>4</Order>
+	        <Order>4</Order>
           <StopPointName>Test</StopPointName>
           <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
           <ArrivalStatus>delayed</ArrivalStatus>

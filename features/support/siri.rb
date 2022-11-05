@@ -5,12 +5,39 @@ module Siri
   class Validator
 
     def self.enabled?
-      @enabled ||= (ENV['SIRI_VALIDATE'] == "true")
+      @enabled ||= %w{true strict}.include?(ENV['SIRI_VALIDATE'])
+    end
+
+    mattr_accessor :error_count, default: 0
+
+    def self.strict_mode?
+      @strict_mode ||= (ENV['SIRI_VALIDATE'] == "strict")
+    end
+
+    def self.enable
+      previous_value = enabled?
+
+      @enabled = true
+      yield if block_given?
+    ensure
+      @enabled = previous_value
+    end
+
+    def self.detect_error?(&block)
+      before_error_count = self.error_count
+      enable(&block)
+      before_error_count != self.error_count
+    end
+
+    def self.fail_on_error(scenario, block)
+      if detect_error? { block.call }
+        scenario.fail("Invalid SIRI XML detected") 
+      end
     end
 
     def self.create(content, description = nil)
       if enabled?
-        new content, description
+        new content, description: description
       else
         Null.instance
       end
@@ -23,7 +50,7 @@ module Siri
       def log; end
     end
 
-    def initialize(content, description = nil)
+    def initialize(content, description: nil)
       @content = content
       @description = description
     end
@@ -37,6 +64,8 @@ module Siri
       unless validated?
         validator.validate(StringIO.new(content))
         @validated = true
+
+        self.error_count += validator.errors.count
       end
     end
 
@@ -77,4 +106,16 @@ end
 
 Before do
   Siri::Validator.logger = self
+end
+
+Around do |scenario, block|
+  unless Siri::Validator.strict_mode?
+    block.call
+  else
+    Siri::Validator.fail_on_error scenario, block
+  end
+end
+
+Around('@siri-valid') do |scenario, block|
+  Siri::Validator.fail_on_error(scenario, block)
 end
