@@ -112,7 +112,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 		}
 
 		stopId := saId.Value()
-		stopSequence := uint32(stopVisits[i].PassageOrder)
+		stopSequence := connector.handleStopSequence(stopVisits[i].PassageOrder)
 		arrival := &gtfs.TripUpdate_StopTimeEvent{}
 		departure := &gtfs.TripUpdate_StopTimeEvent{}
 
@@ -155,4 +155,8 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 		entities = append(entities, entity)
 	}
 	return
+}
+
+func (connector *TripUpdatesBroadcaster) handleStopSequence(stopSequence int) uint32 {
+	return uint32(stopSequence - 1)
 }
