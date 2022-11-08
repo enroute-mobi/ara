@@ -1,5 +1,7 @@
 package apierrs
 
+import "fmt"
+
 type Errors map[string]interface{}
 
 func NewErrors() Errors {
@@ -12,6 +14,7 @@ func (errors Errors) Empty() bool {
 
 const (
 	SETTINGS          = "Settings"
+	CONNECTOR_TYPES   = "ConnectorTypes"
 	ERROR_BLANK       = "Can't be empty"
 	ERROR_SLUG_FORMAT = "Invalid format: only lowercase alphanumeric characters and _"
 	ERROR_ZERO        = "Can't be zero"
@@ -76,6 +79,27 @@ func (errors Errors) AddSettingError(attribute, message string) {
 		errors[SETTINGS] = se
 	}
 	se.(Errors).Add(attribute, message)
+}
+
+func (errors Errors) GetConnectorTypesError(connector string) []string {
+	m, ok := errors[CONNECTOR_TYPES]
+	if !ok {
+		return []string{}
+	}
+	s, ok := m.(Errors)
+	if !ok {
+		return []string{}
+	}
+	return s.Get(connector)
+}
+
+func (errors Errors) AddConnectorTypesError(connector string) {
+	cte, ok := errors[CONNECTOR_TYPES]
+	if !ok {
+		cte = NewErrors()
+		errors[CONNECTOR_TYPES] = cte
+	}
+	cte.(Errors).Add(connector, fmt.Sprintf("Unknown connector %v", connector))
 }
 
 // Test method

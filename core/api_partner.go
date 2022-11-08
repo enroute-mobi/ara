@@ -63,9 +63,11 @@ func (partner *APIPartner) credentials() string {
 func (partner *APIPartner) setFactories() {
 	for _, connectorType := range partner.ConnectorTypes {
 		factory := NewConnectorFactory(connectorType)
-		if factory != nil {
-			partner.factories[connectorType] = factory
+		if factory == nil {
+			partner.Errors.AddConnectorTypesError(connectorType)
+			continue
 		}
+		partner.factories[connectorType] = factory
 	}
 }
 

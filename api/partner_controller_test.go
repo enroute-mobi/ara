@@ -160,7 +160,6 @@ func Test_PartnerController_Update(t *testing.T) {
 
 func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 	// Prepare and send request
-
 	server, referential := createReferential()
 	partner := createPartner(referential)
 
@@ -168,7 +167,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 	rdata.Id = string(partner.Id())
 	rdata.Method = "PUT"
 	rdata.Server = server
-	rdata.Body = []byte(`{ "ConnectorTypes": ["test"] }`)
+	rdata.Body = []byte(`{ "ConnectorTypes": ["test-check-status-client"] }`)
 
 	responseRecorder := sendRequest(rdata, t)
 
@@ -186,7 +185,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 	}
 
 	if len(updatedPartner.ConnectorTypes) != 1 {
-		t.Errorf("ConnectorTypes should have been updated by POST request:\n got: %v\n want: %v", updatedPartner.ConnectorTypes, []string{"test"})
+		t.Errorf("ConnectorTypes should have been updated by POST request:\n got: %v\n want: %v", updatedPartner.ConnectorTypes, []string{"test-check-status-client"})
 	}
 }
 
