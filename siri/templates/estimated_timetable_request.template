@@ -1,5 +1,7 @@
 <siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
 		<siri:Lines>{{ range .Lines }}
-			<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}
+			<siri:LineDirection>
+				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}
+			</siri:LineDirection>
 		</siri:Lines>
