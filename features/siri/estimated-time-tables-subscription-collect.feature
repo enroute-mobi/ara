@@ -52,9 +52,44 @@ Feature: Support SIRI EstimatedTimetable
     And a Line exists with the following attributes:
       | Name      | Test                   |
       | ObjectIDs | "internal": "testLine" |
-    And a minute has passed
+    And 10 seconds have passed
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
+    And 15 seconds have passed
+    And the SIRI server should receive this response
+    """
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+  <S:Body>
+    <ws:Subscribe xmlns:ws='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:01:25.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>test</siri:RequestorRef>
+        <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+      </SubscriptionRequestInfo>
+      <Request>
+        <siri:EstimatedTimetableSubscriptionRequest>
+          <siri:SubscriberRef>test</siri:SubscriberRef>
+          <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionIdentifier>
+          <siri:InitialTerminationTime>2017-01-03T12:01:25.000Z</siri:InitialTerminationTime>
+          <siri:EstimatedTimetableRequest version='2.0:FR-IDF-2.4'>
+            <siri:RequestTimestamp>2017-01-01T12:01:25.000Z</siri:RequestTimestamp>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+            <siri:Lines>
+              <siri:LineDirection>
+                <siri:LineRef>testLine</siri:LineRef>
+              </siri:LineDirection>
+            </siri:Lines>
+          </siri:EstimatedTimetableRequest>
+          <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+          <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+        </siri:EstimatedTimetableSubscriptionRequest>
+      </Request>
+      <RequestExtension/>
+    </ws:Subscribe>
+  </S:Body>
+</S:Envelope>
+    """
 
 #   @ARA-1152
 #   Scenario: Update ara models after a EstimatedTimetableNotify in a subscription
