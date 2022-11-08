@@ -19,7 +19,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             route_id: "Line:1"
           }
           stop_time_update {
-            stop_sequence: 1
+            stop_sequence: 0
             stop_id: "StopArea:A"
             arrival {
               time: 1483272000
@@ -29,7 +29,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             }
           }
           stop_time_update {
-            stop_sequence: 2
+            stop_sequence: 1
             stop_id: "StopArea:B"
             arrival {
               time: 1483272060
@@ -39,7 +39,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             }
           }
           stop_time_update {
-            stop_sequence: 3
+            stop_sequence: 2
             stop_id: "StopArea:C"
             arrival {
               time: 1483272150
@@ -99,7 +99,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             route_id: "Line:1"
           }
           stop_time_update {
-            stop_sequence: 1
+            stop_sequence: 0
             arrival {
               time: 1483272000
             }
@@ -108,7 +108,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             }
           }
           stop_time_update {
-            stop_sequence: 2
+            stop_sequence: 1
             arrival {
               time: 1483272060
             }
@@ -117,7 +117,7 @@ Feature: Collect realtime data via GTFS-RT feeds
             }
           }
           stop_time_update {
-            stop_sequence: 3
+            stop_sequence: 2
             arrival {
               time: 1483272150
             }

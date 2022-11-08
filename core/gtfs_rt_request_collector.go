@@ -117,7 +117,7 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 
 	for _, stu := range t.GetStopTimeUpdate() {
 		sid := stu.GetStopId()
-		svid := fmt.Sprintf("%v-%v", vjObjectId.Value(), stu.GetStopSequence())
+		svid := fmt.Sprintf("%v-%v", vjObjectId.Value(), connector.handleStopSequence(stu))
 		stopAreaObjectId := model.NewObjectID(connector.remoteObjectidKind, sid)
 
 		if sid != "" {
@@ -141,7 +141,7 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 				ObjectId:               stopVisitObjectId,
 				StopAreaObjectId:       stopAreaObjectId,
 				VehicleJourneyObjectId: vjObjectId,
-				PassageOrder:           int(stu.GetStopSequence()),
+				PassageOrder:           connector.handleStopSequence(stu),
 				Monitored:              true,
 				RecordedAt:             connector.Clock().Now(),
 				Schedules:              model.NewStopVisitSchedules(),
@@ -157,6 +157,10 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 			events.StopVisits[sid][svid] = svEvent
 		}
 	}
+}
+
+func (connector *GtfsRequestCollector) handleStopSequence(st *gtfs.TripUpdate_StopTimeUpdate) int {
+	return int(st.GetStopSequence() + uint32(1))
 }
 
 func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents, v *gtfs.VehiclePosition) {
