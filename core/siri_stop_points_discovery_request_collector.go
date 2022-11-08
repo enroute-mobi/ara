@@ -102,7 +102,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "StopDiscoveryRequest",
+		Type:      "StopPointsDiscoveryRequest",
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),
