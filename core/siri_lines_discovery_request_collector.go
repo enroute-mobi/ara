@@ -100,7 +100,7 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 
 func (connector *SIRILinesDiscoveryRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "StopDiscoveryRequest",
+		Type:      "LinesDiscoveryRequest",
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),
