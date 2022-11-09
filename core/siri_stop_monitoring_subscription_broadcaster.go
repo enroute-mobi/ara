@@ -219,8 +219,8 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 			Type:     "StopArea",
 		}
 
-		r := sub.CreateAddNewResource(ref)
-		r.SubscribedAt = connector.Clock().Now()
+		r := sub.CreateAndAddNewResource(ref)
+		r.Subscribed(connector.Clock().Now())
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
 		connector.fillOptions(sub, r, request, sm)

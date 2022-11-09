@@ -23,10 +23,10 @@ func Test_subscription_MarshalJSON(t *testing.T) {
 	}
 	subscription.id = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 	subscription.kind = "salut"
-	subscription.CreateAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
+	subscription.CreateAndAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
 	subscription.externalId = "externalId"
 
-	expected := `{"SubscriptionRef":"6ba7b814-9dad-11d1-0-00c04fd430c8","ExternalId":"externalId","Kind":"salut","Resources":[{"Reference":{"ObjectId":{"test":"value"}},"RetryCount":0,"SubscribedAt":"0001-01-01T00:00:00Z","SubscribedUntil":"1984-04-04T00:02:00Z"}]}`
+	expected := `{"SubscriptionRef":"6ba7b814-9dad-11d1-0-00c04fd430c8","ExternalId":"externalId","Kind":"salut","Resources":[{"Reference":{"ObjectId":{"test":"value"}},"RetryCount":0,"SubscribedUntil":"1984-04-04T00:02:00Z","SubscribedAt":"0001-01-01T00:00:00Z"}]}`
 	jsonBytes, err := subscription.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -106,7 +106,7 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 		ObjectId: &obj,
 	}
 
-	existingSubscription.CreateAddNewResource(reference)
+	existingSubscription.CreateAndAddNewResource(reference)
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 

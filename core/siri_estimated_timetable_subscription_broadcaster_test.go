@@ -50,7 +50,7 @@ func Test_EstimatedTimetableBroadcaster_Create_Events(t *testing.T) {
 
 	subs := partner.Subscriptions().New("EstimatedTimetable")
 	subs.Save()
-	subs.CreateAddNewResource(reference)
+	subs.CreateAndAddNewResource(reference)
 	subs.SetExternalId("externalId")
 	subs.Save()
 

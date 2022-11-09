@@ -67,8 +67,6 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 	var lineIds, subIds []string
 
 	for _, ptt := range request.XMLSubscriptionPTTEntries() {
-		var failedSubscription bool
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ptt.MessageIdentifier(),
 			SubscriberRef:     ptt.SubscriberRef(),
@@ -79,25 +77,24 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 		// for logging
 		lineIds = append(lineIds, ptt.Lines()...)
 
-		resources, unknownLineIds := connector.checkLines(ptt)
-		if len(unknownLineIds) != 0 {
-			logger.Log.Debugf("ProductionTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
-			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
-			failedSubscription = true
-		}
-
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ptt.SubscriptionIdentifier())
 		if ok && sub.Kind() != ProductionTimetableBroadcast {
 			logger.Log.Debugf("ProductionTimetable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
 			rs.ErrorType = "OtherError"
 			rs.ErrorNumber = 2
 			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ptt.SubscriptionIdentifier())
-			failedSubscription = true
+
+			resps = append(resps, rs)
+			message.Status = "Error"
+			continue
 		}
 
-		// We do not want to create a subscription that will fail
-		if failedSubscription {
+		resources, unknownLineIds := connector.checkLines(ptt)
+		if len(unknownLineIds) != 0 {
+			logger.Log.Debugf("ProductionTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
+			rs.ErrorType = "InvalidDataReferencesError"
+			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
+
 			resps = append(resps, rs)
 			message.Status = "Error"
 			continue
@@ -156,7 +153,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 				Type:     "Line",
 			}
 			r := NewResource(ref)
-			r.SubscribedAt = connector.Clock().Now()
+			r.Subscribed(connector.Clock().Now())
 			r.SubscribedUntil = ptt.InitialTerminationTime()
 			resources = append(resources, r)
 		}
@@ -179,7 +176,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 		}
 
 		r := NewResource(ref)
-		r.SubscribedAt = connector.Clock().Now()
+		r.Subscribed(connector.Clock().Now())
 		r.SubscribedUntil = ptt.InitialTerminationTime()
 		resources = append(resources, r)
 	}

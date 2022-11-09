@@ -44,7 +44,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	subs := partner.Subscriptions().New("kind")
 	subs.Save()
-	subs.CreateAddNewResource(reference)
+	subs.CreateAndAddNewResource(reference)
 	subs.SetExternalId("externalId")
 	subs.Save()
 
@@ -87,7 +87,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	}
 
 	subs := partner.Subscriptions().New("StopMonitoringBroadcast")
-	subs.CreateAddNewResource(reference)
+	subs.CreateAndAddNewResource(reference)
 	subs.SetExternalId("externalId")
 	subs.Save()
 
@@ -132,7 +132,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 	}
 
 	sub := partner.Subscriptions().New("StopMonitoringBroadcast")
-	sub.CreateAddNewResource(reference)
+	sub.CreateAndAddNewResource(reference)
 	sub.SetExternalId("externalId")
 	sub.SetSubscriptionOption("LineRef", "incorrect:lineRef")
 	sub.Save()
@@ -230,8 +230,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
 	subscription.SubscriberRef = "subscriber"
 	subscription.SetExternalId("externalId")
-	subscription.CreateAddNewResource(reference)
-	subscription.CreateAddNewResource(reference2)
+	subscription.CreateAndAddNewResource(reference)
+	subscription.CreateAndAddNewResource(reference2)
 	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
 	// subscription.subscriptionOptions["MaximumStopVisits"] = "1"
 	subscription.Save()

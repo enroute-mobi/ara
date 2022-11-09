@@ -40,7 +40,7 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 
 	subs := partner.Subscriptions().New("kind")
 	subs.Save()
-	subs.CreateAddNewResource(reference)
+	subs.CreateAndAddNewResource(reference)
 	subs.Save()
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 
@@ -97,7 +97,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageBroadcast")
 	subscription.SubscriberRef = "subscriber"
-	subscription.CreateAddNewResource(reference)
+	subscription.CreateAndAddNewResource(reference)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 	situation.Save()

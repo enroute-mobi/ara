@@ -79,7 +79,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) RequestVehicleUpdat
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
 			}
-			if !resource.SubscribedAt.IsZero() {
+			if !resource.SubscribedAt().IsZero() {
 				resource.SubscribedUntil = connector.Clock().Now().Add(2 * time.Minute)
 			}
 		}
@@ -93,7 +93,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) RequestVehicleUpdat
 		Type:     "Line",
 	}
 
-	newSubscription.CreateAddNewResource(ref)
+	newSubscription.CreateAndAddNewResource(ref)
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionCollector) SetVehicleMonitoringSubscriber(vehicleMonitoringSubscriber SIRIVehicleMonitoringSubscriber) {

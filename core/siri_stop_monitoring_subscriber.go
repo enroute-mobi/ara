@@ -98,7 +98,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 	stopAreasToRequest := make(map[string]*saToRequest)
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
-			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
+			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				stopAreasToRequest[messageIdentifier] = &saToRequest{
 					subId: subscription.id,
@@ -187,7 +187,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			message.Status = "Error"
 			continue
 		}
-		resource.SubscribedAt = subscriber.Clock().Now()
+		resource.Subscribed(subscriber.Clock().Now())
 		resource.RetryCount = 0
 	}
 	// Should not happen but see #4691

@@ -145,8 +145,8 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 				ObjectId: &obj,
 				Type:     "Situation",
 			}
-			r = sub.CreateAddNewResource(ref)
-			r.SubscribedAt = connector.Clock().Now()
+			r = sub.CreateAndAddNewResource(ref)
+			r.Subscribed(connector.Clock().Now())
 			r.SubscribedUntil = gm.InitialTerminationTime()
 		}
 

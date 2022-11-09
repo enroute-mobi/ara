@@ -163,7 +163,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	}
 
 	subscription := partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
-	subscription.CreateAddNewResource(ref)
+	subscription.CreateAndAddNewResource(ref)
 	subscription.Save()
 
 	partner.CancelSubscriptions()

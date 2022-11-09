@@ -79,7 +79,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
 			}
-			if !resource.SubscribedAt.IsZero() {
+			if !resource.SubscribedAt().IsZero() {
 				resource.SubscribedUntil = connector.Clock().Now().Add(2 * time.Minute)
 			}
 		}
@@ -93,7 +93,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		Type:     "StopArea",
 	}
 
-	newSubscription.CreateAddNewResource(ref)
+	newSubscription.CreateAndAddNewResource(ref)
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubscriber(stopMonitoringSubscriber SIRIStopMonitoringSubscriber) {
