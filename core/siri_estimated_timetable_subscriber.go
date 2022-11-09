@@ -102,6 +102,7 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
 		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
 		RequestTimestamp:  subscriber.Clock().Now(),
+		SortForTest:       subscriber.connector.Partner().SortForTests(),
 	}
 
 	var subIds []string

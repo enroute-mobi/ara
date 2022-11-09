@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,6 +16,8 @@ type SIRIEstimatedTimetableSubscriptionRequest struct {
 	RequestTimestamp  time.Time
 
 	Entries []*SIRIEstimatedTimetableSubscriptionRequestEntry
+
+	SortForTest bool
 }
 
 type SIRIEstimatedTimetableSubscriptionRequestEntry struct {
@@ -36,6 +39,12 @@ func (request *SIRIEstimatedTimetableSubscriptionRequest) BuildXML(envelopeType 
 	}
 
 	templateName = fmt.Sprintf("estimated_timetable_subscription_request%s.template", envType)
+
+	if request.SortForTest {
+		for _, entry := range request.Entries {
+			sort.Strings(entry.Lines)
+		}
+	}
 
 	if err := templates.ExecuteTemplate(&buffer, templateName, request); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)

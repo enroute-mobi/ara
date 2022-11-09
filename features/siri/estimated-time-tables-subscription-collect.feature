@@ -56,6 +56,67 @@ Feature: Support SIRI EstimatedTimetable
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
 
+  @ARA-1179
+  Scenario: Check EstimatedTimetable subscription collect payload
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url             | http://localhost:8090 |
+      | local_url              | http://test           |
+      | remote_credential      | test                  |
+      | local_credential       | NINOXE:default        |
+      | remote_objectid_kind   | internal              |
+      | sort_payload_for_test  | true                  |
+    And a Line exists with the following attributes:
+      | Name      | Test1                   |
+      | ObjectIDs | "internal": "testLine1" |
+    And a Line exists with the following attributes:
+      | Name      | Test2                   |
+      | ObjectIDs | "internal": "testLine2" |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableCollect     |
+      | ExternalId        | ExternalId                    |
+      | ReferenceArray[0] | Line, "internal": "testLine1" |
+      | ReferenceArray[1] | Line, "internal": "testLine2" |
+    And 5 seconds have passed
+    Then the SIRI server should receive this response
+    """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <SubscriptionRequestInfo>
+	<siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
+	<siri:RequestorRef>test</siri:RequestorRef>
+	<siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+        <siri:ConsumerAddress>http://test</siri:ConsumerAddress>
+      </SubscriptionRequestInfo>
+      <Request>
+	<siri:EstimatedTimetableSubscriptionRequest>
+	  <siri:SubscriberRef>test</siri:SubscriberRef>
+	  <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionIdentifier>
+	  <siri:InitialTerminationTime>2017-01-03T12:00:05.000Z</siri:InitialTerminationTime>
+	  <siri:EstimatedTimetableRequest version="2.0:FR-IDF-2.4">
+	    <siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
+	    <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+	    <siri:Lines>
+	      <siri:LineDirection>
+		<siri:LineRef>testLine1</siri:LineRef>
+	      </siri:LineDirection>
+	      <siri:LineDirection>
+		<siri:LineRef>testLine2</siri:LineRef>
+	      </siri:LineDirection>
+	    </siri:Lines>
+	  </siri:EstimatedTimetableRequest>
+	  <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+	  <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+	</siri:EstimatedTimetableSubscriptionRequest>
+      </Request>
+      <RequestExtension />
+    </ws:Subscribe>
+  </S:Body>
+</S:Envelope>
+    """
+
 #   @ARA-1152
 #   Scenario: Update ara models after a EstimatedTimetableNotify in a subscription
 #     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
