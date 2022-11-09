@@ -98,11 +98,11 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	siriEstimatedTimetableSubscriptionRequest := &siri.SIRIEstimatedTimetableSubscriptionRequest{
-		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
-		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
-		RequestTimestamp:  subscriber.Clock().Now(),
-		SortForTest:       subscriber.connector.Partner().SortForTests(),
+		ConsumerAddress:    subscriber.connector.Partner().Address(),
+		MessageIdentifier:  subscriber.connector.Partner().NewMessageIdentifier(),
+		RequestorRef:       subscriber.connector.Partner().RequestorRef(),
+		RequestTimestamp:   subscriber.Clock().Now(),
+		SortPayloadForTest: subscriber.connector.Partner().SortPaylodForTest(),
 	}
 
 	var subIds []string

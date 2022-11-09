@@ -17,7 +17,7 @@ type SIRIEstimatedTimetableSubscriptionRequest struct {
 
 	Entries []*SIRIEstimatedTimetableSubscriptionRequestEntry
 
-	SortForTest bool
+	SortPayloadForTest bool
 }
 
 type SIRIEstimatedTimetableSubscriptionRequestEntry struct {
@@ -40,7 +40,7 @@ func (request *SIRIEstimatedTimetableSubscriptionRequest) BuildXML(envelopeType 
 
 	templateName = fmt.Sprintf("estimated_timetable_subscription_request%s.template", envType)
 
-	if request.SortForTest {
+	if request.SortPayloadForTest {
 		for _, entry := range request.Entries {
 			sort.Strings(entry.Lines)
 		}

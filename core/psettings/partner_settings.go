@@ -232,7 +232,7 @@ func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
 	return
 }
 
-func (s *PartnerSettings) SortForTests() (sort bool) {
+func (s *PartnerSettings) SortPaylodForTest() (sort bool) {
 	s.m.RLock()
 	sort, _ = strconv.ParseBool(s.s[SORT_PAYLOAD_FOR_TEST])
 	s.m.RUnlock()
