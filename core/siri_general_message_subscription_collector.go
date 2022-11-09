@@ -73,7 +73,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
 			}
-			if !resource.SubscribedAt.IsZero() {
+			if !resource.SubscribedAt().IsZero() {
 				resource.SubscribedUntil = connector.Clock().Now().Add(2 * time.Minute)
 			}
 		}
@@ -92,7 +92,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 		ref.Type = "StopArea"
 	}
 
-	newSubscription.CreateAddNewResource(ref)
+	newSubscription.CreateAndAddNewResource(ref)
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) {

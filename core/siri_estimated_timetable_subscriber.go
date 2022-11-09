@@ -79,7 +79,7 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 	linesToRequest := make(map[string][]string)
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
-			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
+			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				mid := subscriber.connector.Partner().NewMessageIdentifier()
 				if len(linesToRequest[string(subscription.id)]) == 0 {
 					requestMessageRefToSub[mid] = string(subscription.id)
@@ -155,7 +155,6 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 			logger.Log.Debugf("Error in ETT Subscription Collector, no lines to request for subscription %v", subId)
 			continue
 		}
-		delete(linesToRequest, subId) // See #4691
 
 		subscription, ok := subscriber.connector.partner.Subscriptions().Find(SubscriptionId(subId))
 		if !ok { // Should never happen
@@ -170,15 +169,15 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 			}
 
 			if !responseStatus.Status() {
-				logger.Log.Debugf("Subscription status false for stopArea %v: %v %v ", line, responseStatus.ErrorType(), responseStatus.ErrorText())
+				logger.Log.Debugf("Subscription status false for line %v: %v %v ", line, responseStatus.ErrorType(), responseStatus.ErrorText())
 				resource.RetryCount++
 				message.Status = "Error"
 				continue
 			}
-			resource.SubscribedAt = subscriber.Clock().Now()
+			resource.Subscribed(subscriber.Clock().Now())
 			resource.RetryCount = 0
-
 		}
+		delete(linesToRequest, subId) // See #4691
 	}
 	// Should not happen but see #4691
 	if len(linesToRequest) == 0 {

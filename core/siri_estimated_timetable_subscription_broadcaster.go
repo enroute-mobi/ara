@@ -58,8 +58,6 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 	var lineIds, subIds []string
 
 	for _, ett := range request.XMLSubscriptionETTEntries() {
-		var failedSubscription bool
-
 		rs := siri.SIRIResponseStatus{
 			RequestMessageRef: ett.MessageIdentifier(),
 			SubscriberRef:     ett.SubscriberRef(),
@@ -70,25 +68,24 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 		// for logging
 		lineIds = append(lineIds, ett.Lines()...)
 
-		resources, unknownLineIds := connector.checkLines(ett)
-		if len(unknownLineIds) != 0 {
-			logger.Log.Debugf("EstimatedTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
-			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
-			failedSubscription = true
-		}
-
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
 		if ok && sub.Kind() != EstimatedTimetableBroadcast {
 			logger.Log.Debugf("EstimatedTimetable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
 			rs.ErrorType = "OtherError"
 			rs.ErrorNumber = 2
 			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ett.SubscriptionIdentifier())
-			failedSubscription = true
+
+			resps = append(resps, rs)
+			message.Status = "Error"
+			continue
 		}
 
-		// We do not want to create a subscription that will fail
-		if failedSubscription {
+		resources, unknownLineIds := connector.checkLines(ett)
+		if len(unknownLineIds) != 0 {
+			logger.Log.Debugf("EstimatedTimetable subscription request Could not find line(s) with id : %v", strings.Join(unknownLineIds, ","))
+			rs.ErrorType = "InvalidDataReferencesError"
+			rs.ErrorText = fmt.Sprintf("Unknown Line(s) %v", strings.Join(unknownLineIds, ","))
+
 			resps = append(resps, rs)
 			message.Status = "Error"
 			continue
@@ -159,7 +156,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *
 				Type:     "Line",
 			}
 			r := NewResource(ref)
-			r.SubscribedAt = connector.Clock().Now()
+			r.Subscribed(connector.Clock().Now())
 			r.SubscribedUntil = ett.InitialTerminationTime()
 			resources = append(resources, r)
 		}
@@ -182,7 +179,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *
 		}
 
 		r := NewResource(ref)
-		r.SubscribedAt = connector.Clock().Now()
+		r.Subscribed(connector.Clock().Now())
 		r.SubscribedUntil = ett.InitialTerminationTime()
 		resources = append(resources, r)
 	}

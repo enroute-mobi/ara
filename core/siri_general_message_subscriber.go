@@ -100,7 +100,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	resourcesToRequest := make(map[string]*resourceToRequest)
 	for _, subscription := range subscriptions {
 		for _, resource := range subscription.ResourcesByObjectIDCopy() {
-			if resource.SubscribedAt.IsZero() && resource.RetryCount <= 10 {
+			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
@@ -197,7 +197,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			message.Status = "Error"
 			continue
 		}
-		resource.SubscribedAt = subscriber.Clock().Now()
+		resource.Subscribed(subscriber.Clock().Now())
 		resource.RetryCount = 0
 	}
 	// Should not happen but see #4691

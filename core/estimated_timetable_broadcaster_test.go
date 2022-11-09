@@ -70,7 +70,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	subscription := partner.Subscriptions().New(EstimatedTimetableBroadcast)
 	subscription.SubscriberRef = "subscriber"
 	subscription.SetExternalId("externalId")
-	subscription.CreateAddNewResource(reference)
+	subscription.CreateAndAddNewResource(reference)
 	subscription.SetSubscriptionOption("MessageIdentifier", "MessageIdentifier")
 	subscription.Save()
 
