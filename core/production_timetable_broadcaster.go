@@ -118,7 +118,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			SubscriptionIdentifier: sub.ExternalId(),
 			ResponseTimestamp:      ptt.connector.Clock().Now(),
 			Status:                 true,
-			SortForTests:           ptt.connector.Partner().SortForTests(),
+			SortPayloadForTest:     ptt.connector.Partner().SortPaylodForTest(),
 		}
 
 		for _, stopVisitId := range stopVisits {
