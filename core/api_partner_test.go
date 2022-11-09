@@ -12,6 +12,7 @@ func Test_APIPartner_SetFactories(t *testing.T) {
 	partner := &APIPartner{
 		ConnectorTypes: []string{"unexistant-factory", "test-check-status-client"},
 		factories:      make(map[string]ConnectorFactory),
+		Errors:         e.NewErrors(),
 	}
 	partner.setFactories()
 
