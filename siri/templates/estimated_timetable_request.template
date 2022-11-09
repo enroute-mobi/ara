@@ -2,6 +2,6 @@
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
 		<siri:Lines>{{ range .Lines }}
 			<siri:LineDirection>
-				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}
-			</siri:LineDirection>
+				<siri:LineRef>{{ . }}</siri:LineRef>
+			</siri:LineDirection>{{ end }}
 		</siri:Lines>
