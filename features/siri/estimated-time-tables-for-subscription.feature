@@ -569,7 +569,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Schedule[aimed]#Arrival         | 2017-01-01T12:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
-    And 10 seconds have passed
+    And 5 seconds have passed
     When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | Delayed                  |
@@ -579,16 +579,16 @@ Feature: Support SIRI EstimatedTimetable by subscription
 <?xml version='1.0' encoding='utf-8'?>
 <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
  <ServiceDelivery>
-   <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+   <ResponseTimestamp>2017-01-01T12:00:10.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
-     <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+     <ResponseTimestamp>2017-01-01T12:00:10.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
      <SubscriptionRef>externalId</SubscriptionRef>
      <Status>true</Status>
      <EstimatedJourneyVersionFrame>
-       <RecordedAtTime>2017-01-01T12:00:15.000Z</RecordedAtTime>
+       <RecordedAtTime>2017-01-01T12:00:10.000Z</RecordedAtTime>
        <EstimatedVehicleJourney>
          <LineRef>NINOXE:Line:3:LOC</LineRef>
          <DirectionRef>Aller</DirectionRef>
@@ -625,16 +625,16 @@ Feature: Support SIRI EstimatedTimetable by subscription
 <?xml version='1.0' encoding='utf-8'?>
 <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
   <ServiceDelivery>
-    <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+    <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
     <ProducerRef>test</ProducerRef>
     <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
     <EstimatedTimetableDelivery>
-      <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
       <SubscriberRef>subscriber</SubscriberRef>
       <SubscriptionRef>externalId</SubscriptionRef>
       <Status>true</Status>
       <EstimatedJourneyVersionFrame>
-        <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
+        <RecordedAtTime>2017-01-01T12:00:15.000Z</RecordedAtTime>
         <EstimatedVehicleJourney>
          <LineRef>NINOXE:Line:3:LOC</LineRef>
          <DirectionRef>Aller</DirectionRef>
