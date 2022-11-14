@@ -145,9 +145,9 @@ func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction strin
 	if !err {
 
 		switch strings.ToLower(direction) {
-		case "aller":
+		case model.VEHICLE_DIRECTION_ALLER:
 			dir = model.VEHICLE_DIRECTION_INBOUND
-		case "retour":
+		case model.VEHICLE_DIRECTION_RETOUR:
 			dir = model.VEHICLE_DIRECTION_OUTBOUND
 		default:
 			dir = direction
