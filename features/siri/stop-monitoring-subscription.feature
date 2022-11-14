@@ -44,12 +44,12 @@ Feature: Support SIRI StopMonitoring by subscription
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090             |
-      | remote_credential                  | test                              |
-      | local_credential                   | NINOXE:default                    |
-      | remote_objectid_kind               | internal                          |
-      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC    |
-      | siri.direction_type                | ch:1:Direction:R,ch:1:Direction:H |
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | NINOXE:default                 |
+      | remote_objectid_kind               | internal                       |
+      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
+      | siri.direction_type                | Aller,Retour                   |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -138,7 +138,6 @@ Feature: Support SIRI StopMonitoring by subscription
       | Collected     | true  |
       | PassageOrder  | 4     |
       | VehicleAtStop | false |
-      Then I see ara vehicle_journeys
       Then the VehicleJourney "6ba7b814-9dad-11d1-5-00c04fd430c8" has the following attributes:
       | DirectionType | inbound |
 
