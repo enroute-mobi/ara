@@ -11,8 +11,6 @@ import (
 const (
 	VEHICLE_DIRECTION_INBOUND  = "inbound"
 	VEHICLE_DIRECTION_OUTBOUND = "outbound"
-	VEHICLE_DIRECTION_ALLER    = "aller"
-	VEHICLE_DIRECTION_RETOUR   = "retour"
 )
 
 type VehicleJourneyId ModelId
