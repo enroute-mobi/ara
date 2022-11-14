@@ -75,7 +75,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			LineObjectId:    lineObjectId,
 			OriginRef:       xmlStopVisitEvent.OriginRef(),
 			OriginName:      xmlStopVisitEvent.OriginName(),
-			DirectionType:   xmlStopVisitEvent.DirectionRef(),
+			DirectionType:   builder.directionRef(xmlStopVisitEvent.DirectionRef()),
 			DestinationRef:  xmlStopVisitEvent.DestinationRef(),
 			DestinationName: xmlStopVisitEvent.DestinationName(),
 			Monitored:       xmlStopVisitEvent.Monitored(),
@@ -127,6 +127,24 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 		builder.stopMonitoringUpdateEvents.StopVisits[xmlStopVisitEvent.StopPointRef()][xmlStopVisitEvent.ItemIdentifier()] = svEvent
 
 	}
+}
+
+func (builder *StopMonitoringUpdateEventBuilder) directionRef(direction string) (dir string) {
+	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
+	if err {
+		return direction
+	}
+
+	switch direction {
+	case in:
+		dir = model.VEHICLE_DIRECTION_INBOUND
+	case out:
+		dir = model.VEHICLE_DIRECTION_OUTBOUND
+	default:
+		dir = direction
+	}
+
+	return dir
 }
 
 func (builder *StopMonitoringUpdateEventBuilder) SetUpdateEvents(stopVisits []*sxml.XMLMonitoredStopVisit) {

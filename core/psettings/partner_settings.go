@@ -64,6 +64,7 @@ const (
 
 	SIRI_ENVELOPE            = "siri.envelope"
 	SIRI_LINE_PUBLISHED_NAME = "siri.line.published_name"
+	SIRI_DIRECTION_TYPE      = "siri.direction_type"
 	SIRI_PASSAGE_ORDER       = "siri.passage_order"
 	DEFAULT_GTFS_TTL         = 30 * time.Second
 
@@ -258,6 +259,23 @@ func (s *PartnerSettings) Address() string {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.s[LOCAL_URL]
+}
+
+func (s *PartnerSettings) SIRIDirectionType() (string, string, bool) {
+	var inboundValue, outboundValue string
+	s.m.RLock()
+	defer s.m.RUnlock()
+
+	directions := strings.Split(s.s[SIRI_DIRECTION_TYPE], ",")
+	// ensure the correctness of the setting
+	if len(directions) != 2 {
+		return inboundValue, outboundValue, true
+	}
+
+	inboundValue = directions[0]
+	outboundValue = directions[1]
+
+	return inboundValue, outboundValue, false
 }
 
 func (s *PartnerSettings) SIRILinePublishedName() string {

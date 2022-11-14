@@ -8,6 +8,11 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
+const (
+	VEHICLE_DIRECTION_INBOUND  = "inbound"
+	VEHICLE_DIRECTION_OUTBOUND = "outbound"
+)
+
 type VehicleJourneyId ModelId
 
 type VehicleJourney struct {

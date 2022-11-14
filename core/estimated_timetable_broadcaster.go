@@ -224,7 +224,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 
 				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
 					LineRef:                lineObjectId.Value(),
-					DirectionType:          vehicleJourney.DirectionType,
+					DirectionType:          ett.connector.directionType(vehicleJourney.DirectionType),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           ett.connector.dataFrameRef(),
 					PublishedLineName:      ett.connector.publishedLineName(line),
@@ -299,6 +299,24 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) UseVisitNumber()
 	default:
 		return false
 	}
+}
+
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) directionType(direction string) (dir string) {
+	in, out, err := connector.partner.PartnerSettings.SIRIDirectionType()
+	if err {
+		return direction
+	}
+
+	switch direction {
+	case model.VEHICLE_DIRECTION_INBOUND:
+		dir = in
+	case model.VEHICLE_DIRECTION_OUTBOUND:
+		dir = out
+	default:
+		dir = direction
+	}
+
+	return dir
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
