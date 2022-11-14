@@ -138,21 +138,18 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction string) string {
-	var dir string
+func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction string) (dir string) {
+	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
+	if err {
+		return direction
+	}
 
-	_, _, err := builder.partner.PartnerSettings.SIRIDirectionType()
-	if !err {
-
-		switch strings.ToLower(direction) {
-		case model.VEHICLE_DIRECTION_ALLER:
-			dir = model.VEHICLE_DIRECTION_INBOUND
-		case model.VEHICLE_DIRECTION_RETOUR:
-			dir = model.VEHICLE_DIRECTION_OUTBOUND
-		default:
-			dir = direction
-		}
-	} else {
+	switch direction {
+	case in:
+		dir = model.VEHICLE_DIRECTION_INBOUND
+	case out:
+		dir = model.VEHICLE_DIRECTION_OUTBOUND
+	default:
 		dir = direction
 	}
 

@@ -236,12 +236,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090             |
-      | remote_credential                  | test                              |
-      | local_credential                   | NINOXE:default                    |
-      | remote_objectid_kind               | internal                          |
-      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC    |
-      | siri.direction_type                | ch:1:Direction:R,ch:1:Direction:H |
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | NINOXE:default                 |
+      | remote_objectid_kind               | internal                       |
+      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
+      | siri.direction_type                | Aller, Retour                  |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
