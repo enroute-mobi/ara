@@ -301,9 +301,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) UseVisitNumber()
 	}
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) directionType(direction string) string {
-	var dir string
-
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) directionType(direction string) (dir string) {
 	in, out, err := connector.partner.PartnerSettings.SIRIDirectionType()
 	if err {
 		return direction

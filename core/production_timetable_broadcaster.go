@@ -260,9 +260,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) publishedLineNa
 	return pln
 }
 
-func (connector *SIRIProductionTimetableSubscriptionBroadcaster) directionType(direction string) string {
-	var dir string
-
+func (connector *SIRIProductionTimetableSubscriptionBroadcaster) directionType(direction string) (dir string) {
 	in, out, err := connector.partner.PartnerSettings.SIRIDirectionType()
 	if err {
 		return direction

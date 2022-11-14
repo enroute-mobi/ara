@@ -180,9 +180,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	return monitoredStopVisit
 }
 
-func (builder *BroadcastStopMonitoringBuilder) directionType(direction string) string {
-	var dir string
-
+func (builder *BroadcastStopMonitoringBuilder) directionType(direction string) (dir string) {
 	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
 	if err {
 		return direction
