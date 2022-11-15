@@ -447,7 +447,7 @@ Feature: Support SIRI StopMonitoring by request
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
       | LineId                                 | 6ba7b814-9dad-11d1-6-00c04fd430c8               |
       | Monitored                              | true                                            |
-      | Occupancy                              | MANY_SEATS_AVAILABLE                            |
+      | Occupancy                              | manySeatsAvailable                              |
       | Attribute[Bearing]                     | N                                               |
       | Attribute[Delay]                       | 30                                              |
       | DestinationName                        | Cimetière des Sauvages                          |
@@ -536,7 +536,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FirstOrLastJourney                                           | first                                                       | VehicleJourney#Attribute[FirstOrLastJourney]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Monitored                                                    | true                                                        | VehicleJourney#Attribute[Monitored]                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoringError                                              | false                                                       | VehicleJourney#Attribute[MonitoringError]             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | MANY_SEATS_AVAILABLE                                        | VehicleJourney#Occupancy                              |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Occupancy                                                    | manySeatsAvailable                                          | VehicleJourney#Occupancy                              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Delay                                                        | 30                                                          | VehicleJourney#Attribute[Delay]                       |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Bearing                                                      | N                                                           | VehicleJourney#Attribute[Bearing]                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InPanic                                                      | false                                                       | VehicleJourney#Attribute[InPanic]                     |
@@ -1765,13 +1765,13 @@ Feature: Support SIRI StopMonitoring by request
       | Name         | Ligne 3 Metro                             |
       | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                              | "internal": "NINOXE:VehicleJourney:201"         |
-      | Name                                   | Magicien Noir - Cimetière (OMNI)                |
-      | LineId                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8               |
-      | Monitored                              | true                                            |
-      | Occupancy                              | MANY_SEATS_AVAILABLE                            |
-      | Attribute[DirectionName]               | Mago-Cime OMNI                                  |
-      | DirectionType                          | inbound                                    |
+      | ObjectIDs                | "internal": "NINOXE:VehicleJourney:201" |
+      | Name                     | Magicien Noir - Cimetière (OMNI)        |
+      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored                | true                                    |
+      | Occupancy                | manySeatsAvailable                      |
+      | Attribute[DirectionName] | Mago-Cime OMNI                          |
+      | DirectionType            | inbound                                 |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |

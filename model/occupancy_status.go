@@ -19,15 +19,15 @@ import (
 */
 
 const (
-	empty                   = "EMPTY"
-	manySeatsAvailable      = "MANY_SEATS_AVAILABLE"
-	fewSeatsAvailable       = "FEW_SEATS_AVAILABLE"
-	standingRoomOnly        = "STANDING_ROOM_ONLY"
-	crushedStandingRoomOnly = "CRUSHED_STANDING_ROOM_ONLY"
-	full                    = "FULL"
-	notAcceptingPassengers  = "NOT_ACCEPTING_PASSENGERS"
-	noDataAvailable         = "NO_DATA_AVAILABLE"
-	notBoardable            = "NOT_BOARDABLE"
+	empty                   = "empry"
+	manySeatsAvailable      = "manySeatsAvailable"
+	fewSeatsAvailable       = "fewSeatsAvailable"
+	standingRoomOnly        = "standingRoomOnly"
+	crushedStandingRoomOnly = "crushedStandingRoomOnly"
+	full                    = "full"
+	notAcceptingPassengers  = "notAcceptingPassengers"
+	noDataAvailable         = "noDataAvailable"
+	notBoardable            = "notBoardable"
 )
 
 func NormalizedOccupancyName(occupancy string) string { // Doesn't do mutch for now, but it felt faster this way
