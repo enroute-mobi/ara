@@ -2,7 +2,7 @@
 # docker build -t ara --build-arg VERSION="build-999" .
 # docker run -it --add-host db:172.17.0.1 -e ARA_DB_NAME=ara -e ARA_DB_USER=ara -e ARA_DB_PASSWORD=ara -e ARA_API_KEY=secret -e ARA_DEBUG=true -p 8080:8080 ara
 
-FROM golang:1.18 AS builder
+FROM golang:1.19.3 AS builder
 ARG VERSION=dev
 
 ENV DEV_PACKAGES="libxml2-dev libproj-dev"
