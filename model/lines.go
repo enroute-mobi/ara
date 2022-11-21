@@ -13,19 +13,15 @@ type LineId ModelId
 
 type Line struct {
 	Collectable
-	ObjectIDConsumer
-
-	model  Model
-	origin string
-
-	id LineId
-
-	CollectGeneralMessages bool
-
-	Name       string `json:",omitempty"`
-	Number     string `json:",omitempty"`
-	Attributes Attributes
+	model      Model
 	References References
+	ObjectIDConsumer
+	Attributes             Attributes
+	id                     LineId
+	Name                   string `json:",omitempty"`
+	Number                 string `json:",omitempty"`
+	origin                 string
+	CollectGeneralMessages bool
 }
 
 func NewLine(model Model) *Line {
@@ -65,13 +61,13 @@ func (line *Line) SetOrigin(origin string) {
 func (line *Line) MarshalJSON() ([]byte, error) {
 	type Alias Line
 	aux := struct {
-		Id            LineId
+		*Alias
 		ObjectIDs     ObjectIDs            `json:",omitempty"`
 		NextCollectAt *time.Time           `json:",omitempty"`
 		CollectedAt   *time.Time           `json:",omitempty"`
 		Attributes    Attributes           `json:",omitempty"`
 		References    map[string]Reference `json:",omitempty"`
-		*Alias
+		Id            LineId
 	}{
 		Id:    line.id,
 		Alias: (*Alias)(line),

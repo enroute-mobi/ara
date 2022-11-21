@@ -18,23 +18,19 @@ type Message struct {
 }
 
 type Situation struct {
+	RecordedAt time.Time
+	ValidUntil time.Time
+	model      Model
 	ObjectIDConsumer
-
-	model  Model
-	Origin string
-
-	id SituationId
-
-	References   []*Reference
-	LineSections []*References
+	id           SituationId
+	ProducerRef  string `json:",omitempty"`
+	Channel      string `json:",omitempty"`
+	Format       string `json:",omitempty"`
+	Origin       string
 	Messages     []*Message
-
-	RecordedAt  time.Time
-	ValidUntil  time.Time
-	Format      string `json:",omitempty"`
-	Channel     string `json:",omitempty"`
-	ProducerRef string `json:",omitempty"`
-	Version     int    `json:",omitempty"`
+	LineSections []*References
+	References   []*Reference
+	Version      int `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {
@@ -88,14 +84,14 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 func (situation *Situation) MarshalJSON() ([]byte, error) {
 	type Alias Situation
 	aux := struct {
+		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		RecordedAt *time.Time `json:",omitempty"`
+		ValidUntil *time.Time `json:",omitempty"`
+		*Alias
 		Id           SituationId
-		ObjectIDs    ObjectIDs     `json:",omitempty"`
-		RecordedAt   *time.Time    `json:",omitempty"`
-		ValidUntil   *time.Time    `json:",omitempty"`
 		Messages     []*Message    `json:",omitempty"`
 		References   []*Reference  `json:",omitempty"`
 		LineSections []*References `json:",omitempty"`
-		*Alias
 	}{
 		Id:    situation.id,
 		Alias: (*Alias)(situation),

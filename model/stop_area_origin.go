@@ -6,9 +6,8 @@ import (
 )
 
 type StopAreaOrigins struct {
-	sync.RWMutex
-
 	partners map[string]bool
+	sync.RWMutex
 }
 
 func NewStopAreaOrigins() *StopAreaOrigins {

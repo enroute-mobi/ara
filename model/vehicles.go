@@ -15,28 +15,22 @@ import (
 type VehicleId ModelId
 
 type Vehicle struct {
+	RecordedAtTime time.Time
+	ValidUntilTime time.Time `json:",omitempty"`
+	model          Model
 	ObjectIDConsumer
-
-	model Model
-
-	id               VehicleId
+	Attributes       Attributes
+	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
+	Occupancy        string           `json:",omitempty"`
 	LineId           LineId           `json:",omitempty"`
 	StopAreaId       StopAreaId       `json:",omitempty"`
-	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
-
-	Longitude float64 `json:",omitempty"`
-	Latitude  float64 `json:",omitempty"`
-
-	Bearing        float64   `json:",omitempty"`
-	LinkDistance   float64   `json:",omitempty"`
-	Percentage     float64   `json:",omitempty"`
-	DriverRef      string    `json:",omitempty"`
-	Occupancy      string    `json:",omitempty"`
-	ValidUntilTime time.Time `json:",omitempty"`
-
-	RecordedAtTime time.Time
-
-	Attributes Attributes
+	DriverRef        string           `json:",omitempty"`
+	id               VehicleId
+	LinkDistance     float64 `json:",omitempty"`
+	Percentage       float64 `json:",omitempty"`
+	Longitude        float64 `json:",omitempty"`
+	Latitude         float64 `json:",omitempty"`
+	Bearing          float64 `json:",omitempty"`
 }
 
 func NewVehicle(model Model) *Vehicle {
@@ -92,10 +86,10 @@ func (vehicle *Vehicle) VehicleJourney() *VehicleJourney {
 func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	type Alias Vehicle
 	aux := struct {
-		Id         VehicleId
 		ObjectIDs  ObjectIDs  `json:",omitempty"`
 		Attributes Attributes `json:",omitempty"`
 		*Alias
+		Id VehicleId
 	}{
 		Id:    vehicle.id,
 		Alias: (*Alias)(vehicle),

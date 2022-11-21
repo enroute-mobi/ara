@@ -17,9 +17,9 @@ const (
 var stopVisitScheduleTypes = [3]StopVisitScheduleType{STOP_VISIT_SCHEDULE_AIMED, STOP_VISIT_SCHEDULE_EXPECTED, STOP_VISIT_SCHEDULE_ACTUAL}
 
 type StopVisitSchedule struct {
-	kind          StopVisitScheduleType
 	departureTime time.Time
 	arrivalTime   time.Time
+	kind          StopVisitScheduleType
 }
 
 func (schedule *StopVisitSchedule) Kind() StopVisitScheduleType {
@@ -60,9 +60,9 @@ func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
 func (schedule *StopVisitSchedule) UnmarshalJSON(data []byte) error {
 
 	aux := &struct {
-		Kind          StopVisitScheduleType
 		DepartureTime time.Time
 		ArrivalTime   time.Time
+		Kind          StopVisitScheduleType
 	}{}
 
 	err := json.Unmarshal(data, aux)
@@ -78,9 +78,8 @@ func (schedule *StopVisitSchedule) UnmarshalJSON(data []byte) error {
 }
 
 type StopVisitSchedules struct {
-	sync.RWMutex
-
 	byType map[StopVisitScheduleType]*StopVisitSchedule
+	sync.RWMutex
 }
 
 func NewStopVisitSchedules() *StopVisitSchedules {

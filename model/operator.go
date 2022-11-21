@@ -49,9 +49,9 @@ func (operator *Operator) MarshalJSON() ([]byte, error) {
 	type Alias Operator
 
 	aux := struct {
-		Id        OperatorId
 		ObjectIDs ObjectIDs `json:",omitempty"`
 		*Alias
+		Id OperatorId
 	}{
 		Id:    operator.id,
 		Alias: (*Alias)(operator),

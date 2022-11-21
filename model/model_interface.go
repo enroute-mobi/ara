@@ -27,20 +27,18 @@ type Model interface {
 }
 
 type MemoryModel struct {
-	date        Date
-	referential string
-
+	lines               *MemoryLines
+	vehicles            *MemoryVehicles
 	stopAreas           *MemoryStopAreas
 	stopVisits          *MemoryStopVisits
 	scheduledStopVisits *MemoryStopVisits
 	vehicleJourneys     *MemoryVehicleJourneys
-	lines               *MemoryLines
-	vehicles            *MemoryVehicles
 	situations          *MemorySituations
 	operators           *MemoryOperators
-
-	SMEventsChan chan StopMonitoringBroadcastEvent
-	GMEventsChan chan GeneralMessageBroadcastEvent
+	SMEventsChan        chan StopMonitoringBroadcastEvent
+	GMEventsChan        chan GeneralMessageBroadcastEvent
+	referential         string
+	date                Date
 }
 
 // Optionnal argument for tests

@@ -15,29 +15,23 @@ type StopAreaId ModelId
 
 type StopArea struct {
 	Collectable
+	CollectedUntil time.Time
+	model          Model
+	References     References
 	ObjectIDConsumer
-
-	model Model
-
-	id         StopAreaId
-	ParentId   StopAreaId `json:",omitempty"`
-	ReferentId StopAreaId `json:",omitempty"`
-
-	CollectedUntil         time.Time
-	CollectedAlways        bool
+	Origins                *StopAreaOrigins
+	Attributes             Attributes
+	ReferentId             StopAreaId `json:",omitempty"`
+	id                     StopAreaId
+	ParentId               StopAreaId `json:",omitempty"`
+	Name                   string
+	LineIds                StopAreaLineIds `json:"Lines,omitempty"`
+	Latitude               float64         `json:",omitempty"`
+	Longitude              float64         `json:",omitempty"`
+	CollectChildren        bool
 	CollectGeneralMessages bool
-
-	Monitored bool
-	Origins   *StopAreaOrigins
-
-	Name            string
-	LineIds         StopAreaLineIds `json:"Lines,omitempty"`
-	CollectChildren bool
-	Attributes      Attributes
-	References      References
-
-	Longitude float64 `json:",omitempty"`
-	Latitude  float64 `json:",omitempty"`
+	CollectedAlways        bool
+	Monitored              bool
 }
 
 func NewStopArea(model Model) *StopArea {
@@ -89,14 +83,14 @@ func (stopArea *StopArea) Id() StopAreaId {
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	type Alias StopArea
 	aux := struct {
-		Id             StopAreaId
+		References     map[string]Reference `json:",omitempty"`
 		ObjectIDs      ObjectIDs            `json:",omitempty"`
 		NextCollectAt  *time.Time           `json:",omitempty"`
 		CollectedAt    *time.Time           `json:",omitempty"`
 		CollectedUntil *time.Time           `json:",omitempty"`
 		Attributes     Attributes           `json:",omitempty"`
-		References     map[string]Reference `json:",omitempty"`
 		*Alias
+		Id StopAreaId
 	}{
 		Id:    stopArea.id,
 		Alias: (*Alias)(stopArea),
