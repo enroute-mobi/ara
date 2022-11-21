@@ -105,7 +105,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 		t.Errorf("Response first Trip Update have incorrect number of StopTimeUpdate:\n got: %v\n want: 1", l)
 	}
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
-	if r := uint32(1); stopTimeUpdate.GetStopSequence() != r {
+	if r := uint32(0); stopTimeUpdate.GetStopSequence() != r {
 		t.Errorf("Incorrect StopSequence in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopSequence(), r)
 	}
 	if r := "saId"; stopTimeUpdate.GetStopId() != r {
