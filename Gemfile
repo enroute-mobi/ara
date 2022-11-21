@@ -12,6 +12,7 @@ group :test do
   gem 'gtfs-rt', en_route: 'gtfs-rt'
   gem 'pry'
   gem 'siri-xsd', en_route: 'siri-xsd'
+  gem 'activesupport'
 end
 
 group :development do
