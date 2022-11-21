@@ -112,7 +112,7 @@ Around do |scenario, block|
   unless Siri::Validator.strict_mode?
     block.call
   else
-    Siri::Validator.fail_on_error scenario, block
+    Siri::Validator.fail_on_error(scenario, block)
   end
 end
 
