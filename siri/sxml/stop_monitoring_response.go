@@ -38,40 +38,24 @@ type XMLMonitoredStopVisit struct {
 }
 
 type XMLMonitoredVehicleJourney struct {
-	XMLStructure
+	XMLCall
 
-	stopPointRef           string
-	stopPointName          string
 	datedVehicleJourneyRef string
 	lineRef                string
 	vehicleJourneyName     string
 	publishedLineName      string
-	departureStatus        string
-	arrivalStatus          string
 	dataFrameRef           string
-	order                  int
-
-	aimedArrivalTime    time.Time
-	expectedArrivalTime time.Time
-	actualArrivalTime   time.Time
-
-	aimedDepartureTime    time.Time
-	expectedDepartureTime time.Time
-	actualDepartureTime   time.Time
 
 	// Attributes
-
 	situationRef                string
 	inCongestion                string
 	delay                       string
-	vehicleAtStop               Bool
 	actualQuayName              string
 	aimedHeadwayInterval        string
 	arrivalPlatformName         string
 	arrivalProximyTest          string
 	departureBoardingActivity   string
 	departurePlatformName       string
-	destinationDisplay          string
 	distanceFromStop            string
 	expectedHeadwayInterval     string
 	numberOfStopsAway           string
@@ -224,20 +208,6 @@ func (sv *XMLMonitoredStopVisit) RecordedAt() time.Time {
 	return sv.recordedAt
 }
 
-func (vj *XMLMonitoredVehicleJourney) StopPointRef() string {
-	if vj.stopPointRef == "" {
-		vj.stopPointRef = vj.findStringChildContent("StopPointRef")
-	}
-	return vj.stopPointRef
-}
-
-func (vj *XMLMonitoredVehicleJourney) StopPointName() string {
-	if vj.stopPointName == "" {
-		vj.stopPointName = vj.findStringChildContent("StopPointName")
-	}
-	return vj.stopPointName
-}
-
 func (vj *XMLMonitoredVehicleJourney) DatedVehicleJourneyRef() string {
 	if vj.datedVehicleJourneyRef == "" {
 		vj.datedVehicleJourneyRef = vj.findStringChildContent("DatedVehicleJourneyRef")
@@ -264,75 +234,6 @@ func (vj *XMLMonitoredVehicleJourney) PublishedLineName() string {
 		vj.publishedLineName = vj.findStringChildContent("PublishedLineName")
 	}
 	return vj.publishedLineName
-}
-
-func (vj *XMLMonitoredVehicleJourney) DepartureStatus() string {
-	if vj.departureStatus == "" {
-		vj.departureStatus = vj.findStringChildContent("DepartureStatus")
-	}
-	return vj.departureStatus
-}
-
-func (vj *XMLMonitoredVehicleJourney) ArrivalStatus() string {
-	if vj.arrivalStatus == "" {
-		vj.arrivalStatus = vj.findStringChildContent("ArrivalStatus")
-	}
-	return vj.arrivalStatus
-}
-
-func (vj *XMLMonitoredVehicleJourney) Order() int {
-	if vj.order == 0 {
-		if vj.findNode("Order") != nil {
-			vj.order = vj.findIntChildContent("Order")
-
-		} else {
-			vj.order = vj.findIntChildContent("VisitNumber")
-		}
-	}
-
-	return vj.order
-}
-
-func (vj *XMLMonitoredVehicleJourney) AimedArrivalTime() time.Time {
-	if vj.aimedArrivalTime.IsZero() {
-		vj.aimedArrivalTime = vj.findTimeChildContent("AimedArrivalTime")
-	}
-	return vj.aimedArrivalTime
-}
-
-func (vj *XMLMonitoredVehicleJourney) ExpectedArrivalTime() time.Time {
-	if vj.expectedArrivalTime.IsZero() {
-		vj.expectedArrivalTime = vj.findTimeChildContent("ExpectedArrivalTime")
-	}
-	return vj.expectedArrivalTime
-}
-
-func (vj *XMLMonitoredVehicleJourney) ActualArrivalTime() time.Time {
-	if vj.actualArrivalTime.IsZero() {
-		vj.actualArrivalTime = vj.findTimeChildContent("ActualArrivalTime")
-	}
-	return vj.actualArrivalTime
-}
-
-func (vj *XMLMonitoredVehicleJourney) AimedDepartureTime() time.Time {
-	if vj.aimedDepartureTime.IsZero() {
-		vj.aimedDepartureTime = vj.findTimeChildContent("AimedDepartureTime")
-	}
-	return vj.aimedDepartureTime
-}
-
-func (vj *XMLMonitoredVehicleJourney) ExpectedDepartureTime() time.Time {
-	if vj.expectedDepartureTime.IsZero() {
-		vj.expectedDepartureTime = vj.findTimeChildContent("ExpectedDepartureTime")
-	}
-	return vj.expectedDepartureTime
-}
-
-func (vj *XMLMonitoredVehicleJourney) ActualDepartureTime() time.Time {
-	if vj.actualDepartureTime.IsZero() {
-		vj.actualDepartureTime = vj.findTimeChildContent("ActualDepartureTime")
-	}
-	return vj.actualDepartureTime
 }
 
 // Attributes
@@ -383,13 +284,6 @@ func (vj *XMLMonitoredVehicleJourney) DeparturePlatformName() string {
 		vj.departurePlatformName = vj.findStringChildContent("DeparturePlatformName")
 	}
 	return vj.departurePlatformName
-}
-
-func (vj *XMLMonitoredVehicleJourney) DestinationDisplay() string {
-	if vj.destinationDisplay == "" {
-		vj.destinationDisplay = vj.findStringChildContent("DestinationDisplay")
-	}
-	return vj.destinationDisplay
 }
 
 func (vj *XMLMonitoredVehicleJourney) DistanceFromStop() string {
@@ -497,16 +391,9 @@ func (vj *XMLMonitoredVehicleJourney) JourneyPatternName() string {
 	return vj.journeyPatternName
 }
 
-func (vj *XMLMonitoredVehicleJourney) VehicleAtStop() bool {
-	if !vj.vehicleAtStop.Defined {
-		vj.vehicleAtStop.Parse(vj.findStringChildContent("VehicleAtStop"))
-	}
-	return vj.vehicleAtStop.Value
-}
-
 func (vj *XMLMonitoredVehicleJourney) Monitored() bool {
 	if !vj.monitored.Defined {
-		vj.monitored.Parse(vj.findStringChildContent("Monitored"))
+		vj.monitored.SetValue(vj.findBoolChildContent("Monitored"))
 	}
 	return vj.monitored.Value
 }

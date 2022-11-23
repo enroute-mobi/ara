@@ -14,10 +14,7 @@ type XMLNotifyEstimatedTimetable struct {
 type XMLNotifyEstimatedTimetableDelivery struct {
 	SubscriptionDeliveryXMLStructure
 
-	lineRef string
-
-	// monitoredStopVisits             []*XMLMonitoredStopVisit
-	// monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
+	estimatedJourneyVersionFrames []*XMLEstimatedJourneyVersionFrame
 }
 
 func NewXMLNotifyEstimatedTimetableDelivery(node XMLNode) *XMLNotifyEstimatedTimetableDelivery {
@@ -38,13 +35,6 @@ func (notify *XMLNotifyEstimatedTimetable) EstimatedTimetableDeliveries() []*XML
 	return notify.deliveries
 }
 
-func (delivery *XMLNotifyEstimatedTimetableDelivery) LineRef() string {
-	if delivery.lineRef == "" {
-		delivery.lineRef = delivery.findStringChildContent("LineRef")
-	}
-	return delivery.lineRef
-}
-
 func NewXMLNotifyEstimatedTimetable(node xml.Node) *XMLNotifyEstimatedTimetable {
 	xmlEstimatedTimetableResponse := &XMLNotifyEstimatedTimetable{}
 	xmlEstimatedTimetableResponse.node = NewXMLNode(node)
@@ -58,4 +48,16 @@ func NewXMLNotifyEstimatedTimetableFromContent(content []byte) (*XMLNotifyEstima
 	}
 	response := NewXMLNotifyEstimatedTimetable(doc.Root().XmlNode)
 	return response, nil
+}
+
+func (delivery *XMLNotifyEstimatedTimetableDelivery) EstimatedJourneyVersionFrames() []*XMLEstimatedJourneyVersionFrame {
+	if delivery.estimatedJourneyVersionFrames == nil {
+		estimatedJourneyVersionFrames := []*XMLEstimatedJourneyVersionFrame{}
+		nodes := delivery.findNodes("EstimatedJourneyVersionFrame")
+		for _, node := range nodes {
+			estimatedJourneyVersionFrames = append(estimatedJourneyVersionFrames, NewXMLEstimatedJourneyVersionFrame(node))
+		}
+		delivery.estimatedJourneyVersionFrames = estimatedJourneyVersionFrames
+	}
+	return delivery.estimatedJourneyVersionFrames
 }

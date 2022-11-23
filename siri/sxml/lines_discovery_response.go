@@ -82,7 +82,7 @@ func (annotatedLine *XMLAnnotatedLineRef) LineName() string {
 
 func (annotatedLine *XMLAnnotatedLineRef) Monitored() bool {
 	if !annotatedLine.monitored.Defined {
-		annotatedLine.monitored.Parse(annotatedLine.findStringChildContent("Monitored"))
+		annotatedLine.monitored.SetValue(annotatedLine.findBoolChildContent("Monitored"))
 	}
 	return annotatedLine.monitored.Value
 }

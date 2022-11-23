@@ -1,6 +1,8 @@
 package sxml
 
-import "time"
+import (
+	"time"
+)
 
 type XMLProductionTimetableSubscriptionRequestEntry struct {
 	XMLProductionTimetableRequest

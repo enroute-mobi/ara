@@ -29,7 +29,7 @@ type XMLGeneralMessage struct {
 	infoChannelRef        string
 	formatRef             string
 
-	infoMessageVersion int
+	infoMessageVersion Int
 
 	recordedAtTime time.Time
 	validUntilTime time.Time
@@ -56,8 +56,8 @@ type XMLMessage struct {
 
 	messageText         string
 	messageType         string
-	numberOfLines       int
-	numberOfCharPerLine int
+	numberOfLines       Int
+	numberOfCharPerLine Int
 }
 
 type IDFLineSectionStructure struct {
@@ -167,13 +167,10 @@ func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
 }
 
 func (visit *XMLGeneralMessage) InfoMessageVersion() int {
-	if visit.infoMessageVersion == 0 {
-		visit.infoMessageVersion = visit.findIntChildContent("InfoMessageVersion")
-		if visit.infoMessageVersion == 0 {
-			visit.infoMessageVersion = 1
-		}
+	if !visit.infoMessageVersion.Defined {
+		visit.infoMessageVersion.SetValueWithDefault(visit.findIntChildContent("InfoMessageVersion"), 1)
 	}
-	return visit.infoMessageVersion
+	return visit.infoMessageVersion.Value
 }
 
 func (visit *XMLGeneralMessage) InfoChannelRef() string {
@@ -320,15 +317,15 @@ func (message *XMLMessage) MessageType() string {
 }
 
 func (message *XMLMessage) NumberOfLines() int {
-	if message.numberOfLines == 0 {
-		message.numberOfLines = message.findIntChildContent("NumberOfLines")
+	if !message.numberOfLines.Defined {
+		message.numberOfLines.SetValue(message.findIntChildContent("NumberOfLines"))
 	}
-	return message.numberOfLines
+	return message.numberOfLines.Value
 }
 
 func (message *XMLMessage) NumberOfCharPerLine() int {
-	if message.numberOfCharPerLine == 0 {
-		message.numberOfCharPerLine = message.findIntChildContent("NumberOfCharPerLine")
+	if !message.numberOfCharPerLine.Defined {
+		message.numberOfCharPerLine.SetValue(message.findIntChildContent("NumberOfCharPerLine"))
 	}
-	return message.numberOfCharPerLine
+	return message.numberOfCharPerLine.Value
 }
