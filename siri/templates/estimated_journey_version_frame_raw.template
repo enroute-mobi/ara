@@ -10,7 +10,22 @@
 					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}{{ if .PublishedLineName }}
 					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}{{ if .References.OperatorRef }}
 					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ else }}
-					<OperatorRef/>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
+					<OperatorRef/>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
+					<RecordedCalls>{{ range .RecordedCalls }}
+						<RecordedCall>
+							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
+							<VisitNumber>{{ .Order }}</VisitNumber>{{ else }}
+							<Order>{{ .Order }}</Order>{{ end }}{{ if .StopPointName }}
+							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if .DestinationDisplay }}
+							<DestinationDisplay>{{ .DestinationDisplay }}</DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
+							<ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
+							<ArrivalStatus>{{ .ArrivalStatus }}</ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
+							<AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
+							<ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
+							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
+						</RecordedCall>{{ end }}
+					</RecordedCalls>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
 					<EstimatedCalls>{{ range .EstimatedCalls }}
 						<EstimatedCall>
 							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
@@ -26,21 +41,6 @@
 							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
 						</EstimatedCall>{{ end }}
 					</EstimatedCalls>
-					<IsCompleteStopSequence>false</IsCompleteStopSequence>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
-					<RecordedCalls>{{ range .RecordedCalls }}
-						<RecordedCall>
-							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}
-							<VisitNumber>{{ .Order }}</VisitNumber>{{ else }}
-							<Order>{{ .Order }}</Order>{{ end }}{{ if .StopPointName }}
-							<StopPointName>{{ .StopPointName }}</StopPointName>{{ end }}{{ if .DestinationDisplay }}
-							<DestinationDisplay>{{ .DestinationDisplay }}</DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
-							<AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
-							<ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
-							<ArrivalStatus>{{ .ArrivalStatus }}</ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
-							<AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
-							<ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
-							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
-						</RecordedCall>{{ end }}
-					</RecordedCalls>{{ end }}
+					<IsCompleteStopSequence>false</IsCompleteStopSequence>{{ end }}
 				</EstimatedVehicleJourney>{{ end }}
 			</EstimatedJourneyVersionFrame>
