@@ -8,7 +8,21 @@
 					<siri:OperatorRef/>{{ end }}
 					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .References.OriginRef }}
 					<siri:OriginRef>{{ .References.OriginRef }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
-					<siri:DestinationRef>{{ .References.DestinationRef }}</siri:DestinationRef>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
+					<siri:DestinationRef>{{ .References.DestinationRef }}</siri:DestinationRef>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
+					<siri:RecordedCalls>{{ range .RecordedCalls }}
+						<siri:RecordedCall>
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
+							<siri:Order>{{ .Order }}</siri:Order>{{ if .StopPointName }}
+							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}{{ if .DestinationDisplay }}
+							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
+							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
+							<siri:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
+							<siri:ArrivalStatus>{{ .ArrivalStatus }}</siri:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
+							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
+							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
+							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
+						</siri:RecordedCall>{{ end }}
+					</siri:RecordedCalls>{{ end }}{{ if ne (len .EstimatedCalls) 0 }}
 					<siri:EstimatedCalls>{{ range .EstimatedCalls }}
 						<siri:EstimatedCall>
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .UseVisitNumber }}
@@ -24,20 +38,6 @@
 							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
 							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
 						</siri:EstimatedCall>{{ end }}
-					</siri:EstimatedCalls>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
-					<siri:RecordedCalls>{{ range .RecordedCalls }}
-						<siri:RecordedCall>
-							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
-							<siri:Order>{{ .Order }}</siri:Order>{{ if .StopPointName }}
-							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}{{ if .DestinationDisplay }}
-							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
-							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
-							<siri:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}
-							<siri:ArrivalStatus>{{ .ArrivalStatus }}</siri:ArrivalStatus>{{end}}{{ if not .AimedDepartureTime.IsZero }}
-							<siri:AimedDepartureTime>{{ .AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}{{ if not .ExpectedDepartureTime.IsZero }}
-							<siri:ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
-							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
-						</siri:RecordedCall>{{ end }}
-					</siri:RecordedCalls>{{ end }}
+					</siri:EstimatedCalls>{{ end }}
 				</siri:EstimatedVehicleJourney>{{ end }}
 			</siri:EstimatedJourneyVersionFrame>

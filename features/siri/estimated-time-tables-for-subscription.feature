@@ -530,7 +530,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
 </Siri>
   """
 
-  @ARA-1126
+  @ARA-1126 @siri-valid
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -548,13 +548,16 @@ Feature: Support SIRI EstimatedTimetable by subscription
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name      | Test1                                    |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
       | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
+      | LineId                             | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
       | DirectionType                      | Aller                                   |
       | Attribute[OriginName]              | Le début                                |
       | Attribute[DestinationName]         | La fin.                                 |
@@ -563,16 +566,26 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T12:00:00.000Z                                             |
+      | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus                   | onTime                                                               |
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 5                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T12:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
     And 5 seconds have passed
-    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+    When the StopVisit "6ba7b814-9dad-11d1-7-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 5 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -581,7 +594,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
  <ServiceDelivery>
    <ResponseTimestamp>2017-01-01T12:00:10.000Z</ResponseTimestamp>
    <ProducerRef>test</ProducerRef>
-   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
+   <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ResponseMessageIdentifier>
    <EstimatedTimetableDelivery>
      <ResponseTimestamp>2017-01-01T12:00:10.000Z</ResponseTimestamp>
      <SubscriberRef>subscriber</SubscriberRef>
@@ -604,7 +617,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
              <Order>4</Order>
              <StopPointName>Test</StopPointName>
              <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
-             <ArrivalStatus>Delayed</ArrivalStatus>
+             <ArrivalStatus>delayed</ArrivalStatus>
            </EstimatedCall>
          </EstimatedCalls>
          <IsCompleteStopSequence>false</IsCompleteStopSequence>
@@ -614,7 +627,9 @@ Feature: Support SIRI EstimatedTimetable by subscription
  </ServiceDelivery>
 </Siri>
       """
-    When the StopVisit "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
+    When the StopVisit "6ba7b814-9dad-11d1-8-00c04fd430c8" is edited with the following attributes:
+      | ArrivalStatus | delayed |
+    When the StopVisit "6ba7b814-9dad-11d1-7-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival   | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus                | arrived                  |
       | DepartureStatus              | departed                 |
@@ -627,7 +642,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
   <ServiceDelivery>
     <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
     <ProducerRef>test</ProducerRef>
-    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</ResponseMessageIdentifier>
     <EstimatedTimetableDelivery>
       <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
       <SubscriberRef>subscriber</SubscriberRef>
@@ -655,13 +670,23 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <DepartureStatus>departed</DepartureStatus>
             </RecordedCall>
           </RecordedCalls>
+          <EstimatedCalls>
+            <EstimatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>5</Order>
+              <StopPointName>Test1</StopPointName>
+              <AimedArrivalTime>2017-01-01T12:00:00.000Z</AimedArrivalTime>
+              <ExpectedArrivalTime>2017-01-01T15:00:00.000Z</ExpectedArrivalTime>
+              <ArrivalStatus>delayed</ArrivalStatus>
+            </EstimatedCall>
+          </EstimatedCalls>
+          <IsCompleteStopSequence>false</IsCompleteStopSequence>
         </EstimatedVehicleJourney>
       </EstimatedJourneyVersionFrame>
     </EstimatedTimetableDelivery>
   </ServiceDelivery>
 </Siri>
       """
-
 
   @ARA-1062
   Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
