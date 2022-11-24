@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -139,7 +138,7 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 		return nil, err
 	}
 	defer func() {
-		io.Copy(ioutil.Discard, response.Body)
+		io.Copy(io.Discard, response.Body)
 		response.Body.Close()
 	}()
 
@@ -167,7 +166,7 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 	}
 
 	// Attempt to read the body
-	content, err := ioutil.ReadAll(responseReader)
+	content, err := io.ReadAll(responseReader)
 	if err != nil {
 		return nil, NewGtfsError(fmt.Sprintf("Error while reading body: %v", err))
 	}

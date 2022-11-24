@@ -1,7 +1,7 @@
 package api
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -375,7 +375,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -569,7 +569,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -609,7 +609,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -637,7 +637,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -801,7 +801,7 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

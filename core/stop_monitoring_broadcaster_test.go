@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -180,7 +180,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	response := []byte{}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response, _ = ioutil.ReadAll(r.Body)
+		response, _ = io.ReadAll(r.Body)
 		w.Header().Add("Content-Type", "text/xml")
 	}))
 	defer ts.Close()

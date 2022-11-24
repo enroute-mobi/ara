@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 	"time"
@@ -105,7 +105,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +242,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

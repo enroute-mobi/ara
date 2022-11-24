@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -46,7 +46,7 @@ func Test_status_check_version(t *testing.T) {
 	statusCheckResponseStatus(responseRecorder, t)
 
 	status := &Status{}
-	body, _ := ioutil.ReadAll(responseRecorder.Body)
+	body, _ := io.ReadAll(responseRecorder.Body)
 	json.Unmarshal(body, status)
 	if status.Status != "ok" && status.Version != "" {
 		t.Errorf("Status should be ok and vesion not empty  | Status == %v, Version %v", status.Status, status.Version)

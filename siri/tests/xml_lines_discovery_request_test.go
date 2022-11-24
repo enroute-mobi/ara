@@ -1,7 +1,7 @@
 package siri_tests
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 	"time"
@@ -15,7 +15,7 @@ func getXMLLinesDiscoveryRequest(t *testing.T) *sxml.XMLLinesDiscoveryRequest {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

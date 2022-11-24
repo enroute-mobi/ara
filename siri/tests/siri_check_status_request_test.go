@@ -1,7 +1,7 @@
 package siri_tests
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 	"time"
@@ -36,7 +36,7 @@ func BenchmarkParseRequest(b *testing.B) {
 		b.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		b.Fatal(err)
 	}

@@ -1,7 +1,7 @@
 package siri_tests
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -14,7 +14,7 @@ func getXMLNotifyStopMonitoring(t *testing.T) *sxml.XMLNotifyStopMonitoring {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

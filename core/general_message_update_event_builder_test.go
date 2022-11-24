@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -15,7 +15,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

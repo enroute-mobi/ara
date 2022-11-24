@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -75,7 +74,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	// Attempt to read the body
-	content, err := ioutil.ReadAll(requestReader)
+	content, err := io.ReadAll(requestReader)
 	if err != nil {
 		e := fmt.Sprintf("Error while reading body: %v", err)
 		handler.logError(message, startTime, e)

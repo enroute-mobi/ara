@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -39,7 +39,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

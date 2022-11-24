@@ -1,7 +1,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -36,7 +36,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	line.Save()
 
 	file, _ := os.Open("testdata/estimatedtimetable-request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
@@ -75,7 +75,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 	line.Save()
 
 	file, _ := os.Open("testdata/productiontimetable-request.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
@@ -114,7 +114,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	stopArea.Save()
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
@@ -157,7 +157,7 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	response, err := connector.(*SIRISubscriptionRequestDispatcher).Dispatch(request, &audit.BigQueryMessage{})
@@ -203,7 +203,7 @@ func Test_CancelSubscription(t *testing.T) {
 	partner.Subscriptions().Save(sub)
 
 	file, _ := os.Open("testdata/terminated_subscription_request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
@@ -247,7 +247,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	partner.Subscriptions().Save(sub)
 
 	file, _ := os.Open("testdata/terminated_subscription_request_all-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLDeleteSubscriptionRequestFromContent(body)
 
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
@@ -273,7 +273,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 
 	response := []byte{}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response, _ = ioutil.ReadAll(r.Body)
+		response, _ = io.ReadAll(r.Body)
 		w.Header().Add("Content-Type", "text/xml")
 	}))
 	defer ts.Close()
@@ -336,7 +336,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	sv2.Save()
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
@@ -369,7 +369,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 
 	response := []byte{}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response, _ = ioutil.ReadAll(r.Body)
+		response, _ = io.ReadAll(r.Body)
 		w.Header().Add("Content-Type", "text/xml")
 	}))
 	defer ts.Close()
@@ -441,7 +441,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.Save()
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")
-	body, _ := ioutil.ReadAll(file)
+	body, _ := io.ReadAll(file)
 	request, _ := sxml.NewXMLSubscriptionRequestFromContent(body)
 	time.Sleep(10 * time.Millisecond)
 
@@ -477,7 +477,7 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -518,7 +518,7 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer file.Close()
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatal(err)
 	}

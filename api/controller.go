@@ -1,7 +1,7 @@
 package api
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -56,7 +56,7 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 		http.Error(response, "Invalid request: Can't read request body", http.StatusBadRequest)
 		return nil
 	}
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		http.Error(response, "Invalid request: Can't read request body", http.StatusBadRequest)
 		return nil
