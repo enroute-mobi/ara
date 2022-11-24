@@ -72,6 +72,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) RequestLineUpdate(
 
 	// Try to find a Subscription with the resource
 	subscriptions := connector.partner.Subscriptions().FindByResourceId(lineObjectid.String(), EstimatedTimetableCollect)
+
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
 			resource := subscription.Resource(lineObjectid)

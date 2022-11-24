@@ -60,12 +60,12 @@ Feature: Support SIRI EstimatedTimetable
   Scenario: Check EstimatedTimetable subscription collect payload
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url             | http://localhost:8090 |
-      | local_url              | http://test           |
-      | remote_credential      | test                  |
-      | local_credential       | NINOXE:default        |
-      | remote_objectid_kind   | internal              |
-      | sort_payload_for_test  | true                  |
+      | remote_url            | http://localhost:8090 |
+      | local_url             | http://test           |
+      | remote_credential     | test                  |
+      | local_credential      | NINOXE:default        |
+      | remote_objectid_kind  | internal              |
+      | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
       | Name      | Test1                   |
       | ObjectIDs | "internal": "testLine1" |
@@ -85,31 +85,31 @@ Feature: Support SIRI EstimatedTimetable
   <S:Body>
     <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <SubscriptionRequestInfo>
-	<siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
-	<siri:RequestorRef>test</siri:RequestorRef>
-	<siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+  <siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
+  <siri:RequestorRef>test</siri:RequestorRef>
+  <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
         <siri:ConsumerAddress>http://test</siri:ConsumerAddress>
       </SubscriptionRequestInfo>
       <Request>
-	<siri:EstimatedTimetableSubscriptionRequest>
-	  <siri:SubscriberRef>test</siri:SubscriberRef>
-	  <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionIdentifier>
-	  <siri:InitialTerminationTime>2017-01-03T12:00:05.000Z</siri:InitialTerminationTime>
-	  <siri:EstimatedTimetableRequest version="2.0:FR-IDF-2.4">
-	    <siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
-	    <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
-	    <siri:Lines>
-	      <siri:LineDirection>
-		<siri:LineRef>testLine1</siri:LineRef>
-	      </siri:LineDirection>
-	      <siri:LineDirection>
-		<siri:LineRef>testLine2</siri:LineRef>
-	      </siri:LineDirection>
-	    </siri:Lines>
-	  </siri:EstimatedTimetableRequest>
-	  <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
-	  <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
-	</siri:EstimatedTimetableSubscriptionRequest>
+  <siri:EstimatedTimetableSubscriptionRequest>
+  <siri:SubscriberRef>test</siri:SubscriberRef>
+  <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionIdentifier>
+  <siri:InitialTerminationTime>2017-01-03T12:00:05.000Z</siri:InitialTerminationTime>
+  <siri:EstimatedTimetableRequest version="2.0:FR-IDF-2.4">
+  <siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
+  <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+  <siri:Lines>
+  <siri:LineDirection>
+    <siri:LineRef>testLine1</siri:LineRef>
+  </siri:LineDirection>
+  <siri:LineDirection>
+    <siri:LineRef>testLine2</siri:LineRef>
+  </siri:LineDirection>
+  </siri:Lines>
+  </siri:EstimatedTimetableRequest>
+  <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+  <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+  </siri:EstimatedTimetableSubscriptionRequest>
       </Request>
       <RequestExtension />
     </ws:Subscribe>
@@ -168,6 +168,8 @@ Feature: Support SIRI EstimatedTimetable
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
+      | SubscriberRef     | subscriber                            |
+      | ExternalId        | externalId                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a minute has passed
     When I send this SIRI request
@@ -178,7 +180,7 @@ Feature: Support SIRI EstimatedTimetable
 <sw:NotifyEstimatedTimetable xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
   <ServiceDeliveryInfo>
     <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-    <siri:ProducerRef>test</siri:ProducerRef>
+    <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
     <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
     <siri:RequestMessageRef></siri:RequestMessageRef>
   </ServiceDeliveryInfo>
@@ -187,7 +189,7 @@ Feature: Support SIRI EstimatedTimetable
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
-      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+      <siri:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
         <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
@@ -217,21 +219,22 @@ Feature: Support SIRI EstimatedTimetable
 </S:Envelope>
       """
     And a minute has passed
-    And I see ara lines
-    And I see ara vehicle_journeys
+    # And I see ara lines
+    # And I see ara vehicle_journeys
     Then one VehicleJourney has the following attributes:
       | ObjectIDs     | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId        | 6ba7b814-9dad-11d1-1-00c04fd430c8       |
+      | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | DirectionType | Aller                                   |
-    And I see ara stop_areas
+    # And I see ara stop_areas
     And one StopArea has the following attributes:
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Name      | Test                                     |
-    And I see ara stop_visits
+    # And I see ara stop_visits
     And one StopVisit has the following attributes:
-      | PassageOrder               | 4                        |
-      | VehicleAtStop              | false                    |
-      | ArrivalStatus              | Delayed                  |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | VehicleJourneyId           | ????                     |
-      | StopAreaId                 | ????                     |
+    | ObjectIDs                  | "internal": "StopVisit:6ba7b814-9dad-11d1-8-00c04fd430c8" |
+    | PassageOrder               | 4                                                         |
+    | VehicleAtStop              | false                                                     |
+    | ArrivalStatus              | Delayed                                                   |
+    | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                                      |
+    | VehicleJourneyId           | 6ba7b814-9dad-11d1-a-00c04fd430c8                         |
+    | StopAreaId                 | 6ba7b814-9dad-11d1-9-00c04fd430c8                         |
