@@ -10,6 +10,21 @@ func (b *Bool) SetValue(value bool) {
 	b.Defined = true
 }
 
-func (b *Bool) Parse(value string) {
-	b.SetValue(value == "true" || value == "TRUE" || value == "1")
+type Int struct {
+	Value   int
+	Defined bool
+}
+
+func (i *Int) SetValue(value int) {
+	i.Value = value
+	i.Defined = true
+}
+
+func (i *Int) SetValueWithDefault(value, d int) {
+	i.Defined = true
+	if value == 0 {
+		i.Value = d
+		return
+	}
+	i.Value = value
 }

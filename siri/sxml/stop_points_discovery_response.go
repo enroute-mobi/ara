@@ -95,7 +95,7 @@ func (annotatedStopPoint *XMLAnnotatedStopPointRef) LineRefs() []string {
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) Monitored() bool {
 	if !annotatedStopPoint.monitored.Defined {
-		annotatedStopPoint.monitored.Parse(annotatedStopPoint.findStringChildContent("Monitored"))
+		annotatedStopPoint.monitored.SetValue(annotatedStopPoint.findBoolChildContent("Monitored"))
 	}
 	return annotatedStopPoint.monitored.Value
 }

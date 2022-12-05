@@ -26,7 +26,7 @@ type LightXMLStopMonitoringRequest struct {
 	monitoringRef     string
 	stopVisitTypes    string
 	lineRef           string
-	maximumStopVisits int
+	maximumStopVisits Int
 }
 
 func NewXMLGetStopMonitoring(node xml.Node) *XMLGetStopMonitoring {
@@ -73,10 +73,10 @@ func (request *LightXMLStopMonitoringRequest) LineRef() string {
 }
 
 func (request *LightXMLStopMonitoringRequest) MaximumStopVisits() int {
-	if request.maximumStopVisits == 0 {
-		request.maximumStopVisits = request.findIntChildContent("MaximumStopVisits")
+	if !request.maximumStopVisits.Defined {
+		request.maximumStopVisits.SetValue(request.findIntChildContent("MaximumStopVisits"))
 	}
-	return request.maximumStopVisits
+	return request.maximumStopVisits.Value
 }
 
 func (request *XMLStopMonitoringRequest) PreviewInterval() time.Duration {

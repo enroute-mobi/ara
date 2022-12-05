@@ -101,7 +101,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) {
-	subscriptionErrors := make(map[string]string)
+	// subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
 	for _, delivery := range notify.StopMonitoringDeliveries() {
@@ -110,7 +110,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
-			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
+			// subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
 				subToDelete[subscriptionId] = struct{}{}
 			}
@@ -118,7 +118,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		}
 		if subscription.Kind() != StopMonitoringCollect {
 			logger.Log.Debugf("Partner %s sent a StopVisitNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
-			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
+			// subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
 

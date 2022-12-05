@@ -14,7 +14,7 @@ type EstimatedTimetableSubscriptionCollector interface {
 	state.Startable
 
 	RequestLineUpdate(request *LineUpdateRequest)
-	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable)
+	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable) map[string]struct{}
 }
 
 type SIRIEstimatedTimetableSubscriptionCollector struct {
@@ -72,6 +72,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) RequestLineUpdate(
 
 	// Try to find a Subscription with the resource
 	subscriptions := connector.partner.Subscriptions().FindByResourceId(lineObjectid.String(), EstimatedTimetableCollect)
+
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
 			resource := subscription.Resource(lineObjectid)
@@ -100,8 +101,9 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) SetEstimatedTimeta
 	connector.estimatedTimetableSubscriber = estimatedTimetableSubscriber
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) {
-	subscriptionErrors := make(map[string]string)
+func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) map[string]struct{} {
+	// subscriptionErrors := make(map[string]string)
+	lineRefs := make(map[string]struct{})
 	subToDelete := make(map[string]struct{})
 
 	for _, delivery := range notify.EstimatedTimetableDeliveries() {
@@ -110,7 +112,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
-			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
+			// subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
 				subToDelete[subscriptionId] = struct{}{}
 			}
@@ -118,39 +120,44 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 		}
 		if subscription.Kind() != EstimatedTimetableCollect {
 			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
-			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind EstimatedTimetableCollect"
+			// subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind EstimatedTimetableCollect"
 			continue
 		}
 
-		// builder := NewEstimatedTimetableUpdateEventBuilder(connector.partner)
-		// builder.SetUpdateEvents(delivery.XMLMonitoredStopVisits())
-		// builder.SetStopVisitCancellationEvents(delivery)
-		// updateEvents := builder.UpdateEvents()
+		builder := NewEstimatedTimetableUpdateEventBuilder(connector.partner)
+		builder.SetUpdateEvents(delivery.EstimatedJourneyVersionFrames())
+		updateEvents := builder.UpdateEvents()
 
-		// connector.broadcastUpdateEvents(&updateEvents)
+		connector.broadcastUpdateEvents(&updateEvents)
+
+		for k, v := range updateEvents.LineRefs {
+			lineRefs[k] = v
+		}
 	}
 
 	for subId := range subToDelete {
 		CancelSubscription(subId, "EstimatedTimetableSubscriptionCollector", connector)
 	}
+
+	return lineRefs
 }
 
-// func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
-// 	if connector.updateSubscriber == nil {
-// 		return
-// 	}
-// 	for _, e := range events.StopAreas {
-// 		connector.updateSubscriber(e)
-// 	}
-// 	for _, e := range events.Lines {
-// 		connector.updateSubscriber(e)
-// 	}
-// 	for _, e := range events.VehicleJourneys {
-// 		connector.updateSubscriber(e)
-// 	}
-// 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
-// 		for _, e := range es {
-// 			connector.updateSubscriber(e)
-// 		}
-// 	}
-// }
+func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
+	}
+	for _, e := range events.StopAreas {
+		connector.updateSubscriber(e)
+	}
+	for _, e := range events.Lines {
+		connector.updateSubscriber(e)
+	}
+	for _, e := range events.VehicleJourneys {
+		connector.updateSubscriber(e)
+	}
+	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
+		for _, e := range es {
+			connector.updateSubscriber(e)
+		}
+	}
+}

@@ -277,12 +277,12 @@ Feature: Support SIRI StopMonitoring by subscription
       | PassageOrder  | 4     |
       | VehicleAtStop | false |
       Then the VehicleJourney "6ba7b814-9dad-11d1-5-00c04fd430c8" has the following attributes:
+      | OriginName                             | Magicien Noir                 |
+      | DestinationName                        | Cimetière des Sauvages        |
       | Attribute[DirectionName]               | Mago-Cime OMNI                |
       | Attribute[Delay]                       | P0Y0M0DT0H0M0.000S            |
       | Attribute[DestinationAimedArrivalTime] | 2016-09-22T08:02:00.000+02:00 |
-      | Attribute[DestinationName]             | Cimetière des Sauvages        |
       | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:50:00.000+02:00 |
-      | Attribute[OriginName]                  | Magicien Noir                 |
       | Attribute[ProductCategoryRef]          | 0                             |
 
   Scenario: 3258 - Update a StopVisit after a StopMonitoringDelivery in a subscription
@@ -456,10 +456,10 @@ Feature: Support SIRI StopMonitoring by subscription
       </S:Envelope>
           """
         And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-subscription-collector] and the following settings:
-          | remote_url                         | http://localhost:8090         |
-          | remote_credential                  | test                          |
-          | local_credential                   | NINOXE:default                |
-          | remote_objectid_kind               | internal                      |
+          | remote_url                         | http://localhost:8090       |
+          | remote_credential                  | test                        |
+          | local_credential                   | NINOXE:default              |
+          | remote_objectid_kind               | internal                    |
           | generators.subscription_identifier | Ara:Subscription::%{id}:LOC |
         And 30 seconds have passed
         And a StopArea exists with the following attributes:

@@ -62,8 +62,6 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set("VehicleMode", ue.SiriXML.VehicleMode())
 	ue.attributes.Set("ViaPlaceName", ue.SiriXML.ViaPlaceName())
 	ue.attributes.Set("VehicleJourneyName", ue.SiriXML.VehicleJourneyName())
-	ue.attributes.Set("DestinationName", ue.SiriXML.DestinationName())
-	ue.attributes.Set("OriginName", ue.SiriXML.OriginName())
 
 	// filter empty attributes
 	for k := range ue.attributes {
@@ -89,7 +87,5 @@ func (ue *VehicleJourneyUpdateEvent) References() References {
 	ue.references.SetObjectId("PlaceRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.PlaceRef()))
 	ue.references.SetObjectId("JourneyPatternRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.JourneyPatternRef()))
 	ue.references.SetObjectId("RouteRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.RouteRef()))
-	ue.references.SetObjectId("DestinationRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.DestinationRef()))
-	ue.references.SetObjectId("OriginRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.OriginRef()))
 	return *ue.references
 }
