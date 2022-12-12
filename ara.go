@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
 
 	"bitbucket.org/enroute-mobi/ara/api"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -129,6 +130,23 @@ func main() {
 		apiFlags := flag.NewFlagSet("api", flag.ExitOnError)
 		serverAddressPtr := apiFlags.String("listen", "localhost:8080", "Specify server port")
 		apiFlags.Parse(flag.Args()[1:])
+
+		if os.Getenv("DD_PROFILER") == "true" && os.Getenv("DD_AGENT_ENV") != "" {
+			err := profiler.Start(
+				profiler.WithService("ara-api"),
+				profiler.WithEnv(os.Getenv("DD_AGENT_ENV")),
+				// profiler.WithVersion(),
+				profiler.WithTags("app:ara"),
+				profiler.WithProfileTypes(
+					profiler.CPUProfile,
+					profiler.HeapProfile,
+				),
+			)
+			if err != nil {
+				logger.Log.Panicf("Error while starting Datadog Profiler: %v", err)
+			}
+			defer profiler.Stop()
+		}
 
 		// Init Database
 		model.Database = model.InitDB(config.Config.DB)
