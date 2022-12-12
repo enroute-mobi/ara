@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -25,9 +24,7 @@ func NewVehicleJourneyController(referential *core.Referential) ControllerInterf
 }
 
 func (controller *VehicleJourneyController) findVehicleJourney(identifier string) (*model.VehicleJourney, bool) {
-	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
-	pattern := regexp.MustCompile(idRegexp)
-	foundStrings := pattern.FindStringSubmatch(identifier)
+	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
 		return controller.referential.Model().VehicleJourneys().FindByObjectId(objectid)

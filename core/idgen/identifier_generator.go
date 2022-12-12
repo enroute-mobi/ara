@@ -16,6 +16,8 @@ const (
 	SUBSCRIPTION_IDENTIFIER        = "subscription_identifier"
 )
 
+var re = regexp.MustCompile("%{uuid}")
+
 var defaultIdentifierGenerators = map[string]string{
 	MESSAGE_IDENTIFIER:             "%{uuid}",
 	RESPONSE_MESSAGE_IDENTIFIER:    "%{uuid}",
@@ -61,6 +63,5 @@ func (generator *IdentifierGenerator) FormatString() string {
 }
 
 func (generator *IdentifierGenerator) handleuuids(s string) string {
-	re := regexp.MustCompile("%{uuid}")
 	return re.ReplaceAllStringFunc(s, func(string) string { return generator.uuidGenerator.NewUUID() })
 }

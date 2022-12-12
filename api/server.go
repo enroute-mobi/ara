@@ -16,6 +16,10 @@ import (
 	"bitbucket.org/enroute-mobi/ara/version"
 )
 
+var pathPattern = regexp.MustCompile("/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?")
+var requestDataPathPattern = regexp.MustCompile("([0-9a-zA-Z-_]+(?::[0-9a-zA-Z-_:]+)?)?(?:/([0-9a-zA-Z-_]+))?")
+var siriPathPattern = regexp.MustCompile("v2.0/([a-z-]+).json")
+
 type Server struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
@@ -50,9 +54,7 @@ func NewRequestDataFromContent(params []string) *RequestData {
 
 	copy(requestFiller, params)
 
-	pathRegexp := "([0-9a-zA-Z-_]+(?::[0-9a-zA-Z-_:]+)?)?(?:/([0-9a-zA-Z-_]+))?"
-	pattern := regexp.MustCompile(pathRegexp)
-	foundStrings := pattern.FindStringSubmatch(requestFiller[3])
+	foundStrings := requestDataPathPattern.FindStringSubmatch(requestFiller[3])
 
 	return &RequestData{
 		Referential: requestFiller[1],
@@ -72,9 +74,7 @@ func NewSIRIRequestDataFromContent(params []string) (*SIRIRequestData, bool) {
 	}
 
 	if requestFiller[3] != "" {
-		pathRegexp := "v2.0/([a-z-]+).json"
-		pattern := regexp.MustCompile(pathRegexp)
-		foundStrings := pattern.FindStringSubmatch(requestFiller[3])
+		foundStrings := siriPathPattern.FindStringSubmatch(requestFiller[3])
 		if len(foundStrings) == 0 {
 			return nil, false
 		}
@@ -162,9 +162,7 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 	defer monitoring.HandleHttpPanic(response)
 
 	path := request.URL.RequestURI()
-	pathRegexp := "/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?"
-	pattern := regexp.MustCompile(pathRegexp)
-	foundStrings := pattern.FindStringSubmatch(path)
+	foundStrings := pathPattern.FindStringSubmatch(path)
 	if foundStrings == nil || foundStrings[1] == "" {
 		http.Error(response, "Invalid request", http.StatusBadRequest)
 		return
