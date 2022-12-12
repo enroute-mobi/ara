@@ -9,9 +9,9 @@ import (
 
 type optionParser struct{}
 
-func (parser *optionParser) getOptionDuration(option string) time.Duration {
+var durationRegex = regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:[\.,](\d{1,3}))?S)?)?`)
 
-	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:[\.,](\d{1,3}))?S)?)?`)
+func (parser *optionParser) getOptionDuration(option string) time.Duration {
 	matches := durationRegex.FindStringSubmatch(strings.TrimSpace(option))
 
 	if len(matches) == 0 {

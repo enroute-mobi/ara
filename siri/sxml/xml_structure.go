@@ -12,6 +12,8 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
+var durationRegex = regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
+
 type XMLNode interface {
 	NativeNode() xml.Node
 }
@@ -161,7 +163,6 @@ func (xmlStruct *XMLStructure) findDurationChildContent(localName string) time.D
 	if node == nil {
 		return 0
 	}
-	durationRegex := regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
 	matches := durationRegex.FindStringSubmatch(strings.TrimSpace(node.Content()))
 
 	if len(matches) == 0 {

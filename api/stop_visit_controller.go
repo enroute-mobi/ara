@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -34,9 +33,7 @@ func NewScheduledStopVisitController(referential *core.Referential) ControllerIn
 }
 
 func (controller *StopVisitController) findStopVisit(identifier string) (*model.StopVisit, bool) {
-	idRegexp := "([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)"
-	pattern := regexp.MustCompile(idRegexp)
-	foundStrings := pattern.FindStringSubmatch(identifier)
+	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
 		return controller.svs.FindByObjectId(objectid)
