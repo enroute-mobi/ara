@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
@@ -54,7 +54,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSetting(ps.PARTNER_MAX_RETRY, "1")
+	partner.SetSetting(s.PARTNER_MAX_RETRY, "1")
 	partner.ConnectorTypes = []string{"test-check-status-client"}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partner.RefreshConnectors()

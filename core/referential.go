@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
@@ -22,22 +22,18 @@ import (
 type ReferentialId string
 type ReferentialSlug string
 
-const (
-	REFERENTIAL_SETTING_MODEL_RELOAD_AT = "model.reload_at"
-)
-
 // Validation
 var slugRegexp = regexp.MustCompile(`^[a-z0-9-_]+$`)
 
 type Referential struct {
 	clock.ClockConsumer
+	s.ReferentialSettings
 
 	id   ReferentialId
 	slug ReferentialSlug
 	Name string `json:",omitempty"`
 
-	Settings       map[string]string `json:"Settings,omitempty"`
-	OrganisationId string            `json:",omitempty"`
+	OrganisationId string `json:",omitempty"`
 
 	collectManager    CollectManagerInterface
 	broacasterManager BroadcastManagerInterface
@@ -112,10 +108,6 @@ func (referential *Referential) Slug() ReferentialSlug {
 	return referential.slug
 }
 
-func (referential *Referential) Setting(key string) string {
-	return referential.Settings[key]
-}
-
 func (referential *Referential) StartedAt() time.Time {
 	return referential.startedAt
 }
@@ -187,11 +179,13 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 		Slug         ReferentialSlug
 		NextReloadAt *time.Time `json:",omitempty"`
 		Partners     Partners   `json:",omitempty"`
+		Settings     map[string]string
 		*Alias
 	}{
-		Id:    referential.id,
-		Slug:  referential.slug,
-		Alias: (*Alias)(referential),
+		Id:       referential.id,
+		Slug:     referential.slug,
+		Settings: referential.SettingsDefinition(),
+		Alias:    (*Alias)(referential),
 	}
 
 	if !referential.nextReloadAt.IsZero() {
@@ -205,17 +199,12 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 }
 
 func (referential *Referential) Definition() *APIReferential {
-	settings := map[string]string{}
-	for k, v := range referential.Settings {
-		settings[k] = v
-	}
-
 	return &APIReferential{
 		id:             referential.id,
 		OrganisationId: referential.OrganisationId,
 		Slug:           referential.slug,
 		Name:           referential.Name,
-		Settings:       settings,
+		Settings:       referential.SettingsDefinition(),
 		Errors:         e.NewErrors(),
 		manager:        referential.manager,
 		Tokens:         referential.Tokens,
@@ -224,16 +213,16 @@ func (referential *Referential) Definition() *APIReferential {
 }
 
 func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
-	initialReloadAt := referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT)
+	initialReloadAt := referential.Setting(s.MODEL_RELOAD_AT)
 
 	referential.OrganisationId = apiReferential.OrganisationId
 	referential.slug = apiReferential.Slug
 	referential.Name = apiReferential.Name
-	referential.Settings = apiReferential.Settings
+	referential.SetSettingsDefinition(apiReferential.Settings)
 	referential.Tokens = apiReferential.Tokens
 	referential.ImportTokens = apiReferential.ImportTokens
 
-	if initialReloadAt != referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT) {
+	if initialReloadAt != referential.Setting(s.MODEL_RELOAD_AT) {
 		referential.setNextReloadAt()
 	}
 }
@@ -251,15 +240,9 @@ func (referential *Referential) ReloadModel() {
 }
 
 func (referential *Referential) setNextReloadAt() {
-	reloadHour := referential.Setting(REFERENTIAL_SETTING_MODEL_RELOAD_AT)
-	hour, minute := 4, 0
+	hour, minute := referential.NextReloadAtSetting()
 
-	if len(reloadHour) == 5 {
-		hour, _ = strconv.Atoi(reloadHour[0:2])
-		minute, _ = strconv.Atoi(reloadHour[3:5])
-	}
 	now := referential.Clock().Now()
-
 	day := now.Day()
 
 	if now.Hour() > hour || (now.Hour() == hour && now.Minute() >= minute) {
@@ -295,10 +278,10 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	model := model.NewMemoryModel(string(slug))
 
 	referential := &Referential{
-		manager:  manager,
-		model:    model,
-		slug:     slug,
-		Settings: make(map[string]string),
+		ReferentialSettings: s.NewReferentialSettings(),
+		manager:             manager,
+		model:               model,
+		slug:                slug,
 	}
 
 	referential.partners = NewPartnerManager(referential)
@@ -375,9 +358,11 @@ func (manager *MemoryReferentials) Load() error {
 		}
 
 		if r.Settings.Valid && len(r.Settings.String) > 0 {
-			if err = json.Unmarshal([]byte(r.Settings.String), &referential.Settings); err != nil {
+			m := make(map[string]string)
+			if err = json.Unmarshal([]byte(r.Settings.String), &m); err != nil {
 				return err
 			}
+			referential.SetSettingsDefinition(m)
 		}
 
 		if r.Tokens.Valid && len(r.Tokens.String) > 0 {
@@ -446,7 +431,7 @@ func (manager *MemoryReferentials) SaveToDatabase() (int, error) {
 }
 
 func (manager *MemoryReferentials) newDbReferential(referential *Referential) (*model.DatabaseReferential, error) {
-	settings, err := json.Marshal(referential.Settings)
+	settings, err := referential.ReferentialSettings.ToJson()
 	if err != nil {
 		return nil, err
 	}

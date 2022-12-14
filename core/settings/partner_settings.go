@@ -1,11 +1,9 @@
-package psettings
+package settings
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
@@ -72,65 +70,22 @@ const (
 )
 
 type PartnerSettings struct {
-	m *sync.RWMutex
+	Settings
 
 	ug func() uuid.UUIDGenerator
 
-	s  map[string]string
 	cs *CollectSettings
 	g  map[string]*idgen.IdentifierGenerator
 }
 
-func NewPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
-	return PartnerSettings{
-		m:  &sync.RWMutex{},
-		ug: ug,
-		s:  make(map[string]string),
-		g:  make(map[string]*idgen.IdentifierGenerator),
+func NewPartnerSettings(ug func() uuid.UUIDGenerator) (ps PartnerSettings) {
+	ps = PartnerSettings{
+		Settings: NewSettings(),
+		ug:       ug,
+		g:        make(map[string]*idgen.IdentifierGenerator),
 	}
-}
-
-func (s *PartnerSettings) Setting(key string) string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return s.s[key]
-}
-
-// Should only be used in tests
-func (s *PartnerSettings) SetSetting(k, v string) {
-	s.m.Lock()
-	s.s[k] = v
-	s.reloadSettings()
-	s.m.Unlock()
-}
-
-func (s *PartnerSettings) SettingsDefinition() (m map[string]string) {
-	m = make(map[string]string)
-	s.m.RLock()
-	for k, v := range s.s {
-		m[k] = v
-	}
-	s.m.RUnlock()
+	ps.r = ps.reloadSettings
 	return
-}
-
-func (s *PartnerSettings) SetSettingsDefinition(m map[string]string) {
-	if m == nil {
-		return
-	}
-	s.m.Lock()
-	s.s = make(map[string]string)
-	for k, v := range m {
-		s.s[k] = v
-	}
-	s.reloadSettings()
-	s.m.Unlock()
-}
-
-func (s *PartnerSettings) ToJson() ([]byte, error) {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return json.Marshal(s.s)
 }
 
 func (s *PartnerSettings) Credentials() string {
@@ -530,7 +485,9 @@ func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString 
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
 func (s *PartnerSettings) refreshGenerators() {
-	s.g = make(map[string]*idgen.IdentifierGenerator)
+	for k := range s.g {
+		delete(s.g, k)
+	}
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling

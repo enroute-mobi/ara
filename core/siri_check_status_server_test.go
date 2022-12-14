@@ -7,7 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -75,7 +75,7 @@ func Test_SIRICheckStatusServerFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

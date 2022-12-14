@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) PartnerStatus {
@@ -29,7 +29,7 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Partne
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
 	partner := referential.Partners().New("slug")
-	partner.SetSetting(ps.REMOTE_URL, ts.URL)
+	partner.SetSetting(s.REMOTE_URL, ts.URL)
 	checkStatusClient := NewSIRICheckStatusClient(partner)
 
 	partnerStatus, err := checkStatusClient.Status()
@@ -61,7 +61,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

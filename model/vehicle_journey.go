@@ -167,6 +167,7 @@ type VehicleJourneys interface {
 	FindAll() []*VehicleJourney
 	Save(*VehicleJourney) bool
 	Delete(*VehicleJourney) bool
+	DeleteById(VehicleJourneyId) bool
 }
 
 func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
@@ -249,12 +250,16 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 }
 
 func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) bool {
+	return manager.DeleteById(vehicleJourney.id)
+}
+
+func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
-	delete(manager.byIdentifier, vehicleJourney.id)
-	manager.byObjectId.Delete(ModelId(vehicleJourney.id))
-	manager.byLine.Delete(ModelId(vehicleJourney.id))
+	delete(manager.byIdentifier, id)
+	manager.byObjectId.Delete(ModelId(id))
+	manager.byLine.Delete(ModelId(id))
 
 	return true
 }

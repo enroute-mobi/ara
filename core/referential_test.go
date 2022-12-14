@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 )
 
@@ -66,11 +67,12 @@ func Test_Referential_Partners(t *testing.T) {
 func Test_Referential_MarshalJSON(t *testing.T) {
 
 	referential := &Referential{
-		id:       "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		slug:     "referential",
-		Settings: map[string]string{"key": "value"},
+		id:                  "6ba7b814-9dad-11d1-0-00c04fd430c8",
+		slug:                "referential",
+		ReferentialSettings: s.NewReferentialSettings(),
 	}
 	referential.partners = NewPartnerManager(referential)
+	referential.SetSettingsDefinition(map[string]string{"key": "value"})
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"referential","Settings":{"key":"value"}}`
 	jsonBytes, err := referential.MarshalJSON()
 	if err != nil {
@@ -129,7 +131,10 @@ func Test_Referential_setNextReloadAt(t *testing.T) {
 	}
 
 	for _, condition := range conditions {
-		referential := Referential{Settings: map[string]string{"model.reloadAt": condition.setting}}
+		referential := Referential{
+			ReferentialSettings: s.NewReferentialSettings(),
+		}
+		referential.SetSettingsDefinition(map[string]string{"model.reloadAt": condition.setting})
 
 		fakeClock := clock.NewFakeClockAt(time.Date(2017, time.January, 1, condition.clockHour, condition.clockMinute, 0, 0, time.UTC))
 		referential.SetClock(fakeClock)
@@ -334,7 +339,7 @@ func Test_MemoryReferentials_Load(t *testing.T) {
 	if referential.OrganisationId != "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12" {
 		t.Errorf("Wrong OrganisationId:\n got: %v\n expected: %v", referential.OrganisationId, dbRef.OrganisationId.String)
 	}
-	if expected := map[string]string{"test.key": "test-value", "model.reload_at": "01:00"}; !reflect.DeepEqual(referential.Settings, expected) {
+	if expected := map[string]string{"test.key": "test-value", "model.reload_at": "01:00"}; !reflect.DeepEqual(referential.SettingsDefinition(), expected) {
 		t.Errorf("Wrong Settings:\n got: %#v\n expected: %#v", referential.Settings, expected)
 	}
 	if expected := "ratp"; referential.Slug() != ReferentialSlug(expected) {
@@ -370,7 +375,7 @@ func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
 	// Insert two times to check uniqueness constraints
 	ref2 := referentials.New("slug2")
 	ref2.OrganisationId = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	ref2.Settings = map[string]string{"setting": "value"}
+	ref2.SetSettingsDefinition(map[string]string{"setting": "value"})
 	ref2.Tokens = []string{"token"}
 	ref2.Save()
 
@@ -399,7 +404,7 @@ func Test_MemoryReferentials_SaveToDatabase(t *testing.T) {
 	if referential.OrganisationId != "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12" {
 		t.Errorf("Wrong Referential OrganisationId, got: %v want: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", referential.OrganisationId)
 	}
-	if len(referential.Settings) != 1 || referential.Setting("setting") != "value" {
+	if referential.SettingsLen() != 1 || referential.Setting("setting") != "value" {
 		t.Errorf("Wrong Referential Settings, got: %v want {\"setting\":\"value\"}", referential.Settings)
 	}
 	if len(referential.Tokens) != 1 || referential.Tokens[0] != "token" {
