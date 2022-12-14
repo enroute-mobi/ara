@@ -135,7 +135,7 @@ func main() {
 			err := profiler.Start(
 				profiler.WithService("ara-api"),
 				profiler.WithEnv(os.Getenv("DD_AGENT_ENV")),
-				// profiler.WithVersion(),
+				profiler.WithVersion(version.ApplicationName()),
 				profiler.WithTags("app:ara"),
 				profiler.WithProfileTypes(
 					profiler.CPUProfile,
