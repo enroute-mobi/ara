@@ -236,7 +236,7 @@ func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscri
 
 func (smb *SMBroadcaster) handledStopVisitAppend(stopVisit *model.StopVisit, delivery *siri.SIRINotifyStopMonitoringDelivery, stopMonitoringBuilder *BroadcastStopMonitoringBuilder) bool {
 
-	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
+	if stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.ArrivalStatus == model.STOP_VISIT_ARRIVAL_ARRIVED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED {
 		return smb.handleCancelledStopVisit(stopVisit, delivery, stopMonitoringBuilder)
 	} else {
 		return smb.handleMonitoredStopVisit(stopVisit, delivery, stopMonitoringBuilder)

@@ -956,7 +956,7 @@ Feature: Support SIRI StopMonitoring
       | Collected       | false                     |
       | CollectedAt     | 2017-01-01T12:02:00Z      |
       | DepartureStatus | departed                  |
-      | ArrivalStatus   | cancelled                 |
+      | ArrivalStatus   | arrived                   |
 
   Scenario: 2939 - Partner Setting collect.include_stop_areas is used to select the best Partner
     Given a SIRI server "first" waits GetStopMonitoring request on "http://localhost:8090" to respond with

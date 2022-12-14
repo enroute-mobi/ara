@@ -33,7 +33,7 @@ func (sh *schedulesHandler) handleArrivalStatus(svAs model.StopVisitArrivalStatu
 		return false
 	}
 
-	if svAs == model.STOP_VISIT_ARRIVAL_MISSED || svAs == model.STOP_VISIT_ARRIVAL_NOT_EXPECTED || svAs == model.STOP_VISIT_ARRIVAL_CANCELLED || svAs == model.STOP_VISIT_ARRIVAL_NOREPORT {
+	if svAs == model.STOP_VISIT_ARRIVAL_ARRIVED || svAs == model.STOP_VISIT_ARRIVAL_MISSED || svAs == model.STOP_VISIT_ARRIVAL_NOT_EXPECTED || svAs == model.STOP_VISIT_ARRIVAL_CANCELLED || svAs == model.STOP_VISIT_ARRIVAL_NOREPORT {
 		return true
 	}
 

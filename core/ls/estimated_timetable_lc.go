@@ -33,7 +33,7 @@ func (ettlc *EstimatedTimetableLastChange) UpdateState(sv *model.StopVisit) {
 
 func (ettlc *EstimatedTimetableLastChange) Haschanged(stopVisit *model.StopVisit) bool {
 	// Don't send info on cancelled or departed SV
-	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED || ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || ettlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_CANCELLED {
+	if ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_DEPARTED || ettlc.departureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED || ettlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_ARRIVED || ettlc.arrivalStatuts == model.STOP_VISIT_ARRIVAL_CANCELLED {
 		return false
 	}
 
