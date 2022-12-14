@@ -115,13 +115,12 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		lon := float32(vehicles[i].Longitude)
 		bearing := float32(vehicles[i].Bearing)
 		timestamp := uint64(vehicles[i].RecordedAtTime.Unix())
-		occupancy := model.OccupancyCode(vehicles[i].Occupancy)
 		feedEntity := &gtfs.FeedEntity{
 			Id: &newId,
 			Vehicle: &gtfs.VehiclePosition{
 				Trip:            trip,
 				Vehicle:         &gtfs.VehicleDescriptor{Id: &vId},
-				OccupancyStatus: &occupancy,
+				OccupancyStatus: occupancyCode(vehicles[i].Occupancy),
 				Position: &gtfs.Position{
 					Latitude:  &lat,
 					Longitude: &lon,
@@ -144,4 +143,29 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		entities = append(entities, feedEntity)
 	}
 	return
+}
+
+func occupancyCode(occupancy string) *gtfs.VehiclePosition_OccupancyStatus {
+	var o gtfs.VehiclePosition_OccupancyStatus
+	switch occupancy {
+	case model.Unknown:
+		o = gtfs.VehiclePosition_NO_DATA_AVAILABLE
+	case model.Empty:
+		o = gtfs.VehiclePosition_EMPTY
+	case model.ManySeatsAvailable:
+		o = gtfs.VehiclePosition_MANY_SEATS_AVAILABLE
+	case model.FewSeatsAvailable:
+		o = gtfs.VehiclePosition_FEW_SEATS_AVAILABLE
+	case model.StandingRoomOnly:
+		o = gtfs.VehiclePosition_STANDING_ROOM_ONLY
+	case model.CrushedStandingRoomOnly:
+		o = gtfs.VehiclePosition_CRUSHED_STANDING_ROOM_ONLY
+	case model.Full:
+		o = gtfs.VehiclePosition_FULL
+	case model.NotAcceptingPassengers:
+		o = gtfs.VehiclePosition_NOT_ACCEPTING_PASSENGERS
+	default:
+		return nil
+	}
+	return &o
 }
