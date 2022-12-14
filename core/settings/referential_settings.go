@@ -23,7 +23,7 @@ func NewReferentialSettings() (rs ReferentialSettings) {
 
 func (rs *ReferentialSettings) NextReloadAtSetting() (hour, minute int) {
 	rs.m.RLock()
-	r, _ := rs.s[MODEL_RELOAD_AT]
+	r := rs.s[MODEL_RELOAD_AT]
 	rs.m.RUnlock()
 
 	if len(r) != 5 {
