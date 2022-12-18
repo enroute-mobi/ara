@@ -168,7 +168,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 	if trip == nil || v.GetVehicle() == nil {
 		return
 	}
-	occupancy := v.GetOccupancyStatus()
+	occupancy := v.OccupancyStatus
 	vjObjectId := connector.handleTrip(events, trip, occupancy) // returns the vj objectid
 
 	vid := v.GetVehicle().GetId()
@@ -183,7 +183,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 			Longitude:              float64(p.GetLongitude()),
 			Latitude:               float64(p.GetLatitude()),
 			Bearing:                float64(p.GetBearing()),
-			Occupancy:              model.OccupancyName(occupancy),
+			Occupancy:              occupancyName(occupancy),
 		}
 
 		events.Vehicles[vid] = event
@@ -191,7 +191,7 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 }
 
 // returns the vj objectid
-func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...gtfs.VehiclePosition_OccupancyStatus) model.ObjectID {
+func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...*gtfs.VehiclePosition_OccupancyStatus) model.ObjectID {
 	rid := trip.GetRouteId()
 	tid := trip.GetTripId()
 	lineObjectId := model.NewObjectID(connector.remoteObjectidKind, rid)
@@ -217,7 +217,7 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 			Monitored:    true,
 		}
 		if len(occupancy) != 0 {
-			vjEvent.Occupancy = model.OccupancyName(occupancy[0])
+			vjEvent.Occupancy = occupancyName(occupancy[0])
 		}
 
 		events.VehicleJourneys[tid] = vjEvent
@@ -258,6 +258,34 @@ func operationnalStatusFromError(err error) OperationnalStatus {
 		return OPERATIONNAL_STATUS_DOWN
 	}
 	return OPERATIONNAL_STATUS_UNKNOWN
+}
+
+func occupancyName(occupancy *gtfs.VehiclePosition_OccupancyStatus) string {
+	if occupancy == nil {
+		return model.Undefined
+	}
+	switch *occupancy {
+	case gtfs.VehiclePosition_NO_DATA_AVAILABLE:
+		return model.Undefined
+	case gtfs.VehiclePosition_EMPTY:
+		return model.Empty
+	case gtfs.VehiclePosition_MANY_SEATS_AVAILABLE:
+		return model.ManySeatsAvailable
+	case gtfs.VehiclePosition_FEW_SEATS_AVAILABLE:
+		return model.FewSeatsAvailable
+	case gtfs.VehiclePosition_STANDING_ROOM_ONLY:
+		return model.StandingRoomOnly
+	case gtfs.VehiclePosition_CRUSHED_STANDING_ROOM_ONLY:
+		return model.CrushedStandingRoomOnly
+	case gtfs.VehiclePosition_FULL:
+		return model.Full
+	case gtfs.VehiclePosition_NOT_ACCEPTING_PASSENGERS:
+		return model.NotAcceptingPassengers
+	// case gtfs.VehiclePosition_NOT_BOARDABLE:
+	// 	return model.Unknown
+	default:
+		return model.Unknown
+	}
 }
 
 func (connector *GtfsRequestCollector) newBQEvent() *audit.BigQueryMessage {

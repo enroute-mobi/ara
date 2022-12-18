@@ -2,8 +2,6 @@ package model
 
 import (
 	"strings"
-
-	"bitbucket.org/enroute-mobi/ara/gtfs"
 )
 
 /* For Reference, these are the gtfs statuses:
@@ -19,84 +17,42 @@ import (
 */
 
 const (
-	empty                   = "empry"
-	manySeatsAvailable      = "manySeatsAvailable"
-	fewSeatsAvailable       = "fewSeatsAvailable"
-	standingRoomOnly        = "standingRoomOnly"
-	crushedStandingRoomOnly = "crushedStandingRoomOnly"
-	full                    = "full"
-	notAcceptingPassengers  = "notAcceptingPassengers"
-	noDataAvailable         = "noDataAvailable"
-	notBoardable            = "notBoardable"
+	Undefined               = ""
+	Unknown                 = "unknown"
+	Empty                   = "empty"
+	ManySeatsAvailable      = "manySeatsAvailable"
+	FewSeatsAvailable       = "fewSeatsAvailable"
+	StandingRoomOnly        = "standingRoomOnly"
+	CrushedStandingRoomOnly = "crushedStandingRoomOnly"
+	Full                    = "full"
+	NotAcceptingPassengers  = "notAcceptingPassengers"
+	StandingAvailable       = "standingAvailable"
+	SeatsAvailable          = "seatsAvailable"
 )
 
-func NormalizedOccupancyName(occupancy string) string { // Doesn't do mutch for now, but it felt faster this way
+func NormalizedOccupancyName(occupancy string) string {
 	switch strings.TrimSpace(occupancy) {
-	case "":
-		return ""
-	case empty:
-		return empty
-	case manySeatsAvailable:
-		return manySeatsAvailable
-	case fewSeatsAvailable:
-		return fewSeatsAvailable
-	case standingRoomOnly:
-		return standingRoomOnly
-	case crushedStandingRoomOnly:
-		return crushedStandingRoomOnly
-	case full:
-		return full
-	case notAcceptingPassengers:
-		return notAcceptingPassengers
-	case notBoardable:
-		return notBoardable
+	case Unknown:
+		return Unknown
+	case Empty:
+		return Empty
+	case ManySeatsAvailable:
+		return ManySeatsAvailable
+	case FewSeatsAvailable:
+		return FewSeatsAvailable
+	case StandingRoomOnly:
+		return StandingRoomOnly
+	case CrushedStandingRoomOnly:
+		return CrushedStandingRoomOnly
+	case Full:
+		return Full
+	case NotAcceptingPassengers:
+		return NotAcceptingPassengers
+	case StandingAvailable:
+		return StandingRoomOnly
+	case SeatsAvailable:
+		return ManySeatsAvailable
 	default:
-		return noDataAvailable
-	}
-}
-
-func OccupancyCode(occupancy string) gtfs.VehiclePosition_OccupancyStatus {
-	switch occupancy {
-	case empty:
-		return gtfs.VehiclePosition_OccupancyStatus(0)
-	case manySeatsAvailable:
-		return gtfs.VehiclePosition_OccupancyStatus(1)
-	case fewSeatsAvailable:
-		return gtfs.VehiclePosition_OccupancyStatus(2)
-	case standingRoomOnly:
-		return gtfs.VehiclePosition_OccupancyStatus(3)
-	case crushedStandingRoomOnly:
-		return gtfs.VehiclePosition_OccupancyStatus(4)
-	case full:
-		return gtfs.VehiclePosition_OccupancyStatus(5)
-	case notAcceptingPassengers:
-		return gtfs.VehiclePosition_OccupancyStatus(6)
-	case notBoardable:
-		return gtfs.VehiclePosition_OccupancyStatus(8)
-	default: // NO_DATA_AVAILABLE
-		return gtfs.VehiclePosition_OccupancyStatus(7)
-	}
-}
-
-func OccupancyName(occupancy gtfs.VehiclePosition_OccupancyStatus) string {
-	switch occupancy {
-	case 0:
-		return empty
-	case 1:
-		return manySeatsAvailable
-	case 2:
-		return fewSeatsAvailable
-	case 3:
-		return standingRoomOnly
-	case 4:
-		return crushedStandingRoomOnly
-	case 5:
-		return full
-	case 6:
-		return notAcceptingPassengers
-	case 8:
-		return notBoardable
-	default:
-		return noDataAvailable
+		return Undefined
 	}
 }
