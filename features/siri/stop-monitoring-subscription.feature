@@ -512,8 +512,8 @@ Feature: Support SIRI StopMonitoring by subscription
           </soap:Envelope>
           """
         Then the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" has the following attributes:
-          | DepartureStatus | departed  |
-          | ArrivalStatus   | cancelled |
+          | DepartureStatus | departed |
+          | ArrivalStatus   | arrived  |
 
   Scenario: Handle multiple StopAreas in Subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with

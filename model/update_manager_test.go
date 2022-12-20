@@ -243,7 +243,7 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_DEPARTED {
 		t.Errorf("StopVisit DepartureStatus should be updated")
 	}
-	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_CANCELLED {
+	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ARRIVED {
 		t.Errorf("StopVisit ArrivalStatus should be updated")
 	}
 	if updatedStopVisit.collected {
