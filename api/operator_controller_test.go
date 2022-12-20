@@ -127,7 +127,7 @@ func Test_OperatorController_Create(t *testing.T) {
 		t.Errorf("Operator should be found after POST request")
 	}
 	operatorMarshal, _ := operator.MarshalJSON()
-	expected := `{"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Name":"OperatorName"}`
+	expected := `{"Name":"OperatorName","Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
 	if responseRecorder.Body.String() != string(expected) && string(operatorMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

@@ -5,20 +5,19 @@ import (
 )
 
 type VehicleUpdateEvent struct {
-	Origin string
-
+	ValidUntilTime         time.Time
+	RecordedAt             time.Time
 	ObjectId               ObjectID
 	StopAreaObjectId       ObjectID
 	VehicleJourneyObjectId ObjectID
 	DriverRef              string
 	Occupancy              string
-	LinkDistance           float64
-	Percentage             float64
+	Origin                 string
 	Longitude              float64
 	Latitude               float64
 	Bearing                float64
-	ValidUntilTime         time.Time
-	RecordedAt             time.Time
+	Percentage             float64
+	LinkDistance           float64
 }
 
 func NewVehicleUpdateEvent() *VehicleUpdateEvent {

@@ -20,27 +20,23 @@ var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{
 type StopVisitId ModelId
 
 type StopVisit struct {
-	ObjectIDConsumer
-
-	model  Model
-	Origin string
-
-	id          StopVisitId
-	collected   bool
+	RecordedAt  time.Time
 	collectedAt time.Time
-
-	StopAreaId       StopAreaId       `json:",omitempty"`
-	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
-	Attributes       Attributes
-	References       References
-
-	ArrivalStatus   StopVisitArrivalStatus   `json:",omitempty"`
-	DepartureStatus StopVisitDepartureStatus `json:",omitempty"`
-	DataFrameRef    string                   `json:",omitempty"`
-	RecordedAt      time.Time
-	Schedules       *StopVisitSchedules
-	VehicleAtStop   bool
-	PassageOrder    int `json:",omitempty"`
+	model       Model
+	References  References
+	Attributes  Attributes
+	Schedules   *StopVisitSchedules
+	ObjectIDConsumer
+	VehicleJourneyId VehicleJourneyId         `json:",omitempty"`
+	StopAreaId       StopAreaId               `json:",omitempty"`
+	ArrivalStatus    StopVisitArrivalStatus   `json:",omitempty"`
+	DepartureStatus  StopVisitDepartureStatus `json:",omitempty"`
+	DataFrameRef     string                   `json:",omitempty"`
+	id               StopVisitId
+	Origin           string
+	PassageOrder     int `json:",omitempty"`
+	collected        bool
+	VehicleAtStop    bool
 }
 
 func NewStopVisit(model Model) *StopVisit {
@@ -124,15 +120,15 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	type Alias StopVisit
 	aux := struct {
-		Id          StopVisitId
-		ObjectIDs   ObjectIDs `json:",omitempty"`
-		Collected   bool
-		CollectedAt *time.Time           `json:",omitempty"`
-		RecordedAt  *time.Time           `json:",omitempty"`
-		Attributes  Attributes           `json:",omitempty"`
-		References  map[string]Reference `json:",omitempty"`
-		Schedules   []StopVisitSchedule  `json:",omitempty"`
+		References map[string]Reference `json:",omitempty"`
+		ObjectIDs  ObjectIDs            `json:",omitempty"`
 		*Alias
+		CollectedAt *time.Time `json:",omitempty"`
+		RecordedAt  *time.Time `json:",omitempty"`
+		Attributes  Attributes `json:",omitempty"`
+		Id          StopVisitId
+		Schedules   []StopVisitSchedule `json:",omitempty"`
+		Collected   bool
 	}{
 		Id:        stopVisit.id,
 		Collected: stopVisit.collected,
@@ -166,11 +162,11 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	type Alias StopVisit
 	aux := &struct {
+		CollectedAt time.Time
 		ObjectIDs   map[string]string
 		References  map[string]Reference
-		CollectedAt time.Time
-		Schedules   []StopVisitSchedule
 		*Alias
+		Schedules []StopVisitSchedule
 	}{
 		Alias: (*Alias)(stopVisit),
 	}

@@ -22,7 +22,7 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		Origin: "test",
 	}
 	situation.Messages = append(situation.Messages, &Message{Content: "Joyeux Noel", Type: "Un Type"})
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}],"Origin":"test"}`
+	expected := `{"Origin":"test","Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}]}`
 	jsonBytes, err := situation.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

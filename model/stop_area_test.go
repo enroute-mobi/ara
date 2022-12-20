@@ -41,7 +41,7 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 		Origins: NewStopAreaOrigins(),
 	}
 	stopArea.Origins.NewOrigin("partnerTest")
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","CollectedAlways":false,"CollectGeneralMessages":false,"Monitored":false,"Origins":{"partnerTest":true},"Name":"Test","CollectChildren":false}`
+	expected := `{"Origins":{"partnerTest":true},"Name":"Test","CollectChildren":false,"CollectGeneralMessages":false,"CollectedAlways":false,"Monitored":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 	jsonBytes, err := stopArea.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

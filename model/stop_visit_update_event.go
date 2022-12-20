@@ -7,25 +7,22 @@ import (
 )
 
 type StopVisitUpdateEvent struct {
-	Origin string
-
-	ObjectId               ObjectID
-	StopAreaObjectId       ObjectID
+	RecordedAt             time.Time
+	Schedules              *StopVisitSchedules
+	attributes             Attributes
+	SiriXML                *sxml.XMLMonitoredStopVisit
+	references             *References
 	VehicleJourneyObjectId ObjectID
-
-	DataFrameRef    string
-	PassageOrder    int
-	Monitored       bool
-	VehicleAtStop   bool
-	Schedules       *StopVisitSchedules
-	DepartureStatus StopVisitDepartureStatus
-	ArrivalStatus   StopVisitArrivalStatus
-	RecordedAt      time.Time
-
-	ObjectidKind string
-	SiriXML      *sxml.XMLMonitoredStopVisit
-	attributes   Attributes
-	references   *References
+	StopAreaObjectId       ObjectID
+	ObjectId               ObjectID
+	ObjectidKind           string
+	DepartureStatus        StopVisitDepartureStatus
+	ArrivalStatus          StopVisitArrivalStatus
+	DataFrameRef           string
+	Origin                 string
+	PassageOrder           int
+	Monitored              bool
+	VehicleAtStop          bool
 }
 
 func NewStopVisitUpdateEvent() *StopVisitUpdateEvent {

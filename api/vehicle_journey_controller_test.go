@@ -136,7 +136,7 @@ func Test_VehicleJourneyController_Index(t *testing.T) {
 	checkVehicleJourneyResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Monitored":false}]`
+	expected := `[{"Monitored":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

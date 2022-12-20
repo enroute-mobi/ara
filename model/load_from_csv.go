@@ -37,17 +37,17 @@ const (
 )
 
 type Loader struct {
-	referentialSlug string
-	force           bool
-	printErrors     bool
+	result          Result
 	deletedModels   map[string]map[string]struct{}
-	operators       []byte
-	stopAreas       []byte
-	lines           []byte
+	bulkCounter     map[string]int
+	referentialSlug string
 	vehicleJourneys []byte
 	stopVisits      []byte
-	bulkCounter     map[string]int
-	result          Result
+	stopAreas       []byte
+	lines           []byte
+	operators       []byte
+	force           bool
+	printErrors     bool
 }
 
 type Result struct {

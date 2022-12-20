@@ -5,23 +5,21 @@ import (
 )
 
 type VehicleJourneyUpdateEvent struct {
-	Origin string
-
+	references      *References
+	SiriXML         *sxml.XMLMonitoredVehicleJourney
+	attributes      Attributes
 	ObjectId        ObjectID
 	LineObjectId    ObjectID
-	OriginRef       string
-	OriginName      string
-	DestinationRef  string
-	DestinationName string
 	Direction       string
+	DestinationName string
+	DestinationRef  string
 	DirectionType   string
 	Occupancy       string
+	OriginName      string
+	ObjectidKind    string
+	OriginRef       string
+	Origin          string
 	Monitored       bool
-
-	ObjectidKind string
-	SiriXML      *sxml.XMLMonitoredVehicleJourney
-	attributes   Attributes
-	references   *References
 }
 
 func NewVehicleJourneyUpdateEvent() *VehicleJourneyUpdateEvent {

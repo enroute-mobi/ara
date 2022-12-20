@@ -5,23 +5,23 @@ import "time"
 type SituationUpdateRequestId string
 
 type SituationUpdateEvent struct {
-	Origin              string
-	id                  SituationUpdateRequestId
 	CreatedAt           time.Time
 	RecordedAt          time.Time
 	SituationObjectID   ObjectID
-	Version             int
+	id                  SituationUpdateRequestId
+	Origin              string
 	ProducerRef         string
 	SituationAttributes SituationAttributes
+	Version             int
 }
 
 type SituationAttributes struct {
+	ValidUntil   time.Time
 	Format       string
 	Channel      string
 	References   []*Reference
 	LineSections []*References
 	Messages     []*Message
-	ValidUntil   time.Time
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {

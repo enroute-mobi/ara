@@ -4,12 +4,12 @@ import "database/sql"
 
 type DatabaseReferential struct {
 	ReferentialId  string         `db:"referential_id"`
-	OrganisationId sql.NullString `db:"organisation_id"`
 	Slug           string         `db:"slug"`
 	Name           string         `db:"name"`
 	Settings       string         `db:"settings"`
 	Tokens         string         `db:"tokens"`
 	ImportTokens   string         `db:"import_tokens"`
+	OrganisationId sql.NullString `db:"organisation_id"`
 }
 
 type SelectReferential struct {
@@ -51,22 +51,22 @@ type DatabaseOperator struct {
 type SelectOperator struct {
 	Id              string
 	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
 	Name            sql.NullString
 	ObjectIDs       sql.NullString `db:"object_ids"`
-	ModelName       string         `db:"model_name"`
 }
 
 type DatabaseStopArea struct {
-	Id                     string         `db:"id"`
+	LineIds                string         `db:"line_ids"`
 	ReferentialSlug        string         `db:"referential_slug"`
-	ParentId               sql.NullString `db:"parent_id"`
-	ReferentId             sql.NullString `db:"referent_id"`
+	References             string         `db:"siri_references"`
+	Attributes             string         `db:"attributes"`
 	ModelName              string         `db:"model_name"`
 	Name                   string         `db:"name"`
 	ObjectIDs              string         `db:"object_ids"`
-	LineIds                string         `db:"line_ids"`
-	Attributes             string         `db:"attributes"`
-	References             string         `db:"siri_references"`
+	Id                     string         `db:"id"`
+	ReferentId             sql.NullString `db:"referent_id"`
+	ParentId               sql.NullString `db:"parent_id"`
 	CollectedAlways        bool           `db:"collected_always"`
 	CollectChildren        bool           `db:"collect_children"`
 	CollectGeneralMessages bool           `db:"collect_general_messages"`

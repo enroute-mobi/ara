@@ -22,7 +22,7 @@ func Test_Operator_MarshalJSON(t *testing.T) {
 		Name: "OperatorName",
 	}
 
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Name":"OperatorName"}`
+	expected := `{"Name":"OperatorName","Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 	jsonBytes, err := operator.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)

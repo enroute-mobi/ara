@@ -16,24 +16,19 @@ const (
 type VehicleJourneyId ModelId
 
 type VehicleJourney struct {
+	References References
+	model      Model
+	Attributes Attributes
 	ObjectIDConsumer
-
-	model  Model
-	Origin string `json:",omitempty"`
-
-	id VehicleJourneyId
-
 	LineId          LineId `json:",omitempty"`
 	Name            string `json:",omitempty"`
-	OriginName      string `json:",omitempty"`
+	id              VehicleJourneyId
 	DestinationName string `json:",omitempty"`
 	Occupancy       string `json:",omitempty"`
 	DirectionType   string `json:",omitempty"`
-
-	Monitored bool
-
-	Attributes Attributes
-	References References
+	Origin          string `json:",omitempty"`
+	OriginName      string `json:",omitempty"`
+	Monitored       bool
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -75,12 +70,12 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
 	aux := struct {
-		Id         VehicleJourneyId
 		ObjectIDs  ObjectIDs            `json:",omitempty"`
-		StopVisits []StopVisitId        `json:",omitempty"`
 		Attributes Attributes           `json:",omitempty"`
 		References map[string]Reference `json:",omitempty"`
 		*Alias
+		Id         VehicleJourneyId
+		StopVisits []StopVisitId `json:",omitempty"`
 	}{
 		Id:    vehicleJourney.id,
 		Alias: (*Alias)(vehicleJourney),
