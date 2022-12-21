@@ -27,6 +27,24 @@ func getvm(t *testing.T, filePath string) *sxml.XMLVehicleMonitoringResponse {
 	return response
 }
 
+func Test_Vehicle_ObjectID_With_VehicleRef(t *testing.T) {
+	vm := getvm(t, "testdata/vm_response_soap.xml")
+	mvj := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0].XMLMonitoredVehicleJourney
+
+	if vehicleRef := "RLA290"; mvj.VehicleRef() != vehicleRef {
+		t.Errorf("Wrong VehicleRef. Expected %v, got %v", vehicleRef, mvj.VehicleRef())
+	}
+}
+
+func Test_Vehicle_ObjectID_Without_VehicleRef_With_VehicleMonitoringRef(t *testing.T) {
+	vm := getvm(t, "testdata/vm_response_soap2.xml")
+	mvj := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0].XMLMonitoredVehicleJourney
+
+	if vehicleRef := "TRANSDEV:Vehicle::7658:LOC"; mvj.VehicleRef() != vehicleRef {
+		t.Errorf("Wrong VehicleRef. Expected %v, got %v", vehicleRef, mvj.VehicleRef())
+	}
+}
+
 func Test_Coordinates_Transform(t *testing.T) {
 	p := NewPartner()
 	builder := NewVehicleMonitoringUpdateEventBuilder(p)

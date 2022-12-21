@@ -549,7 +549,12 @@ func (vj *XMLMonitoredVehicleJourney) Latitude() string {
 
 func (vj *XMLMonitoredVehicleJourney) VehicleRef() string {
 	if vj.vehicleRef == "" {
-		vj.vehicleRef = vj.findStringChildContent("VehicleRef")
+		vref := vj.findStringChildContent("VehicleRef")
+		if vref != "" {
+			vj.vehicleRef = vref
+		} else {
+			vj.vehicleRef = vj.findStringChildContent("VehicleMonitoringRef")
+		}
 	}
 	return vj.vehicleRef
 }
