@@ -163,7 +163,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                       <ns5:Coordinates>603204 6878517</ns5:Coordinates>
                     </ns5:VehicleLocation>
                     <ns5:Bearing>171.0</ns5:Bearing>
-                    <ns5:VehicleRef>108</ns5:VehicleRef>
+                    <ns5:VehicleRef>TRANSDEV:Vehicle::1501:LOC</ns5:VehicleRef>
                     <ns5:MonitoredCall>
                       <ns5:StopPointRef>50000016</ns5:StopPointRef>
                       <ns5:Order>9</ns5:Order>
@@ -189,11 +189,18 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
       And I see ara vehicles
       Then one Vehicle has the following attributes:
-      | ObjectIDs | "internal": "108"                 |
-      | LineId    | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
-      | Bearing   | 171.0                             |
-      | Latitude  | 48.99927561424598                 |
-      | Longitude | 1.6770970859674874                |
+        | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | LineId    |        6ba7b814-9dad-11d1-9-00c04fd430c8 |
+        | Bearing   |                                    171.0 |
+        | Latitude  |                        48.99927561424598 |
+        | Longitude |                       1.6770970859674874 |
+      Then an audit event should exist with these attributes:
+        | Type      | NotifyVehicleMonitoring        |
+        | Protocol  | siri                           |
+        | Direction | received                       |
+        | Status    | OK                             |
+        | Partner   | test                           |
+        | Vehicles  | ["TRANSDEV:Vehicle::1501:LOC"] |
 
   @ARA-1101
   Scenario: Update a Vehicle after a VehicleMonitoringDelivery in a subscription using the partner setting siri.direction_type should update the DirectionRef

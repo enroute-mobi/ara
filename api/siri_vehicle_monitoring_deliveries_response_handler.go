@@ -39,16 +39,26 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
 
 	subIds := make(map[string]struct{})
+	vehicleRefs := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.VehicleMonitoringDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
 		if !delivery.Status() {
 			params.message.Status = "Error"
 		}
+		for _, vehicleActivity := range delivery.VehicleActivities() {
+			vehicleRefs[vehicleActivity.XMLMonitoredVehicleJourney.VehicleRef()] = struct{}{}
+		}
 	}
 	subs := make([]string, 0, len(subIds))
+	vehicles := make([]string, 0, len(vehicleRefs))
 	for k := range subIds {
 		subs = append(subs, k)
 	}
+	for j := range vehicleRefs {
+		vehicles = append(vehicles, j)
+	}
+
+	params.message.Vehicles = vehicles
 	params.message.SubscriptionIdentifiers = subs
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }
