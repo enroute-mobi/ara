@@ -14,6 +14,12 @@ const (
 	STOP_VISIT_SCHEDULE_ACTUAL   StopVisitScheduleType = "actual"
 )
 
+var SCHEDULE_ORDER_ARRAY = [3]StopVisitScheduleType{
+	STOP_VISIT_SCHEDULE_ACTUAL,
+	STOP_VISIT_SCHEDULE_EXPECTED,
+	STOP_VISIT_SCHEDULE_AIMED,
+}
+
 var stopVisitScheduleTypes = [3]StopVisitScheduleType{STOP_VISIT_SCHEDULE_AIMED, STOP_VISIT_SCHEDULE_EXPECTED, STOP_VISIT_SCHEDULE_ACTUAL}
 
 type StopVisitSchedule struct {
@@ -198,8 +204,12 @@ func (schedules *StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, dep
 
 func (schedules *StopVisitSchedules) Schedule(kind StopVisitScheduleType) *StopVisitSchedule {
 	schedules.RLock()
+	defer schedules.RUnlock()
+	return schedules.schedule(kind)
+}
+
+func (schedules *StopVisitSchedules) schedule(kind StopVisitScheduleType) *StopVisitSchedule {
 	schedule, ok := schedules.byType[kind]
-	schedules.RUnlock()
 	if !ok {
 		return &StopVisitSchedule{}
 	}
@@ -243,4 +253,43 @@ func (schedules *StopVisitSchedules) ToSlice() (scheduleSlice []StopVisitSchedul
 	}
 	schedules.RUnlock()
 	return
+}
+
+func (schedules *StopVisitSchedules) ReferenceTime() time.Time {
+	schedules.RLock()
+	defer schedules.RUnlock()
+	if t := schedules.referenceArrivalTime(); !t.IsZero() {
+		return t
+	}
+	return schedules.referenceDepartureTime()
+}
+
+func (schedules *StopVisitSchedules) ReferenceArrivalTime() time.Time {
+	schedules.RLock()
+	defer schedules.RUnlock()
+	return schedules.referenceArrivalTime()
+}
+
+func (schedules *StopVisitSchedules) referenceArrivalTime() time.Time {
+	for _, kind := range SCHEDULE_ORDER_ARRAY {
+		if s := schedules.schedule(kind).arrivalTime; !s.IsZero() {
+			return s
+		}
+	}
+	return time.Time{}
+}
+
+func (schedules *StopVisitSchedules) ReferenceDepartureTime() time.Time {
+	schedules.RLock()
+	defer schedules.RUnlock()
+	return schedules.referenceDepartureTime()
+}
+
+func (schedules *StopVisitSchedules) referenceDepartureTime() time.Time {
+	for _, kind := range SCHEDULE_ORDER_ARRAY {
+		if s := schedules.schedule(kind).departureTime; !s.IsZero() {
+			return s
+		}
+	}
+	return time.Time{}
 }

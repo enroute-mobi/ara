@@ -11,12 +11,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-var SCHEDULE_ORDER_ARRAY = [3]StopVisitScheduleType{
-	STOP_VISIT_SCHEDULE_ACTUAL,
-	STOP_VISIT_SCHEDULE_EXPECTED,
-	STOP_VISIT_SCHEDULE_AIMED,
-}
-
 type StopVisitId ModelId
 
 type StopVisit struct {
@@ -212,28 +206,15 @@ func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
 }
 
 func (stopVisit *StopVisit) ReferenceTime() time.Time {
-	if t := stopVisit.ReferenceArrivalTime(); !t.IsZero() {
-		return t
-	}
-	return stopVisit.ReferenceDepartureTime()
+	return stopVisit.Schedules.ReferenceTime()
 }
 
 func (stopVisit *StopVisit) ReferenceArrivalTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_ARRAY {
-		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.ArrivalTime().IsZero() {
-			return schedule.ArrivalTime()
-		}
-	}
-	return time.Time{}
+	return stopVisit.Schedules.ReferenceArrivalTime()
 }
 
 func (stopVisit *StopVisit) ReferenceDepartureTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_ARRAY {
-		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.DepartureTime().IsZero() {
-			return schedule.DepartureTime()
-		}
-	}
-	return time.Time{}
+	return stopVisit.Schedules.ReferenceDepartureTime()
 }
 
 type ByTime []*StopVisit
