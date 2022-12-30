@@ -63,3 +63,16 @@ func NewSiriLiteVehicleActivity() *VehicleActivity {
 		MonitoredVehicleJourney: mvj,
 	}
 }
+
+type VehicleActivities []*VehicleActivity
+
+func (a VehicleActivities) Len() int      { return len(a) }
+func (a VehicleActivities) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type SortByVehicleMonitoringRef struct {
+	VehicleActivities
+}
+
+func (s SortByVehicleMonitoringRef) Less(i, j int) bool {
+	return s.VehicleActivities[i].VehicleMonitoringRef < s.VehicleActivities[j].VehicleMonitoringRef
+}
