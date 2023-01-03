@@ -469,6 +469,12 @@ Feature: Audit API exchanges
       | remote_credential    | test                  |
       | local_credential     | test                  |
       | remote_objectid_kind | internal              |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableCollect             |
+      | SubscriberRef     | subscriber                            |
+      | ExternalId        | externalId                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+
     When I send this SIRI request to the Referential "test"
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -486,7 +492,7 @@ Feature: Audit API exchanges
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
       <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
-      <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+      <siri:SubscriptionRef>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
         <siri:RecordedAtTime>2017-01-01T12:00:20.000Z</siri:RecordedAtTime>
@@ -521,3 +527,4 @@ Feature: Audit API exchanges
       | Protocol          | siri                     |
       | Partner           | test                     |
       | RequestIdentifier | enRoute:Message::test    |
+      | Lines             | ["NINOXE:Line:3:LOC"]    |
