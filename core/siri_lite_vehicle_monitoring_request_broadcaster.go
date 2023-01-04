@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"net/url"
+	"sort"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -112,6 +113,10 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		response.VehicleActivity = append(response.VehicleActivity, activity)
 
 		vehicleIds = append(vehicleIds, vehicleId.Value())
+	}
+
+	if connector.partner.PartnerSettings.SortPaylodForTest() {
+		sort.Sort(siri.SortByVehicleMonitoringRef{response.VehicleActivity})
 	}
 
 	message.Vehicles = vehicleIds

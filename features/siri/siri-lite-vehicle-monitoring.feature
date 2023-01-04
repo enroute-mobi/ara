@@ -152,12 +152,11 @@ Feature: Support SIRI VehicleMonitoring
 }
       """
 
-  @wip
-  # See ARA-712
   Scenario: Send all the vehicles to a SIRI Lite VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
-      | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | local_credential      | test     |
+      | remote_objectid_kind  | internal |
+      | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
       | ObjectIDs | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
