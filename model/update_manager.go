@@ -153,7 +153,9 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 
 	vj.Occupancy = event.Occupancy
 	vj.Monitored = event.Monitored
-	vj.DirectionType = event.DirectionType
+	if event.DirectionType != "" { // Do not override unknown DirectionType
+		vj.DirectionType = event.DirectionType
+	}
 
 	manager.model.VehicleJourneys().Save(vj)
 }
