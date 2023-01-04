@@ -46,7 +46,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 		}
 
 		builder.updateEvents.Lines[estimatedJourneyVersionFrame.LineRef()] = lineEvent
-		builder.updateEvents.MonitoringRefs[estimatedJourneyVersionFrame.LineRef()] = struct{}{}
+		builder.updateEvents.LineRefs[estimatedJourneyVersionFrame.LineRef()] = struct{}{}
 	}
 
 	// VehicleJourneys
