@@ -9,5 +9,13 @@ const (
 	STOP_VISIT_DEPARTURE_CANCELLED StopVisitDepartureStatus = "cancelled"
 	STOP_VISIT_DEPARTURE_NOREPORT  StopVisitDepartureStatus = "noreport"
 	STOP_VISIT_DEPARTURE_DEPARTED  StopVisitDepartureStatus = "departed"
-	STOP_VISIT_DEPARTURE_UNDEFINED StopVisitDepartureStatus = ""
 )
+
+func SetStopVisitDepartureStatus(departureStatus string) StopVisitDepartureStatus {
+	switch departureStatus {
+	case "":
+		return STOP_VISIT_DEPARTURE_ONTIME
+	default:
+		return StopVisitDepartureStatus(departureStatus)
+	}
+}
