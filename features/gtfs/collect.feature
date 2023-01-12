@@ -2,6 +2,47 @@ Feature: Collect realtime data via GTFS-RT feeds
   Background:
     Given a Referential "test" is created
 
+  @ARA-1218
+  Scenario: Collect GTFS TripUpdate (with stop_id) with stop_time_update having SKIPPED schedule_relationship
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+      header {
+        gtfs_realtime_version: "2.0"
+        incrementality: FULL_DATASET
+        timestamp: 1630318853
+      }
+      entity {
+        id: "trip:ORLEANS:VehicleJourney:20_R_67_13_2067_1_152701"
+        trip_update {
+          trip {
+            trip_id: "Trip:A"
+            route_id: "Line:1"
+          }
+          stop_time_update {
+            stop_sequence: 0
+            stop_id: "StopArea:A"
+            arrival {
+              time: 1483272000
+            }
+            departure {
+              time: 1483272000
+            }
+            schedule_relationship: SKIPPED
+          }
+        }
+      }
+      """
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_objectid_kind | internal              |
+    When a minute has passed
+    Then one StopArea has the following attributes:
+      | ObjectIDs | "internal": "StopArea:A" |
+    And one StopVisit has the following attributes:
+      | ObjectIDs       | "internal": "Trip:A-1" |
+      | ArrivalStatus   | cancelled              |
+      | DepartureStatus | cancelled              |
+
   @ARA-878
   Scenario: Collect GTFS TripUpdate (with stop_id)
     Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
