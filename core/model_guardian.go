@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 type ModelGuardian struct {
@@ -54,14 +56,24 @@ func (guardian *ModelGuardian) Run() {
 				return
 			}
 
-			guardian.refreshStopAreas()
-			guardian.refreshLines()
-			guardian.simulateActualAttributes()
-			guardian.requestSituations()
+			guardian.routineWork()
 
 			c = guardian.Clock().After(10 * time.Second)
 		}
 	}
+}
+
+func (guardian *ModelGuardian) routineWork() {
+	ctx := context.Background()
+
+	span, spanContext := tracer.StartSpanFromContext(ctx, "model_guardian.routine")
+	defer span.Finish()
+	span.SetTag("referential", guardian.referential.slug)
+
+	guardian.refreshStopAreas(spanContext)
+	guardian.refreshLines(spanContext)
+	guardian.simulateActualAttributes(spanContext)
+	guardian.requestSituations()
 }
 
 func (guardian *ModelGuardian) checkReloadModel() bool {
@@ -72,12 +84,16 @@ func (guardian *ModelGuardian) checkReloadModel() bool {
 	return false
 }
 
-func (guardian *ModelGuardian) refreshStopAreas() {
+func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.refresh_stop_areas")
+	defer child.Finish()
+
 	defer monitoring.HandlePanic()
 
 	now := guardian.Clock().Now()
 
 	sas := guardian.referential.Model().StopAreas().FindAll()
+	child.SetTag("stop_areas_count", len(sas))
 	for i := range sas {
 		if sas[i].ParentId != "" {
 			parent, ok := sas[i].Parent()
@@ -113,12 +129,16 @@ func (guardian *ModelGuardian) refreshStopAreas() {
 	}
 }
 
-func (guardian *ModelGuardian) refreshLines() {
+func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.refresh_lines")
+	defer child.Finish()
+
 	defer monitoring.HandlePanic()
 
 	now := guardian.Clock().Now()
 
 	lines := guardian.referential.Model().Lines().FindAll()
+	child.SetTag("lines_count", len(lines))
 	for i := range lines {
 		if !lines[i].NextCollectAt().Before(now) {
 			continue
@@ -160,10 +180,14 @@ func (guardian *ModelGuardian) requestSituations() {
 	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 }
 
-func (guardian *ModelGuardian) simulateActualAttributes() {
+func (guardian *ModelGuardian) simulateActualAttributes(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.simulate_actual_attributes")
+	defer child.Finish()
+
 	defer monitoring.HandlePanic()
 
 	svs := guardian.referential.Model().StopVisits().FindAll()
+	child.SetTag("stop_visits_count", len(svs))
 	for i := range svs {
 		if svs[i].IsCollected() {
 			continue

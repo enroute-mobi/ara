@@ -1,14 +1,24 @@
 package core
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
+	ctx := context.Background()
+
+	mt := mocktracer.Start()
+	defer mt.Stop()
+	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
+	defer testSpan.Finish()
+
 	referential := &Referential{
 		model:          model.NewMemoryModel(),
 		collectManager: NewTestCollectManager(),
@@ -24,7 +34,7 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 
 	// Advance time
 	fakeClock.Advance(11 * time.Second)
-	referential.modelGuardian.refreshStopAreas()
+	referential.modelGuardian.refreshStopAreas(spanCtx)
 
 	updatedStopArea, ok := referential.Model().StopAreas().Find(stopAreaId)
 	if !ok {
@@ -37,6 +47,13 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 }
 
 func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
+	ctx := context.Background()
+
+	mt := mocktracer.Start()
+	defer mt.Stop()
+	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
+	defer testSpan.Finish()
+
 	referential := &Referential{
 		model:          model.NewMemoryModel(),
 		collectManager: NewTestCollectManager(),
@@ -52,7 +69,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	stopArea.NextCollect(fakeClock.Now())
 	referential.Model().StopAreas().Save(stopArea)
 
-	referential.modelGuardian.refreshStopAreas()
+	referential.modelGuardian.refreshStopAreas(spanCtx)
 
 	updatedStopArea, ok := referential.Model().StopAreas().Find(stopArea.Id())
 	if !ok {
@@ -67,7 +84,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 
 	fakeClock.Advance(15*time.Minute + time.Second)
 
-	referential.modelGuardian.refreshStopAreas()
+	referential.modelGuardian.refreshStopAreas(spanCtx)
 
 	updatedStopArea, ok = referential.Model().StopAreas().Find(stopArea.Id())
 	if !ok {
@@ -79,6 +96,13 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 }
 
 func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
+	ctx := context.Background()
+
+	mt := mocktracer.Start()
+	defer mt.Stop()
+	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
+	defer testSpan.Finish()
+
 	referential := &Referential{
 		model: model.NewMemoryModel(),
 	}
@@ -103,7 +127,7 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	stopVisit.Save()
 
 	fakeClock.Advance(1*time.Minute + 1*time.Second)
-	referential.modelGuardian.simulateActualAttributes()
+	referential.modelGuardian.simulateActualAttributes(spanCtx)
 
 	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
 	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {
@@ -114,7 +138,7 @@ func Test_ModelGuardian_Run_simulateActualAttributes(t *testing.T) {
 	}
 
 	fakeClock.Advance(10 * time.Minute)
-	referential.modelGuardian.simulateActualAttributes()
+	referential.modelGuardian.simulateActualAttributes(spanCtx)
 
 	stopVisit, _ = referential.Model().StopVisits().Find(stopVisit.Id())
 	if expected := model.STOP_VISIT_ARRIVAL_ARRIVED; stopVisit.ArrivalStatus != expected {

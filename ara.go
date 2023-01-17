@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
 
 	"bitbucket.org/enroute-mobi/ara/api"
@@ -130,6 +131,15 @@ func main() {
 		apiFlags := flag.NewFlagSet("api", flag.ExitOnError)
 		serverAddressPtr := apiFlags.String("listen", "localhost:8080", "Specify server port")
 		apiFlags.Parse(flag.Args()[1:])
+
+		if os.Getenv("DD_AGENT_ENV") != "" {
+			tracer.Start(
+				tracer.WithService("ara-api"),
+				tracer.WithEnv(os.Getenv("DD_AGENT_ENV")),
+				tracer.WithServiceVersion(version.ApplicationName()),
+			)
+			defer tracer.Stop()
+		}
 
 		if os.Getenv("DD_PROFILER") == "true" && os.Getenv("DD_AGENT_ENV") != "" {
 			err := profiler.Start(
