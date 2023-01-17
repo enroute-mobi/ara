@@ -279,6 +279,10 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 			}
 
+			if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()) {
+				estimatedVehicleJourney.IsCompleteStopSequence = true
+			}
+
 			processedStopVisits[stopVisitId] = struct{}{}
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))

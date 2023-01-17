@@ -265,6 +265,7 @@ type StopVisits interface {
 	FindByObjectId(ObjectID) (*StopVisit, bool)
 	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
+	StopVisitsLenByVehicleJourney(VehicleJourneyId) int
 	FindByStopAreaId(StopAreaId) []*StopVisit
 	FindMonitoredByOriginByStopAreaId(StopAreaId, string) []*StopVisit
 	FindFollowingByStopAreaId(StopAreaId) []*StopVisit
@@ -327,6 +328,12 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 
 	manager.mutex.RUnlock()
 	return
+}
+
+func (manager *MemoryStopVisits) StopVisitsLenByVehicleJourney(id VehicleJourneyId) int {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	return manager.byVehicleJourney.IndexableLength(ModelId(id))
 }
 
 func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
