@@ -1380,7 +1380,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <ArrivalStatus>delayed</ArrivalStatus>
         </EstimatedCall>
       </EstimatedCalls>
-      <IsCompleteStopSequence>false</IsCompleteStopSequence>
+      <IsCompleteStopSequence>true</IsCompleteStopSequence>
     </EstimatedVehicleJourney>
   </EstimatedJourneyVersionFrame>
 </EstimatedTimetableDelivery>
