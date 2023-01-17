@@ -43,6 +43,8 @@ type SIRIEstimatedVehicleJourney struct {
 	DirectionType          string
 	PublishedLineName      string
 
+	IsCompleteStopSequence bool
+
 	Attributes map[string]string
 	References map[string]string
 

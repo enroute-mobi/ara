@@ -48,6 +48,10 @@ func (index *Index) Delete(modelId ModelId) {
 	delete(index.byIdentifier, modelId)
 }
 
+func (index *Index) IndexableLength(indexable ModelId) int {
+	return len(index.byIndexable[indexable])
+}
+
 func (index *Index) removeFromIndexable(indexable, modelId ModelId) {
 	if len(index.byIndexable[indexable]) == 0 {
 		return

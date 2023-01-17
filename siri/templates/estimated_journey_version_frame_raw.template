@@ -41,6 +41,6 @@
 							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
 						</EstimatedCall>{{ end }}
 					</EstimatedCalls>
-					<IsCompleteStopSequence>false</IsCompleteStopSequence>{{ end }}
+					<IsCompleteStopSequence>{{ .IsCompleteStopSequence }}</IsCompleteStopSequence>{{ end }}
 				</EstimatedVehicleJourney>{{ end }}
 			</EstimatedJourneyVersionFrame>
