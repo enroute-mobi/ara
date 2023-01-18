@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	em "bitbucket.org/enroute-mobi/ara-external-models"
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -11,7 +13,17 @@ import (
 type PushCollector struct {
 	connector
 
-	subscriber UpdateSubscriber
+	vjEvents        map[string]model.UpdateEvent
+	svEvents        []model.UpdateEvent
+	vjOfIgnoredSv   map[string]struct{}
+	vjWithStopVisit map[string]struct{}
+	persistence     persistence
+	subscriber      UpdateSubscriber
+}
+
+type persistence struct {
+	p  time.Duration
+	ok bool
 }
 
 type PushCollectorFactory struct{}
@@ -45,15 +57,22 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 	}
 }
 
+func (pc *PushCollector) refresh() {
+	pc.persistence.p, pc.persistence.ok = pc.partner.Referential().ModelPersistenceDuration()
+	pc.vjEvents = make(map[string]model.UpdateEvent)
+	pc.svEvents = []model.UpdateEvent{}
+	pc.vjOfIgnoredSv = make(map[string]struct{})
+	pc.vjWithStopVisit = make(map[string]struct{})
+}
+
 func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel, message *audit.BigQueryMessage) {
 	t := clock.DefaultClock().Now()
+	pc.refresh()
 
 	pc.handleStopAreas(model.GetStopAreas())
 	pc.handleLines(model.GetLines())
-	pc.handleVehicleJourneys(model.GetVehicleJourneys())
-	pc.handleStopVisits(model.GetStopVisits())
+	pc.handleVehicleJourneysAndStopVisits(model.GetVehicleJourneys(), model.GetStopVisits())
 	pc.handleVehicles(model.GetVehicles())
-
 	processingTime := clock.DefaultClock().Since(t)
 
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
@@ -103,6 +122,26 @@ func (pc *PushCollector) handleLines(lines []*em.ExternalLine) (lineIds []string
 	return
 }
 
+func (pc *PushCollector) handleVehicleJourneysAndStopVisits(vjs []*em.ExternalVehicleJourney, svs []*em.ExternalStopVisit) {
+	pc.handleVehicleJourneys(vjs)
+	pc.handleStopVisits(svs)
+
+	// For each vehicle journey for which we didn't save a stopvisit, check if we did save at least one
+	// If not, we don't save them at all
+	for id := range pc.vjOfIgnoredSv {
+		if _, ok := pc.vjWithStopVisit[id]; !ok {
+			delete(pc.vjEvents, id)
+		}
+	}
+
+	for k := range pc.vjEvents {
+		pc.broadcastUpdateEvent(pc.vjEvents[k])
+	}
+	for i := range pc.svEvents {
+		pc.broadcastUpdateEvent(pc.svEvents[i])
+	}
+}
+
 func (pc *PushCollector) handleVehicleJourneys(vjs []*em.ExternalVehicleJourney) {
 	partner := string(pc.Partner().Slug())
 
@@ -119,7 +158,7 @@ func (pc *PushCollector) handleVehicleJourneys(vjs []*em.ExternalVehicleJourney)
 		event.DestinationName = vj.GetDestinationName()
 		event.Direction = vj.GetDirection()
 
-		pc.broadcastUpdateEvent(event)
+		pc.vjEvents[vj.GetObjectid()] = event
 	}
 }
 
@@ -130,6 +169,12 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		sv := svs[i]
 		event := model.NewStopVisitUpdateEvent()
 
+		handleSchedules(event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
+		if pc.persistence.ok && event.Schedules.ReferenceTime().Before(pc.Clock().Now().Add(pc.persistence.p)) {
+			pc.vjOfIgnoredSv[sv.GetVehicleJourneyRef()] = struct{}{} // Save vehicle journeys for which we didn't save at least 1 stop visit
+			continue
+		}
+
 		event.Origin = partner
 		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetObjectid())
 		event.StopAreaObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetStopAreaRef())
@@ -139,9 +184,8 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		event.ArrivalStatus = model.StopVisitArrivalStatus(sv.GetArrivalStatus())
 		event.DepartureStatus = model.StopVisitDepartureStatus(sv.GetDepartureStatus())
 
-		handleSchedules(event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
-
-		pc.broadcastUpdateEvent(event)
+		pc.vjWithStopVisit[sv.GetVehicleJourneyRef()] = struct{}{} // Save vehicle journeys for which we did save at least 1 stop visit
+		pc.svEvents = append(pc.svEvents, event)
 	}
 }
 

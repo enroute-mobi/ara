@@ -72,7 +72,7 @@ func (guardian *ModelGuardian) routineWork() {
 
 	guardian.refreshStopAreas(spanContext)
 	guardian.refreshLines(spanContext)
-	guardian.simulateActualAttributes(spanContext)
+	guardian.cleanOrUpdateStopVisits(spanContext)
 	guardian.requestSituations()
 }
 
@@ -180,24 +180,40 @@ func (guardian *ModelGuardian) requestSituations() {
 	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 }
 
-func (guardian *ModelGuardian) simulateActualAttributes(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.simulate_actual_attributes")
+func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.cleanOrUpdateStopVisits")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
 
-	svs := guardian.referential.Model().StopVisits().FindAll()
+	m := guardian.referential.Model()
+
+	svs := m.StopVisits().UnsafeFindAll()
+	persistence, ok := guardian.referential.ModelPersistenceDuration()
+	vjs := make(map[model.VehicleJourneyId]struct{})
+
 	child.SetTag("stop_visits_count", len(svs))
 	for i := range svs {
+		if ok && svs[i].ReferenceTime().Before(guardian.Clock().Now().Add(persistence)) {
+			vjs[svs[i].VehicleJourneyId] = struct{}{}
+			m.StopVisits().Delete(svs[i])
+			continue
+		}
+
 		if svs[i].IsCollected() {
 			continue
 		}
 
-		stopVisit, _ := guardian.referential.Model().StopVisits().Find(svs[i].Id())
-		simulator := NewActualAttributesSimulator(stopVisit)
+		simulator := NewActualAttributesSimulator(svs[i])
 		simulator.SetClock(guardian.Clock())
 		if simulator.Simulate() {
-			stopVisit.Save()
+			svs[i].Save()
+		}
+	}
+
+	for id := range vjs {
+		if !m.StopVisits().VehicleJourneyHasStopVisits(id) {
+			m.VehicleJourneys().DeleteById(id)
 		}
 	}
 }

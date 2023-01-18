@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 func Test_APIPartner_SetFactories(t *testing.T) {
@@ -80,7 +80,7 @@ func Test_APIPartner_Validate(t *testing.T) {
 	if len(apiPartner.Errors.Get("Slug")) != 1 || apiPartner.Errors.Get("Slug")[0] != e.ERROR_UNIQUE {
 		t.Errorf("apiPartner should have Error for Slug, got %v", apiPartner.Errors)
 	}
-	if len(apiPartner.Errors.GetSettingError(ps.LOCAL_CREDENTIAL)) != 1 || apiPartner.Errors.GetSettingError(ps.LOCAL_CREDENTIAL)[0] != e.ERROR_UNIQUE {
+	if len(apiPartner.Errors.GetSettingError(s.LOCAL_CREDENTIAL)) != 1 || apiPartner.Errors.GetSettingError(s.LOCAL_CREDENTIAL)[0] != e.ERROR_UNIQUE {
 		t.Errorf("apiPartner should have Error for local_credential, got %v", apiPartner.Errors)
 	}
 

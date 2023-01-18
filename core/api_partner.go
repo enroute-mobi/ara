@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 type APIPartner struct {
@@ -45,11 +45,11 @@ func (partner *APIPartner) Validate() bool {
 
 	// Check Credentials uniqueness
 	if !partner.manager.UniqCredentials(partner.Id, partner.credentials()) {
-		if _, ok := partner.Settings[ps.LOCAL_CREDENTIAL]; ok {
-			partner.Errors.AddSettingError(ps.LOCAL_CREDENTIAL, e.ERROR_UNIQUE)
+		if _, ok := partner.Settings[s.LOCAL_CREDENTIAL]; ok {
+			partner.Errors.AddSettingError(s.LOCAL_CREDENTIAL, e.ERROR_UNIQUE)
 		}
-		if _, ok := partner.Settings[ps.LOCAL_CREDENTIALS]; ok {
-			partner.Errors.AddSettingError(ps.LOCAL_CREDENTIALS, e.ERROR_UNIQUE)
+		if _, ok := partner.Settings[s.LOCAL_CREDENTIALS]; ok {
+			partner.Errors.AddSettingError(s.LOCAL_CREDENTIALS, e.ERROR_UNIQUE)
 		}
 	}
 
@@ -57,7 +57,7 @@ func (partner *APIPartner) Validate() bool {
 }
 
 func (partner *APIPartner) credentials() string {
-	return fmt.Sprintf("%v,%v", partner.Settings[ps.LOCAL_CREDENTIAL], partner.Settings[ps.LOCAL_CREDENTIALS])
+	return fmt.Sprintf("%v,%v", partner.Settings[s.LOCAL_CREDENTIAL], partner.Settings[s.LOCAL_CREDENTIALS])
 }
 
 func (partner *APIPartner) setFactories() {
@@ -85,23 +85,23 @@ func (partner *APIPartner) ValidatePresenceOfSetting(setting string) bool {
 }
 
 func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
-	if !partner.IsSettingDefined(ps.LOCAL_CREDENTIAL) && !partner.IsSettingDefined(ps.LOCAL_CREDENTIALS) {
-		partner.Errors.AddSettingError(ps.LOCAL_CREDENTIAL, e.ERROR_BLANK)
+	if !partner.IsSettingDefined(s.LOCAL_CREDENTIAL) && !partner.IsSettingDefined(s.LOCAL_CREDENTIALS) {
+		partner.Errors.AddSettingError(s.LOCAL_CREDENTIAL, e.ERROR_BLANK)
 		return false
 	}
 	return true
 }
 
 func (partner *APIPartner) ValidatePresenceOfRemoteObjectIdKind() bool {
-	return partner.ValidatePresenceOfSetting(ps.REMOTE_OBJECTID_KIND)
+	return partner.ValidatePresenceOfSetting(s.REMOTE_OBJECTID_KIND)
 }
 
 func (partner *APIPartner) ValidatePresenceOfRemoteCredentials() bool {
-	return partner.ValidatePresenceOfSetting(ps.REMOTE_URL) && partner.ValidatePresenceOfSetting(ps.REMOTE_CREDENTIAL)
+	return partner.ValidatePresenceOfSetting(s.REMOTE_URL) && partner.ValidatePresenceOfSetting(s.REMOTE_CREDENTIAL)
 }
 
 func (partner *APIPartner) ValidatePresenceOfLightRemoteCredentials() bool {
-	return partner.ValidatePresenceOfSetting(ps.REMOTE_URL)
+	return partner.ValidatePresenceOfSetting(s.REMOTE_URL)
 }
 
 func (partner *APIPartner) ValidatePresenceOfConnector(connector string) bool {

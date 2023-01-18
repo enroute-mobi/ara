@@ -1,4 +1,4 @@
-package psettings
+package settings
 
 type CollectSettings struct {
 	UseDiscoveredSA    bool

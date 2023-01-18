@@ -11,7 +11,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/cache"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"
@@ -67,7 +67,7 @@ type PartnerStatusCheck struct {
 
 type Partner struct {
 	uuid.UUIDConsumer
-	ps.PartnerSettings
+	s.PartnerSettings
 
 	mutex *sync.RWMutex
 
@@ -125,7 +125,7 @@ func NewPartner() *Partner {
 		},
 		gtfsCache: cache.NewCacheTable(),
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
 	return partner
@@ -675,7 +675,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
 }

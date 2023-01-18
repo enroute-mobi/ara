@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	ps "bitbucket.org/enroute-mobi/ara/core/psettings"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -59,7 +59,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	partners.Save(partner)
 
 	// No Connectors
-	ps, err := partner.CheckStatus()
+	_, err := partner.CheckStatus()
 	if err == nil {
 		t.Fatalf("should have an error when partner doesn't have any connectors")
 	}
@@ -67,7 +67,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	// Push collector but old collect
 	partner.RefreshConnectors()
 
-	ps, err = partner.CheckStatus()
+	ps, err := partner.CheckStatus()
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
@@ -98,7 +98,7 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	partners.Save(partner)
 
 	// No Connectors
-	ps, err := partner.CheckStatus()
+	_, err := partner.CheckStatus()
 	if err == nil {
 		t.Fatalf("should have an error when partner doesn't have any connectors")
 	}
@@ -106,7 +106,7 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	// Push collector but old collect
 	partner.RefreshConnectors()
 
-	ps, err = partner.CheckStatus()
+	ps, err := partner.CheckStatus()
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
@@ -181,7 +181,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 		slug:           "partner",
 		ConnectorTypes: []string{},
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}`
 	jsonBytes, err := partner.MarshalJSON()
 	if err != nil {
@@ -247,13 +247,13 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 func Test_Partner_CanCollectTrue(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -269,13 +269,13 @@ func Test_Partner_CanCollectTrueLine(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
 	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
-	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.SetSetting(s.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
 	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, lines) {
 		t.Errorf("Partner can collect should return false")
@@ -295,7 +295,7 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -305,7 +305,7 @@ func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
 func Test_Partner_CanCollectFalse(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
@@ -315,7 +315,7 @@ func Test_Partner_CanCollectFalse(t *testing.T) {
 func Test_Partner_CanCollectFalseLine(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(ps.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
+	partner.SetSetting(s.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return flase")
@@ -325,14 +325,14 @@ func Test_Partner_CanCollectFalseLine(t *testing.T) {
 func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
+	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
 	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return true")
 	}
 
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -347,14 +347,14 @@ func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
 func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
 	}
 
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -364,7 +364,7 @@ func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
 func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -374,7 +374,7 @@ func Test_Partner_CanCollectFalseSPD(t *testing.T) {
 func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
 	partner.SetCollectSettings()
 	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
@@ -385,9 +385,9 @@ func Test_Partner_CanCollectTrueSPD(t *testing.T) {
 func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
 	partner := NewPartner()
 	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_SA, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
 	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.SetSetting(ps.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
 	partner.SetCollectSettings()
 	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
 		t.Errorf("Partner can collect should return false")
@@ -396,7 +396,7 @@ func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
 
 func Test_Partner_CanCollectFalseLD(t *testing.T) {
 	partner := NewPartner()
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
 	partner.SetCollectSettings()
 	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
 		t.Errorf("Partner can collect should return false")
@@ -405,7 +405,7 @@ func Test_Partner_CanCollectFalseLD(t *testing.T) {
 
 func Test_Partner_CanCollectTrueLD(t *testing.T) {
 	partner := NewPartner()
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
 	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
 	partner.SetCollectSettings()
 	if !partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
@@ -415,9 +415,9 @@ func Test_Partner_CanCollectTrueLD(t *testing.T) {
 
 func Test_Partner_CanCollectTrueLDButExcluded(t *testing.T) {
 	partner := NewPartner()
-	partner.SetSetting(ps.COLLECT_USE_DISCOVERED_LINES, "true")
+	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
 	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
-	partner.SetSetting(ps.COLLECT_EXCLUDE_LINES, "NINOXE:Line:SP:24:LOC")
+	partner.SetSetting(s.COLLECT_EXCLUDE_LINES, "NINOXE:Line:SP:24:LOC")
 	partner.SetCollectSettings()
 	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
 		t.Errorf("Partner can collect should return false")
@@ -429,15 +429,15 @@ func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	partner1 := &Partner{
 		slug: "First",
 	}
-	partner1.PartnerSettings = ps.NewPartnerSettings(partner1.UUIDGenerator)
+	partner1.PartnerSettings = s.NewPartnerSettings(partner1.UUIDGenerator)
 	partner2 := &Partner{
 		slug: "Second",
 	}
-	partner2.PartnerSettings = ps.NewPartnerSettings(partner2.UUIDGenerator)
+	partner2.PartnerSettings = s.NewPartnerSettings(partner2.UUIDGenerator)
 
-	partner1.SetSetting(ps.COLLECT_PRIORITY, "2")
+	partner1.SetSetting(s.COLLECT_PRIORITY, "2")
 
-	partner2.SetSetting(ps.COLLECT_PRIORITY, "1")
+	partner2.SetSetting(s.COLLECT_PRIORITY, "1")
 
 	partners.Save(partner1)
 	partners.Save(partner2)
@@ -517,10 +517,10 @@ func Test_PartnerManager_FindByCredential(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.SetSetting(ps.LOCAL_CREDENTIAL, "cred")
+	existingPartner.SetSetting(s.LOCAL_CREDENTIAL, "cred")
 	partners.Save(existingPartner)
 
-	partner, ok := partners.FindBySetting(ps.LOCAL_CREDENTIAL, "cred")
+	partner, ok := partners.FindBySetting(s.LOCAL_CREDENTIAL, "cred")
 	if !ok {
 		t.Fatal("FindBySetting should return true when Partner is found")
 	}
@@ -533,8 +533,8 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	existingPartner := partners.New("partner")
-	existingPartner.SetSetting(ps.LOCAL_CREDENTIAL, "cred")
-	existingPartner.SetSetting(ps.LOCAL_CREDENTIALS, "cred2,cred3")
+	existingPartner.SetSetting(s.LOCAL_CREDENTIAL, "cred")
+	existingPartner.SetSetting(s.LOCAL_CREDENTIALS, "cred2,cred3")
 	partners.Save(existingPartner)
 
 	partner, ok := partners.FindByCredential("cred")
@@ -682,7 +682,7 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 
 	g := partner.IdentifierGenerator("message_identifier")
 	if expected := "%{uuid}"; g.FormatString() != expected {
@@ -739,19 +739,19 @@ func Test_Partner_SIRIClient(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	partner.SIRIClient()
 	if partner.httpClient == nil {
 		t.Error("partner.SIRIClient() should set Partner httpClient")
 	}
 
-	partner.SetSetting(ps.REMOTE_URL, "remote_url")
+	partner.SetSetting(s.REMOTE_URL, "remote_url")
 	partner.SIRIClient()
 	if partner.httpClient.Url != "remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
 	}
 
-	partner.SetSetting(ps.SUBSCRIPTIONS_REMOTE_URL, "sub_remote_url")
+	partner.SetSetting(s.SUBSCRIPTIONS_REMOTE_URL, "sub_remote_url")
 	partner.SIRIClient()
 	if partner.httpClient.SubscriptionsUrl != "sub_remote_url" {
 		t.Error("Partner should have created a new SoapClient when partner setting changes")
@@ -762,8 +762,8 @@ func Test_Partner_RequestorRef(t *testing.T) {
 	partner := &Partner{
 		slug: "partner",
 	}
-	partner.PartnerSettings = ps.NewPartnerSettings(partner.UUIDGenerator)
-	partner.SetSetting(ps.REMOTE_CREDENTIAL, "ara")
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.SetSetting(s.REMOTE_CREDENTIAL, "ara")
 	if partner.RequestorRef() != "ara" {
 		t.Errorf("Wrong Partner RequestorRef:\n got: %s\n want: \"ara\"", partner.RequestorRef())
 	}

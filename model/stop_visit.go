@@ -11,12 +11,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-var SCHEDULE_ORDER_MAP = [3]StopVisitScheduleType{
-	STOP_VISIT_SCHEDULE_ACTUAL,
-	STOP_VISIT_SCHEDULE_EXPECTED,
-	STOP_VISIT_SCHEDULE_AIMED,
-}
-
 type StopVisitId ModelId
 
 type StopVisit struct {
@@ -212,28 +206,15 @@ func (stopVisit *StopVisit) Reference(key string) (Reference, bool) {
 }
 
 func (stopVisit *StopVisit) ReferenceTime() time.Time {
-	if t := stopVisit.ReferenceArrivalTime(); !t.IsZero() {
-		return t
-	}
-	return stopVisit.ReferenceDepartureTime()
+	return stopVisit.Schedules.ReferenceTime()
 }
 
 func (stopVisit *StopVisit) ReferenceArrivalTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_MAP {
-		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.ArrivalTime().IsZero() {
-			return schedule.ArrivalTime()
-		}
-	}
-	return time.Time{}
+	return stopVisit.Schedules.ReferenceArrivalTime()
 }
 
 func (stopVisit *StopVisit) ReferenceDepartureTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_MAP {
-		if schedule := stopVisit.Schedules.Schedule(kind); !schedule.DepartureTime().IsZero() {
-			return schedule.DepartureTime()
-		}
-	}
-	return time.Time{}
+	return stopVisit.Schedules.ReferenceDepartureTime()
 }
 
 type ByTime []*StopVisit
@@ -264,6 +245,7 @@ type StopVisits interface {
 	Find(StopVisitId) (*StopVisit, bool)
 	FindByObjectId(ObjectID) (*StopVisit, bool)
 	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
+	VehicleJourneyHasStopVisits(VehicleJourneyId) bool
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	StopVisitsLenByVehicleJourney(VehicleJourneyId) int
 	FindByStopAreaId(StopAreaId) []*StopVisit
@@ -271,6 +253,7 @@ type StopVisits interface {
 	FindFollowingByStopAreaId(StopAreaId) []*StopVisit
 	FindFollowingByStopAreaIds([]StopAreaId) []*StopVisit
 	FindAll() []*StopVisit
+	UnsafeFindAll() []*StopVisit
 	FindAllAfter(time.Time) []*StopVisit
 	Save(*StopVisit) bool
 	Delete(*StopVisit) bool
@@ -334,6 +317,10 @@ func (manager *MemoryStopVisits) StopVisitsLenByVehicleJourney(id VehicleJourney
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 	return manager.byVehicleJourney.IndexableLength(ModelId(id))
+}
+
+func (manager *MemoryStopVisits) VehicleJourneyHasStopVisits(id VehicleJourneyId) bool {
+	return manager.StopVisitsLenByVehicleJourney(id) != 0
 }
 
 func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
@@ -423,6 +410,18 @@ func (manager *MemoryStopVisits) FindAll() (stopVisits []*StopVisit) {
 
 	for _, stopVisit := range manager.byIdentifier {
 		stopVisits = append(stopVisits, stopVisit.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
+}
+
+// Warning, this method doesn't copy the StopVisits so we shouldn't access its maps
+func (manager *MemoryStopVisits) UnsafeFindAll() (stopVisits []*StopVisit) {
+	manager.mutex.RLock()
+
+	for _, stopVisit := range manager.byIdentifier {
+		stopVisits = append(stopVisits, stopVisit)
 	}
 
 	manager.mutex.RUnlock()
