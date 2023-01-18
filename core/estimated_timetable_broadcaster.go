@@ -279,7 +279,8 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 			}
 
-			if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()) {
+			max := max(ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()), ett.connector.Partner().Model().ScheduledStopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()))
+			if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == max {
 				estimatedVehicleJourney.IsCompleteStopSequence = true
 			}
 
@@ -478,4 +479,11 @@ func (ett *ETTBroadcaster) logSIRIEstimatedTimetableNotify(message *audit.BigQue
 	}
 	message.ResponseRawMessage = xml
 	message.ResponseSize = int64(len(xml))
+}
+
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
 }
