@@ -320,9 +320,7 @@ func (manager *MemoryStopVisits) StopVisitsLenByVehicleJourney(id VehicleJourney
 }
 
 func (manager *MemoryStopVisits) VehicleJourneyHasStopVisits(id VehicleJourneyId) bool {
-	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
-	return manager.byVehicleJourney.IndexableLength(ModelId(id)) != 0
+	return manager.StopVisitsLenByVehicleJourney(id) != 0
 }
 
 func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {

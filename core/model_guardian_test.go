@@ -152,6 +152,13 @@ func Test_ModelGuardian_Run_cleanOrUpdateStopVisits(t *testing.T) {
 }
 
 func Test_ModelGuardian_Run_cleanOrUpdateStopVisits_Clean(t *testing.T) {
+	ctx := context.Background()
+
+	mt := mocktracer.Start()
+	defer mt.Stop()
+	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
+	defer testSpan.Finish()
+
 	referentials := NewMemoryReferentials()
 
 	referential := referentials.New(ReferentialSlug("referential"))
@@ -191,7 +198,7 @@ func Test_ModelGuardian_Run_cleanOrUpdateStopVisits_Clean(t *testing.T) {
 	sv4.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, fakeClock.Now())
 	sv4.Save()
 
-	referential.modelGuardian.cleanOrUpdateStopVisits()
+	referential.modelGuardian.cleanOrUpdateStopVisits(spanCtx)
 
 	_, ok := referential.Model().StopVisits().Find(sv1.Id())
 	if ok {
