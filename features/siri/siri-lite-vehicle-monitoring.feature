@@ -26,6 +26,7 @@ Feature: Support SIRI VehicleMonitoring
       | Occupancy        | seatsAvailable                        |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
+      | DriverRef        | "1233"                                |
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -62,7 +63,8 @@ Feature: Support SIRI VehicleMonitoring
               "Longitude": 1.234,
               "Latitude": 5.678
             },
-            "Occupancy": "seatsAvailable"
+            "Occupancy": "seatsAvailable",
+            "DriverRef": "1233"
           }
         }]
       }
