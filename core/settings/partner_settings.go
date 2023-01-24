@@ -16,6 +16,7 @@ const (
 	LOCAL_CREDENTIAL  = "local_credential"
 	LOCAL_CREDENTIALS = "local_credentials"
 	LOCAL_URL         = "local_url"
+	RATE_LIMIT_PER_IP = "rate_limit_per_ip"
 
 	PARTNER_MAX_RETRY = "partner.status.maximum_retry"
 
@@ -76,6 +77,7 @@ type PartnerSettings struct {
 
 	cs *CollectSettings
 	g  map[string]*idgen.IdentifierGenerator
+	rl float64
 }
 
 func NewPartnerSettings(ug func() uuid.UUIDGenerator) (ps PartnerSettings) {
@@ -98,6 +100,10 @@ func (s *PartnerSettings) Credentials() string {
 		return ""
 	}
 	return fmt.Sprintf("%v,%v", s.s[LOCAL_CREDENTIAL], s.s[LOCAL_CREDENTIALS])
+}
+
+func (s *PartnerSettings) RateLimit() float64 {
+	return s.rl
 }
 
 func (s *PartnerSettings) RemoteObjectIDKind(connectorName ...string) string {
@@ -488,6 +494,16 @@ func (s *PartnerSettings) refreshGenerators() {
 	for k := range s.g {
 		delete(s.g, k)
 	}
+}
+
+func (s *PartnerSettings) RefreshRateLimit() {
+	s.m.RLock()
+	i, _ := strconv.Atoi(s.s[RATE_LIMIT_PER_IP])
+	s.m.RUnlock()
+	if i < 0 {
+		i = 0
+	}
+	s.rl = float64(i)
 }
 
 // Warning, this method isn't threadsafe. Mutex must be handled before and after calling

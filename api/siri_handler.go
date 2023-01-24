@@ -211,6 +211,10 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	m.Partner = string(partner.Slug())
+	if !partner.Allow(handler.HandleRemoteAddress(request)) {
+		http.Error(response, "Too many requests", http.StatusTooManyRequests)
+		return
+	}
 
 	connector, ok := partner.Connector(requestHandler.ConnectorType())
 	if !ok {
