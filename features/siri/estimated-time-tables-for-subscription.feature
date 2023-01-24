@@ -687,6 +687,54 @@ Feature: Support SIRI EstimatedTimetable by subscription
   </ServiceDelivery>
 </Siri>
       """
+    When the StopVisit "6ba7b814-9dad-11d1-8-00c04fd430c8" is edited with the following attributes:
+      | Schedule[expected]#Arrival   | 2017-01-01T14:01:01.000Z |
+      | ArrivalStatus                | arrived                  |
+      | DepartureStatus              | departed                 |
+      | Schedule[expected]#Departure | 2017-01-01T14:01:11.000Z |
+    And 5 seconds have passed
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+  <ServiceDelivery>
+    <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+    <ProducerRef>test</ProducerRef>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <EstimatedTimetableDelivery>
+      <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+      <SubscriberRef>subscriber</SubscriberRef>
+      <SubscriptionRef>externalId</SubscriptionRef>
+      <Status>true</Status>
+      <EstimatedJourneyVersionFrame>
+        <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
+        <EstimatedVehicleJourney>
+         <LineRef>NINOXE:Line:3:LOC</LineRef>
+         <DirectionRef>Aller</DirectionRef>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+          <RecordedCalls>
+            <RecordedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>5</Order>
+              <StopPointName>Test1</StopPointName>
+              <ExpectedArrivalTime>2017-01-01T14:01:01.000Z</ExpectedArrivalTime>
+              <ArrivalStatus>arrived</ArrivalStatus>
+              <ExpectedDepartureTime>2017-01-01T14:01:11.000Z</ExpectedDepartureTime>
+              <DepartureStatus>departed</DepartureStatus>
+            </RecordedCall>
+          </RecordedCalls>
+          <IsCompleteStopSequence>false</IsCompleteStopSequence>
+        </EstimatedVehicleJourney>
+      </EstimatedJourneyVersionFrame>
+    </EstimatedTimetableDelivery>
+  </ServiceDelivery>
+</Siri>
+      """
 
   @ARA-1062
   Scenario: Manage a ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
