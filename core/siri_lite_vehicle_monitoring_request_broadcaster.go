@@ -116,7 +116,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	}
 
 	if connector.partner.PartnerSettings.SortPaylodForTest() {
-		sort.Sort(siri.SortByVehicleMonitoringRef{response.VehicleActivity})
+		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: response.VehicleActivity})
 	}
 
 	message.Vehicles = vehicleIds
