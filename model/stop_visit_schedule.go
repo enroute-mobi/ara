@@ -89,7 +89,7 @@ type StopVisitSchedules struct {
 }
 
 func NewStopVisitSchedules() *StopVisitSchedules {
-	return &StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule)}
+	return &StopVisitSchedules{byType: make(map[StopVisitScheduleType]*StopVisitSchedule, 3)}
 }
 
 func (schedules *StopVisitSchedules) Copy() *StopVisitSchedules {
