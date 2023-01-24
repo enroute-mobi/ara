@@ -40,7 +40,7 @@
 							<ExpectedDepartureTime>{{ .ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</ExpectedDepartureTime>{{ end }}{{ if .DepartureStatus }}
 							<DepartureStatus>{{ .DepartureStatus }}</DepartureStatus>{{end}}
 						</EstimatedCall>{{ end }}
-					</EstimatedCalls>
-					<IsCompleteStopSequence>{{ .IsCompleteStopSequence }}</IsCompleteStopSequence>{{ end }}
+					</EstimatedCalls>{{ end }}
+					<IsCompleteStopSequence>{{ .IsCompleteStopSequence }}</IsCompleteStopSequence>
 				</EstimatedVehicleJourney>{{ end }}
 			</EstimatedJourneyVersionFrame>
