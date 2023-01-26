@@ -259,7 +259,7 @@ func (partner *Partner) Allow(ip string) bool {
 	rl, ok := partner.limiters[ip]
 	if !ok {
 		logger.Log.Debugf("Create a new limiter for ip %v", ip)
-		tick := time.Duration(limit / 60.0 * float64(time.Second))
+		tick := time.Duration(limit / 60.0 * float64(time.Minute))
 		burst := int(math.Min(limit, 10))
 		limiter := rate.NewLimiter(rate.Every(tick), burst)
 		partner.limiters[ip] = limiter
