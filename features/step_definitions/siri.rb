@@ -80,8 +80,19 @@ When(/^the SIRI server (?:"([^"]*)" )?has received (\d+) (\S+) requests$/) do |n
   SIRIServer.find(name).wait_request message_type, count.to_i
 end
 
-When(/^I send this SIRI request(?: to the Referential "([^"]*)")?$/) do |referential, request|
-  send_siri_request request, referential: referential
+When(/^I send this SIRI request(?: (\d+) times)?(?: to the Referential "([^"]*)")?$/) do |n, referential, request|
+  n = 1 if n.nil? || n == 0
+  n.times do
+    send_siri_request request, referential: referential
+  end
+end
+
+When(/^I send this SIRI request(?: to the Referential "([^"]*)")? expecting an error$/) do |referential, request|
+  begin
+    send_siri_request request, referential: referential
+  rescue => e
+    @last_siri_response = e.response
+  end
 end
 
 When(/^I send a (\S+) SIRI Lite request(?: to the Referential "([^"]*)")? with the following parameters$/) do |request, referential, params|

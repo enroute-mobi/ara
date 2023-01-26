@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"sync"
@@ -17,6 +18,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"golang.org/x/time/rate"
 )
 
 type OperationnalStatus string
@@ -91,6 +93,8 @@ type Partner struct {
 	httpClient *remote.HTTPClient
 
 	gtfsCache *cache.CacheTable
+
+	limiters map[string]*rate.Limiter
 }
 
 type ByPriority []*Partner
@@ -124,6 +128,7 @@ func NewPartner() *Partner {
 			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
 		},
 		gtfsCache: cache.NewCacheTable(),
+		limiters:  make(map[string]*rate.Limiter),
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
@@ -220,6 +225,8 @@ func (partner *Partner) Stop() {
 	partner.CancelSubscriptions()
 	partner.gtfsCache.Clear()
 	partner.httpClient = nil
+
+	partner.limiters = make(map[string]*rate.Limiter)
 }
 
 func (partner *Partner) Start() {
@@ -239,6 +246,26 @@ func (partner *Partner) Start() {
 	partner.gtfsCache.Add("trip-updates", to, nil)
 	partner.gtfsCache.Add("vehicle-positions", to, nil)
 	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
+
+	partner.RefreshRateLimit()
+}
+
+func (partner *Partner) Allow(ip string) bool {
+	limit := partner.RateLimit()
+	if limit == 0 {
+		return true
+	}
+
+	rl, ok := partner.limiters[ip]
+	if !ok {
+		logger.Log.Debugf("Create a new limiter for ip %v", ip)
+		tick := time.Duration(limit / 60.0 * float64(time.Second))
+		burst := int(math.Min(limit, 10))
+		limiter := rate.NewLimiter(rate.Every(tick), burst)
+		partner.limiters[ip] = limiter
+		rl = limiter
+	}
+	return rl.Allow()
 }
 
 func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) bool {
@@ -674,6 +701,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		},
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
+		limiters:       make(map[string]*rate.Limiter),
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
