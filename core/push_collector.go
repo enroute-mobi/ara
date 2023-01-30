@@ -181,8 +181,8 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		event.VehicleJourneyObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetVehicleJourneyRef())
 		event.Monitored = sv.GetMonitored()
 		event.PassageOrder = int(sv.GetPassageOrder())
-		event.ArrivalStatus = model.StopVisitArrivalStatus(sv.GetArrivalStatus())
-		event.DepartureStatus = model.StopVisitDepartureStatus(sv.GetDepartureStatus())
+		event.ArrivalStatus = model.SetStopVisitArrivalStatus(sv.GetArrivalStatus())
+		event.DepartureStatus = model.SetStopVisitDepartureStatus(sv.GetDepartureStatus())
 
 		pc.vjWithStopVisit[sv.GetVehicleJourneyRef()] = struct{}{} // Save vehicle journeys for which we did save at least 1 stop visit
 		pc.svEvents = append(pc.svEvents, event)

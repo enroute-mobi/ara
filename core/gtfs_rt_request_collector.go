@@ -151,12 +151,21 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 				time.Unix(stu.GetDeparture().GetTime(), 0),
 				time.Unix(stu.GetArrival().GetTime(), 0))
 
+			if connector.hasSkippedScheduleRelationship(stu) {
+				svEvent.DepartureStatus = model.STOP_VISIT_DEPARTURE_CANCELLED
+				svEvent.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
+			}
+
 			if events.StopVisits[sid] == nil {
 				events.StopVisits[sid] = make(map[string]*model.StopVisitUpdateEvent)
 			}
 			events.StopVisits[sid][svid] = svEvent
 		}
 	}
+}
+
+func (connector *GtfsRequestCollector) hasSkippedScheduleRelationship(stu *gtfs.TripUpdate_StopTimeUpdate) bool {
+	return stu.GetScheduleRelationship() == gtfs.TripUpdate_StopTimeUpdate_SKIPPED
 }
 
 func (connector *GtfsRequestCollector) handleStopSequence(st *gtfs.TripUpdate_StopTimeUpdate) int {

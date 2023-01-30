@@ -11,8 +11,16 @@ const (
 	STOP_VISIT_ARRIVAL_NOREPORT     StopVisitArrivalStatus = "noreport"
 	STOP_VISIT_ARRIVAL_MISSED       StopVisitArrivalStatus = "missed"
 	STOP_VISIT_ARRIVAL_NOT_EXPECTED StopVisitArrivalStatus = "notExpected"
-	STOP_VISIT_ARRIVAL_UNDEFINED    StopVisitArrivalStatus = ""
 )
+
+func SetStopVisitArrivalStatus(arrivalStatus string) StopVisitArrivalStatus {
+	switch arrivalStatus {
+	case "":
+		return STOP_VISIT_ARRIVAL_ONTIME
+	default:
+		return StopVisitArrivalStatus(arrivalStatus)
+	}
+}
 
 func (svas StopVisitArrivalStatus) Arrived() bool {
 	return svas == STOP_VISIT_ARRIVAL_CANCELLED ||

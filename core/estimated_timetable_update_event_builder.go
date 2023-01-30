@@ -113,8 +113,8 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model
 			PassageOrder:    call.Order(),
 			Monitored:       true,
 			VehicleAtStop:   call.VehicleAtStop(),
-			ArrivalStatus:   model.StopVisitArrivalStatus(call.ArrivalStatus()),
-			DepartureStatus: model.StopVisitDepartureStatus(call.DepartureStatus()),
+			ArrivalStatus:   model.SetStopVisitArrivalStatus(call.ArrivalStatus()),
+			DepartureStatus: model.SetStopVisitDepartureStatus(call.DepartureStatus()),
 			RecordedAt:      recordedAt,
 			Schedules:       model.NewStopVisitSchedules(),
 
