@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -50,6 +51,28 @@ type SIRIEstimatedVehicleJourney struct {
 
 	EstimatedCalls []*SIRIEstimatedCall
 	RecordedCalls  []*SIRIRecordedCall
+}
+
+type SIRIEstimatedCalls []*SIRIEstimatedCall
+
+func (a SIRIEstimatedCalls) Len() int      { return len(a) }
+func (a SIRIEstimatedCalls) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type SortEstimatedCallsByStopVisitOrder struct{ SIRIEstimatedCalls }
+
+func (s SortEstimatedCallsByStopVisitOrder) Less(i, j int) bool {
+	return s.SIRIEstimatedCalls[i].Order < s.SIRIEstimatedCalls[j].Order
+}
+
+type SIRIRecordedCalls []*SIRIRecordedCall
+
+func (a SIRIRecordedCalls) Len() int      { return len(a) }
+func (a SIRIRecordedCalls) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type SortRecordedCallsByStopVisitOrder struct{ SIRIRecordedCalls }
+
+func (s SortRecordedCallsByStopVisitOrder) Less(i, j int) bool {
+	return s.SIRIRecordedCalls[i].Order < s.SIRIRecordedCalls[j].Order
 }
 
 type SIRIEstimatedCall struct {
@@ -128,6 +151,12 @@ func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryX
 
 func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXML() (string, error) {
 	var buffer bytes.Buffer
+
+	for _, evj := range frame.EstimatedVehicleJourneys {
+		sort.Sort(SortEstimatedCallsByStopVisitOrder{evj.EstimatedCalls})
+		sort.Sort(SortRecordedCallsByStopVisitOrder{evj.RecordedCalls})
+	}
+
 	if err := templates.ExecuteTemplate(&buffer, "estimated_journey_version_frame.template", frame); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
@@ -146,6 +175,12 @@ func (delivery *SIRIEstimatedTimetableDelivery) BuildEstimatedTimetableDeliveryX
 
 func (frame *SIRIEstimatedJourneyVersionFrame) BuildEstimatedJourneyVersionFrameXMLRaw() (string, error) {
 	var buffer bytes.Buffer
+
+	for _, evj := range frame.EstimatedVehicleJourneys {
+		sort.Sort(SortEstimatedCallsByStopVisitOrder{evj.EstimatedCalls})
+		sort.Sort(SortRecordedCallsByStopVisitOrder{evj.RecordedCalls})
+	}
+
 	if err := templates.ExecuteTemplate(&buffer, "estimated_journey_version_frame_raw.template", frame); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
