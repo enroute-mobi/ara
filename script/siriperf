@@ -1,0 +1,49 @@
+#!env ruby
+
+require 'uri'
+require 'tempfile'
+
+url=URI(ARGV.shift)
+token= ENV.fetch 'TOKEN', 'open-data'
+
+request = %{
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:CheckStatus xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+    <Request>
+      <siri:RequestTimestamp>2017-01-01T12:00:30.000Z</siri:RequestTimestamp>
+      <siri:RequestorRef>#{token}</siri:RequestorRef>
+      <siri:MessageIdentifier>6ba7b814-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+    </Request>
+    <RequestExtension/>
+    </sw:CheckStatus>
+  </S:Body>
+</S:Envelope>
+}
+
+one_line_request = request.gsub("\n",'').gsub(/>[ \t]*</,"><")
+escaped_one_line_request = one_line_request.gsub('"',"\\\"")
+
+http_requests = [
+  "#{url.path} method=POST contents=\"#{escaped_one_line_request}\""
+]
+
+session_file = Tempfile.new('siriperf')
+session_file.write http_requests.join("\n")
+session_file.close
+
+options = [
+  "--server #{url.host}",
+  "--port #{url.port}",
+  "--hog", 
+  "--wsesslog=100,0,#{session_file.path}",
+  "--timeout 5"
+]
+options << "--ssl" if url.instance_of?(URI::HTTPS)
+options += ARGV
+
+command="httperf #{options.join(' ')}"
+system command
+
+session_file.unlink
