@@ -34,6 +34,7 @@ type MonitoredVehicleJourney struct {
 	Bearing                 float64
 	VehicleLocation         *VehicleLocation
 	Occupancy               string `json:",omitempty"`
+	DriverRef               string `json:",omitempty"`
 }
 
 type FramedVehicleJourneyRef struct {

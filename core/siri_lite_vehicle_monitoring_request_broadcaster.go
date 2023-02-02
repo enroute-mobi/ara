@@ -95,6 +95,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
 		activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
+		activity.MonitoredVehicleJourney.DriverRef = vs[i].DriverRef
 
 		refs := vj.References.Copy()
 		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef("OriginRef", vj.Origin, refs)
