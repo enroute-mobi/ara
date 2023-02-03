@@ -18,8 +18,6 @@ func (ids StopAreaLineIds) Contains(id LineId) bool {
 }
 
 func (ids StopAreaLineIds) Copy() (t StopAreaLineIds) {
-	for k := range ids {
-		t = append(t, ids[k])
-	}
+	t = append(t, ids...)
 	return t
 }
