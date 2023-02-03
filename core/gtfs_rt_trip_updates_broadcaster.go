@@ -46,9 +46,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
 	entities, _ := connector.cache.Value()
 	feedEntities := entities.([]*gtfs.FeedEntity)
 
-	for i := range feedEntities {
-		feed.Entity = append(feed.Entity, feedEntities[i])
-	}
+	feed.Entity = append(feed.Entity, feedEntities...)
 }
 
 func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {

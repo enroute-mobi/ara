@@ -570,9 +570,7 @@ func (loader *Loader) err(i int, e error) {
 	loader.result.Import[ERRORS]++
 
 	if cerr, ok := e.(ComplexError); ok {
-		for i := range cerr.Errors {
-			loader.result.Errors[fmt.Sprint("Error on line ", i)] = append(loader.result.Errors[fmt.Sprint("Error on line ", i)], cerr.Errors[i])
-		}
+		loader.result.Errors[fmt.Sprint("Error on line ", i)] = append(loader.result.Errors[fmt.Sprint("Error on line ", i)], cerr.Errors...)
 	} else {
 		loader.result.Errors[fmt.Sprint("Error on line ", i)] = append(loader.result.Errors[fmt.Sprint("Error on line ", i)], e.Error())
 	}
