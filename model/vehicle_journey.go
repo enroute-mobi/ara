@@ -20,15 +20,16 @@ type VehicleJourney struct {
 	model      Model
 	Attributes Attributes
 	ObjectIDConsumer
-	LineId          LineId `json:",omitempty"`
-	Name            string `json:",omitempty"`
-	id              VehicleJourneyId
-	DestinationName string `json:",omitempty"`
-	Occupancy       string `json:",omitempty"`
-	DirectionType   string `json:",omitempty"`
-	Origin          string `json:",omitempty"`
-	OriginName      string `json:",omitempty"`
-	Monitored       bool
+	LineId                  LineId `json:",omitempty"`
+	Name                    string `json:",omitempty"`
+	id                      VehicleJourneyId
+	DestinationName         string `json:",omitempty"`
+	Occupancy               string `json:",omitempty"`
+	DirectionType           string `json:",omitempty"`
+	Origin                  string `json:",omitempty"`
+	OriginName              string `json:",omitempty"`
+	Monitored               bool
+	HasCompleteStopSequence bool
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {

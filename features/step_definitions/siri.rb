@@ -219,7 +219,6 @@ Then(/^the (?:"([^"]*)" )?SIRI server should receive this response$/) do |name, 
   name ||= "default"
   last_siri_request = SIRIServer.find(name).requests.last.body
   expect(normalized_xml(last_siri_request).strip).to eq(normalized_xml(expected_xml).strip)
-
 end
 
 Then (/^I send this SIRI ServiceDelivery$/) do |request|
