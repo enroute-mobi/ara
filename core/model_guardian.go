@@ -29,7 +29,7 @@ func NewModelGuardian(referential *Referential) *ModelGuardian {
 func (guardian *ModelGuardian) Start() {
 	logger.Log.Debugf("Start models guardian")
 
-	rand.Seed(time.Now().UTC().UnixNano())
+	rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	guardian.stop = make(chan struct{})
 	go guardian.Run()
 }
