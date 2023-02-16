@@ -239,14 +239,30 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			}
 
 			// Get StopVist call
-			ett.connector.buildCall(stopVisit, stopArea, stopAreaId, estimatedVehicleJourney)
+			// Broadcast full stopVisit sequence if needed
+			if vehicleJourney.HasCompleteStopSequence && !ett.connector.Partner().Model().VehicleJourneys().FullVehicleJourneyExistBySubscriptionId(string(subId)) {
+				for _, sv := range ett.connector.Partner().Model().StopVisits().FindByVehicleJourneyId(vehicleJourney.Id()) {
+					sa, saId, ok := ett.connector.stopPointRef(sv.StopAreaId)
+					if !ok {
+						logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+						continue
+					}
+					ett.connector.buildCall(sv, sa, saId, estimatedVehicleJourney)
+					processedStopVisits[sv.Id()] = struct{}{}
 
+				}
+				ett.connector.Partner().Model().VehicleJourneys().SetFullVehicleJourneyBySubscriptionId(string(subId), vehicleJourney.Id())
+			} else {
+				// or broadcast single stopVisit
+				ett.connector.buildCall(stopVisit, stopArea, stopAreaId, estimatedVehicleJourney)
+				processedStopVisits[stopVisitId] = struct{}{}
+			}
+
+			// Set IsCompleteStopSequence
 			max := max(ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()), ett.connector.Partner().Model().ScheduledStopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()))
 			if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == max {
 				estimatedVehicleJourney.IsCompleteStopSequence = true
 			}
-
-			processedStopVisits[stopVisitId] = struct{}{}
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
