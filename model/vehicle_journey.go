@@ -191,15 +191,15 @@ func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
 }
 
 func (manager *MemoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) {
-	manager.mutex.RLock()
+	manager.mutex.Lock()
 	manager.byBroadcastedFull[id] = vehicleJourneyId
-	defer manager.mutex.RUnlock()
+	manager.mutex.Unlock()
 }
 
 func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string) bool {
 	manager.mutex.RLock()
 	_, ok := manager.byBroadcastedFull[id]
-	defer manager.mutex.RUnlock()
+	manager.mutex.RUnlock()
 
 	return ok
 }
