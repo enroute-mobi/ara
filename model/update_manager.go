@@ -255,6 +255,15 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	manager.model.StopVisits().Save(sv)
+
+	// VehicleJourney stop sequence
+	if !vj.HasCompleteStopSequence {
+		completeStopSequence := vj.model.ScheduledStopVisits().StopVisitsLenByVehicleJourney(vj.Id()) == vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())
+		if completeStopSequence {
+			vj.HasCompleteStopSequence = true
+			manager.model.VehicleJourneys().Save(vj)
+		}
+	}
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {

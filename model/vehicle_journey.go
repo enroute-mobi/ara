@@ -20,15 +20,16 @@ type VehicleJourney struct {
 	model      Model
 	Attributes Attributes
 	ObjectIDConsumer
-	LineId          LineId `json:",omitempty"`
-	Name            string `json:",omitempty"`
-	id              VehicleJourneyId
-	DestinationName string `json:",omitempty"`
-	Occupancy       string `json:",omitempty"`
-	DirectionType   string `json:",omitempty"`
-	Origin          string `json:",omitempty"`
-	OriginName      string `json:",omitempty"`
-	Monitored       bool
+	LineId                  LineId `json:",omitempty"`
+	Name                    string `json:",omitempty"`
+	id                      VehicleJourneyId
+	DestinationName         string `json:",omitempty"`
+	Occupancy               string `json:",omitempty"`
+	DirectionType           string `json:",omitempty"`
+	Origin                  string `json:",omitempty"`
+	OriginName              string `json:",omitempty"`
+	Monitored               bool
+	HasCompleteStopSequence bool
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -151,10 +152,11 @@ type MemoryVehicleJourneys struct {
 
 	model Model
 
-	mutex        *sync.RWMutex
-	byIdentifier map[VehicleJourneyId]*VehicleJourney
-	byObjectId   *ObjectIdIndex
-	byLine       *Index
+	mutex             *sync.RWMutex
+	byIdentifier      map[VehicleJourneyId]*VehicleJourney
+	byObjectId        *ObjectIdIndex
+	byLine            *Index
+	byBroadcastedFull map[string]VehicleJourneyId
 }
 
 type VehicleJourneys interface {
@@ -164,8 +166,10 @@ type VehicleJourneys interface {
 	Find(VehicleJourneyId) (*VehicleJourney, bool)
 	FindByObjectId(objectid ObjectID) (*VehicleJourney, bool)
 	FindByLineId(LineId) []*VehicleJourney
+	FullVehicleJourneyExistBySubscriptionId(id string) bool
 	FindAll() []*VehicleJourney
 	Save(*VehicleJourney) bool
+	SetFullVehicleJourneyBySubscriptionId(string, VehicleJourneyId)
 	Delete(*VehicleJourney) bool
 	DeleteById(VehicleJourneyId) bool
 }
@@ -174,15 +178,30 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	extractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*VehicleJourney)).LineId) }
 
 	return &MemoryVehicleJourneys{
-		mutex:        &sync.RWMutex{},
-		byIdentifier: make(map[VehicleJourneyId]*VehicleJourney),
-		byObjectId:   NewObjectIdIndex(),
-		byLine:       NewIndex(extractor),
+		mutex:             &sync.RWMutex{},
+		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
+		byObjectId:        NewObjectIdIndex(),
+		byLine:            NewIndex(extractor),
+		byBroadcastedFull: make(map[string]VehicleJourneyId),
 	}
 }
 
 func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
 	return NewVehicleJourney(manager.model)
+}
+
+func (manager *MemoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) {
+	manager.mutex.Lock()
+	manager.byBroadcastedFull[id] = vehicleJourneyId
+	manager.mutex.Unlock()
+}
+
+func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byBroadcastedFull[id]
+	manager.mutex.RUnlock()
+
+	return ok
 }
 
 func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney, bool) {

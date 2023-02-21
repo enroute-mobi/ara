@@ -238,53 +238,34 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 				vehicleJourneys[vehicleJourney.Id()] = estimatedVehicleJourney
 			}
 
-			var useVisitNumber = ett.connector.UseVisitNumber()
+			// Get StopVist call
+			// Broadcast full stopVisit sequence if needed
+			if vehicleJourney.HasCompleteStopSequence && !ett.connector.Partner().Model().VehicleJourneys().FullVehicleJourneyExistBySubscriptionId(string(subId)) {
+				for _, sv := range ett.connector.Partner().Model().StopVisits().FindByVehicleJourneyId(vehicleJourney.Id()) {
+					sa, saId, ok := ett.connector.stopPointRef(sv.StopAreaId)
+					if !ok {
+						logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+						continue
+					}
+					ett.connector.buildCall(sv, sa, saId, estimatedVehicleJourney)
+					processedStopVisits[sv.Id()] = struct{}{}
 
-			if stopVisit.IsRecordable() && ett.connector.Partner().RecordedCallsDuration() != 0 {
-				// recordedCall
-				recordedCall := &siri.SIRIRecordedCall{
-					ArrivalStatus:         string(stopVisit.ArrivalStatus),
-					DepartureStatus:       string(stopVisit.DepartureStatus),
-					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-					Order:                 stopVisit.PassageOrder,
-					StopPointRef:          stopAreaId,
-					StopPointName:         stopArea.Name,
-					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
 				}
-
-				recordedCall.UseVisitNumber = useVisitNumber
-
-				estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
+				ett.connector.Partner().Model().VehicleJourneys().SetFullVehicleJourneyBySubscriptionId(string(subId), vehicleJourney.Id())
 			} else {
-				// EstimatedCall
-				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:         string(stopVisit.ArrivalStatus),
-					DepartureStatus:       string(stopVisit.DepartureStatus),
-					AimedArrivalTime:      stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-					ExpectedArrivalTime:   stopVisit.Schedules.Schedule("expected").ArrivalTime(),
-					AimedDepartureTime:    stopVisit.Schedules.Schedule("aimed").DepartureTime(),
-					ExpectedDepartureTime: stopVisit.Schedules.Schedule("expected").DepartureTime(),
-					Order:                 stopVisit.PassageOrder,
-					StopPointRef:          stopAreaId,
-					StopPointName:         stopArea.Name,
-					DestinationDisplay:    stopVisit.Attributes["DestinationDisplay"],
-					VehicleAtStop:         stopVisit.VehicleAtStop,
+				// or broadcast single stopVisit
+				ett.connector.buildCall(stopVisit, stopArea, stopAreaId, estimatedVehicleJourney)
+				processedStopVisits[stopVisitId] = struct{}{}
+			}
+
+			// Set IsCompleteStopSequence
+
+			if vehicleJourney.HasCompleteStopSequence {
+				expectedLen := ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id())
+				if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == expectedLen {
+					estimatedVehicleJourney.IsCompleteStopSequence = true
 				}
-
-				estimatedCall.UseVisitNumber = useVisitNumber
-
-				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 			}
-
-			max := max(ett.connector.Partner().Model().StopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()), ett.connector.Partner().Model().ScheduledStopVisits().StopVisitsLenByVehicleJourney(vehicleJourney.Id()))
-			if len(estimatedVehicleJourney.RecordedCalls)+len(estimatedVehicleJourney.EstimatedCalls) == max {
-				estimatedVehicleJourney.IsCompleteStopSequence = true
-			}
-
-			processedStopVisits[stopVisitId] = struct{}{}
 
 			lastStateInterface, ok := resource.LastState(string(stopVisit.Id()))
 			if !ok {
@@ -303,6 +284,49 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) UseVisitNumber()
 		return true
 	default:
 		return false
+	}
+}
+
+func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *model.StopVisit, sa *model.StopArea, saId string, evj *siri.SIRIEstimatedVehicleJourney) {
+	var useVisitNumber = connector.UseVisitNumber()
+
+	if sv.IsRecordable() && connector.Partner().RecordedCallsDuration() != 0 {
+		// recordedCall
+		recordedCall := &siri.SIRIRecordedCall{
+			ArrivalStatus:         string(sv.ArrivalStatus),
+			DepartureStatus:       string(sv.DepartureStatus),
+			AimedArrivalTime:      sv.Schedules.Schedule("aimed").ArrivalTime(),
+			ExpectedArrivalTime:   sv.Schedules.Schedule("expected").ArrivalTime(),
+			AimedDepartureTime:    sv.Schedules.Schedule("aimed").DepartureTime(),
+			ExpectedDepartureTime: sv.Schedules.Schedule("expected").DepartureTime(),
+			Order:                 sv.PassageOrder,
+			StopPointRef:          saId,
+			StopPointName:         sa.Name,
+			DestinationDisplay:    sv.Attributes["DestinationDisplay"],
+		}
+
+		recordedCall.UseVisitNumber = useVisitNumber
+
+		evj.RecordedCalls = append(evj.RecordedCalls, recordedCall)
+	} else {
+		// EstimatedCall
+		estimatedCall := &siri.SIRIEstimatedCall{
+			ArrivalStatus:         string(sv.ArrivalStatus),
+			DepartureStatus:       string(sv.DepartureStatus),
+			AimedArrivalTime:      sv.Schedules.Schedule("aimed").ArrivalTime(),
+			ExpectedArrivalTime:   sv.Schedules.Schedule("expected").ArrivalTime(),
+			AimedDepartureTime:    sv.Schedules.Schedule("aimed").DepartureTime(),
+			ExpectedDepartureTime: sv.Schedules.Schedule("expected").DepartureTime(),
+			Order:                 sv.PassageOrder,
+			StopPointRef:          saId,
+			StopPointName:         sa.Name,
+			DestinationDisplay:    sv.Attributes["DestinationDisplay"],
+			VehicleAtStop:         sv.VehicleAtStop,
+		}
+
+		estimatedCall.UseVisitNumber = useVisitNumber
+
+		evj.EstimatedCalls = append(evj.EstimatedCalls, estimatedCall)
 	}
 }
 
@@ -479,11 +503,4 @@ func (ett *ETTBroadcaster) logSIRIEstimatedTimetableNotify(message *audit.BigQue
 	}
 	message.ResponseRawMessage = xml
 	message.ResponseSize = int64(len(xml))
-}
-
-func max(a, b int) int {
-	if a < b {
-		return b
-	}
-	return a
 }
