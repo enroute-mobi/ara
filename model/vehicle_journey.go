@@ -156,7 +156,7 @@ type MemoryVehicleJourneys struct {
 	byIdentifier      map[VehicleJourneyId]*VehicleJourney
 	byObjectId        *ObjectIdIndex
 	byLine            *Index
-	byBroadcastedFull map[string]VehicleJourneyId
+	byBroadcastedFull map[string]map[VehicleJourneyId]struct{}
 }
 
 type VehicleJourneys interface {
@@ -166,7 +166,7 @@ type VehicleJourneys interface {
 	Find(VehicleJourneyId) (*VehicleJourney, bool)
 	FindByObjectId(objectid ObjectID) (*VehicleJourney, bool)
 	FindByLineId(LineId) []*VehicleJourney
-	FullVehicleJourneyExistBySubscriptionId(id string) bool
+	FullVehicleJourneyExistBySubscriptionId(string, VehicleJourneyId) bool
 	FindAll() []*VehicleJourney
 	Save(*VehicleJourney) bool
 	SetFullVehicleJourneyBySubscriptionId(string, VehicleJourneyId)
@@ -182,7 +182,7 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
 		byObjectId:        NewObjectIdIndex(),
 		byLine:            NewIndex(extractor),
-		byBroadcastedFull: make(map[string]VehicleJourneyId),
+		byBroadcastedFull: make(map[string]map[VehicleJourneyId]struct{}),
 	}
 }
 
@@ -192,13 +192,18 @@ func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
 
 func (manager *MemoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) {
 	manager.mutex.Lock()
-	manager.byBroadcastedFull[id] = vehicleJourneyId
+	vjIds, ok := manager.byBroadcastedFull[id]
+	if !ok {
+		vjIds = make(map[VehicleJourneyId]struct{})
+		manager.byBroadcastedFull[id] = vjIds
+	}
+	vjIds[vehicleJourneyId] = struct{}{}
 	manager.mutex.Unlock()
 }
 
-func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string) bool {
+func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byBroadcastedFull[id]
+	_, ok := manager.byBroadcastedFull[id][vehicleJourneyId]
 	manager.mutex.RUnlock()
 
 	return ok
