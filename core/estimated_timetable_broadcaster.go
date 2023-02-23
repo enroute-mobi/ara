@@ -240,7 +240,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 
 			// Get StopVist call
 			// Broadcast full stopVisit sequence if needed
-			if vehicleJourney.HasCompleteStopSequence && !ett.connector.Partner().Model().VehicleJourneys().FullVehicleJourneyExistBySubscriptionId(string(subId)) {
+			if vehicleJourney.HasCompleteStopSequence && !ett.connector.Partner().Model().VehicleJourneys().FullVehicleJourneyExistBySubscriptionId(string(subId), vehicleJourney.Id()) {
 				logger.Log.Printf("ETT VehicleJourney %v full StopVisit broadcast coming from StopVisit %v", vehicleJourney.Id(), stopVisitId)
 				for _, sv := range ett.connector.Partner().Model().StopVisits().FindByVehicleJourneyId(vehicleJourney.Id()) {
 					sa, saId, ok := ett.connector.stopPointRef(sv.StopAreaId)
