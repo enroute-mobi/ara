@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -88,10 +89,11 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	subscription.SetDefinition(&apiSubscription)
 	subscription.Save()
 
-	// Subscribe the Resources immediately for test
+	// Subscribe the Resources for test immediately
 	if apiSubscription.SubscribeResourcesNow {
-		for _, resource := range subscription.Resources(subscription.Clock().Now()) {
-			resource.Subscribed(subscription.Clock().Now())
+		for k, resource := range subscription.Resources(subscription.Clock().Now()) {
+			// delay each Resource
+			resource.Subscribed(subscription.Clock().Now().Add(time.Duration(k*40) * time.Second))
 		}
 	}
 
