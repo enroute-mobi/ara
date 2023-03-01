@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 	"sync"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -24,6 +25,7 @@ type Subscriptions interface {
 	Delete(Subscription *Subscription) bool
 	DeleteById(id SubscriptionId)
 	CancelSubscriptions()
+	CancelSubscriptionsResourcesBefore(time.Time)
 	CancelBroadcastSubscriptions()
 	CancelCollectSubscriptions()
 	FindByResourceId(id, kind string) []*Subscription
@@ -203,6 +205,25 @@ func (manager *MemorySubscriptions) DeleteById(id SubscriptionId) {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, id)
+}
+
+func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time.Time) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	for _, sub := range manager.byIdentifier {
+		for key, resource := range sub.ResourcesByObjectIDCopy() {
+			if resource.SubscribedAt().After(time) || resource.SubscribedAt().IsZero() {
+				continue
+			}
+			sub.DeleteResource(key)
+			logger.Log.Printf("Deleting ressource %v from subscription with id %v", key, sub.Id())
+
+		}
+		if sub.ResourcesLen() == 0 {
+			delete(manager.byIdentifier, sub.Id())
+		}
+	}
 }
 
 func (manager *MemorySubscriptions) CancelSubscriptions() {

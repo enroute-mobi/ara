@@ -106,7 +106,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus
-		partner.Subscriptions().CancelSubscriptions()
+		partner.Subscriptions().CancelSubscriptionsResourcesBefore(partnerStatus.ServiceStartedAt)
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner reloaded
 		return false
 	}

@@ -86,8 +86,13 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	}
 
 	subscription.SetDefinition(&apiSubscription)
-
 	subscription.Save()
+
+	// Subscribe the Resources immediately for tests
+	for _, resource := range subscription.Resources(subscription.Clock().Now()) {
+		resource.Subscribed(subscription.Clock().Now())
+	}
+
 	jsonBytes, _ := subscription.MarshalJSON()
 	response.Write(jsonBytes)
 }

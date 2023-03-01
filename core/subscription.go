@@ -43,9 +43,10 @@ type Subscription struct {
 }
 
 type APISubscription struct {
-	ExternalId    string
-	Kind          string
-	SubscriberRef string
+	ExternalId            string
+	Kind                  string
+	SubscriberRef         string
+	SubscribeResourcesNow bool
 
 	References []model.Reference
 }
