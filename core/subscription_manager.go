@@ -217,7 +217,7 @@ func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time
 				continue
 			}
 			sub.DeleteResource(key)
-			logger.Log.Printf("Deleting ressource %v from subscription with id %v", key, sub.Id())
+			logger.Log.Printf("Deleting ressource %v from subscription with id %v after partner reload", key, sub.Id())
 
 		}
 		if sub.ResourcesLen() == 0 {
