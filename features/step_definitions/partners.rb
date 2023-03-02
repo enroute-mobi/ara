@@ -82,7 +82,7 @@ Then(/^one Subscription exists with the following attributes:$/) do |attributes|
   expect(response_array).to include(a_hash_including(attributes))
 end
 
-Then(/^Subscriptions exist with the following attributes:$/) do |attributes|
+Then(/^Subscriptions exist with the following resources:$/) do |attributes|
   path = partners_path + '/' + getFirstPartner + '/subscriptions'
   response = RestClient.get path, { content_type: :json, accept: :json, :Authorization => "Token token=#{$token}" }
   response_array = JSON.parse(response.body)
@@ -96,7 +96,7 @@ Then(/^Subscriptions exist with the following attributes:$/) do |attributes|
   end
 end
 
-Then(/^No Subscriptions exist with the following attributes:$/) do |attributes|
+Then(/^No Subscriptions exist with the following resources:$/) do |attributes|
   path = partners_path + '/' + getFirstPartner + '/subscriptions'
   response = RestClient.get path, { content_type: :json, accept: :json, :Authorization => "Token token=#{$token}" }
   response_array = JSON.parse(response.body)

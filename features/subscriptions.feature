@@ -29,9 +29,9 @@ Feature: Subscription Management
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:00:20.000+02:00"
     And 30 seconds have passed
-    Then No Subscriptions exist with the following attributes:
+    Then No Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:01:00.000+02:00"
     And 30 seconds have passed
@@ -57,9 +57,9 @@ Feature: Subscription Management
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:00:20.000+02:00"
     And 30 seconds have passed
-    Then No Subscriptions exist with the following attributes:
+    Then No Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:01:00.000+02:00"
     And 30 seconds have passed

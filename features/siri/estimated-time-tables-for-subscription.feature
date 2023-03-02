@@ -111,9 +111,9 @@ Feature: Support SIRI EstimatedTimetable by subscription
 </SubscriptionResponse>
 </Siri>
       """
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:Line:A:BUS |
-    Then No Subscriptions exist with the following attributes:
+    Then No Subscriptions exist with the following resources:
       | internal | NINOXE:Line:3:LOC |
 
   Scenario: 4234 - Handle a SOAP SIRI EstimatedTimetable request for subscription
