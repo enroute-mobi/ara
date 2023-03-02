@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 
@@ -91,7 +92,13 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 
 	// Subscribe the Resources for test immediately
 	if apiSubscription.SubscribeResourcesNow {
-		for k, resource := range subscription.Resources(subscription.Clock().Now()) {
+		resources := subscription.Resources(subscription.Clock().Now())
+		// sort the map to ensure consistency with the tests
+		sort.Slice(resources, func(i, j int) bool {
+			return resources[i].Reference.ObjectId.Value() < resources[j].Reference.ObjectId.Value()
+		})
+
+		for k, resource := range resources {
 			// delay each Resource
 			resource.Subscribed(subscription.Clock().Now().Add(time.Duration(k*40) * time.Second))
 		}
