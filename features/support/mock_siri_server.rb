@@ -27,7 +27,9 @@ class SIRIServer
     @@authorized_tokens
   end
 
-  attr_accessor :url, :port, :path, :requests, :responses, :started
+  attr_accessor :url, :port, :path, :requests, :responses, :started, :service_started_at
+
+  SERVICE_STARTED_AT = '2016-09-22T03:30:32.000+02:00'.freeze
 
   def initialize(url, envelope)
     @url = url
@@ -36,6 +38,7 @@ class SIRIServer
     @responses = []
     @envelope = envelope
     @http_server = WEBrick::HTTPServer.new(Port: @uri.port, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
+    @service_started_at = SERVICE_STARTED_AT
 
     proceed_request
   end
@@ -122,7 +125,7 @@ class SIRIServer
     </CheckStatusAnswerInfo>
     <Answer>
       <ns3:Status>true</ns3:Status>
-      <ns3:ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ns3:ServiceStartedTime>
+      <ns3:ServiceStartedTime>#{@service_started_at}</ns3:ServiceStartedTime>
     </Answer>
     <AnswerExtension/>
   </ns8:CheckStatusResponse>)
@@ -148,7 +151,7 @@ class SIRIServer
       </CheckStatusAnswerInfo>
       <Answer>
         <ns3:Status>true</ns3:Status>
-        <ns3:ServiceStartedTime>2016-09-22T03:30:32.000+02:00</ns3:ServiceStartedTime>
+        <ns3:ServiceStartedTime>#{@service_started_at}</ns3:ServiceStartedTime>
       </Answer>
       <AnswerExtension/>
     </ns8:CheckStatusResponse>

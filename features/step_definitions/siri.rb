@@ -113,6 +113,10 @@ When(/^I receive this GeneralMessageRequest$/) do |message_type|
   SIRIServer.find("default").wait_request message_type
 end
 
+When(/^I edit the (?:"([^"]*)" )?SIRI server with new ServiceStartedTime "([^"]+)"$/) do |name, time|
+  SIRIServer.find(name).service_started_at = time
+end
+
 Then(/^I should receive a SIRI \S+ with$/) do |expected|
   document = REXML::Document.new(@last_siri_response)
 

@@ -17,6 +17,10 @@ def url_for_model(attributes = {})
     referential: 'test'
   }.merge(attributes.delete_if { |k,v| v.nil? })
 
-  path = [ "#{attributes[:resource]}s", attributes[:id] ].compact.join('/')
+  if attributes[:model] == 'subscriptions'
+    path = [ "#{attributes[:resource]}s", attributes[:partner_name], attributes[:model]].compact.join('/')
+  else
+    path = [ "#{attributes[:resource]}s", attributes[:id] ].compact.join('/')
+  end
   url_for(attributes.merge(path: path))
 end
