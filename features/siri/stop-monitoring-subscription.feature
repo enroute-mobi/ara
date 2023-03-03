@@ -1953,3 +1953,133 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       Then the VehicleJourney "6ba7b814-9dad-11d1-7-00c04fd430c8" has the following attributes:
         | HasCompleteStopSequence | true                                                                        |
         | StopVisits              | ["6ba7b814-9dad-11d1-f-00c04fd430c8", "6ba7b814-9dad-11d1-14-00c04fd430c8"] |
+
+
+  @ARA-1256
+  Scenario: Delete and recreate subscription when receiving subscription with same existing number
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | test                  |
+       | local_credential                   | NINOXE:default        |
+       | remote_objectid_kind               | internal              |
+       | broadcast.subscriptions.persistent | true                  |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                   |
+      | ObjectIDs | "internal": "coicogn2" |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <SOAP-ENV:Header />
+  <SOAP-ENV:Body>
+    <ws:Subscribe>
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+        <siri:MessageIdentifier>Ara:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:MessageIdentifier>
+        <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
+      </SubscriptionRequestInfo>
+      <Request>
+        <StopMonitoringSubscriptionRequest>
+          <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
+          <SubscriptionIdentifier>1</SubscriptionIdentifier>
+          <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
+          <StopMonitoringRequest>
+            <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
+            <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
+            <MonitoringRef>coicogn2</MonitoringRef>
+            <StopVisitTypes>all</StopVisitTypes>
+          </StopMonitoringRequest>
+          <IncrementalUpdates>true</IncrementalUpdates>
+          <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
+        </StopMonitoringSubscriptionRequest>
+      </Request>
+      <RequestExtension />
+    </ws:Subscribe>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+    """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | StopMonitoringBroadcast           |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+    """
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <SOAP-ENV:Header />
+  <SOAP-ENV:Body>
+    <ws:Subscribe>
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:02:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+        <siri:MessageIdentifier>Ara:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:MessageIdentifier>
+        <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
+      </SubscriptionRequestInfo>
+      <Request>
+        <StopMonitoringSubscriptionRequest>
+          <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
+          <SubscriptionIdentifier>1</SubscriptionIdentifier>
+          <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
+          <StopMonitoringRequest>
+            <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
+            <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
+            <MonitoringRef>coicogn2</MonitoringRef>
+            <StopVisitTypes>all</StopVisitTypes>
+          </StopMonitoringRequest>
+          <IncrementalUpdates>true</IncrementalUpdates>
+          <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
+        </StopMonitoringSubscriptionRequest>
+      </Request>
+      <RequestExtension />
+    </ws:Subscribe>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+      """
+    Then No Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | StopMonitoringBroadcast           |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | StopMonitoringBroadcast           |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+    """
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <SOAP-ENV:Header />
+  <SOAP-ENV:Body>
+    <ws:Subscribe>
+      <SubscriptionRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:02:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+        <siri:MessageIdentifier>Ara:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:MessageIdentifier>
+        <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
+      </SubscriptionRequestInfo>
+      <Request>
+        <StopMonitoringSubscriptionRequest>
+          <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
+          <SubscriptionIdentifier>2</SubscriptionIdentifier>
+          <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
+          <StopMonitoringRequest>
+            <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
+            <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
+            <MonitoringRef>coicogn2</MonitoringRef>
+            <StopVisitTypes>all</StopVisitTypes>
+          </StopMonitoringRequest>
+          <IncrementalUpdates>true</IncrementalUpdates>
+          <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
+        </StopMonitoringSubscriptionRequest>
+      </Request>
+      <RequestExtension />
+    </ws:Subscribe>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | StopMonitoringBroadcast           |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | Kind            | StopMonitoringBroadcast           |
+      | ExternalId      | 2                                 |

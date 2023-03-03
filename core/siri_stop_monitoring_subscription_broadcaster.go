@@ -199,20 +199,24 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		subIds = append(subIds, sm.SubscriptionIdentifier())
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(sm.SubscriptionIdentifier())
-		if !ok {
-			sub = connector.Partner().Subscriptions().New(StopMonitoringBroadcast)
-			sub.SubscriberRef = sm.SubscriberRef()
-			sub.SetExternalId(sm.SubscriptionIdentifier())
-		} else if sub.Kind() != StopMonitoringBroadcast {
-			logger.Log.Debugf("StopMonitoring subscription request with a duplicated Id: %v", sm.SubscriptionIdentifier())
-			rs.ErrorType = "OtherError"
-			rs.ErrorNumber = 2
-			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", sm.SubscriptionIdentifier())
-			resps = append(resps, rs)
+		if ok {
+			if sub.Kind() != StopMonitoringBroadcast {
+				logger.Log.Debugf("StopMonitoring subscription request with a duplicated Id: %v", sm.SubscriptionIdentifier())
+				rs.ErrorType = "OtherError"
+				rs.ErrorNumber = 2
+				rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", sm.SubscriptionIdentifier())
+				resps = append(resps, rs)
 
-			message.Status = "Error"
-			continue
+				message.Status = "Error"
+				continue
+			}
+
+			sub.Delete()
 		}
+
+		sub = connector.Partner().Subscriptions().New(StopMonitoringBroadcast)
+		sub.SubscriberRef = sm.SubscriberRef()
+		sub.SetExternalId(sm.SubscriptionIdentifier())
 
 		ref := model.Reference{
 			ObjectId: &objectid,
