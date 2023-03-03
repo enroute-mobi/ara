@@ -1142,3 +1142,93 @@ Feature: Support SIRI ProductionTimetable by subscription
       </ServiceDelivery>
       </Siri>
       """
+
+  @ARA-1256
+  Scenario: Delete and recreate subscription when receiving subscription with same existing number
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-production-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | test                  |
+       | local_credential                   | NINOXE:default        |
+       | remote_objectid_kind               | internal              |
+       | siri.envelope                      | raw                   |
+       | broadcast.subscriptions.persistent | true                  |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2022-02-10T02:50:00Z</InitialTerminationTime>
+         <ProductionTimetableRequest>
+            <RequestTimestamp>2022-02-09T02:15:23.690717Z</RequestTimestamp>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | ProductionTimetableBroadcast      |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT23H</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then No Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | ProductionTimetableBroadcast      |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | ProductionTimetableBroadcast      |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <ProductionTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>2</SubscriptionIdentifier>
+         <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT23H</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </ProductionTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | ProductionTimetableBroadcast      |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | ProductionTimetableBroadcast      |
+      | ExternalId      | 2                                 |
