@@ -69,15 +69,19 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 		lineIds = append(lineIds, ett.Lines()...)
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ett.SubscriptionIdentifier())
-		if ok && sub.Kind() != EstimatedTimetableBroadcast {
-			logger.Log.Debugf("EstimatedTimetable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
-			rs.ErrorType = "OtherError"
-			rs.ErrorNumber = 2
-			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ett.SubscriptionIdentifier())
+		if ok {
+			if sub.Kind() != EstimatedTimetableBroadcast {
+				logger.Log.Debugf("EstimatedTimetable subscription request with a duplicated Id: %v", ett.SubscriptionIdentifier())
+				rs.ErrorType = "OtherError"
+				rs.ErrorNumber = 2
+				rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ett.SubscriptionIdentifier())
 
-			resps = append(resps, rs)
-			message.Status = "Error"
-			continue
+				resps = append(resps, rs)
+				message.Status = "Error"
+				continue
+			}
+
+			sub.Delete()
 		}
 
 		resources, unknownLineIds := connector.checkLines(ett)
@@ -97,12 +101,10 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 
 		subIds = append(subIds, ett.SubscriptionIdentifier())
 
-		if !ok {
-			sub = connector.Partner().Subscriptions().New(EstimatedTimetableBroadcast)
-			sub.SubscriberRef = ett.SubscriberRef()
-			sub.SetExternalId(ett.SubscriptionIdentifier())
-			connector.fillOptions(sub, request)
-		}
+		sub = connector.Partner().Subscriptions().New(EstimatedTimetableBroadcast)
+		sub.SubscriberRef = ett.SubscriberRef()
+		sub.SetExternalId(ett.SubscriptionIdentifier())
+		connector.fillOptions(sub, request)
 
 		for _, r := range resources {
 			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
