@@ -65,6 +65,16 @@ When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following att
   debug response.body
 end
 
+Then(/^No Subscription exists with the following attributes:$/) do |attributes|
+  path = partners_path + '/' + getFirstPartner() + '/subscriptions'
+  response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+  response_array = JSON.parse(response.body)
+
+  attributes = attributes.rows_hash
+
+  expect(response_array).not_to include(a_hash_including(attributes))
+end
+
 Then(/^one Subscription exists with the following attributes:$/) do |attributes|
   path = partners_path + '/' + getFirstPartner() + '/subscriptions'
   response = RestClient.get path, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
