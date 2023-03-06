@@ -213,9 +213,9 @@ Feature: Support SIRI subscription
   </TerminateSubscriptionResponse>
 </Siri>
      """
-    Then No Subscriptions exist with the following attributes:
+    Then No Subscriptions exist with the following resources:
       | internal | NINOXE:Line:3:LOC |
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:Line:A:BUS |
 
   @ARA-1066

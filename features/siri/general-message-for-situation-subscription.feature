@@ -474,3 +474,133 @@ Feature: Support SIRI GeneralMessage by subscription
     </soap:Envelope>
     """
     Then the SIRI server should have received 2 DeleteSubscription requests
+
+  @ARA-1256
+  Scenario: Delete and recreate subscription when receiving subscription with same existing number
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-general-message-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | test                  |
+       | local_credential                   | NINOXE:default        |
+       | remote_objectid_kind               | internal              |
+       | broadcast.subscriptions.persistent | true                  |
+      And a Line exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
+      <SubscriptionRequestInfo>
+	<siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+	<siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+	<siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+      </SubscriptionRequestInfo>
+      <Request>
+	<siri:GeneralMessageSubscriptionRequest>
+	  <siri:SubscriberRef>test</siri:SubscriberRef>
+	  <siri:SubscriptionIdentifier>1</siri:SubscriptionIdentifier>
+	  <siri:InitialTerminationTime>2017-01-03T12:00:45.000Z</siri:InitialTerminationTime>
+	  <siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
+	    <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+	    <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+	    <siri:Extensions>
+	      <sws:IDFGeneralMessageRequestFilter>
+		<siri:LineRef>1234</siri:LineRef>
+	      </sws:IDFGeneralMessageRequestFilter>
+	    </siri:Extensions>
+	  </siri:GeneralMessageRequest>
+	</siri:GeneralMessageSubscriptionRequest>
+      </Request>
+      <RequestExtension/>
+    </sw:Subscribe>
+  </S:Body>
+</S:Envelope>
+    """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | GeneralMessageBroadcast           |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+    """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
+      <SubscriptionRequestInfo>
+	<siri:RequestTimestamp>2017-01-01T12:01:45.000Z</siri:RequestTimestamp>
+	<siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+	<siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+      </SubscriptionRequestInfo>
+      <Request>
+	<siri:GeneralMessageSubscriptionRequest>
+	  <siri:SubscriberRef>test</siri:SubscriberRef>
+	  <siri:SubscriptionIdentifier>1</siri:SubscriptionIdentifier>
+	  <siri:InitialTerminationTime>2017-01-03T12:00:45.000Z</siri:InitialTerminationTime>
+	  <siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
+	    <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+	    <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+	    <siri:Extensions>
+	      <sws:IDFGeneralMessageRequestFilter>
+		<siri:LineRef>1234</siri:LineRef>
+	      </sws:IDFGeneralMessageRequestFilter>
+	    </siri:Extensions>
+	  </siri:GeneralMessageRequest>
+	</siri:GeneralMessageSubscriptionRequest>
+      </Request>
+      <RequestExtension/>
+    </sw:Subscribe>
+  </S:Body>
+</S:Envelope>
+      """
+    Then No Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | GeneralMessageBroadcast           |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | GeneralMessageBroadcast           |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+    """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
+      <SubscriptionRequestInfo>
+	<siri:RequestTimestamp>2017-01-01T12:01:45.000Z</siri:RequestTimestamp>
+	<siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+	<siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+      </SubscriptionRequestInfo>
+      <Request>
+	<siri:GeneralMessageSubscriptionRequest>
+	  <siri:SubscriberRef>test</siri:SubscriberRef>
+	  <siri:SubscriptionIdentifier>2</siri:SubscriptionIdentifier>
+	  <siri:InitialTerminationTime>2017-01-03T12:00:45.000Z</siri:InitialTerminationTime>
+	  <siri:GeneralMessageRequest version="2.0:FR-IDF-2.4">
+	    <siri:RequestTimestamp>2017-01-01T12:00:45.000Z</siri:RequestTimestamp>
+	    <siri:MessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:MessageIdentifier>
+	    <siri:Extensions>
+	      <sws:IDFGeneralMessageRequestFilter>
+		<siri:LineRef>1234</siri:LineRef>
+	      </sws:IDFGeneralMessageRequestFilter>
+	    </siri:Extensions>
+	  </siri:GeneralMessageRequest>
+	</siri:GeneralMessageSubscriptionRequest>
+      </Request>
+      <RequestExtension/>
+    </sw:Subscribe>
+  </S:Body>
+</S:Envelope>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | GeneralMessageBroadcast           |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | Kind            | GeneralMessageBroadcast           |
+      | ExternalId      | 2                                 |

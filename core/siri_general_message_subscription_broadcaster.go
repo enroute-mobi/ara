@@ -116,20 +116,24 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		subIds = append(subIds, gm.SubscriptionIdentifier())
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(gm.SubscriptionIdentifier())
-		if !ok {
-			sub = connector.Partner().Subscriptions().New(GeneralMessageBroadcast)
-			sub.SubscriberRef = gm.SubscriberRef()
-			sub.SetExternalId(gm.SubscriptionIdentifier())
-		} else if sub.Kind() != GeneralMessageBroadcast {
-			logger.Log.Debugf("GeneralMessage subscription request with a duplicated Id: %v", gm.SubscriptionIdentifier())
-			rs.Status = false
-			rs.ErrorType = "OtherError"
-			rs.ErrorNumber = 2
-			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", gm.SubscriptionIdentifier())
-			resps = append(resps, rs)
-			message.Status = "Error"
-			continue
+		if ok {
+			if sub.Kind() != GeneralMessageBroadcast {
+				logger.Log.Debugf("GeneralMessage subscription request with a duplicated Id: %v", gm.SubscriptionIdentifier())
+				rs.Status = false
+				rs.ErrorType = "OtherError"
+				rs.ErrorNumber = 2
+				rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", gm.SubscriptionIdentifier())
+				resps = append(resps, rs)
+				message.Status = "Error"
+				continue
+			}
+
+			sub.Delete()
 		}
+
+		sub = connector.Partner().Subscriptions().New(GeneralMessageBroadcast)
+		sub.SubscriberRef = gm.SubscriberRef()
+		sub.SetExternalId(gm.SubscriptionIdentifier())
 
 		resps = append(resps, rs)
 

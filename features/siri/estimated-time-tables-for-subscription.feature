@@ -111,9 +111,9 @@ Feature: Support SIRI EstimatedTimetable by subscription
 </SubscriptionResponse>
 </Siri>
       """
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:Line:A:BUS |
-    Then No Subscriptions exist with the following attributes:
+    Then No Subscriptions exist with the following resources:
       | internal | NINOXE:Line:3:LOC |
 
   Scenario: 4234 - Handle a SOAP SIRI EstimatedTimetable request for subscription
@@ -183,6 +183,94 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableBroadcast |
+
+  @ARA-1256
+  Scenario: Delete and recreate subscription when receiving subscription with same existing number
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | test                  |
+       | local_credential                   | NINOXE:default        |
+       | remote_objectid_kind               | internal              |
+       | siri.envelope                      | raw                   |
+       | broadcast.subscriptions.persistent | true                  |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT23H</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | EstimatedTimetableBroadcast       |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>1</SubscriptionIdentifier>
+         <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT23H</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then No Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | EstimatedTimetableBroadcast       |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | EstimatedTimetableBroadcast       |
+      | ExternalId      | 1                                 |
+    When I send this SIRI request
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+   <SubscriptionRequest>
+      <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+      <RequestorRef>NINOXE:default</RequestorRef>
+      <EstimatedTimetableSubscriptionRequest>
+         <SubscriptionIdentifier>2</SubscriptionIdentifier>
+         <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
+         <EstimatedTimetableRequest>
+            <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
+            <PreviewInterval>PT23H</PreviewInterval>
+         </EstimatedTimetableRequest>
+         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+      </EstimatedTimetableSubscriptionRequest>
+   </SubscriptionRequest>
+</Siri>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | EstimatedTimetableBroadcast       |
+      | ExternalId      | 1                                 |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | EstimatedTimetableBroadcast       |
+      | ExternalId      | 2                                 |
 
   Scenario: 4235 - Manage a ETT Notify after modification of a StopVisit
     Given a SIRI server on "http://localhost:8090"

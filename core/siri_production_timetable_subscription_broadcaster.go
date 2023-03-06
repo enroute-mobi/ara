@@ -78,15 +78,19 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 		lineIds = append(lineIds, ptt.Lines()...)
 
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(ptt.SubscriptionIdentifier())
-		if ok && sub.Kind() != ProductionTimetableBroadcast {
-			logger.Log.Debugf("ProductionTimetable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
-			rs.ErrorType = "OtherError"
-			rs.ErrorNumber = 2
-			rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ptt.SubscriptionIdentifier())
+		if ok {
+			if sub.Kind() != ProductionTimetableBroadcast {
+				logger.Log.Debugf("ProductionTimetable subscription request with a duplicated Id: %v", ptt.SubscriptionIdentifier())
+				rs.ErrorType = "OtherError"
+				rs.ErrorNumber = 2
+				rs.ErrorText = fmt.Sprintf("[BAD_REQUEST] Subscription Id %v already exists", ptt.SubscriptionIdentifier())
 
-			resps = append(resps, rs)
-			message.Status = "Error"
-			continue
+				resps = append(resps, rs)
+				message.Status = "Error"
+				continue
+			}
+
+			sub.Delete()
 		}
 
 		resources, unknownLineIds := connector.checkLines(ptt)
@@ -106,12 +110,10 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 
 		subIds = append(subIds, ptt.SubscriptionIdentifier())
 
-		if !ok {
-			sub = connector.Partner().Subscriptions().New(ProductionTimetableBroadcast)
-			sub.SubscriberRef = ptt.SubscriberRef()
-			sub.SetExternalId(ptt.SubscriptionIdentifier())
-			sub.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
-		}
+		sub = connector.Partner().Subscriptions().New(ProductionTimetableBroadcast)
+		sub.SubscriberRef = ptt.SubscriberRef()
+		sub.SetExternalId(ptt.SubscriptionIdentifier())
+		sub.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
 
 		for _, r := range resources {
 			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
