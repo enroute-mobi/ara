@@ -106,6 +106,8 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *sxml.X
 		ResponseTimestamp: currentTime,
 	}
 
+	ignoreTerminate := connector.Partner().IgnoreTerminateSubscriptionsRequest()
+
 	if r.CancelAll() {
 		for _, subscription := range connector.Partner().Subscriptions().FindBroadcastSubscriptions() {
 			responseStatus := &siri.SIRITerminationResponseStatus{
@@ -114,9 +116,20 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *sxml.X
 				ResponseTimestamp: currentTime,
 				Status:            true,
 			}
+
+			if ignoreTerminate {
+				responseStatus.ErrorType = "CapabilityNotSupportedError"
+				responseStatus.ErrorText = "Subscription Termination is disabled for this Subscriber"
+				responseStatus.Status = false
+			}
+
 			resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
 		}
-		connector.Partner().CancelBroadcastSubscriptions()
+
+		if !ignoreTerminate {
+			connector.Partner().CancelBroadcastSubscriptions()
+		}
+
 		return resp
 	}
 
@@ -136,6 +149,18 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *sxml.X
 
 		responseStatus.ErrorType = "UnknownSubscriptionError"
 		responseStatus.ErrorText = fmt.Sprintf("Subscription not found: '%s'", r.SubscriptionRef())
+
+		message.Status = "Error"
+		message.ErrorDetails = responseStatus.ErrorText
+
+		return resp
+	}
+
+	if ignoreTerminate {
+		logger.Log.Debugf("Subscription Termination is disabled for partner %s", connector.Partner().Id())
+
+		responseStatus.ErrorType = "CapabilityNotSupportedError"
+		responseStatus.ErrorText = "Subscription Termination is disabled for this Subscriber"
 
 		message.Status = "Error"
 		message.ErrorDetails = responseStatus.ErrorText
