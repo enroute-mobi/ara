@@ -61,11 +61,12 @@ const (
 	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
 
-	SIRI_ENVELOPE            = "siri.envelope"
-	SIRI_LINE_PUBLISHED_NAME = "siri.line.published_name"
-	SIRI_DIRECTION_TYPE      = "siri.direction_type"
-	SIRI_PASSAGE_ORDER       = "siri.passage_order"
-	DEFAULT_GTFS_TTL         = 30 * time.Second
+	SIRI_ENVELOPE                                         = "siri.envelope"
+	SIRI_LINE_PUBLISHED_NAME                              = "siri.line.published_name"
+	SIRI_DIRECTION_TYPE                                   = "siri.direction_type"
+	SIRI_PASSAGE_ORDER                                    = "siri.passage_order"
+	DEFAULT_GTFS_TTL                                      = 30 * time.Second
+	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
 
 	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
 )
@@ -197,6 +198,13 @@ func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
 func (s *PartnerSettings) SortPaylodForTest() (sort bool) {
 	s.m.RLock()
 	sort, _ = strconv.ParseBool(s.s[SORT_PAYLOAD_FOR_TEST])
+	s.m.RUnlock()
+	return
+}
+
+func (s *PartnerSettings) IgnoreTerminateSubscriptionsRequest() (ignore bool) {
+	s.m.RLock()
+	ignore, _ = strconv.ParseBool(s.s[BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS])
 	s.m.RUnlock()
 	return
 }
