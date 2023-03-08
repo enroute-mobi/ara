@@ -126,7 +126,10 @@ func (connector *SIRISubscriptionRequestDispatcher) CancelSubscription(r *sxml.X
 			resp.ResponseStatus = append(resp.ResponseStatus, responseStatus)
 		}
 
-		if !ignoreTerminate {
+		if ignoreTerminate {
+			message.Status = "Error"
+			message.ErrorDetails = "Subscription Termination is disabled for this Subscriber"
+		} else {
 			connector.Partner().CancelBroadcastSubscriptions()
 		}
 
