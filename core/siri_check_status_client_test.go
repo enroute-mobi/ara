@@ -8,9 +8,10 @@ import (
 	"testing"
 
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
+	"github.com/stretchr/testify/assert"
 )
 
-func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) PartnerStatus {
+func prepareSiriCheckStatusClient(t *testing.T, responseFilePath string) (PartnerStatus, error) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -33,25 +34,32 @@ func prepare_siriCheckStatusClient(t *testing.T, responseFilePath string) Partne
 	checkStatusClient := NewSIRICheckStatusClient(partner)
 
 	partnerStatus, err := checkStatusClient.Status()
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	return partnerStatus
+	return partnerStatus, err
 }
 
 func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
-	partnerStatus := prepare_siriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
-	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-		t.Errorf("Wrong status found:\n got: %v\n expected: up", partnerStatus.OperationnalStatus)
-	}
+	assert := assert.New(t)
+	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
+
+	assert.Nil(err)
+	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_UP)
 }
 
 func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
-	partnerStatus := prepare_siriCheckStatusClient(t, "testdata/checkstatus-negative-response-soap.xml")
-	if partnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
-		t.Errorf("Wrong status found:\n got: %v\n expected: down", partnerStatus.OperationnalStatus)
-	}
+	assert := assert.New(t)
+	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-negative-response-soap.xml")
+
+	assert.Nil(err)
+	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_DOWN)
+}
+
+func Test_SIRICheckStatusClient_Status_Not_Successful(t *testing.T) {
+	assert := assert.New(t)
+	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-500.html")
+
+	assert.Error(err, "SIRI CRITICAL: HTTP Content-Type text/html; charset=utf-8")
+	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_DOWN)
 }
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
