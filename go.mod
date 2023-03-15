@@ -20,7 +20,7 @@ require (
 	golang.org/x/time v0.3.0
 	google.golang.org/api v0.111.0
 	google.golang.org/protobuf v1.28.1
-	gopkg.in/DataDog/dd-trace-go.v1 v1.46.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.48.0
 	gopkg.in/gorp.v1 v1.7.2
 	gopkg.in/yaml.v2 v2.4.0
 )
