@@ -1,6 +1,6 @@
 module bitbucket.org/enroute-mobi/ara
 
-go 1.19
+go 1.20
 
 require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
