@@ -79,7 +79,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 		e := fmt.Sprintf("Error during CheckStatus: %v", err)
 		message.Status = "Error"
 		message.ErrorDetails = e
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
 		return partnerStatus, err
 	}
 
