@@ -21,7 +21,11 @@ def an_audit_event_with_attributes(attributes)
         else
           value
         end
-      [ attribute, matcher ]
+      if matcher.is_a?(Array)
+        [ attribute, match_array(matcher) ]
+      else
+        [ attribute, matcher ]
+      end
   end.to_h
 
   time_reference = Time.utc(2017,1,1,12)
