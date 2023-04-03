@@ -179,6 +179,14 @@ Feature: Support SIRI subscription
     """
     Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
+    Then an audit event should exist with these attributes:
+      | Type                    | DeleteSubscriptionRequest                                |
+      | Protocol                | siri                                                     |
+      | Direction               | received                                                 |
+      | Status                  | Error                                                    |
+      | Partner                 | test                                                     |
+      | ErrorDetails            | Subscription Termination is disabled for this Subscriber |
+      | SubscriptionIdentifiers | ["ExternalId"]                                           |
 
   @ARA-1267
   Scenario: Ignore DeleteSubscription if setting broadcast.siri.ignore_terminate_subscription_requests is set to true for a TerminateSubscriptionRequest for All subscriptions
@@ -258,6 +266,14 @@ Feature: Support SIRI subscription
       | internal | NINOXE:Line:3:LOC  |
       | internal | NINOXE:Line:A:BUS  |
       | internal | NINOXE:Line:C:Tram |
+    Then an audit event should exist with these attributes:
+      | Type         | DeleteSubscriptionRequest                                |
+      | Protocol     | siri                                                     |
+      | Direction    | received                                                 |
+      | Status       | Error                                                    |
+      | Partner      | test                                                     |
+      | ErrorDetails | Subscription Termination is disabled for this Subscriber |
+
 
   @ARA-1066
   Scenario: Remove all subscriptions at once with termination request using raw envelope
