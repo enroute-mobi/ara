@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	BQ_MESSAGE       = "message"
-	BQ_VEHICLE_EVENT = "vehicle"
-	BQ_PARTNER_EVENT = "partner"
+	BQ_MESSAGE                    = "message"
+	BQ_VEHICLE_EVENT              = "vehicle"
+	BQ_PARTNER_EVENT              = "partner"
+	BQ_LONG_TERM_STOP_VISIT_EVENT = "long_term_stop_visit"
 )
 
 type BigQueryEvent interface {
@@ -119,4 +120,102 @@ var bqVehicleSchema = bigquery.Schema{
 	{Name: "bearing", Required: false, Type: bigquery.FloatFieldType},
 	{Name: "recorded_at_time", Required: false, Type: bigquery.DateTimeFieldType},
 	{Name: "objectids", Repeated: true, Type: bigquery.StringFieldType},
+}
+
+type BigQueryLongTermStopVisitEvent struct {
+	UUID               string    `bigquery:"uuid"`
+	Timestamp          time.Time `bigquery:"timestamp"`
+	AimedDepartureTime time.Time `bigquery:"timestamp,nullable"`
+	AimedArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+
+	ExpectedDepartureTime time.Time `bigquery:"timestamp,nullable"`
+	ExpectedArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+
+	ActualDepartureTime time.Time `bigquery:"timestamp,nullable"`
+	ActualArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+
+	DepartureStatus string `bigquery:"departure_status,nullable"`
+	ArrivalStatus   string `bigquery:"arrival_status,nullable"`
+
+	StopAreaName        string           `bigquery:"stop_area_name"`
+	StopAreaCodes       []ObjectIdsCodes `bigquery:"stop_area_codes"`
+	StopAreaCoordinates string           `bigquery:"stop_area_coordinates"`
+
+	LineName          string           `bigquery:"line_name"`
+	LineNumber        string           `bigquery:"line_number"`
+	LineTransportMode string           `bigquery:"line_transport_mode"`
+	LineCodes         []ObjectIdsCodes `bigquiery:"line_codes"`
+
+	VehicleJourneyDirectionType   string           `bigquery:"vehicle_journey_direction_type"`
+	VehicleJourneyOriginName      string           `bigquery:"vehicle_journey_origin_name"`
+	VehicleJourneyDestinationName string           `bigquery:"vehicle_journey_destionation_name"`
+	VehicleJourneyCodes           []ObjectIdsCodes `bigquery:"vehicle_journey_codes"`
+	VehicleDriverRef              string           `bigquery:"vehicle_driver_ref"`
+	VehicleOccupancy              string           `bigquery:"vehicle_occupancy"`
+}
+
+type ObjectIdsCodes struct {
+	Kind  string `bigquery:"kind"`
+	Value string `bigquery:"value"`
+}
+
+func (bq *BigQueryLongTermStopVisitEvent) EventType() string        { return BQ_LONG_TERM_STOP_VISIT_EVENT }
+func (bq *BigQueryLongTermStopVisitEvent) SetTimeStamp(t time.Time) { bq.Timestamp = t }
+func (bq *BigQueryLongTermStopVisitEvent) SetUUID(u string)         { bq.UUID = u }
+
+var bqLongTermStopVisits = bigquery.Schema{
+	{Name: "uuid", Required: true, Type: bigquery.StringFieldType},
+	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
+
+	{Name: "aimed_departure_time", Required: false, Type: bigquery.TimestampFieldType},
+	{Name: "aimed_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
+
+	{Name: "expected_departure_time", Required: false, Type: bigquery.TimestampFieldType},
+	{Name: "expected_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
+
+	{Name: "actual_departure_time", Required: false, Type: bigquery.TimestampFieldType},
+	{Name: "actual_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
+
+	{Name: "departure_status", Required: true, Type: bigquery.StringFieldType},
+	{Name: "arrival_status", Required: true, Type: bigquery.StringFieldType},
+
+	{Name: "stop_area_name", Required: false, Type: bigquery.StringFieldType},
+	{Name: "stop_area_codes",
+		Required: false,
+		Repeated: true,
+		Schema: bigquery.Schema{
+			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "value", Type: bigquery.StringFieldType},
+		},
+	},
+
+	{Name: "stop_area_coordinates", Required: false, Type: bigquery.StringFieldType},
+
+	{Name: "line_name", Required: false, Type: bigquery.StringFieldType},
+	{Name: "line_number", Required: false, Type: bigquery.StringFieldType},
+	{Name: "line_transport_mode", Required: false, Type: bigquery.StringFieldType},
+	{Name: "line_codes",
+		Required: false,
+		Repeated: true,
+		Schema: bigquery.Schema{
+			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "value", Type: bigquery.StringFieldType},
+		},
+	},
+
+	{Name: "vehicle_journey_direction_type", Required: false, Type: bigquery.StringFieldType},
+	{Name: "vehicle_journey_origin_name", Required: false, Type: bigquery.StringFieldType},
+	{Name: "vehicle_journey_destination_name", Required: false, Type: bigquery.StringFieldType},
+
+	{Name: "vehicle_journey_codes",
+		Required: false,
+		Repeated: true,
+		Schema: bigquery.Schema{
+			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "value", Type: bigquery.StringFieldType},
+		},
+	},
+
+	{Name: "vehicle_driver_ref", Required: false, Type: bigquery.StringFieldType},
+	{Name: "vehicle_driver_occupancy", Required: false, Type: bigquery.StringFieldType},
 }

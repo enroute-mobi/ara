@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	EXCHANGE_TABLE = "exchanges"
-	PARTNER_TABLE  = "partners"
-	VEHICLE_TABLE  = "vehicles"
+	EXCHANGE_TABLE             = "exchanges"
+	PARTNER_TABLE              = "partners"
+	VEHICLE_TABLE              = "vehicles"
+	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
 )
 
 type BigQuery interface {
@@ -74,9 +75,10 @@ func NewNullBigQuery() BigQuery {
 
 /**** Test Memory Structure ****/
 type FakeBigQuery struct {
-	messages      []*BigQueryMessage
-	partnerEvents []*BigQueryPartnerEvent
-	vehicleEvents []*BigQueryVehicleEvent
+	messages                []*BigQueryMessage
+	partnerEvents           []*BigQueryPartnerEvent
+	vehicleEvents           []*BigQueryVehicleEvent
+	longTermStopVisitEvents []*BigQueryLongTermStopVisitEvent
 }
 
 func NewFakeBigQuery() *FakeBigQuery {
@@ -94,6 +96,8 @@ func (bq *FakeBigQuery) WriteEvent(e BigQueryEvent) error {
 		bq.partnerEvents = append(bq.partnerEvents, e.(*BigQueryPartnerEvent))
 	case BQ_VEHICLE_EVENT:
 		bq.vehicleEvents = append(bq.vehicleEvents, e.(*BigQueryVehicleEvent))
+	case BQ_LONG_TERM_STOP_VISIT_EVENT:
+		bq.longTermStopVisitEvents = append(bq.longTermStopVisitEvents, e.(*BigQueryLongTermStopVisitEvent))
 	}
 	return nil
 }
@@ -108,6 +112,10 @@ func (bq *FakeBigQuery) PartnerEvents() []*BigQueryPartnerEvent {
 
 func (bq *FakeBigQuery) VehicleEvents() []*BigQueryVehicleEvent {
 	return bq.vehicleEvents
+}
+
+func (bq *FakeBigQuery) LongTermStopVisitEvents() []*BigQueryLongTermStopVisitEvent {
+	return bq.longTermStopVisitEvents
 }
 
 /**** Test External Structure ****/
@@ -168,17 +176,19 @@ type BigQueryClient struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
 
-	projectID       string
-	dataset         string
-	ctx             context.Context
-	client          *bigquery.Client
-	inserter        *bigquery.Inserter
-	vehicleInserter *bigquery.Inserter
-	partnerInserter *bigquery.Inserter
-	messages        chan *BigQueryMessage
-	partnerEvents   chan *BigQueryPartnerEvent
-	vehicleEvents   chan *BigQueryVehicleEvent
-	stop            chan struct{}
+	projectID                 string
+	dataset                   string
+	ctx                       context.Context
+	client                    *bigquery.Client
+	inserter                  *bigquery.Inserter
+	vehicleInserter           *bigquery.Inserter
+	partnerInserter           *bigquery.Inserter
+	longTermStopVisitInserter *bigquery.Inserter
+	messages                  chan *BigQueryMessage
+	partnerEvents             chan *BigQueryPartnerEvent
+	vehicleEvents             chan *BigQueryVehicleEvent
+	longTermStopVisitEvents   chan *BigQueryLongTermStopVisitEvent
+	stop                      chan struct{}
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -192,11 +202,12 @@ func NewBigQuery(dataset string) BigQuery {
 
 func NewBigQueryClient(dataset string) *BigQueryClient {
 	return &BigQueryClient{
-		dataset:       dataset,
-		projectID:     config.Config.BigQueryProjectID,
-		messages:      make(chan *BigQueryMessage, 500),
-		partnerEvents: make(chan *BigQueryPartnerEvent, 500),
-		vehicleEvents: make(chan *BigQueryVehicleEvent, 500),
+		dataset:                 dataset,
+		projectID:               config.Config.BigQueryProjectID,
+		messages:                make(chan *BigQueryMessage, 500),
+		partnerEvents:           make(chan *BigQueryPartnerEvent, 500),
+		vehicleEvents:           make(chan *BigQueryVehicleEvent, 500),
+		longTermStopVisitEvents: make(chan *BigQueryLongTermStopVisitEvent, 500),
 	}
 }
 
@@ -225,6 +236,8 @@ func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
 		return bq.writePartnerEvent(e.(*BigQueryPartnerEvent))
 	case BQ_VEHICLE_EVENT:
 		return bq.writeVehicleEvent(e.(*BigQueryVehicleEvent))
+	case BQ_LONG_TERM_STOP_VISIT_EVENT:
+		return bq.writeLongTermStopVisitEvent(e.(*BigQueryLongTermStopVisitEvent))
 	}
 	logger.Log.Debugf("Unknown BigQueryMessage type")
 	return nil
@@ -257,6 +270,15 @@ func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) 
 	return nil
 }
 
+func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *BigQueryLongTermStopVisitEvent) error {
+	select {
+	case bq.longTermStopVisitEvents <- longTermStopVisitEvent:
+	default:
+		logger.Log.Debugf("BigQuery longTermStopVisit queue is full")
+	}
+	return nil
+}
+
 func (bq *BigQueryClient) run() {
 	bq.connect()
 
@@ -271,6 +293,8 @@ func (bq *BigQueryClient) run() {
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
 			bq.send(vehicleMessage, bq.vehicleInserter)
+		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
+			bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
 		}
 	}
 }
@@ -305,6 +329,7 @@ func (bq *BigQueryClient) connect() {
 	bq.inserter = dataset.Table(EXCHANGE_TABLE).Inserter()
 	bq.partnerInserter = dataset.Table(PARTNER_TABLE).Inserter()
 	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
+	bq.longTermStopVisitInserter = dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Inserter()
 }
 
 func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
@@ -343,6 +368,10 @@ func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
 	}
 
 	if err := dataset.Table(VEHICLE_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqVehicleSchema}); err != nil {
+		return nil, err
+	}
+
+	if err := dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqLongTermStopVisits}); err != nil {
 		return nil, err
 	}
 
