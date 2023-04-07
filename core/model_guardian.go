@@ -68,12 +68,12 @@ func (guardian *ModelGuardian) routineWork() {
 
 	span, spanContext := tracer.StartSpanFromContext(ctx, "model_guardian.routine")
 	defer span.Finish()
-	span.SetTag("referential", guardian.referential.slug)
+	span.SetTag("referential", guardian.referential.Slug())
 
 	guardian.refreshStopAreas(spanContext)
 	guardian.refreshLines(spanContext)
 	guardian.cleanOrUpdateStopVisits(spanContext)
-	guardian.requestSituations()
+	guardian.requestSituations(spanContext)
 }
 
 func (guardian *ModelGuardian) checkReloadModel() bool {
@@ -85,7 +85,7 @@ func (guardian *ModelGuardian) checkReloadModel() bool {
 }
 
 func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.refresh_stop_areas")
+	child, _ := tracer.StartSpanFromContext(ctx, "refresh_stop_areas")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
@@ -124,13 +124,13 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 
 		if sas[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
-			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+			guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
 		}
 	}
 }
 
 func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.refresh_lines")
+	child, _ := tracer.StartSpanFromContext(ctx, "refresh_lines")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
@@ -153,18 +153,21 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 
 		if lines[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(line.Id()))
-			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+			guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
 		}
 
 		lineUpdateRequest := NewLineUpdateRequest(line.Id())
-		guardian.referential.CollectManager().UpdateLine(lineUpdateRequest)
+		guardian.referential.CollectManager().UpdateLine(ctx, lineUpdateRequest)
 
 		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
-		guardian.referential.CollectManager().UpdateVehicle(vehicleUpdateRequest)
+		guardian.referential.CollectManager().UpdateVehicle(ctx, vehicleUpdateRequest)
 	}
 }
 
-func (guardian *ModelGuardian) requestSituations() {
+func (guardian *ModelGuardian) requestSituations(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "request_situations")
+	defer child.Finish()
+
 	defer monitoring.HandlePanic()
 
 	if guardian.Clock().Now().Before(guardian.gmTimer.Add(1 * time.Minute)) {
@@ -177,11 +180,11 @@ func (guardian *ModelGuardian) requestSituations() {
 		kind:      SITUATION_UPDATE_REQUEST_ALL,
 		createdAt: guardian.Clock().Now(),
 	}
-	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
+	guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
 }
 
 func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "model_guardian.cleanOrUpdateStopVisits")
+	child, _ := tracer.StartSpanFromContext(ctx, "clean_or_update_stop_visits")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
