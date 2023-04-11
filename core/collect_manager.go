@@ -1,9 +1,12 @@
 package core
 
 import (
+	"context"
+
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
@@ -13,13 +16,13 @@ type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
 
 	UpdateStopArea(request *StopAreaUpdateRequest)
-	UpdateLine(request *LineUpdateRequest)
-	UpdateVehicle(request *VehicleUpdateRequest)
+	UpdateLine(ctx context.Context, request *LineUpdateRequest)
+	UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
 
-	UpdateSituation(request *SituationUpdateRequest)
+	UpdateSituation(ctx context.Context, request *SituationUpdateRequest)
 	HandleSituationUpdateEvent(SituationUpdateSubscriber)
 	BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent)
 }
@@ -63,12 +66,12 @@ func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent)
 	manager.UpdateEvents = append(manager.UpdateEvents, event)
 }
 
-func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
-func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
+func (manager *TestCollectManager) UpdateSituation(context.Context, *SituationUpdateRequest) {}
+func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber)     {}
 func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
 }
-func (manager *TestCollectManager) UpdateLine(*LineUpdateRequest)       {}
-func (manager *TestCollectManager) UpdateVehicle(*VehicleUpdateRequest) {}
+func (manager *TestCollectManager) UpdateLine(context.Context, *LineUpdateRequest)       {}
+func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdateRequest) {}
 
 // TEST END
 
@@ -151,7 +154,9 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	}
 }
 
-func (manager *CollectManager) UpdateLine(request *LineUpdateRequest) {
+func (manager *CollectManager) UpdateLine(ctx context.Context, request *LineUpdateRequest) {
+	child, _ := tracer.StartSpanFromContext(ctx, "update_line")
+	defer child.Finish()
 	line, ok := manager.referential.Model().Lines().Find(request.LineId())
 	if !ok {
 		logger.Log.Debugf("Can't find Line %v in Collect Manager", request.LineId())
@@ -196,7 +201,9 @@ func (manager *CollectManager) UpdateLine(request *LineUpdateRequest) {
 	}
 }
 
-func (manager *CollectManager) UpdateVehicle(request *VehicleUpdateRequest) {
+func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest) {
+	child, _ := tracer.StartSpanFromContext(ctx, "update_vehicle")
+	defer child.Finish()
 	line, ok := manager.referential.Model().Lines().Find(request.LineId())
 	if !ok {
 		logger.Log.Debugf("Can't find Line %v in Collect Manager", request.LineId())
@@ -248,20 +255,24 @@ func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.Situ
 	}
 }
 
-func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
+func (manager *CollectManager) UpdateSituation(ctx context.Context, request *SituationUpdateRequest) {
+	child, _ := tracer.StartSpanFromContext(ctx, "update_situation")
+	defer child.Finish()
 	switch request.Kind() {
 	case SITUATION_UPDATE_REQUEST_ALL:
-		manager.requestAllSituations()
+		manager.requestAllSituations(ctx)
 	case SITUATION_UPDATE_REQUEST_LINE:
-		manager.requestLineFilteredSituation(request.RequestedId())
+		manager.requestLineFilteredSituation(ctx, request.RequestedId())
 	case SITUATION_UPDATE_REQUEST_STOP_AREA:
-		manager.requestStopAreaFilteredSituation(request.RequestedId())
+		manager.requestStopAreaFilteredSituation(ctx, request.RequestedId())
 	default:
 		logger.Log.Debugf("SituationUpdateRequest of unknown kind")
 	}
 }
 
-func (manager *CollectManager) requestAllSituations() {
+func (manager *CollectManager) requestAllSituations(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "request_all_situations")
+	defer child.Finish()
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
@@ -285,7 +296,9 @@ func (manager *CollectManager) requestAllSituations() {
 	}
 }
 
-func (manager *CollectManager) requestLineFilteredSituation(requestedId string) {
+func (manager *CollectManager) requestLineFilteredSituation(ctx context.Context, requestedId string) {
+	child, _ := tracer.StartSpanFromContext(ctx, "request_line_filtered_situation")
+	defer child.Finish()
 	line, ok := manager.referential.Model().Lines().Find(model.LineId(requestedId))
 	if !ok {
 		logger.Log.Debugf("Can't find Line to request %v", requestedId)
@@ -329,7 +342,9 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 	// logger.Log.Debugf("Can't find a partner to request filtered Situations for Line %v", requestedId)
 }
 
-func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId string) {
+func (manager *CollectManager) requestStopAreaFilteredSituation(ctx context.Context, requestedId string) {
+	child, _ := tracer.StartSpanFromContext(ctx, "request_stop_areas_filtered_situation")
+	defer child.Finish()
 	stopArea, ok := manager.referential.Model().StopAreas().Find(model.StopAreaId(requestedId))
 	if !ok {
 		logger.Log.Debugf("Can't find StopArea to request %v", requestedId)
