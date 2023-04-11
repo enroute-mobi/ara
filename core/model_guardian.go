@@ -73,7 +73,7 @@ func (guardian *ModelGuardian) routineWork() {
 	guardian.refreshStopAreas(spanContext)
 	guardian.refreshLines(spanContext)
 	guardian.cleanOrUpdateStopVisits(spanContext)
-	guardian.requestSituations(spanContext)
+	guardian.requestSituations()
 }
 
 func (guardian *ModelGuardian) checkReloadModel() bool {
@@ -124,7 +124,7 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 
 		if sas[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
-			guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
+			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 	}
 }
@@ -153,7 +153,7 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 
 		if lines[i].CollectGeneralMessages {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(line.Id()))
-			guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
+			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 
 		lineUpdateRequest := NewLineUpdateRequest(line.Id())
@@ -164,10 +164,7 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 	}
 }
 
-func (guardian *ModelGuardian) requestSituations(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "request_situations")
-	defer child.Finish()
-
+func (guardian *ModelGuardian) requestSituations() {
 	defer monitoring.HandlePanic()
 
 	if guardian.Clock().Now().Before(guardian.gmTimer.Add(1 * time.Minute)) {
@@ -180,7 +177,7 @@ func (guardian *ModelGuardian) requestSituations(ctx context.Context) {
 		kind:      SITUATION_UPDATE_REQUEST_ALL,
 		createdAt: guardian.Clock().Now(),
 	}
-	guardian.referential.CollectManager().UpdateSituation(ctx, situationUpdateRequest)
+	guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 }
 
 func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
