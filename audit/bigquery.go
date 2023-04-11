@@ -371,7 +371,7 @@ func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
 		return nil, err
 	}
 
-	if err := dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqLongTermStopVisits}); err != nil {
+	if err := dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqLongTermStopVisitsSchema}); err != nil {
 		return nil, err
 	}
 

@@ -163,7 +163,7 @@ func (bq *BigQueryLongTermStopVisitEvent) EventType() string        { return BQ_
 func (bq *BigQueryLongTermStopVisitEvent) SetTimeStamp(t time.Time) { bq.Timestamp = t }
 func (bq *BigQueryLongTermStopVisitEvent) SetUUID(u string)         { bq.UUID = u }
 
-var bqLongTermStopVisits = bigquery.Schema{
+var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "uuid", Required: true, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
 
