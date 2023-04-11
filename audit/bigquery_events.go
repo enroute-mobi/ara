@@ -141,10 +141,10 @@ type BigQueryLongTermStopVisitEvent struct {
 	StopAreaCodes       []ObjectIdsCodes `bigquery:"stop_area_codes"`
 	StopAreaCoordinates string           `bigquery:"stop_area_coordinates"`
 
-	LineName          string           `bigquery:"line_name"`
-	LineNumber        string           `bigquery:"line_number"`
-	LineTransportMode string           `bigquery:"line_transport_mode"`
-	LineCodes         []ObjectIdsCodes `bigquiery:"line_codes"`
+	LineName      string           `bigquery:"line_name"`
+	LineNumber    string           `bigquery:"line_number"`
+	TransportMode string           `bigquery:"transport_mode"`
+	LineCodes     []ObjectIdsCodes `bigquiery:"line_codes"`
 
 	VehicleJourneyDirectionType   string           `bigquery:"vehicle_journey_direction_type"`
 	VehicleJourneyOriginName      string           `bigquery:"vehicle_journey_origin_name"`
@@ -193,7 +193,7 @@ var bqLongTermStopVisits = bigquery.Schema{
 
 	{Name: "line_name", Required: false, Type: bigquery.StringFieldType},
 	{Name: "line_number", Required: false, Type: bigquery.StringFieldType},
-	{Name: "line_transport_mode", Required: false, Type: bigquery.StringFieldType},
+	{Name: "transport_mode", Required: false, Type: bigquery.StringFieldType},
 	{Name: "line_codes",
 		Required: false,
 		Repeated: true,

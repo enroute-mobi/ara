@@ -309,7 +309,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 		transportMode, ok := vj.Attribute("VehicleMode")
 		if ok {
-			longTermStopVisitEvent.LineTransportMode = transportMode
+			longTermStopVisitEvent.TransportMode = transportMode
 		}
 
 		if vj.Line() != nil {

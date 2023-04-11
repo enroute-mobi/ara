@@ -155,7 +155,7 @@ Feature: Audit API exchanges
       | StopAreaCoordinates           | 48.85660,2.35220                                                                         |
       | LineName                      | Ligne 3 Metro                                                                            |
       | LineNumber                    | L3                                                                                       |
-      | LineTransportMode             | bus                                                                                      |
+      | TransportMode                 | bus                                                                                      |
       | LineCodes                     | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}] |
       | VehicleJourneyDirectionType   | aller                                                                                    |
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                           |
@@ -314,7 +314,7 @@ Feature: Audit API exchanges
       | StopAreaCoordinates           | 48.85660,2.35220                                              |
       | LineName                      | Ligne 3 Metro                                                 |
       | LineNumber                    | L3                                                            |
-      | LineTransportMode             | bus                                                           |
+      | TransportMode                 | bus                                                           |
       | LineCodes                     | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"}]          |
       | VehicleJourneyDirectionType   | aller                                                         |
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                |
