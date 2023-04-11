@@ -292,7 +292,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		}
 
 		for _, obj := range sv.StopArea().objectids {
-			code := &audit.ObjectIdsCodes{
+			code := &audit.Code{
 				Kind:  obj.kind,
 				Value: obj.value,
 			}
@@ -300,7 +300,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		}
 
 		for _, obj := range vj.objectids {
-			code := &audit.ObjectIdsCodes{
+			code := &audit.Code{
 				Kind:  obj.kind,
 				Value: obj.value,
 			}
@@ -316,7 +316,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			longTermStopVisitEvent.LineName = vj.Line().Name
 			longTermStopVisitEvent.LineNumber = vj.Line().Number
 			for _, obj := range vj.Line().objectids {
-				code := &audit.ObjectIdsCodes{
+				code := &audit.Code{
 					Kind:  obj.kind,
 					Value: obj.value,
 				}

@@ -137,24 +137,24 @@ type BigQueryLongTermStopVisitEvent struct {
 	DepartureStatus string `bigquery:"departure_status,nullable"`
 	ArrivalStatus   string `bigquery:"arrival_status,nullable"`
 
-	StopAreaName        string           `bigquery:"stop_area_name"`
-	StopAreaCodes       []ObjectIdsCodes `bigquery:"stop_area_codes"`
-	StopAreaCoordinates string           `bigquery:"stop_area_coordinates"`
+	StopAreaName        string `bigquery:"stop_area_name"`
+	StopAreaCodes       []Code `bigquery:"stop_area_codes"`
+	StopAreaCoordinates string `bigquery:"stop_area_coordinates"`
 
-	LineName      string           `bigquery:"line_name"`
-	LineNumber    string           `bigquery:"line_number"`
-	TransportMode string           `bigquery:"transport_mode"`
-	LineCodes     []ObjectIdsCodes `bigquiery:"line_codes"`
+	LineName      string `bigquery:"line_name"`
+	LineNumber    string `bigquery:"line_number"`
+	TransportMode string `bigquery:"transport_mode"`
+	LineCodes     []Code `bigquiery:"line_codes"`
 
-	VehicleJourneyDirectionType   string           `bigquery:"vehicle_journey_direction_type"`
-	VehicleJourneyOriginName      string           `bigquery:"vehicle_journey_origin_name"`
-	VehicleJourneyDestinationName string           `bigquery:"vehicle_journey_destionation_name"`
-	VehicleJourneyCodes           []ObjectIdsCodes `bigquery:"vehicle_journey_codes"`
-	VehicleDriverRef              string           `bigquery:"vehicle_driver_ref"`
-	VehicleOccupancy              string           `bigquery:"vehicle_occupancy"`
+	VehicleJourneyDirectionType   string `bigquery:"vehicle_journey_direction_type"`
+	VehicleJourneyOriginName      string `bigquery:"vehicle_journey_origin_name"`
+	VehicleJourneyDestinationName string `bigquery:"vehicle_journey_destionation_name"`
+	VehicleJourneyCodes           []Code `bigquery:"vehicle_journey_codes"`
+	VehicleDriverRef              string `bigquery:"vehicle_driver_ref"`
+	VehicleOccupancy              string `bigquery:"vehicle_occupancy"`
 }
 
-type ObjectIdsCodes struct {
+type Code struct {
 	Kind  string `bigquery:"kind"`
 	Value string `bigquery:"value"`
 }
