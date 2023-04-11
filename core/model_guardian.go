@@ -130,7 +130,7 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 }
 
 func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "refresh_lines")
+	child, childContext := tracer.StartSpanFromContext(ctx, "refresh_lines")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
@@ -157,10 +157,10 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 		}
 
 		lineUpdateRequest := NewLineUpdateRequest(line.Id())
-		guardian.referential.CollectManager().UpdateLine(ctx, lineUpdateRequest)
+		guardian.referential.CollectManager().UpdateLine(childContext, lineUpdateRequest)
 
 		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
-		guardian.referential.CollectManager().UpdateVehicle(ctx, vehicleUpdateRequest)
+		guardian.referential.CollectManager().UpdateVehicle(childContext, vehicleUpdateRequest)
 	}
 }
 
