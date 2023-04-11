@@ -15,6 +15,7 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
 
 	"bitbucket.org/enroute-mobi/ara/api"
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -121,6 +122,30 @@ func main() {
 	command := flag.Args()[0]
 
 	switch command {
+	case "convert":
+		convertFlags := flag.NewFlagSet("convert", flag.ExitOnError)
+		convertFlags.Parse(flag.Args()[1:])
+
+		if convertFlags.NArg() < 1 {
+			logger.Log.Printf("Incorrect use of command convert: not enough aguments")
+			logger.Log.Printf("usage: ara convert <schema name>")
+			os.Exit(1)
+		}
+		schemaName := convertFlags.Arg(0)
+
+		schema := audit.AraBigQuerySchemas[schemaName]
+		if schema == nil {
+			logger.Log.Printf("Error: schema %v does no exist", schemaName)
+			os.Exit(1)
+		}
+
+		jsonSchema, err := schema.ToJSONFields()
+		if err != nil {
+			logger.Log.Printf("Error while converting schema to JSON: %v", err)
+			os.Exit(1)
+		}
+		fmt.Println(string(jsonSchema))
+		os.Exit(0)
 	case "check":
 		checkFlags := flag.NewFlagSet("check", flag.ExitOnError)
 		requestorRefPtr := checkFlags.String("requestor-ref", "Ara", "Specify requestorRef")

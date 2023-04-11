@@ -4,6 +4,9 @@ export ARA_CONFIG=$(PWD)/config
 run: # for dev
 	go run -race ara.go api
 
+convert:
+	go run ara.go convert $(SCHEMA_NAME)
+
 migrations:
 	go run ara.go migrate up
 	ARA_ENV=test go run ara.go migrate up
