@@ -189,7 +189,7 @@ var bqLongTermStopVisits = bigquery.Schema{
 		},
 	},
 
-	{Name: "stop_area_coordinates", Required: false, Type: bigquery.StringFieldType},
+	{Name: "stop_area_coordinates", Required: false, Type: bigquery.GeographyFieldType},
 
 	{Name: "line_name", Required: false, Type: bigquery.StringFieldType},
 	{Name: "line_number", Required: false, Type: bigquery.StringFieldType},

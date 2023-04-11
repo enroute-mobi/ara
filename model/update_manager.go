@@ -282,7 +282,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			ActualDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"actual"}),
 
 			StopAreaName:        sv.StopArea().Name,
-			StopAreaCoordinates: fmt.Sprintf("%.5f,%.5f", sv.StopArea().Latitude, sv.StopArea().Longitude),
+			StopAreaCoordinates: fmt.Sprintf("POINT(%f %f)", sv.StopArea().Longitude, sv.StopArea().Latitude),
 
 			ArrivalStatus:                 string(sv.ArrivalStatus),
 			DepartureStatus:               string(sv.DepartureStatus),

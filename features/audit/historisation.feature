@@ -152,7 +152,7 @@ Feature: Audit API exchanges
       | ArrivalStatus                 | arrived                                                                                  |
       | StopAreaName                  | Origin                                                                                   |
       | StopAreaCodes                 | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                            |
-      | StopAreaCoordinates           | 48.85660,2.35220                                                                         |
+      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                |
       | LineName                      | Ligne 3 Metro                                                                            |
       | LineNumber                    | L3                                                                                       |
       | TransportMode                 | bus                                                                                      |
@@ -311,7 +311,7 @@ Feature: Audit API exchanges
       | ArrivalStatus                 | cancelled                                                     |
       | StopAreaName                  | Origin                                                        |
       | StopAreaCodes                 | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}] |
-      | StopAreaCoordinates           | 48.85660,2.35220                                              |
+      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                     |
       | LineName                      | Ligne 3 Metro                                                 |
       | LineNumber                    | L3                                                            |
       | TransportMode                 | bus                                                           |
