@@ -183,6 +183,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "stop_area_codes",
 		Required: false,
 		Repeated: true,
+		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
 			{Name: "kind", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
@@ -197,6 +198,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "line_codes",
 		Required: false,
 		Repeated: true,
+		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
 			{Name: "kind", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
@@ -210,6 +212,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "vehicle_journey_codes",
 		Required: false,
 		Repeated: true,
+		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
 			{Name: "kind", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
