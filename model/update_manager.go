@@ -1,6 +1,9 @@
 package model
 
 import (
+	"fmt"
+
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -263,6 +266,69 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			vj.HasCompleteStopSequence = true
 			manager.model.VehicleJourneys().Save(vj)
 		}
+	}
+
+	// long term historisation
+	if sv.IsArchivable() {
+		longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
+			Timestamp:          manager.Clock().Now(),
+			AimedArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"aimed"}),
+			AimedDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"aimed"}),
+
+			ExpectedArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"expected"}),
+			ExpectedDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"expected"}),
+
+			ActualArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"actual"}),
+			ActualDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"actual"}),
+
+			StopAreaName:        sv.StopArea().Name,
+			StopAreaCoordinates: fmt.Sprintf("POINT(%f %f)", sv.StopArea().Longitude, sv.StopArea().Latitude),
+
+			ArrivalStatus:                 string(sv.ArrivalStatus),
+			DepartureStatus:               string(sv.DepartureStatus),
+			VehicleJourneyDirectionType:   vj.DirectionType,
+			VehicleJourneyOriginName:      vj.OriginName,
+			VehicleJourneyDestinationName: vj.DestinationName,
+		}
+
+		for _, obj := range sv.StopArea().objectids {
+			code := &audit.Code{
+				Kind:  obj.kind,
+				Value: obj.value,
+			}
+			longTermStopVisitEvent.StopAreaCodes = append(longTermStopVisitEvent.StopAreaCodes, *code)
+		}
+
+		for _, obj := range vj.objectids {
+			code := &audit.Code{
+				Kind:  obj.kind,
+				Value: obj.value,
+			}
+			longTermStopVisitEvent.VehicleJourneyCodes = append(longTermStopVisitEvent.VehicleJourneyCodes, *code)
+		}
+
+		transportMode, ok := vj.Attribute("VehicleMode")
+		if ok {
+			longTermStopVisitEvent.TransportMode = transportMode
+		}
+
+		if vj.Line() != nil {
+			longTermStopVisitEvent.LineName = vj.Line().Name
+			longTermStopVisitEvent.LineNumber = vj.Line().Number
+			for _, obj := range vj.Line().objectids {
+				code := &audit.Code{
+					Kind:  obj.kind,
+					Value: obj.value,
+				}
+				longTermStopVisitEvent.LineCodes = append(longTermStopVisitEvent.LineCodes, *code)
+			}
+		}
+
+		if vj.Occupancy != "" {
+			longTermStopVisitEvent.VehicleOccupancy = vj.Occupancy
+		}
+
+		audit.CurrentBigQuery(manager.model.Referential()).WriteEvent(longTermStopVisitEvent)
 	}
 }
 
