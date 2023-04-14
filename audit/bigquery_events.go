@@ -144,11 +144,11 @@ type BigQueryLongTermStopVisitEvent struct {
 	LineName      string `bigquery:"line_name"`
 	LineNumber    string `bigquery:"line_number"`
 	TransportMode string `bigquery:"transport_mode"`
-	LineCodes     []Code `bigquiery:"line_codes"`
+	LineCodes     []Code `bigquery:"line_codes"`
 
 	VehicleJourneyDirectionType   string `bigquery:"vehicle_journey_direction_type"`
 	VehicleJourneyOriginName      string `bigquery:"vehicle_journey_origin_name"`
-	VehicleJourneyDestinationName string `bigquery:"vehicle_journey_destionation_name"`
+	VehicleJourneyDestinationName string `bigquery:"vehicle_journey_destination_name"`
 	VehicleJourneyCodes           []Code `bigquery:"vehicle_journey_codes"`
 	VehicleDriverRef              string `bigquery:"vehicle_driver_ref"`
 	VehicleOccupancy              string `bigquery:"vehicle_occupancy"`
