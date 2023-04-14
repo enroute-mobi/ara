@@ -220,7 +220,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	},
 
 	{Name: "vehicle_driver_ref", Required: false, Type: bigquery.StringFieldType},
-	{Name: "vehicle_driver_occupancy", Required: false, Type: bigquery.StringFieldType},
+	{Name: "vehicle_occupancy", Required: false, Type: bigquery.StringFieldType},
 }
 
 var AraBigQuerySchemas = map[string]bigquery.Schema{
