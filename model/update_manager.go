@@ -269,9 +269,9 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	// long term historisation
+
 	if sv.IsArchivable() {
 		longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
-			Timestamp:          manager.Clock().Now(),
 			AimedArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"aimed"}),
 			AimedDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"aimed"}),
 
