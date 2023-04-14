@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -54,12 +53,6 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		Status:            true,
 		ResponseTimestamp: connector.Clock().Now(),
 		MonitoringRef:     request.MonitoringRef(),
-	}
-	if !stopArea.Monitored && connector.Partner().SendProducerUnavailableError() {
-		delivery.Status = false
-		delivery.ErrorType = "OtherError"
-		delivery.ErrorNumber = 1
-		delivery.ErrorText = fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", strings.Join(stopArea.Origins.PartnersKO(), ", "))
 	}
 
 	// Prepare StopVisit Selectors

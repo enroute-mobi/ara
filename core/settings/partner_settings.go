@@ -47,7 +47,6 @@ const (
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
 	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
-	SEND_PRODUCER_UNAVAILABLE_ERROR            = "broadcast.send_producer_unavailable_error"
 	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
 	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
 
@@ -364,13 +363,6 @@ func (s *PartnerSettings) CollectFilteredGeneralMessages() (r bool) {
 func (s *PartnerSettings) IgnoreStopWithoutLine() (r bool) {
 	s.m.RLock()
 	r = s.s[IGNORE_STOP_WITHOUT_LINE] != "false"
-	s.m.RUnlock()
-	return
-}
-
-func (s *PartnerSettings) SendProducerUnavailableError() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[SEND_PRODUCER_UNAVAILABLE_ERROR])
 	s.m.RUnlock()
 	return
 }
