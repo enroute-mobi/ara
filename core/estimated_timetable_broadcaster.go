@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -74,7 +73,6 @@ func (ett *SIRIEstimatedTimetableBroadcaster) run() {
 			logger.Log.Debugf("SIRISIRIEstimatedTimetableBroadcaster visit")
 
 			ett.prepareSIRIEstimatedTimetable()
-			ett.prepareNotMonitored()
 
 			c = ett.Clock().After(5 * time.Second)
 		}
@@ -84,40 +82,6 @@ func (ett *SIRIEstimatedTimetableBroadcaster) run() {
 func (ett *SIRIEstimatedTimetableBroadcaster) Stop() {
 	if ett.stop != nil {
 		close(ett.stop)
-	}
-}
-
-func (ett *ETTBroadcaster) prepareNotMonitored() {
-	ett.connector.mutex.Lock()
-
-	notMonitored := ett.connector.notMonitored
-	ett.connector.notMonitored = make(map[SubscriptionId]map[string]struct{})
-
-	ett.connector.mutex.Unlock()
-
-	for subId, producers := range notMonitored {
-		sub, ok := ett.connector.Partner().Subscriptions().Find(subId)
-		if !ok {
-			continue
-		}
-
-		for producer := range producers {
-			delivery := &siri.SIRINotifyEstimatedTimetable{
-				Address:                   ett.connector.Partner().Address(),
-				ProducerRef:               ett.connector.Partner().ProducerRef(),
-				ResponseMessageIdentifier: ett.connector.Partner().NewResponseMessageIdentifier(),
-				SubscriberRef:             sub.SubscriberRef,
-				SubscriptionIdentifier:    sub.ExternalId(),
-				ResponseTimestamp:         ett.connector.Clock().Now(),
-				Status:                    false,
-				ErrorType:                 "OtherError",
-				ErrorNumber:               1,
-				ErrorText:                 fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", producer),
-				RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			}
-
-			ett.sendDelivery(delivery)
-		}
 	}
 }
 

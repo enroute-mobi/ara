@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -151,11 +150,6 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 				if stopArea.Monitored {
 					estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
 					estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
-				} else if connector.Partner().SendProducerUnavailableError() {
-					delivery.Status = false
-					delivery.ErrorType = "OtherError"
-					delivery.ErrorNumber = 1
-					delivery.ErrorText = fmt.Sprintf("Erreur [PRODUCER_UNAVAILABLE] : %v indisponible", strings.Join(stopArea.Origins.PartnersKO(), ", "))
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
