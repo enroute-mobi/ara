@@ -41,6 +41,7 @@ const (
 	TEST_CHECK_STATUS_CLIENT_TYPE                      = "test-check-status-client"
 	SIRI_CHECK_STATUS_SERVER_TYPE                      = "siri-check-status-server"
 	SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER   = "siri-lite-vehicle-monitoring-request-broadcaster"
+	SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER        = "siri-vehicle-monitoring-request-broadcaster"
 	TEST_VALIDATION_CONNECTOR                          = "test-validation-connector"
 	TEST_STARTABLE_CONNECTOR                           = "test-startable-connector-connector"
 	GTFS_RT_REQUEST_COLLECTOR                          = "gtfs-rt-request-collector"
@@ -140,6 +141,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRICheckStatusServerFactory{}
 	case SIRI_LITE_VEHICLE_MONITORING_REQUEST_BROADCASTER:
 		return &SIRILiteVehicleMonitoringRequestBroadcasterFactory{}
+	case SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER:
+		return &SIRIVehicleMonitoringRequestBroadcasterFactory{}
 	case GTFS_RT_REQUEST_COLLECTOR:
 		return &GtfsRequestCollectorFactory{}
 	case GTFS_RT_TRIP_UPDATES_BROADCASTER:

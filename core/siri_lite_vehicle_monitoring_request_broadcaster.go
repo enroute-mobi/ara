@@ -12,7 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 )
 
-type VehicleMonitoringRequestBroadcaster interface {
+type VehicleMonitoringLiteRequestBroadcaster interface {
 	RequestVehicles(string, url.Values, *audit.BigQueryMessage) *siri.SiriLiteResponse
 }
 

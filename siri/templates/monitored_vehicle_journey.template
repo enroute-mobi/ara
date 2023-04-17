@@ -1,0 +1,23 @@
+<siri:MonitoredVehicleJourney>
+					<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .FramedVehicleJourneyRef }}
+					<siri:FramedVehicleJourneyRef>{{ if .FramedVehicleJourneyRef.DataFrameRef }}
+						<siri:DataFrameRef>{{ .FramedVehicleJourneyRef.DataFrameRef }}</siri:DataFrameRef>{{ end }}{{ if .FramedVehicleJourneyRef.DatedVehicleJourneyRef }}
+						<siri:DatedVehicleJourneyRef>{{ .FramedVehicleJourneyRef.DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ end }}
+					</siri:FramedVehicleJourneyRef>{{ end }}{{ if .JourneyPatternRef }}
+					<siri:JourneyPatternRef>{{ .JourneyPatternRef }}</siri:JourneyPatternRef>{{ end }}{{ if .JourneyPatternName }}
+					<siri:JourneyPatternName>{{ .JourneyPatternName }}</siri:JourneyPatternName>{{ end }}{{ if .PublishedLineName }}
+					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ end }}{{ if .DirectionName }}
+					<siri:DirectionName>{{ .DirectionName }}</siri:DirectionName>{{ end }}{{ if .OriginRef }}
+					<siri:OriginRef>{{ .OriginRef }}</siri:OriginRef>{{ end }}{{ if .OriginName }}
+					<siri:OriginName>{{ .OriginName }}</siri:OriginName>{{ end }}{{ if .DestinationRef }}
+					<siri:DestinationRef>{{ .DestinationRef }}</siri:DestinationRef>{{ end }}{{ if .DestinationName }}
+					<siri:DestinationName>{{ .DestinationName }}</siri:DestinationName>{{ end }}{{ if .Monitored }}
+					<siri:Monitored>{{ .Monitored }}</siri:Monitored>{{ end }}{{ if .VehicleLocation }}
+					<siri:VehicleLocation>{{ if .VehicleLocation.Longitude }}
+						<siri:Longitude>{{ .VehicleLocation.Longitude }}</siri:Longitude>{{ end }}{{ if .VehicleLocation.Latitude }}
+						<siri:Latitude>{{ .VehicleLocation.Latitude }}</siri:Latitude>{{ end }}
+					</siri:VehicleLocation>{{ end }}{{ if .Bearing }}
+					<siri:Bearing>{{ .Bearing }}</siri:Bearing>{{ end }}{{ if .VehicleRef }}
+					<siri:VehicleRef>{{ .VehicleRef }}</siri:VehicleRef>{{ end }}{{ if .DriverRef }}
+					<siri:DriverRef>{{ .DriverRef }}</siri:DriverRef>{{ end }}
+				</siri:MonitoredVehicleJourney>

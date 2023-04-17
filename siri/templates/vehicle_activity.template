@@ -1,0 +1,10 @@
+<siri:VehicleActivity>
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00"  }}</siri:RecordedAtTime>
+				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00"  }}</siri:ValidUntilTime>
+				<siri:VehicleMonitoringRef>{{ .VehicleMonitoringRef }}</siri:VehicleMonitoringRef>{{ if .ProgressBetweenStops }}
+				<siri:ProgressBetweenStops>{{ if .ProgressBetweenStops.LinkDistance }}
+					<siri:LinkDistance>{{ .ProgressBetweenStops.LinkDistance }}</siri:LinkDistance>{{ end }}{{ if .ProgressBetweenStops.Percentage }}
+					<siri:Percentage>{{ .ProgressBetweenStops.Percentage }}</siri:Percentage>{{ end }}
+				</siri:ProgressBetweenStops>{{ end }}
+				{{.MonitoredVehicleJourney.BuildMonitoredVehicleJourneyXML }}
+			</siri:VehicleActivity>

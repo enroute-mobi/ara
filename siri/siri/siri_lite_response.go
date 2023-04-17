@@ -15,11 +15,11 @@ type SiriLiteResponseSubstructure struct {
 }
 
 type ServiceDelivery struct {
-	ResponseTimestamp         time.Time                  `json:",omitempty"`
-	ProducerRef               string                     `json:",omitempty"`
-	ResponseMessageIdentifier string                     `json:",omitempty"`
-	RequestMessageRef         string                     `json:",omitempty"`
-	VehicleMonitoringDelivery *VehicleMonitoringDelivery `json:",omitempty"`
+	ResponseTimestamp         time.Time                      `json:",omitempty"`
+	ProducerRef               string                         `json:",omitempty"`
+	ResponseMessageIdentifier string                         `json:",omitempty"`
+	RequestMessageRef         string                         `json:",omitempty"`
+	VehicleMonitoringDelivery *SIRIVehicleMonitoringDelivery `json:",omitempty"`
 	// StopMonitoringDelivery *StopMonitoringDelivery `json:",omitempty"`
 	// ...
 }
