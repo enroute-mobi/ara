@@ -123,16 +123,16 @@ var bqVehicleSchema = bigquery.Schema{
 }
 
 type BigQueryLongTermStopVisitEvent struct {
-	UUID               string    `bigquery:"uuid"`
-	Timestamp          time.Time `bigquery:"timestamp"`
-	AimedDepartureTime time.Time `bigquery:"aimed_departure_time,nullable"`
-	AimedArrivalTime   time.Time `bigquery:"aimed_arrival_time,nullable"`
+	UUID               string                 `bigquery:"uuid"`
+	Timestamp          time.Time              `bigquery:"timestamp"`
+	AimedDepartureTime bigquery.NullTimestamp `bigquery:"aimed_departure_time"`
+	AimedArrivalTime   bigquery.NullTimestamp `bigquery:"aimed_arrival_time"`
 
-	ExpectedDepartureTime time.Time `bigquery:"expected_departure_time,nullable"`
-	ExpectedArrivalTime   time.Time `bigquery:"expected_arrival_time,nullable"`
+	ExpectedDepartureTime bigquery.NullTimestamp `bigquery:"expected_departure_time"`
+	ExpectedArrivalTime   bigquery.NullTimestamp `bigquery:"expected_arrival_time"`
 
-	ActualDepartureTime time.Time `bigquery:"actual_departure_time,nullable"`
-	ActualArrivalTime   time.Time `bigquery:"actual_arrival_time,nullable"`
+	ActualDepartureTime bigquery.NullTimestamp `bigquery:"actual_departure_time"`
+	ActualArrivalTime   bigquery.NullTimestamp `bigquery:"actual_arrival_time"`
 
 	DepartureStatus string `bigquery:"departure_status"`
 	ArrivalStatus   string `bigquery:"arrival_status"`

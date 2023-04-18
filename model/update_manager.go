@@ -2,11 +2,13 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"cloud.google.com/go/bigquery"
 
 	"golang.org/x/exp/maps"
 )
@@ -272,14 +274,14 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	if sv.IsArchivable() {
 		longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
-			AimedArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"aimed"}),
-			AimedDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"aimed"}),
+			AimedArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
+			AimedDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
 
-			ExpectedArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"expected"}),
-			ExpectedDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"expected"}),
+			ExpectedArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
+			ExpectedDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
 
-			ActualArrivalTime:   sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{"actual"}),
-			ActualDepartureTime: sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{"actual"}),
+			ActualArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
+			ActualDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
 
 			StopAreaName:        sv.StopArea().Name,
 			StopAreaCoordinates: fmt.Sprintf("POINT(%f %f)", sv.StopArea().Longitude, sv.StopArea().Latitude),
@@ -330,6 +332,32 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 		audit.CurrentBigQuery(manager.model.Referential()).WriteEvent(longTermStopVisitEvent)
 	}
+}
+
+func (manager *UpdateManager) setArrivalTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
+	t := bigquery.NullTimestamp{}
+	arrivalTime := sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{kind})
+	if arrivalTime == (time.Time{}) {
+		t.Valid = false
+	} else {
+		t.Timestamp = arrivalTime
+		t.Valid = true
+	}
+
+	return t
+}
+
+func (manager *UpdateManager) setDepartureTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
+	t := bigquery.NullTimestamp{}
+	departureTime := sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{kind})
+	if departureTime == (time.Time{}) {
+		t.Valid = false
+	} else {
+		t.Timestamp = departureTime
+		t.Valid = true
+	}
+
+	return t
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
