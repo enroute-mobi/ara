@@ -274,6 +274,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	if sv.IsArchivable() {
 		longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
+			StopVisitUUID:      string(sv.Id()),
 			AimedArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
 			AimedDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
 

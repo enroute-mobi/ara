@@ -123,8 +123,10 @@ var bqVehicleSchema = bigquery.Schema{
 }
 
 type BigQueryLongTermStopVisitEvent struct {
-	UUID               string                 `bigquery:"uuid"`
-	Timestamp          time.Time              `bigquery:"timestamp"`
+	UUID      string    `bigquery:"uuid"`
+	Timestamp time.Time `bigquery:"timestamp"`
+
+	StopVisitUUID      string                 `bigquery:"stop_visit_uuid"`
 	AimedDepartureTime bigquery.NullTimestamp `bigquery:"aimed_departure_time"`
 	AimedArrivalTime   bigquery.NullTimestamp `bigquery:"aimed_arrival_time"`
 
@@ -166,6 +168,8 @@ func (bq *BigQueryLongTermStopVisitEvent) SetUUID(u string)         { bq.UUID = 
 var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "uuid", Required: true, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
+
+	{Name: "stop_visit_uuid", Required: true, Type: bigquery.StringFieldType},
 
 	{Name: "aimed_departure_time", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "aimed_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
