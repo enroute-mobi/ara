@@ -123,19 +123,21 @@ var bqVehicleSchema = bigquery.Schema{
 }
 
 type BigQueryLongTermStopVisitEvent struct {
-	UUID               string    `bigquery:"uuid"`
-	Timestamp          time.Time `bigquery:"timestamp"`
-	AimedDepartureTime time.Time `bigquery:"timestamp,nullable"`
-	AimedArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+	UUID      string    `bigquery:"uuid"`
+	Timestamp time.Time `bigquery:"timestamp"`
 
-	ExpectedDepartureTime time.Time `bigquery:"timestamp,nullable"`
-	ExpectedArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+	StopVisitUUID      string                 `bigquery:"stop_visit_uuid"`
+	AimedDepartureTime bigquery.NullTimestamp `bigquery:"aimed_departure_time"`
+	AimedArrivalTime   bigquery.NullTimestamp `bigquery:"aimed_arrival_time"`
 
-	ActualDepartureTime time.Time `bigquery:"timestamp,nullable"`
-	ActualArrivalTime   time.Time `bigquery:"timestamp,nullable"`
+	ExpectedDepartureTime bigquery.NullTimestamp `bigquery:"expected_departure_time"`
+	ExpectedArrivalTime   bigquery.NullTimestamp `bigquery:"expected_arrival_time"`
 
-	DepartureStatus string `bigquery:"departure_status,nullable"`
-	ArrivalStatus   string `bigquery:"arrival_status,nullable"`
+	ActualDepartureTime bigquery.NullTimestamp `bigquery:"actual_departure_time"`
+	ActualArrivalTime   bigquery.NullTimestamp `bigquery:"actual_arrival_time"`
+
+	DepartureStatus string `bigquery:"departure_status"`
+	ArrivalStatus   string `bigquery:"arrival_status"`
 
 	StopAreaName        string `bigquery:"stop_area_name"`
 	StopAreaCodes       []Code `bigquery:"stop_area_codes"`
@@ -144,11 +146,11 @@ type BigQueryLongTermStopVisitEvent struct {
 	LineName      string `bigquery:"line_name"`
 	LineNumber    string `bigquery:"line_number"`
 	TransportMode string `bigquery:"transport_mode"`
-	LineCodes     []Code `bigquiery:"line_codes"`
+	LineCodes     []Code `bigquery:"line_codes"`
 
 	VehicleJourneyDirectionType   string `bigquery:"vehicle_journey_direction_type"`
 	VehicleJourneyOriginName      string `bigquery:"vehicle_journey_origin_name"`
-	VehicleJourneyDestinationName string `bigquery:"vehicle_journey_destionation_name"`
+	VehicleJourneyDestinationName string `bigquery:"vehicle_journey_destination_name"`
 	VehicleJourneyCodes           []Code `bigquery:"vehicle_journey_codes"`
 	VehicleDriverRef              string `bigquery:"vehicle_driver_ref"`
 	VehicleOccupancy              string `bigquery:"vehicle_occupancy"`
@@ -166,6 +168,8 @@ func (bq *BigQueryLongTermStopVisitEvent) SetUUID(u string)         { bq.UUID = 
 var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "uuid", Required: true, Type: bigquery.StringFieldType},
 	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
+
+	{Name: "stop_visit_uuid", Required: true, Type: bigquery.StringFieldType},
 
 	{Name: "aimed_departure_time", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "aimed_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
@@ -220,7 +224,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	},
 
 	{Name: "vehicle_driver_ref", Required: false, Type: bigquery.StringFieldType},
-	{Name: "vehicle_driver_occupancy", Required: false, Type: bigquery.StringFieldType},
+	{Name: "vehicle_occupancy", Required: false, Type: bigquery.StringFieldType},
 }
 
 var AraBigQuerySchemas = map[string]bigquery.Schema{

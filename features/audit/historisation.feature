@@ -146,6 +146,7 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
+      | StopVisitUUID                 | /{test-uuid}/                                                                            |
       | AimedArrivalTime              | 2017-01-01T13:00:00+02:00                                                                |
       | ExpectedArrivalTime           | 2017-01-01T13:01:00+02:00                                                                |
       | DepartureStatus               | departed                                                                                 |
@@ -305,6 +306,7 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
+      | StopVisitUUID                 | /{test-uuid}/                                                 |
       | ActualArrivalTime             | 2017-01-01T13:05:00+02:00                                     |
       | ActualDepartureTime           | 2017-01-01T13:22:00+02:00                                     |
       | DepartureStatus               | cancelled                                                     |
