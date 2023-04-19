@@ -322,3 +322,66 @@ Feature: Audit API exchanges
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                |
       | VehicleJourneyOriginName      | Origin                                                        |
       | VehicleJourneyCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]  |
+
+  @ARA-1241
+  Scenario: Audit a event for a Stop Visit when departure & arrival status are set by Ara internal update mechanism
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-collector] and the following settings:
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | NINOXE:default                 |
+      | remote_objectid_kind               | internal                       |
+      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
+    And 30 seconds have passed
+    And a StopArea exists with the following attributes:
+      | Name      | Origin                                   |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Latitude  | 48.8566                                  |
+      | Longitude | 2.3522                                   |
+      # "Id":"6ba7b814-9dad-11d1-3-00c04fd430c8"
+    And a StopArea exists with the following attributes:
+      | Name      | Mago-Cime OMNI                           |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:62:LOC" |
+      # "Id":"6ba7b814-9dad-11d1-4-00c04fd430c8"
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC", "ddip": "L3:LOC" |
+      | Name      | Ligne 3 Metro                                     |
+      | Number    | L3                                                |
+      # "Id":"6ba7b814-9dad-11d1-5-00c04fd430c8"
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                              |
+      | ObjectIDs                | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId                   | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
+      | Monitored                | true                                    |
+      | Attribute[DirectionName] | A Direction Name                        |
+      | Attribute[VehicleMode]   | bus                                     |
+      # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                    | 4                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop                   | true                                                                 |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T00:55:00.000+02:00                                        |
+      | Schedule[aimed]#Departure       | 2017-01-01T00:59:00.000+02:00                                        |
+      | DepartureStatus                 | onTime                                                               |
+      | ArrivalStatus                   | onTime                                                               |
+      # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
+    And a minute has passed
+    And a minute has passed
+    Then an audit event should exist with these attributes:
+      | StopVisitUUID       | /{test-uuid}/                                                                            |
+      | AimedArrivalTime    | 2017-01-01T00:55:00+02:00                                                                |
+      | AimedDepartureTime  | 2017-01-01T00:59:00+02:00                                                                |
+      | ActualArrivalTime   | 2017-01-01T00:55:00+02:00                                                                |
+      | ActualDepartureTime | 2017-01-01T00:59:00+02:00                                                                |
+      | DepartureStatus     | departed                                                                                 |
+      | ArrivalStatus       | arrived                                                                                  |
+      | StopAreaName        | Mago-Cime OMNI                                                                           |
+      | StopAreaCodes       | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                            |
+      | LineName            | Ligne 3 Metro                                                                            |
+      | LineNumber          | L3                                                                                       |
+      | TransportMode       | bus                                                                                      |
+      | LineCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}] |
+      | VehicleJourneyCodes | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                             |
