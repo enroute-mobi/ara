@@ -1,14 +1,9 @@
 package model
 
 import (
-	"fmt"
-	"time"
-
-	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"cloud.google.com/go/bigquery"
 
 	"golang.org/x/exp/maps"
 )
@@ -271,94 +266,14 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	// long term historisation
-
 	if sv.IsArchivable() {
-		longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
-			StopVisitUUID:      string(sv.Id()),
-			AimedArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
-			AimedDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
-
-			ExpectedArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
-			ExpectedDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
-
-			ActualArrivalTime:   manager.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
-			ActualDepartureTime: manager.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
-
-			StopAreaName:        sv.StopArea().Name,
-			StopAreaCoordinates: fmt.Sprintf("POINT(%f %f)", sv.StopArea().Longitude, sv.StopArea().Latitude),
-
-			ArrivalStatus:                 string(sv.ArrivalStatus),
-			DepartureStatus:               string(sv.DepartureStatus),
-			VehicleJourneyDirectionType:   vj.DirectionType,
-			VehicleJourneyOriginName:      vj.OriginName,
-			VehicleJourneyDestinationName: vj.DestinationName,
+		sva := &StopVisitArchiver{
+			Model:     manager.model,
+			StopVisit: sv,
 		}
-
-		for _, obj := range sv.StopArea().objectids {
-			code := &audit.Code{
-				Kind:  obj.kind,
-				Value: obj.value,
-			}
-			longTermStopVisitEvent.StopAreaCodes = append(longTermStopVisitEvent.StopAreaCodes, *code)
-		}
-
-		for _, obj := range vj.objectids {
-			code := &audit.Code{
-				Kind:  obj.kind,
-				Value: obj.value,
-			}
-			longTermStopVisitEvent.VehicleJourneyCodes = append(longTermStopVisitEvent.VehicleJourneyCodes, *code)
-		}
-
-		transportMode, ok := vj.Attribute("VehicleMode")
-		if ok {
-			longTermStopVisitEvent.TransportMode = transportMode
-		}
-
-		if vj.Line() != nil {
-			longTermStopVisitEvent.LineName = vj.Line().Name
-			longTermStopVisitEvent.LineNumber = vj.Line().Number
-			for _, obj := range vj.Line().objectids {
-				code := &audit.Code{
-					Kind:  obj.kind,
-					Value: obj.value,
-				}
-				longTermStopVisitEvent.LineCodes = append(longTermStopVisitEvent.LineCodes, *code)
-			}
-		}
-
-		if vj.Occupancy != "" {
-			longTermStopVisitEvent.VehicleOccupancy = vj.Occupancy
-		}
-
-		audit.CurrentBigQuery(manager.model.Referential()).WriteEvent(longTermStopVisitEvent)
-	}
-}
-
-func (manager *UpdateManager) setArrivalTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
-	t := bigquery.NullTimestamp{}
-	arrivalTime := sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{kind})
-	if arrivalTime == (time.Time{}) {
-		t.Valid = false
-	} else {
-		t.Timestamp = arrivalTime
-		t.Valid = true
+		sva.Archive()
 	}
 
-	return t
-}
-
-func (manager *UpdateManager) setDepartureTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
-	t := bigquery.NullTimestamp{}
-	departureTime := sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{kind})
-	if departureTime == (time.Time{}) {
-		t.Valid = false
-	} else {
-		t.Timestamp = departureTime
-		t.Valid = true
-	}
-
-	return t
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
