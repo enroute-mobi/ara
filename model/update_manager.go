@@ -329,6 +329,12 @@ func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent)
 
 	stopVisit.NotCollected()
 	manager.model.StopVisits().Save(stopVisit)
-
+	if stopVisit.IsArchivable() {
+		sva := &StopVisitArchiver{
+			Model:     manager.model,
+			StopVisit: stopVisit,
+		}
+		sva.Archive()
+	}
 	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.ObjectId)
 }
