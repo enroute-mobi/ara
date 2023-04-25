@@ -231,10 +231,19 @@ func Test_UpdateManager_UpdateStatus(t *testing.T) {
 func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	model := NewMemoryModel()
 	manager := newUpdateManager(model)
-
 	objectid := NewObjectID("kind", "value")
+
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
 	stopVisit := model.StopVisits().New()
 	stopVisit.SetObjectID(objectid)
+	stopVisit.StopAreaId = sa.Id()
 	stopVisit.collected = true
 	stopVisit.Save()
 

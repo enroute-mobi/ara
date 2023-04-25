@@ -208,6 +208,14 @@ func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
 		simulator.SetClock(guardian.Clock())
 		if simulator.Simulate() {
 			svs[i].Save()
+			if svs[i].IsArchivable() {
+				sva := &model.StopVisitArchiver{
+					Model:     guardian.referential.Model(),
+					StopVisit: svs[i],
+				}
+				sva.Archive()
+			}
+
 		}
 	}
 
