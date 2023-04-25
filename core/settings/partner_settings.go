@@ -379,9 +379,9 @@ func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
 
 func (s *PartnerSettings) CollectSettings() *CollectSettings {
 	if s.cs == nil {
-		s.m.RLock()
+		s.m.Lock()
 		s.SetCollectSettings()
-		s.m.RUnlock()
+		s.m.Unlock()
 	}
 
 	return s.cs
