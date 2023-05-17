@@ -1,6 +1,8 @@
 package sxml
 
 import (
+	"strings"
+
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -16,6 +18,8 @@ type XMLVehicleMonitoringRequest struct {
 
 	lineRef           string
 	messageIdentifier string
+
+	lines []string
 }
 
 func NewXMLGetVehicleMonitoring(node xml.Node) *XMLGetVehicleMonitoring {
@@ -31,6 +35,16 @@ func NewXMLGetVehicleMonitoringFromContent(content []byte) (*XMLGetVehicleMonito
 	}
 	request := NewXMLGetVehicleMonitoring(doc.Root().XmlNode)
 	return request, nil
+}
+
+func (request *XMLVehicleMonitoringRequest) Lines() []string {
+	if len(request.lines) == 0 {
+		nodes := request.findNodes("LineRef")
+		for _, node := range nodes {
+			request.lines = append(request.lines, strings.TrimSpace(node.NativeNode().Content()))
+		}
+	}
+	return request.lines
 }
 
 func (request *XMLGetVehicleMonitoring) LineRef() string {

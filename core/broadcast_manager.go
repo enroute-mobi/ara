@@ -12,6 +12,7 @@ type BroadcastManagerInterface interface {
 
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
 	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent
+	GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent
 }
 
 type BroadcastManager struct {
@@ -19,6 +20,7 @@ type BroadcastManager struct {
 
 	smbEventChan chan model.StopMonitoringBroadcastEvent
 	gmbEventChan chan model.GeneralMessageBroadcastEvent
+	vbEventChan  chan model.VehicleBroadcastEvent
 	stop         chan struct{}
 }
 
@@ -27,6 +29,7 @@ func NewBroadcastManager(referential *Referential) *BroadcastManager {
 		Referential:  referential,
 		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 2000),
 		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 2000),
+		vbEventChan:  make(chan model.VehicleBroadcastEvent, 2000),
 	}
 }
 
@@ -36,6 +39,10 @@ func (manager *BroadcastManager) GetStopMonitoringBroadcastEventChan() chan mode
 
 func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent {
 	return manager.gmbEventChan
+}
+
+func (manager *BroadcastManager) GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent {
+	return manager.vbEventChan
 }
 
 func (manager *BroadcastManager) Start() {
@@ -54,6 +61,8 @@ func (manager *BroadcastManager) run() {
 			manager.ettsbEvent_handler(event)
 		case event := <-manager.gmbEventChan:
 			manager.gmsbEvent_handler(event)
+		case event := <-manager.vbEventChan:
+			manager.vmEvent_handler(event)
 		case <-manager.stop:
 			logger.Log.Debugf("BroadcastManager Stop")
 			return
@@ -91,6 +100,24 @@ func (manager *BroadcastManager) ettsbEvent_handler(event model.StopMonitoringBr
 		connector, ok = partner.Connector(TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*TestETTSubscriptionBroadcaster).HandleBroadcastEvent(&event)
+			continue
+		}
+	}
+}
+
+func (manager *BroadcastManager) vmEvent_handler(event model.VehicleBroadcastEvent) {
+	connectorTypes := []string{SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
+		connector, ok := partner.Connector(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRIVehicleMonitoringSubscriptionBroadcaster).HandleBroadcastEvent(&event)
+			continue
+		}
+
+		// TEST
+		connector, ok = partner.Connector(TEST_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*TestVMSubscriptionBroadcaster).HandleBroadcastEvent(&event)
 			continue
 		}
 	}

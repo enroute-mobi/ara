@@ -16,6 +16,7 @@ const (
 	GeneralMessageBroadcast      = "GeneralMessageBroadcast"
 	ProductionTimetableBroadcast = "ProductionTimetableBroadcast"
 	StopMonitoringBroadcast      = "StopMonitoringBroadcast"
+	VehicleMonitoringBroadcast   = "VehicleMonitoringBroadcast"
 
 	EstimatedTimetableCollect = "EstimatedTimetableCollect"
 	GeneralMessageCollect     = "GeneralMessageCollect"

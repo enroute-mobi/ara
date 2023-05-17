@@ -368,3 +368,14 @@ func (client *SIRIClient) NotifyProductionTimetable(request *siri.SIRINotifyProd
 	}
 	return nil
 }
+
+func (client *SIRIClient) NotifyVehicleMonitoring(request *siri.SIRINotifyVehicleMonitoring) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
