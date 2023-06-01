@@ -17,6 +17,7 @@ const (
 	SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER       = "siri-lines-discovery-request-broadcaster"
 	SIRI_SERVICE_REQUEST_BROADCASTER               = "siri-service-request-broadcaster"
 	SIRI_STOP_MONITORING_REQUEST_COLLECTOR         = "siri-stop-monitoring-request-collector"
+	SIRI_LITE_STOP_MONITORING_REQUEST_COLLECTOR    = "siri-lite-stop-monitoring-request-collector"
 	TEST_STOP_MONITORING_REQUEST_COLLECTOR         = "test-stop-monitoring-request-collector"
 	SIRI_STOP_MONITORING_REQUEST_BROADCASTER       = "siri-stop-monitoring-request-broadcaster"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR    = "siri-stop-monitoring-subscription-collector"

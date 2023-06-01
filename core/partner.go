@@ -472,6 +472,15 @@ func (partner *Partner) StopMonitoringRequestCollector() (smrc StopMonitoringReq
 	return
 }
 
+func (partner *Partner) LiteStopMonitoringRequestCollector() (lsmrc LiteStopMonitoringRequestCollector) {
+	c, ok := partner.connectors[SIRI_LITE_STOP_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return c.(LiteStopMonitoringRequestCollector)
+	}
+
+	return nil
+}
+
 func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubscriptionCollector {
 	client, ok := partner.connectors[SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR]
 	if ok {
