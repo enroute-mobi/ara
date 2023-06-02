@@ -93,6 +93,17 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSu
 		return &response, nil
 	}
 
+	if len(request.XMLSubscriptionVMEntries()) > 0 {
+		vmbc, ok := connector.Partner().Connector(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("no VehicleMonitoringSubscriptionBroadcaster Connector")
+		}
+
+		response.ResponseStatus = vmbc.(*SIRIVehicleMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+
+		return &response, nil
+	}
+
 	return nil, fmt.Errorf("subscription not supported")
 }
 

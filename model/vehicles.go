@@ -134,6 +134,8 @@ type MemoryVehicles struct {
 	mutex        *sync.RWMutex
 	byIdentifier map[VehicleId]*Vehicle
 	byObjectId   *ObjectIdIndex
+
+	broadcastEvent func(event VehicleBroadcastEvent)
 }
 
 type Vehicles interface {
@@ -207,6 +209,7 @@ func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
 
 func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
 
 	if vehicle.id == "" {
 		vehicle.id = VehicleId(manager.NewUUID())
@@ -224,7 +227,15 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.byIdentifier[vehicle.Id()] = vehicle
 	manager.byObjectId.Index(vehicle)
 
-	manager.mutex.Unlock()
+	event := VehicleBroadcastEvent{
+		ModelId:   string(vehicle.id),
+		ModelType: "Vehicle",
+	}
+
+	if manager.broadcastEvent != nil {
+		manager.broadcastEvent(event)
+	}
+
 	return true
 }
 

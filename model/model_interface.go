@@ -37,6 +37,7 @@ type MemoryModel struct {
 	operators           *MemoryOperators
 	SMEventsChan        chan StopMonitoringBroadcastEvent
 	GMEventsChan        chan GeneralMessageBroadcastEvent
+	VeEventChan         chan VehicleBroadcastEvent
 	referential         string
 	date                Date
 }
@@ -91,6 +92,7 @@ func (model *MemoryModel) refresh() {
 	vehicles := NewMemoryVehicles()
 	vehicles.model = model
 	model.vehicles = vehicles
+	model.vehicles.broadcastEvent = model.broadcastVeEvent
 }
 
 func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
@@ -99,6 +101,10 @@ func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonit
 
 func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan GeneralMessageBroadcastEvent) {
 	model.GMEventsChan = broadcastGMEventChan
+}
+
+func (model *MemoryModel) SetBroadcastVeChan(broadcastVeEventChan chan VehicleBroadcastEvent) {
+	model.VeEventChan = broadcastVeEventChan
 }
 
 func (model *MemoryModel) Referential() string {
@@ -114,6 +120,14 @@ func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	case model.SMEventsChan <- event:
 	default:
 		logger.Log.Debugf("BrocasterManager StopMonitoringBroadcastEvent queue is full")
+	}
+}
+
+func (model *MemoryModel) broadcastVeEvent(event VehicleBroadcastEvent) {
+	select {
+	case model.VeEventChan <- event:
+	default:
+		logger.Log.Debugf("BrocasterManager VehicleBroadcastEvent queue is full")
 	}
 }
 

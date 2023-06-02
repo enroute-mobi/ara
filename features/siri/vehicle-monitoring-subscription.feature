@@ -3,6 +3,505 @@ Feature: Support SIRI VehicleMonitoring by subscription
   Background:
       Given a Referential "test" is created
 
+  @ARA-1236 @siri-valid
+  Scenario: Send a VehicleMonitoring notification when a vehicle changes
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | Ara                   |
+      | local_credential      | Subscriber            |
+      | remote_objectid_kind  | internal              |
+      | sort_payload_for_test | true                  |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                                |
+      | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                | true                                      |
+      | Attribute[DirectionName] | Direction Name                            |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:999:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringBroadcast       |
+      | SubscriberRef     | Subscriber                       |
+      | ExternalId        | subscription-1                   |
+      | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
+    When the Vehicle "internal:Test:Vehicle:201123:LOC" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 234                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+    When the Vehicle "internal:Test:Vehicle:999:LOC" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 12.234                            |
+      | Latitude         | 8.678                             |
+      | Bearing          | 126                               |
+      | RecordedAtTime   | 2017-01-01T12:10:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T13:59:00.000Z          |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>Subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:201123:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T12:10:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T13:59:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:999:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>12.234</siri:Longitude>
+                      <siri:Latitude>8.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>126</siri:Bearing>
+                    </siri:MonitoredVehicleJourney>
+                  </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Notification>
+            <SiriExtension />
+          </sw:NotifyVehicleMonitoring>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyVehicleMonitoring                             |
+      | Direction               | sent                                                |
+      | Protocol                | siri                                                |
+      | Partner                 | test                                                |
+      | Status                  | OK                                                  |
+      | SubscriptionIdentifiers | ["subscription-1"]                                  |
+      | Lines                   | ["Test:Line:3:LOC"]                                 |
+      | Vehicles                | ["Test:Vehicle:201123:LOC", "Test:Vehicle:999:LOC"] |
+
+  @ARA-1236 @siri-valid
+  Scenario: Delete and recreate SIRI VehicleMonitoring request for subscription when receiving subscription with same existing number
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url                        | http://localhost:8090 |
+       | remote_credential                 | test                  |
+       | local_credential                  | NINOXE:default        |
+       | remote_objectid_kind              | internal              |
+       | broadcast.subscription_persistent | true                  |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>test1</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | VehicleMonitoringBroadcast        |
+      | ExternalId      | test1                             |
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-a-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>test1</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-a-00c04fd430c8</siri:MessageIdentifier>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+     """
+    Then No Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Kind            | VehicleMonitoringBroadcast        |
+      | ExternalId      | test1                             |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | VehicleMonitoringBroadcast        |
+      | ExternalId      | test1                             |
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-b-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>test2</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-b-00c04fd430c8</siri:MessageIdentifier>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+     """
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Kind            | VehicleMonitoringBroadcast        |
+      | ExternalId      | test1                             |
+    Then one Subscription exists with the following attributes:
+      | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Kind            | VehicleMonitoringBroadcast        |
+      | ExternalId      | test2                             |
+
+  @ARA-1236 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request for subscription to all lines
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>test1</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    Then one Subscription exists with the following attributes:
+      | Kind | VehicleMonitoringBroadcast |
+    Then an audit event should exist with these attributes:
+      | Type                    | VehicleMonitoringSubscriptionRequest |
+      | Direction               | received                             |
+      | Protocol                | siri                                 |
+      | Partner                 | test                                 |
+      | Status                  | OK                                   |
+      | SubscriptionIdentifiers | ["test1"]                            |
+
+  @ARA-1236 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request for subscription for all existing lines in a referential only with same remote_objectid_kind
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "another": "NINOXE:Line:3:LOC"  |
+      | Name      | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Name      | Ligne A Bus                     |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1--00c04fd430c8</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    Then Subscriptions exist with the following resources:
+      | internal | NINOXE:Line:A:BUS |
+    Then No Subscriptions exist with the following resources:
+      | internal | NINOXE:Line:3:LOC |
+
+  @ARA-1236 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request for subscription to a line not existing in a referential
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "another": "NINOXE:Line:3:LOC"  |
+      | Name      | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Name      | Ligne A Bus                     |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>subscription-1</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+                <siri:LineRef>testLine</siri:LineRef>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+     <?xml version='1.0' encoding='UTF-8'?> 
+     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+       <S:Body>
+         <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+           <SubscriptionAnswerInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+             <siri:Address/>
+             <siri:ResponderRef>test</siri:ResponderRef>
+             <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
+           </SubscriptionAnswerInfo>
+           <Answer>
+             <siri:ResponseStatus>
+               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:RequestMessageRef>
+               <siri:SubscriberRef>test</siri:SubscriberRef>
+               <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+               <siri:Status>false</siri:Status>
+               <siri:ErrorCondition>
+                 <siri:InvalidDataReferencesError>
+                   <siri:ErrorText>Unknown Line(s) testLine</siri:ErrorText>
+                 </siri:InvalidDataReferencesError>
+               </siri:ErrorCondition>
+             </siri:ResponseStatus>
+             <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
+           </Answer>
+           <AnswerExtension/>
+         </sw:SubscribeResponse>
+       </S:Body>
+     </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | VehicleMonitoringSubscriptionRequest |
+      | Direction               | received                             |
+      | Protocol                | siri                                 |
+      | Partner                 | test                                 |
+      | Status                  | Error                                |
+      | Lines                   | ["testLine"]                         |
+
+   @ARA-1236 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request for subscription to a single line
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                   |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:VehicleMonitoringSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>subscription-1</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:VehicleMonitoringRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+                <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+              </siri:VehicleMonitoringRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+              <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+            </siri:VehicleMonitoringSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+     <?xml version='1.0' encoding='UTF-8'?> 
+     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+       <S:Body>
+         <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+           <SubscriptionAnswerInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+             <siri:Address/>
+             <siri:ResponderRef>test</siri:ResponderRef>
+             <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
+           </SubscriptionAnswerInfo>
+           <Answer>
+             <siri:ResponseStatus>
+               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:RequestMessageRef>
+               <siri:SubscriberRef>test</siri:SubscriberRef>
+               <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+               <siri:Status>true</siri:Status>
+               <siri:ValidUntil>2017-01-03T12:03:00.000Z</siri:ValidUntil>
+             </siri:ResponseStatus>
+             <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
+           </Answer>
+           <AnswerExtension/>
+         </sw:SubscribeResponse>
+       </S:Body>
+     </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                      | VehicleMonitoringSubscriptionRequest |
+      | Direction                 | received                             |
+      | Protocol                  | siri                                 |
+      | Partner                   | test                                 |
+      | Status                    | OK                                   |
+      | Lines                     | ["NINOXE:Line:3:LOC"]                |
+      | SubscriptionIdentifiers   | ["subscription-1"]                   |
+
   Scenario: Create Vehicle Monitoring subscription by Line
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """

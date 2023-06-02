@@ -396,6 +396,11 @@ func (partner *Partner) hasSubscribers() bool {
 		return true
 	}
 
+	_, ok = partner.connectors[SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
+
 	return ok
 }
 
