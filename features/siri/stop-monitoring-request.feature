@@ -2,6 +2,95 @@ Feature: Support SIRI StopMonitoring by request
 
   Background:
       Given a Referential "test" is created
+  
+  @ARA-1240 @wip
+  Scenario: Collect by using SIRI Lite Stop Monitoring
+    Given a lite SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+    """
+{
+  "Siri": {
+    "ServiceDelivery": {
+      "ResponseTimestamp": "2023-06-02T11:16:11.127Z",
+      "ProducerRef": "IVTR_HET",
+      "ResponseMessageIdentifier": "IVTR_HET:ResponseMessage:9bd2199f-2685-4f37-9a60-177312447a38:LOC:",
+      "StopMonitoringDelivery": [
+        {
+          "ResponseTimestamp": "2023-06-02T11:16:11.249Z",
+          "Version": "2.0",
+          "Status": "true",
+          "MonitoredStopVisit": [
+            {
+              "RecordedAtTime": "2023-06-02T01:07:19.892Z",
+              "ItemIdentifier": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC",
+              "MonitoringRef": "STIF:StopPoint:Q:41178:",
+              "MonitoredVehicleJourney": {
+                "LineRef": "STIF:Line::C01740:",
+                "OperatorRef": "SNCF_ACCES_CLOUD:Operator::SNCF:",
+                "FramedVehicleJourneyRef": {
+                  "DataFrameRef": "any",
+                  "DatedVehicleJourneyRef": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC"
+                },
+                "DestinationRef": "STIF:StopPoint:Q:41194:",
+                "DestinationName": "Gare Saint-Lazare",
+                "JourneyNote": "PASA",
+                "MonitoredCall": {
+                  "StopPointName": "Gare de Saint-Cloud",
+                  "VehicleAtStop": false,
+                  "DestinationDisplay": "Gare Saint-Lazare",
+                  "ExpectedArrivalTime": "2023-06-02T08:46:40.000Z",
+                  "ExpectedDepartureTime": "2023-06-02T08:47:40.000Z",
+                  "DepartureStatus": "onTime",
+                  "Order": 6,
+                  "AimedArrivalTime": "2023-06-02T08:46:40.000Z",
+                  "ArrivalPlatformName": "2",
+                  "AimedDepartureTime": "2023-06-02T08:47:40.000Z",
+                  "ArrivalStatus": "onTime"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+    """
+    And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
+      | remote_url                       | http://localhost:8090   |
+      | remote_credential                | test                    |
+      | remote_objectid_kind             | internal                |
+      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
+      | collect.subscriptions.persistent | true                    |
+      | local_credential                 | toto                    |
+      | collect.subscriptions.persistent | true |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name      | Test 1                                |
+      | ObjectIDs | "internal": "STIF:StopPoint:Q:41178:" |
+    # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
+    When a minute has passed
+    Then one StopVisit has the following attributes:
+      | ObjectIDs                 | "internal": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC" |
+      | ArrivalStatus             | onTime                                                |
+      | DepartureStatus           | onTime                                                |
+      | DataFrameRef              | any                                                   |
+      | PassageOrder              | 6                                                     |
+      | StopAreaId                | 6ba7b814-9dad-11d1-2-00c04fd430c8                     |
+      | VehicleAtStop             | false                                                 |
+    And one Line has the following attributes:
+      | ObjectIDs | "internal": "STIF:Line::C01740:" |
+    And one VehicleJourney has the following attributes:
+      | ObjectIDs       | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC" |
+      | DestinationName | Gare Saint-Lazare                                                                       |
+      | Monitored       | true                                                                                    |
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                                                               |
+      | Direction          | sent                                                               |
+      | ResponseIdentifier | IVTR_HET:ResponseMessage:9bd2199f-2685-4f37-9a60-177312447a38:LOC: |
+      | Status             | OK                                                                 |
+      | Type               | GetStopMonitoringRequest                                           |
+      | StopAreas          | ["STIF:StopPoint:Q:41178:"]                                        |
+      | RequestRawMessage  | MonitoringRef=STIF:StopPoint:Q:41178:                              |
 
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
