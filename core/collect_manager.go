@@ -102,8 +102,10 @@ func (manager *CollectManager) HandlePartnerStatusChange(partner string, status 
 
 func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 	stopArea, ok := manager.referential.Model().StopAreas().Find(request.StopAreaId())
+	localLogger := NewStopAreaLogger(manager.referential, stopArea)
+
 	if !ok {
-		logger.Log.Debugf("Can't find StopArea %v in Collect Manager", request.StopAreaId())
+		localLogger.Printf("Can't find StopArea %v in Collect Manager", request.StopAreaId())
 		return
 	}
 
@@ -112,11 +114,13 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		requestCollector := partner.StopMonitoringRequestCollector()
 
 		if subscriptionCollector == nil && requestCollector == nil {
+			localLogger.Printf("No Collector for Partner %s", partner.Slug())
 			continue
 		}
 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
+				localLogger.Printf("Partner %s isn't up", partner.Slug())
 				continue
 			}
 		}
@@ -125,6 +129,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 
 		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
 		if !ok {
+			localLogger.Printf("No ObjectId matching Partner ObjectIdKind (%s)", partnerKind)
 			continue
 		}
 
@@ -142,7 +147,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 		}
 
 		if partner.CanCollect(stopAreaObjectID.Value(), lineIds) {
-			logger.Log.Debugf("RequestStopAreaUpdate %v", request.StopAreaId())
+			localLogger.Printf("RequestStopAreaUpdate %v", request.StopAreaId())
 
 			if subscriptionCollector != nil {
 				subscriptionCollector.RequestStopAreaUpdate(request)
@@ -150,6 +155,8 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			}
 			requestCollector.RequestStopAreaUpdate(request)
 			return
+		} else {
+			localLogger.Printf("Partner %s can't collect StopArea", partner.Slug())
 		}
 	}
 }

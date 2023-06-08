@@ -1,13 +1,17 @@
 package settings
 
 import (
+	"regexp"
 	"strconv"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 const (
-	MODEL_RELOAD_AT   = "model.reload_at"
-	MODEL_PERSISTENCE = "model.persistence"
+	MODEL_RELOAD_AT           = "model.reload_at"
+	MODEL_PERSISTENCE         = "model.persistence"
+	LOGGER_VERBOSE_STOP_AREAS = "logger.verbose.stop_areas"
 )
 
 type ReferentialSettings struct {
@@ -46,4 +50,26 @@ func (rs *ReferentialSettings) ModelPersistenceDuration() (d time.Duration, ok b
 		d = 0
 	}
 	return -d, true
+}
+
+var loggerObjectId = regexp.MustCompile(`^([^:]+):(.*)$`)
+
+func (rs *ReferentialSettings) LoggerVerboseStopAreas() []model.ObjectID {
+	rs.m.RLock()
+	setting, ok := rs.s[LOGGER_VERBOSE_STOP_AREAS]
+	rs.m.RUnlock()
+
+	if !ok {
+		return []model.ObjectID{}
+	}
+
+	parsedSetting := loggerObjectId.FindStringSubmatch(setting)
+	if len(parsedSetting) == 0 {
+		return []model.ObjectID{}
+	}
+
+	kind := parsedSetting[1]
+	value := parsedSetting[2]
+
+	return []model.ObjectID{model.NewObjectID(kind, value)}
 }
