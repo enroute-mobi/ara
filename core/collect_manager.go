@@ -118,11 +118,9 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
-				localLogger.Printf("Partner %s isn't up", partner.Slug())
-				continue
-			}
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+			localLogger.Printf("Partner %s isn't up", partner.Slug())
+			continue
 		}
 
 		partnerKind := partner.RemoteObjectIDKind()
@@ -179,10 +177,9 @@ func (manager *CollectManager) UpdateLine(ctx context.Context, request *LineUpda
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
-				continue
-			}
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
+			continue
 		}
 
 		partnerKind := partner.RemoteObjectIDKind()
@@ -225,10 +222,9 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
-			if !partner.PersistentCollectSubscriptions() || subscriptionCollector == nil {
-				continue
-			}
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
+			continue
 		}
 
 		partnerKind := partner.RemoteObjectIDKind()

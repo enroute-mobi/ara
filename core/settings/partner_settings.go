@@ -36,6 +36,7 @@ const (
 	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
 	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
+	COLLECT_PERSISTENT               = "collect.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
 	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
@@ -339,9 +340,12 @@ func (s *PartnerSettings) GeneralMessageRequestVersion22() (r bool) {
 	return
 }
 
-func (s *PartnerSettings) PersistentCollectSubscriptions() (r bool) {
+func (s *PartnerSettings) PersistentCollect() (r bool) {
 	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[COLLECT_SUBSCRIPTIONS_PERSISTENT])
+	subscription, _ := strconv.ParseBool(s.s[COLLECT_SUBSCRIPTIONS_PERSISTENT])
+	collect, _ := strconv.ParseBool(s.s[COLLECT_PERSISTENT])
+
+	r = subscription || collect
 	s.m.RUnlock()
 	return
 }

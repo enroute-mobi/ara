@@ -116,7 +116,7 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		partner.PartnerStatus.RetryCount = 0
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
 
-		collectPersistent := partner.PersistentCollectSubscriptions()
+		collectPersistent := partner.PersistentCollect()
 		if !collectPersistent {
 			partner.Subscriptions().CancelCollectSubscriptions()
 		}
