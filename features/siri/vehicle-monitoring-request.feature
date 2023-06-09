@@ -3,6 +3,55 @@ Feature: Support SIRI VehicleMonitoring by request
   Background:
       Given a Referential "test" is created
 
+  @ARA-1306
+  Scenario: VehicleMonitoring request collect should send GetVehicleMonitoring request to partner
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-request-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   Then the SIRI server should have received 1 GetVehicleMonitoring request
+
+  @ARA-1306
+  Scenario: VehicleMonitoring request collect and partner CheckStatus is unavailable should not send GetVehicleMonitoring request to partner
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   Then the SIRI server should not have received a GetVehicleMonitoring request
+
+  @ARA-1306
+  Scenario: VehicleMonitoring request collect and partner CheckStatus is unavailable should send GetVehicleMonitoring request to partner whith setting collect.persistent 
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | remote_objectid_kind             | internal              |
+      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
+      | local_credential                 | ara                   |
+      | collect.persistent               | true                  |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   Then the SIRI server should have received 1 GetVehicleMonitoring request
+
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with fallback on generic connector remote_objectid_kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
