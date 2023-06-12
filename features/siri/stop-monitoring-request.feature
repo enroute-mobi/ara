@@ -1673,3 +1673,49 @@ Feature: Support SIRI StopMonitoring by request
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef | ch:1:Direction:R | VehicleJourney#DirectionType |
+
+  @ARA-1306
+  Scenario: StopMonitoring request collect should send GetStopMonitoring request to partner
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+     | remote_url                 | http://localhost:8090      |
+     | remote_credential          | test                       |
+     | remote_objectid_kind       | internal                   |
+     | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+   And a minute has passed
+   And a StopArea exists with the following attributes:
+     | Name      | Test 1                                   |
+     | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+   When a minute has passed
+   Then the SIRI server should have received 1 GetStopMonitoring request
+
+  @ARA-1306
+  Scenario: StopMonitoring request collect and partner CheckStatus is unavailable should not send GetStopMonitoring request to partner
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
+     | remote_url                 | http://localhost:8090      |
+     | remote_credential          | test                       |
+     | remote_objectid_kind       | internal                   |
+     | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+   And a minute has passed
+   And a StopArea exists with the following attributes:
+     | Name      | Test 1                                   |
+     | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+   When a minute has passed
+   And the SIRI server should not have received a GetStopMonitoring request
+
+  @ARA-1306
+  Scenario: StopMonitoring request collect and partner CheckStauts is unavailable should send GetStopMonitoring request to partner whith setting collect.persistent
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                 | http://localhost:8090      |
+      | remote_credential          | test                       |
+      | remote_objectid_kind       | internal                   |
+      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+      | collect.persistent         | true                       |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name      | Test 1                                   |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    When a minute has passed
+    Then the SIRI server should have received 1 GetStopMonitoring request

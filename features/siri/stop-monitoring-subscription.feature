@@ -2083,3 +2083,74 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | SubscriptionRef | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Kind            | StopMonitoringBroadcast           |
       | ExternalId      | 2                                 |
+
+  @ARA-1306
+  Scenario: StopMonitoring subscription collect should send StopMonitoringSubscription request to partner
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-subscription-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | remote_objectid_kind | internal              |
+      | local_credential     | ara                   |
+   And a StopArea exists with the following attributes:
+     | Name      | Arletty               |
+     | ObjectIDs | "internal": "boaarle" |
+   And a Subscription exist with the following attributes:
+     | Kind              | StopMonitoringCollect           |
+     | ReferenceArray[0] | StopArea, "internal": "boaarle" |
+   And a minute has passed
+   Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request
+
+  @ARA-1306 
+  Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should not send StopMonitoringSubscription request to partner
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | remote_objectid_kind | internal              |
+      | local_credential     | ara                   |
+   And a StopArea exists with the following attributes:
+     | Name      | Arletty               |
+     | ObjectIDs | "internal": "boaarle" |
+   And a Subscription exist with the following attributes:
+     | Kind              | StopMonitoringCollect           |
+     | ReferenceArray[0] | StopArea, "internal": "boaarle" |
+   And a minute has passed
+   Then the SIRI server should not have received a StopMonitoringSubscription request
+
+  @ARA-1306
+  Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should send StopMonitoringSubscription request to partner whith setting collect.subscriptions.persistent
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | remote_objectid_kind             | internal              |
+      | local_credential                 | ara                   |
+      | collect.subscriptions.persistent | true                  |
+     And a StopArea exists with the following attributes:
+      | Name      | Arletty               |
+      | ObjectIDs | "internal": "boaarle" |
+    And a Subscription exist with the following attributes:
+      | Kind              | StopMonitoringCollect           |
+      | ReferenceArray[0] | StopArea, "internal": "boaarle" |
+    And a minute has passed
+    Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request
+
+  @ARA-1306
+  Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should send StopMonitoringSubscription request to partner whith setting collect.persistent
+   Given a SIRI server on "http://localhost:8090"
+   And a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | remote_objectid_kind             | internal              |
+      | local_credential                 | ara                   |
+      | collect.persistent               | true                  |
+     And a StopArea exists with the following attributes:
+      | Name      | Arletty               |
+      | ObjectIDs | "internal": "boaarle" |
+    And a Subscription exist with the following attributes:
+      | Kind              | StopMonitoringCollect           |
+      | ReferenceArray[0] | StopArea, "internal": "boaarle" |
+    And a minute has passed
+    And 10 seconds ahve passed
+    Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request

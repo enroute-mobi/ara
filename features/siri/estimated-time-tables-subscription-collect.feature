@@ -3,6 +3,76 @@ Feature: Support SIRI EstimatedTimetable
   Background:
       Given a Referential "test" is created
 
+  @ARA-1306
+  Scenario: EstimatedTimetable subscription collect should send EstimatedTimetableSubscriptionRequest to partner
+   Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And a minute has passed
+   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+
+  @ARA-1306
+  Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should not send EstimatedTimetableSubscriptionRequest to partner
+   Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And a minute has passed
+   Then the SIRI server should not have received a EstimatedTimetableSubscriptionRequest request
+
+  @ARA-1306
+  Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should send EstimatedTimetableSubscriptionRequest to partner whith setting collect.subscriptions.persistent
+   Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | remote_objectid_kind             | internal              |
+      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
+      | local_credential                 | ara                   |
+      | collect.subscriptions.persistent | true                  |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And a minute has passed
+   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+
+  @ARA-1306
+  Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should send EstimatedTimetableSubscriptionRequest to partner whith setting collect.persistent
+   Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | remote_objectid_kind             | internal              |
+      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
+      | local_credential                 | ara                   |
+      | collect.persistent               | true                  |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And 10 seconds have passed
+   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+
   @ARA-1152
   Scenario: Create EstimatedTimetable subscription collect
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
