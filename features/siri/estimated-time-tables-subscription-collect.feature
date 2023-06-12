@@ -17,7 +17,7 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And a minute has passed
+   And 10 seconds have passed
    Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
 
   @ARA-1306
@@ -34,7 +34,7 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And a minute has passed
+   And 10 seconds have passed
    Then the SIRI server should not have received a EstimatedTimetableSubscriptionRequest request
 
   @ARA-1306
@@ -52,7 +52,7 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And a minute has passed
+   And 10 seconds have passed
    Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
 
   @ARA-1306
