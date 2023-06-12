@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -74,14 +76,14 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 	}
 
 	for _, call := range estimatedJourneyVersionFrame.EstimatedCalls() {
-		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), call)
+		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
 	}
 	for _, call := range estimatedJourneyVersionFrame.RecordedCalls() {
-		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), call)
+		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
 	}
 }
 
-func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model.ObjectID, recordedAt time.Time, call *sxml.XMLCall) {
+func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model.ObjectID, recordedAt time.Time, datedVehicleJourneyRef string, call *sxml.XMLCall) {
 	// StopAreas
 	stopAreaObjectId := model.NewObjectID(builder.remoteObjectidKind, call.StopPointRef())
 
@@ -99,7 +101,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model
 	}
 
 	// StopVisits
-	stopVisitId := builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "StopVisit", Id: builder.NewUUID()})
+	stopVisitId := fmt.Sprintf("%s-%s", datedVehicleJourneyRef, strconv.Itoa(call.Order()))
 	stopVisitObjectId := model.NewObjectID(builder.remoteObjectidKind, stopVisitId)
 
 	_, ok = builder.updateEvents.StopVisits[call.StopPointRef()][stopVisitId]
