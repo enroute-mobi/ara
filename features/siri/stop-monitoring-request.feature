@@ -3,7 +3,7 @@ Feature: Support SIRI StopMonitoring by request
   Background:
       Given a Referential "test" is created
   
-  @ARA-1240 @wip
+  @ARA-1240
   Scenario: Collect by using SIRI Lite Stop Monitoring
     Given a lite SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
     """
@@ -62,7 +62,7 @@ Feature: Support SIRI StopMonitoring by request
       | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
       | collect.subscriptions.persistent | true                    |
       | local_credential                 | toto                    |
-      | collect.subscriptions.persistent | true |
+      | collect.persistent               | true                    |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                |

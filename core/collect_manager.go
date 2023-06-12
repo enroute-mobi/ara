@@ -111,9 +111,10 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
 		subscriptionCollector := partner.StopMonitoringSubscriptionCollector()
-		requestCollector := partner.StopMonitoringRequestCollector()
+		SMrequestCollector := partner.StopMonitoringRequestCollector()
+		SMLiterequestCollector := partner.LiteStopMonitoringRequestCollector()
 
-		if subscriptionCollector == nil && requestCollector == nil {
+		if subscriptionCollector == nil && SMrequestCollector == nil && SMLiterequestCollector == nil {
 			localLogger.Printf("No Collector for Partner %s", partner.Slug())
 			continue
 		}
@@ -150,11 +151,17 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			if subscriptionCollector != nil {
 				subscriptionCollector.RequestStopAreaUpdate(request)
 				return
+			} else if SMrequestCollector != nil {
+				SMrequestCollector.RequestStopAreaUpdate(request)
+				return
+			} else if SMLiterequestCollector != nil {
+				SMLiterequestCollector.RequestStopAreaUpdate(request)
+				return
+			} else {
+
+				localLogger.Printf("Partner %s can't collect StopArea", partner.Slug())
 			}
-			requestCollector.RequestStopAreaUpdate(request)
-			return
-		} else {
-			localLogger.Printf("Partner %s can't collect StopArea", partner.Slug())
+
 		}
 	}
 }
