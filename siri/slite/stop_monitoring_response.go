@@ -71,6 +71,8 @@ type Siri struct {
 	ServiceDelivery ServiceDelivery `json:"ServiceDelivery,omitempty"`
 }
 
+// When StopPointRef is not defined, we should use MonitoringRef value.
+// see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetStopPointRef() string {
 	if msv.StopPointRef != "" {
 		return msv.StopPointRef
@@ -79,6 +81,9 @@ func (msv *MonitoredStopVisit) GetStopPointRef() string {
 	return msv.MonitoringRef
 }
 
+// When ItemIdentifier is not defined, we should use
+// DatedVehicleJourneyRef + Order to create a default value.
+// see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetItemIdentifier() string {
 	if msv.ItemIdentifier != "" {
 		return msv.ItemIdentifier
