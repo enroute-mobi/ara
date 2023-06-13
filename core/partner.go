@@ -179,6 +179,10 @@ func (partner *Partner) SIRIClient() *remote.SIRIClient {
 	return partner.HTTPClient().SIRIClient()
 }
 
+func (partner *Partner) SIRILiteClient() *remote.SIRILiteClient {
+	return partner.HTTPClient().SIRILiteClient()
+}
+
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }

@@ -52,7 +52,7 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 	dest := &slite.SIRILiteStopMonitoring{}
 	startTime := connector.Clock().Now()
 
-	query, err := connector.Partner().HTTPClient().SIRILiteStopMonitoringRequest(dest, objectid.Value())
+	dest, err := connector.Partner().SIRILiteClient().StopMonitoring(objectid.Value())
 	if err != nil {
 		e := fmt.Sprintf("Error during LiteStopMonitoring request: %v", err)
 
@@ -61,7 +61,7 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 		return
 	}
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
-	message.RequestRawMessage = query
+	message.RequestRawMessage = fmt.Sprintf("MonitoringRef=%s", objectid.Value())
 	logSIRILiteStopMonitoringResponse(message, dest)
 
 	builder := NewLiteStopMonitoringUpdateEventBuilder(connector.partner, objectid)

@@ -1,22 +1,17 @@
 package remote
 
 import (
-	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri/slite"
 	"bitbucket.org/enroute-mobi/ara/version"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/protobuf/proto"
@@ -43,8 +38,9 @@ type HTTPClientUrls struct {
 type HTTPClient struct {
 	HTTPClientUrls
 
-	httpClient *http.Client
-	siriClient *SIRIClient
+	httpClient     *http.Client
+	siriClient     *SIRIClient
+	siriLiteClient *SIRILiteClient
 }
 
 func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
@@ -54,6 +50,9 @@ func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
 	}
 	sc := NewSIRIClient(c, opts.SiriEnvelopeType)
 	c.siriClient = sc
+
+	slc := NewSIRILiteClient(c)
+	c.siriLiteClient = slc
 
 	return c
 }
@@ -121,6 +120,10 @@ func (c *HTTPClient) SIRIClient() *SIRIClient {
 	return c.siriClient
 }
 
+func (c *HTTPClient) SIRILiteClient() *SIRILiteClient {
+	return c.siriLiteClient
+}
+
 func (c *HTTPClient) HTTPClient() *http.Client {
 	return c.httpClient
 }
@@ -186,91 +189,4 @@ func (c *HTTPClient) GTFSRequest() (*gtfs.FeedMessage, error) {
 	}
 
 	return feed, nil
-}
-
-func (c *HTTPClient) SIRILiteStopMonitoringRequest(dest interface{}, stopArea string) (string, error) {
-	var rawQuery string
-	ctx, cncl := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cncl()
-
-	// Prepare URI
-	params := url.Values{}
-	params.Add("MonitoringRef", stopArea)
-
-	buildUrl, err := URI(c.Url, "", params)
-	if err != nil {
-		return rawQuery, errors.Wrap(err, "unable to build URI")
-	}
-
-	rawQuery, _ = url.PathUnescape(buildUrl.RawQuery)
-
-	// Create http request
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodGet, buildUrl.String(), nil)
-	if err != nil {
-		return rawQuery, errors.Wrap(err, "cannot create request")
-	}
-
-	httpRequest.Header.Add("Accept", "application/json")
-	httpRequest.Header.Add("Content-Type", "application/json")
-	httpRequest.Header.Set("User-Agent", version.ApplicationName())
-
-	// Send http request
-	resp, err := c.httpClient.Do(httpRequest)
-	if err != nil {
-		return rawQuery, errors.Wrap(err, "cannot proceed request")
-	}
-
-	// Attempt to read the body
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return rawQuery, errors.Wrap(err, "cannot read the response")
-	}
-
-	// Check empty body
-	if len(body) == 0 {
-		return rawQuery, errors.Wrap(err, "empty body")
-	}
-
-	// Check response status
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		errMsg := string(body)
-		errData := &slite.SIRILiteStopMonitoring{}
-
-		if json.Unmarshal(body, &errData); err == nil {
-			errMsg = errData.
-				Siri.
-				ServiceDelivery.
-				StopMonitoringDelivery[0].
-				ErrorCondition.
-				ErrorInformation.
-				ErrorText
-		}
-
-		return rawQuery, fmt.Errorf("request failed with status %d: %s",
-			resp.StatusCode, errMsg)
-	}
-
-	// Parse the body
-	if dest != nil {
-		err := json.NewDecoder(bytes.NewReader(body)).Decode(&dest)
-		if err != nil {
-			return rawQuery, errors.Wrap(err, "cannot parse server response")
-		}
-	}
-
-	return rawQuery, nil
-}
-
-func URI(baseurl string, path string, params url.Values) (*url.URL, error) {
-	base, err := url.Parse(baseurl)
-	if err != nil {
-		return nil, errors.Wrapf(err, "unable to parse base url %v", baseurl)
-	}
-
-	if params == nil {
-		params = url.Values{}
-	}
-	u := base.ResolveReference(&url.URL{Path: path, RawQuery: params.Encode()})
-	return u, nil
 }

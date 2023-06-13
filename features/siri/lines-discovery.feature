@@ -95,9 +95,9 @@ Feature: Support SIRI LinesDiscovery
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-lines-discovery-request-collector] and the following settings:
-      | remote_url                 | http://localhost:8090      |
-      | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
     And a minute has passed
     Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
     And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
