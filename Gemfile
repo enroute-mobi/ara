@@ -13,6 +13,7 @@ group :test do
   gem 'pry'
   gem 'siri-xsd', en_route: 'siri-xsd'
   gem 'activesupport'
+  gem 'webrick'
 end
 
 group :development do

@@ -111,6 +111,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
+    webrick (1.8.1)
     with_env (1.1.0)
     xml-simple (1.1.9)
       rexml
@@ -133,6 +134,7 @@ DEPENDENCIES
   rest-client
   rspec-expectations
   siri-xsd!
+  webrick
 
 BUNDLED WITH
    2.2.33
