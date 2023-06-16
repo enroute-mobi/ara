@@ -67,6 +67,9 @@ case $command in
   migrate)
     exec ./ara migrate up
     ;;
+  purge)
+    exec ./ara purge -days 3
+    ;;
   *)
     exec $@
 esac
