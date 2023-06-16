@@ -223,6 +223,7 @@ func (partner *Partner) Stop() {
 		}
 	}
 	partner.CancelSubscriptions()
+	partner.ResetCollectSettings()
 	partner.gtfsCache.Clear()
 	partner.httpClient = nil
 
@@ -330,6 +331,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.slug = apiPartner.Slug
 	partner.Name = apiPartner.Name
 	partner.SetSettingsDefinition(apiPartner.Settings)
+	partner.ResetCollectSettings()
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 
