@@ -21,7 +21,7 @@ type MonitoredCall struct {
 	ExpectedArrivalTime   time.Time `json:"ExpectedArrivalTime,omitempty"`
 	ExpectedDepartureTime time.Time `json:"ExpectedDepartureTime,omitempty"`
 	DepartureStatus       string    `json:"DepartureStatus,omitempty"`
-	Order                 int       `json:"Order,omitempty"`
+	Order                 *int      `json:"Order,omitempty"`
 	AimedArrivalTime      time.Time `json:"AimedArrivalTime,omitempty"`
 	ArrivalPlatformName   string    `json:"ArrivalPlatformName,omitempty"`
 	AimedDepartureTime    time.Time `json:"AimedDepartureTime,omitempty"`
@@ -72,6 +72,10 @@ type Siri struct {
 	ServiceDelivery ServiceDelivery `json:"ServiceDelivery,omitempty"`
 }
 
+func (msv *MonitoredStopVisit) HasOrder() bool {
+	return msv.MonitoredVehicleJourney.MonitoredCall.Order != nil
+}
+
 // When Monitored is not defined, it should be true by default
 // see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetMonitored() bool {
@@ -103,7 +107,7 @@ func (msv *MonitoredStopVisit) GetItemIdentifier() string {
 
 	identifier := fmt.Sprintf("%s-%s",
 		msv.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef,
-		strconv.Itoa(msv.MonitoredVehicleJourney.MonitoredCall.Order),
+		strconv.Itoa(*msv.MonitoredVehicleJourney.MonitoredCall.Order),
 	)
 
 	return identifier

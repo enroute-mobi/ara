@@ -28,6 +28,12 @@ func NewLiteStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObj
 }
 
 func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisitEvent *slite.MonitoredStopVisit) {
+	// When Order is not defined, we should ignore the MonitoredStopVisit
+	// see ARA-1240 "Special cases"
+	if !StopVisitEvent.HasOrder() {
+		return
+	}
+
 	origin := string(builder.partner.Slug())
 	stopPointRef := StopVisitEvent.GetStopPointRef()
 
@@ -95,18 +101,13 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 
 	_, ok = builder.stopMonitoringUpdateEvents.StopVisits[stopPointRef][StopVisitEvent.GetItemIdentifier()]
 	if !ok {
-		// When Order is not defined, we should ignore the MonitoredStopVisit
-		// see ARA-1240 "Special cases"
-		if StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.Order == 0 {
-			return
-		}
 		svEvent := &model.StopVisitUpdateEvent{
 			Origin:                 origin,
 			ObjectId:               stopVisitObjectId,
 			StopAreaObjectId:       stopAreaObjectId,
 			VehicleJourneyObjectId: vjObjectId,
 			DataFrameRef:           StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef,
-			PassageOrder:           StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.Order,
+			PassageOrder:           *StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.Order,
 			VehicleAtStop:          StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.VehicleAtStop,
 			ArrivalStatus:          model.SetStopVisitArrivalStatus(StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.ArrivalStatus),
 			DepartureStatus:        model.SetStopVisitDepartureStatus(StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.DepartureStatus),
