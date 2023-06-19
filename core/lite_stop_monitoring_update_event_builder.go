@@ -112,13 +112,10 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			DepartureStatus:        model.SetStopVisitDepartureStatus(StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.DepartureStatus),
 			RecordedAt:             StopVisitEvent.RecordedAtTime,
 			Schedules:              model.NewStopVisitSchedules(),
+			Monitored:              StopVisitEvent.GetMonitored(),
 
 			ObjectidKind: builder.remoteObjectidKind,
 		}
-
-		// When Monitored is not defined, it should be true by default
-		// see ARA-1240 "Special cases"
-		svEvent.Monitored = true
 
 		monitoredCall := StopVisitEvent.MonitoredVehicleJourney.MonitoredCall
 

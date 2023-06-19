@@ -36,6 +36,7 @@ type MonitoredVehicleJourney struct {
 	DestinationRef          string                  `json:"DestinationRef,omitempty"`
 	DestinationName         string                  `json:"DestinationName,omitempty"`
 	JourneyNote             string                  `json:"JourneyNote,omitempty"`
+	Monitored               *bool                   `json:"Monitored"`
 	MonitoredCall           MonitoredCall           `json:"MonitoredCall,omitempty"`
 }
 type MonitoredStopVisit struct {
@@ -69,6 +70,17 @@ type ServiceDelivery struct {
 }
 type Siri struct {
 	ServiceDelivery ServiceDelivery `json:"ServiceDelivery,omitempty"`
+}
+
+// When Monitored is not defined, it should be true by default
+// see ARA-1240 "Special cases"
+func (msv *MonitoredStopVisit) GetMonitored() bool {
+	monitored := msv.MonitoredVehicleJourney.Monitored
+	if monitored == nil {
+		return true
+	}
+
+	return *monitored
 }
 
 // When StopPointRef is not defined, we should use MonitoringRef value.
