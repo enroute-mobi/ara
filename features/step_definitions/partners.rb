@@ -37,6 +37,12 @@ Given(/^a (SIRI )?Partner "([^"]*)" exists (?:in Referential "([^"]+)" )?with co
   end
 end
 
+Given('the Partner {string} is updated with the following settings:') do |slug, settings|
+	attributes = {"slug" => slug, "settings" => settings.rows_hash}
+  path = partners_path + '/' + slug
+	RestClient.put path, attributes.to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
+end
+
 Then(/^one Partner(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get partners_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   response_array = api_attributes(response.body)

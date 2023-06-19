@@ -403,6 +403,12 @@ func (s *PartnerSettings) SetCollectSettings() {
 	}
 }
 
+func (s *PartnerSettings) ResetCollectSettings() {
+	s.m.Lock()
+	s.cs = nil
+	s.m.Unlock()
+}
+
 func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
 	opts = remote.HTTPClientOptions{
