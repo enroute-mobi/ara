@@ -82,8 +82,14 @@ func (c *SIRILiteClient) prepareAndSendRequest(args siriLiteClientArguments) err
 		return c.handleUnsuccessfullStatusCode(resp.StatusCode, args.expectedResponse, body)
 	}
 
+	// rewrite the payload
+	rewriteBody, err := slite.RewriteValues(body)
+	if err != nil {
+		return errors.Wrap(err, "cannot rewrite the payload")
+	}
+
 	// Parse the body
-	err = json.NewDecoder(bytes.NewReader(body)).Decode(&dest)
+	err = json.NewDecoder(bytes.NewReader(rewriteBody)).Decode(&dest)
 	if err != nil {
 		return errors.Wrap(err, "cannot parse server response")
 	}
