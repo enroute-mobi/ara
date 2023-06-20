@@ -17,8 +17,9 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And 10 seconds have passed
-   Then the SIRI server should have received 1 VehicleMonitoringSubscriptionRequest request
+   And 20 seconds have passed
+   Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1306
   Scenario: VehicleMonitoring subscription collect and partner CheckStatus is unavailable should not send VehicleMonitoringSubscriptionRequest to partner
@@ -52,8 +53,9 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And 10 seconds have passed
-   Then the SIRI server should have received 1 VehicleMonitoringSubscriptionRequest request
+   And 30 seconds have passed
+   Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1306
   Scenario: VehicleMonitoring subscription collect and partner CheckStatus is unavailable should send VehicleMonitoringSubscriptionRequest to partner whith setting collect.persistent
@@ -71,7 +73,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
-   Then the SIRI server should have received 1 VehicleMonitoringSubscriptionRequest request
+   Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1236 @siri-valid
   Scenario: Send a VehicleMonitoring notification when a vehicle changes
