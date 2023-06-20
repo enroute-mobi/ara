@@ -16,7 +16,7 @@ RUN go install -v -ldflags "-X bitbucket.org/enroute-mobi/ara/version.value=${VE
 
 FROM debian:stable-slim
 
-ENV RUN_PACKAGES="libxml2 libproj19 ca-certificates"
+ENV RUN_PACKAGES="libxml2 libproj25 ca-certificates"
 
 RUN apt-get update && apt-get -y dist-upgrade && apt-get -y install --no-install-recommends $RUN_PACKAGES && \
     apt-get clean && apt-get -y autoremove && rm -rf /var/lib/apt/lists/*
