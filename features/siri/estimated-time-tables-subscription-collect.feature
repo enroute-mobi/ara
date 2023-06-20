@@ -17,8 +17,9 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And 10 seconds have passed
-   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+   And 20 seconds have passed
+   Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1306
   Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should not send EstimatedTimetableSubscriptionRequest to partner
@@ -52,8 +53,9 @@ Feature: Support SIRI EstimatedTimetable
       | Name      | Test 1                             |
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
-   And 10 seconds have passed
-   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+   And 30 seconds have passed
+   Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1306
   Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should send EstimatedTimetableSubscriptionRequest to partner whith setting collect.persistent
@@ -71,7 +73,8 @@ Feature: Support SIRI EstimatedTimetable
       | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
-   Then the SIRI server should have received 1 EstimatedTimetableSubscriptionRequest request
+   Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
+      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1152
   Scenario: Create EstimatedTimetable subscription collect

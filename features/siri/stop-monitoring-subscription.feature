@@ -2099,7 +2099,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
      | Kind              | StopMonitoringCollect           |
      | ReferenceArray[0] | StopArea, "internal": "boaarle" |
    And a minute has passed
-   Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request
+   Then the SIRI server should have received a StopMonitoringSubscriptionRequest request with:
+     | //siri:MonitoringRef | boaarle |
 
   @ARA-1306 
   Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should not send StopMonitoringSubscription request to partner
@@ -2134,7 +2135,8 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Kind              | StopMonitoringCollect           |
       | ReferenceArray[0] | StopArea, "internal": "boaarle" |
     And a minute has passed
-    Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request
+    Then the SIRI server should have received a StopMonitoringSubscriptionRequest request with:
+      | //siri:MonitoringRef | boaarle |
 
   @ARA-1306
   Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should send StopMonitoringSubscription request to partner whith setting collect.persistent
@@ -2152,5 +2154,6 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       | Kind              | StopMonitoringCollect           |
       | ReferenceArray[0] | StopArea, "internal": "boaarle" |
     And a minute has passed
-    And 10 seconds ahve passed
-    Then the SIRI server should have received 1 StopMonitoringSubscriptionRequest request
+    And 10 seconds have passed
+    Then the SIRI server should have received a StopMonitoringSubscriptionRequest request with:
+      | //siri:MonitoringRef | boaarle |
