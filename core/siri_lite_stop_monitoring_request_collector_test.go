@@ -65,8 +65,15 @@ func Test_SIRILiteStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testin
 	for i := range updateEvents {
 		eventKinds = append(eventKinds, updateEvents[i].EventKind())
 	}
-	// 1 StopArea, 1 Line, 1 VehicleJourney, 1 StopVisit
-	assert.ElementsMatch([]model.EventKind{0, 2, 3, 4}, eventKinds)
+
+	expectedEventKinds := []model.EventKind{
+		model.STOP_AREA_EVENT,
+		model.LINE_EVENT,
+		model.VEHICLE_JOURNEY_EVENT,
+		model.STOP_VISIT_EVENT}
+
+	assert.ElementsMatch(expectedEventKinds, eventKinds,
+		"Should have 1 StopArea, 1 Line, 1 VehicleJourney, 1 StopVisit")
 
 	stopVisitEvent := findSVEvent(updateEvents, "SNCF_ACCES_CLOUD:Item::41178_133528:LOC")
 	assert.NotNil(stopVisitEvent)
