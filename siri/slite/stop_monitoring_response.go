@@ -41,9 +41,9 @@ type MonitoredVehicleJourney struct {
 }
 type MonitoredStopVisit struct {
 	RecordedAtTime          time.Time               `json:"RecordedAtTime,omitempty"`
-	ItemIdentifier          string                  `json:"ItemIdentifier,omitempty"`
+	ItemIdentifier          *string                 `json:"ItemIdentifier"`
 	MonitoringRef           string                  `json:"MonitoringRef,omitempty"`
-	StopPointRef            string                  `json:"StopPointRef,omitempty"`
+	StopPointRef            *string                 `json:"StopPointRef"`
 	MonitoredVehicleJourney MonitoredVehicleJourney `json:"MonitoredVehicleJourney,omitempty"`
 }
 type StopMonitoringDelivery struct {
@@ -79,19 +79,18 @@ func (msv *MonitoredStopVisit) HasOrder() bool {
 // When Monitored is not defined, it should be true by default
 // see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetMonitored() bool {
-	monitored := msv.MonitoredVehicleJourney.Monitored
-	if monitored == nil {
-		return true
+	if monitored := msv.MonitoredVehicleJourney.Monitored; monitored != nil {
+		return *monitored
 	}
 
-	return *monitored
+	return true
 }
 
 // When StopPointRef is not defined, we should use MonitoringRef value.
 // see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetStopPointRef() string {
-	if msv.StopPointRef != "" {
-		return msv.StopPointRef
+	if stopPointRef := msv.StopPointRef; stopPointRef != nil {
+		return *stopPointRef
 	}
 
 	return msv.MonitoringRef
@@ -101,14 +100,12 @@ func (msv *MonitoredStopVisit) GetStopPointRef() string {
 // DatedVehicleJourneyRef + Order to create a default value.
 // see ARA-1240 "Special cases"
 func (msv *MonitoredStopVisit) GetItemIdentifier() string {
-	if msv.ItemIdentifier != "" {
-		return msv.ItemIdentifier
+	if itemIdentifier := msv.ItemIdentifier; itemIdentifier != nil {
+		return *itemIdentifier
 	}
 
-	identifier := fmt.Sprintf("%s-%s",
+	return fmt.Sprintf("%s-%s",
 		msv.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef,
 		strconv.Itoa(*msv.MonitoredVehicleJourney.MonitoredCall.Order),
 	)
-
-	return identifier
 }
