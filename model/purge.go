@@ -38,7 +38,7 @@ func (p *Purifier) Purge() error {
 		if err != nil {
 			logger.Log.Debugf("Error with Result.RowsAffected: %v", err)
 		}
-		logger.Log.Debugf("Purged %v %v from database", ra, table_names[i])
+		logger.Log.Printf("Purged %v %v from database", ra, table_names[i])
 	}
 
 	// Commit transaction
