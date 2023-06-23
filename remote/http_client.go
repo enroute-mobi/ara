@@ -21,6 +21,12 @@ type HTTPClientOptions struct {
 	SiriEnvelopeType string
 	OAuth            *HTTPClientOAuth
 	Urls             HTTPClientUrls
+	SiriCredential   SiriCredentialHeader
+}
+
+type SiriCredentialHeader struct {
+	CredentialHeader string
+	Value            string
 }
 
 type HTTPClientOAuth struct {
@@ -51,7 +57,7 @@ func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
 	sc := NewSIRIClient(c, opts.SiriEnvelopeType)
 	c.siriClient = sc
 
-	slc := NewSIRILiteClient(c)
+	slc := NewSIRILiteClient(c, opts.SiriCredential)
 	c.siriLiteClient = slc
 
 	return c

@@ -411,9 +411,15 @@ func (s *PartnerSettings) ResetCollectSettings() {
 
 func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
+	credential := remote.SiriCredentialHeader{
+		CredentialHeader: "X-SIRI-Requestor",
+		Value:            s.RequestorRef(),
+	}
+
 	opts = remote.HTTPClientOptions{
 		SiriEnvelopeType: s.siriEnvelopeType(),
 		OAuth:            s.httpClientOAuth(),
+		SiriCredential:   credential,
 		Urls: remote.HTTPClientUrls{
 			Url:              s.s[REMOTE_URL],
 			SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],

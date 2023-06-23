@@ -17,6 +17,7 @@ import (
 
 type SIRILiteClient struct {
 	HTTPClientUrls
+	credential SiriCredentialHeader
 
 	httpClient *HTTPClient
 }
@@ -28,9 +29,10 @@ type siriLiteClientArguments struct {
 	destination      interface{}
 }
 
-func NewSIRILiteClient(c *HTTPClient) *SIRILiteClient {
+func NewSIRILiteClient(c *HTTPClient, credential SiriCredentialHeader) *SIRILiteClient {
 	return &SIRILiteClient{
 		httpClient: c,
+		credential: credential,
 	}
 }
 
@@ -58,6 +60,7 @@ func (c *SIRILiteClient) prepareAndSendRequest(args siriLiteClientArguments) err
 	httpRequest.Header.Add("Accept", "application/json")
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Set("User-Agent", version.ApplicationName())
+	httpRequest.Header.Set(c.credential.CredentialHeader, c.credential.Value)
 
 	// Send http request
 	resp, err := c.remoteClient().Do(httpRequest)
