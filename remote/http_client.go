@@ -38,8 +38,9 @@ type HTTPClientUrls struct {
 type HTTPClient struct {
 	HTTPClientUrls
 
-	httpClient *http.Client
-	siriClient *SIRIClient
+	httpClient     *http.Client
+	siriClient     *SIRIClient
+	siriLiteClient *SIRILiteClient
 }
 
 func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
@@ -49,6 +50,9 @@ func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
 	}
 	sc := NewSIRIClient(c, opts.SiriEnvelopeType)
 	c.siriClient = sc
+
+	slc := NewSIRILiteClient(c)
+	c.siriLiteClient = slc
 
 	return c
 }
@@ -114,6 +118,10 @@ func (c *HTTPClient) SetURLs(urls HTTPClientUrls) {
 
 func (c *HTTPClient) SIRIClient() *SIRIClient {
 	return c.siriClient
+}
+
+func (c *HTTPClient) SIRILiteClient() *SIRILiteClient {
+	return c.siriLiteClient
 }
 
 func (c *HTTPClient) HTTPClient() *http.Client {

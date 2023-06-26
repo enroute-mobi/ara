@@ -1,0 +1,22 @@
+{
+  "Siri": {
+    "ServiceDelivery": {
+      "ResponseTimestamp": "2023-06-05T17:01:53.942Z",
+      "ProducerRef": "IVTR_HET",
+      "ResponseMessageIdentifier": "IVTR_HET:ResponseMessage:aa56d2c1-acac-4c3b-87a3-f866ccfeaf8c:LOC:",
+      "StopMonitoringDelivery": [
+        {
+          "ResponseTimestamp": "2023-06-05T17:01:53.942Z",
+          "Version": "2.0",
+          "Status": "true",
+          "ErrorCondition": {
+            "ErrorInformation": {
+              "ErrorText": "La requête contient des identifiants qui sont inconnus",
+              "ErrorDescription": "Les paramètres ne peuvent contenir qu'un MonitoringRef pouvant être couplé à un LineRef."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

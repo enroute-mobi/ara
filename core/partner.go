@@ -179,6 +179,10 @@ func (partner *Partner) SIRIClient() *remote.SIRIClient {
 	return partner.HTTPClient().SIRIClient()
 }
 
+func (partner *Partner) SIRILiteClient() *remote.SIRILiteClient {
+	return partner.HTTPClient().SIRILiteClient()
+}
+
 func (partner *Partner) OperationnalStatus() OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }
@@ -470,6 +474,15 @@ func (partner *Partner) StopMonitoringRequestCollector() (smrc StopMonitoringReq
 	}
 	smrc, _ = c.(StopMonitoringRequestCollector)
 	return
+}
+
+func (partner *Partner) LiteStopMonitoringRequestCollector() (lsmrc LiteStopMonitoringRequestCollector) {
+	c, ok := partner.connectors[SIRI_LITE_STOP_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return c.(LiteStopMonitoringRequestCollector)
+	}
+
+	return nil
 }
 
 func (partner *Partner) StopMonitoringSubscriptionCollector() StopMonitoringSubscriptionCollector {

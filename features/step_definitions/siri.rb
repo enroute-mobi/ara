@@ -56,18 +56,25 @@ Given(/^an OAuth server (?:"([^"]*)" )?waits request on "([^"]*)" and accepts cl
   OAUTHServer.create(name, url, config).start
 end
 
-Given(/^a ?(raw|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
-  name ||= "default"
-  if envelope == ""
+Given(/^a ?(raw|lite|) SIRI server (?:"([^"]*)" )?waits (\S+) request on "([^"]*)" to respond with$/) do |envelope, name, message_type, url, response|
+  name ||= 'default'
+  if envelope == ''
     SIRIServer.create(name, url).expect_request(message_type, response).start
-  else
+  elsif envelope == 'raw'
     SIRIServer.create(name, url, 'raw').expect_request(message_type, response).start
+  else
+    SIRILiteServer.create(name, url).expect_request(message_type, response).start
   end
 end
 
 Given(/^the SIRI server (?:"([^"]*)" )?waits a (\S+) request to respond with$/) do |name, message_type, response|
   name ||= "default"
   SIRIServer.find(name).expect_request(message_type, response)
+end
+
+When(/^the SIRI Lite server (?:"([^"]*)" )?has received a (\S+) request$/) do |name, message_type|
+  name ||= "default"
+  SIRIServer.find(name).wait_request message_type
 end
 
 When(/^the SIRI server (?:"([^"]*)" )?has received a (\S+) request$/) do |name, message_type|
