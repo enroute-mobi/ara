@@ -71,15 +71,12 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 	}
 
 	// VehicleJourneys
-	vjObjectId := model.NewObjectID(builder.remoteObjectidKind,
-		StopVisitEvent.
-			MonitoredVehicleJourney.
-			FramedVehicleJourneyRef.
-			DatedVehicleJourneyRef)
+	vjCode := StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
+	vjObjectId := model.NewObjectID(builder.remoteObjectidKind, vjCode)
 
 	_, ok = builder.
 		stopMonitoringUpdateEvents.
-		VehicleJourneys[StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef]
+		VehicleJourneys[vjCode]
 
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
@@ -93,12 +90,13 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			ObjectidKind: builder.remoteObjectidKind,
 		}
 
-		builder.stopMonitoringUpdateEvents.VehicleJourneys[StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef] = vjEvent
+		builder.stopMonitoringUpdateEvents.VehicleJourneys[vjCode] = vjEvent
 	}
 
 	// StopVisits
 	stopVisitObjectId := model.NewObjectID(builder.remoteObjectidKind, StopVisitEvent.GetItemIdentifier())
 
+	monitoredCall := StopVisitEvent.MonitoredVehicleJourney.MonitoredCall
 	_, ok = builder.stopMonitoringUpdateEvents.StopVisits[stopPointRef][StopVisitEvent.GetItemIdentifier()]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
@@ -107,18 +105,16 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			StopAreaObjectId:       stopAreaObjectId,
 			VehicleJourneyObjectId: vjObjectId,
 			DataFrameRef:           StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef,
-			PassageOrder:           *StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.Order,
-			VehicleAtStop:          StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.VehicleAtStop,
-			ArrivalStatus:          model.SetStopVisitArrivalStatus(StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.ArrivalStatus),
-			DepartureStatus:        model.SetStopVisitDepartureStatus(StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.DepartureStatus),
+			PassageOrder:           *monitoredCall.Order,
+			VehicleAtStop:          monitoredCall.VehicleAtStop,
+			ArrivalStatus:          model.SetStopVisitArrivalStatus(monitoredCall.ArrivalStatus),
+			DepartureStatus:        model.SetStopVisitDepartureStatus(monitoredCall.DepartureStatus),
 			RecordedAt:             StopVisitEvent.RecordedAtTime,
 			Schedules:              model.NewStopVisitSchedules(),
 			Monitored:              StopVisitEvent.GetMonitored(),
 
 			ObjectidKind: builder.remoteObjectidKind,
 		}
-
-		monitoredCall := StopVisitEvent.MonitoredVehicleJourney.MonitoredCall
 
 		aimedDerpatureTime := monitoredCall.AimedDepartureTime
 		aimedArrivalTime := monitoredCall.AimedArrivalTime
