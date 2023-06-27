@@ -69,28 +69,5 @@ func Test_SIRILiteClient_StopMonitoringDelivery_With_Error_400(t *testing.T) {
 	stopArea := "STIF:StopPoint:Q:41178:"
 
 	_, err := client.StopMonitoring(stopArea)
-	assert.EqualError(err, "request failed with status 400: La requête contient des identifiants qui sont inconnus", err.Error())
-}
-
-func Test_SIRILiteClient_StopMonitoringDelivery_With_Error_400_With_unmarshallable_Error(t *testing.T) {
-	assert := assert.New(t)
-
-	// Create a test http server with return code 400 and error payload
-	ts := createSIRILiteServer(t, "stop-monitoring-lite-delivery-error-unmarshallable", 400)
-	defer ts.Close()
-
-	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientOptions{
-		Urls: HTTPClientUrls{Url: ts.URL},
-		SiriCredential: SiriCredentialHeader{
-			CredentialHeader: "X-SIRI-Requestor",
-			Value:            "test",
-		},
-	})
-	client := httpClient.SIRILiteClient()
-	stopArea := "STIF:StopPoint:Q:41178:"
-	expectedErrorMessage := "request failed with status 400: \"ERROR\""
-
-	_, err := client.StopMonitoring(stopArea)
-	assert.EqualError(err, expectedErrorMessage, err.Error())
+	assert.EqualError(err, "request failed with status 400: {    \"message\": \"no Route matched with those values\"}", err.Error())
 }
