@@ -82,7 +82,7 @@ func (c *SIRILiteClient) prepareAndSendRequest(args siriLiteClientArguments) err
 
 	// Check response status
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return c.handleUnsuccessfullStatusCode(resp.StatusCode, args.expectedResponse, body)
+		return fmt.Errorf("request failed with status %d: %s", resp.StatusCode, strings.Replace(string(body), "\n", "", -1))
 	}
 
 	// rewrite the payload
@@ -144,26 +144,4 @@ func (client *SIRILiteClient) getURL(requestType requestType) string {
 		}
 	}
 	return client.httpClient.Url
-}
-
-func (client *SIRILiteClient) handleUnsuccessfullStatusCode(statusCode int, expectedResponse string, body []byte) error {
-	switch expectedResponse {
-	case "StopMonitoringDelivery":
-		errData := slite.SIRILiteStopMonitoring{}
-		var errMsg string
-		if err := json.Unmarshal(body, &errData); err == nil {
-			errMsg = errData.
-				Siri.
-				ServiceDelivery.
-				StopMonitoringDelivery[0].
-				ErrorCondition.
-				ErrorInformation.
-				ErrorText
-			return fmt.Errorf("request failed with status %d: %s", statusCode, errMsg)
-		} else {
-			// cannot parse the response
-			return fmt.Errorf("request failed with status %d: %s", statusCode, strings.Replace(string(body), "\n", "", -1))
-		}
-	}
-	return fmt.Errorf("request failed with status %d: ", statusCode)
 }
