@@ -274,57 +274,89 @@ func (partner *Partner) Allow(ip string) bool {
 }
 
 func (partner *Partner) CanCollect(stopId string, lineIds map[string]struct{}) bool {
-	if partner.CollectSettings().Empty() {
-		return true
+	canCollect := partner.CanCollectStop(stopId)
+
+	if canCollect == s.COLLECT_UNKNOWN {
+		canCollect = partner.CanCollectLines(lineIds)
 	}
 
-	if partner.CollectSettings().UseDiscoveredSA || partner.CollectSettings().UseDiscoveredLines {
-		return partner.checkDiscovered(stopId, lineIds) // Check excluded stops and lines
-	}
-
-	return partner.CollectSettings().CanCollectStop(stopId) && partner.CollectSettings().CanCollectLines(lineIds)
+	return canCollect == s.COLLECT_UNKNOWN || canCollect == s.CAN_COLLECT
 }
 
-func (partner *Partner) CanCollectLine(lineId string) bool { // Used for vehicle collect
-	if partner.CollectSettings().UseDiscoveredLines {
-		return partner.checkDiscoveredLine(lineId)
+func (partner *Partner) CanCollectStop(stopId string) s.CollectStatus {
+	canCollect := partner.CollectSettings().CanCollectStop(stopId)
+	if canCollect != s.COLLECT_UNKNOWN {
+		return canCollect
 	}
 
-	return partner.CollectSettings().CanCollectLine(lineId)
+	if !partner.CollectSettings().UseDiscoveredSA {
+		return s.COLLECT_UNKNOWN
+	}
+
+	if partner.checkDiscoveredStopArea(stopId) {
+		return s.CAN_COLLECT
+	}
+	return s.CANNOT_COLLECT
 }
 
-func (partner *Partner) checkDiscovered(stopId string, lineIds map[string]struct{}) (ok bool) {
-	// Return false if we exclude the stop or all the associated lines
-	if partner.CollectSettings().ExcludeStop(stopId) || partner.CollectSettings().ExcludeAllLines(lineIds) {
-		return
-	}
-
+func (partner *Partner) checkDiscoveredStopArea(stopId string) (ok bool) {
 	partner.mutex.RLock()
 	defer partner.mutex.RUnlock()
 
-	if partner.CollectSettings().UseDiscoveredLines {
-		for l := range lineIds {
-			_, ok = partner.discoveredLines[l]
-			if ok {
-				return
-			}
-		}
-	}
-	if partner.CollectSettings().UseDiscoveredSA {
-		_, ok = partner.discoveredStopAreas[stopId]
-	}
-
+	_, ok = partner.discoveredStopAreas[stopId]
 	return
 }
 
-func (partner *Partner) checkDiscoveredLine(lineId string) (ok bool) {
-	if partner.CollectSettings().ExcludeLine(lineId) {
-		return
+func (partner *Partner) CanCollectLines(lineIds map[string]struct{}) s.CollectStatus {
+	if len(lineIds) == 0 {
+		return s.COLLECT_UNKNOWN
 	}
 
+	canCollect := partner.CollectSettings().CanCollectLines(lineIds)
+	if canCollect != s.COLLECT_UNKNOWN {
+		return canCollect
+	}
+
+	if !partner.CollectSettings().UseDiscoveredLines {
+		return s.COLLECT_UNKNOWN
+	}
+
+	if partner.checkDiscoveredLines(lineIds) {
+		return s.CAN_COLLECT
+	}
+	return s.CANNOT_COLLECT
+}
+
+func (partner *Partner) CanCollectLine(lineId string) bool { // Used for vehicle collect
+	canCollect := partner.CollectSettings().CanCollectLine(lineId)
+	if canCollect != s.COLLECT_UNKNOWN {
+		return canCollect == s.CAN_COLLECT
+	}
+
+	if partner.CollectSettings().UseDiscoveredLines {
+		return partner.checkDiscoveredLine(lineId)
+	}
+	return true
+}
+
+func (partner *Partner) checkDiscoveredLines(lineIds map[string]struct{}) (ok bool) {
 	partner.mutex.RLock()
+	defer partner.mutex.RUnlock()
+
+	for l := range lineIds {
+		_, ok = partner.discoveredLines[l]
+		if ok {
+			return
+		}
+	}
+	return false
+}
+
+func (partner *Partner) checkDiscoveredLine(lineId string) (ok bool) {
+	partner.mutex.RLock()
+	defer partner.mutex.RUnlock()
+
 	_, ok = partner.discoveredLines[lineId]
-	partner.mutex.RUnlock()
 
 	return
 }
