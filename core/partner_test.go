@@ -452,6 +452,13 @@ func Test_CanCollectStopArea(t *testing.T) {
 			expectedOutput:                s.CANNOT_COLLECT,
 			testName:                      10,
 		},
+		{
+			collectIncludeStopAreas:       []string{"other"},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			expectedOutput:                s.CANNOT_COLLECT,
+			testName:                      11,
+		},
 	}
 
 	for _, tt := range TestCases {
@@ -565,6 +572,13 @@ func Test_CanCollectLine(t *testing.T) {
 			discoveredLine:            "dummy",
 			expectedOutput:            false,
 			testName:                  10,
+		},
+		{
+			collectIncludeLines:       []string{"other"},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: false,
+			expectedOutput:            false,
+			testName:                  11,
 		},
 	}
 

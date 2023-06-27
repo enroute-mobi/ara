@@ -25,25 +25,20 @@ func (c collection) include(s string) (ok bool) {
 	return
 }
 
-// Returns true if at least one element of the argument map isn't in the collection
-func (c collection) atLeastOneNotInCollection(m map[string]struct{}) bool {
-	for k := range m {
-		if _, ok := c[k]; !ok {
-			return true
-		}
-	}
-	return false
-}
-
 func (cs *CollectSettings) Empty() bool {
 	return len(cs.includedSA) == 0 && len(cs.excludedSA) == 0 && len(cs.includedLines) == 0 && len(cs.excludedLines) == 0 && !cs.UseDiscoveredSA && !cs.UseDiscoveredLines
 }
 
 func (cs *CollectSettings) IncludeStop(s string) CollectStatus {
+	if len(cs.includedSA) == 0 {
+		return COLLECT_UNKNOWN
+	}
+
 	if cs.includedSA.include(s) {
 		return CAN_COLLECT
 	}
-	return COLLECT_UNKNOWN
+
+	return CANNOT_COLLECT
 }
 
 func (cs *CollectSettings) ExcludeStop(s string) CollectStatus {
@@ -63,10 +58,15 @@ func (cs *CollectSettings) CanCollectStop(s string) CollectStatus {
 }
 
 func (cs *CollectSettings) IncludeLine(lineId string) CollectStatus {
+	if len(cs.includedLines) == 0 {
+		return COLLECT_UNKNOWN
+	}
+
 	if cs.includedLines.include(lineId) {
 		return CAN_COLLECT
 	}
-	return COLLECT_UNKNOWN
+
+	return CANNOT_COLLECT
 }
 
 func (cs *CollectSettings) ExcludeLine(lineId string) CollectStatus {
@@ -74,14 +74,6 @@ func (cs *CollectSettings) ExcludeLine(lineId string) CollectStatus {
 		return CANNOT_COLLECT
 	}
 	return COLLECT_UNKNOWN
-}
-
-// Returns true if all lines are excluded
-func (cs *CollectSettings) ExcludeAllLines(ls map[string]struct{}) bool {
-	if len(cs.excludedLines) == 0 {
-		return false
-	}
-	return !cs.excludedLines.atLeastOneNotInCollection(ls)
 }
 
 func (cs *CollectSettings) CanCollectLine(lineId string) CollectStatus {
