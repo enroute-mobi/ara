@@ -1,5 +1,13 @@
 package settings
 
+const (
+	COLLECT_UNKNOWN CollectStatus = iota
+	CAN_COLLECT
+	CANNOT_COLLECT
+)
+
+type CollectStatus int64
+
 type CollectSettings struct {
 	UseDiscoveredSA    bool
 	UseDiscoveredLines bool
@@ -17,16 +25,6 @@ func (c collection) include(s string) (ok bool) {
 	return
 }
 
-// Returns true if any element of the collection is in the argument map
-func (c collection) isInMap(m map[string]struct{}) bool {
-	for i := range c {
-		if _, ok := m[i]; ok {
-			return true
-		}
-	}
-	return false
-}
-
 // Returns true if at least one element of the argument map isn't in the collection
 func (c collection) atLeastOneNotInCollection(m map[string]struct{}) bool {
 	for k := range m {
@@ -41,30 +39,41 @@ func (cs *CollectSettings) Empty() bool {
 	return len(cs.includedSA) == 0 && len(cs.excludedSA) == 0 && len(cs.includedLines) == 0 && len(cs.excludedLines) == 0 && !cs.UseDiscoveredSA && !cs.UseDiscoveredLines
 }
 
-func (cs *CollectSettings) IncludeStop(s string) bool {
-	if len(cs.includedSA) == 0 {
-		return true
+func (cs *CollectSettings) IncludeStop(s string) CollectStatus {
+	if cs.includedSA.include(s) {
+		return CAN_COLLECT
 	}
-	return cs.includedSA.include(s)
+	return COLLECT_UNKNOWN
 }
 
-func (cs *CollectSettings) ExcludeStop(s string) bool {
-	return cs.excludedSA.include(s)
-}
-
-func (cs *CollectSettings) CanCollectStop(s string) bool {
-	return cs.IncludeStop(s) && !cs.ExcludeStop(s)
-}
-
-func (cs *CollectSettings) IncludeLine(s string) bool {
-	if len(cs.includedLines) == 0 {
-		return true
+func (cs *CollectSettings) ExcludeStop(s string) CollectStatus {
+	if cs.excludedSA.include(s) {
+		return CANNOT_COLLECT
 	}
-	return cs.includedLines.include(s)
+	return COLLECT_UNKNOWN
 }
 
-func (cs *CollectSettings) ExcludeLine(s string) bool {
-	return cs.excludedLines.include(s)
+func (cs *CollectSettings) CanCollectStop(s string) CollectStatus {
+	canCollect := cs.IncludeStop(s)
+	if canCollect != COLLECT_UNKNOWN {
+		return canCollect
+	}
+
+	return cs.ExcludeStop(s)
+}
+
+func (cs *CollectSettings) IncludeLine(lineId string) CollectStatus {
+	if cs.includedLines.include(lineId) {
+		return CAN_COLLECT
+	}
+	return COLLECT_UNKNOWN
+}
+
+func (cs *CollectSettings) ExcludeLine(lineId string) CollectStatus {
+	if cs.excludedLines.include(lineId) {
+		return CANNOT_COLLECT
+	}
+	return COLLECT_UNKNOWN
 }
 
 // Returns true if all lines are excluded
@@ -75,16 +84,26 @@ func (cs *CollectSettings) ExcludeAllLines(ls map[string]struct{}) bool {
 	return !cs.excludedLines.atLeastOneNotInCollection(ls)
 }
 
-func (cs *CollectSettings) CanCollectLine(s string) bool {
-	return cs.IncludeLine(s) && !cs.ExcludeLine(s)
+func (cs *CollectSettings) CanCollectLine(lineId string) CollectStatus {
+	canCollect := cs.IncludeLine(lineId)
+	if canCollect != COLLECT_UNKNOWN {
+		return canCollect
+	}
+
+	canCollect = cs.ExcludeLine(lineId)
+	if canCollect != COLLECT_UNKNOWN {
+		return canCollect
+	}
+	return COLLECT_UNKNOWN
 }
 
-// Return true if we can collect any of the lines passed in argument
-func (cs *CollectSettings) canCollectLines(ls map[string]struct{}) bool {
-	return len(cs.includedLines) == 0 || cs.includedLines.isInMap(ls)
-}
+func (cs *CollectSettings) CanCollectLines(lineIds map[string]struct{}) CollectStatus {
+	for line := range lineIds {
+		canCollect := cs.CanCollectLine(line)
 
-// Return true if we can collect the lines and don't exclude at least one
-func (cs *CollectSettings) CanCollectLines(ls map[string]struct{}) bool {
-	return cs.canCollectLines(ls) && !cs.ExcludeAllLines(ls)
+		if canCollect != COLLECT_UNKNOWN {
+			return canCollect
+		}
+	}
+	return COLLECT_UNKNOWN
 }

@@ -10,6 +10,7 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func createTestPartnerManager() *PartnerManager {
@@ -243,184 +244,352 @@ func Test_Partner_RefreshConnectors(t *testing.T) {
 		t.Errorf("Partner CheckStatus client should be TestCheckStatusClient, got: %v", reflect.TypeOf(partner.CheckStatusClient()))
 	}
 }
-
-func Test_Partner_CanCollectTrue(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetCollectSettings()
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
+func Test_CanCollect(t *testing.T) {
+	assert := assert.New(t)
+	var TestCases = []struct {
+		collectIncludeStopAreas       []string
+		collectExcludeStopAreas       []string
+		collectUseDiscoveredStopAreas bool
+		discoveredStopArea            string
+		collectIncludeLines           []string
+		collectExcludeLines           []string
+		collectUseDiscoveredLines     bool
+		discoveredLine                string
+		lineIds                       []string
+		expectedOutput                bool
+		testName                      int
+	}{
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			collectIncludeLines:           []string{},
+			collectExcludeLines:           []string{},
+			collectUseDiscoveredLines:     false,
+			lineIds:                       []string{"dummy"},
+			expectedOutput:                true,
+			testName:                      1,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			collectIncludeLines:           []string{"dummy"},
+			collectExcludeLines:           []string{},
+			collectUseDiscoveredLines:     false,
+			lineIds:                       []string{"dummy"},
+			expectedOutput:                true,
+			testName:                      2,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			collectIncludeLines:           []string{},
+			collectExcludeLines:           []string{"dummy"},
+			collectUseDiscoveredLines:     false,
+			lineIds:                       []string{"dummy"},
+			expectedOutput:                false,
+			testName:                      3,
+		},
+		{
+			collectIncludeStopAreas:       []string{"dummy"},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			collectIncludeLines:           []string{},
+			collectExcludeLines:           []string{},
+			collectUseDiscoveredLines:     false,
+			lineIds:                       []string{},
+			expectedOutput:                true,
+			testName:                      4,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{"dummy"},
+			collectUseDiscoveredStopAreas: false,
+			collectIncludeLines:           []string{},
+			collectExcludeLines:           []string{},
+			collectUseDiscoveredLines:     false,
+			lineIds:                       []string{},
+			expectedOutput:                false,
+			testName:                      5,
+		},
 	}
 
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
+	for _, tt := range TestCases {
+		partner := NewPartner()
+		// StopArea
+		if len(tt.collectIncludeStopAreas) != 0 {
+			partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, tt.collectIncludeStopAreas[0])
+		}
 
-	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
-	}
-}
+		if len(tt.collectExcludeStopAreas) != 0 {
+			partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, tt.collectExcludeStopAreas[0])
+		}
 
-func Test_Partner_CanCollectTrueLine(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	lines := map[string]struct{}{"NINOXE:Line:SP:24:": struct{}{}}
-	partner.SetSetting(s.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
-	partner.SetCollectSettings()
-	if !partner.CanCollect(stopAreaObjectId, lines) {
-		t.Errorf("Partner can collect should return true")
-	}
+		if tt.collectUseDiscoveredStopAreas {
+			partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
+		}
 
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, lines) {
-		t.Errorf("Partner can collect should return false")
-	}
+		if tt.discoveredStopArea != "" {
+			partner.discoveredStopAreas[tt.discoveredStopArea] = struct{}{}
+		}
 
-	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
-	if !partner.CanCollect(stopAreaObjectId, lines) {
-		t.Errorf("Partner can collect should return true")
-	}
-}
+		// Line
+		if len(tt.collectIncludeLines) != 0 {
+			partner.SetSetting(s.COLLECT_INCLUDE_LINES, tt.collectIncludeLines[0])
+		}
 
-func Test_Partner_CanCollectTrue_EmptySettings(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetCollectSettings()
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
-	}
+		if len(tt.collectExcludeLines) != 0 {
+			partner.SetSetting(s.COLLECT_EXCLUDE_LINES, tt.collectExcludeLines[0])
+		}
 
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
-}
+		if tt.collectUseDiscoveredLines {
+			partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
+		}
 
-func Test_Partner_CanCollectFalse(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return flase")
-	}
-}
+		if tt.discoveredLine != "" {
+			partner.discoveredLines[tt.discoveredLine] = struct{}{}
+		}
 
-func Test_Partner_CanCollectFalseLine(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "BAD_VALUE"
-	partner.SetSetting(s.COLLECT_INCLUDE_LINES, "NINOXE:Line:SP:24:")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return flase")
-	}
-}
+		lineIds := make(map[string]struct{})
+		if len(tt.lineIds) != 0 {
+			lineIds[tt.lineIds[0]] = struct{}{}
+		}
 
-func Test_Partner_CanCollectTrueExcluded(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:25:LOC")
-	partner.SetCollectSettings()
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
-	}
+		// test
+		partner.SetCollectSettings()
+		output := partner.CanCollect("dummy", lineIds)
 
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
-
-	partner.discoveredStopAreas[stopAreaObjectId] = struct{}{}
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
-	}
-}
-
-func Test_Partner_CanCollectFalseExcluded(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
-
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
-}
-
-func Test_Partner_CanCollectFalseSPD(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
+		assert.Equal(tt.expectedOutput, output, tt.testName)
 	}
 }
 
-func Test_Partner_CanCollectTrueSPD(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.SetCollectSettings()
-	if !partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return true")
+func Test_CanCollectStopArea(t *testing.T) {
+	assert := assert.New(t)
+
+	var TestCases = []struct {
+		collectIncludeStopAreas       []string
+		collectExcludeStopAreas       []string
+		collectUseDiscoveredStopAreas bool
+		discoveredStopArea            string
+		expectedOutput                s.CollectStatus
+		testName                      int
+	}{
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			expectedOutput:                s.COLLECT_UNKNOWN,
+			testName:                      1,
+		},
+		{
+			collectIncludeStopAreas:       []string{"dummy"},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			expectedOutput:                s.CAN_COLLECT,
+			testName:                      2,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{"dummy"},
+			collectUseDiscoveredStopAreas: false,
+			expectedOutput:                s.CANNOT_COLLECT,
+			testName:                      3,
+		},
+		{
+			collectIncludeStopAreas:       []string{"dummy"},
+			collectExcludeStopAreas:       []string{"dummy"},
+			collectUseDiscoveredStopAreas: false,
+			expectedOutput:                s.CAN_COLLECT,
+			testName:                      4,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: true,
+			discoveredStopArea:            "dummy",
+			expectedOutput:                s.CAN_COLLECT,
+			testName:                      5,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: true,
+			discoveredStopArea:            "ANOTHER_DUMMY",
+			expectedOutput:                s.CANNOT_COLLECT,
+			testName:                      6,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			discoveredStopArea:            "dummy",
+			expectedOutput:                s.COLLECT_UNKNOWN,
+			testName:                      7,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: false,
+			discoveredStopArea:            "ANOTHER_DUMMY",
+			expectedOutput:                s.COLLECT_UNKNOWN,
+			testName:                      8,
+		},
+		{
+			collectIncludeStopAreas:       []string{"dummy"},
+			collectExcludeStopAreas:       []string{},
+			collectUseDiscoveredStopAreas: true,
+			discoveredStopArea:            "ANOTHER_DUMMY",
+			expectedOutput:                s.CAN_COLLECT,
+			testName:                      9,
+		},
+		{
+			collectIncludeStopAreas:       []string{},
+			collectExcludeStopAreas:       []string{"dummy"},
+			collectUseDiscoveredStopAreas: true,
+			discoveredStopArea:            "dummy",
+			expectedOutput:                s.CANNOT_COLLECT,
+			testName:                      10,
+		},
+	}
+
+	for _, tt := range TestCases {
+		partner := NewPartner()
+		if len(tt.collectIncludeStopAreas) != 0 {
+			partner.SetSetting(s.COLLECT_INCLUDE_STOP_AREAS, tt.collectIncludeStopAreas[0])
+		}
+
+		if len(tt.collectExcludeStopAreas) != 0 {
+			partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, tt.collectExcludeStopAreas[0])
+		}
+
+		if tt.collectUseDiscoveredStopAreas {
+			partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
+		}
+
+		if tt.discoveredStopArea != "" {
+			partner.discoveredStopAreas[tt.discoveredStopArea] = struct{}{}
+		}
+
+		partner.SetCollectSettings()
+
+		output := partner.CanCollectStop("dummy")
+		assert.Equal(output, tt.expectedOutput)
 	}
 }
 
-func Test_Partner_CanCollectTrueSPDButExcluded(t *testing.T) {
-	partner := NewPartner()
-	stopAreaObjectId := "NINOXE:StopPoint:SP:24:LOC"
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_SA, "true")
-	partner.discoveredStopAreas["NINOXE:StopPoint:SP:24:LOC"] = struct{}{}
-	partner.SetSetting(s.COLLECT_EXCLUDE_STOP_AREAS, "NINOXE:StopPoint:SP:24:LOC")
-	partner.SetCollectSettings()
-	if partner.CanCollect(stopAreaObjectId, map[string]struct{}{}) {
-		t.Errorf("Partner can collect should return false")
-	}
-}
+func Test_CanCollectLine(t *testing.T) {
+	assert := assert.New(t)
 
-func Test_Partner_CanCollectFalseLD(t *testing.T) {
-	partner := NewPartner()
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
-	partner.SetCollectSettings()
-	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
-		t.Errorf("Partner can collect should return false")
+	var TestCases = []struct {
+		collectIncludeLines       []string
+		collectExcludeLines       []string
+		collectUseDiscoveredLines bool
+		discoveredLine            string
+		expectedOutput            bool
+		testName                  int
+	}{
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: false,
+			expectedOutput:            true,
+			testName:                  1,
+		},
+		{
+			collectIncludeLines:       []string{"dummy"},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: false,
+			expectedOutput:            true,
+			testName:                  2,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{"dummy"},
+			collectUseDiscoveredLines: false,
+			expectedOutput:            false,
+			testName:                  3,
+		},
+		{
+			collectIncludeLines:       []string{"dummy"},
+			collectExcludeLines:       []string{"dummy"},
+			collectUseDiscoveredLines: false,
+			expectedOutput:            true,
+			testName:                  4,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: true,
+			discoveredLine:            "dummy",
+			expectedOutput:            true,
+			testName:                  5,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: true,
+			discoveredLine:            "ANOTHER_DUMMY",
+			expectedOutput:            false,
+			testName:                  6,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: false,
+			discoveredLine:            "dummy",
+			expectedOutput:            true,
+			testName:                  7,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: false,
+			discoveredLine:            "ANOTHER_DUMMY",
+			expectedOutput:            true,
+			testName:                  8,
+		},
+		{
+			collectIncludeLines:       []string{"dummy"},
+			collectExcludeLines:       []string{},
+			collectUseDiscoveredLines: true,
+			discoveredLine:            "ANOTHER_DUMMY",
+			expectedOutput:            true,
+			testName:                  9,
+		},
+		{
+			collectIncludeLines:       []string{},
+			collectExcludeLines:       []string{"dummy"},
+			collectUseDiscoveredLines: true,
+			discoveredLine:            "dummy",
+			expectedOutput:            false,
+			testName:                  10,
+		},
 	}
-}
 
-func Test_Partner_CanCollectTrueLD(t *testing.T) {
-	partner := NewPartner()
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
-	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
-	partner.SetCollectSettings()
-	if !partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
-		t.Fatal("Partner can collect should return true")
-	}
-}
+	for _, tt := range TestCases {
+		partner := NewPartner()
+		if len(tt.collectIncludeLines) != 0 {
+			partner.SetSetting(s.COLLECT_INCLUDE_LINES, tt.collectIncludeLines[0])
+		}
 
-func Test_Partner_CanCollectTrueLDButExcluded(t *testing.T) {
-	partner := NewPartner()
-	partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
-	partner.discoveredLines["NINOXE:Line:SP:24:LOC"] = struct{}{}
-	partner.SetSetting(s.COLLECT_EXCLUDE_LINES, "NINOXE:Line:SP:24:LOC")
-	partner.SetCollectSettings()
-	if partner.CanCollect("", map[string]struct{}{"NINOXE:Line:SP:24:LOC": struct{}{}}) {
-		t.Errorf("Partner can collect should return false")
+		if len(tt.collectExcludeLines) != 0 {
+			partner.SetSetting(s.COLLECT_EXCLUDE_LINES, tt.collectExcludeLines[0])
+		}
+
+		if tt.collectUseDiscoveredLines {
+			partner.SetSetting(s.COLLECT_USE_DISCOVERED_LINES, "true")
+		}
+
+		if tt.discoveredLine != "" {
+			partner.discoveredLines[tt.discoveredLine] = struct{}{}
+		}
+
+		partner.SetCollectSettings()
+
+		output := partner.CanCollectLine("dummy")
+		assert.Equal(output, tt.expectedOutput, strconv.Itoa(tt.testName))
 	}
 }
 
