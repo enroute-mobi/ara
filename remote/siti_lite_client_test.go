@@ -34,7 +34,13 @@ func Test_SIRILiteClient_StopMonitoringDelivery(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
+	httpClient := NewHTTPClient(HTTPClientOptions{
+		Urls: HTTPClientUrls{Url: ts.URL},
+		SiriCredential: SiriCredentialHeader{
+			CredentialHeader: "X-SIRI-Requestor",
+			Value:            "test",
+		},
+	})
 	client := httpClient.SIRILiteClient()
 
 	stopArea := "STIF:StopPoint:Q:41178:"
@@ -52,7 +58,13 @@ func Test_SIRILiteClient_StopMonitoringDelivery_With_Error_400(t *testing.T) {
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
+	httpClient := NewHTTPClient(HTTPClientOptions{
+		Urls: HTTPClientUrls{Url: ts.URL},
+		SiriCredential: SiriCredentialHeader{
+			CredentialHeader: "X-SIRI-Requestor",
+			Value:            "test",
+		},
+	})
 	client := httpClient.SIRILiteClient()
 	stopArea := "STIF:StopPoint:Q:41178:"
 
@@ -68,7 +80,13 @@ func Test_SIRILiteClient_StopMonitoringDelivery_With_Error_400_With_unmarshallab
 	defer ts.Close()
 
 	// Create and send request
-	httpClient := NewHTTPClient(HTTPClientOptions{Urls: HTTPClientUrls{Url: ts.URL}})
+	httpClient := NewHTTPClient(HTTPClientOptions{
+		Urls: HTTPClientUrls{Url: ts.URL},
+		SiriCredential: SiriCredentialHeader{
+			CredentialHeader: "X-SIRI-Requestor",
+			Value:            "test",
+		},
+	})
 	client := httpClient.SIRILiteClient()
 	stopArea := "STIF:StopPoint:Q:41178:"
 	expectedErrorMessage := "request failed with status 400: \"ERROR\""
