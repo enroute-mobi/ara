@@ -54,10 +54,18 @@ func rewriteVisit(parent rewriteParent, content map[string]interface{}) {
 	for key, value := range content {
 		if mapValue, ok := value.(map[string]interface{}); ok {
 			rewriteVisit(newRewriteMapParent(content, key), mapValue)
+
+			if len(mapValue) == 0 {
+				delete(content, key)
+			}
 		} else if arrayValue, ok := value.([]interface{}); ok {
-			parent := newRewriteMapParent(content, key)
-			for _, entry := range arrayValue {
-				rewriteVisit(parent, entry.(map[string]interface{}))
+			if len(arrayValue) == 0 {
+				delete(content, key)
+			} else {
+				parent := newRewriteMapParent(content, key)
+				for _, entry := range arrayValue {
+					rewriteVisit(parent, entry.(map[string]interface{}))
+				}
 			}
 		}
 	}
