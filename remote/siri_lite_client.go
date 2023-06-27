@@ -52,7 +52,7 @@ func (c *SIRILiteClient) prepareAndSendRequest(args siriLiteClientArguments) err
 	}
 
 	// Create http request
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, buildUrl.String(), nil)
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodGet, buildUrl.String(), nil)
 	if err != nil {
 		return errors.Wrap(err, "cannot create request")
 	}

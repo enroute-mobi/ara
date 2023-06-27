@@ -65,6 +65,7 @@ const (
 	SIRI_LINE_PUBLISHED_NAME                              = "siri.line.published_name"
 	SIRI_DIRECTION_TYPE                                   = "siri.direction_type"
 	SIRI_PASSAGE_ORDER                                    = "siri.passage_order"
+	SIRI_CREDENTIAL_HEADER                                = "siri.credential.header"
 	DEFAULT_GTFS_TTL                                      = 30 * time.Second
 	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
 
@@ -409,10 +410,23 @@ func (s *PartnerSettings) ResetCollectSettings() {
 	s.m.Unlock()
 }
 
+func (s *PartnerSettings) SetSiriCredentialHeader() (header string) {
+	s.m.RLock()
+	c := s.s[SIRI_CREDENTIAL_HEADER]
+
+	if c == "" {
+		header = "X-SIRI-Requestor"
+	} else {
+		header = c
+	}
+	s.m.RUnlock()
+	return
+}
+
 func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
 	s.m.RLock()
 	credential := remote.SiriCredentialHeader{
-		CredentialHeader: "X-SIRI-Requestor",
+		CredentialHeader: s.SetSiriCredentialHeader(),
 		Value:            s.RequestorRef(),
 	}
 
