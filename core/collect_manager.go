@@ -157,12 +157,12 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			} else if SMLiterequestCollector != nil {
 				SMLiterequestCollector.RequestStopAreaUpdate(request)
 				return
-			} else {
-
-				localLogger.Printf("Partner %s can't collect StopArea", partner.Slug())
 			}
-
+		} else {
+			localLogger.Printf("Partner %s can't collect StopArea", partner.Slug())
+			localLogger.Printf("Partner %s collect settings: %#v", partner.Slug(), partner.CollectSettings())
 		}
+
 	}
 }
 
