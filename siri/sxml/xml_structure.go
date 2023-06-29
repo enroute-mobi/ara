@@ -1,5 +1,17 @@
 package sxml
 
+/*
+#cgo pkg-config: libxml-2.0
+#include <libxml/xmlerror.h>
+
+static inline void libxml_nilErrorHandler(void *ctx, const char *msg, ...) {}
+
+static inline void libxml_SilenceParseErrors() {
+  xmlSetGenericErrorFunc(NULL, libxml_nilErrorHandler);
+  xmlThrDefSetGenericErrorFunc(NULL, libxml_nilErrorHandler);
+}
+*/
+import "C"
 import (
 	"fmt"
 	"regexp"
@@ -16,6 +28,10 @@ var durationRegex = regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?
 
 type XMLNode interface {
 	NativeNode() xml.Node
+}
+
+func init() {
+	C.libxml_SilenceParseErrors()
 }
 
 func NewXMLNode(nativeNode xml.Node) XMLNode {
