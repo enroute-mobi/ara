@@ -175,6 +175,7 @@ func main() {
 				profiler.WithProfileTypes(
 					profiler.CPUProfile,
 					profiler.HeapProfile,
+					profiler.MutexProfile,
 				),
 			)
 			if err != nil {
