@@ -10,14 +10,15 @@ type VehicleUpdateEvent struct {
 	ObjectId               ObjectID
 	StopAreaObjectId       ObjectID
 	VehicleJourneyObjectId ObjectID
-	DriverRef              string
 	Occupancy              string
+	DriverRef              string
 	Origin                 string
 	Longitude              float64
 	Latitude               float64
 	Bearing                float64
 	Percentage             float64
 	LinkDistance           float64
+	NextStopPointOrder     int
 }
 
 func NewVehicleUpdateEvent() *VehicleUpdateEvent {

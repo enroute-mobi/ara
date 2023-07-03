@@ -7,7 +7,106 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/assert"
 )
+
+func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.T) {
+	assert := assert.New(t)
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.SetObjectID(objectid)
+	stopVisit.VehicleJourneyId = vj.Id()
+	stopVisit.StopAreaId = sa.Id()
+	stopVisit.PassageOrder = 5
+	stopVisit.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.SetObjectID(objectid)
+	vehicle.LineId = l.Id()
+	vehicle.StopAreaId = sa.Id()
+	vehicle.VehicleJourneyId = vj.Id()
+	vehicle.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &VehicleUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		NextStopPointOrder:     5,
+	}
+
+	manager.Update(event)
+
+	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+
+	assert.Equal(stopVisit.Id(), updatedVehicle.NextStopVisitId)
+}
+
+func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testing.T) {
+	assert := assert.New(t)
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.SetObjectID(objectid)
+	stopVisit.VehicleJourneyId = vj.Id()
+	stopVisit.StopAreaId = sa.Id()
+	stopVisit.PassageOrder = 6
+	stopVisit.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.SetObjectID(objectid)
+	vehicle.LineId = l.Id()
+	vehicle.StopAreaId = sa.Id()
+	vehicle.VehicleJourneyId = vj.Id()
+	vehicle.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &VehicleUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		NextStopPointOrder:     5,
+	}
+
+	manager.Update(event)
+
+	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+
+	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
+}
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 	model := NewMemoryModel()

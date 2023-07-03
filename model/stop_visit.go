@@ -235,13 +235,19 @@ type MemoryStopVisits struct {
 
 	model Model
 
-	mutex            *sync.RWMutex
-	byIdentifier     map[StopVisitId]*StopVisit
-	byObjectId       *ObjectIdIndex
-	byStopArea       *Index
-	byVehicleJourney *Index
+	mutex                             *sync.RWMutex
+	byIdentifier                      map[StopVisitId]*StopVisit
+	byObjectId                        *ObjectIdIndex
+	byStopArea                        *Index
+	byVehicleJourney                  *Index
+	byVehicleJourneyIdAndPassageOrder map[vehicleJourneyStopVisitOrder]*StopVisit
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
+}
+
+type vehicleJourneyStopVisitOrder struct {
+	vehicleJourneyId      VehicleJourneyId
+	stopVisitPassageOrder int
 }
 
 type StopVisits interface {
@@ -251,6 +257,7 @@ type StopVisits interface {
 	Find(StopVisitId) (*StopVisit, bool)
 	FindByObjectId(ObjectID) (*StopVisit, bool)
 	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
+	FindByVehicleJourneyIdAndStopVisitOrder(VehicleJourneyId, int) *StopVisit
 	VehicleJourneyHasStopVisits(VehicleJourneyId) bool
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	StopVisitsLenByVehicleJourney(VehicleJourneyId) int
@@ -270,11 +277,12 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 	vjExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).VehicleJourneyId) }
 
 	return &MemoryStopVisits{
-		mutex:            &sync.RWMutex{},
-		byIdentifier:     make(map[StopVisitId]*StopVisit),
-		byObjectId:       NewObjectIdIndex(),
-		byStopArea:       NewIndex(stopExtractor),
-		byVehicleJourney: NewIndex(vjExtractor),
+		mutex:                             &sync.RWMutex{},
+		byIdentifier:                      make(map[StopVisitId]*StopVisit),
+		byObjectId:                        NewObjectIdIndex(),
+		byStopArea:                        NewIndex(stopExtractor),
+		byVehicleJourney:                  NewIndex(vjExtractor),
+		byVehicleJourneyIdAndPassageOrder: make(map[vehicleJourneyStopVisitOrder]*StopVisit),
 	}
 }
 
@@ -303,6 +311,15 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (*StopVisit, 
 	}
 
 	return &StopVisit{}, false
+}
+
+func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopVisitOrder(vjId VehicleJourneyId, order int) *StopVisit {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	sv := manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
+		vehicleJourneyId:      vjId,
+		stopVisitPassageOrder: order}]
+	return sv
 }
 
 func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
@@ -460,6 +477,9 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	manager.byObjectId.Index(stopVisit)
 	manager.byStopArea.Index(stopVisit)
 	manager.byVehicleJourney.Index(stopVisit)
+	manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
+		vehicleJourneyId:      stopVisit.VehicleJourneyId,
+		stopVisitPassageOrder: stopVisit.PassageOrder}] = stopVisit
 
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
@@ -481,6 +501,10 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	manager.byObjectId.Delete(ModelId(stopVisit.id))
 	manager.byStopArea.Delete(ModelId(stopVisit.id))
 	manager.byVehicleJourney.Delete(ModelId(stopVisit.id))
+	delete(manager.byVehicleJourneyIdAndPassageOrder, vehicleJourneyStopVisitOrder{
+		vehicleJourneyId:      stopVisit.VehicleJourneyId,
+		stopVisitPassageOrder: stopVisit.PassageOrder,
+	})
 
 	return true
 }

@@ -20,17 +20,18 @@ type Vehicle struct {
 	model          Model
 	ObjectIDConsumer
 	Attributes       Attributes
-	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
+	StopAreaId       StopAreaId       `json:",omitempty"`
 	Occupancy        string           `json:",omitempty"`
 	LineId           LineId           `json:",omitempty"`
-	StopAreaId       StopAreaId       `json:",omitempty"`
+	VehicleJourneyId VehicleJourneyId `json:",omitempty"`
 	DriverRef        string           `json:",omitempty"`
 	id               VehicleId
-	LinkDistance     float64 `json:",omitempty"`
-	Percentage       float64 `json:",omitempty"`
-	Longitude        float64 `json:",omitempty"`
-	Latitude         float64 `json:",omitempty"`
-	Bearing          float64 `json:",omitempty"`
+	NextStopVisitId  StopVisitId `json:",omitempty"`
+	LinkDistance     float64     `json:",omitempty"`
+	Percentage       float64     `json:",omitempty"`
+	Longitude        float64     `json:",omitempty"`
+	Latitude         float64     `json:",omitempty"`
+	Bearing          float64     `json:",omitempty"`
 }
 
 func NewVehicle(model Model) *Vehicle {
@@ -64,6 +65,7 @@ func (vehicle *Vehicle) copy() *Vehicle {
 		Occupancy:        vehicle.Occupancy,
 		RecordedAtTime:   vehicle.RecordedAtTime,
 		Attributes:       vehicle.Attributes.Copy(),
+		NextStopVisitId:  vehicle.NextStopVisitId,
 	}
 }
 
