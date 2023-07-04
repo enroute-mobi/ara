@@ -209,6 +209,12 @@ func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id
 	return ok
 }
 
+func (manager *MemoryVehicleJourneys) TestLenFullVehicleJourneyBySubscriptionId() int {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	return len(manager.byBroadcastedFull)
+}
+
 func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
 	vehicleJourney, ok := manager.byIdentifier[id]
@@ -284,7 +290,12 @@ func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	delete(manager.byIdentifier, id)
 	manager.byObjectId.Delete(ModelId(id))
 	manager.byLine.Delete(ModelId(id))
-
+	for subscriptionId, vehicleJourneyIds := range manager.byBroadcastedFull {
+		delete(vehicleJourneyIds, id)
+		if len(vehicleJourneyIds) == 0 {
+			delete(manager.byBroadcastedFull, subscriptionId)
+		}
+	}
 	return true
 }
 
