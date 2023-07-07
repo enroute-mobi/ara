@@ -133,9 +133,10 @@ type MemoryVehicles struct {
 
 	model *MemoryModel
 
-	mutex        *sync.RWMutex
-	byIdentifier map[VehicleId]*Vehicle
-	byObjectId   *ObjectIdIndex
+	mutex             *sync.RWMutex
+	byIdentifier      map[VehicleId]*Vehicle
+	byObjectId        *ObjectIdIndex
+	byNextStopVisitId map[StopVisitId]*Vehicle
 
 	broadcastEvent func(event VehicleBroadcastEvent)
 }
@@ -147,6 +148,7 @@ type Vehicles interface {
 	Find(VehicleId) (*Vehicle, bool)
 	FindByObjectId(ObjectID) (*Vehicle, bool)
 	FindByLineId(LineId) []*Vehicle
+	FindByNextStopVisitId(StopVisitId) (*Vehicle, bool)
 	FindAll() []*Vehicle
 	Save(*Vehicle) bool
 	Delete(*Vehicle) bool
@@ -154,9 +156,10 @@ type Vehicles interface {
 
 func NewMemoryVehicles() *MemoryVehicles {
 	return &MemoryVehicles{
-		mutex:        &sync.RWMutex{},
-		byIdentifier: make(map[VehicleId]*Vehicle),
-		byObjectId:   NewObjectIdIndex(),
+		mutex:             &sync.RWMutex{},
+		byIdentifier:      make(map[VehicleId]*Vehicle),
+		byObjectId:        NewObjectIdIndex(),
+		byNextStopVisitId: make(map[StopVisitId]*Vehicle),
 	}
 }
 
@@ -209,6 +212,16 @@ func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
 	return
 }
 
+func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	vehicle, ok := manager.byNextStopVisitId[stopVisitId]
+	if !ok {
+		return nil, ok
+	}
+	return vehicle, true
+}
+
 func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -228,6 +241,10 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
 	manager.byObjectId.Index(vehicle)
+
+	if vehicle.NextStopVisitId != StopVisitId("") {
+		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle
+	}
 
 	event := VehicleBroadcastEvent{
 		ModelId:   string(vehicle.id),
@@ -263,6 +280,7 @@ func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
 
 	delete(manager.byIdentifier, vehicle.Id())
 	manager.byObjectId.Delete(ModelId(vehicle.id))
+	delete(manager.byNextStopVisitId, vehicle.NextStopVisitId)
 
 	manager.mutex.Unlock()
 	return true
