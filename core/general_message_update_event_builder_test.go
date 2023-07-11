@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -25,7 +26,11 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
 	partner := referential.Partners().New("slug")
-	partner.SetSetting("remote_objectid_kind", "remote_objectid_kind")
+
+	settings := map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
 
 	events := &[]*model.SituationUpdateEvent{}

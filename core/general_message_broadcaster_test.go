@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -21,7 +22,10 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -69,10 +73,12 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	defer referential.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "internal")
-	partner.SetSetting("local_credential", "external")
-	partner.SetSetting("remote_url", ts.URL)
-
+	settings := map[string]string{
+		"remote_objectid_kind": "internal",
+		"local_credential":     "external",
+		"remote_url":           ts.URL,
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)

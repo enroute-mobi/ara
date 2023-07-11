@@ -30,7 +30,10 @@ func prepareSiriCheckStatusClient(t *testing.T, responseFilePath string) (Partne
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
 	partner := referential.Partners().New("slug")
-	partner.SetSetting(s.REMOTE_URL, ts.URL)
+
+	settings := map[string]string{s.REMOTE_URL: ts.URL}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
 	checkStatusClient := NewSIRICheckStatusClient(partner)
 
 	partnerStatus, err := checkStatusClient.Status()
@@ -69,7 +72,7 @@ func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

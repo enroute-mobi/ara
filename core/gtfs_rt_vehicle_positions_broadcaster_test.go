@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -14,7 +15,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -106,7 +110,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -163,7 +170,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -220,7 +230,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -280,8 +293,12 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind", "WRONG_ID")
+
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+		"gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind": "WRONG_ID",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -341,7 +358,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())

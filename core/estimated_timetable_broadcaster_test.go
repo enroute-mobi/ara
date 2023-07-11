@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -35,10 +36,13 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "internal")
-	partner.SetSetting("remote_credential", "external")
-	partner.SetSetting("local_credential", "local")
-	partner.SetSetting("remote_url", ts.URL)
+	settings := map[string]string{
+		"remote_objectid_kind": "internal",
+		"remote_credential":    "external",
+		"local_credential":     "local",
+		"remote_url":           ts.URL,
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()

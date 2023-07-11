@@ -27,7 +27,7 @@ type SIRIEstimatedTimetableRequestBroadcasterFactory struct{}
 func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimatedTimetableRequestBroadcaster {
 	connector := &SIRIEstimatedTimetableRequestBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
-	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
+	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 	connector.partner = partner
 	return connector
@@ -101,7 +101,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 					logger.Log.Debugf("Vehicle journey with id %v does not have a proper objectid at %v", vehicleJourneyId, connector.Clock().Now())
 					continue
 				}
-				referenceGenerator := connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER)
+				referenceGenerator := connector.Partner().ReferenceIdentifierGenerator()
 				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 			}
 
@@ -229,7 +229,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedVehicleJo
 				continue
 			}
 		}
-		generator := connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER)
+		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
 		defaultObjectID := model.NewObjectID(connector.remoteObjectidKind, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
 		references[refType] = defaultObjectID.Value()
 	}

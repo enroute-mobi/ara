@@ -33,9 +33,9 @@ type BroadcastStopMonitoringBuilder struct {
 func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		partner:                       partner,
-		referenceGenerator:            partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
-		stopAreareferenceGenerator:    partner.IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER),
-		dataFrameGenerator:            partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER),
+		referenceGenerator:            partner.ReferenceIdentifierGenerator(),
+		stopAreareferenceGenerator:    partner.ReferenceStopAreaIdentifierGenerator(),
+		dataFrameGenerator:            partner.DataFrameIdentifierGenerator(),
 		remoteObjectidKind:            partner.RemoteObjectIDKind(connectorName),
 		vjRemoteObjectidKinds:         partner.VehicleJourneyRemoteObjectIDKindWithFallback(connectorName),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),

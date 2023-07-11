@@ -27,7 +27,7 @@ type EstimatedTimetableUpdateEventBuilder struct {
 func NewEstimatedTimetableUpdateEventBuilder(partner *Partner) EstimatedTimetableUpdateEventBuilder {
 	return EstimatedTimetableUpdateEventBuilder{
 		partner:            partner,
-		referenceGenerator: partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
+		referenceGenerator: partner.ReferenceIdentifierGenerator(),
 		remoteObjectidKind: partner.RemoteObjectIDKind(),
 		origin:             string(partner.Slug()),
 		updateEvents:       NewCollectUpdateEvents(),

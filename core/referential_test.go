@@ -495,7 +495,8 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 
 	// Save data in the DB 2 times to check uniqueness constraints
 	partner2 := partners.New("slug2")
-	partner2.SetSetting("setting", "value")
+	settings2 := map[string]string{"setting": "value"}
+	partner2.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings2)
 	partner2.ConnectorTypes = []string{"connector"}
 	partner2.Save()
 

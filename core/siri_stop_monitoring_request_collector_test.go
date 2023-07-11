@@ -39,10 +39,12 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	// Create a SIRIStopMonitoringRequestCollector
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	// Create StopArea with ObjectId
@@ -142,7 +144,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

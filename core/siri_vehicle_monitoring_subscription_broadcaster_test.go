@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +23,12 @@ func Test_VehicleMonitoringBroadcaster_Create_Events(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "internal")
+
+	settings := map[string]string{
+		"remote_objectid_kind": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
 	partner.ConnectorTypes = []string{TEST_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)

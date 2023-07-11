@@ -39,7 +39,6 @@ type Partners interface {
 
 	New(PartnerSlug) *Partner
 	Find(PartnerId) *Partner
-	FindBySetting(string, string) (*Partner, bool)
 	FindBySlug(PartnerSlug) (*Partner, bool)
 	FindByCredential(string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
@@ -130,7 +129,7 @@ func NewPartner() *Partner {
 		gtfsCache: cache.NewCacheTable(),
 		limiters:  make(map[string]*rate.Limiter),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 
 	return partner
@@ -227,7 +226,6 @@ func (partner *Partner) Stop() {
 		}
 	}
 	partner.CancelSubscriptions()
-	partner.ResetCollectSettings()
 	partner.gtfsCache.Clear()
 	partner.httpClient = nil
 
@@ -251,8 +249,6 @@ func (partner *Partner) Start() {
 	partner.gtfsCache.Add("trip-updates", to, nil)
 	partner.gtfsCache.Add("vehicle-positions", to, nil)
 	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
-
-	partner.RefreshRateLimit()
 }
 
 func (partner *Partner) Allow(ip string) bool {
@@ -366,8 +362,9 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.id = apiPartner.Id
 	partner.slug = apiPartner.Slug
 	partner.Name = apiPartner.Name
-	partner.SetSettingsDefinition(apiPartner.Settings)
-	partner.ResetCollectSettings()
+
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, apiPartner.Settings)
+
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
 	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
 
@@ -755,7 +752,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		gtfsCache:      cache.NewCacheTable(),
 		limiters:       make(map[string]*rate.Limiter),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
 }
@@ -773,19 +770,6 @@ func (manager *PartnerManager) Find(id PartnerId) *Partner {
 	partner := manager.byId[id]
 	manager.mutex.RUnlock()
 	return partner
-}
-
-func (manager *PartnerManager) FindBySetting(setting, value string) (*Partner, bool) {
-	manager.mutex.RLock()
-	for _, partner := range manager.byId {
-		if partner.Setting(setting) == value {
-			manager.mutex.RUnlock()
-			return partner, true
-		}
-	}
-
-	manager.mutex.RUnlock()
-	return nil, false
 }
 
 func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
@@ -897,11 +881,11 @@ func (manager *PartnerManager) Load() error {
 		}
 
 		if p.Settings.Valid && len(p.Settings.String) > 0 {
-			m := make(map[string]string)
-			if err = json.Unmarshal([]byte(p.Settings.String), &m); err != nil {
+			settings := make(map[string]string)
+			if err = json.Unmarshal([]byte(p.Settings.String), &settings); err != nil {
 				return err
 			}
-			partner.SetSettingsDefinition(m)
+			partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 		}
 
 		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
@@ -968,7 +952,7 @@ func (manager *PartnerManager) SaveToDatabase() (int, error) {
 }
 
 func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePartner, error) {
-	settings, err := partner.PartnerSettings.ToJson()
+	settings, err := json.Marshal(partner.PartnerSettings.SettingsDefinition())
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ func newSIRIVehicleMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIVehi
 	connector := &SIRIVehicleMonitoringSubscriptionBroadcaster{}
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
-	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
+	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.VehicleId)

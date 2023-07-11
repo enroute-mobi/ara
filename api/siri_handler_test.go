@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
@@ -28,7 +29,8 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 	referential := server.CurrentReferentials().New("default")
 
 	partner := referential.Partners().New("partner")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"remote_url":                             "",
 		"remote_credential":                      "",
 		"remote_objectid_kind":                   "objectidKind",
@@ -38,7 +40,8 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 		"generators.data_frame_identifier":       "RATPDev:DataFrame::%{id}:LOC",
 		"siri.envelope":                          envelopeType,
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{
 		"siri-check-status-server",
 		"siri-stop-monitoring-request-broadcaster",

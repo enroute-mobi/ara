@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -35,11 +36,12 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"local_url":            "http://example.com/test/siri",
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test_kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
@@ -84,12 +86,13 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
 		"remote_objectid_kind":               "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 

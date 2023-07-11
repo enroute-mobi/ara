@@ -54,7 +54,10 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSetting(s.PARTNER_MAX_RETRY, "1")
+	settings := map[string]string{
+		s.PARTNER_MAX_RETRY: "1",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{"test-check-status-client"}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partner.RefreshConnectors()

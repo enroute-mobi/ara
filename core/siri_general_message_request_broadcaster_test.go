@@ -18,10 +18,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("local_url", "http://ara")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 
+	settings := map[string]string{
+		"local_url":                              "http://ara",
+		"remote_objectid_kind":                   "objectidKind",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -73,10 +76,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("local_url", "http://ara")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 
+	settings := map[string]string{
+		"local_url":                              "http://ara",
+		"remote_objectid_kind":                   "objectidKind",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -116,10 +122,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("local_url", "http://ara")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
 
+	settings := map[string]string{
+		"local_url":                              "http://ara",
+		"remote_objectid_kind":                   "objectidKind",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
@@ -187,7 +196,7 @@ func Test_SIRIGeneralMessageRequestBroadcasterFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
@@ -207,8 +216,11 @@ func Test_SIRIGeneralMessageRequestBroadcasterFactory_Validate(t *testing.T) {
 func Test_SIRIGeneralMessageRequestBroadcaster_RemoteObjectIDKindAbsent(t *testing.T) {
 	partner := NewPartner()
 
-	partner.SetSetting("siri-general-message-request-broadcaster.remote_objectid_kind", "")
-	partner.SetSetting("remote_objectid_kind", "Kind2")
+	settings := map[string]string{
+		"siri-general-message-request-broadcaster.remote_objectid_kind": "",
+		"remote_objectid_kind": "Kind2",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
@@ -220,9 +232,11 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RemoteObjectIDKindAbsent(t *testi
 func Test_SIRIGeneralMessageBroadcaster_RemoteObjectIDKindPresent(t *testing.T) {
 	partner := NewPartner()
 
-	partner.SetSetting("siri-general-message-request-broadcaster.remote_objectid_kind", "Kind1")
-	partner.SetSetting("remote_objectid_kind", "Kind2")
-
+	settings := map[string]string{
+		"siri-general-message-request-broadcaster.remote_objectid_kind": "Kind1",
+		"remote_objectid_kind": "Kind2",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
 	if connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "Kind1" {
