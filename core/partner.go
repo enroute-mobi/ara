@@ -68,7 +68,7 @@ type PartnerStatusCheck struct {
 
 type Partner struct {
 	uuid.UUIDConsumer
-	s.PartnerSettings
+	*s.PartnerSettings
 
 	mutex *sync.RWMutex
 

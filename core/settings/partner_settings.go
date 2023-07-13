@@ -103,7 +103,6 @@ type PartnerSettings struct {
 	ignoreStopWithoutLine          bool
 	discoveryInterval              time.Duration
 	cacheTimeouts                  sync.Map
-	cacheTimeout                   time.Duration
 	siriDirectionTypeInbound       string
 	siriDirectionTypeOutbound      string
 
@@ -137,16 +136,16 @@ type PartnerSettings struct {
 	originalSettings map[string]string
 }
 
-func NewEmptyPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
-	partnerSettings := PartnerSettings{
+func NewEmptyPartnerSettings(ug func() uuid.UUIDGenerator) *PartnerSettings {
+	partnerSettings := &PartnerSettings{
 		ug: ug,
 	}
 	partnerSettings.parseSettings(map[string]string{})
 	return partnerSettings
 }
 
-func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string) PartnerSettings {
-	partnerSettings := PartnerSettings{
+func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string) *PartnerSettings {
+	partnerSettings := &PartnerSettings{
 		ug: generator,
 	}
 
@@ -190,9 +189,12 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setSortPayloadForTest(settings)
 
 	s.setVehicleRemoteObjectIDKindWithFallback(settings)
+	s.setVehicleJourneyRemoteObjectIDKindWithFallback(settings)
 
 	s.setIgnoreTerminateSubscriptionsRequest(settings)
 	s.setIdentifierGenerators(settings)
+
+	s.setHttpClientOAuth(settings)
 
 	// depends on other settings
 	s.setHTTPClientOptions(settings)
@@ -231,7 +233,7 @@ func (s *PartnerSettings) RateLimit() float64 {
 }
 
 func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
-	r, _ := regexp.Compile("(.+)\\.remote_objectid_kind")
+	r, _ := regexp.Compile(`(.+)\.remote_objectid_kind`)
 
 	// xxxx.remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
@@ -382,7 +384,7 @@ func (s *PartnerSettings) GtfsCacheTimeout() (t time.Duration) {
 }
 
 func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
-	r, _ := regexp.Compile("(.+)\\.cache_timeout")
+	r, _ := regexp.Compile(`(.+)\.cache_timeout`)
 
 	// xxxx.cache_timeout = dummy -> xxxx = dummy
 	for key, value := range settings {
@@ -398,7 +400,6 @@ func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
 		connectorName := matches[1]
 		s.cacheTimeouts.Store(connectorName, value)
 	}
-	return
 }
 
 func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
@@ -407,8 +408,7 @@ func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
 		return value.(time.Duration)
 	}
 
-	emptyDuration, _ := time.ParseDuration("")
-	return emptyDuration
+	return 0
 }
 
 func (s *PartnerSettings) setSortPayloadForTest(settings map[string]string) {
@@ -422,7 +422,6 @@ func (s *PartnerSettings) SortPaylodForTest() bool {
 func (s *PartnerSettings) setIgnoreTerminateSubscriptionsRequest(settings map[string]string) {
 	ignore, _ := strconv.ParseBool(settings[BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS])
 	s.ignoreTerminateSubscriptionsRequest = ignore
-	return
 }
 
 func (s *PartnerSettings) IgnoreTerminateSubscriptionsRequest() bool {
