@@ -416,7 +416,7 @@ func (s *PartnerSettings) IgnoreTerminateSubscriptionsRequest() bool {
 func (s *PartnerSettings) setProducerRef(settings map[string]string) {
 	producerRef := settings[REMOTE_CREDENTIAL]
 	if producerRef == "" {
-		s.producerRef = "Ara"
+		producerRef = "Ara"
 	}
 	s.producerRef = producerRef
 }
