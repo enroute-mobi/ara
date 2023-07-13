@@ -138,9 +138,11 @@ type PartnerSettings struct {
 }
 
 func NewEmptyPartnerSettings(ug func() uuid.UUIDGenerator) PartnerSettings {
-	return PartnerSettings{
+	partnerSettings := PartnerSettings{
 		ug: ug,
 	}
+	partnerSettings.parseSettings(map[string]string{})
+	return partnerSettings
 }
 
 func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string) PartnerSettings {
@@ -148,49 +150,54 @@ func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string
 		ug: generator,
 	}
 
-	partnerSettings.setCredentials(settings)
-	partnerSettings.setRateLimit(settings)
-	partnerSettings.setGtfsTTL(settings)
-	partnerSettings.setGtfsCacheTimeout(settings)
-	partnerSettings.setRecordedCallsDuration(settings)
-
-	partnerSettings.setSIRIEnvelopeType(settings)
-	partnerSettings.setAddress(settings)
-	partnerSettings.setProducerRef(settings)
-	partnerSettings.setSIRILinePublishedName(settings)
-	partnerSettings.setSIRIDirectionType(settings)
-	partnerSettings.setCollectSettings(settings)
-	partnerSettings.setSiriCredentialHeader(settings)
-	partnerSettings.setSiriEnvelopeType(settings)
-	partnerSettings.setSIRIPassageOrder(settings)
-	partnerSettings.setMaximumChechstatusRetry(settings)
-	partnerSettings.setSubscriptionMaximumResources(settings)
-	partnerSettings.setCollectPriority(settings)
-	partnerSettings.setDefaultSRSName(settings)
-	partnerSettings.setNoDestinationRefRewritingFrom(settings)
-	partnerSettings.setNoDataFrameRefRewritingFrom(settings)
-	partnerSettings.setGzipGtfs(settings)
-	partnerSettings.setGeneralMessageRequestVersion22(settings)
-	partnerSettings.setPersistentCollect(settings)
-	partnerSettings.setPersistentBroadcastSubscriptions(settings)
-	partnerSettings.setRewriteJourneyPatternRef(settings)
-	partnerSettings.setCollectFilteredGeneralMessages(settings)
-	partnerSettings.setIgnoreStopWithoutLine(settings)
-	partnerSettings.setDiscoveryInterval(settings)
-	partnerSettings.setCacheTimeouts(settings)
-	partnerSettings.setSortPayloadForTest(settings)
-
-	partnerSettings.setVehicleRemoteObjectIDKindWithFallback(settings)
-
-	partnerSettings.setIgnoreTerminateSubscriptionsRequest(settings)
-	partnerSettings.setIdentifierGenerators(settings)
-
-	// depends on other settings
-	partnerSettings.setHTTPClientOptions(settings)
-
-	partnerSettings.originalSettings = settings
+	partnerSettings.parseSettings(settings)
 
 	return partnerSettings
+}
+
+func (s *PartnerSettings) parseSettings(settings map[string]string) {
+	s.setRemoteObjectIDKinds(settings)
+	s.setCredentials(settings)
+	s.setRateLimit(settings)
+	s.setGtfsTTL(settings)
+	s.setGtfsCacheTimeout(settings)
+	s.setRecordedCallsDuration(settings)
+
+	s.setSIRIEnvelopeType(settings)
+	s.setAddress(settings)
+	s.setProducerRef(settings)
+	s.setSIRILinePublishedName(settings)
+	s.setSIRIDirectionType(settings)
+	s.setCollectSettings(settings)
+	s.setSiriCredentialHeader(settings)
+	s.setSiriEnvelopeType(settings)
+	s.setSIRIPassageOrder(settings)
+	s.setMaximumChechstatusRetry(settings)
+	s.setSubscriptionMaximumResources(settings)
+	s.setCollectPriority(settings)
+	s.setDefaultSRSName(settings)
+	s.setNoDestinationRefRewritingFrom(settings)
+	s.setNoDataFrameRefRewritingFrom(settings)
+	s.setGzipGtfs(settings)
+	s.setGeneralMessageRequestVersion22(settings)
+	s.setPersistentCollect(settings)
+	s.setPersistentBroadcastSubscriptions(settings)
+	s.setRewriteJourneyPatternRef(settings)
+	s.setCollectFilteredGeneralMessages(settings)
+	s.setIgnoreStopWithoutLine(settings)
+	s.setDiscoveryInterval(settings)
+	s.setCacheTimeouts(settings)
+	s.setSortPayloadForTest(settings)
+
+	s.setVehicleRemoteObjectIDKindWithFallback(settings)
+
+	s.setIgnoreTerminateSubscriptionsRequest(settings)
+	s.setIdentifierGenerators(settings)
+
+	// depends on other settings
+	s.setHTTPClientOptions(settings)
+
+	s.originalSettings = settings
 }
 
 func (s *PartnerSettings) SettingsDefinition() map[string]string {

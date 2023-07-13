@@ -752,6 +752,7 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		gtfsCache:      cache.NewCacheTable(),
 		limiters:       make(map[string]*rate.Limiter),
 	}
+	partner.SetUUIDGenerator(manager.UUIDGenerator())
 	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	return partner
