@@ -235,6 +235,10 @@ func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
 
 	// xxxx.remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
 		matches := r.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
@@ -268,6 +272,10 @@ func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settin
 
 	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
 		matches := r.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
@@ -305,6 +313,10 @@ func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[
 
 	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
 		matches := r.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
@@ -374,6 +386,10 @@ func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
 
 	// xxxx.cache_timeout = dummy -> xxxx = dummy
 	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
 		matches := r.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
