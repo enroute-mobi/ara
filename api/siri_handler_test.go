@@ -29,7 +29,7 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 	referential := server.CurrentReferentials().New("default")
 
 	partner := referential.Partners().New("partner")
-
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"remote_url":                             "",
 		"remote_credential":                      "",
@@ -52,7 +52,6 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 		"siri-lines-discovery-request-broadcaster",
 	}
 	partner.RefreshConnectors()
-	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	partner.Save()
 	referential.Save()

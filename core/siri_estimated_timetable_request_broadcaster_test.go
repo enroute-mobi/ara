@@ -18,6 +18,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
@@ -26,7 +27,6 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()
@@ -183,6 +183,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
@@ -191,7 +192,6 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	stopArea := referential.Model().StopAreas().New()

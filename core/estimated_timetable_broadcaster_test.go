@@ -42,6 +42,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 		"local_credential":     "local",
 		"remote_url":           ts.URL,
 	}
+	partner.SetUUIDGenerator(uuidGenerator)
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}

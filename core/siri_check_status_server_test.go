@@ -16,6 +16,7 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
@@ -27,7 +28,6 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referential.Start()
 	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")
