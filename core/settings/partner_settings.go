@@ -236,11 +236,11 @@ func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
 	// xxxx.remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
 		matches := r.FindStringSubmatch(key)
-		if len(matches) != 1 {
-			break
+		if len(matches) == 0 {
+			continue
 		}
 
-		connectorName := matches[0]
+		connectorName := matches[1]
 		s.remoteObjectIDKinds.Store(connectorName, value)
 	}
 
@@ -269,8 +269,8 @@ func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settin
 	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
 		matches := r.FindStringSubmatch(key)
-		if len(matches) != 1 {
-			break
+		if len(matches) == 0 {
+			continue
 		}
 
 		var connectorRemoteObjectIDKinds []string
@@ -279,7 +279,7 @@ func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settin
 
 		// "a,b,c" -> [a,b,c]
 
-		connectorName := matches[0]
+		connectorName := matches[1]
 		s.vehicleJourneyRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
 	}
 }
@@ -306,8 +306,8 @@ func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[
 	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
 	for key, value := range settings {
 		matches := r.FindStringSubmatch(key)
-		if len(matches) != 1 {
-			break
+		if len(matches) == 0 {
+			continue
 		}
 
 		var connectorRemoteObjectIDKinds []string
@@ -316,7 +316,7 @@ func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[
 
 		// "a,b,c" -> [a,b,c]
 
-		connectorName := matches[0]
+		connectorName := matches[1]
 		s.vehicleRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
 	}
 }
@@ -375,11 +375,11 @@ func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
 	// xxxx.cache_timeout = dummy -> xxxx = dummy
 	for key, value := range settings {
 		matches := r.FindStringSubmatch(key)
-		if len(matches) != 1 {
-			break
+		if len(matches) == 0 {
+			continue
 		}
 
-		connectorName := matches[0]
+		connectorName := matches[1]
 		s.cacheTimeouts.Store(connectorName, value)
 	}
 	return
