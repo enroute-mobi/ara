@@ -457,17 +457,18 @@ func (s *PartnerSettings) setSIRIDirectionType(settings map[string]string) {
 	directions := strings.Split(settings[SIRI_DIRECTION_TYPE], ",")
 	// ensure the correctness of the setting
 	if len(directions) != 2 {
-		s.siriDirectionTypeOutbound = "Aller"
-		s.siriDirectionTypeInbound = "Retour"
+		s.siriDirectionTypeInbound = ""
+		s.siriDirectionTypeOutbound = ""
 		return
 	}
 
-	s.siriDirectionTypeOutbound = directions[0]
-	s.siriDirectionTypeInbound = directions[1]
+	s.siriDirectionTypeInbound = directions[0]
+	s.siriDirectionTypeOutbound = directions[1]
 }
 
 func (s *PartnerSettings) SIRIDirectionType() (string, string, bool) {
-	return s.siriDirectionTypeInbound, s.siriDirectionTypeOutbound, true
+	valid := len(s.siriDirectionTypeOutbound) > 0 && len(s.siriDirectionTypeInbound) > 0
+	return s.siriDirectionTypeInbound, s.siriDirectionTypeOutbound, !valid
 }
 
 func (s *PartnerSettings) setSIRILinePublishedName(settings map[string]string) {
