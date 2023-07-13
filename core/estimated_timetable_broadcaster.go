@@ -182,7 +182,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ett.connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER)
+					referenceGenerator := ett.connector.Partner().ReferenceIdentifierGenerator()
 					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 				}
 
@@ -375,7 +375,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) getEstimatedVehi
 				continue
 			}
 		}
-		generator := connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER)
+		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
 		defaultObjectID := model.NewObjectID(connector.remoteObjectidKind, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
 		references[refType] = defaultObjectID.Value()
 	}

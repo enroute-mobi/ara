@@ -61,7 +61,10 @@ func Test_APIPartner_Validate(t *testing.T) {
 
 	// Check Already Used Slug and local_credential
 	partner := partners.New("slug")
-	partner.SetSetting("local_credential", "cred")
+	settings := map[string]string{
+		"local_credential": "cred",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	apiPartner = &APIPartner{

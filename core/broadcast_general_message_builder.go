@@ -24,7 +24,7 @@ type BroadcastGeneralMessageBuilder struct {
 func NewBroadcastGeneralMessageBuilder(partner *Partner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
 		partner:            partner,
-		referenceGenerator: partner.IdentifierGenerator(idgen.REFERENCE_IDENTIFIER),
+		referenceGenerator: partner.ReferenceIdentifierGenerator(),
 		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),

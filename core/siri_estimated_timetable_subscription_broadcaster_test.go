@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -23,7 +24,10 @@ func Test_EstimatedTimetableBroadcaster_Create_Events(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{TEST_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -72,10 +76,14 @@ func Test_checklines(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("local_url", "http://ara")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	settings := map[string]string{
+		"local_url":            "http://ara",
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := newSIRIEstimatedTimetableSubscriptionBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()

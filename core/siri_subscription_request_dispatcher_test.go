@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -23,7 +24,11 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -62,7 +67,10 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -98,7 +106,10 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -149,7 +160,10 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -192,7 +206,10 @@ func Test_CancelSubscription(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -229,7 +246,10 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 	referential.model = model.NewMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -287,9 +307,14 @@ func Test_ReceiveStateSM(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
-	partner.SetSetting("remote_credential", "external")
-	partner.SetSetting("remote_url", ts.URL)
+
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+		"remote_credential":    "external",
+		"remote_url":           ts.URL,
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -383,9 +408,14 @@ func Test_ReceiveStateGM(t *testing.T) {
 	defer referential.broacasterManager.Stop()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
-	partner.SetSetting("remote_objectid_kind", "_internal")
-	partner.SetSetting("remote_credential", "external")
-	partner.SetSetting("remote_url", ts.URL)
+
+	settings := map[string]string{
+		"remote_objectid_kind": "_internal",
+		"remote_credential":    "external",
+		"remote_url":           ts.URL,
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER, SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	partner.RefreshConnectors()
 	referential.Partners().Save(partner)
@@ -486,10 +516,12 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"remote_url":           "une url",
 		"remote_objectid_kind": "_internal",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRISubscriptionRequestDispatcher(partner)
 	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector
@@ -528,10 +560,12 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"remote_url":           "une url",
 		"remote_objectid_kind": "_internal",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRISubscriptionRequestDispatcher(partner)
 	partner.connectors[SIRI_SUBSCRIPTION_REQUEST_DISPATCHER] = connector

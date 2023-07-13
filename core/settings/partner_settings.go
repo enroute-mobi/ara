@@ -2,8 +2,10 @@ package settings
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
@@ -52,7 +54,7 @@ const (
 	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
-	GENEREAL_MESSAGE_REQUEST_2_2    = "generalMessageRequest.version2.2"
+	GENERAL_MESSAGE_REQUEST_2_2     = "generalMessageRequest.version2.2"
 	SUBSCRIPTIONS_MAXIMUM_RESOURCES = "subscriptions.maximum_resources"
 
 	CACHE_TIMEOUT = "cache_timeout"
@@ -73,399 +75,647 @@ const (
 )
 
 type PartnerSettings struct {
-	Settings
-
 	ug func() uuid.UUIDGenerator
 
-	cs *CollectSettings
-	g  map[string]*idgen.IdentifierGenerator
-	rl float64
+	collectSettings *CollectSettings
+
+	credentials                    string
+	rateLimit                      float64
+	gtfsTTL                        time.Duration
+	gtfsCacheTimeout               time.Duration
+	siriCredentialHeader           string
+	siriEnvelopeType               string
+	httpClientOAuth                *remote.HTTPClientOAuth
+	recordedCallsDuration          time.Duration
+	producerRef                    string
+	address                        string
+	linePublishedName              string
+	passageOrder                   string
+	envelopeType                   string
+	collectPriority                int
+	defaultSRSName                 string
+	noDestinationRefRewritingFrom  []string
+	noDataFrameRefRewritingFrom    []string
+	rewriteJourneyPatternRef       bool
+	gzipGtfs                       bool
+	generalMessageRequestVersion22 bool
+	collectFilteredGeneralMessages bool
+	ignoreStopWithoutLine          bool
+	discoveryInterval              time.Duration
+	cacheTimeouts                  sync.Map
+	siriDirectionTypeInbound       string
+	siriDirectionTypeOutbound      string
+
+	maximumCheckstatusRetry          int
+	subscriptionMaximumResources     int
+	persistentCollect                bool
+	persistentBroadcastSubscriptions bool
+
+	messageIdentifierGenerator           *idgen.IdentifierGenerator
+	responseMessageIdentifierGenerator   *idgen.IdentifierGenerator
+	dataFrameIdentifierGenerator         *idgen.IdentifierGenerator
+	referenceIdentifierGenerator         *idgen.IdentifierGenerator
+	referenceStopAreaIdentifierGenerator *idgen.IdentifierGenerator
+	subscriptionIdentifierGenerator      *idgen.IdentifierGenerator
+
+	remoteObjectIDKinds sync.Map
+	remoteObjectIDKind  string
+
+	httpClientOptions remote.HTTPClientOptions
+
+	sortPayloadForTest                  bool
+	ignoreTerminateSubscriptionsRequest bool
+
+	vehicleRemoteObjectIDKinds            []string
+	vehicleRemoteObjectIDKindsByConnector sync.Map
+
+	vehicleJourneyRemoteObjectIDKinds            []string
+	vehicleJourneyRemoteObjectIDKindsByConnector sync.Map
+
+	// ! Never use these values outside SettingsDefinition()
+	originalSettings map[string]string
 }
 
-func NewPartnerSettings(ug func() uuid.UUIDGenerator) (ps PartnerSettings) {
-	ps = PartnerSettings{
-		Settings: NewSettings(),
-		ug:       ug,
-		g:        make(map[string]*idgen.IdentifierGenerator),
+func NewEmptyPartnerSettings(ug func() uuid.UUIDGenerator) *PartnerSettings {
+	partnerSettings := &PartnerSettings{
+		ug: ug,
 	}
-	ps.r = ps.reloadSettings
-	return
+	partnerSettings.parseSettings(map[string]string{})
+	return partnerSettings
+}
+
+func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string) *PartnerSettings {
+	partnerSettings := &PartnerSettings{
+		ug: generator,
+	}
+
+	partnerSettings.parseSettings(settings)
+
+	return partnerSettings
+}
+
+func (s *PartnerSettings) parseSettings(settings map[string]string) {
+	s.setRemoteObjectIDKinds(settings)
+	s.setCredentials(settings)
+	s.setRateLimit(settings)
+	s.setGtfsTTL(settings)
+	s.setGtfsCacheTimeout(settings)
+	s.setRecordedCallsDuration(settings)
+
+	s.setSIRIEnvelopeType(settings)
+	s.setAddress(settings)
+	s.setProducerRef(settings)
+	s.setSIRILinePublishedName(settings)
+	s.setSIRIDirectionType(settings)
+	s.setCollectSettings(settings)
+	s.setSiriCredentialHeader(settings)
+	s.setSiriEnvelopeType(settings)
+	s.setSIRIPassageOrder(settings)
+	s.setMaximumChechstatusRetry(settings)
+	s.setSubscriptionMaximumResources(settings)
+	s.setCollectPriority(settings)
+	s.setDefaultSRSName(settings)
+	s.setNoDestinationRefRewritingFrom(settings)
+	s.setNoDataFrameRefRewritingFrom(settings)
+	s.setGzipGtfs(settings)
+	s.setGeneralMessageRequestVersion22(settings)
+	s.setPersistentCollect(settings)
+	s.setPersistentBroadcastSubscriptions(settings)
+	s.setRewriteJourneyPatternRef(settings)
+	s.setCollectFilteredGeneralMessages(settings)
+	s.setIgnoreStopWithoutLine(settings)
+	s.setDiscoveryInterval(settings)
+	s.setCacheTimeouts(settings)
+	s.setSortPayloadForTest(settings)
+
+	s.setVehicleRemoteObjectIDKindWithFallback(settings)
+	s.setVehicleJourneyRemoteObjectIDKindWithFallback(settings)
+
+	s.setIgnoreTerminateSubscriptionsRequest(settings)
+	s.setIdentifierGenerators(settings)
+
+	s.setHttpClientOAuth(settings)
+
+	// depends on other settings
+	s.setHTTPClientOptions(settings)
+
+	s.originalSettings = settings
+}
+
+func (s *PartnerSettings) SettingsDefinition() map[string]string {
+	return s.originalSettings
+}
+
+func (s *PartnerSettings) setCredentials(settings map[string]string) {
+	_, ok := settings[LOCAL_CREDENTIAL]
+	_, ok2 := settings[LOCAL_CREDENTIALS]
+	if !ok && !ok2 {
+		s.credentials = ""
+	} else {
+		s.credentials = fmt.Sprintf("%v,%v", settings[LOCAL_CREDENTIAL], settings[LOCAL_CREDENTIALS])
+	}
 }
 
 func (s *PartnerSettings) Credentials() string {
-	s.m.RLock()
-	defer s.m.RUnlock()
+	return s.credentials
+}
 
-	_, ok := s.s[LOCAL_CREDENTIAL]
-	_, ok2 := s.s[LOCAL_CREDENTIALS]
-	if !ok && !ok2 {
-		return ""
+func (s *PartnerSettings) setRateLimit(settings map[string]string) {
+	value, _ := strconv.Atoi(settings[RATE_LIMIT_PER_IP])
+	if value < 0 {
+		value = 0
 	}
-	return fmt.Sprintf("%v,%v", s.s[LOCAL_CREDENTIAL], s.s[LOCAL_CREDENTIALS])
+	s.rateLimit = float64(value)
 }
 
 func (s *PartnerSettings) RateLimit() float64 {
-	return s.rl
+	return s.rateLimit
 }
 
-func (s *PartnerSettings) RemoteObjectIDKind(connectorName ...string) string {
-	var cn string
-	if len(connectorName) != 0 {
-		cn = connectorName[0]
+func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
+	r, _ := regexp.Compile(`(.+)\.remote_objectid_kind`)
+
+	// xxxx.remote_objectid_kind = dummy -> xxxx = dummy
+	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
+		matches := r.FindStringSubmatch(key)
+		if len(matches) == 0 {
+			continue
+		}
+
+		connectorName := matches[1]
+		s.remoteObjectIDKinds.Store(connectorName, value)
 	}
 
-	s.m.RLock()
-	defer s.m.RUnlock()
-
-	if setting := s.s[fmt.Sprintf("%s.%s", cn, REMOTE_OBJECTID_KIND)]; setting != "" {
-		return setting
-	}
-	return s.s[REMOTE_OBJECTID_KIND]
+	s.remoteObjectIDKind = settings[REMOTE_OBJECTID_KIND]
 }
 
-func (s *PartnerSettings) VehicleRemoteObjectIDKindWithFallback(connectorName ...string) []string {
-	return s.remoteObjectIDKindWithFallback(VEHICLE_REMOTE_OBJECTID_KIND, connectorName...)
-}
+func (s *PartnerSettings) RemoteObjectIDKind(optionalConnectorName ...string) string {
+	if len(optionalConnectorName) == 1 {
+		connectorName := optionalConnectorName[0]
 
-func (s *PartnerSettings) VehicleJourneyRemoteObjectIDKindWithFallback(connectorName ...string) []string {
-	return s.remoteObjectIDKindWithFallback(VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND, connectorName...)
-}
-
-func (s *PartnerSettings) remoteObjectIDKindWithFallback(settingName string, connectorName ...string) (k []string) {
-	var cn string
-	if len(connectorName) != 0 {
-		cn = connectorName[0]
-	}
-
-	s.m.RLock()
-
-	if setting := s.s[fmt.Sprintf("%s.%s", cn, settingName)]; setting != "" {
-		k = append(k, trimedSlice(setting)...)
-	}
-	if setting := s.s[settingName]; setting != "" {
-		k = append(k, trimedSlice(setting)...)
-	}
-
-	if len(k) == 0 {
-		if setting := s.s[fmt.Sprintf("%s.%s", cn, REMOTE_OBJECTID_KIND)]; setting != "" {
-			k = append(k, setting)
-		} else {
-			k = append(k, s.s[REMOTE_OBJECTID_KIND])
+		value, ok := s.remoteObjectIDKinds.Load(connectorName)
+		if ok {
+			return value.(string)
 		}
 	}
 
-	s.m.RUnlock()
-	return
+	return s.remoteObjectIDKind
+}
+
+func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settings map[string]string) {
+	// xxxx.vehicle_journey_remote_objectid_kind
+	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND))
+
+	s.vehicleJourneyRemoteObjectIDKinds = trimedSlice(settings[VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND])
+
+	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
+	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
+		matches := r.FindStringSubmatch(key)
+		if len(matches) == 0 {
+			continue
+		}
+
+		var connectorRemoteObjectIDKinds []string
+		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, trimedSlice(value)...)
+		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, s.vehicleJourneyRemoteObjectIDKinds...)
+
+		// "a,b,c" -> [a,b,c]
+
+		connectorName := matches[1]
+		s.vehicleJourneyRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
+	}
+}
+
+func (s *PartnerSettings) VehicleJourneyRemoteObjectIDKindWithFallback(connectorName string) []string {
+	value, ok := s.vehicleJourneyRemoteObjectIDKindsByConnector.Load(connectorName)
+	if ok {
+		return value.([]string)
+	}
+
+	if len(s.vehicleJourneyRemoteObjectIDKinds) > 0 {
+		return s.vehicleJourneyRemoteObjectIDKinds
+	}
+
+	return []string{s.RemoteObjectIDKind(connectorName)}
+}
+
+func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[string]string) {
+	// xxxx.vehicle_journey_remote_objectid_kind
+	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_REMOTE_OBJECTID_KIND))
+
+	s.vehicleRemoteObjectIDKinds = trimedSlice(settings[VEHICLE_REMOTE_OBJECTID_KIND])
+
+	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
+	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
+		matches := r.FindStringSubmatch(key)
+		if len(matches) == 0 {
+			continue
+		}
+
+		var connectorRemoteObjectIDKinds []string
+		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, trimedSlice(value)...)
+		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, s.vehicleRemoteObjectIDKinds...)
+
+		// "a,b,c" -> [a,b,c]
+
+		connectorName := matches[1]
+		s.vehicleRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
+	}
+}
+
+func (s *PartnerSettings) VehicleRemoteObjectIDKindWithFallback(connectorName string) []string {
+	value, ok := s.vehicleRemoteObjectIDKindsByConnector.Load(connectorName)
+	if ok {
+		return value.([]string)
+	}
+
+	if len(s.vehicleRemoteObjectIDKinds) > 0 {
+		return s.vehicleRemoteObjectIDKinds
+	}
+
+	return []string{s.RemoteObjectIDKind(connectorName)}
+}
+
+func (s *PartnerSettings) setGtfsTTL(settings map[string]string) {
+	duration, _ := time.ParseDuration(settings[COLLECT_GTFS_TTL])
+	if duration < DEFAULT_GTFS_TTL {
+		duration = DEFAULT_GTFS_TTL
+	}
+	s.gtfsTTL = duration
 }
 
 func (s *PartnerSettings) GtfsTTL() (t time.Duration) {
-	s.m.RLock()
-	t, _ = time.ParseDuration(s.s[COLLECT_GTFS_TTL])
-	s.m.RUnlock()
-	if t < DEFAULT_GTFS_TTL {
-		t = DEFAULT_GTFS_TTL
-	}
-
-	return
+	return s.gtfsTTL
 }
 
+func (s *PartnerSettings) setRecordedCallsDuration(settings map[string]string) {
+	duration, _ := time.ParseDuration(settings[BROADCAST_RECORDED_CALLS_DURATION])
+	s.recordedCallsDuration = duration
+}
 func (s *PartnerSettings) RecordedCallsDuration() (t time.Duration) {
-	s.m.RLock()
-	t, _ = time.ParseDuration(s.s[BROADCAST_RECORDED_CALLS_DURATION])
-	s.m.RUnlock()
+	return s.recordedCallsDuration
+}
 
-	return
+func (s *PartnerSettings) setGtfsCacheTimeout(settings map[string]string) {
+	duration, _ := time.ParseDuration(settings[BROADCAST_GTFS_CACHE_TIMEOUT])
+
+	if duration < cache.MIN_CACHE_LIFESPAN {
+		duration = cache.DEFAULT_CACHE_LIFESPAN
+	}
+
+	s.gtfsCacheTimeout = duration
 }
 
 // Very specific for now, we'll refacto if we need to cache more
 func (s *PartnerSettings) GtfsCacheTimeout() (t time.Duration) {
-	s.m.RLock()
-	t, _ = time.ParseDuration(s.s[BROADCAST_GTFS_CACHE_TIMEOUT])
-	s.m.RUnlock()
+	return s.gtfsCacheTimeout
+}
 
-	if t < cache.MIN_CACHE_LIFESPAN {
-		t = cache.DEFAULT_CACHE_LIFESPAN
+func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
+	r, _ := regexp.Compile(`(.+)\.cache_timeout`)
+
+	// xxxx.cache_timeout = dummy -> xxxx = dummy
+	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
+		matches := r.FindStringSubmatch(key)
+		if len(matches) == 0 {
+			continue
+		}
+
+		connectorName := matches[1]
+		s.cacheTimeouts.Store(connectorName, value)
 	}
-	return
 }
 
 func (s *PartnerSettings) CacheTimeout(connectorName string) (t time.Duration) {
-	s.m.RLock()
-	t, _ = time.ParseDuration(s.s[fmt.Sprintf("%s.%s", connectorName, CACHE_TIMEOUT)])
-	s.m.RUnlock()
-	return
+	value, ok := s.cacheTimeouts.Load(connectorName)
+	if ok {
+		return value.(time.Duration)
+	}
+
+	return 0
 }
 
-func (s *PartnerSettings) SortPaylodForTest() (sort bool) {
-	s.m.RLock()
-	sort, _ = strconv.ParseBool(s.s[SORT_PAYLOAD_FOR_TEST])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setSortPayloadForTest(settings map[string]string) {
+	sortPayload, _ := strconv.ParseBool(settings[SORT_PAYLOAD_FOR_TEST])
+	s.sortPayloadForTest = sortPayload
+}
+func (s *PartnerSettings) SortPaylodForTest() bool {
+	return s.sortPayloadForTest
 }
 
-func (s *PartnerSettings) IgnoreTerminateSubscriptionsRequest() (ignore bool) {
-	s.m.RLock()
-	ignore, _ = strconv.ParseBool(s.s[BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setIgnoreTerminateSubscriptionsRequest(settings map[string]string) {
+	ignore, _ := strconv.ParseBool(settings[BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS])
+	s.ignoreTerminateSubscriptionsRequest = ignore
 }
 
-func (s *PartnerSettings) ProducerRef() (producerRef string) {
-	s.m.RLock()
-	producerRef = s.s[REMOTE_CREDENTIAL]
-	s.m.RUnlock()
+func (s *PartnerSettings) IgnoreTerminateSubscriptionsRequest() bool {
+	return s.ignoreTerminateSubscriptionsRequest
+}
 
+func (s *PartnerSettings) setProducerRef(settings map[string]string) {
+	producerRef := settings[REMOTE_CREDENTIAL]
 	if producerRef == "" {
 		producerRef = "Ara"
 	}
-	return producerRef
+	s.producerRef = producerRef
+}
+
+func (s *PartnerSettings) ProducerRef() string {
+	return s.producerRef
 }
 
 func (s *PartnerSettings) RequestorRef() string {
 	return s.ProducerRef()
 }
 
+func (s *PartnerSettings) setAddress(settings map[string]string) {
+	address := settings[LOCAL_URL]
+	s.address = address
+}
+
 func (s *PartnerSettings) Address() string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return s.s[LOCAL_URL]
+	return s.address
+}
+
+func (s *PartnerSettings) setSIRIDirectionType(settings map[string]string) {
+	directions := strings.Split(settings[SIRI_DIRECTION_TYPE], ",")
+	// ensure the correctness of the setting
+	if len(directions) != 2 {
+		s.siriDirectionTypeInbound = ""
+		s.siriDirectionTypeOutbound = ""
+		return
+	}
+
+	s.siriDirectionTypeInbound = directions[0]
+	s.siriDirectionTypeOutbound = directions[1]
 }
 
 func (s *PartnerSettings) SIRIDirectionType() (string, string, bool) {
-	var inboundValue, outboundValue string
-	s.m.RLock()
-	defer s.m.RUnlock()
-
-	directions := strings.Split(s.s[SIRI_DIRECTION_TYPE], ",")
-	// ensure the correctness of the setting
-	if len(directions) != 2 {
-		return inboundValue, outboundValue, true
-	}
-
-	inboundValue = directions[0]
-	outboundValue = directions[1]
-
-	return inboundValue, outboundValue, false
+	valid := len(s.siriDirectionTypeOutbound) > 0 && len(s.siriDirectionTypeInbound) > 0
+	return s.siriDirectionTypeInbound, s.siriDirectionTypeOutbound, !valid
 }
 
+func (s *PartnerSettings) setSIRILinePublishedName(settings map[string]string) {
+	lineName := settings[SIRI_LINE_PUBLISHED_NAME]
+	s.linePublishedName = lineName
+}
 func (s *PartnerSettings) SIRILinePublishedName() string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return s.s[SIRI_LINE_PUBLISHED_NAME]
+	return s.linePublishedName
+}
+
+func (s *PartnerSettings) setSIRIPassageOrder(settings map[string]string) {
+	passageOrder := settings[SIRI_PASSAGE_ORDER]
+	s.passageOrder = passageOrder
 }
 
 func (s *PartnerSettings) SIRIPassageOrder() string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-	return s.s[SIRI_PASSAGE_ORDER]
+	return s.passageOrder
 }
 
-func (s *PartnerSettings) SIRIEnvelopeType() (set string) {
-	s.m.RLock()
-	set = s.s[SIRI_ENVELOPE]
-	s.m.RUnlock()
-
-	if set == "" {
-		set = "soap"
+func (s *PartnerSettings) setSIRIEnvelopeType(settings map[string]string) {
+	envelopeType := settings[SIRI_ENVELOPE]
+	if envelopeType == "" {
+		envelopeType = "soap"
 	}
-	return
+	s.envelopeType = envelopeType
 }
 
-func (s *PartnerSettings) MaximumChechstatusRetry() (i int) {
-	s.m.RLock()
-	i, _ = strconv.Atoi(s.s[PARTNER_MAX_RETRY])
-	if i < 0 {
-		i = 0
+func (s *PartnerSettings) SIRIEnvelopeType() string {
+	return s.envelopeType
+}
+
+func (s *PartnerSettings) setMaximumChechstatusRetry(settings map[string]string) {
+	maxRetry, _ := strconv.Atoi(settings[PARTNER_MAX_RETRY])
+	if maxRetry < 0 {
+		maxRetry = 0
 	}
-	s.m.RUnlock()
-	return
+	s.maximumCheckstatusRetry = maxRetry
 }
 
-func (s *PartnerSettings) SubscriptionMaximumResources() (i int) {
-	s.m.RLock()
-	i, _ = strconv.Atoi(s.s[SUBSCRIPTIONS_MAXIMUM_RESOURCES])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) MaximumChechstatusRetry() int {
+	return s.maximumCheckstatusRetry
 }
 
-func (s *PartnerSettings) CollectPriority() (value int) {
-	s.m.RLock()
-	value, _ = strconv.Atoi(s.s[COLLECT_PRIORITY])
-	s.m.RUnlock()
-	return value
+func (s *PartnerSettings) setSubscriptionMaximumResources(settings map[string]string) {
+	maxResources, _ := strconv.Atoi(settings[SUBSCRIPTIONS_MAXIMUM_RESOURCES])
+	s.subscriptionMaximumResources = maxResources
 }
 
-func (s *PartnerSettings) DefaultSRSName() (srsName string) {
-	s.m.RLock()
-	if s.s[COLLECT_DEFAULT_SRS_NAME] == "" {
+func (s *PartnerSettings) SubscriptionMaximumResources() int {
+	return s.subscriptionMaximumResources
+}
+
+func (s *PartnerSettings) setCollectPriority(settings map[string]string) {
+	collectPriority, _ := strconv.Atoi(settings[COLLECT_PRIORITY])
+	s.collectPriority = collectPriority
+}
+func (s *PartnerSettings) CollectPriority() int {
+	return s.collectPriority
+}
+
+func (s *PartnerSettings) setDefaultSRSName(settings map[string]string) {
+	var srsName string
+	if settings[COLLECT_DEFAULT_SRS_NAME] == "" {
 		srsName = "EPSG:2154"
 	} else {
-		srsName = s.s[COLLECT_DEFAULT_SRS_NAME]
+		srsName = settings[COLLECT_DEFAULT_SRS_NAME]
 	}
-	s.m.RUnlock()
-	return srsName
+	s.defaultSRSName = srsName
+}
+func (s *PartnerSettings) DefaultSRSName() string {
+	return s.defaultSRSName
 }
 
+func (s *PartnerSettings) setNoDestinationRefRewritingFrom(settings map[string]string) {
+	values := trimedSlice(settings[BROADCAST_NO_DESTINATIONREF_REWRITING_FROM])
+	s.noDestinationRefRewritingFrom = values
+}
 func (s *PartnerSettings) NoDestinationRefRewritingFrom() []string {
-	s.m.RLock()
-	defer s.m.RUnlock()
+	return s.noDestinationRefRewritingFrom
+}
 
-	return trimedSlice(s.s[BROADCAST_NO_DESTINATIONREF_REWRITING_FROM])
+func (s *PartnerSettings) setNoDataFrameRefRewritingFrom(settings map[string]string) {
+	values := trimedSlice(settings[BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM])
+	s.noDataFrameRefRewritingFrom = values
 }
 
 func (s *PartnerSettings) NoDataFrameRefRewritingFrom() []string {
-	s.m.RLock()
-	defer s.m.RUnlock()
-
-	return trimedSlice(s.s[BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM])
+	return s.noDataFrameRefRewritingFrom
 }
 
-func (s *PartnerSettings) RewriteJourneyPatternRef() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setRewriteJourneyPatternRef(settings map[string]string) {
+	rewrite, _ := strconv.ParseBool(settings[BROADCAST_REWRITE_JOURNEY_PATTERN_REF])
+	s.rewriteJourneyPatternRef = rewrite
+}
+func (s *PartnerSettings) RewriteJourneyPatternRef() bool {
+	return s.rewriteJourneyPatternRef
 }
 
-func (s *PartnerSettings) GzipGtfs() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[BROADCAST_GZIP_GTFS])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setGzipGtfs(settings map[string]string) {
+	gzipGtfs, _ := strconv.ParseBool(settings[BROADCAST_GZIP_GTFS])
+	s.gzipGtfs = gzipGtfs
+}
+func (s *PartnerSettings) GzipGtfs() bool {
+	return s.gzipGtfs
 }
 
-func (s *PartnerSettings) GeneralMessageRequestVersion22() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[GENEREAL_MESSAGE_REQUEST_2_2])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setGeneralMessageRequestVersion22(settings map[string]string) {
+	version22, _ := strconv.ParseBool(settings[GENERAL_MESSAGE_REQUEST_2_2])
+	s.generalMessageRequestVersion22 = version22
+}
+func (s *PartnerSettings) GeneralMessageRequestVersion22() bool {
+	return s.generalMessageRequestVersion22
 }
 
-func (s *PartnerSettings) PersistentCollect() (r bool) {
-	s.m.RLock()
-	subscription, _ := strconv.ParseBool(s.s[COLLECT_SUBSCRIPTIONS_PERSISTENT])
-	collect, _ := strconv.ParseBool(s.s[COLLECT_PERSISTENT])
+func (s *PartnerSettings) setPersistentCollect(settings map[string]string) {
+	subscription, _ := strconv.ParseBool(settings[COLLECT_SUBSCRIPTIONS_PERSISTENT])
+	collect, _ := strconv.ParseBool(settings[COLLECT_PERSISTENT])
 
-	r = subscription || collect
-	s.m.RUnlock()
-	return
+	peristent := subscription || collect
+	s.persistentCollect = peristent
 }
 
-func (s *PartnerSettings) PersistentBroadcastSubscriptions() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[BROADCAST_SUBSCRIPTIONS_PERSISTENT])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) PersistentCollect() bool {
+	return s.persistentCollect
 }
 
-func (s *PartnerSettings) CollectFilteredGeneralMessages() (r bool) {
-	s.m.RLock()
-	r, _ = strconv.ParseBool(s.s[COLLECT_FILTER_GENERAL_MESSAGES])
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) setPersistentBroadcastSubscriptions(settings map[string]string) {
+	persistent, _ := strconv.ParseBool(settings[BROADCAST_SUBSCRIPTIONS_PERSISTENT])
+	s.persistentBroadcastSubscriptions = persistent
 }
 
-func (s *PartnerSettings) IgnoreStopWithoutLine() (r bool) {
-	s.m.RLock()
-	r = s.s[IGNORE_STOP_WITHOUT_LINE] != "false"
-	s.m.RUnlock()
-	return
+func (s *PartnerSettings) PersistentBroadcastSubscriptions() bool {
+	return s.persistentBroadcastSubscriptions
 }
 
-func (s *PartnerSettings) DiscoveryInterval() (d time.Duration) {
-	s.m.RLock()
-	d, _ = time.ParseDuration(s.s[DISCOVERY_INTERVAL])
-	s.m.RUnlock()
-	if d == 0 {
-		d = 1 * time.Hour
+func (s *PartnerSettings) setCollectFilteredGeneralMessages(settings map[string]string) {
+	collect, _ := strconv.ParseBool(settings[COLLECT_FILTER_GENERAL_MESSAGES])
+	s.collectFilteredGeneralMessages = collect
+}
+
+func (s *PartnerSettings) CollectFilteredGeneralMessages() bool {
+	return s.collectFilteredGeneralMessages
+}
+
+func (s *PartnerSettings) setIgnoreStopWithoutLine(settings map[string]string) {
+	s.ignoreStopWithoutLine = settings[IGNORE_STOP_WITHOUT_LINE] != "false"
+}
+
+func (s *PartnerSettings) IgnoreStopWithoutLine() bool {
+	return s.ignoreStopWithoutLine
+}
+
+func (s *PartnerSettings) setDiscoveryInterval(settings map[string]string) {
+	interval, _ := time.ParseDuration(settings[DISCOVERY_INTERVAL])
+	if interval == 0 {
+		interval = 1 * time.Hour
 	}
-	return -d
+
+	s.discoveryInterval = -interval
+}
+
+func (s *PartnerSettings) DiscoveryInterval() time.Duration {
+	return s.discoveryInterval
+}
+
+func (s *PartnerSettings) setCollectSettings(settings map[string]string) {
+	s.collectSettings = &CollectSettings{
+		UseDiscoveredSA:    settings[COLLECT_USE_DISCOVERED_SA] != "",
+		UseDiscoveredLines: settings[COLLECT_USE_DISCOVERED_LINES] != "",
+		includedSA:         toMap(settings[COLLECT_INCLUDE_STOP_AREAS]),
+		excludedSA:         toMap(settings[COLLECT_EXCLUDE_STOP_AREAS]),
+		includedLines:      toMap(settings[COLLECT_INCLUDE_LINES]),
+		excludedLines:      toMap(settings[COLLECT_EXCLUDE_LINES]),
+	}
 }
 
 func (s *PartnerSettings) CollectSettings() *CollectSettings {
-	if s.cs == nil {
-		s.m.Lock()
-		s.SetCollectSettings()
-		s.m.Unlock()
-	}
-
-	return s.cs
+	return s.collectSettings
 }
 
-// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) SetCollectSettings() {
-	s.cs = &CollectSettings{
-		UseDiscoveredSA:    s.s[COLLECT_USE_DISCOVERED_SA] != "",
-		UseDiscoveredLines: s.s[COLLECT_USE_DISCOVERED_LINES] != "",
-		includedSA:         toMap(s.s[COLLECT_INCLUDE_STOP_AREAS]),
-		excludedSA:         toMap(s.s[COLLECT_EXCLUDE_STOP_AREAS]),
-		includedLines:      toMap(s.s[COLLECT_INCLUDE_LINES]),
-		excludedLines:      toMap(s.s[COLLECT_EXCLUDE_LINES]),
-	}
-}
+func (s *PartnerSettings) setSiriCredentialHeader(settings map[string]string) {
+	header := settings[SIRI_CREDENTIAL_HEADER]
 
-func (s *PartnerSettings) ResetCollectSettings() {
-	s.m.Lock()
-	s.cs = nil
-	s.m.Unlock()
-}
-
-func (s *PartnerSettings) SetSiriCredentialHeader() (header string) {
-	s.m.RLock()
-	c := s.s[SIRI_CREDENTIAL_HEADER]
-
-	if c == "" {
+	if header == "" {
 		header = "X-SIRI-Requestor"
-	} else {
-		header = c
 	}
-	s.m.RUnlock()
-	return
+
+	s.siriCredentialHeader = header
 }
 
-func (s *PartnerSettings) HTTPClientOptions() (opts remote.HTTPClientOptions) {
-	s.m.RLock()
+func (s *PartnerSettings) SiriCredentialHeader() string {
+	return s.siriCredentialHeader
+}
+
+func (s *PartnerSettings) setHTTPClientOptions(settings map[string]string) {
 	credential := remote.SiriCredentialHeader{
-		CredentialHeader: s.SetSiriCredentialHeader(),
+		CredentialHeader: s.SiriCredentialHeader(),
 		Value:            s.RequestorRef(),
 	}
 
-	opts = remote.HTTPClientOptions{
-		SiriEnvelopeType: s.siriEnvelopeType(),
-		OAuth:            s.httpClientOAuth(),
+	s.httpClientOptions = remote.HTTPClientOptions{
+		SiriEnvelopeType: s.SiriEnvelopeType(),
+		OAuth:            s.HTTPClientOAuth(),
 		SiriCredential:   credential,
 		Urls: remote.HTTPClientUrls{
-			Url:              s.s[REMOTE_URL],
-			SubscriptionsUrl: s.s[SUBSCRIPTIONS_REMOTE_URL],
-			NotificationsUrl: s.s[NOTIFICATIONS_REMOTE_URL],
+			Url:              settings[REMOTE_URL],
+			SubscriptionsUrl: settings[SUBSCRIPTIONS_REMOTE_URL],
+			NotificationsUrl: settings[NOTIFICATIONS_REMOTE_URL],
 		},
 	}
-	s.m.RUnlock()
-	return
 }
 
-func (s *PartnerSettings) siriEnvelopeType() (set string) {
-	set = s.s[SIRI_ENVELOPE]
-	if set == "" {
-		set = "soap"
+func (s *PartnerSettings) HTTPClientOptions() remote.HTTPClientOptions {
+	return s.httpClientOptions
+}
+
+func (s *PartnerSettings) setSiriEnvelopeType(settings map[string]string) {
+	value := settings[SIRI_ENVELOPE]
+	if value == "" {
+		value = "soap"
 	}
 
-	return set
+	s.siriEnvelopeType = value
 }
 
-// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) httpClientOAuth() (opts *remote.HTTPClientOAuth) {
-	cid, ok1 := s.s[OAUTH_CLIENT_ID]
-	cs, ok2 := s.s[OAUTH_CLIENT_SECRET]
-	t, ok3 := s.s[OAUTH_TOKEN_URL]
-	if ok1 && ok2 && ok3 {
-		opts = &remote.HTTPClientOAuth{
-			ClientID:     cid,
-			ClientSecret: cs,
-			TokenURL:     t,
+func (s *PartnerSettings) SiriEnvelopeType() string {
+	return s.siriEnvelopeType
+}
+
+func (s *PartnerSettings) setHttpClientOAuth(settings map[string]string) {
+	clientId, clientIdFound := settings[OAUTH_CLIENT_ID]
+	clientSecret, clientSecretFound := settings[OAUTH_CLIENT_SECRET]
+	tokenURL, tokenURLFound := settings[OAUTH_TOKEN_URL]
+
+	if clientIdFound && clientSecretFound && tokenURLFound {
+		s.httpClientOAuth = &remote.HTTPClientOAuth{
+			ClientID:     clientId,
+			ClientSecret: clientSecret,
+			TokenURL:     tokenURL,
 		}
+	} else {
+		s.httpClientOAuth = nil
 	}
-	return
+}
+
+func (s *PartnerSettings) HTTPClientOAuth() *remote.HTTPClientOAuth {
+	return s.httpClientOAuth
 }
 
 func trimedSlice(s string) (slc []string) {
@@ -491,53 +741,75 @@ func toMap(s string) (m map[string]struct{}) {
 	return
 }
 
-func (s *PartnerSettings) IdentifierGenerator(generatorName string) *idgen.IdentifierGenerator {
-	s.m.Lock()
-	generator, ok := s.g[generatorName]
-	if !ok {
-		generator = idgen.NewIdentifierGenerator(s.idGeneratorFormat(generatorName), s.ug())
-		s.g[generatorName] = generator
+func (s *PartnerSettings) setIdentifierGenerators(settings map[string]string) {
+	s.messageIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.MESSAGE_IDENTIFIER)
+	s.responseMessageIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.RESPONSE_MESSAGE_IDENTIFIER)
+	s.dataFrameIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.DATA_FRAME_IDENTIFIER)
+	s.referenceIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.REFERENCE_IDENTIFIER)
+	s.referenceStopAreaIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.REFERENCE_STOP_AREA_IDENTIFIER)
+	s.subscriptionIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.SUBSCRIPTION_IDENTIFIER)
+}
+
+func (s *PartnerSettings) MessageIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.messageIdentifierGenerator
+}
+
+func (s *PartnerSettings) ResponseMessageIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.responseMessageIdentifierGenerator
+}
+
+func (s *PartnerSettings) DataFrameIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.dataFrameIdentifierGenerator
+}
+
+func (s *PartnerSettings) ReferenceIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.referenceIdentifierGenerator
+}
+
+func (s *PartnerSettings) ReferenceStopAreaIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.referenceStopAreaIdentifierGenerator
+}
+
+func (s *PartnerSettings) SubscriptionIdentifierGenerator() *idgen.IdentifierGenerator {
+	return s.subscriptionIdentifierGenerator
+}
+
+func (s *PartnerSettings) createIdentifierGenerator(settings map[string]string, generatorName string) *idgen.IdentifierGenerator {
+	format := settings[fmt.Sprintf("generators.%v", generatorName)]
+
+	if format == "" {
+		format = idgen.DefaultIdentifierGenerator(generatorName)
 	}
-	s.m.Unlock()
-	return generator
+
+	return idgen.NewIdentifierGenerator(format, s.ug())
 }
 
 func (s *PartnerSettings) NewMessageIdentifier() string {
-	return s.IdentifierGenerator(idgen.MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	return s.messageIdentifierGenerator.NewMessageIdentifier()
 }
 
 func (s *PartnerSettings) NewResponseMessageIdentifier() string {
-	return s.IdentifierGenerator(idgen.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	return s.responseMessageIdentifierGenerator.NewMessageIdentifier()
 }
 
-func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {
-	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
+// func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {
+// 	formatString = s.s[fmt.Sprintf("generators.%v", generatorName)]
 
-	if formatString == "" {
-		formatString = idgen.DefaultIdentifierGenerator(generatorName)
-	}
-	return
-}
+// 	if formatString == "" {
+// 		formatString = idgen.DefaultIdentifierGenerator(generatorName)
+// 	}
+// 	return
+// }
 
-// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) refreshGenerators() {
-	for k := range s.g {
-		delete(s.g, k)
-	}
-}
+// // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+// func (s *PartnerSettings) refreshGenerators() {
+// 	for k := range s.g {
+// 		delete(s.g, k)
+// 	}
+// }
 
-func (s *PartnerSettings) RefreshRateLimit() {
-	s.m.RLock()
-	i, _ := strconv.Atoi(s.s[RATE_LIMIT_PER_IP])
-	s.m.RUnlock()
-	if i < 0 {
-		i = 0
-	}
-	s.rl = float64(i)
-}
-
-// Warning, this method isn't threadsafe. Mutex must be handled before and after calling
-func (s *PartnerSettings) reloadSettings() {
-	s.SetCollectSettings()
-	s.refreshGenerators()
-}
+// // Warning, this method isn't threadsafe. Mutex must be handled before and after calling
+// func (s *PartnerSettings) reloadSettings() {
+// 	s.SetCollectSettings()
+// 	s.refreshGenerators()
+// }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"google.golang.org/protobuf/proto"
@@ -31,10 +32,11 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]mo
 	referentials.Save(referential)
 	partners := referential.partners
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test_kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	gtfsCollector := NewGtfsRequestCollector(partner)
@@ -129,10 +131,11 @@ func Test_PartnerStatusDown(t *testing.T) {
 	// Create a GtfsRequestCollector
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test_kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	gtfsCollector := NewGtfsRequestCollector(partner)

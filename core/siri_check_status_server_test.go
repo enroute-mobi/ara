@@ -16,13 +16,18 @@ func Test_SIRICheckStatusServer_CheckStatus(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("local_url", "http://ara")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	settings := map[string]string{
+		"local_url":                              "http://ara",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
 	partner.Save()
 	referential.Start()
 	referential.Stop()
 	connector := NewSIRICheckStatusServer(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	file, err := os.Open("testdata/checkstatus_request.xml")
@@ -75,7 +80,7 @@ func Test_SIRICheckStatusServerFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

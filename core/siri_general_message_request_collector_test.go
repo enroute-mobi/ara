@@ -38,10 +38,11 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	situation := partners.Model().Situations().New()
@@ -71,7 +72,7 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

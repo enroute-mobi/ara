@@ -46,7 +46,7 @@ func newSIRIProductionTimetableSubscriptionBroadcaster(partner *Partner) *SIRIPr
 	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.noDataFrameRefRewritingFrom = partner.NoDataFrameRefRewritingFrom()
-	connector.dataFrameGenerator = partner.IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER)
+	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)

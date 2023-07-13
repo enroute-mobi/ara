@@ -144,7 +144,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				if !ok {
 					continue
 				}
-				referenceGenerator := vm.connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER)
+				referenceGenerator := vm.connector.Partner().ReferenceIdentifierGenerator()
 				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 			}
 
@@ -195,7 +195,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			framedVehicleJourneyRef := &siri.SIRIFramedVehicleJourneyRef{}
 			modelDate := vm.connector.partner.Model().Date()
 			framedVehicleJourneyRef.DataFrameRef =
-				vm.connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+				vm.connector.Partner().DataFrameIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 			framedVehicleJourneyRef.DatedVehicleJourneyRef = datedVehicleJourneyRef
 
 			monitoredVehicleJourney.FramedVehicleJourneyRef = framedVehicleJourneyRef
@@ -243,7 +243,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) resolveStopAreaRe
 			return obj.Value()
 		}
 	}
-	return connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
+	return connector.Partner().ReferenceStopAreaIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatternRef(refs model.References) string {

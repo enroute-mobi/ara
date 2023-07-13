@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -34,8 +35,11 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
-	partner.SetSetting("remote_objectid_kind", "_internal")
-	partner.SetSetting("generators.subscription_identifier", "Subscription::%{id}::LOC")
+	settings := map[string]string{
+		"remote_objectid_kind":               "_internal",
+		"generators.subscription_identifier": "Subscription::%{id}::LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
 
@@ -89,10 +93,11 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test_kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
@@ -135,12 +140,14 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
 		"remote_objectid_kind":               "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -191,12 +198,14 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
 		"remote_objectid_kind":               "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 

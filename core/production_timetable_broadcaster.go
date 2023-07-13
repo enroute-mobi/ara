@@ -189,7 +189,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ptt.connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER)
+					referenceGenerator := ptt.connector.Partner().ReferenceIdentifierGenerator()
 					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 				}
 

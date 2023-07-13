@@ -18,7 +18,9 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+
+	settings := map[string]string{"remote_objectid_kind": "objectidKind"}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
@@ -90,8 +92,13 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	settings := map[string]string{
+		"remote_objectid_kind":                   "objectidKind",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{
 		SIRI_SERVICE_REQUEST_BROADCASTER,
 		SIRI_STOP_MONITORING_REQUEST_BROADCASTER,
@@ -101,7 +108,6 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
@@ -202,13 +208,17 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
-	partner.SetSetting("generators.response_message_identifier", "Ara:ResponseMessage::%{uuid}:LOC")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	settings := map[string]string{
+		"remote_objectid_kind":                   "objectidKind",
+		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER, SIRI_STOP_MONITORING_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	file, err := os.Open("testdata/siri-service-smrequest-soap.xml")
@@ -255,7 +265,7 @@ func Test_SIRIServiceRequestBroadcasterFactory_Validate(t *testing.T) {
 		connectors:     make(map[string]Connector),
 		manager:        NewPartnerManager(nil),
 	}
-	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator)
+	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {

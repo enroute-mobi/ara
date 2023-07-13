@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -14,9 +15,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
@@ -123,9 +127,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("WRONG_ID", "saId")
@@ -166,9 +173,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
@@ -209,9 +219,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
@@ -252,9 +265,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdKind(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")
@@ -295,9 +311,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
-	partner.SetSetting("remote_objectid_kind", "objectidKind")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_objectid_kind": "objectidKind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
-	connector.Partner().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector.SetClock(clock.NewFakeClock())
 
 	saId := model.NewObjectID("objectidKind", "saId")

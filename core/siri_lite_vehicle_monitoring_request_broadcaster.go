@@ -44,7 +44,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	siriLiteResponse = siri.NewSiriLiteResponse()
 	siriLiteResponse.Siri.ServiceDelivery.ResponseTimestamp = connector.Clock().Now()
 	siriLiteResponse.Siri.ServiceDelivery.ProducerRef = connector.Partner().ProducerRef()
-	siriLiteResponse.Siri.ServiceDelivery.ResponseMessageIdentifier = connector.Partner().IdentifierGenerator(idgen.RESPONSE_MESSAGE_IDENTIFIER).NewMessageIdentifier()
+	siriLiteResponse.Siri.ServiceDelivery.ResponseMessageIdentifier = connector.Partner().ResponseMessageIdentifierGenerator().NewMessageIdentifier()
 	siriLiteResponse.Siri.ServiceDelivery.RequestMessageRef = filters.Get("MessageIdentifier")
 
 	response := siri.NewSiriLiteVehicleMonitoringDelivery()
@@ -103,7 +103,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 
 		modelDate := connector.partner.Model().Date()
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
-			connector.Partner().IdentifierGenerator(idgen.DATA_FRAME_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+			connector.Partner().DataFrameIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
 
 		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
@@ -137,7 +137,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourne
 			return "", false
 		}
 		dataVehicleJourneyRef =
-			connector.Partner().IdentifierGenerator(idgen.REFERENCE_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+			connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -168,7 +168,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) resolveStopAreaRef
 			return obj.Value()
 		}
 	}
-	return connector.Partner().IdentifierGenerator(idgen.REFERENCE_STOP_AREA_IDENTIFIER).NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
+	return connector.Partner().ReferenceStopAreaIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
 }
 
 func (factory *SIRILiteVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {

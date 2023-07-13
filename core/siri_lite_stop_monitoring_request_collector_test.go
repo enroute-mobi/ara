@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,10 +29,12 @@ func prepare_SIRILiteStopMonitoringRequestCollector(t *testing.T, responseFilePa
 	// Create a SIRIStopMonitoringRequestCollector
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
-	partner.SetSettingsDefinition(map[string]string{
+
+	settings := map[string]string{
 		"remote_url":           ts.URL,
 		"remote_objectid_kind": "test kind",
-	})
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	// Create StopArea with ObjectId
