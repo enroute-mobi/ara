@@ -36,8 +36,13 @@
 					<siri:Monitored>{{.Monitored}}</siri:Monitored>{{ if .Attributes.VehicleJourneyAttributes.MonitoringError}}
 					<siri:MonitoringError>{{.Attributes.VehicleJourneyAttributes.MonitoringError}}</siri:MonitoringError>{{end}}{{ if .Occupancy }}
 					<siri:Occupancy>{{.Occupancy}}</siri:Occupancy>{{end}}{{if .Attributes.VehicleJourneyAttributes.Delay}}
-					<siri:Delay>{{.Attributes.VehicleJourneyAttributes.Delay}}</siri:Delay>{{end}}{{if .Attributes.VehicleJourneyAttributes.Bearing}}
-					<siri:Bearing>{{.Attributes.VehicleJourneyAttributes.Bearing}}</siri:Bearing>{{end}}{{ if .Attributes.VehicleJourneyAttributes.InPanic }}
+					<siri:Delay>{{.Attributes.VehicleJourneyAttributes.Delay}}</siri:Delay>{{end}}{{if .HasVehicleInformation}}{{if .SIRIVehicleLocation}}
+					<siri:VehicleLocation>{{ if .SIRIVehicleLocation.Longitude}}
+						<siri:Longitude>{{ .SIRIVehicleLocation.Longitude}}</siri:Longitude>{{end}}{{ if .SIRIVehicleLocation.Latitude}}
+						<siri:Latitude>{{ .SIRIVehicleLocation.Latitude}}</siri:Latitude>{{end}}
+					</siri:VehicleLocation>{{end}}{{ if .Bearing}}
+					<siri:Bearing>{{ .Bearing}}</siri:Bearing>{{end}}{{else}}{{if .Attributes.VehicleJourneyAttributes.Bearing}}
+					<siri:Bearing>{{.Attributes.VehicleJourneyAttributes.Bearing}}</siri:Bearing>{{end}}{{end}}{{ if .Attributes.VehicleJourneyAttributes.InPanic }}
 					<siri:InPanic>{{.Attributes.VehicleJourneyAttributes.InPanic}}</siri:InPanic>{{end}}{{ if .Attributes.VehicleJourneyAttributes.InCongestion }}
 					<siri:InCongestion>{{.Attributes.VehicleJourneyAttributes.InCongestion}}</siri:InCongestion>{{end}}{{ if .Attributes.VehicleJourneyAttributes.TrainNumberRef }}
 					<siri:TrainNumber>

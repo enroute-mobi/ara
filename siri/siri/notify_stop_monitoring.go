@@ -30,8 +30,9 @@ type SIRINotifyStopMonitoringDelivery struct {
 	ErrorNumber int
 	ErrorText   string
 
-	MonitoredStopVisits []*SIRIMonitoredStopVisit
-	CancelledStopVisits []*SIRICancelledStopVisit
+	MonitoredVehicleJourney *SIRIMonitoredVehicleJourney
+	MonitoredStopVisits     []*SIRIMonitoredStopVisit
+	CancelledStopVisits     []*SIRICancelledStopVisit
 }
 
 func (notify *SIRINotifyStopMonitoring) BuildXML(envelopeType ...string) (string, error) {
