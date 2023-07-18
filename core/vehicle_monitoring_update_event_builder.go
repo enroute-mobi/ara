@@ -125,7 +125,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
 			RecordedAt:             xmlVehicleActivity.RecordedAtTime(),
 			Occupancy:              model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
-			NextStopPointOrder:     xmlVehicleActivity.XMLMonitoredVehicleJourney.XMLCall.Order(),
+			NextStopPointOrder:     xmlVehicleActivity.Order(),
 		}
 
 		longitude, latitude, err := builder.handleCoordinates(xmlVehicleActivity)
