@@ -136,7 +136,7 @@ type MemoryVehicles struct {
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleId]*Vehicle
 	byObjectId        *ObjectIdIndex
-	byNextStopVisitId map[StopVisitId]*Vehicle
+	byNextStopVisitId map[StopVisitId]VehicleId
 
 	broadcastEvent func(event VehicleBroadcastEvent)
 }
@@ -159,7 +159,7 @@ func NewMemoryVehicles() *MemoryVehicles {
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleId]*Vehicle),
 		byObjectId:        NewObjectIdIndex(),
-		byNextStopVisitId: make(map[StopVisitId]*Vehicle),
+		byNextStopVisitId: make(map[StopVisitId]VehicleId),
 	}
 }
 
@@ -215,11 +215,14 @@ func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
 func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
-	vehicle, ok := manager.byNextStopVisitId[stopVisitId]
-	if !ok {
-		return nil, ok
+	vehicleId, ok := manager.byNextStopVisitId[stopVisitId]
+	if ok {
+		vehicle, ok := manager.byIdentifier[vehicleId]
+		if ok {
+			return vehicle.copy(), true
+		}
 	}
-	return vehicle, true
+	return &Vehicle{}, false
 }
 
 func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
@@ -243,7 +246,7 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.byObjectId.Index(vehicle)
 
 	if vehicle.NextStopVisitId != StopVisitId("") {
-		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle
+		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
 	}
 
 	event := VehicleBroadcastEvent{
