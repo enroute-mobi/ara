@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Vehicle_Id(t *testing.T) {
@@ -93,6 +94,64 @@ func Test_Vehicle_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("New vehicle should be found by objectId")
 	}
+}
+
+func Test_Vehicle_Save_WithNextStopVisitId(t *testing.T) {
+	assert := assert.New(t)
+
+	model := NewMemoryModel()
+	vehicle := model.Vehicles().New()
+	stopVisit := model.StopVisits().New()
+	stopVisit.Save()
+
+	objectid := NewObjectID("kind", "value")
+	vehicle.SetObjectID(objectid)
+	vehicle.NextStopVisitId = stopVisit.Id()
+	ok := vehicle.Save()
+	assert.True(ok)
+
+	_, ok = model.Vehicles().FindByNextStopVisitId(stopVisit.Id())
+	assert.Truef(ok, "Should find vehicle by Next stop visit Id")
+}
+
+func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
+	assert := assert.New(t)
+
+	var ok bool
+
+	model := NewMemoryModel()
+	vehicleA := model.Vehicles().New()
+	vehicleB := model.Vehicles().New()
+	stopVisit1 := model.StopVisits().New()
+	stopVisit1.Save()
+
+	objectid := NewObjectID("kind", "value")
+	vehicleA.SetObjectID(objectid)
+	vehicleB.SetObjectID(objectid)
+
+	vehicleA.NextStopVisitId = stopVisit1.Id()
+	ok = vehicleA.Save()
+	assert.True(ok)
+
+	ok = vehicleB.Save()
+	assert.True(ok)
+
+	vehicle, ok := model.Vehicles().FindByNextStopVisitId(stopVisit1.Id())
+	assert.Equal(vehicleA, vehicle)
+	assert.Truef(ok, "Should find vehicleA by nextStopVisit Id# 1")
+
+	// Update the vehicleB with nextStopVisit => stopVisit1
+	vehicleB.NextStopVisitId = stopVisit1.Id()
+	ok = vehicleB.Save()
+	assert.True(ok)
+
+	vehicle, ok = model.Vehicles().FindByNextStopVisitId(stopVisit1.Id())
+	assert.True(ok)
+	assert.Equal(vehicleB, vehicle, "Should find vehicleB nexStopvisit with Id# 1")
+
+	// VehicleA and VehicleB should have same nextStopVisitId
+	assert.Equal(stopVisit1.Id(), vehicleA.NextStopVisitId)
+	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
 }
 
 func Test_Vehicle_ObjectId(t *testing.T) {
@@ -201,6 +260,30 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted vehicle should not be findable by objectid")
 	}
+}
+
+func Test_MemoryVehicles_Delete_WithNextStopVisitId(t *testing.T) {
+	assert := assert.New(t)
+	model := NewMemoryModel()
+
+	vehicle := model.Vehicles().New()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.Save()
+
+	objectid := NewObjectID("kind", "value")
+	vehicle.SetObjectID(objectid)
+	vehicle.NextStopVisitId = stopVisit.Id()
+
+	vehicle.Save()
+
+	model.Vehicles().Delete(vehicle)
+
+	_, ok := model.Vehicles().Find(vehicle.Id())
+	assert.False(ok)
+
+	_, ok = model.Vehicles().FindByNextStopVisitId(stopVisit.Id())
+	assert.Falsef(ok, "Deleted vehicle should not be findable by next stopVisit id")
 }
 
 func Test_Save_BiqQuery(t *testing.T) {

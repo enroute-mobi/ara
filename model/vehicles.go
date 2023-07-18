@@ -133,9 +133,10 @@ type MemoryVehicles struct {
 
 	model *MemoryModel
 
-	mutex        *sync.RWMutex
-	byIdentifier map[VehicleId]*Vehicle
-	byObjectId   *ObjectIdIndex
+	mutex             *sync.RWMutex
+	byIdentifier      map[VehicleId]*Vehicle
+	byObjectId        *ObjectIdIndex
+	byNextStopVisitId map[StopVisitId]VehicleId
 
 	broadcastEvent func(event VehicleBroadcastEvent)
 }
@@ -147,6 +148,7 @@ type Vehicles interface {
 	Find(VehicleId) (*Vehicle, bool)
 	FindByObjectId(ObjectID) (*Vehicle, bool)
 	FindByLineId(LineId) []*Vehicle
+	FindByNextStopVisitId(StopVisitId) (*Vehicle, bool)
 	FindAll() []*Vehicle
 	Save(*Vehicle) bool
 	Delete(*Vehicle) bool
@@ -154,9 +156,10 @@ type Vehicles interface {
 
 func NewMemoryVehicles() *MemoryVehicles {
 	return &MemoryVehicles{
-		mutex:        &sync.RWMutex{},
-		byIdentifier: make(map[VehicleId]*Vehicle),
-		byObjectId:   NewObjectIdIndex(),
+		mutex:             &sync.RWMutex{},
+		byIdentifier:      make(map[VehicleId]*Vehicle),
+		byObjectId:        NewObjectIdIndex(),
+		byNextStopVisitId: make(map[StopVisitId]VehicleId),
 	}
 }
 
@@ -209,6 +212,23 @@ func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
 	return
 }
 
+func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	vehicleId, ok := manager.byNextStopVisitId[stopVisitId]
+	if ok {
+		vehicle, ok := manager.byIdentifier[vehicleId]
+		if ok {
+			if vehicle.NextStopVisitId == stopVisitId {
+				return vehicle.copy(), true
+			}
+		}
+		// clean the index
+		delete(manager.byNextStopVisitId, stopVisitId)
+	}
+	return &Vehicle{}, false
+}
+
 func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -228,6 +248,10 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
 	manager.byObjectId.Index(vehicle)
+
+	if vehicle.NextStopVisitId != StopVisitId("") {
+		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
+	}
 
 	event := VehicleBroadcastEvent{
 		ModelId:   string(vehicle.id),
@@ -260,10 +284,9 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 
 func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
-
+	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
 	manager.byObjectId.Delete(ModelId(vehicle.id))
 
-	manager.mutex.Unlock()
 	return true
 }

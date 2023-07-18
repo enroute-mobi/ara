@@ -174,6 +174,20 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
 	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy.GetSiriReferences()
 
+	vehicle, ok := builder.partner.Model().Vehicles().FindByNextStopVisitId(stopVisit.Id())
+	if ok {
+		monitoredStopVisit.HasVehicleInformation = true
+		if vehicle.Latitude != 0 || vehicle.Longitude != 0 {
+			vehicleLocation := &siri.SIRIVehicleLocation{}
+			vehicleLocation.Latitude = vehicle.Latitude
+			vehicleLocation.Longitude = vehicle.Longitude
+			monitoredStopVisit.SIRIVehicleLocation = *vehicleLocation
+		}
+		// override occupancy
+		monitoredStopVisit.Occupancy = vehicle.Occupancy
+		monitoredStopVisit.Bearing = vehicle.Bearing
+	}
+
 	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 

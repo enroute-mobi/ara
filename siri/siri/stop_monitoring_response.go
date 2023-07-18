@@ -56,9 +56,12 @@ type SIRIMonitoredStopVisit struct {
 	StopAreaObjectId       string
 	DataFrameRef           string
 	Occupancy              string
+	Bearing                float64
 
-	VehicleAtStop bool
-	Monitored     bool
+	SIRIVehicleLocation
+	HasVehicleInformation bool
+	VehicleAtStop         bool
+	Monitored             bool
 
 	Order          int
 	UseVisitNumber bool
