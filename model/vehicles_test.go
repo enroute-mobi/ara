@@ -114,6 +114,46 @@ func Test_Vehicle_Save_WithNextStopVisitId(t *testing.T) {
 	assert.Truef(ok, "Should find vehicle by Next stop visit Id")
 }
 
+func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
+	assert := assert.New(t)
+
+	var ok bool
+
+	model := NewMemoryModel()
+	vehicleA := model.Vehicles().New()
+	vehicleB := model.Vehicles().New()
+	stopVisit1 := model.StopVisits().New()
+	stopVisit1.Save()
+
+	objectid := NewObjectID("kind", "value")
+	vehicleA.SetObjectID(objectid)
+	vehicleB.SetObjectID(objectid)
+
+	vehicleA.NextStopVisitId = stopVisit1.Id()
+	ok = vehicleA.Save()
+	assert.True(ok)
+
+	ok = vehicleB.Save()
+	assert.True(ok)
+
+	vehicle, ok := model.Vehicles().FindByNextStopVisitId(stopVisit1.Id())
+	assert.Equal(vehicleA, vehicle)
+	assert.Truef(ok, "Should find vehicleA by nextStopVisit Id# 1")
+
+	// Update the vehicleB with nextStopVisit => stopVisit1
+	vehicleB.NextStopVisitId = stopVisit1.Id()
+	ok = vehicleB.Save()
+	assert.True(ok)
+
+	vehicle, ok = model.Vehicles().FindByNextStopVisitId(stopVisit1.Id())
+	assert.True(ok)
+	assert.Equal(vehicleB, vehicle, "Should find vehicleB nexStopvisit with Id# 1")
+
+	// VehicleA and VehicleB should have same nextStopVisitId
+	assert.Equal(stopVisit1.Id(), vehicleA.NextStopVisitId)
+	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
+}
+
 func Test_Vehicle_ObjectId(t *testing.T) {
 	vehicle := Vehicle{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",

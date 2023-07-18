@@ -219,8 +219,12 @@ func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*
 	if ok {
 		vehicle, ok := manager.byIdentifier[vehicleId]
 		if ok {
-			return vehicle.copy(), true
+			if vehicle.NextStopVisitId == stopVisitId {
+				return vehicle.copy(), true
+			}
 		}
+		// clean the index
+		delete(manager.byNextStopVisitId, stopVisitId)
 	}
 	return &Vehicle{}, false
 }
@@ -280,11 +284,9 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 
 func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
-
+	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
 	manager.byObjectId.Delete(ModelId(vehicle.id))
-	delete(manager.byNextStopVisitId, vehicle.NextStopVisitId)
 
-	manager.mutex.Unlock()
 	return true
 }
