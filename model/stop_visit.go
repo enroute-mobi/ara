@@ -240,7 +240,7 @@ type MemoryStopVisits struct {
 	byObjectId                        *ObjectIdIndex
 	byStopArea                        *Index
 	byVehicleJourney                  *Index
-	byVehicleJourneyIdAndPassageOrder map[vehicleJourneyStopVisitOrder]*StopVisit
+	byVehicleJourneyIdAndPassageOrder map[vehicleJourneyStopVisitOrder]StopVisitId
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
@@ -282,7 +282,7 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 		byObjectId:                        NewObjectIdIndex(),
 		byStopArea:                        NewIndex(stopExtractor),
 		byVehicleJourney:                  NewIndex(vjExtractor),
-		byVehicleJourneyIdAndPassageOrder: make(map[vehicleJourneyStopVisitOrder]*StopVisit),
+		byVehicleJourneyIdAndPassageOrder: make(map[vehicleJourneyStopVisitOrder]StopVisitId),
 	}
 }
 
@@ -316,10 +316,16 @@ func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (*StopVisit, 
 func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopVisitOrder(vjId VehicleJourneyId, order int) *StopVisit {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
-	sv := manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
+	stopVisitId := manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
 		vehicleJourneyId:      vjId,
 		stopVisitPassageOrder: order}]
-	return sv
+	if stopVisitId != "" {
+		stopVisit, ok := manager.byIdentifier[stopVisitId]
+		if ok {
+			return stopVisit.copy()
+		}
+	}
+	return &StopVisit{}
 }
 
 func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
@@ -479,7 +485,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	manager.byVehicleJourney.Index(stopVisit)
 	manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
 		vehicleJourneyId:      stopVisit.VehicleJourneyId,
-		stopVisitPassageOrder: stopVisit.PassageOrder}] = stopVisit
+		stopVisitPassageOrder: stopVisit.PassageOrder}] = stopVisit.id
 
 	event := StopMonitoringBroadcastEvent{
 		ModelId:   string(stopVisit.id),
