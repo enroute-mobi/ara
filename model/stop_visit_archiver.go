@@ -89,7 +89,11 @@ func (sva *StopVisitArchiver) Archive() {
 		}
 		longTermStopVisitEvent.StopAreaCodes = append(longTermStopVisitEvent.StopAreaCodes, *code)
 	}
-
+	vehicle, ok := sva.Model.Vehicles().FindByNextStopVisitId(sv.Id())
+	if ok {
+		longTermStopVisitEvent.VehicleDriverRef = vehicle.DriverRef
+		longTermStopVisitEvent.VehicleOccupancy = vehicle.Occupancy
+	}
 	audit.CurrentBigQuery(sva.Model.Referential()).WriteEvent(longTermStopVisitEvent)
 }
 
