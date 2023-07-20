@@ -8,11 +8,13 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
+	assert := assert.New(t)
 	ctx := context.Background()
 
 	mt := mocktracer.Start()
@@ -20,11 +22,8 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
 	defer testSpan.Finish()
 
-	referential := &Referential{
-		model:          model.NewMemoryModel(),
-		collectManager: NewTestCollectManager(),
-	}
-	referential.modelGuardian = NewModelGuardian(referential)
+	referential := referentials.New(ReferentialSlug("referential"))
+	referentials.Save(referential)
 
 	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
@@ -38,13 +37,38 @@ func Test_ModelGuardian_RefreshStopAreas_RequestedAt(t *testing.T) {
 	referential.modelGuardian.refreshStopAreas(spanCtx)
 
 	updatedStopArea, ok := referential.Model().StopAreas().Find(stopAreaId)
-	if !ok {
-		t.Fatal("StopArea should still be found after guardian work")
-	}
+	assert.Truef(ok, "StopArea should still be found after guardian work")
+	assert.Truef(updatedStopArea.NextCollectAt().After(fakeClock.Now()),
+		"StopArea should have NextCollectAt before fakeClock %v, got: %v",
+		fakeClock.Now(), updatedStopArea.NextCollectAt())
 
-	if updatedStopArea.NextCollectAt().Before(fakeClock.Now()) {
-		t.Errorf("StopArea should have NextCollectAt before fakeClock %v, got: %v", fakeClock.Now(), updatedStopArea.NextCollectAt())
-	}
+	// Advance time
+	fakeClock.Advance(61 * time.Second)
+	updatedStopArea, _ = referential.Model().StopAreas().Find(stopAreaId)
+	assert.True(updatedStopArea.NextCollectAt().Before(fakeClock.Now()))
+}
+
+func Test_ModelGuardian_RandDuration_Without_Refresh_setting(t *testing.T) {
+	assert := assert.New(t)
+	referential := referentials.New(ReferentialSlug("referential"))
+	referentials.Save(referential)
+
+	randDuration := referential.ModelGuardian().randDuration()
+	assert.InDeltaf(time.Duration(s.DEFAULT_MODEL_REFRESH_TIME).Seconds(), randDuration.Seconds(),
+		10.0,
+		"should be between -10s/+10s range from the Default model.refresh_time of 50s")
+}
+
+func Test_ModelGuardian_RandDuration_With_Refresh_setting(t *testing.T) {
+	assert := assert.New(t)
+	referential := referentials.New(ReferentialSlug("referential"))
+	referential.SetSetting("model.refresh_time", "45s")
+	referentials.Save(referential)
+
+	randDuration := referential.ModelGuardian().randDuration()
+	assert.InDeltaf(time.Duration(45_000_000_000).Seconds(), randDuration.Seconds(),
+		10.0,
+		"should be between -10s/+10s range from the model.refresh_time")
 }
 
 func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
