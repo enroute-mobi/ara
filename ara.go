@@ -175,9 +175,7 @@ func main() {
 				profiler.WithProfileTypes(
 					profiler.CPUProfile,
 					profiler.HeapProfile,
-					profiler.MutexProfile,
 				),
-				profiler.BlockProfileRate(100_000_000),
 			)
 			if err != nil {
 				logger.Log.Panicf("Error while starting Datadog Profiler: %v", err)
