@@ -40,7 +40,8 @@ type BigQueryMessage struct {
 	SubscriptionIdentifiers []string  `bigquery:"subscription_identifiers"` // array of ids
 	StopAreas               []string  `bigquery:"stop_areas"`               // array of objectid values
 	Lines                   []string  `bigquery:"lines"`                    // array of objectid values
-	Vehicles                []string  `bigquery:"vehicles"`                 // array of objectid values
+	Vehicles                []string  `bigquery:"vehicles"`
+	VehicleJourneys         []string  `bigquery:"vehicle_journeys"` // array of objectid values
 }
 
 func (bq *BigQueryMessage) EventType() string        { return BQ_MESSAGE }
@@ -68,6 +69,7 @@ var bqMessageSchema = bigquery.Schema{
 	{Name: "lines", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "stop_areas", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "vehicles", Repeated: true, Type: bigquery.StringFieldType},
+	{Name: "vehicle_journey", Repeated: true, Type: bigquery.StringFieldType},
 }
 
 type BigQueryPartnerEvent struct {
