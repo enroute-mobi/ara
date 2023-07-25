@@ -533,8 +533,15 @@ Feature: Support SIRI StopMonitoring by subscription
       | Collected     | true  |
       | PassageOrder  | 4     |
       | VehicleAtStop | false |
-
-
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                           |
+      | Direction          | received                       |
+      | ResponseIdentifier | /{uuid}/                       |
+      | Status             | OK                             |
+      | Type               | NotifyStopMonitoring           |
+      | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC"] |
+      | VehicleJourneys    | ["NINOXE:VehicleJourney:201"]  |
+      | Lines              | ["NINOXE:Line:3:LOC"]          |
 
       Scenario: 3737 - Manage a MonitoredStopVisitCancellation
         Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with

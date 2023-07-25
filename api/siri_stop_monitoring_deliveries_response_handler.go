@@ -28,7 +28,7 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(param
 
 	t := clock.DefaultClock().Now()
 
-	params.connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
+	updateEvents := params.connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
 
@@ -39,23 +39,20 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(param
 	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
 
 	subIds := make(map[string]struct{})
-	mRefs := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.StopMonitoringDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
 		if !delivery.Status() {
 			params.message.Status = "Error"
 		}
-		mRefs[delivery.MonitoringRef()] = struct{}{}
 	}
 	subs := make([]string, 0, len(subIds))
-	sas := make([]string, 0, len(mRefs))
 	for k := range subIds {
 		subs = append(subs, k)
 	}
-	for k := range mRefs {
-		sas = append(sas, k)
-	}
 	params.message.SubscriptionIdentifiers = subs
-	params.message.StopAreas = sas
+	params.message.StopAreas = updateEvents.GetStopAreas()
+	params.message.Lines = updateEvents.GetLines()
+	params.message.VehicleJourneys = updateEvents.GetVehicleJourneys()
+
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }
