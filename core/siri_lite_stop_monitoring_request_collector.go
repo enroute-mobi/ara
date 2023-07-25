@@ -73,8 +73,10 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 	}
 	updateEvents := builder.UpdateEvents()
 
-	//  Log MonitoringRefs
-	logLiteMonitoringRefs(message, updateEvents.MonitoringRefs)
+	//  Log Models
+	message.StopAreas = updateEvents.GetStopAreas()
+	message.Lines = updateEvents.GetLines()
+	message.VehicleJourneys = updateEvents.GetVehicleJourneys()
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)
@@ -171,17 +173,4 @@ func logSIRILiteStopMonitoringResponse(message *audit.BigQueryMessage, response 
 	}
 	message.ResponseRawMessage = string(b)
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-}
-
-func logLiteMonitoringRefs(message *audit.BigQueryMessage, refs map[string]struct{}) {
-	refSlice := make([]string, len(refs))
-	i := 0
-	for monitoringRef := range refs {
-		refSlice[i] = monitoringRef
-		i++
-	}
-
-	if message != nil {
-		message.StopAreas = refSlice
-	}
 }

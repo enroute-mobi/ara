@@ -84,13 +84,15 @@ Feature: Support SIRI StopMonitoring by request
       | DestinationName | Gare Saint-Lazare                                                                       |
       | Monitored       | true                                                                                    |
     And an audit event should exist with these attributes:
-      | Protocol           | siri                                                               |
-      | Direction          | sent                                                               |
-      | ResponseIdentifier | IVTR_HET:ResponseMessage:9bd2199f-2685-4f37-9a60-177312447a38:LOC: |
-      | Status             | OK                                                                 |
-      | Type               | GetStopMonitoringRequest                                           |
-      | StopAreas          | ["STIF:StopPoint:Q:41178:"]                                        |
-      | RequestRawMessage  | MonitoringRef=STIF:StopPoint:Q:41178:                              |
+      | Protocol           | siri                                                                          |
+      | Direction          | sent                                                                          |
+      | ResponseIdentifier | IVTR_HET:ResponseMessage:9bd2199f-2685-4f37-9a60-177312447a38:LOC:            |
+      | Status             | OK                                                                            |
+      | Type               | GetStopMonitoringRequest                                                      |
+      | StopAreas          | ["STIF:StopPoint:Q:41178:"]                                                   |
+      | Lines              | ["STIF:Line::C01740:"]                                                        |
+      | VehicleJourneys    | ["SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC"] |
+      | RequestRawMessage  | MonitoringRef=STIF:StopPoint:Q:41178:                                         |
 
   @ARA-1240
   Scenario: Collect by using SIRI Lite Stop Monitoring with invalid SIRI Lite 'value'

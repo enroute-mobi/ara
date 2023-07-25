@@ -67,21 +67,23 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			ObjectId: lineObjectId,
 		}
 
-		builder.stopMonitoringUpdateEvents.Lines[StopVisitEvent.MonitoredVehicleJourney.LineRef] = lineEvent
+		lineRef := StopVisitEvent.MonitoredVehicleJourney.LineRef
+		builder.stopMonitoringUpdateEvents.Lines[lineRef] = lineEvent
+		builder.stopMonitoringUpdateEvents.LineRefs[lineRef] = struct{}{}
 	}
 
 	// VehicleJourneys
-	vjCode := StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
-	vjObjectId := model.NewObjectID(builder.remoteObjectidKind, vjCode)
+	vehicleJourneyCode := StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
+	vehicleJourneyObjectId := model.NewObjectID(builder.remoteObjectidKind, vehicleJourneyCode)
 
 	_, ok = builder.
 		stopMonitoringUpdateEvents.
-		VehicleJourneys[vjCode]
+		VehicleJourneys[vehicleJourneyCode]
 
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			ObjectId:        vjObjectId,
+			ObjectId:        vehicleJourneyObjectId,
 			LineObjectId:    lineObjectId,
 			DestinationRef:  StopVisitEvent.MonitoredVehicleJourney.DestinationRef,
 			DestinationName: StopVisitEvent.MonitoredVehicleJourney.DestinationName,
@@ -90,7 +92,8 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			ObjectidKind: builder.remoteObjectidKind,
 		}
 
-		builder.stopMonitoringUpdateEvents.VehicleJourneys[vjCode] = vjEvent
+		builder.stopMonitoringUpdateEvents.VehicleJourneys[vehicleJourneyCode] = vjEvent
+		builder.stopMonitoringUpdateEvents.VehicleJourneyRefs[vehicleJourneyCode] = struct{}{}
 	}
 
 	// StopVisits
@@ -103,7 +106,7 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			Origin:                 origin,
 			ObjectId:               stopVisitObjectId,
 			StopAreaObjectId:       stopAreaObjectId,
-			VehicleJourneyObjectId: vjObjectId,
+			VehicleJourneyObjectId: vehicleJourneyObjectId,
 			DataFrameRef:           StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef,
 			PassageOrder:           *monitoredCall.Order,
 			VehicleAtStop:          monitoredCall.VehicleAtStop,
