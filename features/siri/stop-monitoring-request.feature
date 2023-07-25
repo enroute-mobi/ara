@@ -360,6 +360,15 @@ Feature: Support SIRI StopMonitoring by request
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
       | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                          |
+      | Direction          | sent                          |
+      | ResponseIdentifier | /{uuid}/                      |
+      | Status             | OK                            |
+      | Type               | GetStopMonitoringRequest      |
+      | StopAreas          | ["NINOXE:StopPoint:Q:50:LOC"] |
+      | VehicleJourneys    | ["NINOXE:VehicleJourney:201"] |
+      | Lines              | ["NINOXE:Line:3:LOC"]         |
 
     Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner which respond with multiple deliveries
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
