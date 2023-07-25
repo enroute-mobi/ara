@@ -14,7 +14,7 @@ type VehicleMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestVehicleUpdate(request *VehicleUpdateRequest)
-	HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring)
+	HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring) *VehicleMonitoringUpdateEvents
 }
 
 type SIRIVehicleMonitoringSubscriptionCollector struct {
@@ -100,9 +100,10 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) SetVehicleMonitorin
 	connector.vehicleMonitoringSubscriber = vehicleMonitoringSubscriber
 }
 
-func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) {
+func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) *VehicleMonitoringUpdateEvents {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
+	var updateEvents VehicleMonitoringUpdateEvents
 
 	for _, delivery := range notify.VehicleMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
@@ -125,7 +126,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 		builder := NewVehicleMonitoringUpdateEventBuilder(connector.partner)
 		builder.SetUpdateEvents(delivery.VehicleActivities())
 
-		updateEvents := builder.UpdateEvents()
+		updateEvents = builder.UpdateEvents()
 
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
@@ -133,6 +134,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 	for subId := range subToDelete {
 		CancelSubscription(subId, "VehicleMonitoringSubscriptionCollector", connector)
 	}
+
+	return &updateEvents
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionCollector) broadcastUpdateEvents(events *VehicleMonitoringUpdateEvents) {

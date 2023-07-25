@@ -715,7 +715,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                     <ns5:Percentage>73.0</ns5:Percentage>
                   </ns5:ProgressBetweenStops>
                   <ns5:MonitoredVehicleJourney>
-                    <ns5:LineRef>C</ns5:LineRef>
+                    <ns5:LineRef>testLine</ns5:LineRef>
                     <ns5:DirectionRef>Aller</ns5:DirectionRef>
                     <ns5:FramedVehicleJourneyRef>
                       <ns5:DataFrameRef>NAVINEO:DataFrame::1.0:LOC</ns5:DataFrameRef>
@@ -723,7 +723,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                     </ns5:FramedVehicleJourneyRef>
                     <ns5:JourneyPatternRef>RDMANTOIS:JourneyPattern::LCP37:LOC</ns5:JourneyPatternRef>
                     <ns5:JourneyPatternName>LCP37</ns5:JourneyPatternName>
-                    <ns5:PublishedLineName>C</ns5:PublishedLineName>
+                    <ns5:PublishedLineName>testLine</ns5:PublishedLineName>
                     <ns5:DirectionName>Aller</ns5:DirectionName>
                     <ns5:OperatorRef>OPERYORDM:Operator::OPERYORDM:LOC</ns5:OperatorRef>
                     <ns5:OriginRef>50000037</ns5:OriginRef>
@@ -762,17 +762,20 @@ Feature: Support SIRI VehicleMonitoring by subscription
       And I see ara vehicles
       Then one Vehicle has the following attributes:
         | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    |        6ba7b814-9dad-11d1-9-00c04fd430c8 |
+        | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
         | Bearing   |                                    171.0 |
         | Latitude  |                        48.99927561424598 |
         | Longitude |                       1.6770970859674874 |
       Then an audit event should exist with these attributes:
-        | Type      | NotifyVehicleMonitoring        |
-        | Protocol  | siri                           |
-        | Direction | received                       |
-        | Status    | OK                             |
-        | Partner   | test                           |
-        | Vehicles  | ["TRANSDEV:Vehicle::1501:LOC"] |
+        | Type            | NotifyVehicleMonitoring                   |
+        | Protocol        | siri                                      |
+        | Direction       | received                                  |
+        | Status          | OK                                        |
+        | Partner         | test                                      |
+        | Vehicles        | ["108"]                                   |
+        | VehicleJourneys | ["RDMANTOIS:VehicleJourney::6628652:LOC"] |
+        | StopAreas       | ["50000016"]                              |
+        | Lines           | ["testLine"]                              |
 
   @ARA-1101
   Scenario: Update a Vehicle after a VehicleMonitoringDelivery in a subscription using the partner setting siri.direction_type should update the DirectionRef
