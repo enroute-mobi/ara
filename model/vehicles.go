@@ -224,7 +224,11 @@ func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*
 			}
 		}
 		// clean the index
+		manager.mutex.RUnlock()
+		manager.mutex.Lock()
 		delete(manager.byNextStopVisitId, stopVisitId)
+		manager.mutex.Unlock()
+		manager.mutex.RLock()
 	}
 	return &Vehicle{}, false
 }
