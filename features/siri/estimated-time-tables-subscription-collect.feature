@@ -309,6 +309,14 @@ Feature: Support SIRI EstimatedTimetable
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8         |
       | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                           |
+      | Direction       | received                       |
+      | Status          | OK                             |
+      | Type            | NotifyEstimatedTimetable       |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"] |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201"]  |
+      | Lines           | ["NINOXE:Line:3:LOC"]          |
 
   @ARA-1152 @ARA-1310
   Scenario: Update a StopVisit after an EstimatedTimetableNotify in a subscription

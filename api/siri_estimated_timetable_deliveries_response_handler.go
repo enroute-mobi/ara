@@ -28,8 +28,7 @@ func (handler *SIRIEstimatedTimetableRequestDeliveriesResponseHandler) Respond(p
 
 	t := clock.DefaultClock().Now()
 
-	lineRefs := params.connector.(core.EstimatedTimetableSubscriptionCollector).HandleNotifyEstimatedTimetable(handler.xmlRequest)
-
+	updateEvents := params.connector.(core.EstimatedTimetableSubscriptionCollector).HandleNotifyEstimatedTimetable(handler.xmlRequest)
 	params.rw.WriteHeader(http.StatusOK)
 
 	params.message.Type = "NotifyEstimatedTimetable"
@@ -46,14 +45,13 @@ func (handler *SIRIEstimatedTimetableRequestDeliveriesResponseHandler) Respond(p
 		}
 	}
 	subs := make([]string, 0, len(subIds))
-	lines := make([]string, 0, len(lineRefs))
 	for k := range subIds {
 		subs = append(subs, k)
 	}
-	for k := range lineRefs {
-		lines = append(lines, k)
-	}
 	params.message.SubscriptionIdentifiers = subs
-	params.message.Lines = lines
+	params.message.Lines = updateEvents.GetLines()
+	params.message.VehicleJourneys = updateEvents.GetVehicleJourneys()
+	params.message.StopAreas = updateEvents.GetStopAreas()
+
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

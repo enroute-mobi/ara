@@ -73,6 +73,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 		}
 
 		builder.updateEvents.VehicleJourneys[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()] = vjEvent
+		builder.updateEvents.VehicleJourneyRefs[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()] = struct{}{}
 	}
 
 	for _, call := range estimatedJourneyVersionFrame.EstimatedCalls() {
