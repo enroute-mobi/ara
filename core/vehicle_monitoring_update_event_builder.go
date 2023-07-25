@@ -23,11 +23,14 @@ type VehicleMonitoringUpdateEventBuilder struct {
 }
 
 type VehicleMonitoringUpdateEvents struct {
-	StopAreas       map[string]*model.StopAreaUpdateEvent
-	Lines           map[string]*model.LineUpdateEvent
-	VehicleJourneys map[string]*model.VehicleJourneyUpdateEvent
-	Vehicles        map[string]*model.VehicleUpdateEvent
-	VehicleRefs     map[string]struct{}
+	StopAreas          map[string]*model.StopAreaUpdateEvent
+	Lines              map[string]*model.LineUpdateEvent
+	VehicleJourneys    map[string]*model.VehicleJourneyUpdateEvent
+	Vehicles           map[string]*model.VehicleUpdateEvent
+	VehicleRefs        map[string]struct{}
+	LineRefs           map[string]struct{}
+	VehicleJourneyRefs map[string]struct{}
+	MonitoringRefs     map[string]struct{}
 }
 
 func NewVehicleMonitoringUpdateEventBuilder(partner *Partner) VehicleMonitoringUpdateEventBuilder {
@@ -40,11 +43,14 @@ func NewVehicleMonitoringUpdateEventBuilder(partner *Partner) VehicleMonitoringU
 
 func newVehicleMonitoringUpdateEvents() *VehicleMonitoringUpdateEvents {
 	return &VehicleMonitoringUpdateEvents{
-		StopAreas:       make(map[string]*model.StopAreaUpdateEvent),
-		Lines:           make(map[string]*model.LineUpdateEvent),
-		VehicleJourneys: make(map[string]*model.VehicleJourneyUpdateEvent),
-		Vehicles:        make(map[string]*model.VehicleUpdateEvent),
-		VehicleRefs:     make(map[string]struct{}),
+		StopAreas:          make(map[string]*model.StopAreaUpdateEvent),
+		Lines:              make(map[string]*model.LineUpdateEvent),
+		VehicleJourneys:    make(map[string]*model.VehicleJourneyUpdateEvent),
+		Vehicles:           make(map[string]*model.VehicleUpdateEvent),
+		VehicleRefs:        make(map[string]struct{}),
+		LineRefs:           make(map[string]struct{}),
+		VehicleJourneyRefs: make(map[string]struct{}),
+		MonitoringRefs:     make(map[string]struct{}),
 	}
 }
 
@@ -64,6 +70,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		builder.vehicleMonitoringUpdateEvents.StopAreas[xmlVehicleActivity.StopPointRef()] = event
+		builder.vehicleMonitoringUpdateEvents.MonitoringRefs[xmlVehicleActivity.StopPointRef()] = struct{}{}
 	}
 
 	// Lines
@@ -79,6 +86,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Lines[xmlVehicleActivity.LineRef()] = lineEvent
+		builder.vehicleMonitoringUpdateEvents.LineRefs[xmlVehicleActivity.LineRef()] = struct{}{}
 	}
 
 	// VehicleJourneys
@@ -103,6 +111,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()] = vjEvent
+		builder.vehicleMonitoringUpdateEvents.VehicleJourneyRefs[xmlVehicleActivity.DatedVehicleJourneyRef()] = struct{}{}
 	}
 
 	// Vehicles
@@ -135,7 +144,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
-		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.StopPointRef()] = struct{}{}
+		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.VehicleMonitoringRef()] = struct{}{}
 	}
 }
 
@@ -222,4 +231,20 @@ func (builder *VehicleMonitoringUpdateEventBuilder) SetUpdateEvents(activities [
 
 func (builder *VehicleMonitoringUpdateEventBuilder) UpdateEvents() VehicleMonitoringUpdateEvents {
 	return *builder.vehicleMonitoringUpdateEvents
+}
+
+func (events VehicleMonitoringUpdateEvents) GetLines() []string {
+	return getModelReferenceSlice(events.LineRefs)
+}
+
+func (events VehicleMonitoringUpdateEvents) GetVehicleJourneys() []string {
+	return getModelReferenceSlice(events.VehicleJourneyRefs)
+}
+
+func (events VehicleMonitoringUpdateEvents) GetVehicles() []string {
+	return getModelReferenceSlice(events.VehicleRefs)
+}
+
+func (events VehicleMonitoringUpdateEvents) GetStopAreas() []string {
+	return getModelReferenceSlice(events.MonitoringRefs)
 }

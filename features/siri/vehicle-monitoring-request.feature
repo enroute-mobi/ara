@@ -612,6 +612,15 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance   | 349.0                         |
       | Percentage     | 70.0                          |
       | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                                    |
+      | Direction          | sent                                    |
+      | Status             | OK                                      |
+      | Type               | VehicleMonitoringRequest                |
+      | StopAreas          | ["RLA_Bus:StopPoint:BP:PASTO8:LOC"]     |
+      | VehicleJourneys    | ["RLA_Bus:VehicleJourney::2978464:LOC"] |
+      | Lines              | ["RLA_Bus:Line::05:LOC"]                |
+      | Vehicles           | ["290"]                                 |
 
   Scenario: Collect Vehicle Position with numeric srsName
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with

@@ -82,7 +82,10 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 	updateEvents := builder.UpdateEvents()
 
 	// Log VehicleRefs
-	logVehicleRefs(message, updateEvents.VehicleRefs)
+	message.Lines = updateEvents.GetLines()
+	message.StopAreas = updateEvents.GetStopAreas()
+	message.VehicleJourneys = updateEvents.GetVehicleJourneys()
+	message.Vehicles = updateEvents.GetVehicles()
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)
@@ -144,17 +147,4 @@ func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *s
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-}
-
-func logVehicleRefs(message *audit.BigQueryMessage, refs map[string]struct{}) {
-	refSlice := make([]string, len(refs))
-	i := 0
-	for monitoringRef := range refs {
-		refSlice[i] = monitoringRef
-		i++
-	}
-
-	if message != nil {
-		message.Vehicles = refSlice
-	}
 }
