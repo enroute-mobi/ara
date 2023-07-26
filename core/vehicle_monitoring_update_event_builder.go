@@ -234,17 +234,17 @@ func (builder *VehicleMonitoringUpdateEventBuilder) UpdateEvents() VehicleMonito
 }
 
 func (events VehicleMonitoringUpdateEvents) GetLines() []string {
-	return getModelReferenceSlice(events.LineRefs)
+	return GetModelReferenceSlice(events.LineRefs)
 }
 
 func (events VehicleMonitoringUpdateEvents) GetVehicleJourneys() []string {
-	return getModelReferenceSlice(events.VehicleJourneyRefs)
+	return GetModelReferenceSlice(events.VehicleJourneyRefs)
 }
 
 func (events VehicleMonitoringUpdateEvents) GetVehicles() []string {
-	return getModelReferenceSlice(events.VehicleRefs)
+	return GetModelReferenceSlice(events.VehicleRefs)
 }
 
 func (events VehicleMonitoringUpdateEvents) GetStopAreas() []string {
-	return getModelReferenceSlice(events.MonitoringRefs)
+	return GetModelReferenceSlice(events.MonitoringRefs)
 }

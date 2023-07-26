@@ -29,24 +29,14 @@ func NewCollectUpdateEvents() *CollectUpdateEvents {
 	}
 }
 
-func getModelReferenceSlice(refs map[string]struct{}) []string {
-	refSlice := make([]string, len(refs))
-	i := 0
-	for ref := range refs {
-		refSlice[i] = ref
-		i++
-	}
-	return refSlice
-}
-
 func (events CollectUpdateEvents) GetLines() []string {
-	return getModelReferenceSlice(events.LineRefs)
+	return GetModelReferenceSlice(events.LineRefs)
 }
 
 func (events CollectUpdateEvents) GetVehicleJourneys() []string {
-	return getModelReferenceSlice(events.VehicleJourneyRefs)
+	return GetModelReferenceSlice(events.VehicleJourneyRefs)
 }
 
 func (events CollectUpdateEvents) GetStopAreas() []string {
-	return getModelReferenceSlice(events.MonitoringRefs)
+	return GetModelReferenceSlice(events.MonitoringRefs)
 }
