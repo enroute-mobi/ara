@@ -108,6 +108,111 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
 }
 
+func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_One_StopVisit(t *testing.T) {
+	assert := assert.New(t)
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.SetObjectID(objectid)
+	stopVisit.VehicleJourneyId = vj.Id()
+	stopVisit.StopAreaId = sa.Id()
+	stopVisit.PassageOrder = 6
+	stopVisit.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.SetObjectID(objectid)
+	vehicle.LineId = l.Id()
+	vehicle.StopAreaId = sa.Id()
+	vehicle.VehicleJourneyId = vj.Id()
+	vehicle.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &VehicleUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		OriginFromGtfsRT:       true,
+	}
+
+	manager.Update(event)
+
+	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+
+	assert.Equal(stopVisit.Id(), updatedVehicle.NextStopVisitId)
+}
+
+func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_More_Than_One_StopVisit(t *testing.T) {
+	assert := assert.New(t)
+
+	model := NewMemoryModel()
+	objectid := NewObjectID("kind", "value")
+
+	sa := model.StopAreas().New()
+	sa.SetObjectID(objectid)
+	sa.Save()
+
+	l := model.Lines().New()
+	l.SetObjectID(objectid)
+	l.Save()
+
+	vj := model.VehicleJourneys().New()
+	vj.SetObjectID(objectid)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	stopVisit := model.StopVisits().New()
+	stopVisit.SetObjectID(objectid)
+	stopVisit.VehicleJourneyId = vj.Id()
+	stopVisit.StopAreaId = sa.Id()
+	stopVisit.PassageOrder = 6
+	stopVisit.Save()
+
+	stopVisit1 := model.StopVisits().New()
+	stopVisit1.SetObjectID(objectid)
+	stopVisit1.VehicleJourneyId = vj.Id()
+	stopVisit1.StopAreaId = sa.Id()
+	stopVisit1.PassageOrder = 7
+	stopVisit1.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.SetObjectID(objectid)
+	vehicle.LineId = l.Id()
+	vehicle.StopAreaId = sa.Id()
+	vehicle.VehicleJourneyId = vj.Id()
+	vehicle.Save()
+
+	manager := newUpdateManager(model)
+
+	event := &VehicleUpdateEvent{
+		ObjectId:               objectid,
+		StopAreaObjectId:       objectid,
+		VehicleJourneyObjectId: objectid,
+		OriginFromGtfsRT:       true,
+	}
+
+	manager.Update(event)
+
+	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+
+	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
+}
+
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
 	objectid := NewObjectID("kind", "value")

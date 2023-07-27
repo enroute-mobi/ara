@@ -294,6 +294,13 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		}
 	}
 
+	if event.OriginFromGtfsRT {
+		svIds := manager.model.StopVisits().FindByVehicleJourneyIdAndStopAreaId(VehicleJourneyId(vj.Id()), StopAreaId(sa.Id()))
+		if len(svIds) == 1 {
+			vehicle.NextStopVisitId = svIds[0]
+		}
+	}
+
 	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
 	vehicle.DriverRef = event.DriverRef

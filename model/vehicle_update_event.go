@@ -19,6 +19,7 @@ type VehicleUpdateEvent struct {
 	Percentage             float64
 	LinkDistance           float64
 	NextStopPointOrder     int
+	OriginFromGtfsRT       bool
 }
 
 func NewVehicleUpdateEvent() *VehicleUpdateEvent {

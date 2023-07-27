@@ -267,6 +267,7 @@ type StopVisits interface {
 	FindFollowingByStopAreaIds([]StopAreaId) []*StopVisit
 	FindAll() []*StopVisit
 	UnsafeFindAll() []*StopVisit
+	FindByVehicleJourneyIdAndStopAreaId(VehicleJourneyId, StopAreaId) []StopVisitId
 	FindAllAfter(time.Time) []*StopVisit
 	Save(*StopVisit) bool
 	Delete(*StopVisit) bool
@@ -340,6 +341,23 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (st
 
 	manager.mutex.RUnlock()
 	return
+}
+
+func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopAreaId(vjId VehicleJourneyId, saId StopAreaId) []StopVisitId {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	var stopVisitIds []StopVisitId
+
+	ids, _ := manager.byVehicleJourney.Find(ModelId(vjId))
+	for _, id := range ids {
+		stopVisit := manager.byIdentifier[StopVisitId(id)]
+		if stopVisit.StopAreaId == saId {
+			stopVisitIds = append(stopVisitIds, StopVisitId(id))
+		}
+	}
+
+	return stopVisitIds
 }
 
 func (manager *MemoryStopVisits) StopVisitsLenByVehicleJourney(id VehicleJourneyId) int {

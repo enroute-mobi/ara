@@ -317,3 +317,132 @@ Feature: Collect realtime data via GTFS-RT feeds
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Bearing          | 91.0                              |
+
+  @ARA-1347
+  Scenario: Collect GTFS VehiclePosition (with stop_id) should set the NextStopVisitId if StopVisit exists for a given VehicleJourney and StopArea
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+        header {
+          gtfs_realtime_version: "2.0"
+          incrementality: FULL_DATASET
+          timestamp: 1284457468
+        }
+        entity {
+          id: "entity_id"
+          vehicle: {
+            stop_id: "1234"
+            trip: {
+              trip_id: "270856"
+              start_time: "09:42:00"
+              start_date: "20170313"
+              schedule_relationship: SCHEDULED
+            }
+            position: {
+              latitude : -32.92627
+              longitude: 151.78036
+              bearing  : 91.0
+              speed    : 9.8
+            }
+            timestamp: 1527621931
+            vehicle: {
+              id   : "bus-234"
+            }
+          }
+        }
+      """
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "1234" |
+      # 6ba7b814-9dad-11d1-1-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | ObjectIDs | "internal": "270856"              |
+      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      # 6ba7b814-9dad-11d1-2-00c04fd430c8
+    And a StopArea exists with the following attributes:
+      | ObjectIDs | "internal": "1234" |
+      # 6ba7b814-9dad-11d1-3-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs        | "internal": "270856-1234"         |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      # 6ba7b814-9dad-11d1-4-00c04fd430c8
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_objectid_kind | internal              |
+    When a minute has passed
+    Then one Vehicle has the following attributes:
+      | ObjectIDs        | "internal": "bus-234"             |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Bearing          | 91.0                              |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+
+  @ARA-1347
+  Scenario: Collect GTFS VehiclePosition (with stop_id) should not set the NextStopVisitId if multiple StopVisit exists for a given VehicleJourney and StopArea
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+        header {
+          gtfs_realtime_version: "2.0"
+          incrementality: FULL_DATASET
+          timestamp: 1284457468
+        }
+        entity {
+          id: "entity_id"
+          vehicle: {
+            stop_id: "1234"
+            trip: {
+              trip_id: "270856"
+              start_time: "09:42:00"
+              start_date: "20170313"
+              schedule_relationship: SCHEDULED
+            }
+            position: {
+              latitude : -32.92627
+              longitude: 151.78036
+              bearing  : 91.0
+              speed    : 9.8
+            }
+            timestamp: 1527621931
+            vehicle: {
+              id   : "bus-234"
+            }
+          }
+        }
+      """
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "1234" |
+      # 6ba7b814-9dad-11d1-1-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | ObjectIDs | "internal": "270856"              |
+      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      # 6ba7b814-9dad-11d1-2-00c04fd430c8
+    And a StopArea exists with the following attributes:
+      | ObjectIDs | "internal": "1234" |
+      # 6ba7b814-9dad-11d1-3-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs        | "internal": "270856-1234-6"       |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | PassageOrder     | 6                                 |
+      # 6ba7b814-9dad-11d1-4-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | ObjectIDs        | "internal": "270856-1234-22"      |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | PassageOrder     | 22                                |
+      # 6ba7b814-9dad-11d1-5-00c04fd430c8
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_objectid_kind | internal              |
+    When a minute has passed
+    Then one Vehicle has the following attributes:
+      | ObjectIDs        | "internal": "bus-234"             |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Bearing          | 91.0                              |
+    Then No Vehicle exists with the following attributes:
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+    Then No Vehicle exists with the following attributes:
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
