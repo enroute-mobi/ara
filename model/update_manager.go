@@ -292,6 +292,14 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		if sv := manager.model.StopVisits().FindByVehicleJourneyIdAndStopVisitOrder(VehicleJourneyId(vj.Id()), event.NextStopPointOrder); sv != nil {
 			vehicle.NextStopVisitId = sv.Id()
 		}
+	} else {
+		if sa != nil {
+			svIds := manager.model.StopVisits().FindByVehicleJourneyIdAndStopAreaId(VehicleJourneyId(vj.Id()), StopAreaId(sa.Id()))
+			if len(svIds) == 1 {
+				vehicle.NextStopVisitId = svIds[0]
+			}
+		}
+
 	}
 
 	vehicle.StopAreaId = sa.Id()

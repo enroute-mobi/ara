@@ -52,3 +52,10 @@ Then(/^a Vehicle "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"
     expect(response.body).to include("Stop visit not found: #{kind}:#{value}")
   end
 end
+
+Then(/^No Vehicle exists with the following attributes:$/) do |attributes|
+  response = RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response_array = JSON.parse(response.body)
+
+  expect(response_array).not_to include(a_hash_including(attributes))
+end
