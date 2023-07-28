@@ -62,6 +62,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 		}
 
 		builder.stopMonitoringUpdateEvents.Lines[xmlStopVisitEvent.LineRef()] = lineEvent
+		builder.stopMonitoringUpdateEvents.LineRefs[xmlStopVisitEvent.LineRef()] = struct{}{}
 	}
 
 	// VehicleJourneys
@@ -86,6 +87,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 		}
 
 		builder.stopMonitoringUpdateEvents.VehicleJourneys[xmlStopVisitEvent.DatedVehicleJourneyRef()] = vjEvent
+		builder.stopMonitoringUpdateEvents.VehicleJourneyRefs[xmlStopVisitEvent.DatedVehicleJourneyRef()] = struct{}{}
 	}
 
 	// StopVisits

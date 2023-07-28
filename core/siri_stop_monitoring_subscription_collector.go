@@ -14,7 +14,7 @@ type StopMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
-	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring)
+	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring) *CollectUpdateEvents
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -100,9 +100,10 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) {
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) *CollectUpdateEvents {
 	// subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
+	var updateEvents CollectUpdateEvents
 
 	for _, delivery := range notify.StopMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
@@ -133,7 +134,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaObjectId)
 		builder.SetUpdateEvents(delivery.XMLMonitoredStopVisits())
 		builder.SetStopVisitCancellationEvents(delivery)
-		updateEvents := builder.UpdateEvents()
+		updateEvents = builder.UpdateEvents()
 
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
@@ -141,6 +142,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 	for subId := range subToDelete {
 		CancelSubscription(subId, "StopMonitoringSubscriptionCollector", connector)
 	}
+	return &updateEvents
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {

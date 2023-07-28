@@ -14,7 +14,7 @@ type EstimatedTimetableSubscriptionCollector interface {
 	state.Startable
 
 	RequestLineUpdate(request *LineUpdateRequest)
-	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable) map[string]struct{}
+	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable) *CollectUpdateEvents
 }
 
 type SIRIEstimatedTimetableSubscriptionCollector struct {
@@ -101,9 +101,9 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) SetEstimatedTimeta
 	connector.estimatedTimetableSubscriber = estimatedTimetableSubscriber
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) map[string]struct{} {
+func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) *CollectUpdateEvents {
 	// subscriptionErrors := make(map[string]string)
-	lineRefs := make(map[string]struct{})
+	var updateEvents CollectUpdateEvents
 	subToDelete := make(map[string]struct{})
 
 	for _, delivery := range notify.EstimatedTimetableDeliveries() {
@@ -126,20 +126,16 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 
 		builder := NewEstimatedTimetableUpdateEventBuilder(connector.partner)
 		builder.SetUpdateEvents(delivery.EstimatedJourneyVersionFrames())
-		updateEvents := builder.UpdateEvents()
+		updateEvents = builder.UpdateEvents()
 
 		connector.broadcastUpdateEvents(&updateEvents)
-
-		for k, v := range updateEvents.LineRefs {
-			lineRefs[k] = v
-		}
 	}
 
 	for subId := range subToDelete {
 		CancelSubscription(subId, "EstimatedTimetableSubscriptionCollector", connector)
 	}
 
-	return lineRefs
+	return &updateEvents
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {

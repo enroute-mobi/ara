@@ -103,8 +103,10 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	updateEvents := builder.UpdateEvents()
 
-	// Log MonitoringRefs
-	logMonitoringRefs(message, updateEvents.MonitoringRefs)
+	// Log Models
+	message.StopAreas = updateEvents.GetStopAreas()
+	message.Lines = updateEvents.GetLines()
+	message.VehicleJourneys = updateEvents.GetVehicleJourneys()
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)
@@ -208,17 +210,4 @@ func logXMLStopMonitoringResponse(message *audit.BigQueryMessage, response *sxml
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
-}
-
-func logMonitoringRefs(message *audit.BigQueryMessage, refs map[string]struct{}) {
-	refSlice := make([]string, len(refs))
-	i := 0
-	for monitoringRef := range refs {
-		refSlice[i] = monitoringRef
-		i++
-	}
-
-	if message != nil {
-		message.StopAreas = refSlice
-	}
 }
