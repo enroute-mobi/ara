@@ -48,7 +48,7 @@ func Test_ModelRefreshTime_Without_setting(t *testing.T) {
 	referentialSettings := NewReferentialSettings()
 
 	duration := referentialSettings.ModelRefreshTime()
-	assert.Equalf(time.Duration(50_000_000_000), duration, "should set at 50 seconds by default")
+	assert.Equalf(50*time.Second, duration, "should set at 50 seconds by default")
 }
 
 func Test_ModelRefreshTime_Below_30seconds(t *testing.T) {
@@ -58,7 +58,7 @@ func Test_ModelRefreshTime_Below_30seconds(t *testing.T) {
 	referentialSettings.s["model.refresh_time"] = "10s"
 
 	duration := referentialSettings.ModelRefreshTime()
-	assert.Equalf(time.Duration(30_000_000_000), duration, "should set minium duration at 30 seconds")
+	assert.Equalf(30*time.Second, duration, "should set minium duration at 30 seconds")
 }
 
 func Test_ModelRefreshTime_Abov_30seconds(t *testing.T) {
@@ -68,5 +68,5 @@ func Test_ModelRefreshTime_Abov_30seconds(t *testing.T) {
 	referentialSettings.s["model.refresh_time"] = "40s"
 
 	duration := referentialSettings.ModelRefreshTime()
-	assert.Equalf(time.Duration(40_000_000_000), duration, "should set duration at 40 seconds")
+	assert.Equalf(40*time.Second, duration, "should set duration at 40 seconds")
 }
