@@ -108,7 +108,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
 }
 
-func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_One_StopVisit(t *testing.T) {
+func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
@@ -147,7 +147,6 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_One_StopVisit(t
 		ObjectId:               objectid,
 		StopAreaObjectId:       objectid,
 		VehicleJourneyObjectId: objectid,
-		OriginFromGtfsRT:       true,
 	}
 
 	manager.Update(event)
@@ -157,7 +156,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_One_StopVisit(t
 	assert.Equal(stopVisit.Id(), updatedVehicle.NextStopVisitId)
 }
 
-func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_More_Than_One_StopVisit(t *testing.T) {
+func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
@@ -203,7 +202,6 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_FromGtfs_With_More_Than_One_S
 		ObjectId:               objectid,
 		StopAreaObjectId:       objectid,
 		VehicleJourneyObjectId: objectid,
-		OriginFromGtfsRT:       true,
 	}
 
 	manager.Update(event)

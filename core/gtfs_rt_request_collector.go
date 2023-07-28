@@ -193,7 +193,6 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 			Latitude:               float64(p.GetLatitude()),
 			Bearing:                float64(p.GetBearing()),
 			Occupancy:              occupancyName(occupancy),
-			OriginFromGtfsRT:       true,
 		}
 
 		events.Vehicles[vid] = event
