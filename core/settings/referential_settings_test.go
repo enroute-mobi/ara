@@ -2,6 +2,7 @@ package settings
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,4 +40,33 @@ func Test_ReferentialSettings_LoggerDebugStopAreas_WithoutValue(t *testing.T) {
 
 	objectIds := referentialSettings.LoggerVerboseStopAreas()
 	assert.Empty(objectIds)
+}
+
+func Test_ModelRefreshTime_Without_setting(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+
+	duration := referentialSettings.ModelRefreshTime()
+	assert.Equalf(50*time.Second, duration, "should set at 50 seconds by default")
+}
+
+func Test_ModelRefreshTime_Below_30seconds(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+	referentialSettings.s["model.refresh_time"] = "10s"
+
+	duration := referentialSettings.ModelRefreshTime()
+	assert.Equalf(30*time.Second, duration, "should set minium duration at 30 seconds")
+}
+
+func Test_ModelRefreshTime_Abov_30seconds(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+	referentialSettings.s["model.refresh_time"] = "40s"
+
+	duration := referentialSettings.ModelRefreshTime()
+	assert.Equalf(40*time.Second, duration, "should set duration at 40 seconds")
 }

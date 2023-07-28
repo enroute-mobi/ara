@@ -110,10 +110,7 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 		}
 
 		stopArea, _ := guardian.referential.Model().StopAreas().Find(sas[i].Id())
-
-		randNb := time.Duration(rand.Intn(20)+40) * time.Second
-
-		stopArea.NextCollect(now.Add(randNb))
+		stopArea.NextCollect(now.Add(guardian.randDuration()))
 		stopArea.Save()
 
 		stopAreaUpdateRequest := &StopAreaUpdateRequest{
@@ -146,9 +143,7 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 
 		line, _ := guardian.referential.Model().Lines().Find(lines[i].Id())
 
-		randNb := time.Duration(rand.Intn(20)+40) * time.Second
-
-		line.NextCollect(now.Add(randNb))
+		line.NextCollect(now.Add(guardian.randDuration()))
 		line.Save()
 
 		if lines[i].CollectGeneralMessages {
@@ -162,6 +157,10 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
 		guardian.referential.CollectManager().UpdateVehicle(childContext, vehicleUpdateRequest)
 	}
+}
+
+func (guardian *ModelGuardian) randDuration() time.Duration {
+	return time.Duration(rand.Intn(20)-10)*time.Second + guardian.referential.ModelRefreshTime()
 }
 
 func (guardian *ModelGuardian) requestSituations() {

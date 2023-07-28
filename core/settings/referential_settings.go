@@ -9,9 +9,12 @@ import (
 )
 
 const (
-	MODEL_RELOAD_AT           = "model.reload_at"
-	MODEL_PERSISTENCE         = "model.persistence"
-	LOGGER_VERBOSE_STOP_AREAS = "logger.verbose.stop_areas"
+	MODEL_RELOAD_AT            = "model.reload_at"
+	MODEL_PERSISTENCE          = "model.persistence"
+	MODEL_REFRESH_TIME         = "model.refresh_time"
+	LOGGER_VERBOSE_STOP_AREAS  = "logger.verbose.stop_areas"
+	DEFAULT_MODEL_REFRESH_TIME = 50 * time.Second
+	MINIMUM_MODEL_REFRESH_TIME = 30 * time.Second
 )
 
 type ReferentialSettings struct {
@@ -72,4 +75,19 @@ func (rs *ReferentialSettings) LoggerVerboseStopAreas() []model.ObjectID {
 	value := parsedSetting[2]
 
 	return []model.ObjectID{model.NewObjectID(kind, value)}
+}
+
+func (rs *ReferentialSettings) ModelRefreshTime() (d time.Duration) {
+	rs.m.RLock()
+	mp, ok := rs.s[MODEL_REFRESH_TIME]
+	rs.m.RUnlock()
+	if !ok {
+		return DEFAULT_MODEL_REFRESH_TIME
+	}
+
+	d, _ = time.ParseDuration(mp)
+	if d < MINIMUM_MODEL_REFRESH_TIME {
+		d = MINIMUM_MODEL_REFRESH_TIME
+	}
+	return d
 }
