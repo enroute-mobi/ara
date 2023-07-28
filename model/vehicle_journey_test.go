@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_VehicleJourney_Id(t *testing.T) {
@@ -193,22 +194,31 @@ func Test_MemoryVehicleJourneys_FindAll(t *testing.T) {
 }
 
 func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	existingVehicleJourney := vehicleJourneys.New()
 	objectid := NewObjectID("kind", "value")
 	existingVehicleJourney.SetObjectID(objectid)
 	vehicleJourneys.Save(existingVehicleJourney)
 
+	vehicleJourneys.SetFullVehicleJourneyBySubscriptionId("subscription1", existingVehicleJourney.id)
+	vehicleJourneys.SetFullVehicleJourneyBySubscriptionId("subscription2", existingVehicleJourney.id)
 	vehicleJourneys.Delete(existingVehicleJourney)
 
 	_, ok := vehicleJourneys.Find(existingVehicleJourney.Id())
-	if ok {
-		t.Errorf("Deleted VehicleJourney should not be findable")
-	}
+	assert.False(ok, "Deleted VehicleJourney should not be findable")
+
 	_, ok = vehicleJourneys.FindByObjectId(objectid)
-	if ok {
-		t.Errorf("Deleted VehicleJourney should not be findable by objectid")
-	}
+	assert.False(ok, "Deleted VehicleJourney should not be findable by objectid")
+
+	ok = vehicleJourneys.FullVehicleJourneyExistBySubscriptionId("subscription1", existingVehicleJourney.id)
+	assert.False(ok, "Deleted VehicleJourney should not exist in full broadcasted list for subscription 1")
+
+	ok = vehicleJourneys.FullVehicleJourneyExistBySubscriptionId("subscription2", existingVehicleJourney.id)
+	assert.False(ok, "Deleted VehicleJourney should not exist in full broadcasted list for subscription 2")
+
+	assert.Equal(vehicleJourneys.TestLenFullVehicleJourneyBySubscriptionId(), 0, "List of full broadcasted Vehicle journey must be empty")
 }
 
 func Test_MemoryVehicleJourneys_Load(t *testing.T) {
