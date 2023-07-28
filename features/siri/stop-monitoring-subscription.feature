@@ -867,7 +867,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Monitored                             | true                                            |
       | DirectionType                         | Aller                                           |
       | OriginName                            | Le début                                        |
-      | DestinationName                       | La fin.                                         |
+      | DestinationName                       | La fin. <TER>                                   |
       | Reference[DestinationRef]#ObjectId    | "external": "ThisIsTheEnd"                      |
       | Reference[JourneyPatternRef]#ObjectId | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
     And a StopVisit exists with the following attributes:
@@ -881,6 +881,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival      | 2017-01-01T15:00:00.000Z                                             |
       | ArrivalStatus                   | onTime                                                               |
+      | Attribute[DestinationDisplay]   | Cergy le haut & arret <RER>                                          |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | DataFrameRef                    | abcd                                                                 |
@@ -939,7 +940,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:OriginName>Le début</siri:OriginName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
-          <siri:DestinationName>La fin.</siri:DestinationName>
+          <siri:DestinationName>La fin. &lt;TER&gt;</siri:DestinationName>
           <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
           <siri:Monitored>true</siri:Monitored>
           <siri:MonitoredCall>
@@ -947,6 +948,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
             <siri:Order>4</siri:Order>
             <siri:StopPointName>Test</siri:StopPointName>
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
+            <siri:DestinationDisplay>Cergy le haut &amp; arret &lt;RER&gt;</siri:DestinationDisplay>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
             <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>

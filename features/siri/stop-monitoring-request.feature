@@ -525,10 +525,11 @@ Feature: Support SIRI StopMonitoring by request
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-      | Monitored | true                                    |
+      | Name            | Passage 32                              |
+      | ObjectIDs       | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | Monitored       | true                                    |
+      | DestinationName | La fin. <TER>                           |
     And a StopVisit exists with the following attributes:
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
@@ -537,6 +538,7 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
+      | Attribute[DestinationDisplay]   | Cergy le haut & Arret <RER>                                                      |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -596,6 +598,7 @@ Feature: Support SIRI StopMonitoring by request
               </siri:FramedVehicleJourneyRef>
               <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
               <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
+              <siri:DestinationName>La fin. &lt;TER&gt;</siri:DestinationName>
               <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
               <siri:Monitored>true</siri:Monitored>
               <siri:MonitoredCall>
@@ -603,6 +606,7 @@ Feature: Support SIRI StopMonitoring by request
                 <siri:Order>4</siri:Order>
                 <siri:StopPointName>Test</siri:StopPointName>
                 <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                <siri:DestinationDisplay>Cergy le haut &amp; Arret &lt;RER&gt;</siri:DestinationDisplay>
                 <siri:ActualArrivalTime>2017-01-01T13:00:00.000Z</siri:ActualArrivalTime>
               </siri:MonitoredCall>
             </siri:MonitoredVehicleJourney>
