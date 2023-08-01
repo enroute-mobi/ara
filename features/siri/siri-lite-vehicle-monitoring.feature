@@ -400,6 +400,15 @@ Feature: Support SIRI VehicleMonitoring
   }
 }
       """
+    Then an audit event should exist with these attributes:
+        | Type            | VehicleMonitoringRequest        |
+        | Protocol        | siri-lite                       |
+        | Direction       | received                        |
+        | Status          | OK                              |
+        | Partner         | test                            |
+        | Vehicles        | ["Test:Vehicle:201123:LOC"]     |
+        | Lines           | ["Test:Line:3:LOC"]             |
+        | VehicleJourneys | ["Test:VehicleJourney:201:LOC"] |
 
   @ARA-1044
   Scenario: Handle a SIRI Lite VehicleMonitoring request with fallback on generic connector remote_objectid_kind
