@@ -74,6 +74,8 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 	siriResponse.SIRIVehicleMonitoringDelivery = response
 
 	var vehicleIds []string
+	vehicleJourneyRefs := make(map[string]struct{})
+	lineRefs := make(map[string]struct{})
 
 	vs := connector.partner.Model().Vehicles().FindByLineId(line.Id())
 	for i := range vs {
@@ -129,13 +131,17 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 		response.VehicleActivity = append(response.VehicleActivity, activity)
 
 		vehicleIds = append(vehicleIds, vehicleId.Value())
+		vehicleJourneyRefs[dvj] = struct{}{}
+		lineRefs[lineRef] = struct{}{}
 	}
 
 	if connector.partner.PartnerSettings.SortPaylodForTest() {
 		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: response.VehicleActivity})
 	}
 
+	message.Lines = GetModelReferenceSlice(lineRefs)
 	message.Vehicles = vehicleIds
+	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
 
 	siriResponse.SIRIVehicleMonitoringDelivery = response
 
