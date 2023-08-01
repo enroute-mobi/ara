@@ -33,12 +33,13 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
 	if !ok {
 		return siri.SIRIStopMonitoringDelivery{
-			RequestMessageRef: request.MessageIdentifier(),
-			Status:            false,
-			ResponseTimestamp: connector.Clock().Now(),
-			ErrorType:         "InvalidDataReferencesError",
-			ErrorText:         fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
-			MonitoringRef:     request.MonitoringRef(),
+			RequestMessageRef:  request.MessageIdentifier(),
+			Status:             false,
+			ResponseTimestamp:  connector.Clock().Now(),
+			ErrorType:          "InvalidDataReferencesError",
+			ErrorText:          fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
+			MonitoringRef:      request.MonitoringRef(),
+			VehicleJourneyRefs: make(map[string]struct{}),
 		}
 	}
 
@@ -49,10 +50,12 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	}
 
 	delivery := siri.SIRIStopMonitoringDelivery{
-		RequestMessageRef: request.MessageIdentifier(),
-		Status:            true,
-		ResponseTimestamp: connector.Clock().Now(),
-		MonitoringRef:     request.MonitoringRef(),
+		RequestMessageRef:  request.MessageIdentifier(),
+		Status:             true,
+		ResponseTimestamp:  connector.Clock().Now(),
+		MonitoringRef:      request.MonitoringRef(),
+		VehicleJourneyRefs: make(map[string]struct{}),
+		LineRefs:           make(map[string]struct{}),
 	}
 
 	// Prepare StopVisit Selectors
@@ -101,6 +104,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 		}
 		stopVisitArray = append(stopVisitArray, monitoredStopVisit.ItemIdentifier)
 		delivery.MonitoredStopVisits = append(delivery.MonitoredStopVisits, monitoredStopVisit)
+		delivery.VehicleJourneyRefs[monitoredStopVisit.DatedVehicleJourneyRef] = struct{}{}
+		delivery.LineRefs[monitoredStopVisit.LineRef] = struct{}{}
+
 	}
 
 	return delivery
@@ -119,8 +125,9 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 		message.Status = "Error"
 		message.ErrorDetails = response.SIRIStopMonitoringDelivery.ErrorString()
 	}
-	message.Lines = []string{request.LineRef()}
+	message.Lines = GetModelReferenceSlice(response.LineRefs)
 	message.StopAreas = []string{request.MonitoringRef()}
+	message.VehicleJourneys = GetModelReferenceSlice(response.VehicleJourneyRefs)
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
