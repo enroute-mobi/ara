@@ -47,6 +47,8 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) RequestLine(request *
 		message.ErrorDetails = response.SIRIEstimatedTimetableDelivery.ErrorString()
 	}
 	message.Lines = request.Lines()
+	message.StopAreas = GetModelReferenceSlice(response.MonitoringRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(response.VehicleJourneyRefs)
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
@@ -57,9 +59,11 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 	currentTime := connector.Clock().Now()
 
 	delivery := siri.SIRIEstimatedTimetableDelivery{
-		RequestMessageRef: request.MessageIdentifier(),
-		ResponseTimestamp: currentTime,
-		Status:            true,
+		RequestMessageRef:  request.MessageIdentifier(),
+		ResponseTimestamp:  currentTime,
+		Status:             true,
+		VehicleJourneyRefs: make(map[string]struct{}),
+		MonitoringRefs:     make(map[string]struct{}),
 	}
 
 	selectors := []model.StopVisitSelector{}
@@ -153,10 +157,12 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 				}
 
 				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+				delivery.MonitoringRefs[stopAreaId] = struct{}{}
 			}
 			if len(estimatedVehicleJourney.EstimatedCalls) != 0 {
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 			}
+			delivery.VehicleJourneyRefs[datedVehicleJourneyRef] = struct{}{}
 		}
 		if len(journeyFrame.EstimatedVehicleJourneys) != 0 {
 			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)

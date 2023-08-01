@@ -29,6 +29,9 @@ type SIRIEstimatedTimetableDelivery struct {
 	ErrorText   string
 
 	EstimatedJourneyVersionFrames []*SIRIEstimatedJourneyVersionFrame
+
+	MonitoringRefs     map[string]struct{}
+	VehicleJourneyRefs map[string]struct{}
 }
 
 type SIRIEstimatedJourneyVersionFrame struct {

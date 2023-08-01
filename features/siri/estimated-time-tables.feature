@@ -310,6 +310,14 @@ Feature: Support SIRI EstimatedTimetable
         </S:Body>
       </S:Envelope>
       """
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                                                                                          |
+      | Direction       | received                                                                                      |
+      | Status          | OK                                                                                            |
+      | Type            | EstimatedTimetableRequest                                                                     |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC","NINOXE:StopPoint:SP:25:LOC","NINOXE:StopPoint:SP:26:LOC","NINOXE:StopPoint:SP:27:LOC"] |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201"]                                                                 |
+      | Lines           | ["NINOXE:Line:3:LOC"]                                                                         |
 
   Scenario: 3950 - Handle a SIRI EstimatedTimetable request with the no rewrite setting
     Given a SIRI Partner "test" exists with connectors [siri-estimated-timetable-request-broadcaster] and the following settings:
