@@ -22,6 +22,10 @@ type SIRIServiceResponse struct {
 	StopMonitoringDeliveries     []*SIRIStopMonitoringDelivery
 	GeneralMessageDeliveries     []*SIRIGeneralMessageDelivery
 	EstimatedTimetableDeliveries []*SIRIEstimatedTimetableDelivery
+
+	MonitoringRefs     map[string]struct{}
+	LineRefs           map[string]struct{}
+	VehicleJourneyRefs map[string]struct{}
 }
 
 func (response *SIRIServiceResponse) BuildXML(envelopeType ...string) (string, error) {
