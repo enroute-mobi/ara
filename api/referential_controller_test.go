@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTokens(t *testing.T) {
@@ -127,8 +129,14 @@ func Test_ReferentialController_Delete(t *testing.T) {
 }
 
 func Test_ReferentialController_Update(t *testing.T) {
+	assert := assert.New(t)
 	// Prepare and send request
-	body := []byte(`{ "Slug": "another_test", "OrganisationId": "test", "Name": "test name" }`)
+	body := []byte(`{
+"Slug": "another_test",
+"OrganisationId": "test",
+"Name": "test name",
+"Settings": {"model.refresh_time": "4h", "logger.verbose.stop_areas": "stif:STIF:StopPoint:Q:473947:"}
+}`)
 
 	referential, responseRecorder, server := referentialPrepareRequest("PUT", true, body, t)
 
@@ -137,22 +145,19 @@ func Test_ReferentialController_Update(t *testing.T) {
 
 	// Test Results
 	updatedReferential := server.CurrentReferentials().Find(referential.Id())
-	if updatedReferential == nil {
-		t.Errorf("Referential should be found after PUT request")
-	}
+	assert.NotNil(updatedReferential, "Referential should be found after PUT request")
 
-	if expected := core.ReferentialSlug("another_test"); updatedReferential.Slug() != expected {
-		t.Errorf("Referential slug should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.Slug(), expected)
-	}
-	if expected := "test"; updatedReferential.OrganisationId != expected {
-		t.Errorf("Referential organisation id should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.OrganisationId, expected)
-	}
-	if expected := "test name"; updatedReferential.Name != expected {
-		t.Errorf("Referential name should be updated after PUT request:\n got: %v\n want: %v", updatedReferential.Name, expected)
-	}
-	if expected, _ := updatedReferential.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.Equal(core.ReferentialSlug("another_test"), updatedReferential.Slug())
+	assert.Equal("test", updatedReferential.OrganisationId)
+	assert.Equal("test name", updatedReferential.Name)
+
+	jsonReferential, _ := updatedReferential.MarshalJSON()
+	assert.JSONEq(responseRecorder.Body.String(), string(jsonReferential), "Wrong body for PUT response request")
+
+	// Settings must be set
+	assert.Equal(4*time.Hour, updatedReferential.ModelRefreshTime())
+	expectedLoggerStopAreas := []model.ObjectID{model.NewObjectID("stif", "STIF:StopPoint:Q:473947:")}
+	assert.Equal(expectedLoggerStopAreas, updatedReferential.LoggerVerboseStopAreas())
 }
 
 func Test_ReferentialController_Update_ExistingSlug(t *testing.T) {

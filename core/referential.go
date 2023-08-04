@@ -75,6 +75,25 @@ type APIReferential struct {
 	manager Referentials
 }
 
+func (apiReferential *APIReferential) UnmarshalJSON(data []byte) error {
+	type Alias APIReferential
+	aux := &struct {
+		Settings map[string]string
+		*Alias
+	}{
+		Alias: (*Alias)(apiReferential),
+	}
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.Settings != nil {
+		apiReferential.Settings = aux.Settings
+	}
+
+	return nil
+}
 func (referential *APIReferential) Id() ReferentialId {
 	return referential.id
 }
