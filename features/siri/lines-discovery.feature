@@ -101,3 +101,72 @@ Feature: Support SIRI LinesDiscovery
     And a minute has passed
     Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
     And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
+
+  @ARA-1298 @siri-vali
+  Scenario: LinesDiscovery collect
+    Given a SIRI server waits LinesDiscovery request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+      <siri:Status>true</siri:Status>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:6:LOC</siri:LineRef>
+          <siri:LineName>Test</siri:LineName>
+          <siri:Monitored>true</siri:Monitored>
+        </siri:AnnotatedLineRef>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:7:LOC</siri:LineRef>
+          <siri:LineName>Test 3</siri:LineName>
+          <siri:Monitored>true</siri:Monitored>
+        </siri:AnnotatedLineRef>
+      </Answer>
+      <AnswerExtension/>
+    </sw:LinesDiscoveryResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-lines-discovery-request-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+    And a minute has passed
+    Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
+    And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
+    And the Partner "test" is updated with the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | remote_objectid_kind | external              |
+    And a SIRI server waits LinesDiscovery request on "http://localhost:8090" to respond with
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+      <siri:Status>true</siri:Status>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:6:LOC</siri:LineRef>
+          <siri:LineName>Test</siri:LineName>
+          <siri:Monitored>true</siri:Monitored>
+        </siri:AnnotatedLineRef>
+        <siri:AnnotatedLineRef>
+          <siri:LineRef>NINOXE:Line:BP:7:LOC</siri:LineRef>
+          <siri:LineName>Test 3</siri:LineName>
+          <siri:Monitored>true</siri:Monitored>
+        </siri:AnnotatedLineRef>
+      </Answer>
+      <AnswerExtension/>
+    </sw:LinesDiscoveryResponse>
+  </S:Body>
+</S:Envelope>
+      """
+    And a minute has passed
+    Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
+    And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
+    Then a Line "external":"NINOXE:Line:BP:6:LOC" should exist
+    And a Line "external":"NINOXE:Line:BP:7:LOC" should exist
