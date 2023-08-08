@@ -54,6 +54,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	partners.Model().StopAreas().Save(stopArea)
 
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
+	siriStopMonitoringRequestCollector.Start()
 
 	fs := fakeBroadcaster{}
 	siriStopMonitoringRequestCollector.SetUpdateSubscriber(fs.FakeBroadcaster)
