@@ -25,6 +25,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.Model().Lines().New()
 	lineObjectId := model.NewObjectID("test", "1234")
@@ -127,6 +128,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.Model().Lines().New()
 	lineObjectId := model.NewObjectID("test", "1234")
