@@ -1133,3 +1133,212 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received 1 GetVehicleMonitoring request
+
+  @siri-valid @ARA-1298
+  Scenario: Handle a SIRI VehicleMonitoring request with Partner remote_objectid_kind changed
+    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential      | test     |
+      | remote_objectid_kind  | internal |
+      | sort_payload_for_test | true     |
+    And a Line exists with the following attributes:
+      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                 |
+      # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
+    And a Line exists with the following attributes:
+      | ObjectIDs | "external": "Test:Line:A:BUS:LOC" |
+      | Name      | Ligne A Bus                       |
+      # Id 6ba7b814-9dad-11d1-3-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                                |
+      | ObjectIDs | "external": "Test:VehicleJourney:201:LOC" |
+      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Monitored | true                                      |
+      # Id 6ba7b814-9dad-11d1-4-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | Name                                  | Passage 33                                |
+      | ObjectIDs                             | "internal": "Test:VehicleJourney:202:LOC" |
+      | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                             | true                                      |
+      | Reference[DestinationRef]#ObjectId    | "internal": "Test:StopPoint:Destination"  |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "Test:JourneyPattern:1"       |
+      | Reference[OriginRef]#ObjectId         | "internal": "Test:StopPoint:Origin"       |
+      | OriginName                            | Origin Name                               |
+      | DestinationName                       | Destination Name                          |
+      | DirectionName                         | Direction Name                            |
+      | DirectionType                         | outbound                                  |
+      | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
+      # Id 6ba7b814-9dad-11d1-5-00c04fd430c8
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver1                           |
+      | Bearing          | 120                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 12                                |
+      | Percentage       | 42                                |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "external": "Test:Vehicle:2:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver2                           |
+      | Bearing          | 153                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 34                                |
+      | Percentage       | 55                                |
+    And I see ara lines
+    And I see ara vehicle_journeys
+    And I see ara vehicles
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+    <?xml version='1.0' encoding='UTF-8'?> 
+    <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+      <S:Body>
+        <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>Ara</siri:ProducerRef>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Answer>
+            <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+              <siri:Status>true</siri:Status>
+              <siri:VehicleActivity>
+                <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                <siri:VehicleMonitoringRef>Test:Vehicle:1:LOC</siri:VehicleMonitoringRef>
+                <siri:ProgressBetweenStops>
+                  <siri:LinkDistance>12</siri:LinkDistance>
+                  <siri:Percentage>42</siri:Percentage>
+                </siri:ProgressBetweenStops>
+                <siri:MonitoredVehicleJourney>
+                  <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                  <siri:FramedVehicleJourneyRef>
+                    <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                    <siri:DatedVehicleJourneyRef>Test:VehicleJourney:202:LOC</siri:DatedVehicleJourneyRef>
+                  </siri:FramedVehicleJourneyRef>
+                  <siri:JourneyPatternRef>Test:JourneyPattern:1</siri:JourneyPatternRef>
+                  <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                  <siri:OriginRef>RATPDev:StopPoint:Q:488317b5b41cb7ba0a4812c18b312f0e2b986852:LOC</siri:OriginRef>
+                  <siri:OriginName>Origin Name</siri:OriginName>
+                  <siri:DestinationRef>RATPDev:StopPoint:Q:7bef317e38443efe7d8e8e7f3b7b59881b2e3be0:LOC</siri:DestinationRef>
+                  <siri:DestinationName>Destination Name</siri:DestinationName>
+                  <siri:Monitored>true</siri:Monitored>
+                  <siri:VehicleLocation>
+                    <siri:Longitude>1.234</siri:Longitude>
+                    <siri:Latitude>5.678</siri:Latitude>
+                  </siri:VehicleLocation>
+                  <siri:Bearing>120</siri:Bearing>
+                  <siri:DriverRef>Driver1</siri:DriverRef>
+                </siri:MonitoredVehicleJourney>
+              </siri:VehicleActivity>
+            </siri:VehicleMonitoringDelivery>
+          </Answer>
+          <AnswerExtension/>
+        </sw:GetVehicleMonitoringResponse>
+      </S:Body>
+    </S:Envelope>
+    """
+    And the Partner "test" is updated with the following settings:
+      | local_credential     | test     |
+      | remote_objectid_kind | external |
+    And a minute has passed
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:123456::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:123456::LOC</siri:MessageIdentifier>
+              <siri:LineRef>Test:Line:A:BUS:LOC</siri:LineRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+     <?xml version='1.0' encoding='UTF-8'?> 
+     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+       <S:Body>
+         <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+           <ServiceDeliveryInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+             <siri:ProducerRef>Ara</siri:ProducerRef>
+             <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-9-00c04fd430c8</siri:ResponseMessageIdentifier>
+             <siri:RequestMessageRef>Test:123456::LOC</siri:RequestMessageRef>
+           </ServiceDeliveryInfo>
+           <Answer>
+             <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef>Test:123456::LOC</siri:RequestMessageRef>
+               <siri:Status>true</siri:Status>
+               <siri:VehicleActivity>
+                 <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                 <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                 <siri:VehicleMonitoringRef>Test:Vehicle:2:LOC</siri:VehicleMonitoringRef>
+                 <siri:ProgressBetweenStops>
+                   <siri:LinkDistance>34</siri:LinkDistance>
+                   <siri:Percentage>55</siri:Percentage>
+                 </siri:ProgressBetweenStops>
+                 <siri:MonitoredVehicleJourney>
+                   <siri:LineRef>Test:Line:A:BUS:LOC</siri:LineRef>
+                   <siri:FramedVehicleJourneyRef>
+                     <siri:DataFrameRef>2017-01-01</siri:DataFrameRef>
+                     <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                   </siri:FramedVehicleJourneyRef>
+                   <siri:PublishedLineName>Ligne A Bus</siri:PublishedLineName>
+                   <siri:Monitored>true</siri:Monitored>
+                   <siri:VehicleLocation>
+                     <siri:Longitude>1.234</siri:Longitude>
+                     <siri:Latitude>5.678</siri:Latitude>
+                   </siri:VehicleLocation>
+                   <siri:Bearing>153</siri:Bearing>
+                   <siri:DriverRef>Driver2</siri:DriverRef>
+                 </siri:MonitoredVehicleJourney>
+               </siri:VehicleActivity>
+             </siri:VehicleMonitoringDelivery>
+           </Answer>
+           <AnswerExtension/>
+         </sw:GetVehicleMonitoringResponse>
+       </S:Body>
+     </S:Envelope>
+    """

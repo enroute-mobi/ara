@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type VehicleMonitoringRequestBroadcaster interface {
@@ -17,6 +18,8 @@ type VehicleMonitoringRequestBroadcaster interface {
 }
 
 type SIRIVehicleMonitoringRequestBroadcaster struct {
+	state.Startable
+
 	connector
 
 	vjRemoteObjectidKinds      []string
@@ -26,13 +29,16 @@ type SIRIVehicleMonitoringRequestBroadcaster struct {
 type SIRIVehicleMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRIVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRIVehicleMonitoringRequestBroadcaster {
-	connector := &SIRIVehicleMonitoringRequestBroadcaster{
-		vjRemoteObjectidKinds:      partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER),
-		vehicleRemoteObjectidKinds: partner.VehicleRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER),
-	}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector := &SIRIVehicleMonitoringRequestBroadcaster{}
+
 	connector.partner = partner
 	return connector
+}
+
+func (connector *SIRIVehicleMonitoringRequestBroadcaster) Start() {
+	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.vehicleRemoteObjectidKinds = connector.partner.VehicleRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(request *sxml.XMLGetVehicleMonitoring, message *audit.BigQueryMessage) (siriResponse *siri.SIRIVehicleMonitoringResponse) {
