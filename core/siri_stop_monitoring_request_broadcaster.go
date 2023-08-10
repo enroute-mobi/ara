@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type StopMonitoringRequestBroadcaster interface {
@@ -16,6 +17,7 @@ type StopMonitoringRequestBroadcaster interface {
 }
 
 type SIRIStopMonitoringRequestBroadcaster struct {
+	state.Startable
 	connector
 }
 
@@ -23,11 +25,13 @@ type SIRIStopMonitoringRequestBroadcasterFactory struct{}
 
 func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitoringRequestBroadcaster {
 	connector := &SIRIStopMonitoringRequestBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
 	connector.partner = partner
 	return connector
 }
 
+func (connector *SIRIStopMonitoringRequestBroadcaster) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+}
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(request *sxml.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
 	objectid := model.NewObjectID(connector.remoteObjectidKind, request.MonitoringRef())
 	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
