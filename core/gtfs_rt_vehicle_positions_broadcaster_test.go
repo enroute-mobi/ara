@@ -22,6 +22,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -117,6 +118,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("WRONG_KIND", "lId")
@@ -177,6 +179,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -237,6 +240,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -302,6 +306,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
@@ -365,6 +370,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.model.Lines().New()
 	lId := model.NewObjectID("objectidKind", "lId")
