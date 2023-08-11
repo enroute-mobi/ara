@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 )
 
 type TripUpdatesBroadcaster struct {
+	state.Startable
 	connector
 
 	vjRemoteObjectidKinds []string
@@ -34,12 +36,15 @@ func (factory *TripUpdatesBroadcasterFactory) Validate(apiPartner *APIPartner) {
 
 func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 	connector := &TripUpdatesBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
-	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.partner = partner
-	connector.cache = cache.NewCachedItem("TripUpdates", partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 
 	return connector
+}
+
+func (connector *TripUpdatesBroadcaster) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.cache = cache.NewCachedItem("TripUpdates", connector.partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 }
 
 func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {

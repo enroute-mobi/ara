@@ -20,6 +20,13 @@ Then('this GTFS-RT response should contain a Vehicle Position with these attribu
   expect(@gtfs_response.vehicle_positions).to include(an_object_having_attributes(gtfs_attributes(vehicle_position_attributes)))
 end
 
+Then('this GTFS-RT response should contain a Trip Update with these attributes:') do |attributes|
+  debug @gtfs_response.trip_updates.inspect
+
+  @gtfs_response = @gtfs_response.trip_updates.map(&:trip)
+  expect(@gtfs_response).to include(an_object_having_attributes(gtfs_attributes(attributes)))
+end
+
 Then('this GTFS-RT response should not contain Vehicle Positions') do
   debug @gtfs_response.vehicle_positions.inspect
   expect(@gtfs_response.vehicle_positions).to be_empty
