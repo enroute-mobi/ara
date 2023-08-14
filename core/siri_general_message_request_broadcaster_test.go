@@ -30,7 +30,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.SetObjectID(objectid)
 	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
 	routeReference.Type = "RouteRef"
@@ -89,7 +90,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	situation.Origin = "partner"
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.SetObjectID(objectid)
 	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
 	routeReference.Type = "RouteRef"
@@ -138,7 +140,8 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.SetObjectID(objectid)
 	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
 	routeReference.Type = "RouteRef"
@@ -147,7 +150,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 
 	objectid2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
 	situation2 := referential.Model().Situations().New()
-	situation2.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	situation2.ValidityPeriods = []*model.TimeRange{period}
 	situation2.SetObjectID(objectid2)
 	lineReference := model.NewReference(model.NewObjectID("objectidKind", "LineRef"))
 	lineReference.Type = "LineRef"

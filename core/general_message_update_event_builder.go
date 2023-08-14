@@ -61,7 +61,11 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 
 	situationEvent.SituationAttributes.Format = xmlGeneralMessageEvent.FormatRef()
 	situationEvent.SituationAttributes.Channel = xmlGeneralMessageEvent.InfoChannelRef()
-	situationEvent.SituationAttributes.ValidUntil = xmlGeneralMessageEvent.ValidUntilTime()
+	timeRange := &model.TimeRange{
+		StartTime: xmlGeneralMessageEvent.RecordedAtTime(),
+		EndTime:   xmlGeneralMessageEvent.ValidUntilTime(),
+	}
+	situationEvent.ValidityPeriods = []*model.TimeRange{timeRange}
 
 	content := xmlGeneralMessageEvent.Content().(sxml.IDFGeneralMessageStructure)
 	for _, xmlMessage := range content.Messages() {

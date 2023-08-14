@@ -18,19 +18,28 @@ type Message struct {
 }
 
 type Situation struct {
-	RecordedAt time.Time
-	ValidUntil time.Time
-	model      Model
+	model Model
 	ObjectIDConsumer
-	id           SituationId
-	ProducerRef  string `json:",omitempty"`
-	Channel      string `json:",omitempty"`
-	Format       string `json:",omitempty"`
-	Origin       string
+	id     SituationId
+	Origin string
+
+	RecordedAt time.Time
+	Version    int `json:",omitempty"`
+
+	ValidityPeriods []*TimeRange `json:",omitempty"`
+
+	ProducerRef string `json:",omitempty"`
+	Channel     string `json:",omitempty"`
+	Format      string `json:",omitempty"`
+
 	Messages     []*Message
 	LineSections []*References
 	References   []*Reference
-	Version      int `json:",omitempty"`
+}
+
+type TimeRange struct {
+	StartTime time.Time `json:",omitempty"`
+	EndTime   time.Time `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {
@@ -86,12 +95,12 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	aux := struct {
 		ObjectIDs  ObjectIDs  `json:",omitempty"`
 		RecordedAt *time.Time `json:",omitempty"`
-		ValidUntil *time.Time `json:",omitempty"`
 		*Alias
-		Id           SituationId
-		Messages     []*Message    `json:",omitempty"`
-		References   []*Reference  `json:",omitempty"`
-		LineSections []*References `json:",omitempty"`
+		Id              SituationId
+		ValidityPeriods []*TimeRange  `json:",omitempty"`
+		Messages        []*Message    `json:",omitempty"`
+		References      []*Reference  `json:",omitempty"`
+		LineSections    []*References `json:",omitempty"`
 	}{
 		Id:    situation.id,
 		Alias: (*Alias)(situation),
@@ -112,11 +121,18 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
 	}
-	if !situation.ValidUntil.IsZero() {
-		aux.ValidUntil = &situation.ValidUntil
+	if len(situation.ValidityPeriods) != 0 {
+		aux.ValidityPeriods = situation.ValidityPeriods
 	}
 
 	return json.Marshal(&aux)
+}
+
+func (situation *Situation) GMValidUntil() time.Time {
+	if len(situation.ValidityPeriods) == 0 {
+		return time.Time{}
+	}
+	return situation.ValidityPeriods[0].EndTime
 }
 
 type MemorySituations struct {

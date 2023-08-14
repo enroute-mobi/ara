@@ -168,7 +168,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *Subscription, r *SubscribedResource) {
 	situations := connector.partner.Model().Situations().FindAll()
 	for i := range situations {
-		if situations[i].ValidUntil.Before(connector.Clock().Now()) {
+		if situations[i].GMValidUntil().Before(connector.Clock().Now()) {
 			continue
 		}
 

@@ -12,11 +12,11 @@ type SituationUpdateEvent struct {
 	Origin              string
 	ProducerRef         string
 	SituationAttributes SituationAttributes
+	ValidityPeriods     []*TimeRange
 	Version             int
 }
 
 type SituationAttributes struct {
-	ValidUntil   time.Time
 	Format       string
 	Channel      string
 	References   []*Reference

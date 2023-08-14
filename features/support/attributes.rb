@@ -81,6 +81,24 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Situation ValidityPeriods is an array of TimeRange
+    # Format: | ValidityPeriods[0]#StartTime | 2017-01-01T13:00:00.000Z |
+    #         | ValidityPeriods[0]#EndTime   | 2017-01-02T15:00:00.000Z |
+    if key =~ /ValidityPeriods\[(\d+)\]#(\S+)/
+      period_number = Regexp.last_match(1).to_i
+      attribute = Regexp.last_match(2).to_s
+
+      attributes['ValidityPeriods'] ||= []
+
+      until attributes['ValidityPeriods'].length >= period_number + 1
+        attributes['ValidityPeriods'] << {}
+      end
+
+      attributes['ValidityPeriods'][period_number][attribute.to_s] = value
+
+      attributes.delete key
+    end
+
     # Situation References are an array of Reference
     # Format: | Reference[0] | Kind:ObjectId |
     if key =~ /References\[(\d+)\]/

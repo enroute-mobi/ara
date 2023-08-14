@@ -7,11 +7,14 @@ import (
 )
 
 func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdateEvent) {
+	period := &TimeRange{EndTime: testTime}
+
 	event = &SituationUpdateEvent{
 		RecordedAt:        testTime,
 		SituationObjectID: objectid,
 		Version:           1,
 		ProducerRef:       "Ara",
+		ValidityPeriods:   []*TimeRange{period},
 	}
 
 	message := &Message{
@@ -22,10 +25,9 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 	}
 
 	event.SituationAttributes = SituationAttributes{
-		Format:     "format",
-		Channel:    "channel",
-		Messages:   []*Message{message},
-		ValidUntil: testTime,
+		Format:   "format",
+		Channel:  "channel",
+		Messages: []*Message{message},
 	}
 	event.SituationAttributes.References = append(event.SituationAttributes.References, &Reference{ObjectId: &objectid, Type: "type"})
 
@@ -40,15 +42,17 @@ func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) 
 		NumberOfCharPerLine: 20,
 	}
 
+	period := &TimeRange{EndTime: testTime}
+
 	testSituation := Situation{
-		id:          situation.id,
-		Messages:    []*Message{message},
-		RecordedAt:  testTime,
-		ValidUntil:  testTime,
-		Format:      "format",
-		Channel:     "channel",
-		ProducerRef: "Ara",
-		Version:     1,
+		id:              situation.id,
+		Messages:        []*Message{message},
+		RecordedAt:      testTime,
+		ValidityPeriods: []*TimeRange{period},
+		Format:          "format",
+		Channel:         "channel",
+		ProducerRef:     "Ara",
+		Version:         1,
 	}
 	testSituation.model = situation.model
 	testSituation.objectids = make(ObjectIDs)

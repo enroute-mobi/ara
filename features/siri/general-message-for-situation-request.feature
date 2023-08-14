@@ -5,23 +5,23 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3797 - Ignore situations associatd to the Commercial channel
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "1"                                 |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                        |
-      | Version                 | 1                                                |
-      | Channel                 | Commercial                                       |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00                        |
-      | Messages[0]#MessageType | longMessage                                      |
-      | Messages[0]#MessageText | Les situations commercials doivent être ignorées |
-      | References[0]           | LineRef:{"internal":"NINOXE:Line:3:LOC"}         |
+      | ObjectIDs                  | "internal" : "1"                                 |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                        |
+      | Version                    | 1                                                |
+      | Channel                    | Commercial                                       |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                        |
+      | Messages[0]#MessageType    | longMessage                                      |
+      | Messages[0]#MessageText    | Les situations commercials doivent être ignorées |
+      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}         |
     And a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "2"                         |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                |
-      | Version                 | 1                                        |
-      | Channel                 | Perturbations                            |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00                |
-      | Messages[0]#MessageType | longMessage                              |
-      | Messages[0]#MessageText | Les autres non                           |
-      | References[0]           | LineRef:{"internal":"NINOXE:Line:3:LOC"} |
+      | ObjectIDs                  | "internal" : "2"                         |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                |
+      | Version                    | 1                                        |
+      | Channel                    | Perturbations                            |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                |
+      | Messages[0]#MessageType    | longMessage                              |
+      | Messages[0]#MessageText    | Les autres non                           |
+      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"} |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -94,14 +94,14 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "test"                                                        |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                 | 1                                                                          |
-      | Channel                 | Perturbation                                                               |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00                                                  |
-      | Messages[0]#MessageType | longMessage                                                                |
-      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | References[0]           | LineRef:{"external":"NINOXE:Line:3:LOC"}                                   |
+      | ObjectIDs                  | "external" : "test"                                                        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                    | 1                                                                          |
+      | Channel                    | Perturbation                                                               |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                                  |
+      | Messages[0]#MessageType    | longMessage                                                                |
+      | Messages[0]#MessageText    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | References[0]              | LineRef:{"external":"NINOXE:Line:3:LOC"}                                   |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -198,7 +198,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
                   <siri:ValidUntilTime>
-                  2017-03-29T20:30:06.000+02:00</siri:ValidUntilTime>
+                  2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content>
                     <Message>
                       <MessageType>longMessage</MessageType>
@@ -225,14 +225,15 @@ Feature: Support SIRI GeneralMessage for Situation
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
-      | RecordedAt              | 2017-03-29T03:30:06+02:00                                                  |
-      | Version                 | 1                                                                          |
-      | Channel                 | Commercial                                                                 |
-      | ProducerRef             | NINOXE:default                                                             |
-      | ValidUntil              | 2017-03-29T20:30:06+02:00                                                  |
-      | Messages[0]#MessageType | longMessage                                                                |
-      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | ObjectIDs                    | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
+      | RecordedAt                   | 2017-03-29T03:30:06+02:00                                                  |
+      | Version                      | 1                                                                          |
+      | Channel                      | Commercial                                                                 |
+      | ProducerRef                  | NINOXE:default                                                             |
+      | ValidityPeriods[0]#StartTime | 2017-03-29T03:30:06+02:00                                                  |
+      | ValidityPeriods[0]#EndTime   | 2017-03-29T20:50:06+02:00                                                  |
+      | Messages[0]#MessageType      | longMessage                                                                |
+      | Messages[0]#MessageText      | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
@@ -259,16 +260,16 @@ Feature: Support SIRI GeneralMessage for Situation
                 <siri:Status>true</siri:Status>
                 <siri:GeneralMessage>
                   <siri:formatRef>STIF-IDF</siri:formatRef>
-                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:RecordedAtTime>2017-01-01T03:35:00.000+02:00</siri:RecordedAtTime>
                   <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ItemIdentifier>
                   <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
-                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoMessageVersion>2</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
-                  <siri:ValidUntilTime>2017-01-07T20:30:06.000+02:00</siri:ValidUntilTime>
+                  <siri:ValidUntilTime>2017-01-07T23:30:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content>
                     <Message>
                       <MessageType>longMessage</MessageType>
-                      <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
+                      <MessageText>Points de vente du réseau ouvert demain matin</MessageText>
                     </Message>
                   </siri:Content>
                 </siri:GeneralMessage>
@@ -280,48 +281,49 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
     And a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "NINOXE:GeneralMessage:27_1"                                  |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                 | 1                                                                          |
-      | Channel                 | Perturbation                                                               |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00                                                  |
-      | Messages[0]#MessageType | longMessage                                                                |
-      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | ObjectIDs                  | "external" : "NINOXE:GeneralMessage:27_1"                                  |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                    | 1                                                                          |
+      | Channel                    | Perturbation                                                               |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                                  |
+      | Messages[0]#MessageType    | longMessage                                                                |
+      | Messages[0]#MessageText    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
-      | remote_objectid_kind | internal              |
+      | remote_objectid_kind | external              |
     And a Line exists with the following attributes:
       | Name                   | Test              |
-      | ObjectIDs              | "internal":"1234" |
+      | ObjectIDs              | "external":"1234" |
       | CollectGeneralMessages | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
-    Then a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "NINOXE:GeneralMessage:27_1"                                  |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                 | 1                                                                          |
-      | Channel                 | Perturbation                                                               |
-      | ValidUntil              | 2017-01-07T20:30:06+02:00                                                  |
-      | Messages[0]#MessageType | longMessage                                                                |
-      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+    Then one Situation has the following attributes:
+      | ObjectIDs                    | "external" : "NINOXE:GeneralMessage:27_1"         |
+      | RecordedAt                   | 2017-01-01T03:35:00+02:00                     |
+      | Version                      | 2                                             |
+      | Channel                      | Perturbation                                  |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T03:35:00+02:00                     |
+      | ValidityPeriods[0]#EndTime   | 2017-01-07T23:30:06+02:00                     |
+      | Messages[0]#MessageType      | longMessage                                   |
+      | Messages[0]#MessageText      | Points de vente du réseau ouvert demain matin |
 
   Scenario: 3882 - GeneralMessageResponse empty with an expired Situation
     Given a Situation exists with the following attributes:
-      | ObjectIDs               | "external" : "test"                                                        |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                 | 1                                                                          |
-      | Channel                 | Perturbation                                                               |
-      | ValidUntil              | 2017-01-01T12:01:00+02:00                                                  |
-      | Messages[0]#MessageType | longMessage                                                                |
-      | Messages[0]#MessageText | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | ObjectIDs                  | "external" : "test"                                                        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                    | 1                                                                          |
+      | Channel                    | Perturbation                                                               |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T01:01:00+02:00                                                  |
+      | Messages[0]#MessageType    | longMessage                                                                |
+      | Messages[0]#MessageText    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
     And a Line exists with the following attributes:
       | Name                   | Test              |
-      | ObjectIDs              | "internal":"1234" |
+      | ObjectIDs              | "external":"1234" |
       | CollectGeneralMessages | true              |
     And a minute has passed
     And a minute has passed

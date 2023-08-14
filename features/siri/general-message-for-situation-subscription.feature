@@ -57,13 +57,13 @@ Feature: Support SIRI GeneralMessage by subscription
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
-        | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | RecordedAt              | 2017-01-01T03:30:06+02:00                 |
-        | Version                 | 1                                         |
-        | Channel                 | Perturbations                             |
-        | ValidUntil              | 2017-01-01T20:30:06+02:00                 |
-        | Messages[0]#MessageType | longMessage                               |
-        | Messages[0]#MessageText | Les autres non                            |
+        | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
+        | Version                    | 1                                         |
+        | Channel                    | Perturbations                             |
+        | VelidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
+        | Messages[0]#MessageType    | longMessage                               |
+        | Messages[0]#MessageText    | Les autres non                            |
     When I send this SIRI request
       """
     <?xml version='1.0' encoding='utf-8'?>
@@ -165,13 +165,13 @@ Feature: Support SIRI GeneralMessage by subscription
     And a Subscription exist with the following attributes:
       | Kind | GeneralMessageCollect |
     And a Situation exists with the following attributes:
-      | ObjectIDs               | "internal" : "2"          |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00 |
-      | Version                 | 1                         |
-      | Channel                 | Perturbations             |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00 |
-      | Messages[0]#MessageType | longMessage               |
-      | Messages[0]#MessageText | Les autres non            |
+      | ObjectIDs                  | "internal" : "2"          |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00 |
+      | Version                    | 1                         |
+      | Channel                    | Perturbations             |
+      | ValidityPeriods[0]#EndTIme | 2017-01-01T20:30:06+02:00 |
+      | Messages[0]#MessageType    | longMessage               |
+      | Messages[0]#MessageText    | Les autres non            |
     When I send this SIRI request
     """
     <?xml version='1.0' encoding='utf-8'?>

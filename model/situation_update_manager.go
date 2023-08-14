@@ -38,7 +38,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.References = event.SituationAttributes.References
 		situation.LineSections = event.SituationAttributes.LineSections
 		situation.Messages = event.SituationAttributes.Messages
-		situation.ValidUntil = event.SituationAttributes.ValidUntil
+		situation.ValidityPeriods = event.ValidityPeriods
 		situation.Channel = event.SituationAttributes.Channel
 		situation.Format = event.SituationAttributes.Format
 

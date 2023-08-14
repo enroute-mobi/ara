@@ -452,7 +452,9 @@ func Test_ReceiveStateGM(t *testing.T) {
 
 	objectid3 := model.NewObjectID("_internal", string(situation.Id()))
 	situation.Channel = "Mondial"
-	situation.ValidUntil = fakeClock.Now().Add(10 * time.Minute)
+	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
+
 	message := &model.Message{
 		Content:             "Le content",
 		Type:                "Le Type",

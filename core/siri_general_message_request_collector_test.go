@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 )
 
 type fakeSituationBroadcaster struct {
@@ -91,6 +92,7 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 }
 
 func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T) {
+	assert := assert.New(t)
 	situationUpdateEvents := prepare_SIRIGeneralMessageRequestCollector(t, "testdata/generalmessage-response-soap.xml")
 	if situationUpdateEvents == nil {
 		t.Error("RequestSituationUpdate should not return nil")
@@ -116,9 +118,8 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Channel)
 	}
 
-	if expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00"); !situationEvent.SituationAttributes.ValidUntil.Equal(expected) {
-		t.Errorf("Wrong ValidUntil for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.ValidUntil)
-	}
+	expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00")
+	assert.Equal(expected, situationEvent.ValidityPeriods[0].EndTime)
 
 	if expected := "NINOXE:default"; situationEvent.ProducerRef != "NINOXE:default" {
 		t.Errorf("Wrong ProducerRef for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.ProducerRef)

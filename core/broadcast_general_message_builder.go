@@ -52,7 +52,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 }
 
 func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
-	if situation.Origin == string(builder.partner.Slug()) || situation.Channel == "Commercial" || situation.ValidUntil.Before(builder.Clock().Now()) {
+	if situation.Origin == string(builder.partner.Slug()) || situation.Channel == "Commercial" || situation.GMValidUntil().Before(builder.Clock().Now()) {
 		return nil
 	}
 
@@ -79,7 +79,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		InfoMessageIdentifier: infoMessageIdentifier,
 		InfoChannelRef:        situation.Channel,
 		InfoMessageVersion:    situation.Version,
-		ValidUntilTime:        situation.ValidUntil,
+		ValidUntilTime:        situation.GMValidUntil(),
 		RecordedAtTime:        situation.RecordedAt,
 		FormatRef:             "STIF-IDF",
 	}
