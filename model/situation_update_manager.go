@@ -39,7 +39,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.LineSections = event.SituationAttributes.LineSections
 		situation.Messages = event.SituationAttributes.Messages
 		situation.ValidityPeriods = event.ValidityPeriods
-		situation.Channel = event.SituationAttributes.Channel
+		situation.Keywords = event.Keywords
 		situation.Format = event.SituationAttributes.Format
 
 		situation.Save()

@@ -28,8 +28,9 @@ type Situation struct {
 
 	ValidityPeriods []*TimeRange `json:",omitempty"`
 
+	Keywords []string `json:",omitempty"`
+
 	ProducerRef string `json:",omitempty"`
-	Channel     string `json:",omitempty"`
 	Format      string `json:",omitempty"`
 
 	Messages     []*Message
@@ -133,6 +134,31 @@ func (situation *Situation) GMValidUntil() time.Time {
 		return time.Time{}
 	}
 	return situation.ValidityPeriods[0].EndTime
+}
+
+func (situation *Situation) GetGMChannel() (string, bool) {
+	switch {
+	case situation.containsKeyword("Perturbation"):
+		return "Perturbation", true
+	case situation.containsKeyword("Information"):
+		return "Information", true
+	case situation.containsKeyword("Commercial"):
+		return "Commercial", true
+	default:
+		return "", false
+	}
+}
+
+func (situation *Situation) containsKeyword(str string) bool {
+	if len(situation.Keywords) == 0 {
+		return false
+	}
+	for _, v := range situation.Keywords {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
 
 type MemorySituations struct {

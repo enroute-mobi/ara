@@ -89,6 +89,7 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)

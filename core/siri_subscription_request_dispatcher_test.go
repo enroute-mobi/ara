@@ -451,7 +451,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	stopArea.Save()
 
 	objectid3 := model.NewObjectID("_internal", string(situation.Id()))
-	situation.Channel = "Mondial"
+	situation.Keywords = []string{"Perturbation"}
 	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 

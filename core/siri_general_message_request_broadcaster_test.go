@@ -32,6 +32,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
 	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
 	routeReference.Type = "RouteRef"
@@ -142,6 +143,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
 	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
 	routeReference.Type = "RouteRef"
@@ -151,6 +153,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	objectid2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
 	situation2 := referential.Model().Situations().New()
 	situation2.ValidityPeriods = []*model.TimeRange{period}
+	situation2.Keywords = []string{"Perturbation"}
 	situation2.SetObjectID(objectid2)
 	lineReference := model.NewReference(model.NewObjectID("objectidKind", "LineRef"))
 	lineReference.Type = "LineRef"

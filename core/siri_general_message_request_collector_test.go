@@ -114,9 +114,7 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.Version)
 	}
 
-	if expected := "Commercial"; situationEvent.SituationAttributes.Channel != expected {
-		t.Errorf("Wrong Channel for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.SituationAttributes.Channel)
-	}
+	assert.ElementsMatch([]string{"Commercial"}, situationEvent.Keywords)
 
 	expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00")
 	assert.Equal(expected, situationEvent.ValidityPeriods[0].EndTime)

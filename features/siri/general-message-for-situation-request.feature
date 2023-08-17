@@ -3,25 +3,25 @@ Feature: Support SIRI GeneralMessage for Situation
   Background:
       Given a Referential "test" is created
 
-  Scenario: 3797 - Ignore situations associatd to the Commercial channel
+  Scenario: 3797 - Ignore situations associated to other keywords than Commercial/Perturbation/Information
     Given a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "1"                                 |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                        |
-      | Version                    | 1                                                |
-      | Channel                    | Commercial                                       |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                        |
-      | Messages[0]#MessageType    | longMessage                                      |
-      | Messages[0]#MessageText    | Les situations commercials doivent être ignorées |
-      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}         |
+      | ObjectIDs                  | "internal" : "1"                                        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                               |
+      | Version                    | 1                                                       |
+      | Keywords                   | ["Others"]                                              |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                               |
+      | Messages[0]#MessageType    | longMessage                                             |
+      | Messages[0]#MessageText    | Les situations commercials NE doivent PAS être ignorées |
+      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}                |
     And a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "2"                         |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                |
-      | Version                    | 1                                        |
-      | Channel                    | Perturbations                            |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                |
-      | Messages[0]#MessageType    | longMessage                              |
-      | Messages[0]#MessageText    | Les autres non                           |
-      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"} |
+      | ObjectIDs                  | "internal" : "2"                                   |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                          |
+      | Version                    | 1                                                  |
+      | Keywords                   | ["Perturbation"]                                   |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                          |
+      | Messages[0]#MessageType    | longMessage                                        |
+      | Messages[0]#MessageText    | Les situations \"Perturbation\" sont broadcastees  |
+      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}           |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -53,43 +53,43 @@ Feature: Support SIRI GeneralMessage for Situation
       """
     Then I should receive this SIRI response
       """
-      <?xml version='1.0' encoding='utf-8'?>
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-        <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-            <ServiceDeliveryInfo>
-              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-              <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
-            </ServiceDeliveryInfo>
-            <Answer>
-              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
-                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-                <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
-                <siri:Status>true</siri:Status>
-                <siri:GeneralMessage formatRef="STIF-IDF">
-                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
-                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
-                  <siri:InfoMessageIdentifier>2</siri:InfoMessageIdentifier>
-                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
-                  <siri:InfoChannelRef>Perturbations</siri:InfoChannelRef>
-                  <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
-                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          				xsi:type="stif:IDFGeneralMessageStructure">
-                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText>Les autres non</MessageText>
-                    </Message>
-                  </siri:Content>
-                </siri:GeneralMessage>
-              </siri:GeneralMessageDelivery>
-            </Answer>
-            <AnswerExtension/>
-          </sw:GetGeneralMessageResponse>
-        </S:Body>
-      </S:Envelope>
+     <?xml version='1.0' encoding='utf-8'?>
+     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+       <S:Body>
+         <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+           <ServiceDeliveryInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+             <siri:ProducerRef>Ara</siri:ProducerRef>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
+           </ServiceDeliveryInfo>
+           <Answer>
+             <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
+               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
+               <siri:Status>true</siri:Status>
+               <siri:GeneralMessage formatRef="STIF-IDF">
+                 <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
+                 <siri:InfoMessageIdentifier>2</siri:InfoMessageIdentifier>
+                 <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                 <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                 <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
+                 <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                               xsi:type="stif:IDFGeneralMessageStructure">
+                   <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                   <Message>
+                     <MessageType>longMessage</MessageType>
+                     <MessageText>Les situations \"Perturbation\" sont broadcastees</MessageText>
+                   </Message>
+                 </siri:Content>
+               </siri:GeneralMessage>
+             </siri:GeneralMessageDelivery>
+           </Answer>
+           <AnswerExtension/>
+         </sw:GetGeneralMessageResponse>
+       </S:Body>
+     </S:Envelope>
       """
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
@@ -97,7 +97,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ObjectIDs                  | "external" : "test"                                                        |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
-      | Channel                    | Perturbation                                                               |
+      | Keywords                   | ["Commercial"]                                                               |
       | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                                  |
       | Messages[0]#MessageType    | longMessage                                                                |
       | Messages[0]#MessageText    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
@@ -153,7 +153,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ItemIdentifier>
                   <siri:InfoMessageIdentifier>test</siri:InfoMessageIdentifier>
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
-                  <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                  <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
                   <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='stif:IDFGeneralMessageStructure'>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
@@ -228,7 +228,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ObjectIDs                    | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                   | 2017-03-29T03:30:06+02:00                                                  |
       | Version                      | 1                                                                          |
-      | Channel                      | Commercial                                                                 |
+      | Keywords                     | ["Commercial"]                                                             |
       | ProducerRef                  | NINOXE:default                                                             |
       | ValidityPeriods[0]#StartTime | 2017-03-29T03:30:06+02:00                                                  |
       | ValidityPeriods[0]#EndTime   | 2017-03-29T20:50:06+02:00                                                  |
@@ -300,10 +300,10 @@ Feature: Support SIRI GeneralMessage for Situation
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs                    | "external" : "NINOXE:GeneralMessage:27_1"         |
+      | ObjectIDs                    | "external" : "NINOXE:GeneralMessage:27_1"     |
       | RecordedAt                   | 2017-01-01T03:35:00+02:00                     |
       | Version                      | 2                                             |
-      | Channel                      | Perturbation                                  |
+      | Keywords                     | ["Perturbation"]                              |
       | ValidityPeriods[0]#StartTime | 2017-01-01T03:35:00+02:00                     |
       | ValidityPeriods[0]#EndTime   | 2017-01-07T23:30:06+02:00                     |
       | Messages[0]#MessageType      | longMessage                                   |
@@ -448,7 +448,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
       <siri:Extensions>
         <sws:IDFGeneralMessageRequestFilter>
-          <siri:LineRef>1234</siri:LineRef>
+          <siri:LineRef>1234</siri:LineRef> 
         </sws:IDFGeneralMessageRequestFilter>
       </siri:Extensions>
     </Request>

@@ -13,12 +13,12 @@ type SituationUpdateEvent struct {
 	ProducerRef         string
 	SituationAttributes SituationAttributes
 	ValidityPeriods     []*TimeRange
+	Keywords            []string
 	Version             int
 }
 
 type SituationAttributes struct {
 	Format       string
-	Channel      string
 	References   []*Reference
 	LineSections []*References
 	Messages     []*Message

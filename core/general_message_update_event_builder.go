@@ -60,7 +60,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 
 	situationEvent.SituationAttributes.Format = xmlGeneralMessageEvent.FormatRef()
-	situationEvent.SituationAttributes.Channel = xmlGeneralMessageEvent.InfoChannelRef()
+	situationEvent.Keywords = append(situationEvent.Keywords, xmlGeneralMessageEvent.InfoChannelRef())
 	timeRange := &model.TimeRange{
 		StartTime: xmlGeneralMessageEvent.RecordedAtTime(),
 		EndTime:   xmlGeneralMessageEvent.ValidUntilTime(),

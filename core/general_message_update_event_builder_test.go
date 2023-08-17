@@ -8,9 +8,11 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *testing.T) {
+	assert := assert.New(t)
 	file, err := os.Open("testdata/long-general-message-response.xml")
 	if err != nil {
 		t.Fatal(err)
@@ -36,18 +38,15 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	events := &[]*model.SituationUpdateEvent{}
 
 	builder.buildGeneralMessageUpdateEvent(events, response.XMLGeneralMessages()[0], "producer")
-
-	if len(*events) != 1 {
-		t.Fatalf("One event should have been created, got %v", len(*events))
-	}
+	assert.Len(*events, 1, "One event should have been created")
 
 	event := (*events)[0]
 	if event.SituationAttributes.Format != "FRANCE" {
 		t.Errorf("Wrong Format, expected: FRANCE, got: %v", event.SituationAttributes.Format)
 	}
-	if event.SituationAttributes.Channel != "Commercial" {
-		t.Errorf("Wrong Channel, expected: Commercial, got: %v", event.SituationAttributes.Channel)
-	}
+
+	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
+
 	if len(event.SituationAttributes.References) != 12 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
 	}
