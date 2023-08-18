@@ -17,6 +17,13 @@ type Message struct {
 	NumberOfCharPerLine int    `json:",omitempty"`
 }
 
+const (
+	SituationReportTypeGeneral  ReportType = "general"
+	SituationReportTypeIncident ReportType = "incident"
+)
+
+type ReportType string
+
 type Situation struct {
 	model Model
 	ObjectIDConsumer
@@ -28,7 +35,8 @@ type Situation struct {
 
 	ValidityPeriods []*TimeRange `json:",omitempty"`
 
-	Keywords []string `json:",omitempty"`
+	Keywords   []string   `json:",omitempty"`
+	ReportType ReportType `json:",omitempty"`
 
 	ProducerRef string `json:",omitempty"`
 	Format      string `json:",omitempty"`

@@ -59,7 +59,11 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	// Filter by expected channel for GM
 	channel, ok := situation.GetGMChannel()
 	if !ok {
-		return nil
+		if situation.ReportType == model.SituationReportTypeIncident {
+			channel = "Perturbation"
+		} else {
+			channel = "Information"
+		}
 	}
 
 	// InfoChannelRef filter

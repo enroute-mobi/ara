@@ -61,6 +61,8 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 
 	situationEvent.SituationAttributes.Format = xmlGeneralMessageEvent.FormatRef()
 	situationEvent.Keywords = append(situationEvent.Keywords, xmlGeneralMessageEvent.InfoChannelRef())
+	situationEvent.ReportType = builder.setReportType(xmlGeneralMessageEvent.InfoChannelRef())
+
 	timeRange := &model.TimeRange{
 		StartTime: xmlGeneralMessageEvent.RecordedAtTime(),
 		EndTime:   xmlGeneralMessageEvent.ValidUntilTime(),
@@ -83,6 +85,15 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	*event = append(*event, situationEvent)
 }
 
+func (builder *GeneralMessageUpdateEventBuilder) setReportType(infoChannelRef string) model.ReportType {
+	switch infoChannelRef {
+	case "Perturbation":
+		return model.SituationReportTypeIncident
+	default:
+		return model.SituationReportTypeGeneral
+	}
+
+}
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 	remoteObjectidKind := builder.remoteObjectidKind
 

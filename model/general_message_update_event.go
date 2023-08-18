@@ -14,6 +14,7 @@ type SituationUpdateEvent struct {
 	SituationAttributes SituationAttributes
 	ValidityPeriods     []*TimeRange
 	Keywords            []string
+	ReportType          ReportType
 	Version             int
 }
 

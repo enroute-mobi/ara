@@ -114,6 +114,7 @@ Feature: Support SIRI GeneralMessage by subscription
     Then one Situation has the following attributes:
         | ObjectIDs                    | "internal" : "NINOXE:GeneralMessage:27_1" |
         | Keywords                     | ["Commercial"]                            |
+        | ReportType                   | general                                   |
         | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00                 |
         | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00                 |
         | Version                      | 2                                         |
@@ -276,6 +277,76 @@ Feature: Support SIRI GeneralMessage by subscription
                    <Message>
                      <MessageType>longMessage</MessageType>
                      <MessageText>an ANOTHER very very very long message</MessageText>
+                   </Message>
+                 </siri:Content>
+               </siri:GeneralMessage>
+             </siri:GeneralMessageDelivery>
+           </Notification>
+           <NotifyExtension />
+         </sw:NotifyGeneralMessage>
+       </S:Body>
+     </S:Envelope>
+    """
+
+  Scenario: Brodcast a GeneralMessage Notification when keywords does not contains Perturbation/Information/Commercial but ReportType is type incident should broadcast as Pertubation
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
+       | remote_url           | http://localhost:8090 |
+       | remote_credential    | test                  |
+       | local_credential     | NINOXE:default        |
+       | remote_objectid_kind | internal              |
+    And a Subscription exist with the following attributes:
+      | Kind              | GeneralMessageBroadcast                     |
+      | ExternalId        | externalId                                  |
+      | SubscriberRef     | subscriber                                  |
+      | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
+    And a Line exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+    And a Situation exists with the following attributes:
+      | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
+      | Version                    | 1                                         |
+      | Keywords                   | ["Other"]                                 |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
+      | ReportType                 | incident                                  |
+      | Messages[0]#MessageType    | longMessage                               |
+      | Messages[0]#MessageText    | a very very very long message             |
+      | References[0]              | LineRef:{"internal":"1234"}               |
+    And 20 seconds have passed
+    Then the SIRI server should receive this response
+    """
+     <?xml version='1.0' encoding='utf-8'?>
+     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+       <S:Body>
+         <sw:NotifyGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+           <ServiceDeliveryInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+             <siri:ProducerRef>test</siri:ProducerRef>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:RequestMessageRef></siri:RequestMessageRef>
+           </ServiceDeliveryInfo>
+           <Notification>
+             <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
+               <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef></siri:RequestMessageRef>
+               <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+               <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+               <siri:Status>true</siri:Status>
+               <siri:GeneralMessage formatRef="STIF-IDF">
+                 <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
+                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
+                 <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                 <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                 <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                 <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
+                 <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                               xsi:type="stif:IDFGeneralMessageStructure">
+                   <siri:LineRef>1234</siri:LineRef>
+                   <Message>
+                     <MessageType>longMessage</MessageType>
+                     <MessageText>a very very very long message</MessageText>
                    </Message>
                  </siri:Content>
                </siri:GeneralMessage>

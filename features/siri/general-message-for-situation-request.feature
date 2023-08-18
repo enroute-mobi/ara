@@ -3,25 +3,17 @@ Feature: Support SIRI GeneralMessage for Situation
   Background:
       Given a Referential "test" is created
 
-  Scenario: 3797 - Ignore situations associated to other keywords than Commercial/Perturbation/Information
+  Scenario: 3797 - Do not ignore Situations associated to other keywords than Commercial/Perturbation/Information
     Given a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "1"                                        |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                               |
-      | Version                    | 1                                                       |
-      | Keywords                   | ["Others"]                                              |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                               |
-      | Messages[0]#MessageType    | longMessage                                             |
-      | Messages[0]#MessageText    | Les situations commercials NE doivent PAS être ignorées |
-      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}                |
-    And a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "2"                                   |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                          |
-      | Version                    | 1                                                  |
-      | Keywords                   | ["Perturbation"]                                   |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                          |
-      | Messages[0]#MessageType    | longMessage                                        |
-      | Messages[0]#MessageText    | Les situations \"Perturbation\" sont broadcastees  |
-      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}           |
+      | ObjectIDs                  | "internal" : "1"                                  |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                         |
+      | Version                    | 1                                                 |
+      | Keywords                   | ["Others"]                                        |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                         |
+      | ReportType                 | general                                           |
+      | Messages[0]#MessageType    | longMessage                                       |
+      | Messages[0]#MessageText    | We can broadcast Other situations with ReportType |
+      | References[0]              | LineRef:{"internal":"NINOXE:Line:3:LOC"}          |
     And a Line exists with the following attributes:
       | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -60,7 +52,7 @@ Feature: Support SIRI GeneralMessage for Situation
            <ServiceDeliveryInfo>
              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
              <siri:ProducerRef>Ara</siri:ProducerRef>
-             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
            </ServiceDeliveryInfo>
            <Answer>
@@ -70,26 +62,26 @@ Feature: Support SIRI GeneralMessage for Situation
                <siri:Status>true</siri:Status>
                <siri:GeneralMessage formatRef="STIF-IDF">
                  <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
-                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
-                 <siri:InfoMessageIdentifier>2</siri:InfoMessageIdentifier>
+                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ItemIdentifier>
+                 <siri:InfoMessageIdentifier>1</siri:InfoMessageIdentifier>
                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
-                 <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                 <siri:InfoChannelRef>Information</siri:InfoChannelRef>
                  <siri:ValidUntilTime>2017-01-01T20:30:06.000+02:00</siri:ValidUntilTime>
                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                    <Message>
                      <MessageType>longMessage</MessageType>
-                     <MessageText>Les situations \"Perturbation\" sont broadcastees</MessageText>
+                     <MessageText>We can broadcast Other situations with ReportType</MessageText>
                    </Message>
                  </siri:Content>
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>
            </Answer>
            <AnswerExtension/>
-         </sw:GetGeneralMessageResponse>
-       </S:Body>
-     </S:Envelope>
+          </sw:GetGeneralMessageResponse>
+         </S:Body>
+       </S:Envelope>
       """
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request

@@ -46,6 +46,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	}
 
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
+	assert.Equal(model.ReportType("general"), event.ReportType)
 
 	if len(event.SituationAttributes.References) != 12 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
@@ -82,4 +83,16 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	if ref, _ := firstLineSection.Get("LineRef"); ref.ObjectId.Value() != "lineSectionRef1" {
 		t.Errorf("Wrong first LineSection LineRef: %v", ref)
 	}
+}
+
+func Test_setReportType(t *testing.T) {
+	assert := assert.New(t)
+	partner := NewPartner()
+	builder := NewGeneralMessageUpdateEventBuilder(partner)
+
+	reportType := builder.setReportType("dummy")
+	assert.Equal(model.SituationReportTypeGeneral, reportType)
+
+	reportType = builder.setReportType("Perturbation")
+	assert.Equal(model.SituationReportTypeIncident, reportType)
 }
