@@ -629,6 +629,14 @@ Feature: Support SIRI StopMonitoring by request
   </S:Body>
 </S:Envelope>
       """
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                           |
+      | Direction       | received                       |
+      | Status          | OK                             |
+      | Type            | StopMonitoringRequest          |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"] |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201"]  |
+      | Lines           | ["NINOXE:Line:3:LOC"]          |
 
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:

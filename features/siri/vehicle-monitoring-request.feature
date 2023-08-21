@@ -509,6 +509,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Vehicles          | ["Test:Vehicle:1:LOC", "Test:Vehicle:2:LOC", "Test:Vehicle:3:LOC"] |
         | RequestIdentifier | Test:1234::LOC                                                     |
         | Lines             | ["Test:Line:3:LOC"]                                                |
+        | VehicleJourneys   | ["Test:VehicleJourney:202:LOC", "Test:VehicleJourney:201:LOC"]     |
 
   Scenario: Performs a SIRI VehicleMonitoring request to a Partner
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with

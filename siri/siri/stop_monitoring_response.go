@@ -27,6 +27,9 @@ type SIRIStopMonitoringDelivery struct {
 
 	MonitoredStopVisits []*SIRIMonitoredStopVisit
 	CancelledStopVisits []*SIRICancelledStopVisit
+
+	VehicleJourneyRefs map[string]struct{}
+	LineRefs           map[string]struct{}
 }
 
 type SIRICancelledStopVisit struct {

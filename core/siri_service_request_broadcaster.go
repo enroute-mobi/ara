@@ -44,26 +44,31 @@ func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *sxml.XML
 		Status:                    true,
 		RequestMessageRef:         request.MessageIdentifier(),
 		ResponseTimestamp:         connector.Clock().Now(),
+		LineRefs:                  make(map[string]struct{}),
+		VehicleJourneyRefs:        make(map[string]struct{}),
+		MonitoringRefs:            make(map[string]struct{}),
 	}
 
-	var stopIds, lineIds []string
 	if smRequests := request.StopMonitoringRequests(); len(smRequests) != 0 {
-		stopIds = connector.handleStopMonitoringRequests(smRequests, response)
+		connector.handleStopMonitoringRequests(smRequests, response)
 	}
 	if gmRequests := request.GeneralMessageRequests(); len(gmRequests) != 0 {
 		connector.handleGeneralMessageRequests(gmRequests, response)
 	}
 	if ettRequests := request.EstimatedTimetableRequests(); len(ettRequests) != 0 {
-		lineIds = connector.handleEstimatedTimetableRequests(ettRequests, response)
+		connector.handleEstimatedTimetableRequests(ettRequests, response)
 	}
+
+	// log models
+	message.StopAreas = GetModelReferenceSlice(response.MonitoringRefs)
+	message.Lines = GetModelReferenceSlice(response.LineRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(response.VehicleJourneyRefs)
 
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 	if !response.Status {
 		message.Status = "Error"
 	}
-	message.StopAreas = stopIds
-	message.Lines = lineIds
 
 	return response
 }
@@ -90,8 +95,14 @@ func (connector *SIRIServiceRequestBroadcaster) handleStopMonitoringRequests(req
 		}
 
 		response.StopMonitoringDeliveries = append(response.StopMonitoringDeliveries, &delivery)
+		response.MonitoringRefs[stopMonitoringRequest.MonitoringRef()] = struct{}{}
+		for line := range delivery.LineRefs {
+			response.LineRefs[line] = struct{}{}
+		}
 
-		stopIds = append(stopIds, stopMonitoringRequest.MonitoringRef())
+		for vehicleJourney := range delivery.VehicleJourneyRefs {
+			response.VehicleJourneyRefs[vehicleJourney] = struct{}{}
+		}
 	}
 	return
 }
@@ -121,7 +132,7 @@ func (connector *SIRIServiceRequestBroadcaster) handleGeneralMessageRequests(req
 	}
 }
 
-func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*sxml.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) (lineIds []string) {
+func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests(requests []*sxml.XMLEstimatedTimetableRequest, response *siri.SIRIServiceResponse) {
 	for _, estimatedTimetableRequest := range requests {
 		var delivery siri.SIRIEstimatedTimetableDelivery
 
@@ -143,10 +154,16 @@ func (connector *SIRIServiceRequestBroadcaster) handleEstimatedTimetableRequests
 		}
 
 		response.EstimatedTimetableDeliveries = append(response.EstimatedTimetableDeliveries, &delivery)
-
-		lineIds = append(lineIds, estimatedTimetableRequest.Lines()...)
+		for _, line := range estimatedTimetableRequest.Lines() {
+			response.LineRefs[line] = struct{}{}
+		}
+		for stopArea := range delivery.MonitoringRefs {
+			response.MonitoringRefs[stopArea] = struct{}{}
+		}
+		for vehicleJourney := range delivery.VehicleJourneyRefs {
+			response.VehicleJourneyRefs[vehicleJourney] = struct{}{}
+		}
 	}
-	return
 }
 
 func (factory *SIRIServiceRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {

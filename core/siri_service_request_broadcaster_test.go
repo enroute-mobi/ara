@@ -12,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
@@ -89,6 +90,8 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 }
 
 func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
+	assert := assert.New(t)
+
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -151,58 +154,34 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	response := connector.HandleRequests(request, &audit.BigQueryMessage{})
+	message := &audit.BigQueryMessage{}
+	response := connector.HandleRequests(request, message)
+	assert.NotNil(response, "HandleRequests should return a response")
 
-	if response == nil {
-		t.Fatalf("HandleRequests should return a response")
-	}
-	if response.ProducerRef != "Ara" {
-		t.Errorf("Response has wrong producerRef:\n got: %v\n expected: Ara", response.ProducerRef)
-	}
-	if response.RequestMessageRef != "GetSIRIStopMonitoring:Test:0" {
-		t.Errorf("Response has wrong requestMessageRef:\n got: %v\n expected: StopMonitoring:Test:0", response.RequestMessageRef)
-	}
-	if response.ResponseMessageIdentifier != "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC" {
-		t.Errorf("Response has wesponseMessageIdentifier:\n got: %v\n expected: Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier)
-	}
+	assert.Equalf("Ara", response.ProducerRef, "ProducerRef wrong")
+	assert.Equalf("GetSIRIStopMonitoring:Test:0", response.RequestMessageRef, "RequestMessageRef wrong")
+	assert.Equalf("Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier, "ResponseMessageIdentifier wrong")
+
 	time := connector.Clock().Now()
-	if !response.ResponseTimestamp.Equal(time) {
-		t.Errorf("Response has wrong responseTimestamp:\n got: %v\n expected: 2016-09-22 08:01:20.227 +0200 CEST", response.ResponseTimestamp)
-	}
-	if !response.Status {
-		t.Errorf("Response has wrong status:\n got: %v\n expected: true", response.Status)
-	}
+	assert.Equal(time, response.ResponseTimestamp, "Response timestamp wrong")
+	assert.Truef(response.Status, "Status wrong")
 
-	if len(response.StopMonitoringDeliveries) != 1 {
-		t.Fatal("Response should have 1 StopMonitoring delivery")
-	}
-	if !response.StopMonitoringDeliveries[0].Status {
-		xml, err := response.StopMonitoringDeliveries[0].BuildStopMonitoringDeliveryXML()
-		if err != nil {
-			t.Fatalf("Error whild building xml: %v", err)
-		}
-		t.Errorf("StopMonitoring delivery should have status true: %v", xml)
-	}
-	if len(response.GeneralMessageDeliveries) != 1 {
-		t.Fatal("Response should have 1 GeneralMessage delivery")
-	}
-	if !response.GeneralMessageDeliveries[0].Status {
-		xml, err := response.GeneralMessageDeliveries[0].BuildGeneralMessageDeliveryXML()
-		if err != nil {
-			t.Fatalf("Error whild building xml: %v", err)
-		}
-		t.Errorf("GeneralMessage delivery should have status true: %v", xml)
-	}
-	if len(response.EstimatedTimetableDeliveries) != 1 {
-		t.Fatal("Response should have 1 EstimatedTimetable delivery")
-	}
-	if !response.EstimatedTimetableDeliveries[0].Status {
-		xml, err := response.EstimatedTimetableDeliveries[0].BuildEstimatedTimetableDeliveryXML()
-		if err != nil {
-			t.Fatalf("Error whild building xml: %v", err)
-		}
-		t.Errorf("EstimatedTimetable delivery should have status true: %v", xml)
-	}
+	// StopMonitoring
+	assert.Lenf(response.StopMonitoringDeliveries, 1, "Response should have 1 StopMonitoring delivery")
+	assert.True(response.StopMonitoringDeliveries[0].Status)
+
+	// GeneralMessage
+	assert.Lenf(response.GeneralMessageDeliveries, 1, "Response should have 1 GeneralMessage delivery")
+	assert.True(response.GeneralMessageDeliveries[0].Status)
+
+	// EstimatedTimetable
+	assert.Lenf(response.EstimatedTimetableDeliveries, 1, "Response should have 1 EstimatedTimetable delivery")
+	assert.True(response.EstimatedTimetableDeliveries[0].Status)
+
+	// BigQuery
+	assert.Equal([]string{"NINOXE:Line:3:LOC"}, message.Lines)
+	assert.Equal([]string{"vehicleJourney"}, message.VehicleJourneys)
+	assert.Equal([]string{"boaarle"}, message.StopAreas)
 }
 
 func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *testing.T) {

@@ -17,17 +17,17 @@
         <m0:GeneralMessageRequest version="2.0:FR-IDF-2.4">
           <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
           <m0:MessageIdentifier>GetSIRIGeneralMessage:Test:0</m0:MessageIdentifier>
-          <ns2:Extensions>
-            <ns6:IDFGeneralMessageRequestFilter>
-            </ns6:IDFGeneralMessageRequestFilter>
-          </ns2:Extensions>
+          <m1:Extensions>
+            <m1:IDFGeneralMessageRequestFilter>
+            </m1:IDFGeneralMessageRequestFilter>
+          </m1:Extensions>
         </m0:GeneralMessageRequest>
         <m0:EstimatedTimetableRequest version="2.0:FR-IDF-2.4">
-          <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
-          <ns2:MessageIdentifier>GetSIRIEstimatedTimetable:Test:0</ns2:MessageIdentifier>
-          <ns2:Lines>
-            <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
-          </ns2:Lines>
+          <m1:RequestTimestamp>2017-01-01T12:00:00.000+02:00</m1:RequestTimestamp>
+          <m1:MessageIdentifier>GetSIRIEstimatedTimetable:Test:0</m1:MessageIdentifier>
+          <m1:Lines>
+            <m1:LineRef>NINOXE:Line:3:LOC</m1:LineRef>
+          </m1:Lines>
         </m0:EstimatedTimetableRequest>
       </Request>
     </m:GetSiriService>

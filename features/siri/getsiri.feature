@@ -184,6 +184,15 @@ Feature: Support SIRI GetSIRI
         </S:Body>
       </S:Envelope>
       """
+    Then an audit event should exist with these attributes:
+      | Type            | SiriServiceRequest                                |
+      | Protocol        | siri                                              |
+      | Direction       | received                                          |
+      | Status          | OK                                                |
+      | Partner         | test                                              |
+      | StopAreas       | ["boaarle", "cladebr"]                            |
+      | Lines           | ["CdF:Line::415:LOC", "CdF:Line::475:LOC"]        |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201", "5CAR621689196575"] |
 
   Scenario: 2481 - Handle a GetSIRIService request with a StopMonitoring request on a unknown StopArea
     Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
