@@ -28,6 +28,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
@@ -193,6 +194,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
@@ -354,6 +356,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
+	connector.Start()
 
 	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind2" {
 		t.Errorf("RemoteObjectIDKind should be egals to Kind2")

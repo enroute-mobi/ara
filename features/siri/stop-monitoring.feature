@@ -1465,3 +1465,74 @@ Scenario: Update Partner Collect Settings
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received 1 GetStopMonitoring request
+
+@ARA-1298 @siri-valid
+Scenario: Update Partner Collect remote_objectid_kind
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header />
+        <soap:Body>
+          <sw:GetStopMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</siri:ResponseTimestamp>
+              <siri:ProducerRef>test</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>first:ResponseMessage::6ba:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:StopMonitoringDelivery version="1.3">
+                <siri:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>target</siri:MonitoringRef>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>SIRI:33193249</siri:ItemIdentifier>
+                  <siri:MonitoringRef>target</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>CdF:Line::415:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>first:Version:1.0:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>1STD721687165983</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>target</siri:StopPointRef>
+                      <siri:Order>44</siri:Order>
+                      <siri:StopPointName>Arletty</siri:StopPointName>
+                      <siri:AimedArrivalTime>2017-01-01T15:00:00.000+01:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-01T15:00:00.000+01:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-01T15:01:00.000+01:00</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-01T15:01:00.000+01:00</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>onTime</siri:DepartureStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
+            </Answer>
+            <AnswerExtension />
+          </sw:GetStopMonitoringResponse>
+        </soap:Body>
+      </soap:Envelope>
+        """
+    And a StopArea exists with the following attributes:
+      | ObjectIDs | "external": "target" |
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                     | http://localhost:8090 |
+      | collect.include_stop_areas     | target                |
+      | remote_objectid_kind           | internal              |
+      | remote_credential              | dummy                 |
+    And a minute has passed
+    And a minute has passed
+    Then the SIRI server should not have received a GetStopMonitoring request
+    And the Partner "test" is updated with the following settings:
+      | remote_url                 | http://localhost:8090 |
+      | collect.include_stop_areas | target                |
+      | remote_objectid_kind       | external              |
+      | remote_credential          | dummy                 |
+    When a minute has passed
+    And a minute has passed
+    Then the SIRI server should have received 1 GetStopMonitoring request

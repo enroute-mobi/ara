@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type ServiceRequestBroadcaster interface {
@@ -11,6 +12,8 @@ type ServiceRequestBroadcaster interface {
 }
 
 type SIRIServiceRequestBroadcaster struct {
+	state.Startable
+
 	connector
 }
 
@@ -20,6 +23,18 @@ func NewSIRIServiceRequestBroadcaster(partner *Partner) *SIRIServiceRequestBroad
 	siriServiceRequestBroadcaster := &SIRIServiceRequestBroadcaster{}
 	siriServiceRequestBroadcaster.partner = partner
 	return siriServiceRequestBroadcaster
+}
+
+func (connector *SIRIServiceRequestBroadcaster) Start() {
+	stopMonitoringConnector, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	if ok {
+		stopMonitoringConnector.(*SIRIStopMonitoringRequestBroadcaster).Start()
+	}
+
+	estimatedTimetableConnector, ok := connector.Partner().Connector(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+	if ok {
+		estimatedTimetableConnector.(*SIRIEstimatedTimetableRequestBroadcaster).Start()
+	}
 }
 
 func (connector *SIRIServiceRequestBroadcaster) HandleRequests(request *sxml.XMLSiriServiceRequest, message *audit.BigQueryMessage) *siri.SIRIServiceResponse {

@@ -8,9 +8,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type StopMonitoringRequestCollector interface {
+	state.Startable
+
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
 }
 
@@ -43,12 +46,15 @@ func (factory *TestStopMonitoringRequestCollectorFactory) CreateConnector(partne
 
 func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoringRequestCollector {
 	connector := &SIRIStopMonitoringRequestCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 
 	return connector
+}
+
+func (connector *SIRIStopMonitoringRequestCollector) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {

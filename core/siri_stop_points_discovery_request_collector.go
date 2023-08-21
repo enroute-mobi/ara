@@ -7,9 +7,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type StopPointsDiscoveryRequestCollector interface {
+	state.Startable
+
 	RequestStopPoints()
 }
 
@@ -32,12 +35,15 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartn
 
 func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPointsDiscoveryRequestCollector {
 	connector := &SIRIStopPointsDiscoveryRequestCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.stopAreaUpdateSubscriber = manager.BroadcastUpdateEvent
 
 	return connector
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestCollector) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) SetSubscriber(subscriber UpdateSubscriber) {

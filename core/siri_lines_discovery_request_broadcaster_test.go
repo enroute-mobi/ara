@@ -25,6 +25,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRILinesDiscoveryRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	line := referential.Model().Lines().New()
 	line.Name = "line1"

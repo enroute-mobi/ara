@@ -7,9 +7,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type VehicleMonitoringRequestCollector interface {
+	state.Startable
+
 	RequestVehicleUpdate(request *VehicleUpdateRequest)
 }
 
@@ -23,12 +26,15 @@ type SIRIVehicleMonitoringRequestCollectorFactory struct{}
 
 func NewSIRIVehicleMonitoringRequestCollector(partner *Partner) *SIRIVehicleMonitoringRequestCollector {
 	connector := &SIRIVehicleMonitoringRequestCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 
 	return connector
+}
+
+func (connector *SIRIVehicleMonitoringRequestCollector) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
 }
 
 func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(request *VehicleUpdateRequest) {

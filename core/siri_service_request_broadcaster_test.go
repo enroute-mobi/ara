@@ -109,6 +109,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	c, _ := partner.Connector(SIRI_SERVICE_REQUEST_BROADCASTER)
 	connector := c.(*SIRIServiceRequestBroadcaster)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	objectid := model.NewObjectID("objectidKind", "boaarle")
 	stopArea := referential.Model().StopAreas().New()

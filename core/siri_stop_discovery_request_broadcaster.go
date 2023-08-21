@@ -6,9 +6,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
+	state.Startable
+
 	connector
 }
 
@@ -16,9 +19,13 @@ type SIRIStopPointsDiscoveryRequestBroadcasterFactory struct{}
 
 func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDiscoveryRequestBroadcaster {
 	connector := &SIRIStopPointsDiscoveryRequestBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
+
 	connector.partner = partner
 	return connector
+}
+
+func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *sxml.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {

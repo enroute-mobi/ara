@@ -7,9 +7,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type LinesDiscoveryRequestCollector interface {
+	state.Startable
+
 	RequestLines()
 }
 
@@ -32,12 +35,15 @@ func (factory *SIRILinesDiscoveryRequestCollectorFactory) Validate(apiPartner *A
 
 func NewSIRILinesDiscoveryRequestCollector(partner *Partner) *SIRILinesDiscoveryRequestCollector {
 	connector := &SIRILinesDiscoveryRequestCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.lineUpdateSubscriber = manager.BroadcastUpdateEvent
 
 	return connector
+}
+
+func (connector *SIRILinesDiscoveryRequestCollector) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
 }
 
 func (connector *SIRILinesDiscoveryRequestCollector) SetSubscriber(subscriber UpdateSubscriber) {

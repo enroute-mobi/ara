@@ -22,6 +22,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -134,6 +135,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdKind(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("WRONG_ID", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -180,6 +182,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdKind(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -226,6 +229,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdKind(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -272,6 +276,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdKind(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()
@@ -318,6 +323,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	saId := model.NewObjectID("objectidKind", "saId")
 	stopArea := referential.Model().StopAreas().New()

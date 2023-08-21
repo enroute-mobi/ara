@@ -29,6 +29,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	objectid := model.NewObjectID("objectidKind", "modelOperatorRef")
 
@@ -150,6 +151,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea := referential.Model().StopAreas().New()
@@ -251,6 +253,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
@@ -330,6 +333,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")

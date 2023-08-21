@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type EstimatedTimetableRequestBroadcaster interface {
@@ -16,6 +17,8 @@ type EstimatedTimetableRequestBroadcaster interface {
 }
 
 type SIRIEstimatedTimetableRequestBroadcaster struct {
+	state.Startable
+
 	connector
 
 	dataFrameGenerator    *idgen.IdentifierGenerator
@@ -26,11 +29,16 @@ type SIRIEstimatedTimetableRequestBroadcasterFactory struct{}
 
 func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimatedTimetableRequestBroadcaster {
 	connector := &SIRIEstimatedTimetableRequestBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+
 	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
-	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+
 	connector.partner = partner
 	return connector
+}
+
+func (connector *SIRIEstimatedTimetableRequestBroadcaster) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) RequestLine(request *sxml.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimetableResponse {

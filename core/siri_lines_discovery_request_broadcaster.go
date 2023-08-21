@@ -6,6 +6,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/state"
 )
 
 type LinesDiscoveryRequestBroadcaster interface {
@@ -13,6 +14,8 @@ type LinesDiscoveryRequestBroadcaster interface {
 }
 
 type SIRILinesDiscoveryRequestBroadcaster struct {
+	state.Startable
+
 	connector
 }
 
@@ -20,9 +23,12 @@ type SIRILinesDiscoveryRequestBroadcasterFactory struct{}
 
 func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscoveryRequestBroadcaster {
 	connector := &SIRILinesDiscoveryRequestBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
 	connector.partner = partner
 	return connector
+}
+
+func (connector *SIRILinesDiscoveryRequestBroadcaster) Start() {
+	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
