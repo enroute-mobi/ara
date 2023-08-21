@@ -139,7 +139,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			// Find the VehicleJourney
 			vehicleJourney, ok := ett.connector.Partner().Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 			if !ok {
-				return
+				continue
 			}
 
 			// Find the Line
