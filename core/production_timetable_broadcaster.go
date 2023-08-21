@@ -143,7 +143,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			// Find the VehicleJourney
 			vehicleJourney, ok := ptt.connector.Partner().Model().VehicleJourneys().Find(stopVisit.VehicleJourneyId)
 			if !ok {
-				return
+				continue
 			}
 
 			// Find the Line
