@@ -2,6 +2,7 @@ package core
 
 import (
 	"database/sql"
+	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
@@ -10,6 +11,7 @@ import (
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Referential_Id(t *testing.T) {
@@ -528,5 +530,70 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	}
 	if len(testPartner.ConnectorTypes) != 1 || testPartner.ConnectorTypes[0] != "connector" {
 		t.Errorf("Wrong Partner ConnectorTypes, got: %v want [connector]", testPartner.ConnectorTypes)
+	}
+}
+
+func Test_APIreferential_UnmarshalJSON(t *testing.T) {
+	assert := assert.New(t)
+	var TestCases = []struct {
+		payload          string
+		existingSettings map[string]string
+		expectedSlug     ReferentialSlug
+		expectedSettings map[string]string
+		message          string
+	}{
+		{
+			payload:          `{"Slug": "a_slug"}`,
+			existingSettings: nil,
+			expectedSlug:     ReferentialSlug("a_slug"),
+			expectedSettings: nil,
+		},
+		{
+			payload: `{
+"Slug": "a_slug",
+"Settings": {
+"model.next_reload_at": "3:00"
+}}`,
+			existingSettings: nil,
+			expectedSlug:     ReferentialSlug("a_slug"),
+			expectedSettings: map[string]string{"model.next_reload_at": "3:00"},
+			message:          "Should set the Settings",
+		},
+		{
+			payload:          `{"Slug": "a_slug"}`,
+			existingSettings: map[string]string{"dummy": "another"},
+			expectedSlug:     ReferentialSlug("a_slug"),
+			expectedSettings: map[string]string{"dummy": "another"},
+			message:          "Should keep the existing Settings if no Settings in payload",
+		},
+		{
+			payload:          `{"Slug": "a_slug", "Settings": {}}`,
+			existingSettings: map[string]string{"model.next_reload_at": "3:00"},
+			expectedSlug:     ReferentialSlug("a_slug"),
+			expectedSettings: map[string]string{},
+			message:          "Should clear all Settings if Settings are empty in payload",
+		},
+		{
+			payload: `{
+"Slug": "a_slug",
+"Settings": {
+"model.next_reload_at": "3:00"
+}}`,
+			existingSettings: map[string]string{"dummy": "another"},
+			expectedSlug:     ReferentialSlug("a_slug"),
+			expectedSettings: map[string]string{"model.next_reload_at": "3:00"},
+			message:          "Should override all existing Settings with new ones",
+		},
+	}
+
+	for _, tt := range TestCases {
+		apiReferential := APIReferential{}
+		if tt.existingSettings != nil {
+			apiReferential.Settings = tt.existingSettings
+		}
+		err := json.Unmarshal([]byte(tt.payload), &apiReferential)
+		assert.Nil(err)
+		assert.Equal(tt.expectedSlug, apiReferential.Slug)
+		assert.Equal(tt.expectedSettings, apiReferential.Settings, tt.message)
 	}
 }
