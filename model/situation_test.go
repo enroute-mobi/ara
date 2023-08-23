@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Situation_Id(t *testing.T) {
@@ -17,47 +18,61 @@ func Test_Situation_Id(t *testing.T) {
 }
 
 func Test_Situation_MarshalJSON(t *testing.T) {
+	assert := assert.New(t)
 	situation := Situation{
 		id:     "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		Origin: "test",
 	}
-	situation.Messages = append(situation.Messages, &Message{Content: "Joyeux Noel", Type: "Un Type"})
-	expected := `{"Origin":"test","Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}]}`
-	jsonBytes, err := situation.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
+
+	situation.Description = &SituationTranslatedString{
+		DefaultValue: "Joyeux Noel",
+	}
+	situation.Summary = &SituationTranslatedString{
+		DefaultValue: "Noel",
 	}
 
-	jsonString := string(jsonBytes)
-	if jsonString != expected {
-		t.Errorf("Situation.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
-	}
+	expected := `{
+"Origin":"test",
+"Description":{"DefaultValue":"Joyeux Noel"},
+"Summary":{"DefaultValue":"Noel"},
+"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+
+	jsonBytes, err := situation.MarshalJSON()
+	assert.Nil(err)
+	assert.JSONEq(expected, string(jsonBytes))
 }
 
 func Test_Situation_UnmarshalJSON(t *testing.T) {
+	assert := assert.New(t)
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
-  }`
+"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"Summary": { "DefaultValue": "Noel"},
+"Description": { "DefaultValue": "Joyeux Noel" }
+}`
 
 	situation := Situation{}
 	err := json.Unmarshal([]byte(text), &situation)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(err)
 
 	expectedObjectIds := []ObjectID{
 		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
 		NewObjectID("hastus", "sqypis"),
 	}
 
+	expectedSmmary := &SituationTranslatedString{
+		DefaultValue: "Noel",
+	}
+	expectedDescription := &SituationTranslatedString{
+		DefaultValue: "Joyeux Noel",
+	}
+
+	assert.Equal(expectedSmmary, situation.Summary)
+	assert.Equal(expectedDescription, situation.Description)
+
 	for _, expectedObjectId := range expectedObjectIds {
 		objectId, found := situation.ObjectID(expectedObjectId.Kind())
-		if !found {
-			t.Errorf("Missing situation ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
-		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong situation ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
-		}
+		assert.True(found)
+		assert.Equal(expectedObjectId, objectId)
 	}
 }
 

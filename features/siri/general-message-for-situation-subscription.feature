@@ -63,8 +63,7 @@ Feature: Support SIRI GeneralMessage by subscription
         | Version                    | 1                                         |
         | Keywords                   | ["Perturbation"]                          |
         | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-        | Messages[0]#MessageType    | longMessage                               |
-        | Messages[0]#MessageText    | Les autres non                            |
+        | Description[DefaultValue]  | Les autres non                            |
     When I send this SIRI request
       """
     <?xml version='1.0' encoding='utf-8'?>
@@ -172,8 +171,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | Version                    | 1                         |
       | Channel                    | Perturbations             |
       | ValidityPeriods[0]#EndTIme | 2017-01-01T20:30:06+02:00 |
-      | Messages[0]#MessageType    | longMessage               |
-      | Messages[0]#MessageText    | Les autres non            |
+      | Descriptions[DefaultValue] | Les autres non            |
     When I send this SIRI request
     """
     <?xml version='1.0' encoding='utf-8'?>
@@ -229,20 +227,18 @@ Feature: Support SIRI GeneralMessage by subscription
         | ObjectIDs              | "internal":"1234" |
         | CollectGeneralMessages | true              |
     And a Situation exists with the following attributes:
-      | ObjectIDs                    | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                   | 2017-01-01T03:30:06+02:00                 |
-      | Version                      | 1                                         |
-      | Keywords                     | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                 |
-      | Messages[0]#MessageType      | longMessage                               |
-      | Messages[0]#MessageText      | a very very very long message             |
-      | References[0]                | LineRef:{"internal":"1234"}               |
+      | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
+      | Version                    | 1                                         |
+      | Keywords                   | ["Perturbation"]                          |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
+      | Description[DefaultValue]  | a very very very long message             |
+      | References[0]              | LineRef:{"internal":"1234"}               |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
       | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00              |
-      | Messages[0]#MessageType    | longMessage                            |
-      | Messages[0]#MessageText    | an ANOTHER very very very long message |
+      | Description[DefaultValue]  | an ANOTHER very very very long message |
       | Version                    | 2                                      |
     And 20 seconds have passed
     Then the SIRI server should receive this response
@@ -311,8 +307,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | Keywords                   | ["Other"]                                 |
       | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
       | ReportType                 | incident                                  |
-      | Messages[0]#MessageType    | longMessage                               |
-      | Messages[0]#MessageText    | a very very very long message             |
+      | Description[DefaultValue]  | a very very very long message             |
       | References[0]              | LineRef:{"internal":"1234"}               |
     And 20 seconds have passed
     Then the SIRI server should receive this response

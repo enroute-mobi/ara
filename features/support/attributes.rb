@@ -81,6 +81,20 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Description\[([^\]]+)\]/
+      name = $1
+      attributes["Description"] ||= {}
+      attributes["Description"][name] = value
+      attributes.delete key
+    end
+
+    if key =~ /Summary\[([^\]]+)\]/
+      name = $1
+      attributes["Summary"] ||= {}
+      attributes["Summary"][name] = value
+      attributes.delete key
+    end
+
     # Situation ValidityPeriods is an array of TimeRange
     # Format: | ValidityPeriods[0]#StartTime | 2017-01-01T13:00:00.000Z |
     #         | ValidityPeriods[0]#EndTime   | 2017-01-02T15:00:00.000Z |

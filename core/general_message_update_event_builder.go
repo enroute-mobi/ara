@@ -70,19 +70,41 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	situationEvent.ValidityPeriods = []*model.TimeRange{timeRange}
 
 	content := xmlGeneralMessageEvent.Content().(sxml.IDFGeneralMessageStructure)
-	for _, xmlMessage := range content.Messages() {
-		message := &model.Message{
-			Content:             xmlMessage.MessageText(),
-			Type:                xmlMessage.MessageType(),
-			NumberOfLines:       xmlMessage.NumberOfLines(),
-			NumberOfCharPerLine: xmlMessage.NumberOfCharPerLine(),
-		}
-		situationEvent.SituationAttributes.Messages = append(situationEvent.SituationAttributes.Messages, message)
-	}
+
+	builder.buildSituationAndDescriptionFromMessages(content.Messages(), situationEvent)
 
 	builder.setReferences(situationEvent, &content)
 
 	*event = append(*event, situationEvent)
+}
+
+func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessages(messages []*sxml.XMLMessage, event *model.SituationUpdateEvent) {
+	for _, xmlMessage := range messages {
+		builder.buildSituationAndDescriptionFromMessage(xmlMessage.MessageType(), xmlMessage.MessageText(), event)
+	}
+}
+
+func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessage(messageType, messageText string, event *model.SituationUpdateEvent) {
+	switch messageType {
+	case "shortMessage":
+		event.Summary = &model.SituationTranslatedString{
+			DefaultValue: messageText,
+		}
+	case "longMessage":
+		event.Description = &model.SituationTranslatedString{
+			DefaultValue: messageText,
+		}
+	default:
+		if event.Summary == nil && len(messageText) < 160 {
+			event.Summary = &model.SituationTranslatedString{
+				DefaultValue: messageText,
+			}
+		} else {
+			event.Description = &model.SituationTranslatedString{
+				DefaultValue: messageText,
+			}
+		}
+	}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setReportType(infoChannelRef string) model.ReportType {

@@ -24,6 +24,11 @@ const (
 
 type ReportType string
 
+type SituationTranslatedString struct {
+	DefaultValue string            `json:",omitempty"`
+	Translations map[string]string `json:",omitempty"`
+}
+
 type Situation struct {
 	model Model
 	ObjectIDConsumer
@@ -41,7 +46,9 @@ type Situation struct {
 	ProducerRef string `json:",omitempty"`
 	Format      string `json:",omitempty"`
 
-	Messages     []*Message
+	Summary     *SituationTranslatedString `json:",omitempty"`
+	Description *SituationTranslatedString `json:",omitempty"`
+
 	LineSections []*References
 	References   []*Reference
 }
@@ -107,7 +114,6 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		*Alias
 		Id              SituationId
 		ValidityPeriods []*TimeRange  `json:",omitempty"`
-		Messages        []*Message    `json:",omitempty"`
 		References      []*Reference  `json:",omitempty"`
 		LineSections    []*References `json:",omitempty"`
 	}{
@@ -117,9 +123,6 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 
 	if !situation.ObjectIDs().Empty() {
 		aux.ObjectIDs = situation.ObjectIDs()
-	}
-	if len(situation.Messages) != 0 {
-		aux.Messages = situation.Messages
 	}
 	if len(situation.References) != 0 {
 		aux.References = situation.References

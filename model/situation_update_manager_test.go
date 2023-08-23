@@ -20,16 +20,13 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 		Keywords:          []string{"channel"},
 	}
 
-	message := &Message{
-		Content:             "Message Text",
-		Type:                "MessageType",
-		NumberOfLines:       2,
-		NumberOfCharPerLine: 20,
+	summary := &SituationTranslatedString{
+		DefaultValue: "Message Text",
 	}
 
+	event.Summary = summary
 	event.SituationAttributes = SituationAttributes{
-		Format:   "format",
-		Messages: []*Message{message},
+		Format: "format",
 	}
 	event.SituationAttributes.References = append(event.SituationAttributes.References, &Reference{ObjectId: &objectid, Type: "type"})
 
@@ -37,18 +34,15 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 }
 
 func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) bool {
-	message := &Message{
-		Content:             "Message Text",
-		Type:                "MessageType",
-		NumberOfLines:       2,
-		NumberOfCharPerLine: 20,
+	summary := &SituationTranslatedString{
+		DefaultValue: "Message Text",
 	}
 
 	period := &TimeRange{EndTime: testTime}
 
 	testSituation := Situation{
 		id:              situation.id,
-		Messages:        []*Message{message},
+		Summary:         summary,
 		RecordedAt:      testTime,
 		ValidityPeriods: []*TimeRange{period},
 		Format:          "format",

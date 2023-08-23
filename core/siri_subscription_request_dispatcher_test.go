@@ -455,13 +455,9 @@ func Test_ReceiveStateGM(t *testing.T) {
 	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 
-	message := &model.Message{
-		Content:             "Le content",
-		Type:                "Le Type",
-		NumberOfLines:       1,
-		NumberOfCharPerLine: 10,
+	situation.Description = &model.SituationTranslatedString{
+		DefaultValue: "Le content",
 	}
-	situation.Messages = append(situation.Messages, message)
 	situation.SetObjectID(objectid3)
 
 	lineSectionReferences := model.NewReferences()

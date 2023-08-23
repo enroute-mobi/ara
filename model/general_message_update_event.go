@@ -16,13 +16,14 @@ type SituationUpdateEvent struct {
 	Keywords            []string
 	ReportType          ReportType
 	Version             int
+	Summary             *SituationTranslatedString
+	Description         *SituationTranslatedString
 }
 
 type SituationAttributes struct {
 	Format       string
 	References   []*Reference
 	LineSections []*References
-	Messages     []*Message
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {

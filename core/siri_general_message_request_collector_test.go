@@ -123,16 +123,5 @@ func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T
 		t.Errorf("Wrong ProducerRef for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.ProducerRef)
 	}
 
-	messages := situationEvent.SituationAttributes.Messages
-
-	if len(messages) != 2 {
-		t.Error("messages length should be 2")
-	}
-	if expected := "longMessage"; messages[0].Type != expected {
-		t.Errorf("Wrong message type got: %v want: %v", messages[0].Type, expected)
-	}
-
-	if expected := "test"; messages[0].Content != expected {
-		t.Errorf("Wrong message type got: %v want: %v", messages[0].Content, expected)
-	}
+	assert.Equal("Un deuxième message #etouais", situationEvent.Description.DefaultValue)
 }

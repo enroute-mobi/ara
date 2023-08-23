@@ -47,6 +47,8 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
 	assert.Equal(model.ReportType("general"), event.ReportType)
+	assert.Equal("test", event.Description.DefaultValue)
+	assert.Nil(event.Summary)
 
 	if len(event.SituationAttributes.References) != 12 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
@@ -95,4 +97,97 @@ func Test_setReportType(t *testing.T) {
 
 	reportType = builder.setReportType("Perturbation")
 	assert.Equal(model.SituationReportTypeIncident, reportType)
+}
+
+func Test_buildSituationAndDescriptionFromMessage(t *testing.T) {
+	assert := assert.New(t)
+	var TestCases = []struct {
+		summary             *model.SituationTranslatedString
+		messageType         string
+		messageText         string
+		expectedSummary     *model.SituationTranslatedString
+		expectedDescription *model.SituationTranslatedString
+		message             string
+	}{
+		{
+			summary:     nil,
+			messageType: "shortMessage",
+			messageText: "a short message",
+			expectedSummary: &model.SituationTranslatedString{
+				DefaultValue: "a short message",
+			},
+			expectedDescription: nil,
+			message:             "should set summary for shortMessage type",
+		},
+		{
+			summary:         nil,
+			messageType:     "longMessage",
+			messageText:     "a long message",
+			expectedSummary: nil,
+			expectedDescription: &model.SituationTranslatedString{
+				DefaultValue: "a long message",
+			},
+			message: "should set description for longMessage type",
+		},
+		{
+			summary:     nil,
+			messageType: "dummy",
+			messageText: "A message < 160 characters",
+			expectedSummary: &model.SituationTranslatedString{
+				DefaultValue: "A message < 160 characters",
+			},
+			expectedDescription: nil,
+			message: `for messageType other than shortMessage/longMessage
+should set summary if summary is not defined and text lenght < 160`,
+		},
+		{
+			summary:     nil,
+			messageType: "dummy",
+			messageText: `Lorem ipsum dolor sit amet, consectetur adipiscing
+ elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+ veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`,
+			expectedSummary: nil,
+			expectedDescription: &model.SituationTranslatedString{
+				DefaultValue: `Lorem ipsum dolor sit amet, consectetur adipiscing
+ elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+ veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`,
+			},
+			message: `for messageType other than shortMessage/longMessage
+should set description if summary is not defined and text lenght > 160`,
+		},
+		{
+			summary: &model.SituationTranslatedString{
+				DefaultValue: "An existing summary ...",
+			},
+			messageType: "textOnly",
+			messageText: "A message < 160 characters",
+			expectedSummary: &model.SituationTranslatedString{
+				DefaultValue: "An existing summary ...",
+			},
+			expectedDescription: &model.SituationTranslatedString{
+				DefaultValue: "A message < 160 characters",
+			},
+			message: `When messageType is other than shortMessage/longMessage
+and summary is already defined, should keep existing summary and create description`,
+		},
+	}
+
+	for _, tt := range TestCases {
+		partner := NewPartner()
+		builder := NewGeneralMessageUpdateEventBuilder(partner)
+
+		event := &model.SituationUpdateEvent{}
+		if tt.summary != nil {
+			event.Summary = tt.summary
+		}
+
+		builder.buildSituationAndDescriptionFromMessage(
+			tt.messageType,
+			tt.messageText,
+			event)
+		assert.Equal(tt.expectedSummary, event.Summary, tt.message)
+		assert.Equal(tt.expectedDescription, event.Description, tt.message)
+	}
 }

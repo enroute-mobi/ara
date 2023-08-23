@@ -275,7 +275,13 @@ func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 	if len(visit.messages) == 0 {
 		nodes := visit.findNodes("Message")
 		for _, messageNode := range nodes {
-			visit.messages = append(visit.messages, NewXMLMessage(messageNode))
+			message := NewXMLMessage(messageNode)
+			// shortMessage should be inserted first
+			if message.MessageType() == "shortMessage" {
+				visit.messages = append([]*XMLMessage{message}, visit.messages...)
+			} else {
+				visit.messages = append(visit.messages, message)
+			}
 		}
 	}
 	return visit.messages
