@@ -254,7 +254,6 @@ Feature: Support SIRI ProductionTimetable by subscription
 <sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
     <SubscriptionAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
-        <siri:Address></siri:Address>
         <siri:ResponderRef>ara</siri:ResponderRef>
         <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">1</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>
@@ -397,7 +396,6 @@ Feature: Support SIRI ProductionTimetable by subscription
 <sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
     <SubscriptionAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
-        <siri:Address></siri:Address>
         <siri:ResponderRef>ara</siri:ResponderRef>
         <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">1</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>
