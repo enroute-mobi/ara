@@ -1,5 +1,6 @@
 <SubscriptionResponse>
-        <ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>{{ if (ne .ResponderRef "") }}
+        <ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>{{ if .Address }}
+        <Address>{{ .Address }}</Address>{{ end }}{{ if (ne .ResponderRef "") }}
         <ResponderRef>{{ .ResponderRef }}</ResponderRef>{{ end }}{{ if (ne .RequestMessageRef "")}}
         <RequestMessageRef>{{.RequestMessageRef}}</RequestMessageRef>{{ end }}{{ range .ResponseStatus }}
         <ResponseStatus>

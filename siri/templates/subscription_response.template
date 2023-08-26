@@ -1,7 +1,7 @@
 <sw:SubscribeResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
     <SubscriptionAnswerInfo>
-        <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-        <siri:Address>{{ .Address }}</siri:Address>
+        <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>{{ if .Address }}
+        <siri:Address>{{ .Address }}</siri:Address>{{ end }}
         <siri:ResponderRef>{{ .ResponderRef }}</siri:ResponderRef>
         <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">{{.RequestMessageRef}}</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>

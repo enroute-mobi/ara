@@ -464,7 +464,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
          <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
            <SubscriptionAnswerInfo>
              <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
-             <siri:Address/>
              <siri:ResponderRef>test</siri:ResponderRef>
              <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
            </SubscriptionAnswerInfo>
@@ -546,7 +545,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
          <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
            <SubscriptionAnswerInfo>
              <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
-             <siri:Address/>
              <siri:ResponderRef>test</siri:ResponderRef>
              <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
            </SubscriptionAnswerInfo>
