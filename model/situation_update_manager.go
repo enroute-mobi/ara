@@ -46,6 +46,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.Keywords = event.Keywords
 		situation.ReportType = event.ReportType
 		situation.Format = event.SituationAttributes.Format
+		situation.Affects = event.Affects
 
 		situation.Save()
 	}

@@ -18,6 +18,7 @@ type SituationUpdateEvent struct {
 	Version             int
 	Summary             *SituationTranslatedString
 	Description         *SituationTranslatedString
+	Affects             []Affect
 }
 
 type SituationAttributes struct {

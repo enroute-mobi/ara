@@ -27,12 +27,29 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	partner := referential.Partners().New("slug")
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
 
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_objectid_kind": "remote_objectid_kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("remote_objectid_kind", "stopPointRef1")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+	stopAreaId := stopArea.Id()
+
+	objectid2 := model.NewObjectID("remote_objectid_kind", "stopPointRef2")
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
+	stopArea2Id := stopArea2.Id()
+
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
 
 	events := &[]*model.SituationUpdateEvent{}
@@ -50,25 +67,29 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal("test", event.Description.DefaultValue)
 	assert.Nil(event.Summary)
 
-	if len(event.SituationAttributes.References) != 12 {
+	affects := event.Affects
+	assert.Len(affects, 2)
+	assert.Equal("StopArea", affects[0].GetType())
+	assert.Equal(model.ModelId(stopAreaId), affects[0].GetId())
+	assert.Equal("StopArea", affects[1].GetType())
+	assert.Equal(model.ModelId(stopArea2Id), affects[1].GetId())
+
+	if len(event.SituationAttributes.References) != 10 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
 	}
 	if event.SituationAttributes.References[0].ObjectId.Value() != "lineRef1" {
 		t.Errorf("Wrong first LineRef: %v", event.SituationAttributes.References[0])
 	}
-	if event.SituationAttributes.References[2].ObjectId.Value() != "stopPointRef1" {
-		t.Errorf("Wrong first StopPointRef: %v", event.SituationAttributes.References[2])
-	}
-	if event.SituationAttributes.References[4].ObjectId.Value() != "journeyPatternRef1" {
+	if event.SituationAttributes.References[2].ObjectId.Value() != "journeyPatternRef1" {
 		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[4])
 	}
-	if event.SituationAttributes.References[6].ObjectId.Value() != "destinationRef1" {
+	if event.SituationAttributes.References[4].ObjectId.Value() != "destinationRef1" {
 		t.Errorf("Wrong first DestinationRef: %v", event.SituationAttributes.References[6])
 	}
-	if event.SituationAttributes.References[8].ObjectId.Value() != "routeRef1" {
+	if event.SituationAttributes.References[6].ObjectId.Value() != "routeRef1" {
 		t.Errorf("Wrong first RouteRef: %v", event.SituationAttributes.References[8])
 	}
-	if event.SituationAttributes.References[10].ObjectId.Value() != "groupOfLineRef1" {
+	if event.SituationAttributes.References[8].ObjectId.Value() != "groupOfLineRef1" {
 		t.Errorf("Wrong first GroupOfLinesRef: %v", event.SituationAttributes.References[10])
 	}
 

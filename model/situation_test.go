@@ -31,8 +31,13 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		DefaultValue: "Noel",
 	}
 
+	affect := NewAffectedStopArea()
+	affect.StopAreaId = "259344234"
+	situation.Affects = append(situation.Affects, affect)
+
 	expected := `{
 "Origin":"test",
+"Affects":[{"Type":"StopArea","StopAreaId":"259344234"}],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
 "Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
@@ -47,7 +52,8 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	text := `{
 "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
 "Summary": { "DefaultValue": "Noel"},
-"Description": { "DefaultValue": "Joyeux Noel" }
+"Description": { "DefaultValue": "Joyeux Noel" },
+"Affects":[{"Type":"StopArea","StopAreaId":"259344234"}]
 }`
 
 	situation := Situation{}
@@ -66,8 +72,14 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		DefaultValue: "Joyeux Noel",
 	}
 
+	affect := NewAffectedStopArea()
+	affect.StopAreaId = "259344234"
+	expectedAffectedStopArea := affect
+
 	assert.Equal(expectedSmmary, situation.Summary)
 	assert.Equal(expectedDescription, situation.Description)
+	assert.Len(situation.Affects, 1)
+	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
 
 	for _, expectedObjectId := range expectedObjectIds {
 		objectId, found := situation.ObjectID(expectedObjectId.Kind())

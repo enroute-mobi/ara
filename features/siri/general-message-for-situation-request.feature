@@ -86,19 +86,24 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs                  | "external" : "test"                                            |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                                      |
-      | Version                    | 1                                                              |
-      | Keywords                   | ["Commercial"]                                                 |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                      |
+      | ObjectIDs                  | "external" : "test"                                                        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                    | 1                                                                          |
+      | Keywords                   | ["Commercial"]                                                             |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                                  |
       | Description[DefaultValue]  | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | References[0]              | LineRef:{"external":"NINOXE:Line:3:LOC"}                       |
+      | References[0]              | LineRef:{"external":"NINOXE:Line:3:LOC"}                                   |
+      | Affects[StopArea]          | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
+    And show me ara situations
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -131,7 +136,7 @@ Feature: Support SIRI GeneralMessage for Situation
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -141,7 +146,7 @@ Feature: Support SIRI GeneralMessage for Situation
                 <siri:Status>true</siri:Status>
                 <siri:GeneralMessage formatRef="STIF-IDF">
                   <siri:RecordedAtTime>2017-01-01T03:30:06.000+02:00</siri:RecordedAtTime>
-                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ItemIdentifier>
+                  <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ItemIdentifier>
                   <siri:InfoMessageIdentifier>test</siri:InfoMessageIdentifier>
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
@@ -191,6 +196,7 @@ Feature: Support SIRI GeneralMessage for Situation
                   <siri:ValidUntilTime>
                   2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content>
+                   <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                     <Message>
                       <MessageType>longMessage</MessageType>
                       <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
@@ -212,6 +218,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | Name                   | Test              |
       | ObjectIDs              | "internal":"1234" |
       | CollectGeneralMessages | true              |
+    And a StopArea exists with the following attributes:
+      | Name      | Test                                     |
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
@@ -223,7 +232,8 @@ Feature: Support SIRI GeneralMessage for Situation
       | ProducerRef                  | NINOXE:default                                                             |
       | ValidityPeriods[0]#StartTime | 2017-03-29T03:30:06+02:00                                                  |
       | ValidityPeriods[0]#EndTime   | 2017-03-29T20:50:06+02:00                                                  |
-      | Description[DefaultValue]   | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with

@@ -142,6 +142,19 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Affects\[([^\]]+)\]/
+      attribute = Regexp.last_match(1).to_s
+
+      attributes['Affects'] ||= []
+
+      attributes['Affects'][name.to_i] = {
+        'Type' => attribute,
+        "#{attribute}Id" => value
+      }
+
+      attributes.delete key
+    end
+    
     if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2

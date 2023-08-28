@@ -49,8 +49,32 @@ type Situation struct {
 	Summary     *SituationTranslatedString `json:",omitempty"`
 	Description *SituationTranslatedString `json:",omitempty"`
 
+	Affects      []Affect `json:",omitempty"`
 	LineSections []*References
 	References   []*Reference
+}
+
+// SubTypes of Affect
+type Affect interface {
+	GetType() string
+	GetId() ModelId
+}
+
+type AffectedStopArea struct {
+	Type       string
+	StopAreaId StopAreaId `json:",omitempty"`
+}
+
+func (a AffectedStopArea) GetId() ModelId {
+	return ModelId(a.StopAreaId)
+}
+
+func (a AffectedStopArea) GetType() string {
+	return a.Type
+}
+
+func NewAffectedStopArea() *AffectedStopArea {
+	return &AffectedStopArea{Type: "StopArea"}
 }
 
 type TimeRange struct {
@@ -91,15 +115,28 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 
 	aux := &struct {
 		ObjectIDs map[string]string
+		Affects   []map[string]string
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
 	}
+
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
 	}
 
+	if aux.Affects != nil {
+		for _, v := range aux.Affects {
+			if v["Type"] == "StopArea" {
+				a := NewAffectedStopArea()
+				a.StopAreaId = StopAreaId(v["StopAreaId"])
+				situation.Affects = append(situation.Affects, a)
+			}
+
+		}
+
+	}
 	if aux.ObjectIDs != nil {
 		situation.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
@@ -113,6 +150,7 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		RecordedAt *time.Time `json:",omitempty"`
 		*Alias
 		Id              SituationId
+		Affects         []Affect      `json:",omitempty"`
 		ValidityPeriods []*TimeRange  `json:",omitempty"`
 		References      []*Reference  `json:",omitempty"`
 		LineSections    []*References `json:",omitempty"`
@@ -135,6 +173,10 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	}
 	if len(situation.ValidityPeriods) != 0 {
 		aux.ValidityPeriods = situation.ValidityPeriods
+	}
+
+	if len(situation.Affects) != 0 {
+		aux.Affects = situation.Affects
 	}
 
 	return json.Marshal(&aux)

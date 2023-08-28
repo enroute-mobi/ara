@@ -73,6 +73,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 
 	builder.buildSituationAndDescriptionFromMessages(content.Messages(), situationEvent)
 
+	builder.setAffects(situationEvent, &content)
 	builder.setReferences(situationEvent, &content)
 
 	*event = append(*event, situationEvent)
@@ -116,6 +117,22 @@ func (builder *GeneralMessageUpdateEventBuilder) setReportType(infoChannelRef st
 	}
 
 }
+
+func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
+	remoteObjectidKind := builder.remoteObjectidKind
+	for _, stoppointref := range content.StopPointRef() {
+		stopPointRefObjectId := model.NewObjectID(remoteObjectidKind, stoppointref)
+		stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(stopPointRefObjectId)
+		if !ok {
+			continue
+		}
+		affect := model.NewAffectedStopArea()
+		affect.StopAreaId = stopArea.Id()
+
+		event.Affects = append(event.Affects, affect)
+	}
+}
+
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 	remoteObjectidKind := builder.remoteObjectidKind
 
@@ -124,11 +141,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 		ref.Type = "LineRef"
 		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 	}
-	for _, stoppointref := range content.StopPointRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, stoppointref))
-		ref.Type = "StopPointRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
+
 	for _, journeypatternref := range content.JourneyPatternRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, journeypatternref))
 		ref.Type = "JourneyPatternRef"
