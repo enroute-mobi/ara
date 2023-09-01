@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -38,7 +39,8 @@ type MemorySubscriptions struct {
 	mutex   *sync.RWMutex
 	partner *Partner
 
-	byIdentifier map[SubscriptionId]*Subscription
+	byIdentifier        map[SubscriptionId]*Subscription
+	byKindAndResourceId map[string][]SubscriptionId
 }
 
 func (manager *MemorySubscriptions) MarshalJSON() ([]byte, error) {
@@ -52,9 +54,10 @@ func (manager *MemorySubscriptions) MarshalJSON() ([]byte, error) {
 
 func NewMemorySubscriptions(partner *Partner) *MemorySubscriptions {
 	return &MemorySubscriptions{
-		mutex:        &sync.RWMutex{},
-		byIdentifier: make(map[SubscriptionId]*Subscription),
-		partner:      partner,
+		mutex:               &sync.RWMutex{},
+		byIdentifier:        make(map[SubscriptionId]*Subscription),
+		byKindAndResourceId: make(map[string][]SubscriptionId),
+		partner:             partner,
 	}
 }
 
@@ -121,16 +124,53 @@ func (manager *MemorySubscriptions) FindByExternalId(externalId string) (*Subscr
 func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscription {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
+
+	kindAndResourceId := fmt.Sprintf("%s-%s", kind, id)
+	subscriptionIdentifiers, found := manager.byKindAndResourceId[kindAndResourceId]
+
 	subscriptions := []*Subscription{}
 
-	for _, subscription := range manager.byIdentifier {
-		subscription.RLock()
-		_, ok := subscription.resourcesByObjectID[id]
-		subscription.RUnlock()
-		if ok && subscription.kind == kind {
+	if found {
+		for _, subscriptionId := range subscriptionIdentifiers {
+			subscription, ok := manager.byIdentifier[subscriptionId]
+			if !ok {
+				// Subscription no longer exists
+				continue
+			}
+
+			if subscription.kind != kind {
+				// Subscription wrong kind ? changed kind ?
+				continue
+			}
+
+			subscription.RLock()
+			_, ok = subscription.resourcesByObjectID[id]
+			subscription.RUnlock()
+
+			if !ok {
+				// Resource no longer presents in subscription
+				continue
+			}
+
 			subscriptions = append(subscriptions, subscription)
 		}
 	}
+
+	if len(subscriptions) > 0 {
+		if len(subscriptions) != len(subscriptionIdentifiers) {
+			// Some of subscriptions are no longer associated to this kindAndResourceId
+			subscriptionIds := []SubscriptionId{}
+			for _, subscription := range subscriptions {
+				subscriptionIds = append(subscriptionIds, subscription.Id())
+			}
+
+			manager.byKindAndResourceId[kindAndResourceId] = subscriptionIds
+		}
+	} else {
+		// No subscription found for this kindAndResourceId
+		delete(manager.byKindAndResourceId, kindAndResourceId)
+	}
+
 	return subscriptions
 }
 
@@ -188,6 +228,35 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
+
+	// Register the subscription with all associated resources
+	subscription.RLock()
+
+	for resourceId := range subscription.resourcesByObjectID {
+		kindAndResourceId := fmt.Sprintf("%s-%s", subscription.Kind(), resourceId)
+		subscriptionIdentifiers, found := manager.byKindAndResourceId[kindAndResourceId]
+
+		if !found {
+			// No subscription associated to this kindAndResourceId, create a new SubscriptionId slice
+			manager.byKindAndResourceId[kindAndResourceId] = []SubscriptionId{subscription.Id()}
+			continue
+		}
+
+		// Is the Subscription already associated to this kindAndResourceId ?
+		newSubscriptionForKindAndResourceId := true
+		for _, subscriptionId := range subscriptionIdentifiers {
+			if subscriptionId == subscription.Id() {
+				// The Subscription is already associated to this kindAndResourceId
+				newSubscriptionForKindAndResourceId = false
+			}
+		}
+
+		if newSubscriptionForKindAndResourceId {
+			// Associate this Subscription to the kindAndResourceId
+			manager.byKindAndResourceId[kindAndResourceId] = append(subscriptionIdentifiers, subscription.Id())
+		}
+	}
+	subscription.RUnlock()
 
 	return true
 }

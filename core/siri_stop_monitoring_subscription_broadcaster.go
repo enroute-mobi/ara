@@ -240,6 +240,8 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		r.SetLastState(string(sa.Id()), ls.NewStopAreaLastChange(sa, sub))
 		// Init StopVisits LastChange
 		connector.addStopAreaStopVisits(sa, sub, r)
+
+		sub.Save()
 	}
 
 	message.Type = "StopMonitoringSubscriptionRequest"
