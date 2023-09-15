@@ -1,3 +1,4 @@
+@siri-valid
 Feature: Support SIRI ProductionTimetable by subscription
 
   Background:
@@ -219,6 +220,14 @@ Feature: Support SIRI ProductionTimetable by subscription
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 5                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |  
     And a minute has passed
     And I send this SIRI request
       """
@@ -309,12 +318,18 @@ Feature: Support SIRI ProductionTimetable by subscription
                   <siri:StopPointName>Test 24</siri:StopPointName>
                   <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                 </siri:DatedCall>
+                <siri:DatedCall>
+                  <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
+                  <siri:VisitNumber>5</siri:VisitNumber>
+                  <siri:StopPointName>Test 25</siri:StopPointName>
+                  <siri:AimedArrivalTime>2017-01-01T16:00:00.000Z</siri:AimedArrivalTime>
+                </siri:DatedCall>
               </siri:DatedCalls>
             </siri:DatedVehicleJourney>
           </siri:DatedTimetableVersionFrame>
         </siri:ProductionTimetableDelivery>
       </Notification>
-      <NotifyExtension/>
+      <SiriExtension/>
     </sw:NotifyProductionTimetable>
   </S:Body>
 </S:Envelope>
@@ -462,7 +477,7 @@ Feature: Support SIRI ProductionTimetable by subscription
           </siri:DatedTimetableVersionFrame>
         </siri:ProductionTimetableDelivery>
       </Notification>
-      <NotifyExtension/>
+      <SiriExtension/>
     </sw:NotifyProductionTimetable>
   </S:Body>
 </S:Envelope>
@@ -504,6 +519,14 @@ Feature: Support SIRI ProductionTimetable by subscription
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | PassageOrder                    | 5                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
       """
@@ -575,6 +598,12 @@ Feature: Support SIRI ProductionTimetable by subscription
               <Order>4</Order>
               <StopPointName>Test 24</StopPointName>
               <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
+            </DatedCall>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>5</Order>
+              <StopPointName>Test 25</StopPointName>
+              <AimedArrivalTime>2017-01-01T16:00:00.000Z</AimedArrivalTime>
             </DatedCall>
           </DatedCalls>
         </DatedVehicleJourney>
@@ -714,7 +743,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       """
   
   @ARA-1366
-  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with a ScheduledStopVisit having a VehicleJourneyId not existing should not broadcast the  associated DatedCall
+  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with a ScheduledStopVisit having a VehicleJourneyId not existing should not broadcast the associated DatedCall
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url            | http://localhost:8090 |
@@ -750,10 +779,18 @@ Feature: Support SIRI ProductionTimetable by subscription
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-    # ScheduleStopVisit with unknown VehicleJourneyId
       | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
+      | VehicleAtStop                   | false                                                                |
+      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |
+    And a ScheduledStopVisit exists with the following attributes:
+    # ScheduleStopVisit with unknown VehicleJourneyId
+      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-1" |
+      | PassageOrder                    | 6                                                                    |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-30-00c04fd430c8                                   |
       | VehicleAtStop                   | false                                                                |
       | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
@@ -830,6 +867,12 @@ Feature: Support SIRI ProductionTimetable by subscription
               <Order>4</Order>
               <StopPointName>Test 24</StopPointName>
               <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
+            </DatedCall>
+            <DatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:25:LOC</StopPointRef>
+              <Order>5</Order>
+              <StopPointName>Test 25</StopPointName>
+              <AimedArrivalTime>2017-01-01T16:00:00.000Z</AimedArrivalTime>
             </DatedCall>
           </DatedCalls>
         </DatedVehicleJourney>
@@ -951,6 +994,19 @@ Feature: Support SIRI ProductionTimetable by subscription
       | VehicleAtStop                   | false                              |
       | Reference[OperatorRef]#ObjectId | "didok": "CdF:Company::410:LOC"    |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z           |
+    And a StopArea exists with the following attributes:
+    # "6ba7b814-9dad-11d1-7-00c04fd430c8"
+      | Name      | Other                                              |
+      | ObjectIDs | "didok": "fr:1:StopPlace:OTHER:StopArea:log351672" |
+      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]              |
+    And a ScheduledStopVisit exists with the following attributes:
+    # "6ba7b814-9dad-11d1-8-00c04fd430c8"
+      | PassageOrder                    | 5                                  |
+      | StopAreaId                      | 6ba7b814-9dad-11d1-7-00c04fd430c8  |
+      | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8  |
+      | VehicleAtStop                   | false                              |
+      | Reference[OperatorRef]#ObjectId | "didok": "CdF:Company::410:LOC"    |
+      | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z           |
     And a minute has passed
     And I send this SIRI request
       """
@@ -1021,6 +1077,12 @@ Feature: Support SIRI ProductionTimetable by subscription
               <Order>4</Order>
               <StopPointName>Parent</StopPointName>
               <AimedArrivalTime>2017-01-01T15:00:00.000Z</AimedArrivalTime>
+            </DatedCall>
+            <DatedCall>
+              <StopPointRef>fr:1:StopPlace:OTHER:StopArea:log351672</StopPointRef>
+              <Order>5</Order>
+              <StopPointName>Other</StopPointName>
+              <AimedArrivalTime>2017-01-01T16:00:00.000Z</AimedArrivalTime>
             </DatedCall>
           </DatedCalls>
         </DatedVehicleJourney>
@@ -1312,11 +1374,13 @@ Feature: Support SIRI ProductionTimetable by subscription
       <ProductionTimetableSubscriptionRequest>
          <SubscriptionIdentifier>1</SubscriptionIdentifier>
          <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
-         <EstimatedTimetableRequest>
+         <ProductionTimetableRequest>
             <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
-            <PreviewInterval>PT23H</PreviewInterval>
-         </EstimatedTimetableRequest>
-         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
       </ProductionTimetableSubscriptionRequest>
    </SubscriptionRequest>
 </Siri>
@@ -1339,11 +1403,13 @@ Feature: Support SIRI ProductionTimetable by subscription
       <ProductionTimetableSubscriptionRequest>
          <SubscriptionIdentifier>2</SubscriptionIdentifier>
          <InitialTerminationTime>2017-01-01T14:00:00Z</InitialTerminationTime>
-         <EstimatedTimetableRequest>
+         <ProductionTimetableRequest>
             <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>
-            <PreviewInterval>PT23H</PreviewInterval>
-         </EstimatedTimetableRequest>
-         <ChangeBeforeUpdates>PT30S</ChangeBeforeUpdates>
+            <ValidityPeriod>
+               <StartTime>2022-02-09T03:30:00Z</StartTime>
+               <EndTime>2022-02-10T04:30:00Z</EndTime>
+            </ValidityPeriod>
+         </ProductionTimetableRequest>
       </ProductionTimetableSubscriptionRequest>
    </SubscriptionRequest>
 </Siri>

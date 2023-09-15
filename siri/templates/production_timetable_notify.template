@@ -17,5 +17,5 @@
 			{{ .BuildDatedTimetableVersionFrameXML }}{{ end }}{{ end }}
 		</siri:ProductionTimetableDelivery>
 	</Notification>
-	<NotifyExtension />
+	<SiriExtension />
 </sw:NotifyProductionTimetable>
