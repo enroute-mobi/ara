@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/ara/remote"
 )
 
 type SIRIGeneralMessageRequestDeliveriesResponseHandler struct {
@@ -31,6 +32,13 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(param
 	params.connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
+
+	emptySOAPResponse := params.connector.Partner().PartnerSettings.SiriSoapEmptyResponseOnNotification()
+	if params.envelopeType == remote.SOAP_SIRI_ENVELOPE && emptySOAPResponse {
+		buffer := remote.NewSIRIBuffer(params.envelopeType)
+		buffer.WriteXML("")
+		buffer.WriteTo(params.rw)
+	}
 
 	params.message.Type = "NotifyGeneralMessage"
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
