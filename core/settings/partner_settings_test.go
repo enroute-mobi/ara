@@ -690,3 +690,33 @@ func Test_HTTPClientOptions_Without_OAuth(t *testing.T) {
 	}
 	assert.Equal(expected, partnerSettings.HTTPClientOptions())
 }
+
+func Test_SiriSoapEmptyResponseOnNotification_true(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION: "true",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.True(partnerSettings.SiriSoapEmptyResponseOnNotification())
+}
+
+func Test_SiriSoapEmptyResponseOnNotification_undefined(t *testing.T) {
+	assert := assert.New(t)
+
+	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
+
+	assert.False(partnerSettings.SiriSoapEmptyResponseOnNotification())
+}
+
+func Test_SiriSoapEmptyResponseOnNotification_false(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION: "false",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.False(partnerSettings.SiriSoapEmptyResponseOnNotification())
+}

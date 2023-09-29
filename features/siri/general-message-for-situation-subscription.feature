@@ -113,6 +113,9 @@ Feature: Support SIRI GeneralMessage by subscription
     Then a Situation exists with the following attributes:
         | ObjectIDs | "internal" : "NINOXE:GeneralMessage:27_1" |
         | Channel   | Commercial                                |
+    And I should receive this SIRI response
+      """
+      """
 
   Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
@@ -604,3 +607,124 @@ Feature: Support SIRI GeneralMessage by subscription
       | SubscriptionRef | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Kind            | GeneralMessageBroadcast           |
       | ExternalId      | 2                                 |
+
+  @ARA-1378
+  Scenario: Returns empty SOAP response on General Message notification
+    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+       """
+   <?xml version='1.0' encoding='utf-8'?>
+   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
+       <SubscriptionAnswerInfo
+         xmlns:ns2="http://www.ifopt.org.uk/acsb"
+         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+         xmlns:ns5="http://www.siri.org.uk/siri"
+         xmlns:ns6="http://wsdl.siri.org.uk/siri">
+         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
+         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
+         <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns5:RequestMessageRef>
+       </SubscriptionAnswerInfo>
+       <Answer
+         xmlns:ns2="http://www.ifopt.org.uk/acsb"
+         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+         xmlns:ns5="http://www.siri.org.uk/siri"
+         xmlns:ns6="http://wsdl.siri.org.uk/siri">
+         <ns5:ResponseStatus>
+             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+             <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns5:RequestMessageRef>
+             <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
+             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+             <ns5:Status>true</ns5:Status>
+             <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
+         </ns5:ResponseStatus>
+         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
+       </Answer>
+       <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+     </ns1:SubscribeResponse>
+   </S:Body>
+   </S:Envelope>
+   """
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-general-message-subscription-collector] and the following settings:
+      | remote_url                               | http://localhost:8090 |
+      | remote_credential                        | test                  |
+      | local_credential                         | NINOXE:default        |
+      | remote_objectid_kind                     | internal              |
+      | collect.filter_general_messages          | true                  |
+      | collect.include_lines                    | 1234                  |
+      | siri.soap.empty_response_on_notification | true                  |
+    And 30 seconds have passed
+      And a Line exists with the following attributes:
+        | Name                   | Test              |
+        | ObjectIDs              | "internal":"1234" |
+        | CollectGeneralMessages | true              |
+      And 10 seconds have passed
+      And 5 seconds have passed
+      And a Situation exists with the following attributes:
+        | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | RecordedAt              | 2017-01-01T03:30:06+02:00                 |
+        | Version                 | 1                                         |
+        | Channel                 | Perturbations                             |
+        | ValidUntil              | 2017-01-01T20:30:06+02:00                 |
+        | Messages[0]#MessageType | longMessage                               |
+        | Messages[0]#MessageText | Les autres non                            |
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+      <ns1:NotifyGeneralMessage xmlns:ns1="http://wsdl.siri.org.uk">
+       <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+         <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
+         <ns5:ProducerRef>NINOXE:default</ns5:ProducerRef>
+         <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:427843</ns5:ResponseMessageIdentifier>
+         <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
+       </ServiceDeliveryInfo>
+       <Notification xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+         <ns3:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+            <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
+            <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
+            <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+            <ns3:Status>true</ns3:Status>
+            <ns3:GeneralMessage>
+               <ns3:RecordedAtTime>2017-03-29T03:30:06.000+01:00</ns3:RecordedAtTime>
+               <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
+               <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</ns3:InfoMessageIdentifier>
+               <ns3:InfoMessageVersion>2</ns3:InfoMessageVersion>
+               <ns3:formatRef>STIF-IDF</ns3:formatRef>
+               <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
+               <ns3:ValidUntilTime>2017-03-29T03:30:06.000+01:00</ns3:ValidUntilTime>
+               <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFGeneralMessageStructure">
+                  <Message>
+                    <MessageType>longMessage</MessageType>
+                    <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
+                  </Message>
+                  <LineSection>
+                    <FirstStop>NINOXE:StopPoint:SP:24:LOC</FirstStop>
+                    <LastStop>NINOXE:StopPoint:SP:12:LOC</LastStop>
+                    <LineRef>NINOXE:Line::3:LOC</LineRef>
+                  </LineSection>
+               </ns3:Content>
+            </ns3:GeneralMessage>
+         </ns3:GeneralMessageDelivery>
+       </Notification>
+      <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      </ns1:NotifyGeneralMessage>
+   </S:Body>
+   </S:Envelope>
+      """
+    Then a Situation exists with the following attributes:
+        | ObjectIDs | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Channel   | Commercial                                |
+    And I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='UTF-8'?> 
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+        </S:Body>
+      </S:Envelope>
+      """

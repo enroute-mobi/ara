@@ -68,6 +68,7 @@ const (
 	SIRI_DIRECTION_TYPE                                   = "siri.direction_type"
 	SIRI_PASSAGE_ORDER                                    = "siri.passage_order"
 	SIRI_CREDENTIAL_HEADER                                = "siri.credential.header"
+	SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION              = "siri.soap.empty_response_on_notification"
 	DEFAULT_GTFS_TTL                                      = 30 * time.Second
 	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
 
@@ -79,32 +80,33 @@ type PartnerSettings struct {
 
 	collectSettings *CollectSettings
 
-	credentials                    string
-	rateLimit                      float64
-	gtfsTTL                        time.Duration
-	gtfsCacheTimeout               time.Duration
-	siriCredentialHeader           string
-	siriEnvelopeType               string
-	httpClientOAuth                *remote.HTTPClientOAuth
-	recordedCallsDuration          time.Duration
-	producerRef                    string
-	address                        string
-	linePublishedName              string
-	passageOrder                   string
-	envelopeType                   string
-	collectPriority                int
-	defaultSRSName                 string
-	noDestinationRefRewritingFrom  []string
-	noDataFrameRefRewritingFrom    []string
-	rewriteJourneyPatternRef       bool
-	gzipGtfs                       bool
-	generalMessageRequestVersion22 bool
-	collectFilteredGeneralMessages bool
-	ignoreStopWithoutLine          bool
-	discoveryInterval              time.Duration
-	cacheTimeouts                  sync.Map
-	siriDirectionTypeInbound       string
-	siriDirectionTypeOutbound      string
+	credentials                    			string
+	rateLimit                      			float64
+	gtfsTTL                        			time.Duration
+	gtfsCacheTimeout               			time.Duration
+	siriCredentialHeader           			string
+	siriEnvelopeType               			string
+	siriSoapEmptyResponseOnNotification bool
+	httpClientOAuth                			*remote.HTTPClientOAuth
+	recordedCallsDuration          			time.Duration
+	producerRef                    			string
+	address                        			string
+	linePublishedName              			string
+	passageOrder                   			string
+	envelopeType                   			string
+	collectPriority                			int
+	defaultSRSName                 			string
+	noDestinationRefRewritingFrom  			[]string
+	noDataFrameRefRewritingFrom    			[]string
+	rewriteJourneyPatternRef       			bool
+	gzipGtfs                       			bool
+	generalMessageRequestVersion22 			bool
+	collectFilteredGeneralMessages 			bool
+	ignoreStopWithoutLine          			bool
+	discoveryInterval              			time.Duration
+	cacheTimeouts                  			sync.Map
+	siriDirectionTypeInbound       			string
+	siriDirectionTypeOutbound      			string
 
 	maximumCheckstatusRetry          int
 	subscriptionMaximumResources     int
@@ -170,6 +172,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setCollectSettings(settings)
 	s.setSiriCredentialHeader(settings)
 	s.setSiriEnvelopeType(settings)
+	s.setSiriSoapEmptyResponseOnNotification(settings)
 	s.setSIRIPassageOrder(settings)
 	s.setMaximumChechstatusRetry(settings)
 	s.setSubscriptionMaximumResources(settings)
@@ -498,6 +501,14 @@ func (s *PartnerSettings) setSIRIEnvelopeType(settings map[string]string) {
 
 func (s *PartnerSettings) SIRIEnvelopeType() string {
 	return s.envelopeType
+}
+
+func (s *PartnerSettings) setSiriSoapEmptyResponseOnNotification(settings map[string]string) {
+	s.siriSoapEmptyResponseOnNotification, _ = strconv.ParseBool(settings[SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION])
+}
+
+func (s *PartnerSettings) SiriSoapEmptyResponseOnNotification() bool {
+	return s.siriSoapEmptyResponseOnNotification
 }
 
 func (s *PartnerSettings) setMaximumChechstatusRetry(settings map[string]string) {
