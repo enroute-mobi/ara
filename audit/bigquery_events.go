@@ -69,7 +69,7 @@ var bqMessageSchema = bigquery.Schema{
 	{Name: "lines", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "stop_areas", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "vehicles", Repeated: true, Type: bigquery.StringFieldType},
-	{Name: "vehicle_journey", Repeated: true, Type: bigquery.StringFieldType},
+	{Name: "vehicle_journeys", Repeated: true, Type: bigquery.StringFieldType},
 }
 
 type BigQueryPartnerEvent struct {
