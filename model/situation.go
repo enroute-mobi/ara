@@ -77,6 +77,23 @@ func NewAffectedStopArea() *AffectedStopArea {
 	return &AffectedStopArea{Type: "StopArea"}
 }
 
+type AffectedLine struct {
+	Type   string
+	LineId LineId `json:",omitempty"`
+}
+
+func (a AffectedLine) GetId() ModelId {
+	return ModelId(a.LineId)
+}
+
+func (a AffectedLine) GetType() string {
+	return a.Type
+}
+
+func NewAffectedLine() *AffectedLine {
+	return &AffectedLine{Type: "Line"}
+}
+
 type TimeRange struct {
 	StartTime time.Time `json:",omitempty"`
 	EndTime   time.Time `json:",omitempty"`
@@ -128,14 +145,17 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 
 	if aux.Affects != nil {
 		for _, v := range aux.Affects {
-			if v["Type"] == "StopArea" {
+			switch v["Type"] {
+			case "StopArea":
 				a := NewAffectedStopArea()
 				a.StopAreaId = StopAreaId(v["StopAreaId"])
 				situation.Affects = append(situation.Affects, a)
+			case "Line":
+				l := NewAffectedLine()
+				l.LineId = LineId(v["LineId"])
+				situation.Affects = append(situation.Affects, l)
 			}
-
 		}
-
 	}
 	if aux.ObjectIDs != nil {
 		situation.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)

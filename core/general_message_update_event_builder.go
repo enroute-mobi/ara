@@ -131,6 +131,18 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 
 		event.Affects = append(event.Affects, affect)
 	}
+
+	for _, lineRef := range content.LineRef() {
+		LineRefObjectId := model.NewObjectID(remoteObjectidKind, lineRef)
+		line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+		if !ok {
+			continue
+		}
+		affect := model.NewAffectedLine()
+		affect.LineId = line.Id()
+
+		event.Affects = append(event.Affects, affect)
+	}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {

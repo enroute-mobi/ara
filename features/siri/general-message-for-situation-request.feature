@@ -94,6 +94,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | Description[DefaultValue]  | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
       | References[0]              | LineRef:{"external":"NINOXE:Line:3:LOC"}                                   |
       | Affects[StopArea]          | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |

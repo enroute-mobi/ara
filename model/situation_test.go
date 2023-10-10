@@ -31,13 +31,17 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		DefaultValue: "Noel",
 	}
 
-	affect := NewAffectedStopArea()
-	affect.StopAreaId = "259344234"
-	situation.Affects = append(situation.Affects, affect)
+	affectStopArea := NewAffectedStopArea()
+	affectStopArea.StopAreaId = "259344234"
+	situation.Affects = append(situation.Affects, affectStopArea)
+
+	affectLine := NewAffectedLine()
+	affectLine.LineId = "222"
+	situation.Affects = append(situation.Affects, affectLine)
 
 	expected := `{
 "Origin":"test",
-"Affects":[{"Type":"StopArea","StopAreaId":"259344234"}],
+"Affects":[{"Type":"StopArea","StopAreaId":"259344234"},{"Type":"Line","LineId":"222"}],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
 "Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
@@ -53,7 +57,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
 "Summary": { "DefaultValue": "Noel"},
 "Description": { "DefaultValue": "Joyeux Noel" },
-"Affects":[{"Type":"StopArea","StopAreaId":"259344234"}]
+"Affects":[{"Type":"StopArea","StopAreaId":"259344234"},{"Type":"Line","LineId":"222"}]
 }`
 
 	situation := Situation{}
@@ -72,14 +76,19 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		DefaultValue: "Joyeux Noel",
 	}
 
-	affect := NewAffectedStopArea()
-	affect.StopAreaId = "259344234"
-	expectedAffectedStopArea := affect
+	affectStopArea := NewAffectedStopArea()
+	affectStopArea.StopAreaId = "259344234"
+	expectedAffectedStopArea := affectStopArea
+
+	affectLine := NewAffectedLine()
+	affectLine.LineId = "222"
+	expectedAffectedLine := affectLine
 
 	assert.Equal(expectedSmmary, situation.Summary)
 	assert.Equal(expectedDescription, situation.Description)
-	assert.Len(situation.Affects, 1)
+	assert.Len(situation.Affects, 2)
 	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
+	assert.Equal(expectedAffectedLine, situation.Affects[1])
 
 	for _, expectedObjectId := range expectedObjectIds {
 		objectId, found := situation.ObjectID(expectedObjectId.Kind())

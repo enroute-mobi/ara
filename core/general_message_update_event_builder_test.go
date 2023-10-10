@@ -50,6 +50,18 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	stopArea2.Save()
 	stopArea2Id := stopArea2.Id()
 
+	objectid3 := model.NewObjectID("remote_objectid_kind", "lineRef1")
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid3)
+	line.Save()
+	lineId := line.Id()
+
+	objectid4 := model.NewObjectID("remote_objectid_kind", "lineRef2")
+	line2 := referential.Model().Lines().New()
+	line2.SetObjectID(objectid4)
+	line2.Save()
+	line2Id := line2.Id()
+
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
 
 	events := &[]*model.SituationUpdateEvent{}
@@ -68,11 +80,18 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Nil(event.Summary)
 
 	affects := event.Affects
-	assert.Len(affects, 2)
+	assert.Len(affects, 4)
+	// Affected StopAreas
 	assert.Equal("StopArea", affects[0].GetType())
 	assert.Equal(model.ModelId(stopAreaId), affects[0].GetId())
 	assert.Equal("StopArea", affects[1].GetType())
 	assert.Equal(model.ModelId(stopArea2Id), affects[1].GetId())
+
+	// Affected Lines
+	assert.Equal("Line", affects[2].GetType())
+	assert.Equal(model.ModelId(lineId), affects[2].GetId())
+	assert.Equal("Line", affects[3].GetType())
+	assert.Equal(model.ModelId(line2Id), affects[3].GetId())
 
 	if len(event.SituationAttributes.References) != 10 {
 		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
