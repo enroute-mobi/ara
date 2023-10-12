@@ -118,52 +118,68 @@ func (builder *GeneralMessageUpdateEventBuilder) setReportType(infoChannelRef st
 
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
-	remoteObjectidKind := builder.remoteObjectidKind
-	for _, stoppointref := range content.StopPointRef() {
-		stopPointRefObjectId := model.NewObjectID(remoteObjectidKind, stoppointref)
-		stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(stopPointRefObjectId)
-		if !ok {
-			continue
-		}
-		affect := model.NewAffectedStopArea()
-		affect.StopAreaId = stopArea.Id()
-
-		event.Affects = append(event.Affects, affect)
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *model.SituationUpdateEvent, stopPointRef string) {
+	stopPointRefObjectId := model.NewObjectID(builder.remoteObjectidKind, stopPointRef)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(stopPointRefObjectId)
+	if !ok {
+		return
 	}
+	affect := model.NewAffectedStopArea()
+	affect.StopAreaId = stopArea.Id()
+
+	event.Affects = append(event.Affects, affect)
+}
+
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(event *model.SituationUpdateEvent, lineRef string) {
+	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	if !ok {
+		return
+	}
+	affect := model.NewAffectedLine()
+	affect.LineId = line.Id()
+
+	event.Affects = append(event.Affects, affect)
+}
+
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *model.SituationUpdateEvent, destination string, affectedLine *model.AffectedLine) {
+	destinationObjectId := model.NewObjectID(builder.remoteObjectidKind, destination)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(destinationObjectId)
+	if !ok {
+		return
+	}
+
+	affectedDestination := model.AffectedDestination{StopAreaId: stopArea.Id()}
+	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, &affectedDestination)
+}
+
+func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 
 	for _, lineRef := range content.LineRef() {
-		LineRefObjectId := model.NewObjectID(remoteObjectidKind, lineRef)
-		line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
-		if !ok {
-			continue
-		}
-		affect := model.NewAffectedLine()
-		affect.LineId = line.Id()
-
-		event.Affects = append(event.Affects, affect)
+		builder.setAffectedLine(event, lineRef)
 	}
+
+	if len(event.Affects) == 1 && event.Affects[0].GetType() == "Line" {
+		for _, destination := range content.DestinationRef() {
+			builder.setAffectedDestination(event, destination, event.Affects[0].(*model.AffectedLine))
+		}
+	}
+
+	for _, stopPointRef := range content.StopPointRef() {
+		builder.setAffectedStopArea(event, stopPointRef)
+	}
+
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 	remoteObjectidKind := builder.remoteObjectidKind
-
-	for _, lineref := range content.LineRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, lineref))
-		ref.Type = "LineRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
 
 	for _, journeypatternref := range content.JourneyPatternRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, journeypatternref))
 		ref.Type = "JourneyPatternRef"
 		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 	}
-	for _, destinationref := range content.DestinationRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, destinationref))
-		ref.Type = "DestinationRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
+
 	for _, routeref := range content.RouteRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, routeref))
 		ref.Type = "RouteRef"
@@ -179,7 +195,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *sxml.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
+func (Builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *sxml.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
 	references := model.NewReferences()
 
 	lineRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.LineRef()))

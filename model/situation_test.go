@@ -37,11 +37,17 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 
 	affectLine := NewAffectedLine()
 	affectLine.LineId = "222"
+	affectDestinationId := "333"
+	affectedDestination := &AffectedDestination{StopAreaId: StopAreaId(affectDestinationId)}
+	affectLine.AffectedDestinations = append(affectLine.AffectedDestinations, affectedDestination)
 	situation.Affects = append(situation.Affects, affectLine)
 
 	expected := `{
 "Origin":"test",
-"Affects":[{"Type":"StopArea","StopAreaId":"259344234"},{"Type":"Line","LineId":"222"}],
+"Affects":[
+{"Type":"StopArea","StopAreaId":"259344234"},
+{"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}]}
+],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
 "Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
@@ -53,14 +59,20 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 
 func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
-	text := `{
-"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
-"Summary": { "DefaultValue": "Noel"},
-"Description": { "DefaultValue": "Joyeux Noel" },
-"Affects":[{"Type":"StopArea","StopAreaId":"259344234"},{"Type":"Line","LineId":"222"}]
-}`
+	// ,"AffectedDestinations":[{"StopAreaId":"333"}]
 
-	situation := Situation{}
+	text := `{
+"Origin":"test",
+"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"Affects":[
+{"Type":"StopArea","StopAreaId":"259344234"},
+{"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}]}
+],
+"Description":{"DefaultValue":"Joyeux Noel"},
+"Summary":{"DefaultValue":"Noel"},
+"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+
+	situation := &Situation{}
 	err := json.Unmarshal([]byte(text), &situation)
 	assert.Nil(err)
 
@@ -76,13 +88,13 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		DefaultValue: "Joyeux Noel",
 	}
 
-	affectStopArea := NewAffectedStopArea()
-	affectStopArea.StopAreaId = "259344234"
-	expectedAffectedStopArea := affectStopArea
+	expectedAffectedStopArea := NewAffectedStopArea()
+	expectedAffectedStopArea.StopAreaId = "259344234"
 
-	affectLine := NewAffectedLine()
-	affectLine.LineId = "222"
-	expectedAffectedLine := affectLine
+	expectedAffectedLine := NewAffectedLine()
+	expectedAffectedLine.LineId = "222"
+	affectedDestination := &AffectedDestination{StopAreaId: StopAreaId("333")}
+	expectedAffectedLine.AffectedDestinations = append(expectedAffectedLine.AffectedDestinations, affectedDestination)
 
 	assert.Equal(expectedSmmary, situation.Summary)
 	assert.Equal(expectedDescription, situation.Description)

@@ -142,17 +142,30 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /Affects\[([^\]]+)\]/
-      attribute = Regexp.last_match(1).to_s
+    if key =~ %r{^(Affects\[([^\]]+)\])(/AffectedDestinations/StopAreaId)?}
+      attribute = Regexp.last_match(2).to_s
+      subaffect = Regexp.last_match(3).to_s
 
-      attributes['Affects'] ||= []
+      case attribute
+      when 'StopArea', 'Line'
+        (attributes['Affects'] ||= []) << {
+          'Type' => attribute,
+          "#{attribute}Id" => value
+        }
+      else
+        model, id = attribute.split('=')
+        attributes['Affects'].map do |affect|
+          next if affect['Type'] != model && affect["#{model}Id"] != id
 
-      attributes['Affects'][name.to_i] = {
-        'Type' => attribute,
-        "#{attribute}Id" => value
-      }
-
+          case subaffect
+          when '/AffectedDestinations/StopAreaId'
+            affect['AffectedDestinations'] ||= []
+            affect['AffectedDestinations'] << { 'StopAreaId' => value }
+          end
+        end
+      end
       attributes.delete key
+
     end
     
     if key =~ /ReferenceArray\[(\d+)\]/
@@ -219,6 +232,8 @@ def has_attributes(response_array, attributes)
     case value
     when Float
       value = a_value_within(0.00001).of(value)
+    when Array
+      value = match_array(value)
     else
       value
     end

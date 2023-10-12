@@ -150,14 +150,22 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	situation.References = append(situation.References, routeReference)
 	situation.Save()
 
-	objectid2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
+	objectid2 := model.NewObjectID("objectidKind", "2")
 	situation2 := referential.Model().Situations().New()
 	situation2.ValidityPeriods = []*model.TimeRange{period}
 	situation2.Keywords = []string{"Perturbation"}
 	situation2.SetObjectID(objectid2)
-	lineReference := model.NewReference(model.NewObjectID("objectidKind", "LineRef"))
-	lineReference.Type = "LineRef"
-	situation2.References = append(situation.References, lineReference)
+
+	stopArea1 := referential.Model().StopAreas().New()
+	objectId2 := model.NewObjectID("objectidKind", "DepartureStopArea")
+	stopArea1.SetObjectID(objectId2)
+	stopArea1.Save()
+
+	affectedLine := model.NewAffectedLine()
+	affectedLine.LineId = line.Id()
+	affectedDestination := &model.AffectedDestination{StopAreaId: stopArea1.Id()}
+	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, affectedDestination)
+	situation2.Affects = append(situation2.Affects, affectedLine)
 	situation2.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-lineref-soap.xml")

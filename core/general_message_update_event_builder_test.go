@@ -56,14 +56,17 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	line.Save()
 	lineId := line.Id()
 
-	objectid4 := model.NewObjectID("remote_objectid_kind", "lineRef2")
-	line2 := referential.Model().Lines().New()
-	line2.SetObjectID(objectid4)
-	line2.Save()
-	line2Id := line2.Id()
+	objectid4 := model.NewObjectID("remote_objectid_kind", "destinationRef1")
+	destinationRef1 := referential.Model().StopAreas().New()
+	destinationRef1.SetObjectID(objectid4)
+	destinationRef1.Save()
+
+	objectid5 := model.NewObjectID("remote_objectid_kind", "destinationRef2")
+	destinationRef2 := referential.Model().StopAreas().New()
+	destinationRef2.SetObjectID(objectid5)
+	destinationRef2.Save()
 
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
-
 	events := &[]*model.SituationUpdateEvent{}
 
 	builder.buildGeneralMessageUpdateEvent(events, response.XMLGeneralMessages()[0], "producer")
@@ -80,36 +83,33 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Nil(event.Summary)
 
 	affects := event.Affects
-	assert.Len(affects, 4)
-	// Affected StopAreas
-	assert.Equal("StopArea", affects[0].GetType())
-	assert.Equal(model.ModelId(stopAreaId), affects[0].GetId())
-	assert.Equal("StopArea", affects[1].GetType())
-	assert.Equal(model.ModelId(stopArea2Id), affects[1].GetId())
+	assert.Len(affects, 3)
 
 	// Affected Lines
-	assert.Equal("Line", affects[2].GetType())
-	assert.Equal(model.ModelId(lineId), affects[2].GetId())
-	assert.Equal("Line", affects[3].GetType())
-	assert.Equal(model.ModelId(line2Id), affects[3].GetId())
+	assert.Equal("Line", affects[0].GetType())
+	assert.Equal(model.ModelId(lineId), affects[0].GetId())
+	assert.Equal(destinationRef1.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[0].StopAreaId)
+	assert.Equal(destinationRef2.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[1].StopAreaId)
 
-	if len(event.SituationAttributes.References) != 10 {
-		t.Fatalf("Wrong number of References, expected: 12, got: %v", len(event.SituationAttributes.References))
+	// Affected StopAreas
+	assert.Equal("StopArea", affects[1].GetType())
+	assert.Equal(model.ModelId(stopAreaId), affects[1].GetId())
+	assert.Equal("StopArea", affects[2].GetType())
+	assert.Equal(model.ModelId(stopArea2Id), affects[2].GetId())
+
+	if len(event.SituationAttributes.References) != 6 {
+		t.Fatalf("Wrong number of References, expected: 6, got: %v", len(event.SituationAttributes.References))
 	}
-	if event.SituationAttributes.References[0].ObjectId.Value() != "lineRef1" {
-		t.Errorf("Wrong first LineRef: %v", event.SituationAttributes.References[0])
+
+	if event.SituationAttributes.References[0].ObjectId.Value() != "journeyPatternRef1" {
+		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[0])
 	}
-	if event.SituationAttributes.References[2].ObjectId.Value() != "journeyPatternRef1" {
-		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[4])
+
+	if event.SituationAttributes.References[2].ObjectId.Value() != "routeRef1" {
+		t.Errorf("Wrong first RouteRef: %v", event.SituationAttributes.References[4])
 	}
-	if event.SituationAttributes.References[4].ObjectId.Value() != "destinationRef1" {
-		t.Errorf("Wrong first DestinationRef: %v", event.SituationAttributes.References[6])
-	}
-	if event.SituationAttributes.References[6].ObjectId.Value() != "routeRef1" {
-		t.Errorf("Wrong first RouteRef: %v", event.SituationAttributes.References[8])
-	}
-	if event.SituationAttributes.References[8].ObjectId.Value() != "groupOfLineRef1" {
-		t.Errorf("Wrong first GroupOfLinesRef: %v", event.SituationAttributes.References[10])
+	if event.SituationAttributes.References[4].ObjectId.Value() != "groupOfLineRef1" {
+		t.Errorf("Wrong first GroupOfLinesRef: %v", event.SituationAttributes.References[6])
 	}
 
 	if len(event.SituationAttributes.LineSections) != 2 {
@@ -229,5 +229,167 @@ and summary is already defined, should keep existing summary and create descript
 			event)
 		assert.Equal(tt.expectedSummary, event.Summary, tt.message)
 		assert.Equal(tt.expectedDescription, event.Description, tt.message)
+	}
+}
+
+func Test_setAffectedStopArea(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+	settings := map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("remote_objectid_kind", "stopPointRef1")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	var TestCases = []struct {
+		StopPointRef        string
+		expectedEventAffect []model.Affect
+		message             string
+	}{
+		{
+			StopPointRef:        "dummy",
+			expectedEventAffect: nil,
+			message:             "Should not create an AffectedStopArea for unknown StopArea",
+		},
+		{
+			StopPointRef: "stopPointRef1",
+			expectedEventAffect: []model.Affect{
+				&model.AffectedStopArea{
+					Type:       "StopArea",
+					StopAreaId: stopArea.Id(),
+				},
+			},
+			message: "Should create an AffectedStopArea for known StopArea",
+		},
+	}
+	for _, tt := range TestCases {
+		event := &model.SituationUpdateEvent{}
+		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		builder.setAffectedStopArea(event, tt.StopPointRef)
+		assert.Equal(tt.expectedEventAffect, event.Affects, tt.message)
+	}
+}
+
+func Test_setAffectedLine(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+	settings := map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("remote_objectid_kind", "lineRef1")
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid)
+	line.Save()
+
+	var TestCases = []struct {
+		LineRef             string
+		expectedEventAffect []model.Affect
+		message             string
+	}{
+		{
+			LineRef:             "dummy",
+			expectedEventAffect: nil,
+			message:             "Should not create an AffectedLine for unknown Line",
+		},
+		{
+			LineRef: "lineRef1",
+			expectedEventAffect: []model.Affect{
+				&model.AffectedLine{
+					Type:   "Line",
+					LineId: line.Id(),
+				},
+			},
+			message: "Should create an AffectedLine for known Line",
+		},
+	}
+	for _, tt := range TestCases {
+		event := &model.SituationUpdateEvent{}
+		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		builder.setAffectedLine(event, tt.LineRef)
+		assert.Equal(tt.expectedEventAffect, event.Affects, tt.message)
+	}
+}
+
+func Test_setAffectedDestination(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+	settings := map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("remote_objectid_kind", "destinationRef")
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	objectid2 := model.NewObjectID("remote_objectid_kind", "lineRef")
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid2)
+	line.Save()
+
+	var TestCases = []struct {
+		StopPointRef         string
+		expectedAffectedLine *model.AffectedLine
+		message              string
+	}{
+		{
+			StopPointRef: "dummy",
+			expectedAffectedLine: &model.AffectedLine{
+				Type:   "Line",
+				LineId: line.Id(),
+			},
+			message: "Should not create an AffectedDestination for unknown StopArea",
+		},
+		{
+			StopPointRef: "destinationRef",
+			expectedAffectedLine: &model.AffectedLine{
+				Type:   "Line",
+				LineId: line.Id(),
+				AffectedDestinations: []*model.AffectedDestination{
+					&model.AffectedDestination{StopAreaId: stopArea.Id()},
+				},
+			},
+			message: "Should create an AffectedDestination for known StopArea",
+		},
+	}
+
+	for _, tt := range TestCases {
+		event := &model.SituationUpdateEvent{}
+		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		affectedLine := model.NewAffectedLine()
+		affectedLine.LineId = line.Id()
+		builder.setAffectedDestination(event, tt.StopPointRef, affectedLine)
+		assert.Equal(tt.expectedAffectedLine, affectedLine, tt.message)
 	}
 }

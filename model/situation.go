@@ -78,8 +78,13 @@ func NewAffectedStopArea() *AffectedStopArea {
 }
 
 type AffectedLine struct {
-	Type   string
-	LineId LineId `json:",omitempty"`
+	Type                 string
+	LineId               LineId                 `json:",omitempty"`
+	AffectedDestinations []*AffectedDestination `json:",omitempty"`
+}
+
+type AffectedDestination struct {
+	StopAreaId StopAreaId
 }
 
 func (a AffectedLine) GetId() ModelId {
@@ -130,9 +135,12 @@ func (situation *Situation) Save() (ok bool) {
 func (situation *Situation) UnmarshalJSON(data []byte) error {
 	type Alias Situation
 
+	type toto struct {
+		Type string
+	}
 	aux := &struct {
 		ObjectIDs map[string]string
-		Affects   []map[string]string
+		Affects   []json.RawMessage
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
@@ -142,17 +150,21 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-
 	if aux.Affects != nil {
 		for _, v := range aux.Affects {
-			switch v["Type"] {
+			x := &toto{}
+			err = json.Unmarshal(v, x)
+			if err != nil {
+				return err
+			}
+			switch x.Type {
 			case "StopArea":
 				a := NewAffectedStopArea()
-				a.StopAreaId = StopAreaId(v["StopAreaId"])
+				json.Unmarshal(v, a)
 				situation.Affects = append(situation.Affects, a)
 			case "Line":
 				l := NewAffectedLine()
-				l.LineId = LineId(v["LineId"])
+				json.Unmarshal(v, l)
 				situation.Affects = append(situation.Affects, l)
 			}
 		}

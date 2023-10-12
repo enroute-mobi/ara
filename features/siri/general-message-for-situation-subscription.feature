@@ -233,14 +233,14 @@ Feature: Support SIRI GeneralMessage by subscription
       | Keywords                   | ["Perturbation"]                          |
       | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
       | Description[DefaultValue]  | a very very very long message             |
-      | References[0]              | LineRef:{"internal":"1234"}               |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
       | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00              |
       | Description[DefaultValue]  | an ANOTHER very very very long message |
       | Version                    | 2                                      |
-    And 20 seconds have passed
+    And 15 seconds have passed
     Then the SIRI server should receive this response
     """
      <?xml version='1.0' encoding='utf-8'?>
@@ -248,14 +248,14 @@ Feature: Support SIRI GeneralMessage by subscription
        <S:Body>
          <sw:NotifyGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
            <ServiceDeliveryInfo>
-             <siri:ResponseTimestamp>2017-01-01T12:00:30.000Z</siri:ResponseTimestamp>
+             <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
              <siri:ProducerRef>test</siri:ProducerRef>
              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
              <siri:RequestMessageRef></siri:RequestMessageRef>
            </ServiceDeliveryInfo>
            <Notification>
              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
-               <siri:ResponseTimestamp>2017-01-01T12:00:30.000Z</siri:ResponseTimestamp>
+               <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
                <siri:RequestMessageRef></siri:RequestMessageRef>
                <siri:SubscriberRef>subscriber</siri:SubscriberRef>
                <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
@@ -278,7 +278,7 @@ Feature: Support SIRI GeneralMessage by subscription
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>
            </Notification>
-           <NotifyExtension />
+           <SiriExtension />
          </sw:NotifyGeneralMessage>
        </S:Body>
      </S:Envelope>
@@ -308,7 +308,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
       | ReportType                 | incident                                  |
       | Description[DefaultValue]  | a very very very long message             |
-      | References[0]              | LineRef:{"internal":"1234"}               |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
     And 20 seconds have passed
     Then the SIRI server should receive this response
     """
@@ -347,7 +347,7 @@ Feature: Support SIRI GeneralMessage by subscription
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>
            </Notification>
-           <NotifyExtension />
+           <SiriExtension />
          </sw:NotifyGeneralMessage>
        </S:Body>
      </S:Envelope>
