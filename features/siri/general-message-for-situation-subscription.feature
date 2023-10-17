@@ -105,8 +105,7 @@ Feature: Support SIRI GeneralMessage by subscription
             </ns3:GeneralMessage>
          </ns3:GeneralMessageDelivery>
        </Notification>
-      <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-      </ns1:NotifyGeneralMessage>
+      <SiriExtension/>
    </S:Body>
    </S:Envelope>
       """
@@ -151,7 +150,7 @@ Feature: Support SIRI GeneralMessage by subscription
             </ns5:ResponseStatus>
             <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
           </Answer>
-          <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+          <AnswerExtension/>
         </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>
@@ -712,7 +711,7 @@ Feature: Support SIRI GeneralMessage by subscription
             </ns3:GeneralMessage>
          </ns3:GeneralMessageDelivery>
        </Notification>
-      <NotifyExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <SiriExtension/>
       </ns1:NotifyGeneralMessage>
    </S:Body>
    </S:Envelope>

@@ -974,7 +974,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisitCancellation>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotifyExtension />
+  <SiriExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>
@@ -1143,7 +1143,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisitCancellation>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotifyExtension />
+  <SiriExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>
@@ -1309,7 +1309,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisitCancellation>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotifyExtension />
+  <SiriExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>
@@ -1477,7 +1477,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisitCancellation>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotifyExtension />
+  <SiriExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>
@@ -2342,7 +2342,7 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       </siri:MonitoredStopVisit>
     </siri:StopMonitoringDelivery>
   </Notification>
-  <NotifyExtension />
+  <SiriExtension />
 </sw:NotifyStopMonitoring>
 </S:Body>
 </S:Envelope>

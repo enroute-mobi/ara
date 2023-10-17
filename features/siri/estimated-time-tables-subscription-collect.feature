@@ -286,7 +286,7 @@ Feature: Support SIRI EstimatedTimetable
       </siri:EstimatedJourneyVersionFrame>
     </siri:EstimatedTimetableDelivery>
   </Notification>
-  <NotifyExtension/>
+  <SiriExtension/>
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>
@@ -431,7 +431,7 @@ Feature: Support SIRI EstimatedTimetable
       </siri:EstimatedJourneyVersionFrame>
     </siri:EstimatedTimetableDelivery>
   </Notification>
-  <NotifyExtension/>
+  <SiriExtension/>
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>
