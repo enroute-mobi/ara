@@ -28,6 +28,10 @@ When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destro
   RestClient.delete situation_path(expectedSituation["Id"]), {:Authorization => "Token token=#{$token}"}
 end
 
+When(/^the Situation "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
+  RestClient.put situation_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  # Kernel.puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+end
 
 Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get situations_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}" }
