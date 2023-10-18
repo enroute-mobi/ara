@@ -105,9 +105,10 @@ Feature: Support SIRI GeneralMessage by subscription
             </ns3:GeneralMessage>
          </ns3:GeneralMessageDelivery>
        </Notification>
-      <SiriExtension/>
-   </S:Body>
-   </S:Envelope>
+       <SiriExtension/>
+      </ns1:NotifyGeneralMessage>
+    </S:Body>
+    </S:Envelope>
       """
     Then a Situation exists with the following attributes:
         | ObjectIDs | "internal" : "NINOXE:GeneralMessage:27_1" |
