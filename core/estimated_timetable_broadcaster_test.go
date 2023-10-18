@@ -152,7 +152,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
 	</Notification>
-	<NotifyExtension />
+	<SiriExtension />
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>`

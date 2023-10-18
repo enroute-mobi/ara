@@ -516,7 +516,7 @@ Feature: Audit API exchanges
       </siri:EstimatedJourneyVersionFrame>
     </siri:EstimatedTimetableDelivery>
   </Notification>
-  <NotifyExtension/>
+  <SiriExtension/>
 </sw:NotifyEstimatedTimetable>
 </S:Body>
 </S:Envelope>

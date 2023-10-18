@@ -9,5 +9,5 @@
 	<Notification>{{ range .Deliveries }}
 		{{ .BuildNotifyStopMonitoringDeliveryXML }}{{ end }}
 	</Notification>
-	<NotifyExtension />
+	<SiriExtension />
 </sw:NotifyStopMonitoring>

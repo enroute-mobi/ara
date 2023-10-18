@@ -22,5 +22,5 @@
 			{{ .BuildEstimatedJourneyVersionFrameXML }}{{ end }}{{ end }}
 		</siri:EstimatedTimetableDelivery>
 	</Notification>
-	<NotifyExtension />
+	<SiriExtension />
 </sw:NotifyEstimatedTimetable>

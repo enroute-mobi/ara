@@ -22,5 +22,5 @@
 			{{ .BuildGeneralMessageXML }}{{ end }}{{ end }}
 		 </siri:GeneralMessageDelivery>
 	</Notification>
-	<NotifyExtension />
+	<SiriExtension />
 </sw:NotifyGeneralMessage>
