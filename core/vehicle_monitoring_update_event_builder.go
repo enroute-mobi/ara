@@ -144,7 +144,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
-		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.VehicleMonitoringRef()] = struct{}{}
+		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.VehicleRef()] = struct{}{}
 	}
 }
 
