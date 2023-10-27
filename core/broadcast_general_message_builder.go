@@ -127,6 +127,23 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 				}
 				siriGeneralMessage.AffectedRefs = append(siriGeneralMessage.AffectedRefs, affectedDestinationRef)
 			}
+			for _, affectedSection := range affect.(*model.AffectedLine).AffectedSections {
+				// PLEASE CHANGE ME, make a standard resolveStopAreaRef !!!
+				firstStopId, ok := builder.resolveAffectedDestinationRef(model.StopAreaId(affectedSection.FirstStop))
+				if !ok {
+					continue
+				}
+				lastStopId, ok := builder.resolveAffectedDestinationRef(model.StopAreaId(affectedSection.LastStop))
+				if !ok {
+					continue
+				}
+				affectedSectionRef := &siri.SIRILineSection{
+					FirstStop: firstStopId,
+					LastStop:  lastStopId,
+					LineRef:   affectedLineId,
+				}
+				siriGeneralMessage.LineSections = append(siriGeneralMessage.LineSections, affectedSectionRef)
+			}
 		}
 	}
 
@@ -141,13 +158,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	if !builder.checkAffectFilter(siriGeneralMessage.AffectedRefs) {
 		return nil
 	}
-	for _, lineSection := range situation.LineSections {
-		siriLineSection, ok := builder.handleLineSection(*lineSection)
-		if !ok {
-			continue
-		}
-		siriGeneralMessage.LineSections = append(siriGeneralMessage.LineSections, siriLineSection)
-	}
+
 	if len(siriGeneralMessage.References) == 0 && len(siriGeneralMessage.AffectedRefs) == 0 && len(siriGeneralMessage.LineSections) == 0 {
 		return nil
 	}
@@ -188,25 +199,6 @@ func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChanne
 	}
 
 	return false
-}
-
-func (builder *BroadcastGeneralMessageBuilder) handleLineSection(lineSection model.References) (*siri.SIRILineSection, bool) {
-	siriLineSection := &siri.SIRILineSection{}
-	lineSectionMap := make(map[string]string)
-
-	for kind, reference := range lineSection.GetReferences() {
-		ref, ok := builder.resolveReference(&reference)
-		if !ok {
-			return nil, false
-		}
-		lineSectionMap[kind] = ref
-	}
-
-	siriLineSection.FirstStop = lineSectionMap["FirstStop"]
-	siriLineSection.LastStop = lineSectionMap["LastStop"]
-	siriLineSection.LineRef = lineSectionMap["LineRef"]
-
-	return siriLineSection, true
 }
 
 func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model.Reference) (string, bool) {

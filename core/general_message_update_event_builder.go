@@ -153,6 +153,26 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *m
 	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, &affectedDestination)
 }
 
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section *sxml.IDFLineSectionStructure, affectedLine *model.AffectedLine) {
+	firstStopRef := section.FirstStop()
+	firstStopObjectId := model.NewObjectID(builder.remoteObjectidKind, firstStopRef)
+	firstStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(firstStopObjectId)
+	if !ok {
+		return
+	}
+	lastStopRef := section.LastStop()
+	lastStopObjectId := model.NewObjectID(builder.remoteObjectidKind, lastStopRef)
+	lastStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(lastStopObjectId)
+	if !ok {
+		return
+	}
+	affectedSection := model.AffectedSection{
+		FirstStop: firstStopArea.Id(),
+		LastStop:  lastStopArea.Id(),
+	}
+	affectedLine.AffectedSections = append(affectedLine.AffectedSections, &affectedSection)
+}
+
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 
 	for _, lineRef := range content.LineRef() {
@@ -162,6 +182,9 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 	if len(event.Affects) == 1 && event.Affects[0].GetType() == "Line" {
 		for _, destination := range content.DestinationRef() {
 			builder.setAffectedDestination(event, destination, event.Affects[0].(*model.AffectedLine))
+		}
+		for _, section := range content.LineSections() {
+			builder.setAffectedSection(event, section, event.Affects[0].(*model.AffectedLine))
 		}
 	}
 

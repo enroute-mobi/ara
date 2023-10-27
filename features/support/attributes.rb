@@ -142,13 +142,17 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ %r{^(Affects\[([^\]]+)\])(/AffectedDestinations/StopAreaId)?}
+    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections)\[(\d+)])?(/((FirstStop|LastStop)|StopAreaId))?}
+      raw_attribute = Regexp.last_match(0).to_s
       attribute = Regexp.last_match(2).to_s
-      subaffect = Regexp.last_match(3).to_s
+      subaffect = Regexp.last_match(4).to_s
+      index = Regexp.last_match(5).to_i
+      stop_type = Regexp.last_match(7).to_s
 
+      attributes['Affects'] ||= []
       case attribute
       when 'StopArea', 'Line'
-        (attributes['Affects'] ||= []) << {
+        attributes['Affects'] << {
           'Type' => attribute,
           "#{attribute}Id" => value
         }
@@ -157,15 +161,12 @@ def model_attributes(table)
         attributes['Affects'].map do |affect|
           next if affect['Type'] != model && affect["#{model}Id"] != id
 
-          case subaffect
-          when '/AffectedDestinations/StopAreaId'
-            affect['AffectedDestinations'] ||= []
-            affect['AffectedDestinations'] << { 'StopAreaId' => value }
-          end
+          affect[subaffect] ||= []
+          affect[subaffect][index] ||= {}
+          affect[subaffect][index][stop_type] = value
         end
       end
-      attributes.delete key
-
+      attributes.delete raw_attribute
     end
     
     if key =~ /ReferenceArray\[(\d+)\]/
