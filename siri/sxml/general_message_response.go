@@ -40,11 +40,10 @@ type XMLGeneralMessage struct {
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	lineRef           []string
-	stopPointRef      []string
-	journeyPatternRef []string
-	destinationRef    []string
-	routeRef          []string
+	lineRef        []string
+	stopPointRef   []string
+	destinationRef []string
+	routeRef       []string
 
 	lineSections []*IDFLineSectionStructure
 	messages     []*XMLMessage
@@ -218,16 +217,6 @@ func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 		}
 	}
 	return visit.destinationRef
-}
-
-func (visit *IDFGeneralMessageStructure) JourneyPatternRef() []string {
-	if len(visit.journeyPatternRef) == 0 {
-		nodes := visit.findNodes("JourneyPatternRef")
-		for _, journeyPatternRef := range nodes {
-			visit.journeyPatternRef = append(visit.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
-		}
-	}
-	return visit.journeyPatternRef
 }
 
 func (visit *IDFGeneralMessageStructure) StopPointRef() []string {

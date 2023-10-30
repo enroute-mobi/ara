@@ -205,12 +205,6 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 	remoteObjectidKind := builder.remoteObjectidKind
 
-	for _, journeypatternref := range content.JourneyPatternRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, journeypatternref))
-		ref.Type = "JourneyPatternRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
-
 	for _, lineSection := range content.LineSections() {
 		builder.handleLineSection(remoteObjectidKind, lineSection, event)
 	}

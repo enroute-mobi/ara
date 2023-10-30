@@ -97,14 +97,6 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal("StopArea", affects[2].GetType())
 	assert.Equal(model.ModelId(stopArea2Id), affects[2].GetId())
 
-	if len(event.SituationAttributes.References) != 2 {
-		t.Fatalf("Wrong number of References, expected: 2, got: %v", len(event.SituationAttributes.References))
-	}
-
-	if event.SituationAttributes.References[0].ObjectId.Value() != "journeyPatternRef1" {
-		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[0])
-	}
-
 	if len(event.SituationAttributes.LineSections) != 2 {
 		t.Fatalf("Wrong number of LineSections, expected: 2, got: %v", len(event.SituationAttributes.LineSections))
 	}
