@@ -23,7 +23,6 @@ type XMLGeneralMessageRequest struct {
 	journeyPatternRef []string
 	destinationRef    []string
 	routeRef          []string
-	groupOfLinesRef   []string
 }
 
 func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
@@ -56,16 +55,6 @@ func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
 		}
 	}
 	return request.infoChannelRef
-}
-
-func (request *XMLGeneralMessageRequest) GroupOfLinesRef() []string {
-	if len(request.groupOfLinesRef) == 0 {
-		nodes := request.findNodes("GroupOfLinesRef")
-		for _, groupOfLinesRef := range nodes {
-			request.groupOfLinesRef = append(request.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-		}
-	}
-	return request.groupOfLinesRef
 }
 
 func (request *XMLGeneralMessageRequest) RouteRef() []string {

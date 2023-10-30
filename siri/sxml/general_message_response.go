@@ -45,7 +45,6 @@ type IDFGeneralMessageStructure struct {
 	journeyPatternRef []string
 	destinationRef    []string
 	routeRef          []string
-	groupOfLinesRef   []string
 
 	lineSections []*IDFLineSectionStructure
 	messages     []*XMLMessage
@@ -199,16 +198,6 @@ func (visit *XMLGeneralMessage) Content() interface{} {
 	}
 	visit.content = visit.createNewContent()
 	return visit.content
-}
-
-func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() []string {
-	if len(visit.groupOfLinesRef) == 0 {
-		nodes := visit.findNodes("GroupOfLinesRef")
-		for _, groupOfLinesRef := range nodes {
-			visit.groupOfLinesRef = append(visit.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-		}
-	}
-	return visit.groupOfLinesRef
 }
 
 func (visit *IDFGeneralMessageStructure) RouteRef() []string {

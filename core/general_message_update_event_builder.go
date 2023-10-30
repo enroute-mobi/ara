@@ -211,11 +211,6 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 	}
 
-	for _, groupoflinesref := range content.GroupOfLinesRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, groupoflinesref))
-		ref.Type = "GroupOfLinesRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
 	for _, lineSection := range content.LineSections() {
 		builder.handleLineSection(remoteObjectidKind, lineSection, event)
 	}

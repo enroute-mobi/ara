@@ -28,7 +28,6 @@ type SIRIGeneralMessageRequest struct {
 	JourneyPatternRef []string
 	DestinationRef    []string
 	RouteRef          []string
-	GroupOfLinesRef   []string
 }
 
 func NewSIRIGeneralMessageRequest(
