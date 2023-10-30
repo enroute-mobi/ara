@@ -25,9 +25,7 @@ func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdat
 	}
 
 	event.Summary = summary
-	event.SituationAttributes = SituationAttributes{
-		Format: "format",
-	}
+	event.Format = "format"
 
 	return
 }

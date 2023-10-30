@@ -73,8 +73,8 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Len(*events, 1, "One event should have been created")
 
 	event := (*events)[0]
-	if event.SituationAttributes.Format != "FRANCE" {
-		t.Errorf("Wrong Format, expected: FRANCE, got: %v", event.SituationAttributes.Format)
+	if event.Format != "FRANCE" {
+		t.Errorf("Wrong Format, expected: FRANCE, got: %v", event.Format)
 	}
 
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)

@@ -10,6 +10,7 @@ type SituationUpdateEvent struct {
 	SituationObjectID   ObjectID
 	id                  SituationUpdateRequestId
 	Origin              string
+	Format              string
 	ProducerRef         string
 	SituationAttributes SituationAttributes
 	ValidityPeriods     []*TimeRange
@@ -22,7 +23,6 @@ type SituationUpdateEvent struct {
 }
 
 type SituationAttributes struct {
-	Format       string
 	LineSections []*References
 }
 
