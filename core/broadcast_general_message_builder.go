@@ -154,14 +154,6 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		}
 	}
 
-	for _, reference := range situation.References {
-		id, ok := builder.resolveReference(reference)
-		if !ok {
-			continue
-		}
-		siriGeneralMessage.References = append(siriGeneralMessage.References, &siri.SIRIReference{Kind: reference.Type, Id: id})
-	}
-
 	if !builder.checkAffectFilter(siriGeneralMessage.AffectedRefs) {
 		return nil
 	}
@@ -208,16 +200,6 @@ func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChanne
 	return false
 }
 
-func (builder *BroadcastGeneralMessageBuilder) resolveReference(reference *model.Reference) (string, bool) {
-	switch reference.Type {
-	case "DestinationRef", "FirstStop", "LastStop":
-		return builder.resolveStopAreaRef(reference)
-	default:
-		kind := reference.Type
-		return builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: kind[:len(kind)-3], Id: reference.GetSha1()}), true
-	}
-}
-
 func (builder *BroadcastGeneralMessageBuilder) resolveAffectedLineRef(affect model.Affect) (string, bool) {
 	line, ok := builder.partner.Model().Lines().Find(model.LineId(affect.GetId()))
 	if !ok {
@@ -244,18 +226,6 @@ func (builder *BroadcastGeneralMessageBuilder) resolveAffectedStopAreaRef(affect
 
 func (builder *BroadcastGeneralMessageBuilder) resolveAffectedDestinationRef(stopAreaId model.StopAreaId) (string, bool) {
 	stopArea, ok := builder.partner.Model().StopAreas().Find(stopAreaId)
-	if !ok {
-		return "", false
-	}
-	stopAreaObjectId, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
-	if !ok {
-		return "", false
-	}
-	return stopAreaObjectId.Value(), true
-}
-
-func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(reference *model.Reference) (string, bool) {
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
 	if !ok {
 		return "", false
 	}

@@ -110,7 +110,7 @@ func Test_SituationController_Show(t *testing.T) {
 
 func Test_SituationController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "References" : [{"ObjectId":{"lol":"lel"},"Type": "StopArea"}],
+	body := []byte(`{ "Affects" : [{"LineId":"lol","Type": "Line"}],
 		"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareSituationRequest("POST", false, body, t)
 
@@ -125,7 +125,7 @@ func Test_SituationController_Create(t *testing.T) {
 		t.Errorf("Situation should be found after POST request")
 	}
 	situationMarshal, _ := situation.MarshalJSON()
-	expected := `{"ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","References":[{"ObjectId":{"lol":"lel"},"Type":"StopArea"}]}`
+	expected := `{"ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Affects":[{"Type":"Line","LineId":"lol"}]}`
 	if responseRecorder.Body.String() != string(expected) && string(situationMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

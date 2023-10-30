@@ -34,9 +34,14 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-soap.xml")
@@ -94,9 +99,14 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-soap.xml")
@@ -145,9 +155,14 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
 	objectid2 := model.NewObjectID("objectidKind", "2")

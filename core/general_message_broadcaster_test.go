@@ -93,13 +93,24 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
-	objectid2 := model.NewObjectID("SituationResource", "Situation")
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+	objectid2 := model.NewObjectID("internal", "value")
+	stopArea.SetObjectID(objectid2)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
+
+	// routeReference := model.NewReference(model.NewObjectID("internal", "value"))
+	// routeReference.Type = "RouteRef"
+	// situation.References = append(situation.References, routeReference)
+	objectid3 := model.NewObjectID("SituationResource", "Situation")
 
 	reference := model.Reference{
-		ObjectId: &objectid2,
+		ObjectId: &objectid3,
 		Type:     "Situation",
 	}
 

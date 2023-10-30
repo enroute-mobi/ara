@@ -51,7 +51,6 @@ type Situation struct {
 
 	Affects      []Affect `json:",omitempty"`
 	LineSections []*References
-	References   []*Reference
 }
 
 // SubTypes of Affect
@@ -128,16 +127,6 @@ func (situation *Situation) Id() SituationId {
 	return situation.id
 }
 
-func (situation *Situation) FindReferenceByObjectId(obj *ObjectID) (*Reference, bool) {
-	for _, ref := range situation.References {
-		if ref.ObjectId.String() == obj.String() {
-			return ref, true
-		}
-	}
-
-	return &Reference{}, false
-}
-
 func (situation *Situation) Save() (ok bool) {
 	ok = situation.model.Situations().Save(situation)
 	return
@@ -204,9 +193,6 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 
 	if !situation.ObjectIDs().Empty() {
 		aux.ObjectIDs = situation.ObjectIDs()
-	}
-	if len(situation.References) != 0 {
-		aux.References = situation.References
 	}
 	if len(situation.LineSections) != 0 {
 		aux.LineSections = situation.LineSections

@@ -23,7 +23,6 @@ type SituationUpdateEvent struct {
 
 type SituationAttributes struct {
 	Format       string
-	References   []*Reference
 	LineSections []*References
 }
 
