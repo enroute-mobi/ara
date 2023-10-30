@@ -86,17 +86,18 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs                                                                        | "external" : "test"                                                        |
-      | RecordedAt                                                                       | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                                                                          | 1                                                                          |
-      | Keywords                                                                         | ["Commercial"]                                                             |
-      | ValidityPeriods[0]#EndTime                                                       | 2017-01-01T20:30:06+02:00                                                  |
-      | Description[DefaultValue]                                                        | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | Affects[StopArea]                                                                | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
-      | Affects[Line]                                                                    | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
+      | ObjectIDs                                                                           | "external" : "test"                                                        |
+      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                                                                             | 1                                                                          |
+      | Keywords                                                                            | ["Commercial"]                                                             |
+      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                                                  |
+      | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId   | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                                               |
     And a Line exists with the following attributes:
       | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
@@ -161,6 +162,7 @@ Feature: Support SIRI GeneralMessage for Situation
                     <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DestinationRef>NINOXE:StopPoint:SP:24:LOC</siri:DestinationRef>
+                    <siri:RouteRef>Route:66:LOC</siri:RouteRef>
                     <siri:LineSection>
                       <siri:FirstStop>NINOXE:StopPoint:SP:24:LOC</siri:FirstStop>
                       <siri:LastStop>NINOXE:StopPoint:SP:25:LOC</siri:LastStop>
@@ -213,6 +215,7 @@ Feature: Support SIRI GeneralMessage for Situation
                    <siri:LineRef>1234</siri:LineRef>
                    <siri:DestinationRef>destinationRef1</siri:DestinationRef>
                    <siri:DestinationRef>destinationRef2</siri:DestinationRef>
+                   <siri:RouteRef>Route:66:LOC</siri:RouteRef>
                     <siri:LineSection>
                       <siri:FirstStop>NINOXE:StopPoint:SP:25:LOC</siri:FirstStop>
                       <siri:LastStop>NINOXE:StopPoint:SP:26:LOC</siri:LastStop>
@@ -273,6 +276,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[1]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-7-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                                               |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with

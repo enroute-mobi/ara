@@ -82,6 +82,7 @@ type AffectedLine struct {
 	LineId               LineId                 `json:",omitempty"`
 	AffectedDestinations []*AffectedDestination `json:",omitempty"`
 	AffectedSections     []*AffectedSection     `json:",omitempty"`
+	AffectedRoutes       []*AffectedRoute       `json:",omitempty"`
 }
 
 type AffectedDestination struct {
@@ -91,6 +92,10 @@ type AffectedDestination struct {
 type AffectedSection struct {
 	FirstStop StopAreaId
 	LastStop  StopAreaId
+}
+
+type AffectedRoute struct {
+	RouteRef string
 }
 
 func (a AffectedLine) GetId() ModelId {

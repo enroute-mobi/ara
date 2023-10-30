@@ -48,6 +48,8 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		LastStop:  StopAreaId(affectedSectionLastStopId),
 	}
 	affectLine.AffectedSections = append(affectLine.AffectedSections, affectedSection)
+	affectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
+	affectLine.AffectedRoutes = append(affectLine.AffectedRoutes, affectedRoute)
 	situation.Affects = append(situation.Affects, affectLine)
 
 	expected := `{
@@ -56,7 +58,8 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222",
 "AffectedDestinations":[{"StopAreaId":"333"}],
-"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}]}
+"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
+"AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
 ],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
@@ -75,7 +78,8 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}],
-"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}]}
+"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
+"AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
 ],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
@@ -110,6 +114,9 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		LastStop:  StopAreaId("lastStop"),
 	}
 	expectedAffectedLine.AffectedSections = append(expectedAffectedLine.AffectedSections, affectedSection)
+
+	expectedAffectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
+	expectedAffectedLine.AffectedRoutes = append(expectedAffectedLine.AffectedRoutes, expectedAffectedRoute)
 
 	assert.Equal(expectedSmmary, situation.Summary)
 	assert.Equal(expectedDescription, situation.Description)

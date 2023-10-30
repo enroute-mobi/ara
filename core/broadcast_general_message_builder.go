@@ -144,6 +144,13 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 				}
 				siriGeneralMessage.LineSections = append(siriGeneralMessage.LineSections, affectedSectionRef)
 			}
+			for _, affectedRoute := range affect.(*model.AffectedLine).AffectedRoutes {
+				affectedRouteRef := &siri.SIRIAffectedRef{
+					Kind: "RouteRef",
+					Id:   affectedRoute.RouteRef,
+				}
+				siriGeneralMessage.AffectedRefs = append(siriGeneralMessage.AffectedRefs, affectedRouteRef)
+			}
 		}
 	}
 

@@ -97,7 +97,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal("StopArea", affects[2].GetType())
 	assert.Equal(model.ModelId(stopArea2Id), affects[2].GetId())
 
-	if len(event.SituationAttributes.References) != 6 {
+	if len(event.SituationAttributes.References) != 4 {
 		t.Fatalf("Wrong number of References, expected: 6, got: %v", len(event.SituationAttributes.References))
 	}
 
@@ -105,10 +105,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 		t.Errorf("Wrong first JourneyPatternRef: %v", event.SituationAttributes.References[0])
 	}
 
-	if event.SituationAttributes.References[2].ObjectId.Value() != "routeRef1" {
-		t.Errorf("Wrong first RouteRef: %v", event.SituationAttributes.References[4])
-	}
-	if event.SituationAttributes.References[4].ObjectId.Value() != "groupOfLineRef1" {
+	if event.SituationAttributes.References[2].ObjectId.Value() != "groupOfLineRef1" {
 		t.Errorf("Wrong first GroupOfLinesRef: %v", event.SituationAttributes.References[6])
 	}
 

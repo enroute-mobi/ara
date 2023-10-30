@@ -142,6 +142,11 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(event *model.Si
 	event.Affects = append(event.Affects, affect)
 }
 
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(event *model.SituationUpdateEvent, route string, affectedLine *model.AffectedLine) {
+	affectedRoute := model.AffectedRoute{RouteRef: route}
+	affectedLine.AffectedRoutes = append(affectedLine.AffectedRoutes, &affectedRoute)
+}
+
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *model.SituationUpdateEvent, destination string, affectedLine *model.AffectedLine) {
 	destinationObjectId := model.NewObjectID(builder.remoteObjectidKind, destination)
 	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(destinationObjectId)
@@ -186,6 +191,9 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 		for _, section := range content.LineSections() {
 			builder.setAffectedSection(event, section, event.Affects[0].(*model.AffectedLine))
 		}
+		for _, route := range content.RouteRef() {
+			builder.setAffectedRoute(event, route, event.Affects[0].(*model.AffectedLine))
+		}
 	}
 
 	for _, stopPointRef := range content.StopPointRef() {
@@ -203,11 +211,6 @@ func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.Situ
 		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
 	}
 
-	for _, routeref := range content.RouteRef() {
-		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, routeref))
-		ref.Type = "RouteRef"
-		event.SituationAttributes.References = append(event.SituationAttributes.References, ref)
-	}
 	for _, groupoflinesref := range content.GroupOfLinesRef() {
 		ref := model.NewReference(model.NewObjectID(remoteObjectidKind, groupoflinesref))
 		ref.Type = "GroupOfLinesRef"
