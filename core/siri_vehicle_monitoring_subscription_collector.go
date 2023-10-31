@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type VehicleMonitoringSubscriptionCollector interface {
@@ -14,7 +15,7 @@ type VehicleMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestVehicleUpdate(request *VehicleUpdateRequest)
-	HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring) *VehicleMonitoringUpdateEvents
+	HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring) *CollectedRefs
 }
 
 type SIRIVehicleMonitoringSubscriptionCollector struct {
@@ -100,11 +101,12 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) SetVehicleMonitorin
 	connector.vehicleMonitoringSubscriber = vehicleMonitoringSubscriber
 }
 
-func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) *VehicleMonitoringUpdateEvents {
+func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) *CollectedRefs {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 	var updateEvents VehicleMonitoringUpdateEvents
 
+	collectedRefs := NewCollectedRefs()
 	for _, delivery := range notify.VehicleMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
@@ -128,6 +130,11 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 
 		updateEvents = builder.UpdateEvents()
 
+		maps.Copy(collectedRefs.LineRefs, updateEvents.LineRefs)
+		maps.Copy(collectedRefs.MonitoringRefs, updateEvents.MonitoringRefs)
+		maps.Copy(collectedRefs.VehicleJourneyRefs, updateEvents.VehicleJourneyRefs)
+		maps.Copy(collectedRefs.VehicleRefs, updateEvents.VehicleRefs)
+
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
@@ -135,7 +142,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 		CancelSubscription(subId, "VehicleMonitoringSubscriptionCollector", connector)
 	}
 
-	return &updateEvents
+	return collectedRefs
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionCollector) broadcastUpdateEvents(events *VehicleMonitoringUpdateEvents) {

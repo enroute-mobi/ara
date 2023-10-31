@@ -18,6 +18,7 @@ type CollectedRefs struct {
 	MonitoringRefs     map[string]struct{}
 	LineRefs           map[string]struct{}
 	VehicleJourneyRefs map[string]struct{}
+	VehicleRefs        map[string]struct{}
 }
 
 func NewCollectedRefs() *CollectedRefs {
@@ -25,6 +26,7 @@ func NewCollectedRefs() *CollectedRefs {
 		MonitoringRefs:     make(map[string]struct{}),
 		LineRefs:           make(map[string]struct{}),
 		VehicleJourneyRefs: make(map[string]struct{}),
+		VehicleRefs:        make(map[string]struct{}),
 	}
 }
 func NewCollectUpdateEvents() *CollectUpdateEvents {
@@ -49,4 +51,8 @@ func (events *CollectedRefs) GetVehicleJourneys() []string {
 
 func (events *CollectedRefs) GetStopAreas() []string {
 	return GetModelReferenceSlice(events.MonitoringRefs)
+}
+
+func (events *CollectedRefs) GetVehicles() []string {
+	return GetModelReferenceSlice(events.VehicleRefs)
 }

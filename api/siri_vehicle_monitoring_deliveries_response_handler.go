@@ -28,7 +28,7 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 
 	t := clock.DefaultClock().Now()
 
-	updateEvents := params.connector.(core.VehicleMonitoringSubscriptionCollector).HandleNotifyVehicleMonitoring(handler.xmlRequest)
+	collectedRefs := params.connector.(core.VehicleMonitoringSubscriptionCollector).HandleNotifyVehicleMonitoring(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
 
@@ -50,10 +50,10 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 		subs = append(subs, k)
 	}
 	params.message.SubscriptionIdentifiers = subs
-	params.message.Vehicles = updateEvents.GetVehicles()
-	params.message.Lines = updateEvents.GetLines()
-	params.message.VehicleJourneys = updateEvents.GetVehicleJourneys()
-	params.message.StopAreas = updateEvents.GetStopAreas()
+	params.message.Vehicles = collectedRefs.GetVehicles()
+	params.message.Lines = collectedRefs.GetLines()
+	params.message.VehicleJourneys = collectedRefs.GetVehicleJourneys()
+	params.message.StopAreas = collectedRefs.GetStopAreas()
 
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }
