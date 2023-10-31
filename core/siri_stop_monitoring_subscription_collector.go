@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type StopMonitoringSubscriptionCollector interface {
@@ -14,7 +15,7 @@ type StopMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestStopAreaUpdate(request *StopAreaUpdateRequest)
-	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring) *CollectUpdateEvents
+	HandleNotifyStopMonitoring(delivery *sxml.XMLNotifyStopMonitoring) *CollectedRefs
 }
 
 type SIRIStopMonitoringSubscriptionCollector struct {
@@ -100,11 +101,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) *CollectUpdateEvents {
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) *CollectedRefs {
 	// subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 	var updateEvents CollectUpdateEvents
 
+	collectedRefs := NewCollectedRefs()
 	for _, delivery := range notify.StopMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
@@ -136,13 +138,18 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 		builder.SetStopVisitCancellationEvents(delivery)
 		updateEvents = builder.UpdateEvents()
 
+		maps.Copy(collectedRefs.LineRefs, updateEvents.LineRefs)
+		maps.Copy(collectedRefs.MonitoringRefs, updateEvents.MonitoringRefs)
+		maps.Copy(collectedRefs.VehicleJourneyRefs, updateEvents.VehicleJourneyRefs)
+
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
 	for subId := range subToDelete {
 		CancelSubscription(subId, "StopMonitoringSubscriptionCollector", connector)
 	}
-	return &updateEvents
+
+	return collectedRefs
 }
 
 func (connector *SIRIStopMonitoringSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {

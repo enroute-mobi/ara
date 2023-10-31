@@ -28,7 +28,7 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(param
 
 	t := clock.DefaultClock().Now()
 
-	updateEvents := params.connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
+	collectedRefs := params.connector.(core.StopMonitoringSubscriptionCollector).HandleNotifyStopMonitoring(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
 
@@ -50,9 +50,9 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(param
 		subs = append(subs, k)
 	}
 	params.message.SubscriptionIdentifiers = subs
-	params.message.StopAreas = updateEvents.GetStopAreas()
-	params.message.Lines = updateEvents.GetLines()
-	params.message.VehicleJourneys = updateEvents.GetVehicleJourneys()
+	params.message.StopAreas = collectedRefs.GetStopAreas()
+	params.message.Lines = collectedRefs.GetLines()
+	params.message.VehicleJourneys = collectedRefs.GetVehicleJourneys()
 
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }
