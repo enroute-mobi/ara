@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type EstimatedTimetableSubscriptionCollector interface {
@@ -14,7 +15,7 @@ type EstimatedTimetableSubscriptionCollector interface {
 	state.Startable
 
 	RequestLineUpdate(request *LineUpdateRequest)
-	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable) *CollectUpdateEvents
+	HandleNotifyEstimatedTimetable(delivery *sxml.XMLNotifyEstimatedTimetable) *CollectedRefs
 }
 
 type SIRIEstimatedTimetableSubscriptionCollector struct {
@@ -101,11 +102,12 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) SetEstimatedTimeta
 	connector.estimatedTimetableSubscriber = estimatedTimetableSubscriber
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) *CollectUpdateEvents {
+func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) *CollectedRefs {
 	// subscriptionErrors := make(map[string]string)
 	var updateEvents CollectUpdateEvents
 	subToDelete := make(map[string]struct{})
 
+	collectedRefs := NewCollectedRefs()
 	for _, delivery := range notify.EstimatedTimetableDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
@@ -128,6 +130,10 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 		builder.SetUpdateEvents(delivery.EstimatedJourneyVersionFrames())
 		updateEvents = builder.UpdateEvents()
 
+		maps.Copy(collectedRefs.LineRefs, updateEvents.LineRefs)
+		maps.Copy(collectedRefs.MonitoringRefs, updateEvents.MonitoringRefs)
+		maps.Copy(collectedRefs.VehicleJourneyRefs, updateEvents.VehicleJourneyRefs)
+
 		connector.broadcastUpdateEvents(&updateEvents)
 	}
 
@@ -135,7 +141,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 		CancelSubscription(subId, "EstimatedTimetableSubscriptionCollector", connector)
 	}
 
-	return &updateEvents
+	return collectedRefs
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
