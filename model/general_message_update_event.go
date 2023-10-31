@@ -23,7 +23,6 @@ type SituationUpdateEvent struct {
 }
 
 type SituationAttributes struct {
-	LineSections []*References
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {

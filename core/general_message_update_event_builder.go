@@ -74,7 +74,6 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	builder.buildSituationAndDescriptionFromMessages(content.Messages(), situationEvent)
 
 	builder.setAffects(situationEvent, &content)
-	builder.setReferences(situationEvent, &content)
 
 	*event = append(*event, situationEvent)
 }
@@ -200,27 +199,4 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 		builder.setAffectedStopArea(event, stopPointRef)
 	}
 
-}
-
-func (builder *GeneralMessageUpdateEventBuilder) setReferences(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
-	remoteObjectidKind := builder.remoteObjectidKind
-
-	for _, lineSection := range content.LineSections() {
-		builder.handleLineSection(remoteObjectidKind, lineSection, event)
-	}
-}
-
-func (Builder *GeneralMessageUpdateEventBuilder) handleLineSection(remoteObjectidKind string, lineSection *sxml.IDFLineSectionStructure, event *model.SituationUpdateEvent) {
-	references := model.NewReferences()
-
-	lineRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.LineRef()))
-	references.Set("LineRef", *lineRef)
-
-	firstStopRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.FirstStop()))
-	references.Set("FirstStop", *firstStopRef)
-
-	lastStopRef := model.NewReference(model.NewObjectID(remoteObjectidKind, lineSection.LastStop()))
-	references.Set("LastStop", *lastStopRef)
-
-	event.SituationAttributes.LineSections = append(event.SituationAttributes.LineSections, &references)
 }
