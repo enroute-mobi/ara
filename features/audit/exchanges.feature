@@ -671,7 +671,7 @@ Feature: Audit API exchanges
                   <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-4</ns3:ItemIdentifier>
                   <ns3:MonitoringRef>NINOXE:StopPoint:SP:25:LOC</ns3:MonitoringRef>
                   <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
+                    <ns3:LineRef>NINOXE:Line:8:LOC</ns3:LineRef>
                     <ns3:DirectionRef>Aller</ns3:DirectionRef>
                     <ns3:FramedVehicleJourneyRef>
                       <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
@@ -713,14 +713,14 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     And an audit event should exist with these attributes:
-      | Protocol           | siri                                                         |
-      | Direction          | received                                                     |
-      | ResponseIdentifier | /{uuid}/                                                     |
-      | Status             | OK                                                           |
-      | Type               | NotifyStopMonitoring                                         |
+      | Protocol           | siri                                    |
+      | Direction          | received                                |
+      | ResponseIdentifier | /{uuid}/                                |
+      | Status             | OK                                      |
+      | Type               | NotifyStopMonitoring                    |
       | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
-      | VehicleJourneys    | ["NINOXE:VehicleJourney:201", "NINOXE:VehicleJourney:202"]   |
-      | Lines              | ["NINOXE:Line:3:LOC"]                                        |
+      | VehicleJourneys    | ["NINOXE:VehicleJourney:201", "NINOXE:VehicleJourney:202"] |
+      | Lines              | ["NINOXE:Line:3:LOC", "NINOXE:Line:8:LOC"] |
 
   @ARA-1385
   Scenario: Audit a VehicleMonitoringDelivery in a subscription with multiple VehicleMonitoringDeliveries
