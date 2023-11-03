@@ -157,7 +157,14 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *m
 	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, &affectedDestination)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section *sxml.IDFLineSectionStructure, affectedLine *model.AffectedLine) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section *sxml.IDFLineSectionStructure) {
+	// Searching for existing Line ?
+	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, section.LineRef())
+	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	if !ok {
+		return
+	}
+
 	firstStopRef := section.FirstStop()
 	firstStopObjectId := model.NewObjectID(builder.remoteObjectidKind, firstStopRef)
 	firstStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(firstStopObjectId)
@@ -170,11 +177,27 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model
 	if !ok {
 		return
 	}
-	affectedSection := model.AffectedSection{
+
+	var pos *int
+	for element, affect := range event.Affects {
+		if affect.GetType() == "Line" && affect.GetId() == model.ModelId(line.Id()) {
+			*pos = element
+		}
+	}
+
+	affectedSection := &model.AffectedSection{
 		FirstStop: firstStopArea.Id(),
 		LastStop:  lastStopArea.Id(),
 	}
-	affectedLine.AffectedSections = append(affectedLine.AffectedSections, &affectedSection)
+
+	if pos != nil {
+		event.Affects[*pos].(*model.AffectedLine).AffectedSections = append(event.Affects[*pos].(*model.AffectedLine).AffectedSections, affectedSection)
+	} else {
+		affectedLine := model.NewAffectedLine()
+		affectedLine.LineId = line.Id()
+		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
+		event.Affects = append(event.Affects, affectedLine)
+	}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
@@ -187,12 +210,13 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 		for _, destination := range content.DestinationRef() {
 			builder.setAffectedDestination(event, destination, event.Affects[0].(*model.AffectedLine))
 		}
-		for _, section := range content.LineSections() {
-			builder.setAffectedSection(event, section, event.Affects[0].(*model.AffectedLine))
-		}
 		for _, route := range content.RouteRef() {
 			builder.setAffectedRoute(event, route, event.Affects[0].(*model.AffectedLine))
 		}
+	}
+
+	for _, section := range content.LineSections() {
+		builder.setAffectedSection(event, section)
 	}
 
 	for _, stopPointRef := range content.StopPointRef() {

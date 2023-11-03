@@ -38,6 +38,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
+	// StopPointRef
 	objectid := model.NewObjectID("remote_objectid_kind", "stopPointRef1")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetObjectID(objectid)
@@ -50,12 +51,14 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	stopArea2.Save()
 	stopArea2Id := stopArea2.Id()
 
+	// LineRef
 	objectid3 := model.NewObjectID("remote_objectid_kind", "lineRef1")
 	line := referential.Model().Lines().New()
 	line.SetObjectID(objectid3)
 	line.Save()
 	lineId := line.Id()
 
+	// Destinations
 	objectid4 := model.NewObjectID("remote_objectid_kind", "destinationRef1")
 	destinationRef1 := referential.Model().StopAreas().New()
 	destinationRef1.SetObjectID(objectid4)
@@ -66,6 +69,38 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	destinationRef2.SetObjectID(objectid5)
 	destinationRef2.Save()
 
+	// LineSections
+	objectid6 := model.NewObjectID("remote_objectid_kind", "lineSectionRef1")
+	lineSectionRef1 := referential.Model().Lines().New()
+	lineSectionRef1.SetObjectID(objectid6)
+	lineSectionRef1.Save()
+
+	objectid7 := model.NewObjectID("remote_objectid_kind", "firstStop1")
+	firstStop1 := referential.Model().StopAreas().New()
+	firstStop1.SetObjectID(objectid7)
+	firstStop1.Save()
+
+	objectid8 := model.NewObjectID("remote_objectid_kind", "lastStop1")
+	lastStop1 := referential.Model().StopAreas().New()
+	lastStop1.SetObjectID(objectid8)
+	lastStop1.Save()
+
+	objectid9 := model.NewObjectID("remote_objectid_kind", "lineSectionRef2")
+	lineSectionRef2 := referential.Model().Lines().New()
+	lineSectionRef2.SetObjectID(objectid9)
+	lineSectionRef2.Save()
+
+	objectid10 := model.NewObjectID("remote_objectid_kind", "firstStop2")
+	firstStop2 := referential.Model().StopAreas().New()
+	firstStop2.SetObjectID(objectid10)
+	firstStop2.Save()
+
+	objectid11 := model.NewObjectID("remote_objectid_kind", "lastStop2")
+	lastStop2 := referential.Model().StopAreas().New()
+	lastStop2.SetObjectID(objectid11)
+	lastStop2.Save()
+
+	// Building
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
 	events := &[]*model.SituationUpdateEvent{}
 
@@ -83,35 +118,33 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Nil(event.Summary)
 
 	affects := event.Affects
-	assert.Len(affects, 3)
+	assert.Len(affects, 5, "Should have 5 affetcs: 3 affctedLines, 2 affectedStopAreas")
 
 	// Affected Lines
 	assert.Equal("Line", affects[0].GetType())
-	assert.Equal(model.ModelId(lineId), affects[0].GetId())
+	assert.Equal(model.ModelId(lineId), affects[0].GetId(), "Should be Id of lineRef1")
+
 	assert.Equal(destinationRef1.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[0].StopAreaId)
 	assert.Equal(destinationRef2.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[1].StopAreaId)
-	// PLEASE CHANGE ME !!!!!
+
+	// AffectedSections
 	assert.Len(affects[0].(*model.AffectedLine).AffectedSections, 0)
+	assert.Len(affects[1].(*model.AffectedLine).AffectedSections, 1)
+	assert.Len(affects[2].(*model.AffectedLine).AffectedSections, 1)
+
+	affectedSectionLineSection1 := affects[1].(*model.AffectedLine).AffectedSections[0]
+	assert.Equal(firstStop1.Id(), affectedSectionLineSection1.FirstStop)
+	assert.Equal(lastStop1.Id(), affectedSectionLineSection1.LastStop)
+
+	affectedSectionLineSection2 := affects[2].(*model.AffectedLine).AffectedSections[0]
+	assert.Equal(firstStop2.Id(), affectedSectionLineSection2.FirstStop)
+	assert.Equal(lastStop2.Id(), affectedSectionLineSection2.LastStop)
 
 	// Affected StopAreas
-	assert.Equal("StopArea", affects[1].GetType())
-	assert.Equal(model.ModelId(stopAreaId), affects[1].GetId())
-	assert.Equal("StopArea", affects[2].GetType())
-	assert.Equal(model.ModelId(stopArea2Id), affects[2].GetId())
-
-	// if len(event.SituationAttributes.LineSections) != 2 {
-	// 	t.Fatalf("Wrong number of LineSections, expected: 2, got: %v", len(event.SituationAttributes.LineSections))
-	// }
-	// firstLineSection := *event.SituationAttributes.LineSections[0]
-	// if ref, _ := firstLineSection.Get("FirstStop"); ref.ObjectId.Value() != "firstStop1" {
-	// 	t.Errorf("Wrong first LineSection FirstStop: %v", ref)
-	// }
-	// if ref, _ := firstLineSection.Get("LastStop"); ref.ObjectId.Value() != "lastStop1" {
-	// 	t.Errorf("Wrong first LineSection LastStop: %v", ref)
-	// }
-	// if ref, _ := firstLineSection.Get("LineRef"); ref.ObjectId.Value() != "lineSectionRef1" {
-	// 	t.Errorf("Wrong first LineSection LineRef: %v", ref)
-	// }
+	assert.Equal("StopArea", affects[3].GetType())
+	assert.Equal(model.ModelId(stopAreaId), affects[3].GetId())
+	assert.Equal("StopArea", affects[4].GetType())
+	assert.Equal(model.ModelId(stopArea2Id), affects[4].GetId())
 }
 
 func Test_setReportType(t *testing.T) {
