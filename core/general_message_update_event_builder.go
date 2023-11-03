@@ -15,6 +15,12 @@ type GeneralMessageUpdateEventBuilder struct {
 	remoteObjectidKind string
 }
 
+type LineSection struct {
+	LineRef   string
+	FirstStop string
+	LastStop  string
+}
+
 func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateEventBuilder {
 	return GeneralMessageUpdateEventBuilder{
 		partner:            partner,
@@ -157,32 +163,24 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *m
 	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, &affectedDestination)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section *sxml.IDFLineSectionStructure) {
-	// Searching for existing Line ?
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, section.LineRef())
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section LineSection) {
+	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, section.LineRef)
 	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
 	if !ok {
 		return
 	}
 
-	firstStopRef := section.FirstStop()
+	firstStopRef := section.FirstStop
 	firstStopObjectId := model.NewObjectID(builder.remoteObjectidKind, firstStopRef)
 	firstStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(firstStopObjectId)
 	if !ok {
 		return
 	}
-	lastStopRef := section.LastStop()
+	lastStopRef := section.LastStop
 	lastStopObjectId := model.NewObjectID(builder.remoteObjectidKind, lastStopRef)
 	lastStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(lastStopObjectId)
 	if !ok {
 		return
-	}
-
-	var pos *int
-	for element, affect := range event.Affects {
-		if affect.GetType() == "Line" && affect.GetId() == model.ModelId(line.Id()) {
-			*pos = element
-		}
 	}
 
 	affectedSection := &model.AffectedSection{
@@ -190,14 +188,20 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model
 		LastStop:  lastStopArea.Id(),
 	}
 
-	if pos != nil {
-		event.Affects[*pos].(*model.AffectedLine).AffectedSections = append(event.Affects[*pos].(*model.AffectedLine).AffectedSections, affectedSection)
-	} else {
-		affectedLine := model.NewAffectedLine()
-		affectedLine.LineId = line.Id()
-		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
-		event.Affects = append(event.Affects, affectedLine)
+	// Fill already existing AffectedLine if exists
+	for pos, affect := range event.Affects {
+		if affect.GetType() == "Line" && affect.GetId() == model.ModelId(line.Id()) {
+			event.Affects[pos].(*model.AffectedLine).AffectedSections = append(
+				event.Affects[pos].(*model.AffectedLine).AffectedSections, affectedSection)
+			return
+		}
 	}
+
+	// otherwise create new AffectedLine
+	affectedLine := model.NewAffectedLine()
+	affectedLine.LineId = line.Id()
+	affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
+	event.Affects = append(event.Affects, affectedLine)
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
@@ -216,7 +220,13 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 	}
 
 	for _, section := range content.LineSections() {
-		builder.setAffectedSection(event, section)
+		lineSection := LineSection{
+			LineRef:   section.LineRef(),
+			FirstStop: section.FirstStop(),
+			LastStop:  section.LastStop(),
+		}
+
+		builder.setAffectedSection(event, lineSection)
 	}
 
 	for _, stopPointRef := range content.StopPointRef() {

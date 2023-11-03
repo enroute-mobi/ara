@@ -135,9 +135,6 @@ func (situation *Situation) Save() (ok bool) {
 func (situation *Situation) UnmarshalJSON(data []byte) error {
 	type Alias Situation
 
-	type toto struct {
-		Type string
-	}
 	aux := &struct {
 		ObjectIDs map[string]string
 		Affects   []json.RawMessage
@@ -152,12 +149,14 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	}
 	if aux.Affects != nil {
 		for _, v := range aux.Affects {
-			x := &toto{}
-			err = json.Unmarshal(v, x)
+			var affectedSubtype = struct {
+				Type string
+			}{}
+			err = json.Unmarshal(v, &affectedSubtype)
 			if err != nil {
 				return err
 			}
-			switch x.Type {
+			switch affectedSubtype.Type {
 			case "StopArea":
 				a := NewAffectedStopArea()
 				json.Unmarshal(v, a)

@@ -108,10 +108,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Len(*events, 1, "One event should have been created")
 
 	event := (*events)[0]
-	if event.Format != "FRANCE" {
-		t.Errorf("Wrong Format, expected: FRANCE, got: %v", event.Format)
-	}
-
+	assert.Equal("FRANCE", event.Format)
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
 	assert.Equal(model.ReportType("general"), event.ReportType)
 	assert.Equal("test", event.Description.DefaultValue)
@@ -128,9 +125,9 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal(destinationRef2.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[1].StopAreaId)
 
 	// AffectedSections
-	assert.Len(affects[0].(*model.AffectedLine).AffectedSections, 0)
-	assert.Len(affects[1].(*model.AffectedLine).AffectedSections, 1)
-	assert.Len(affects[2].(*model.AffectedLine).AffectedSections, 1)
+	assert.Len(affects[0].(*model.AffectedLine).AffectedSections, 0, "Should have no affected section for lineRef1")
+	assert.Len(affects[1].(*model.AffectedLine).AffectedSections, 1, "Should have 1 affectedSection for lineSectionRef1 ")
+	assert.Len(affects[2].(*model.AffectedLine).AffectedSections, 1, "Should have 1 affecteSection for lineSection2")
 
 	affectedSectionLineSection1 := affects[1].(*model.AffectedLine).AffectedSections[0]
 	assert.Equal(firstStop1.Id(), affectedSectionLineSection1.FirstStop)
@@ -411,5 +408,133 @@ func Test_setAffectedDestination(t *testing.T) {
 		affectedLine.LineId = line.Id()
 		builder.setAffectedDestination(event, tt.StopPointRef, affectedLine)
 		assert.Equal(tt.expectedAffectedLine, affectedLine, tt.message)
+	}
+}
+
+func Test_setAffectedSection(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("slug")
+	referential.model = model.NewMemoryModel()
+	referentials.Save(referential)
+
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+	settings := map[string]string{
+		"remote_objectid_kind": "remote_objectid_kind",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partners.Save(partner)
+
+	objectid := model.NewObjectID("remote_objectid_kind", "firstStop")
+	firstStop := referential.Model().StopAreas().New()
+	firstStop.SetObjectID(objectid)
+	firstStop.Save()
+
+	objectid1 := model.NewObjectID("remote_objectid_kind", "lastStop")
+	lastStop := referential.Model().StopAreas().New()
+	lastStop.SetObjectID(objectid1)
+	lastStop.Save()
+
+	objectid2 := model.NewObjectID("remote_objectid_kind", "lineRef")
+	line := referential.Model().Lines().New()
+	line.SetObjectID(objectid2)
+	line.Save()
+
+	var TestCases = []struct {
+		LineRef              string
+		firstStop            string
+		lastStop             string
+		existingAffectedLine bool
+		expectedAffectedLine *model.AffectedLine
+		message              string
+	}{
+
+		{
+			LineRef:              "DUMMY",
+			firstStop:            "firstStop",
+			lastStop:             "lastStop",
+			existingAffectedLine: false,
+			expectedAffectedLine: nil,
+			message:              "Should not create an AffectedSection if lineRef does not exists",
+		},
+		{
+			LineRef:              "lineRef",
+			firstStop:            "DUMMY",
+			lastStop:             "lastStop",
+			existingAffectedLine: false,
+			expectedAffectedLine: nil,
+			message:              "Should not create an AffectedSection if firstStop does not exists",
+		},
+		{
+			LineRef:              "lineRef",
+			firstStop:            "firstStop",
+			lastStop:             "DUMMY",
+			existingAffectedLine: false,
+			expectedAffectedLine: nil,
+			message:              "Should not create an AffectedSection if lastStop does not exists",
+		},
+		{
+			LineRef:              "lineRef",
+			firstStop:            "firstStop",
+			lastStop:             "lastStop",
+			existingAffectedLine: false,
+			expectedAffectedLine: &model.AffectedLine{
+				Type:   "Line",
+				LineId: line.Id(),
+				AffectedSections: []*model.AffectedSection{
+					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
+				},
+			},
+			message: "Should create an AffectedSection if lineRef, firstStop and lastStop exists",
+		},
+		{
+			LineRef:              "lineRef",
+			firstStop:            "firstStop",
+			lastStop:             "lastStop",
+			existingAffectedLine: true,
+			expectedAffectedLine: &model.AffectedLine{
+				Type:   "Line",
+				LineId: line.Id(),
+				AffectedSections: []*model.AffectedSection{
+					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
+				},
+				AffectedDestinations: []*model.AffectedDestination{
+					&model.AffectedDestination{StopAreaId: firstStop.Id()},
+				},
+			},
+			message: "Should add AffectedSection to existing AffectedLine",
+		},
+	}
+
+	for _, tt := range TestCases {
+		event := &model.SituationUpdateEvent{}
+		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		lineSection := LineSection{
+			LineRef:   tt.LineRef,
+			FirstStop: tt.firstStop,
+			LastStop:  tt.lastStop,
+		}
+
+		if tt.existingAffectedLine {
+			existingAffectedLine := &model.AffectedLine{
+				Type:   "Line",
+				LineId: line.Id(),
+				AffectedDestinations: []*model.AffectedDestination{
+					&model.AffectedDestination{StopAreaId: firstStop.Id()},
+				},
+			}
+			event.Affects = append(event.Affects, existingAffectedLine)
+		}
+
+		builder.setAffectedSection(event, lineSection)
+
+		if tt.expectedAffectedLine == nil {
+			assert.Nil(event.Affects)
+		} else {
+			assert.Equal(tt.expectedAffectedLine, event.Affects[0].(*model.AffectedLine), tt.message)
+		}
+
 	}
 }

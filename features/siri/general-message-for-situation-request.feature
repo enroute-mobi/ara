@@ -110,7 +110,6 @@ Feature: Support SIRI GeneralMessage for Situation
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
-    And show me ara situations
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -260,7 +259,6 @@ Feature: Support SIRI GeneralMessage for Situation
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
-    Then show me ara situations
     Then one Situation has the following attributes:
       | ObjectIDs                                                                          | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                                                  |

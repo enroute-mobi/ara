@@ -39,17 +39,11 @@ type SIRIGeneralMessage struct {
 	InfoChannelRef        string
 
 	AffectedRefs []*SIRIAffectedRef
-	References   []*SIRIReference
 	LineSections []*SIRILineSection
 	Messages     []*SIRIMessage
 }
 
 type SIRIAffectedRef struct {
-	Kind string
-	Id   string
-}
-
-type SIRIReference struct {
 	Kind string
 	Id   string
 }
