@@ -15,22 +15,23 @@ import (
 type Subscriptions interface {
 	uuid.UUIDInterface
 
-	New(kind string) *Subscription
-	Find(id SubscriptionId) (*Subscription, bool)
+	New(string) *Subscription
+	Find(SubscriptionId) (*Subscription, bool)
 	FindAll() []*Subscription
 	FindOrCreateByKind(string) *Subscription
 	FindByKind(string) (*Subscription, bool)
 	FindSubscriptionsByKind(string) []*Subscription
 	FindBroadcastSubscriptions() []*Subscription
-	Save(Subscription *Subscription) bool
-	Delete(Subscription *Subscription) bool
-	DeleteById(id SubscriptionId)
+	Index(*Subscription)
+	Save(*Subscription) bool
+	Delete(*Subscription) bool
+	DeleteById(SubscriptionId)
 	CancelSubscriptions()
 	CancelSubscriptionsResourcesBefore(time.Time)
 	CancelBroadcastSubscriptions()
 	CancelCollectSubscriptions()
 	FindByResourceId(id, kind string) []*Subscription
-	FindByExternalId(externalId string) (*Subscription, bool)
+	FindByExternalId(string) (*Subscription, bool)
 }
 
 type MemorySubscriptions struct {
@@ -244,7 +245,20 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	subscription.manager = manager
 	manager.byIdentifier[subscription.Id()] = subscription
 
-	// Register the subscription with all associated resources
+	manager.unsafeIndex(subscription)
+
+	return true
+}
+
+// Index the subscription with all associated resources
+func (manager *MemorySubscriptions) Index(subscription *Subscription) {
+	manager.mutex.Lock()
+	manager.unsafeIndex(subscription)
+	manager.mutex.Unlock()
+}
+
+// Unsafe method, need to handle manager mutex before calling
+func (manager *MemorySubscriptions) unsafeIndex(subscription *Subscription) {
 	subscription.RLock()
 
 	for resourceId := range subscription.resourcesByObjectID {
@@ -258,21 +272,22 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 		}
 
 		// Is the Subscription already associated to this kindAndResourceId ?
-		newSubscriptionForKindAndResourceId := true
-		for _, subscriptionId := range subscriptionIdentifiers {
-			if subscriptionId == subscription.Id() {
-				// The Subscription is already associated to this kindAndResourceId
-				newSubscriptionForKindAndResourceId = false
-			}
-		}
-
-		if newSubscriptionForKindAndResourceId {
+		if newSubscriptionForKindAndResourceId(subscriptionIdentifiers, subscription.Id()) {
 			// Associate this Subscription to the kindAndResourceId
 			manager.byKindAndResourceId[kindAndResourceId] = append(subscriptionIdentifiers, subscription.Id())
 		}
 	}
 	subscription.RUnlock()
+}
 
+// Check if a SubscriptionId is in a Slice of SubscriptionIds
+func newSubscriptionForKindAndResourceId(s []SubscriptionId, id SubscriptionId) bool {
+	for _, subscriptionId := range s {
+		if subscriptionId == id {
+			// The Subscription is already associated to this kindAndResourceId
+			return false
+		}
+	}
 	return true
 }
 

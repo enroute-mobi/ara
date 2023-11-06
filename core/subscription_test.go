@@ -17,12 +17,10 @@ func Test_Subscription_Id(t *testing.T) {
 }
 
 func Test_subscription_MarshalJSON(t *testing.T) {
-	subscription := &Subscription{
-		resourcesByObjectID: make(map[string]*SubscribedResource),
-		subscriptionOptions: make(map[string]string),
-	}
+	subscriptions := NewMemorySubscriptions(NewPartner())
+
+	subscription := subscriptions.New("salut")
 	subscription.id = "6ba7b814-9dad-11d1-0-00c04fd430c8"
-	subscription.kind = "salut"
 	subscription.CreateAndAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
 	subscription.externalId = "externalId"
 
@@ -107,11 +105,66 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 	}
 
 	existingSubscription.CreateAndAddNewResource(reference)
-	existingSubscription.Save()
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 
 	if len(subs) == 0 {
 		t.Errorf("Should have found the subscription")
+	}
+}
+
+func Test_Subscriptions_byKindAndResourceId(t *testing.T) {
+	subscriptions := NewMemorySubscriptions(NewPartner())
+	existingSubscription := subscriptions.New("kind")
+
+	if len(subscriptions.byKindAndResourceId) != 0 {
+		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
+	}
+
+	existingSubscription.Save()
+
+	if len(subscriptions.byKindAndResourceId) != 0 {
+		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
+	}
+
+	obj := model.NewObjectID("Kind", "Value")
+	reference := model.Reference{
+		ObjectId: &obj,
+	}
+
+	existingSubscription.CreateAndAddNewResource(reference)
+
+	if len(subscriptions.byKindAndResourceId) != 1 {
+		t.Fatal("subscriptions should have one entry in byKindAndResourceId")
+	}
+
+	subs := subscriptions.FindByResourceId(obj.String(), "kind")
+
+	if len(subs) == 0 {
+		t.Errorf("Should have found the subscription")
+	}
+
+	existingSubscription.DeleteResource(obj.String())
+	if len(subscriptions.byKindAndResourceId) != 1 {
+		t.Fatal("subscriptions should have one entry in byKindAndResourceId")
+	}
+
+	subs = subscriptions.FindByResourceId(obj.String(), "kind")
+
+	if len(subs) != 0 {
+		t.Errorf("Should not have found the subscription")
+	}
+
+	existingSubscription.Save()
+
+	existingSubscription.DeleteResource(obj.String())
+	if len(subscriptions.byKindAndResourceId) != 0 {
+		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
+	}
+
+	subs = subscriptions.FindByResourceId(obj.String(), "kind")
+
+	if len(subs) != 0 {
+		t.Errorf("Should not have found the subscription")
 	}
 }
