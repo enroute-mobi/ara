@@ -198,6 +198,9 @@ func (subscription *Subscription) CreateAndAddNewResource(reference model.Refere
 	subscription.Lock()
 	subscription.resourcesByObjectID[reference.ObjectId.String()] = &resource
 	subscription.Unlock()
+
+	subscription.manager.Index(subscription)
+
 	return &resource
 }
 

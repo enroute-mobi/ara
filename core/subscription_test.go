@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Subscription_Id(t *testing.T) {
@@ -17,12 +18,10 @@ func Test_Subscription_Id(t *testing.T) {
 }
 
 func Test_subscription_MarshalJSON(t *testing.T) {
-	subscription := &Subscription{
-		resourcesByObjectID: make(map[string]*SubscribedResource),
-		subscriptionOptions: make(map[string]string),
-	}
+	subscriptions := NewMemorySubscriptions(NewPartner())
+
+	subscription := subscriptions.New("salut")
 	subscription.id = "6ba7b814-9dad-11d1-0-00c04fd430c8"
-	subscription.kind = "salut"
 	subscription.CreateAndAddNewResource(*model.NewReference(model.NewObjectID("test", "value")))
 	subscription.externalId = "externalId"
 
@@ -98,6 +97,8 @@ func Test_MemorySubscriptions_Delete(t *testing.T) {
 }
 
 func Test_Subscription_byIdentifier(t *testing.T) {
+	assert := assert.New(t)
+
 	subscriptions := NewMemorySubscriptions(NewPartner())
 	existingSubscription := subscriptions.New("kind")
 
@@ -107,11 +108,47 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 	}
 
 	existingSubscription.CreateAndAddNewResource(reference)
-	existingSubscription.Save()
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 
-	if len(subs) == 0 {
-		t.Errorf("Should have found the subscription")
+	assert.Len(subs, 1)
+}
+
+func Test_Subscriptions_byKindAndResourceId(t *testing.T) {
+	assert := assert.New(t)
+
+	subscriptions := NewMemorySubscriptions(NewPartner())
+	existingSubscription := subscriptions.New("kind")
+
+	assert.Len(subscriptions.byKindAndResourceId, 0)
+
+	existingSubscription.Save()
+
+	assert.Len(subscriptions.byKindAndResourceId, 0)
+
+	obj := model.NewObjectID("Kind", "Value")
+	reference := model.Reference{
+		ObjectId: &obj,
 	}
+
+	existingSubscription.CreateAndAddNewResource(reference)
+
+	assert.Len(subscriptions.byKindAndResourceId, 1)
+
+	subs := subscriptions.FindByResourceId(obj.String(), "kind")
+	assert.Len(subs, 1)
+
+	existingSubscription.DeleteResource(obj.String())
+
+	assert.Len(subscriptions.byKindAndResourceId, 1)
+
+	subs = subscriptions.FindByResourceId(obj.String(), "kind")
+	assert.Len(subs, 0)
+
+	existingSubscription.Save()
+
+	assert.Len(subscriptions.byKindAndResourceId, 0)
+
+	subs = subscriptions.FindByResourceId(obj.String(), "kind")
+	assert.Len(subs, 0)
 }

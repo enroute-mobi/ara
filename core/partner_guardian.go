@@ -144,7 +144,7 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 				continue
 			}
 			sub.DeleteResource(key)
-			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v befor Clock.Now %v ", partner.Referential().Slug(), partner.Slug(), key, sub.Id(), value.SubscribedUntil, guardian.Clock().Now())
+			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v befor Clock.Now %v ", partner.Slug(), partner.Referential().Slug(), key, sub.Id(), value.SubscribedUntil, guardian.Clock().Now())
 		}
 		if sub.ResourcesLen() == 0 {
 			sub.Delete()
