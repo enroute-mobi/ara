@@ -118,7 +118,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Len(affects, 5, "Should have 5 affetcs: 3 affctedLines, 2 affectedStopAreas")
 
 	// Affected Lines
-	assert.Equal("Line", affects[0].GetType())
+	assert.Equal(model.SituationType("Line"), affects[0].GetType())
 	assert.Equal(model.ModelId(lineId), affects[0].GetId(), "Should be Id of lineRef1")
 
 	assert.Equal(destinationRef1.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[0].StopAreaId)
@@ -138,9 +138,9 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal(lastStop2.Id(), affectedSectionLineSection2.LastStop)
 
 	// Affected StopAreas
-	assert.Equal("StopArea", affects[3].GetType())
+	assert.Equal(model.SituationType("StopArea"), affects[3].GetType())
 	assert.Equal(model.ModelId(stopAreaId), affects[3].GetId())
-	assert.Equal("StopArea", affects[4].GetType())
+	assert.Equal(model.SituationType("StopArea"), affects[4].GetType())
 	assert.Equal(model.ModelId(stopArea2Id), affects[4].GetId())
 }
 

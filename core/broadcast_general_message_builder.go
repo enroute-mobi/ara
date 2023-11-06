@@ -97,10 +97,10 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 
 	// Build from Affects
 	for _, affect := range situation.Affects {
-		switch Type := affect.GetType(); Type {
-		case "StopArea":
+		switch affect.GetType() {
+		case model.SituationTypeStopArea:
 			builder.buildAffectedStopArea(siriGeneralMessage, affect)
-		case "Line":
+		case model.SituationTypeLine:
 			builder.buildAffectedLine(siriGeneralMessage, affect)
 		}
 	}
@@ -129,9 +129,9 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 
 func (builder *BroadcastGeneralMessageBuilder) setAffectKind(affect model.Affect) string {
 	switch affect.GetType() {
-	case "Line":
+	case model.SituationTypeLine:
 		return "LineRef"
-	case "StopArea":
+	case model.SituationTypeStopArea:
 		return "StopPointRef"
 	}
 	return ""

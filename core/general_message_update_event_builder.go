@@ -190,7 +190,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model
 
 	// Fill already existing AffectedLine if exists
 	for pos, affect := range event.Affects {
-		if affect.GetType() == "Line" && affect.GetId() == model.ModelId(line.Id()) {
+		if affect.GetType() == model.SituationTypeLine && affect.GetId() == model.ModelId(line.Id()) {
 			event.Affects[pos].(*model.AffectedLine).AffectedSections = append(
 				event.Affects[pos].(*model.AffectedLine).AffectedSections, affectedSection)
 			return
@@ -210,7 +210,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 		builder.setAffectedLine(event, lineRef)
 	}
 
-	if len(event.Affects) == 1 && event.Affects[0].GetType() == "Line" {
+	if len(event.Affects) == 1 && event.Affects[0].GetType() == model.SituationTypeLine {
 		for _, destination := range content.DestinationRef() {
 			builder.setAffectedDestination(event, destination, event.Affects[0].(*model.AffectedLine))
 		}

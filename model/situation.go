@@ -18,11 +18,14 @@ type Message struct {
 }
 
 const (
-	SituationReportTypeGeneral  ReportType = "general"
-	SituationReportTypeIncident ReportType = "incident"
+	SituationReportTypeGeneral  ReportType    = "general"
+	SituationReportTypeIncident ReportType    = "incident"
+	SituationTypeLine           SituationType = "Line"
+	SituationTypeStopArea       SituationType = "StopArea"
 )
 
 type ReportType string
+type SituationType string
 
 type SituationTranslatedString struct {
 	DefaultValue string            `json:",omitempty"`
@@ -55,12 +58,12 @@ type Situation struct {
 
 // SubTypes of Affect
 type Affect interface {
-	GetType() string
+	GetType() SituationType
 	GetId() ModelId
 }
 
 type AffectedStopArea struct {
-	Type       string
+	Type       SituationType
 	StopAreaId StopAreaId `json:",omitempty"`
 }
 
@@ -68,7 +71,7 @@ func (a AffectedStopArea) GetId() ModelId {
 	return ModelId(a.StopAreaId)
 }
 
-func (a AffectedStopArea) GetType() string {
+func (a AffectedStopArea) GetType() SituationType {
 	return a.Type
 }
 
@@ -77,7 +80,7 @@ func NewAffectedStopArea() *AffectedStopArea {
 }
 
 type AffectedLine struct {
-	Type                 string
+	Type                 SituationType
 	LineId               LineId                 `json:",omitempty"`
 	AffectedDestinations []*AffectedDestination `json:",omitempty"`
 	AffectedSections     []*AffectedSection     `json:",omitempty"`
@@ -101,7 +104,7 @@ func (a AffectedLine) GetId() ModelId {
 	return ModelId(a.LineId)
 }
 
-func (a AffectedLine) GetType() string {
+func (a AffectedLine) GetType() SituationType {
 	return a.Type
 }
 
@@ -150,7 +153,7 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	if aux.Affects != nil {
 		for _, v := range aux.Affects {
 			var affectedSubtype = struct {
-				Type string
+				Type SituationType
 			}{}
 			err = json.Unmarshal(v, &affectedSubtype)
 			if err != nil {
