@@ -107,6 +107,7 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 	}
 
 	existingSubscription.CreateAndAddNewResource(reference)
+	existingSubscription.Save()
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 

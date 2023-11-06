@@ -144,7 +144,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	subs := partner.Subscriptions().FindByResourceId(objectid.String(), "StopMonitoringBroadcast")
 
 	if len(subs) == 0 {
-		t.Errorf("Should have been able to find the stopArea ressource : %v", objectid.String())
+		t.Fatalf("Should have been able to find the stopArea ressource : %v", objectid.String())
 	}
 
 	sub := subs[0]
