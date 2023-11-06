@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Subscription_Id(t *testing.T) {
@@ -96,6 +97,8 @@ func Test_MemorySubscriptions_Delete(t *testing.T) {
 }
 
 func Test_Subscription_byIdentifier(t *testing.T) {
+	assert := assert.New(t)
+
 	subscriptions := NewMemorySubscriptions(NewPartner())
 	existingSubscription := subscriptions.New("kind")
 
@@ -108,24 +111,20 @@ func Test_Subscription_byIdentifier(t *testing.T) {
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
 
-	if len(subs) == 0 {
-		t.Errorf("Should have found the subscription")
-	}
+	assert.Len(subs, 1)
 }
 
 func Test_Subscriptions_byKindAndResourceId(t *testing.T) {
+	assert := assert.New(t)
+
 	subscriptions := NewMemorySubscriptions(NewPartner())
 	existingSubscription := subscriptions.New("kind")
 
-	if len(subscriptions.byKindAndResourceId) != 0 {
-		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
-	}
+	assert.Len(subscriptions.byKindAndResourceId, 0)
 
 	existingSubscription.Save()
 
-	if len(subscriptions.byKindAndResourceId) != 0 {
-		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
-	}
+	assert.Len(subscriptions.byKindAndResourceId, 0)
 
 	obj := model.NewObjectID("Kind", "Value")
 	reference := model.Reference{
@@ -134,37 +133,22 @@ func Test_Subscriptions_byKindAndResourceId(t *testing.T) {
 
 	existingSubscription.CreateAndAddNewResource(reference)
 
-	if len(subscriptions.byKindAndResourceId) != 1 {
-		t.Fatal("subscriptions should have one entry in byKindAndResourceId")
-	}
+	assert.Len(subscriptions.byKindAndResourceId, 1)
 
 	subs := subscriptions.FindByResourceId(obj.String(), "kind")
-
-	if len(subs) == 0 {
-		t.Errorf("Should have found the subscription")
-	}
+	assert.Len(subs, 1)
 
 	existingSubscription.DeleteResource(obj.String())
-	if len(subscriptions.byKindAndResourceId) != 1 {
-		t.Fatal("subscriptions should have one entry in byKindAndResourceId")
-	}
+
+	assert.Len(subscriptions.byKindAndResourceId, 1)
 
 	subs = subscriptions.FindByResourceId(obj.String(), "kind")
-
-	if len(subs) != 0 {
-		t.Errorf("Should not have found the subscription")
-	}
+	assert.Len(subs, 0)
 
 	existingSubscription.Save()
 
-	existingSubscription.DeleteResource(obj.String())
-	if len(subscriptions.byKindAndResourceId) != 0 {
-		t.Fatal("subscriptions shouldn't have anything in byKindAndResourceId")
-	}
+	assert.Len(subscriptions.byKindAndResourceId, 0)
 
 	subs = subscriptions.FindByResourceId(obj.String(), "kind")
-
-	if len(subs) != 0 {
-		t.Errorf("Should not have found the subscription")
-	}
+	assert.Len(subs, 0)
 }
