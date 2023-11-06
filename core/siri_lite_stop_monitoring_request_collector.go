@@ -49,7 +49,6 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
-	dest := &slite.SIRILiteStopMonitoring{}
 	startTime := connector.Clock().Now()
 
 	dest, err := connector.Partner().SIRILiteClient().StopMonitoring(objectid.Value())
