@@ -164,11 +164,26 @@ func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscri
 				subscriptionIds = append(subscriptionIds, subscription.Id())
 			}
 
+			// "Update" lock to RW one
+			manager.mutex.RUnlock()
+			manager.mutex.Lock()
+
 			manager.byKindAndResourceId[kindAndResourceId] = subscriptionIds
+
+			manager.mutex.Unlock()
+			manager.mutex.RLock()
 		}
 	} else {
 		// No subscription found for this kindAndResourceId
+
+		// "Update" lock to RW one
+		manager.mutex.RUnlock()
+		manager.mutex.Lock()
+
 		delete(manager.byKindAndResourceId, kindAndResourceId)
+
+		manager.mutex.Unlock()
+		manager.mutex.RLock()
 	}
 
 	return subscriptions
