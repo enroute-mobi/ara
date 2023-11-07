@@ -621,7 +621,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | StopAreas          | ["RLA_Bus:StopPoint:BP:PASTO8:LOC"]     |
       | VehicleJourneys    | ["RLA_Bus:VehicleJourney::2978464:LOC"] |
       | Lines              | ["RLA_Bus:Line::05:LOC"]                |
-      | Vehicles           | ["290"]                                 |
+      | Vehicles           | ["RLA290"]                              |
 
   Scenario: Collect Vehicle Position with numeric srsName
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with

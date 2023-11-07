@@ -770,7 +770,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         | Direction       | received                                  |
         | Status          | OK                                        |
         | Partner         | test                                      |
-        | Vehicles        | ["108"]                                   |
+        | Vehicles        | ["TRANSDEV:Vehicle::1501:LOC"]            |
         | VehicleJourneys | ["RDMANTOIS:VehicleJourney::6628652:LOC"] |
         | StopAreas       | ["50000016"]                              |
         | Lines           | ["testLine"]                              |
