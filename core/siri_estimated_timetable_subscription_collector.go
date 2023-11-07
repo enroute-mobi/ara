@@ -102,12 +102,12 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) SetEstimatedTimeta
 	connector.estimatedTimetableSubscriber = estimatedTimetableSubscriber
 }
 
-func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) *CollectedRefs {
+func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstimatedTimetable(notify *sxml.XMLNotifyEstimatedTimetable) (collectedRefs *CollectedRefs) {
 	// subscriptionErrors := make(map[string]string)
 	var updateEvents CollectUpdateEvents
 	subToDelete := make(map[string]struct{})
 
-	collectedRefs := NewCollectedRefs()
+	collectedRefs = NewCollectedRefs()
 	for _, delivery := range notify.EstimatedTimetableDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 

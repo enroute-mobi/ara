@@ -101,12 +101,12 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) SetStopMonitoringSubsc
 	connector.stopMonitoringSubscriber = stopMonitoringSubscriber
 }
 
-func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) *CollectedRefs {
+func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonitoring(notify *sxml.XMLNotifyStopMonitoring) (collectedRefs *CollectedRefs) {
 	// subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 	var updateEvents CollectUpdateEvents
 
-	collectedRefs := NewCollectedRefs()
+	collectedRefs = NewCollectedRefs()
 	for _, delivery := range notify.StopMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 

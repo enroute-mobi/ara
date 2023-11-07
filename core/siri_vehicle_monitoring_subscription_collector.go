@@ -101,12 +101,12 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) SetVehicleMonitorin
 	connector.vehicleMonitoringSubscriber = vehicleMonitoringSubscriber
 }
 
-func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) *CollectedRefs {
+func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) (collectedRefs *CollectedRefs) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 	var updateEvents VehicleMonitoringUpdateEvents
 
-	collectedRefs := NewCollectedRefs()
+	collectedRefs = NewCollectedRefs()
 	for _, delivery := range notify.VehicleMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
