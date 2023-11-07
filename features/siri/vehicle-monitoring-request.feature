@@ -310,7 +310,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Direction         | received                       |
         | Status            | Error                          |
         | Partner           | test                           |
-        | Vehicles          | nil                            |
+        | Vehicles          | []                             |
         | RequestIdentifier | Test:1234::LOC                 |
         | Lines             | ["Test:Line:3:LOC"]            |
         | ErrorDetails      | Line Test:Line:3:LOC not found |

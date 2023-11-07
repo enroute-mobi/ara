@@ -47,7 +47,6 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 	messageIdentifier := request.MessageIdentifier()
 
 	message.RequestIdentifier = messageIdentifier
-	message.Lines = []string{lineRef}
 
 	siriResponse = &siri.SIRIVehicleMonitoringResponse{
 		ResponseTimestamp:         connector.Clock().Now(),
@@ -56,102 +55,112 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 		RequestMessageRef:         messageIdentifier,
 	}
 
-	response := siri.SIRIVehicleMonitoringDelivery{
-		Version:           "2.0:FR-IDF-2.4",
-		ResponseTimestamp: connector.Clock().Now(),
-		RequestMessageRef: messageIdentifier,
+	delivery := &siri.SIRIVehicleMonitoringDelivery{
+		Version:            "2.0:FR-IDF-2.4",
+		ResponseTimestamp:  connector.Clock().Now(),
+		RequestMessageRef:  messageIdentifier,
+		LineRefs:           make(map[string]struct{}),
+		VehicleJourneyRefs: make(map[string]struct{}),
+		VehicleRefs:        make(map[string]struct{}),
 	}
 
+	if lineRef != "" {
+		connector.getVehiclesWithLineRef(lineRef, delivery, message, siriResponse)
+	}
+
+	if connector.partner.PartnerSettings.SortPaylodForTest() {
+		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: delivery.VehicleActivity})
+	}
+
+	message.Lines = GetModelReferenceSlice(delivery.LineRefs)
+	message.Vehicles = GetModelReferenceSlice(delivery.VehicleRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(delivery.VehicleJourneyRefs)
+
+	siriResponse.SIRIVehicleMonitoringDelivery = *delivery
+
+	return siriResponse
+}
+
+func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef(lineRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {
 	objectid := model.NewObjectID(connector.remoteObjectidKind, lineRef)
 	line, ok := connector.partner.Model().Lines().FindByObjectId(objectid)
 	if !ok {
-		response.ErrorCondition = &siri.ErrorCondition{
+		delivery.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
 			ErrorText: fmt.Sprintf("Line %v not found", objectid.Value()),
 		}
 		message.Status = "Error"
-		message.ErrorDetails = response.ErrorCondition.ErrorText
-		siriResponse.SIRIVehicleMonitoringDelivery = response
+		message.ErrorDetails = delivery.ErrorCondition.ErrorText
+		delivery.LineRefs[lineRef] = struct{}{}
+		siriResponse.SIRIVehicleMonitoringDelivery = *delivery
 
 		return
 	}
 
-	response.Status = true
-	siriResponse.SIRIVehicleMonitoringDelivery = response
-
-	var vehicleIds []string
-	vehicleJourneyRefs := make(map[string]struct{})
-	lineRefs := make(map[string]struct{})
+	delivery.Status = true
 
 	vs := connector.partner.Model().Vehicles().FindByLineId(line.Id())
 	for i := range vs {
-		vehicleId, ok := vs[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
-		if !ok {
-			continue
-		}
+		connector.buildVehicleActivity(delivery, line, lineRef, vs[i])
+	}
+}
 
-		vj := vs[i].VehicleJourney()
-		if vj == nil {
-			continue
-		}
-		dvj, ok := connector.datedVehicleJourneyRef(vj)
-		if !ok {
-			continue
-		}
-
-		refs := vj.References.Copy()
-
-		activity := &siri.SIRIVehicleActivity{
-			RecordedAtTime:       vs[i].RecordedAtTime,
-			ValidUntilTime:       vs[i].ValidUntilTime,
-			VehicleMonitoringRef: vehicleId.Value(),
-			ProgressBetweenStops: connector.handleProgressBetweenStops(vs[i]),
-		}
-
-		monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
-			LineRef:            lineRef,
-			PublishedLineName:  line.Name,
-			DirectionName:      vj.Attributes["DirectionName"],
-			DirectionType:      vj.DirectionType,
-			OriginName:         vj.OriginName,
-			DestinationName:    vj.DestinationName,
-			Monitored:          vj.Monitored,
-			Bearing:            vs[i].Bearing,
-			DriverRef:          vs[i].DriverRef,
-			Occupancy:          vj.Occupancy,
-			OriginRef:          connector.handleRef("OriginRef", vj.Origin, refs),
-			DestinationRef:     connector.handleRef("DestinationRef", vj.Origin, refs),
-			JourneyPatternRef:  connector.handleJourneyPatternRef(refs),
-			JourneyPatternName: connector.handleJourneyPatternName(refs),
-			VehicleLocation:    connector.handleVehicleLocation(vs[i]),
-		}
-
-		framedVehicleJourneyRef := &siri.SIRIFramedVehicleJourneyRef{}
-		modelDate := connector.partner.Model().Date()
-		framedVehicleJourneyRef.DataFrameRef =
-			connector.Partner().DataFrameIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
-		framedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
-
-		monitoredVehicleJourney.FramedVehicleJourneyRef = framedVehicleJourneyRef
-		activity.MonitoredVehicleJourney = monitoredVehicleJourney
-		response.VehicleActivity = append(response.VehicleActivity, activity)
-
-		vehicleIds = append(vehicleIds, vehicleId.Value())
-		vehicleJourneyRefs[dvj] = struct{}{}
-		lineRefs[lineRef] = struct{}{}
+func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(delivery *siri.SIRIVehicleMonitoringDelivery, line *model.Line, lineRef string, vehicle *model.Vehicle) {
+	vehicleId, ok := vehicle.ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
+	if !ok {
+		return
 	}
 
-	if connector.partner.PartnerSettings.SortPaylodForTest() {
-		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: response.VehicleActivity})
+	vj := vehicle.VehicleJourney()
+	if vj == nil {
+		return
+	}
+	dvj, ok := connector.datedVehicleJourneyRef(vj)
+	if !ok {
+		return
 	}
 
-	message.Lines = GetModelReferenceSlice(lineRefs)
-	message.Vehicles = vehicleIds
-	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
+	refs := vj.References.Copy()
 
-	siriResponse.SIRIVehicleMonitoringDelivery = response
+	activity := &siri.SIRIVehicleActivity{
+		RecordedAtTime:       vehicle.RecordedAtTime,
+		ValidUntilTime:       vehicle.ValidUntilTime,
+		VehicleMonitoringRef: vehicleId.Value(),
+		ProgressBetweenStops: connector.handleProgressBetweenStops(vehicle),
+	}
 
-	return siriResponse
+	monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
+		LineRef:            lineRef,
+		PublishedLineName:  line.Name,
+		DirectionName:      vj.Attributes["DirectionName"],
+		DirectionType:      vj.DirectionType,
+		OriginName:         vj.OriginName,
+		DestinationName:    vj.DestinationName,
+		Monitored:          vj.Monitored,
+		Bearing:            vehicle.Bearing,
+		DriverRef:          vehicle.DriverRef,
+		Occupancy:          vj.Occupancy,
+		OriginRef:          connector.handleRef("OriginRef", vj.Origin, refs),
+		DestinationRef:     connector.handleRef("DestinationRef", vj.Origin, refs),
+		JourneyPatternRef:  connector.handleJourneyPatternRef(refs),
+		JourneyPatternName: connector.handleJourneyPatternName(refs),
+		VehicleLocation:    connector.handleVehicleLocation(vehicle),
+	}
+
+	framedVehicleJourneyRef := &siri.SIRIFramedVehicleJourneyRef{}
+	modelDate := connector.partner.Model().Date()
+	framedVehicleJourneyRef.DataFrameRef =
+		connector.Partner().DataFrameIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+	framedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
+
+	monitoredVehicleJourney.FramedVehicleJourneyRef = framedVehicleJourneyRef
+	activity.MonitoredVehicleJourney = monitoredVehicleJourney
+	delivery.VehicleActivity = append(delivery.VehicleActivity, activity)
+
+	// Logging
+	delivery.LineRefs[lineRef] = struct{}{}
+	delivery.VehicleJourneyRefs[dvj] = struct{}{}
+	delivery.VehicleRefs[vehicleId.Value()] = struct{}{}
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
