@@ -27,6 +27,7 @@ type XMLMonitoredStopVisitCancellation struct {
 
 	itemRef       string
 	monitoringRef string
+	recordedAt    time.Time
 }
 
 type XMLMonitoredStopVisit struct {
@@ -173,6 +174,13 @@ func (cancel *XMLMonitoredStopVisitCancellation) MonitoringRef() string {
 		cancel.monitoringRef = cancel.findStringChildContent("MonitoringRef")
 	}
 	return cancel.monitoringRef
+}
+
+func (cancel *XMLMonitoredStopVisitCancellation) RecordedAt() time.Time {
+	if cancel.recordedAt.IsZero() {
+		cancel.recordedAt = cancel.findTimeChildContent("RecordedAtTime")
+	}
+	return cancel.recordedAt
 }
 
 func NewXMLCancelledStopVisit(node XMLNode) *XMLMonitoredStopVisitCancellation {

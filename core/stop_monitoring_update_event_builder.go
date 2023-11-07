@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
@@ -160,7 +162,15 @@ func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(
 	for _, xmlStopVisitCancellationEvent := range delivery.XMLMonitoredStopVisitCancellations() {
 		builder.stopMonitoringUpdateEvents.MonitoringRefs[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
 
-		builder.stopMonitoringUpdateEvents.Cancellations = append(builder.stopMonitoringUpdateEvents.Cancellations, model.NewNotCollectedUpdateEvent(model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitCancellationEvent.ItemRef())))
+		objectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitCancellationEvent.ItemRef())
+
+		var recordedAt time.Time
+		if t := xmlStopVisitCancellationEvent.RecordedAt(); !t.IsZero() {
+			recordedAt = t
+		} else {
+			recordedAt = delivery.ResponseTimestamp()
+		}
+		builder.stopMonitoringUpdateEvents.Cancellations = append(builder.stopMonitoringUpdateEvents.Cancellations, model.NewNotCollectedUpdateEvent(objectId, recordedAt))
 	}
 }
 

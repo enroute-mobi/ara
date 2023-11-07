@@ -1,12 +1,16 @@
 package model
 
+import "time"
+
 type NotCollectedUpdateEvent struct {
-	ObjectId ObjectID
+	ObjectId       ObjectID
+	NotCollectedAt time.Time
 }
 
-func NewNotCollectedUpdateEvent(obj ObjectID) *NotCollectedUpdateEvent {
+func NewNotCollectedUpdateEvent(obj ObjectID, t time.Time) *NotCollectedUpdateEvent {
 	return &NotCollectedUpdateEvent{
-		ObjectId: obj,
+		ObjectId:       obj,
+		NotCollectedAt: t,
 	}
 }
 

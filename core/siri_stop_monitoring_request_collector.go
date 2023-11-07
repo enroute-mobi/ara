@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -134,7 +135,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 			}
 		}
 
-		connector.broadcastNotCollectedEvents(events, monitoredStopVisits)
+		connector.broadcastNotCollectedEvents(events, monitoredStopVisits, xmlStopMonitoringResponse.ResponseTimestamp())
 	}
 }
 
@@ -164,11 +165,11 @@ func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvent(event 
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID) {
+func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID, t time.Time) {
 	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
 		if _, ok := events[stopVisitObjectID.Value()]; !ok {
 			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
-			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitObjectID))
+			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitObjectID, t))
 		}
 	}
 }
