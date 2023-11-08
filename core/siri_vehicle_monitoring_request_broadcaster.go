@@ -43,9 +43,9 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) Start() {
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(request *sxml.XMLGetVehicleMonitoring, message *audit.BigQueryMessage) (siriResponse *siri.SIRIVehicleMonitoringResponse) {
 	lineRef := request.LineRef()
+	vehicleRef := request.VehicleRef()
 
 	messageIdentifier := request.MessageIdentifier()
-
 	message.RequestIdentifier = messageIdentifier
 
 	siriResponse = &siri.SIRIVehicleMonitoringResponse{
@@ -68,6 +68,9 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 		connector.getVehiclesWithLineRef(lineRef, delivery, message, siriResponse)
 	}
 
+	if vehicleRef != "" {
+		connector.getVehicle(vehicleRef, delivery, message, siriResponse)
+	}
 	if connector.partner.PartnerSettings.SortPaylodForTest() {
 		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: delivery.VehicleActivity})
 	}
@@ -79,6 +82,35 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 	siriResponse.SIRIVehicleMonitoringDelivery = *delivery
 
 	return siriResponse
+}
+
+func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehicle(vehicleRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {
+	objectid := model.NewObjectID(connector.remoteObjectidKind, vehicleRef)
+	vehicle, ok := connector.partner.Model().Vehicles().FindByObjectId(objectid)
+	if !ok {
+		delivery.ErrorCondition = &siri.ErrorCondition{
+			ErrorType: "InvalidDataReferencesError",
+			ErrorText: fmt.Sprintf("Vehicle %v not found", objectid.Value()),
+		}
+		message.Status = "Error"
+		message.ErrorDetails = delivery.ErrorCondition.ErrorText
+		delivery.VehicleRefs[vehicleRef] = struct{}{}
+		siriResponse.SIRIVehicleMonitoringDelivery = *delivery
+
+		return
+	}
+
+	delivery.Status = true
+
+	line, ok := connector.partner.Model().Lines().Find(vehicle.LineId)
+	if !ok {
+		return
+	}
+	lineObjectId, ok := line.ObjectID(objectid.Kind())
+	if !ok {
+		return
+	}
+	connector.buildVehicleActivity(delivery, line, lineObjectId.Value(), vehicle)
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef(lineRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {

@@ -17,6 +17,7 @@ type XMLVehicleMonitoringRequest struct {
 	LightRequestXMLStructure
 
 	lineRef           string
+	vehicleRef        string
 	messageIdentifier string
 
 	lines []string
@@ -52,6 +53,13 @@ func (request *XMLGetVehicleMonitoring) LineRef() string {
 		request.lineRef = request.findStringChildContent("LineRef")
 	}
 	return request.lineRef
+}
+
+func (request *XMLGetVehicleMonitoring) VehicleRef() string {
+	if request.vehicleRef == "" {
+		request.vehicleRef = request.findStringChildContent("VehicleRef")
+	}
+	return request.vehicleRef
 }
 
 func (request *XMLGetVehicleMonitoring) MessageIdentifier() string {

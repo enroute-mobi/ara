@@ -511,6 +511,322 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]                                                |
         | VehicleJourneys   | ["Test:VehicleJourney:202:LOC", "Test:VehicleJourney:201:LOC"]     |
 
+  @siri-valid @ARA-1384
+  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter
+    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential      | test     |
+      | remote_objectid_kind  | internal |
+      | sort_payload_for_test | true     |
+    Given a Line exists with the following attributes:
+      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                                |
+      | ObjectIDs | "internal": "Test:VehicleJourney:201:LOC" |
+      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored | true                                      |
+    And a VehicleJourney exists with the following attributes:
+      | Name                                  | Passage 33                                |
+      | ObjectIDs                             | "internal": "Test:VehicleJourney:202:LOC" |
+      | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                             | true                                      |
+      | Reference[DestinationRef]#ObjectId    | "internal": "Test:StopPoint:Destination"  |
+      | Reference[JourneyPatternRef]#ObjectId | "internal": "Test:JourneyPattern:1"       |
+      | Reference[OriginRef]#ObjectId         | "internal": "Test:StopPoint:Origin"       |
+      | OriginName                            | Origin Name                               |
+      | DestinationName                       | Destination Name                          |
+      | DirectionName                         | Direction Name                            |
+      | DirectionType                         | outbound                                  |
+      | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver1                           |
+      | Bearing          | 120                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 12                                |
+      | Percentage       | 42                                |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver2                           |
+      | Bearing          | 153                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 34                                |
+      | Percentage       | 55                                |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver3                           |
+      | Bearing          | 163                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 56                                |
+      | Percentage       | 21                                |
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:VehicleRef>Test:Vehicle:1:LOC</siri:VehicleRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+    <?xml version='1.0' encoding='UTF-8'?> 
+    <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+      <S:Body>
+        <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>Ara</siri:ProducerRef>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Answer>
+            <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+              <siri:Status>true</siri:Status>
+              <siri:VehicleActivity>
+                <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                <siri:VehicleMonitoringRef>Test:Vehicle:1:LOC</siri:VehicleMonitoringRef>
+                <siri:ProgressBetweenStops>
+                  <siri:LinkDistance>12</siri:LinkDistance>
+                  <siri:Percentage>42</siri:Percentage>
+                </siri:ProgressBetweenStops>
+                <siri:MonitoredVehicleJourney>
+                  <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                  <siri:FramedVehicleJourneyRef>
+                    <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                    <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                  </siri:FramedVehicleJourneyRef>
+                  <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                  <siri:Monitored>true</siri:Monitored>
+                  <siri:VehicleLocation>
+                    <siri:Longitude>1.234</siri:Longitude>
+                    <siri:Latitude>5.678</siri:Latitude>
+                  </siri:VehicleLocation>
+                  <siri:Bearing>120</siri:Bearing>
+                  <siri:DriverRef>Driver1</siri:DriverRef>
+                </siri:MonitoredVehicleJourney>
+              </siri:VehicleActivity>
+             </siri:VehicleMonitoringDelivery>
+          </Answer>
+          <AnswerExtension/>
+        </sw:GetVehicleMonitoringResponse>
+      </S:Body>
+    </S:Envelope>
+    """
+    Then an audit event should exist with these attributes:
+        | Type              | VehicleMonitoringRequest                                           |
+        | Protocol          | siri                                                               |
+        | Direction         | received                                                           |
+        | Status            | OK                                                                 |
+        | Partner           | test                                                               |
+        | Vehicles          | ["Test:Vehicle:1:LOC"]                                             |
+        | RequestIdentifier | Test:1234::LOC                                                     |
+        | Lines             | ["Test:Line:3:LOC"]                                                |
+        | VehicleJourneys   | ["Test:VehicleJourney:201:LOC"]                                  |
+
+  @siri-valid @ARA-1384
+  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with unmatching objectid kind
+   Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+     | local_credential     | test     |
+     | remote_objectid_kind | internal |
+   Given a Line exists with the following attributes:
+     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Name      | Ligne 3 Metro                 |
+   And a VehicleJourney exists with the following attributes:
+     | Name                     | Passage 32                                |
+     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+     | Monitored                | true                                      |
+     | Attribute[DirectionName] | Direction Name                            |
+   And a Vehicle exists with the following attributes:
+     | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+     | Longitude        | 1.234                              |
+     | Latitude         | 5.678                              |
+     | Bearing          | 123                                |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+   When I send this SIRI request
+     """
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceRequestInfo>
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>test</siri:RequestorRef>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request version="2.0:FR-IDF-2.4">
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            <siri:VehicleRef>Test:Vehicle:201123:LOC</siri:VehicleRef>
+          </Request>
+          <RequestExtension />
+        </sw:GetVehicleMonitoring>
+      </soap:Body>
+    </soap:Envelope>
+      """
+   Then I should receive this SIRI response
+      """
+      <?xml version="1.0" encoding="UTF-8"?> 
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+                <siri:Status>false</siri:Status>
+                <siri:ErrorCondition>
+                  <siri:InvalidDataReferencesError>
+                    <siri:ErrorText>Vehicle Test:Vehicle:201123:LOC not found</siri:ErrorText>
+                  </siri:InvalidDataReferencesError>
+                </siri:ErrorCondition>
+              </siri:VehicleMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetVehicleMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+        | Type              | VehicleMonitoringRequest                  |
+        | Protocol          | siri                                      |
+        | Direction         | received                                  |
+        | Status            | Error                                     |
+        | Partner           | test                                      |
+        | Vehicles          | ["Test:Vehicle:201123:LOC"]               |
+        | RequestIdentifier | Test:1234::LOC                            |
+        | Lines             | []                                        |
+        | ErrorDetails      | Vehicle Test:Vehicle:201123:LOC not found |
+
+  @siri-valid @ARA-1234
+  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_objectid_kind
+   Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential                                                      | test     |
+      | remote_objectid_kind                                                  | internal |
+      | siri-vehicle-monitoring-request-broadcaster.remote_objectid_kind      | other    |
+    Given a Line exists with the following attributes:
+      | ObjectIDs | "other": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro              |
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                             |
+      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
+      | Monitored                | true                                   |
+      | Attribute[DirectionName] | Direction Name                         |
+    And a Vehicle exists with the following attributes:
+      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | Longitude        | 1.234                              |
+      | Latitude         | 5.678                              |
+      | Bearing          | 123                                |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+   When I send this SIRI request
+     """
+     <?xml version='1.0' encoding='UTF-8'?> 
+     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceRequestInfo>
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>test</siri:RequestorRef>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request version="2.0:FR-IDF-2.4">
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            <siri:VehicleRef>Test:Vehicle:201123:LOC</siri:VehicleRef>
+          </Request>
+          <RequestExtension />
+        </sw:GetVehicleMonitoring>
+      </soap:Body>
+    </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?> 
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:201123:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>123</siri:Bearing>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetVehicleMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+    """
+
   Scenario: Performs a SIRI VehicleMonitoring request to a Partner
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
       """
