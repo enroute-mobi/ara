@@ -259,6 +259,7 @@ type StopVisits interface {
 	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	FindByVehicleJourneyIdAndStopVisitOrder(VehicleJourneyId, int) *StopVisit
 	VehicleJourneyHasStopVisits(VehicleJourneyId) bool
+	FindByVehicleJourneyIdAfter(VehicleJourneyId, time.Time) []*StopVisit
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	StopVisitsLenByVehicleJourney(VehicleJourneyId) int
 	FindByStopAreaId(StopAreaId) []*StopVisit
@@ -371,13 +372,17 @@ func (manager *MemoryStopVisits) VehicleJourneyHasStopVisits(id VehicleJourneyId
 }
 
 func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
+	return manager.FindByVehicleJourneyIdAfter(id, manager.Clock().Now())
+}
+
+func (manager *MemoryStopVisits) FindByVehicleJourneyIdAfter(id VehicleJourneyId, t time.Time) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
-		if sv.ReferenceTime().After(manager.Clock().Now()) {
+		if sv.ReferenceTime().After(t) {
 			stopVisits = append(stopVisits, sv.copy())
 		}
 	}

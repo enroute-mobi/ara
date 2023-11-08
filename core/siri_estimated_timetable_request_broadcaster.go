@@ -21,6 +21,7 @@ type SIRIEstimatedTimetableRequestBroadcaster struct {
 
 	connector
 
+	useVisitNumber        bool
 	dataFrameGenerator    *idgen.IdentifierGenerator
 	vjRemoteObjectidKinds []string
 }
@@ -39,6 +40,13 @@ func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimate
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) Start() {
 	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+
+	switch connector.partner.PartnerSettings.SIRIPassageOrder() {
+	case "visit_number":
+		connector.useVisitNumber = true
+	default:
+		connector.useVisitNumber = false
+	}
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) RequestLine(request *sxml.XMLGetEstimatedTimetable, message *audit.BigQueryMessage) *siri.SIRIEstimatedTimetableResponse {
@@ -130,7 +138,8 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 			estimatedVehicleJourney.Attributes = vjs[i].Attributes
 
 			// SIRIEstimatedCall
-			svs := connector.partner.Model().StopVisits().FindFollowingByVehicleJourneyId(vjs[i].Id())
+			connector.Partner().RecordedCallsDuration()
+			svs := connector.partner.Model().StopVisits().FindByVehicleJourneyIdAfter(vjs[i].Id(), connector.Clock().Now().Add(-connector.Partner().RecordedCallsDuration()))
 			for i := range svs {
 				if !selector(svs[i]) {
 					continue
@@ -145,29 +154,50 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 
 				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
 
-				estimatedCall := &siri.SIRIEstimatedCall{
-					ArrivalStatus:      string(svs[i].ArrivalStatus),
-					DepartureStatus:    string(svs[i].DepartureStatus),
-					AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
-					AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
-					Order:              svs[i].PassageOrder,
-					StopPointRef:       stopAreaId,
-					StopPointName:      stopArea.Name,
-					DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
-					VehicleAtStop:      svs[i].VehicleAtStop,
+				if svs[i].IsRecordable() && connector.Partner().RecordedCallsDuration() != 0 {
+					// recordedCall
+					recordedCall := &siri.SIRIRecordedCall{
+						ArrivalStatus:         string(svs[i].ArrivalStatus),
+						DepartureStatus:       string(svs[i].DepartureStatus),
+						AimedArrivalTime:      svs[i].Schedules.Schedule("aimed").ArrivalTime(),
+						ExpectedArrivalTime:   svs[i].Schedules.Schedule("expected").ArrivalTime(),
+						AimedDepartureTime:    svs[i].Schedules.Schedule("aimed").DepartureTime(),
+						ExpectedDepartureTime: svs[i].Schedules.Schedule("expected").DepartureTime(),
+						Order:                 svs[i].PassageOrder,
+						StopPointRef:          stopAreaId,
+						StopPointName:         stopArea.Name,
+						DestinationDisplay:    svs[i].Attributes["DestinationDisplay"],
+					}
+
+					recordedCall.UseVisitNumber = connector.useVisitNumber
+
+					estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
+				} else {
+					estimatedCall := &siri.SIRIEstimatedCall{
+						ArrivalStatus:      string(svs[i].ArrivalStatus),
+						DepartureStatus:    string(svs[i].DepartureStatus),
+						AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
+						AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
+						Order:              svs[i].PassageOrder,
+						StopPointRef:       stopAreaId,
+						StopPointName:      stopArea.Name,
+						DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
+						VehicleAtStop:      svs[i].VehicleAtStop,
+					}
+
+					estimatedCall.UseVisitNumber = connector.useVisitNumber
+
+					if stopArea.Monitored {
+						estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
+						estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
+					}
+
+					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 				}
 
-				estimatedCall.UseVisitNumber = connector.UseVisitNumber()
-
-				if stopArea.Monitored {
-					estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
-					estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
-				}
-
-				estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 				delivery.MonitoringRefs[stopAreaId] = struct{}{}
 			}
-			if len(estimatedVehicleJourney.EstimatedCalls) != 0 {
+			if len(estimatedVehicleJourney.EstimatedCalls) != 0 || len(estimatedVehicleJourney.RecordedCalls) != 0 {
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 			}
 			delivery.VehicleJourneyRefs[datedVehicleJourneyRef] = struct{}{}
@@ -177,15 +207,6 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 		}
 	}
 	return delivery
-}
-
-func (connector *SIRIEstimatedTimetableRequestBroadcaster) UseVisitNumber() bool {
-	switch connector.partner.PartnerSettings.SIRIPassageOrder() {
-	case "visit_number":
-		return true
-	default:
-		return false
-	}
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
