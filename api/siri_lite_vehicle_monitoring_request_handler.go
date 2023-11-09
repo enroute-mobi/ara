@@ -40,7 +40,7 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.C
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
 	}
 
-	message.Type = "VehicleMonitoringRequest"
+	message.Type = audit.VEHICLE_MONITORING_REQUEST
 	message.ResponseRawMessage = string(jsonBytes)
 	message.ResponseSize = int64(n)
 	message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()

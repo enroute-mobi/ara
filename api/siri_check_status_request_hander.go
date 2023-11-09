@@ -70,7 +70,7 @@ func (handler *SIRICheckStatusRequestHandler) Respond(params HandlerParams) {
 	}
 
 	params.message.Partner = string(params.connector.(*core.SIRICheckStatusServer).Partner().Slug())
-	params.message.Type = "CheckStatusRequest"
+	params.message.Type = audit.CHECK_STATUS_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

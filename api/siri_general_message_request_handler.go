@@ -59,7 +59,7 @@ func (handler *SIRIGeneralMessageRequestHandler) Respond(params HandlerParams) {
 		return
 	}
 
-	params.message.Type = "GeneralMessageRequest"
+	params.message.Type = audit.GENERAL_MESSAGE_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

@@ -159,7 +159,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		connector.addSituations(sub, r)
 	}
 
-	message.Type = "GeneralMessageSubscriptionRequest"
+	message.Type = audit.GENERAL_MESSAGE_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
 
 	return resps

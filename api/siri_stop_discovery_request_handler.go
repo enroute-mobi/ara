@@ -59,7 +59,7 @@ func (handler *SIRIStopDiscoveryRequestHandler) Respond(params HandlerParams) {
 		return
 	}
 
-	params.message.Type = "StopDiscoveryRequest"
+	params.message.Type = audit.STOP_POINTS_DISCOVERY_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

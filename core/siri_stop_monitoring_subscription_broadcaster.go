@@ -244,7 +244,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.Save()
 	}
 
-	message.Type = "StopMonitoringSubscriptionRequest"
+	message.Type = audit.STOP_MONITORING_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
 	message.StopAreas = monitoringRefs
 

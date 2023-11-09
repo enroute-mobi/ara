@@ -299,7 +299,7 @@ func occupancyName(occupancy *gtfs.VehiclePosition_OccupancyStatus) string {
 
 func (connector *GtfsRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "GtfsRequest",
+		Type:      audit.GTFS_REQUEST,
 		Protocol:  "gtfs",
 		Direction: "sent",
 		Partner:   string(connector.Partner().Slug()),

@@ -121,7 +121,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) SetUpdateSubscriber(upda
 
 func (connector *SIRIVehicleMonitoringRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "VehicleMonitoringRequest",
+		Type:      audit.VEHICLE_MONITORING_REQUEST,
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),

@@ -59,7 +59,7 @@ func (handler *SIRIDeleteSubscriptionRequestHandler) Respond(params HandlerParam
 		return
 	}
 
-	params.message.Type = "DeleteSubscriptionRequest"
+	params.message.Type = audit.DELETE_SUBSCRIPTION_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

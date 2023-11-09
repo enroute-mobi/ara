@@ -118,7 +118,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) HandleSubscriptio
 		}
 		sub.Save()
 	}
-	message.Type = "VehicleMonitoringSubscriptionRequest"
+	message.Type = audit.VEHICLE_MONITORING_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
 	message.Lines = lineIds
 
