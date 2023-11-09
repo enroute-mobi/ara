@@ -95,7 +95,6 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehicle(vehicleRef 
 		message.Status = "Error"
 		message.ErrorDetails = delivery.ErrorCondition.ErrorText
 		delivery.VehicleRefs[vehicleRef] = struct{}{}
-		siriResponse.SIRIVehicleMonitoringDelivery = *delivery
 
 		return
 	}
@@ -124,7 +123,6 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef
 		message.Status = "Error"
 		message.ErrorDetails = delivery.ErrorCondition.ErrorText
 		delivery.LineRefs[lineRef] = struct{}{}
-		siriResponse.SIRIVehicleMonitoringDelivery = *delivery
 
 		return
 	}
