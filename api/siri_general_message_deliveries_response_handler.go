@@ -7,8 +7,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/remote"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type SIRIGeneralMessageRequestDeliveriesResponseHandler struct {
@@ -40,7 +40,7 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(param
 		buffer.WriteTo(params.rw)
 	}
 
-	params.message.Type = "NotifyGeneralMessage"
+	params.message.Type = audit.NOTIFY_GENERAL_MESSAGE
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

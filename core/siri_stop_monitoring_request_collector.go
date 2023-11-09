@@ -179,7 +179,7 @@ func (connector *SIRIStopMonitoringRequestCollector) SetUpdateSubscriber(updateS
 
 func (connector *SIRIStopMonitoringRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "GetStopMonitoringRequest",
+		Type:      audit.STOP_MONITORING_REQUEST,
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),

@@ -58,7 +58,7 @@ func (handler *SIRIStopMonitoringRequestHandler) Respond(params HandlerParams) {
 		return
 	}
 
-	params.message.Type = "StopMonitoringRequest"
+	params.message.Type = audit.STOP_MONITORING_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

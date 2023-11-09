@@ -12,8 +12,43 @@ const (
 	BQ_VEHICLE_EVENT              = "vehicle"
 	BQ_PARTNER_EVENT              = "partner"
 	BQ_LONG_TERM_STOP_VISIT_EVENT = "long_term_stop_visit"
+
+	CHECK_STATUS_REQUEST BigQueryMessageType = "CheckStatusRequest"
+
+	NOTIFY_ESTIMATED_TIMETABLE  BigQueryMessageType = "NotifyEstimatedTimetable"
+	NOTIFY_GENERAL_MESSAGE      BigQueryMessageType = "NotifyGeneralMessage"
+	NOTIFY_PRODUCTION_TIMETABLE BigQueryMessageType = "NotifyProductionTimetable"
+	NOTIFY_STOP_MONITORING      BigQueryMessageType = "NotifyStopMonitoring"
+	NOTIFY_VEHICLE_MONITORING   BigQueryMessageType = "NotifyVehicleMonitoring"
+
+	DELETE_SUBSCRIPTION_REQUEST    BigQueryMessageType = "DeleteSubscriptionRequest"
+	NOTIFY_SUBSCRIPTION_TERMINATED BigQueryMessageType = "NotifySubscriptionTerminated"
+
+	ESTIMATED_TIMETABLE_REQUEST   BigQueryMessageType = "EstimatedTimetableRequest"
+	GENERAL_MESSAGE_REQUEST       BigQueryMessageType = "GeneralMessageRequest"
+	LINES_DISCOVERY_REQUEST       BigQueryMessageType = "LinesDiscoveryRequest"
+	SIRI_SERVICE_REQUEST          BigQueryMessageType = "SiriServiceRequest"
+	STOP_MONITORING_REQUEST       BigQueryMessageType = "StopMonitoringRequest"
+	STOP_POINTS_DISCOVERY_REQUEST BigQueryMessageType = "StopPointsDiscoveryRequest"
+	VEHICLE_MONITORING_REQUEST    BigQueryMessageType = "VehicleMonitoringRequest"
+
+	GTFS_TRIP_UPDATES_VEHICLE_POSITION BigQueryMessageType = "trip-updates,vehicle-position"
+	GTFS_TRIP_UPDATES                  BigQueryMessageType = "trip-updates"
+	GTFS_VEHICLE_POSITION              BigQueryMessageType = "vehicle-position"
+	GTFS_REQUEST                       BigQueryMessageType = "GtfsRequest"
+
+	SUBSCRIPTION_TERMINATED_NOTIFICATION BigQueryMessageType = "SubscriptionTerminatedNotification"
+
+	ESTIMATED_TIMETABLE_SUBSCRIPTION_REQUEST  BigQueryMessageType = "EstimatedTimetableSubscriptionRequest"
+	GENERAL_MESSAGE_SUBSCRIPTION_REQUEST      BigQueryMessageType = "GeneralMessageSubscriptionRequest"
+	PRODUCTION_TIMETABLE_SUBSCRIPTION_REQUEST BigQueryMessageType = "ProductionTimetableSubscriptionRequest"
+	STOP_MONITORING_SUBSCRIPTION_REQUEST      BigQueryMessageType = "StopMonitoringSubscriptionRequest"
+	VEHICLE_MONITORING_SUBSCRIPTION_REQUEST   BigQueryMessageType = "VehicleMonitoringSubscriptionRequest"
+
+	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
 )
 
+type BigQueryMessageType string
 type BigQueryEvent interface {
 	EventType() string
 	SetTimeStamp(time.Time)
@@ -21,27 +56,27 @@ type BigQueryEvent interface {
 }
 
 type BigQueryMessage struct {
-	UUID                    string    `bigquery:"uuid"`
-	Timestamp               time.Time `bigquery:"timestamp"`
-	IPAddress               string    `bigquery:"ip_address"`
-	Protocol                string    `bigquery:"protocol"`  // "siri", "siri-lite", "gtfs", "push"
-	Type                    string    `bigquery:"type"`      // "siri-checkstatus", "gtfs-trip-update", …
-	Direction               string    `bigquery:"direction"` // "sent" (by Ara), "received" (by Ara)
-	Partner                 string    `bigquery:"partner"`   // partner slug
-	Status                  string    `bigquery:"status"`    // "OK", "Error"
-	ErrorDetails            string    `bigquery:"error_details"`
-	RequestRawMessage       string    `bigquery:"request_raw_message"`  // XML or JSON for GTFS-RT
-	ResponseRawMessage      string    `bigquery:"response_raw_message"` // XML or JSON for GTFS-RT
-	RequestIdentifier       string    `bigquery:"request_identifier"`
-	ResponseIdentifier      string    `bigquery:"response_identifier"`
-	RequestSize             int64     `bigquery:"request_size"`
-	ResponseSize            int64     `bigquery:"response_size"`
-	ProcessingTime          float64   `bigquery:"processing_time"`          // in seconds
-	SubscriptionIdentifiers []string  `bigquery:"subscription_identifiers"` // array of ids
-	StopAreas               []string  `bigquery:"stop_areas"`               // array of objectid values
-	Lines                   []string  `bigquery:"lines"`                    // array of objectid values
-	Vehicles                []string  `bigquery:"vehicles"`
-	VehicleJourneys         []string  `bigquery:"vehicle_journeys"` // array of objectid values
+	UUID                    string              `bigquery:"uuid"`
+	Timestamp               time.Time           `bigquery:"timestamp"`
+	IPAddress               string              `bigquery:"ip_address"`
+	Protocol                string              `bigquery:"protocol"`  // "siri", "siri-lite", "gtfs", "push"
+	Type                    BigQueryMessageType `bigquery:"type"`      // "siri-checkstatus", "gtfs-trip-update", …
+	Direction               string              `bigquery:"direction"` // "sent" (by Ara), "received" (by Ara)
+	Partner                 string              `bigquery:"partner"`   // partner slug
+	Status                  string              `bigquery:"status"`    // "OK", "Error"
+	ErrorDetails            string              `bigquery:"error_details"`
+	RequestRawMessage       string              `bigquery:"request_raw_message"`  // XML or JSON for GTFS-RT
+	ResponseRawMessage      string              `bigquery:"response_raw_message"` // XML or JSON for GTFS-RT
+	RequestIdentifier       string              `bigquery:"request_identifier"`
+	ResponseIdentifier      string              `bigquery:"response_identifier"`
+	RequestSize             int64               `bigquery:"request_size"`
+	ResponseSize            int64               `bigquery:"response_size"`
+	ProcessingTime          float64             `bigquery:"processing_time"`          // in seconds
+	SubscriptionIdentifiers []string            `bigquery:"subscription_identifiers"` // array of ids
+	StopAreas               []string            `bigquery:"stop_areas"`               // array of objectid values
+	Lines                   []string            `bigquery:"lines"`                    // array of objectid values
+	Vehicles                []string            `bigquery:"vehicles"`
+	VehicleJourneys         []string            `bigquery:"vehicle_journeys"` // array of objectid values
 }
 
 func (bq *BigQueryMessage) EventType() string        { return BQ_MESSAGE }

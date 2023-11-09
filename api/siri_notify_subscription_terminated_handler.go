@@ -32,7 +32,7 @@ func (handler *SIRINotifySubscriptionTerminatedHandler) Respond(params HandlerPa
 
 	params.rw.WriteHeader(http.StatusOK)
 
-	params.message.Type = "NotifySubscriptionTerminated"
+	params.message.Type = audit.NOTIFY_SUBSCRIPTION_TERMINATED
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

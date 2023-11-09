@@ -95,7 +95,7 @@ func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEve
 
 func (connector *SIRIGeneralMessageRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "GeneralMessageRequest",
+		Type:      audit.GENERAL_MESSAGE_REQUEST,
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),

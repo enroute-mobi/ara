@@ -346,7 +346,7 @@ func (ptt *PTTBroadcaster) sendDelivery(delivery *siri.SIRINotifyProductionTimet
 
 func (ptt *PTTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "NotifyProductionTimetable",
+		Type:      audit.NOTIFY_PRODUCTION_TIMETABLE,
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(ptt.connector.Partner().Slug()),

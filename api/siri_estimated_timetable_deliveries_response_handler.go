@@ -31,7 +31,7 @@ func (handler *SIRIEstimatedTimetableRequestDeliveriesResponseHandler) Respond(p
 	collectedRefs := params.connector.(core.EstimatedTimetableSubscriptionCollector).HandleNotifyEstimatedTimetable(handler.xmlRequest)
 	params.rw.WriteHeader(http.StatusOK)
 
-	params.message.Type = "NotifyEstimatedTimetable"
+	params.message.Type = audit.NOTIFY_ESTIMATED_TIMETABLE
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

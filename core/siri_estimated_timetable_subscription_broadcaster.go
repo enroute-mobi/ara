@@ -119,7 +119,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 		}
 		sub.Save()
 	}
-	message.Type = "EstimatedTimetableSubscriptionRequest"
+	message.Type = audit.ESTIMATED_TIMETABLE_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
 	message.Lines = lineIds
 

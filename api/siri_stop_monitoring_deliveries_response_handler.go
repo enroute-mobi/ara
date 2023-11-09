@@ -32,7 +32,7 @@ func (handler *SIRIStopMonitoringRequestDeliveriesResponseHandler) Respond(param
 
 	params.rw.WriteHeader(http.StatusOK)
 
-	params.message.Type = "NotifyStopMonitoring"
+	params.message.Type = audit.NOTIFY_STOP_MONITORING
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

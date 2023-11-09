@@ -32,7 +32,7 @@ func (handler *SIRISubscriptionTerminatedNotificationHandler) Respond(params Han
 
 	params.rw.WriteHeader(http.StatusOK)
 
-	params.message.Type = "SubscriptionTerminatedNotification"
+	params.message.Type = audit.SUBSCRIPTION_TERMINATED_NOTIFICATION
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

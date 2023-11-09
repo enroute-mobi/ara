@@ -32,7 +32,7 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 
 	params.rw.WriteHeader(http.StatusOK)
 
-	params.message.Type = "NotifyVehicleMonitoring"
+	params.message.Type = audit.NOTIFY_VEHICLE_MONITORING
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()

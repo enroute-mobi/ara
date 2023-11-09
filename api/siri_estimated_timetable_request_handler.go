@@ -58,7 +58,7 @@ func (handler *SIRIEstimatedTimetableRequestHandler) Respond(params HandlerParam
 		return
 	}
 
-	params.message.Type = "EstimatedTimetableRequest"
+	params.message.Type = audit.ESTIMATED_TIMETABLE_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

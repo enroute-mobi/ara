@@ -58,7 +58,7 @@ func (handler *SIRIServiceRequestHandler) Respond(params HandlerParams) {
 		return
 	}
 
-	params.message.Type = "SiriServiceRequest"
+	params.message.Type = audit.SIRI_SERVICE_REQUEST
 	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
 	params.message.ResponseRawMessage = xmlResponse
 	params.message.ResponseSize = n

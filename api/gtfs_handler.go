@@ -57,11 +57,11 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
 		}
 	} else {
-		messageType = "trip-updates,vehicle-position"
+		messageType = string(audit.GTFS_TRIP_UPDATES_VEHICLE_POSITION)
 		gc, ok = partner.GtfsConnectors()
 	}
 
-	message.Type = messageType
+	message.Type = audit.BigQueryMessageType(messageType)
 
 	if !ok {
 		handler.logError(message, startTime, "Partner %v doesn't have the required Gtfs connector %v", partner.Slug(), resource)

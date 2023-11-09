@@ -128,7 +128,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 		}
 		sub.Save()
 	}
-	message.Type = "ProductionTimetableSubscriptionRequest"
+	message.Type = audit.PRODUCTION_TIMETABLE_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
 	message.Lines = lineIds
 

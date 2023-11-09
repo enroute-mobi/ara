@@ -44,7 +44,7 @@ func CancelSubscription(subId, kind string, connector Connector) {
 }
 
 func logSIRIDeleteSubscriptionRequest(message *audit.BigQueryMessage, request *siri.SIRIDeleteSubscriptionRequest, subType, envelopeType string) {
-	message.Type = "DeleteSubscriptionRequest"
+	message.Type = audit.DELETE_SUBSCRIPTION_REQUEST
 	message.RequestIdentifier = request.MessageIdentifier
 	message.SubscriptionIdentifiers = []string{request.SubscriptionRef}
 

@@ -106,7 +106,7 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 
 func (connector *SIRILinesDiscoveryRequestCollector) newBQEvent() *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
-		Type:      "LinesDiscoveryRequest",
+		Type:      audit.LINES_DISCOVERY_REQUEST,
 		Protocol:  "siri",
 		Direction: "sent",
 		Partner:   string(connector.partner.Slug()),
