@@ -737,6 +737,88 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | []                                        |
         | ErrorDetails      | Vehicle Test:Vehicle:201123:LOC not found |
 
+  @siri-valid @ARA-1384
+  Scenario: Handle a SIRI VehicleMonitoring request without Vehicle or Line filter should return an Error
+   Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+     | local_credential     | test     |
+     | remote_objectid_kind | internal |
+   Given a Line exists with the following attributes:
+     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Name      | Ligne 3 Metro                 |
+   And a VehicleJourney exists with the following attributes:
+     | Name                     | Passage 32                                |
+     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+     | Monitored                | true                                      |
+     | Attribute[DirectionName] | Direction Name                            |
+   And a Vehicle exists with the following attributes:
+     | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+     | Longitude        | 1.234                                 |
+     | Latitude         | 5.678                                 |
+     | Bearing          | 123                                   |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
+   When I send this SIRI request
+     """
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceRequestInfo>
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>test</siri:RequestorRef>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request version="2.0:FR-IDF-2.4">
+            <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+            <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+          </Request>
+          <RequestExtension />
+        </sw:GetVehicleMonitoring>
+      </soap:Body>
+    </soap:Envelope>
+      """
+   Then I should receive this SIRI response
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+                <siri:Status>false</siri:Status>
+                <siri:ErrorCondition>
+                  <siri:InvalidDataReferencesError>
+                    <siri:ErrorText>VehicleMonitoringRequest must have one LineRef OR one VehicleRef</siri:ErrorText>
+                  </siri:InvalidDataReferencesError>
+                </siri:ErrorCondition>
+              </siri:VehicleMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetVehicleMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+        | Type              | VehicleMonitoringRequest                                         |
+        | Protocol          | siri                                                             |
+        | Direction         | received                                                         |
+        | Status            | Error                                                            |
+        | Partner           | test                                                             |
+        | Vehicles          | []                                                               |
+        | RequestIdentifier | Test:1234::LOC                                                   |
+        | Lines             | []                                                               |
+        | ErrorDetails      | VehicleMonitoringRequest must have one LineRef OR one VehicleRef |
+
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_objectid_kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:

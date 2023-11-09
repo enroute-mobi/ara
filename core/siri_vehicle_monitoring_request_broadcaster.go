@@ -64,13 +64,26 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 		VehicleRefs:        make(map[string]struct{}),
 	}
 
-	if lineRef != "" {
+	invalidFiltering := (lineRef != "" && vehicleRef != "") || (lineRef == "" && vehicleRef == "")
+	if invalidFiltering {
+		delivery.ErrorCondition = &siri.ErrorCondition{
+			ErrorType: "InvalidDataReferencesError",
+			ErrorText: "VehicleMonitoringRequest must have one LineRef OR one VehicleRef",
+		}
+		message.Status = "Error"
+		message.ErrorDetails = delivery.ErrorCondition.ErrorText
+		if vehicleRef != "" {
+			delivery.VehicleRefs[vehicleRef] = struct{}{}
+		}
+		if lineRef != "" {
+			delivery.LineRefs[lineRef] = struct{}{}
+		}
+	} else if lineRef != "" {
 		connector.getVehiclesWithLineRef(lineRef, delivery, message, siriResponse)
-	}
-
-	if vehicleRef != "" {
+	} else if vehicleRef != "" {
 		connector.getVehicle(vehicleRef, delivery, message, siriResponse)
 	}
+
 	if connector.partner.PartnerSettings.SortPaylodForTest() {
 		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: delivery.VehicleActivity})
 	}
