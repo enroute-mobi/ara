@@ -26,6 +26,10 @@ type SIRIVehicleMonitoringDelivery struct {
 	Status            bool
 	ErrorCondition    *ErrorCondition `json:",omitempty"`
 	VehicleActivity   []*SIRIVehicleActivity
+
+	LineRefs           map[string]struct{} `json:"-"`
+	VehicleJourneyRefs map[string]struct{} `json:"-"`
+	VehicleRefs        map[string]struct{} `json:"-"`
 }
 
 type SIRIVehicleActivity struct {
