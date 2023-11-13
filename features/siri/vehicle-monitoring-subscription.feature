@@ -197,6 +197,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | SubscriptionIdentifiers | ["subscription-1"]                                  |
       | Lines                   | ["Test:Line:3:LOC"]                                 |
       | Vehicles                | ["Test:Vehicle:201123:LOC", "Test:Vehicle:999:LOC"] |
+      | VehicleJourneys         | ["Test:VehicleJourney:201:LOC"]                     |
 
   @ARA-1236 @siri-valid
   Scenario: Delete and recreate SIRI VehicleMonitoring request for subscription when receiving subscription with same existing number
