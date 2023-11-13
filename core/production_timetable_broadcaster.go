@@ -355,24 +355,24 @@ func (ptt *PTTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 }
 
 func (ptt *PTTBroadcaster) logSIRIProductionTimetableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyProductionTimetable) {
-	lineRefs := []string{}
-	mr := make(map[string]struct{})
+	lineRefs := make(map[string]struct{})
+	vehicleJourneyRefs := make(map[string]struct{})
+	monitoringRefs := make(map[string]struct{})
 	for _, dttvf := range response.DatedTimetableVersionFrames {
-		lineRefs = append(lineRefs, dttvf.LineRef)
+		lineRefs[dttvf.LineRef] = struct{}{}
 		for _, vj := range dttvf.DatedVehicleJourneys {
+			vehicleJourneyRefs[vj.DatedVehicleJourneyRef] = struct{}{}
 			for _, ec := range vj.DatedCalls {
-				mr[ec.StopPointRef] = struct{}{}
+				monitoringRefs[ec.StopPointRef] = struct{}{}
 			}
 		}
 	}
-	monitoringRefs := []string{}
-	for k := range mr {
-		monitoringRefs = append(monitoringRefs, k)
-	}
 
-	message.Lines = lineRefs
-	message.StopAreas = monitoringRefs
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
+
+	message.Lines = GetModelReferenceSlice(lineRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
+	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
 
 	if !response.Status {
 		message.Status = "Error"
