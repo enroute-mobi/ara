@@ -5,10 +5,7 @@
 			<siri:IDFGeneralMessageRequestFilter>{{ else }}
 			<sws:IDFGeneralMessageRequestFilter>{{ end }}{{ range .LineRef }}
 				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .StopPointRef }}
-				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ range .JourneyPatternRef }}
-				<siri:JourneyPatternRef>{{ . }}</siri:JourneyPatternRef>{{ end }}{{ range .DestinationRef }}
-				<siri:DestinationRef>{{ . }}</siri:DestinationRef>{{ end }}{{ range .RouteRef }}
-				<siri:RouteRef>{{ . }}</siri:RouteRef>{{ end }}{{ if .XsdInWsdl }}
+				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ if .XsdInWsdl }}
 			</siri:IDFGeneralMessageRequestFilter>{{ else }}
 			</sws:IDFGeneralMessageRequestFilter>{{ end }}
 		</siri:Extensions>
