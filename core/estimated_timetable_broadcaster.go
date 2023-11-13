@@ -437,25 +437,31 @@ func (ett *ETTBroadcaster) newBQEvent() *audit.BigQueryMessage {
 }
 
 func (ett *ETTBroadcaster) logSIRIEstimatedTimetableNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyEstimatedTimetable) {
-	lineRefs := []string{}
-	mr := make(map[string]struct{})
+	lineRefs := make(map[string]struct{})
+	vehicleJourneyRefs := make(map[string]struct{})
+	monitoringRefs := make(map[string]struct{})
+
 	for _, vjvf := range response.EstimatedJourneyVersionFrames {
 		for _, vj := range vjvf.EstimatedVehicleJourneys {
-			lineRefs = append(lineRefs, vj.LineRef)
-			for _, ec := range vj.EstimatedCalls {
-				mr[ec.StopPointRef] = struct{}{}
+			lineRefs[vj.LineRef] = struct{}{}
+			vehicleJourneyRefs[vj.DatedVehicleJourneyRef] = struct{}{}
+			for _, estimatedCall := range vj.EstimatedCalls {
+				monitoringRefs[estimatedCall.StopPointRef] = struct{}{}
+			}
+
+			for _, recordedCall := range vj.RecordedCalls {
+				monitoringRefs[recordedCall.StopPointRef] = struct{}{}
 			}
 		}
-	}
-	monitoringRefs := []string{}
-	for k := range mr {
-		monitoringRefs = append(monitoringRefs, k)
 	}
 
 	message.RequestIdentifier = response.RequestMessageRef
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
-	message.Lines = lineRefs
-	message.StopAreas = monitoringRefs
+
+	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
+	message.Lines = GetModelReferenceSlice(lineRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
+
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
 	if !response.Status {

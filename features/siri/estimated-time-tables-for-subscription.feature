@@ -791,6 +791,14 @@ Feature: Support SIRI EstimatedTimetable by subscription
   </ServiceDelivery>
 </Siri>
       """
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                                                                                                                  |
+      | Direction       | sent                                                                                                                  |
+      | Status          | OK                                                                                                                    |
+      | Type            | NotifyEstimatedTimetable                                                                                              |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC","NINOXE:StopPoint:SP:25:LOC","NINOXE:StopPoint:SP:26:LOC","NINOXE:StopPoint:SP:27:LOC"] |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201"]                                                                                         |
+      | Lines           | ["NINOXE:Line:3:LOC"]                                                                                                 |
 
   @ARA-1126 @siri-valid
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
