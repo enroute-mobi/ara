@@ -979,6 +979,14 @@ xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
 </S:Body>
 </S:Envelope>
 """
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                           |
+      | Direction          | sent                           |
+      | Status             | OK                             |
+      | Type               | NotifyStopMonitoring           |
+      | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC"] |
+      | VehicleJourneys    | ["NINOXE:VehicleJourney:201"]  |
+      | Lines              | ["NINOXE:Line:3:LOC"]          |
 
   Scenario: 4448 - Manage a SM Notify after modification of a StopVisit with the RewriteJourneyPatternRef setting
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
