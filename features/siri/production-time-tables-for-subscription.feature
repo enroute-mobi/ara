@@ -185,6 +185,16 @@ Feature: Support SIRI ProductionTimetable by subscription
       </ServiceDelivery>
       </Siri>
       """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyProductionTimetable                                      |
+      | Direction               | sent                                                           |
+      | Protocol                | siri                                                           |
+      | Partner                 | test                                                           |
+      | Status                  | OK                                                             |
+      | SubscriptionIdentifiers | ["1"]                                                          |
+      | Lines                   | ["NINOXE:Line:3:LOC"]                                          |
+      | VehicleJourneys         | ["NINOXE:VehicleJourney:201", "NINOXE:VehicleJourney:202"]     |
+      | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"]   |
 
   @ARA-1139
   Scenario: Handle a SOAP SIRI ProductionTimetable subscription to all lines with partner setting siri.passage_order set to visit_number should use VisitNumber tag instead of Order

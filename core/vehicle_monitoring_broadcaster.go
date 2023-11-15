@@ -318,24 +318,27 @@ func (vm *VMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 }
 
 func (vm *VMBroadcaster) logSIRIVehicleMonitoring(message *audit.BigQueryMessage, response *siri.SIRINotifyVehicleMonitoring) {
-	lineRefs := []string{}
-	vehicles := []string{}
-	processedLines := make(map[string]struct{})
+	lineRefs := make(map[string]struct{})
+	vehicleJourneyRefs := make(map[string]struct{})
+	vehicleRefs := make(map[string]struct{})
 
 	for _, va := range response.VehicleActivities {
-		vehicles = append(vehicles, va.VehicleMonitoringRef)
+		vehicleRefs[va.VehicleMonitoringRef] = struct{}{}
 
 		line := va.MonitoredVehicleJourney.LineRef
-		if _, ok := processedLines[line]; ok {
+		if _, ok := lineRefs[line]; ok {
 			continue
 		}
-		lineRefs = append(lineRefs, va.MonitoredVehicleJourney.LineRef)
-		processedLines[line] = struct{}{}
+
+		lineRefs[line] = struct{}{}
+		vehicleJourneyRefs[va.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef] = struct{}{}
 	}
 
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
-	message.Lines = lineRefs
-	message.Vehicles = vehicles
+
+	message.Lines = GetModelReferenceSlice(lineRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
+	message.Vehicles = GetModelReferenceSlice(vehicleRefs)
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
 	if !response.Status {

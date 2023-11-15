@@ -246,21 +246,27 @@ func (smb *SMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 }
 
 func (smb *SMBroadcaster) logSIRIStopMonitoringNotify(message *audit.BigQueryMessage, notification *siri.SIRINotifyStopMonitoring) {
-	monitoringRefs := []string{}
-	cancelledMonitoringRefs := []string{}
+	monitoringRefs := make(map[string]struct{})
+	lineRefs := make(map[string]struct{})
+	VehicleJourneyRefs := make(map[string]struct{})
 
 	for _, delivery := range notification.Deliveries {
 		for _, sv := range delivery.MonitoredStopVisits {
-			monitoringRefs = append(monitoringRefs, sv.MonitoringRef)
+			monitoringRefs[sv.MonitoringRef] = struct{}{}
+			lineRefs[sv.LineRef] = struct{}{}
+			VehicleJourneyRefs[sv.DatedVehicleJourneyRef] = struct{}{}
 		}
 		for _, sv := range delivery.CancelledStopVisits {
-			cancelledMonitoringRefs = append(cancelledMonitoringRefs, sv.MonitoringRef)
+			monitoringRefs[sv.MonitoringRef] = struct{}{}
 		}
 	}
 
 	message.RequestIdentifier = notification.RequestMessageRef
 	message.ResponseIdentifier = notification.ResponseMessageIdentifier
-	message.StopAreas = append(monitoringRefs, cancelledMonitoringRefs...)
+
+	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
+	message.Lines = GetModelReferenceSlice(lineRefs)
+	message.VehicleJourneys = GetModelReferenceSlice(VehicleJourneyRefs)
 
 	delivery := notification.Deliveries[0]
 
