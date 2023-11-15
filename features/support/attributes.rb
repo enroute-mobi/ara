@@ -134,11 +134,17 @@ def model_attributes(table)
     attributes["Settings"] = JSON.parse(settings)
   end
 
+  attributes["Schedules"].sort_by!{ |s| s["Kind"] } if attributes["Schedules"]
+
   attributes
 end
 
 def api_attributes(json)
-  JSON.parse(json)
+  attributes = JSON.parse(json)
+
+  attributes["Schedules"].sort_by!{ |s| s["Kind"] } if attributes["Schedules"]
+
+  attributes
   # puts json.inspect
   # attributes = (String === json ? JSON.parse(json) : json)
   # puts attributes.inspect
