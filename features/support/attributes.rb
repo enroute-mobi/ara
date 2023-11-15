@@ -134,25 +134,28 @@ def model_attributes(table)
     attributes["Settings"] = JSON.parse(settings)
   end
 
+  attributes["Schedules"].sort_by!{ |s| s["Kind"] } if attributes["Schedules"]
+
   attributes
 end
 
 def api_attributes(json)
-  JSON.parse(json)
   # puts json.inspect
-  # attributes = (String === json ? JSON.parse(json) : json)
+  attributes = (String === json ? JSON.parse(json) : json)
   # puts attributes.inspect
 
-  # if Array === attributes
-  #   return attributes.map { |item_attributes| api_attributes(item_attributes) }
-  # end
+  if Array === attributes
+    return attributes.map { |item_attributes| api_attributes(item_attributes) }
+  end
+
+  attributes["Schedules"].sort_by!{ |s| s["Kind"] } if attributes["Schedules"]
 
   # objectids = attributes["ObjectIDs"]
   # if Array === objectids
   #   attributes["ObjectIDs"] = Hash[objectids.map { |objectid| [objectid["Kind"], objectid["Value"]] }]
   # end
 
-  # attributes
+  attributes
 end
 
 def has_attributes(response_array, attributes)
