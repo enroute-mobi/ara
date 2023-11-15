@@ -431,6 +431,8 @@ func Test_UpdateManager_UpdateStatus(t *testing.T) {
 }
 
 func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
+	assert := assert.New(t)
+
 	model := NewMemoryModel()
 	manager := newUpdateManager(model)
 	objectid := NewObjectID("kind", "value")
@@ -449,17 +451,18 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	stopVisit.collected = true
 	stopVisit.Save()
 
-	manager.Update(NewNotCollectedUpdateEvent(objectid))
+	time := time.Now()
+
+	manager.Update(NewNotCollectedUpdateEvent(objectid, time))
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
-	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_DEPARTED {
-		t.Errorf("StopVisit DepartureStatus should be updated")
-	}
-	if updatedStopVisit.ArrivalStatus != STOP_VISIT_ARRIVAL_ARRIVED {
-		t.Errorf("StopVisit ArrivalStatus should be updated")
-	}
-	if updatedStopVisit.collected {
-		t.Errorf("StopVisit Collected should be updated")
-	}
+
+	assert.Equal(updatedStopVisit.ArrivalStatus, STOP_VISIT_ARRIVAL_ARRIVED)
+	assert.Equal(updatedStopVisit.DepartureStatus, STOP_VISIT_DEPARTURE_DEPARTED)
+
+	assert.False(updatedStopVisit.collected)
+
+	assert.Equal(time, updatedStopVisit.Schedules.Schedule(STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime())
+	assert.Equal(time, updatedStopVisit.Schedules.Schedule(STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime())
 }
 
 func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {

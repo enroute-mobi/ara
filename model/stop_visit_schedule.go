@@ -182,6 +182,19 @@ func (schedules *StopVisitSchedules) SetDepartureTime(kind StopVisitScheduleType
 	schedules.Unlock()
 }
 
+func (schedules *StopVisitSchedules) SetDepartureTimeIfNotDefined(kind StopVisitScheduleType, departureTime time.Time) {
+	schedules.Lock()
+	defer schedules.Unlock()
+
+	_, ok := schedules.byType[kind]
+	if !ok {
+		schedules.byType[kind] = &StopVisitSchedule{kind: kind}
+	} else if !schedules.byType[kind].departureTime.IsZero() {
+		return
+	}
+	schedules.byType[kind].SetDepartureTime(departureTime)
+}
+
 func (schedules *StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, arrivalTime time.Time) {
 	schedules.Lock()
 	_, ok := schedules.byType[kind]
@@ -190,6 +203,19 @@ func (schedules *StopVisitSchedules) SetArrivalTime(kind StopVisitScheduleType, 
 	}
 	schedules.byType[kind].SetArrivalTime(arrivalTime)
 	schedules.Unlock()
+}
+
+func (schedules *StopVisitSchedules) SetArrivalTimeIfNotDefined(kind StopVisitScheduleType, arrivalTime time.Time) {
+	schedules.Lock()
+	defer schedules.Unlock()
+
+	_, ok := schedules.byType[kind]
+	if !ok {
+		schedules.byType[kind] = &StopVisitSchedule{kind: kind}
+	} else if !schedules.byType[kind].arrivalTime.IsZero() {
+		return
+	}
+	schedules.byType[kind].SetArrivalTime(arrivalTime)
 }
 
 func (schedules *StopVisitSchedules) SetSchedule(kind StopVisitScheduleType, departureTime time.Time, arrivalTime time.Time) {

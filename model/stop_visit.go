@@ -85,10 +85,19 @@ func (stopVisit *StopVisit) IsArchivable() bool {
 			stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_CANCELLED)
 }
 
-func (stopVisit *StopVisit) NotCollected() {
+func (stopVisit *StopVisit) NotCollected(notCollectedAt time.Time) {
 	stopVisit.collected = false
-	stopVisit.ArrivalStatus = STOP_VISIT_ARRIVAL_ARRIVED
-	stopVisit.DepartureStatus = STOP_VISIT_DEPARTURE_DEPARTED
+	stopVisit.VehicleAtStop = false
+
+	if !stopVisit.ArrivalStatus.Arrived() {
+		stopVisit.ArrivalStatus = STOP_VISIT_ARRIVAL_ARRIVED
+	}
+	if !stopVisit.DepartureStatus.Departed() {
+		stopVisit.DepartureStatus = STOP_VISIT_DEPARTURE_DEPARTED
+	}
+
+	stopVisit.Schedules.SetArrivalTimeIfNotDefined(STOP_VISIT_SCHEDULE_ACTUAL, notCollectedAt)
+	stopVisit.Schedules.SetDepartureTimeIfNotDefined(STOP_VISIT_SCHEDULE_ACTUAL, notCollectedAt)
 }
 
 func (stopVisit *StopVisit) CollectedAt() time.Time {
