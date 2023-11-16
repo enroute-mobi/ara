@@ -41,7 +41,7 @@ type Situation struct {
 	RecordedAt time.Time
 	Version    int `json:",omitempty"`
 
-	ValidityPeriods []*TimeRange `json:",omitempty"`
+	ValidityPeriods []*TimeRange
 
 	Keywords   []string   `json:",omitempty"`
 	ReportType ReportType `json:",omitempty"`
@@ -207,11 +207,10 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		ObjectIDs  ObjectIDs  `json:",omitempty"`
 		RecordedAt *time.Time `json:",omitempty"`
 		*Alias
-		Id              SituationId
-		Affects         []Affect      `json:",omitempty"`
-		ValidityPeriods []*TimeRange  `json:",omitempty"`
-		References      []*Reference  `json:",omitempty"`
-		LineSections    []*References `json:",omitempty"`
+		Id           SituationId
+		Affects      []Affect      `json:",omitempty"`
+		References   []*Reference  `json:",omitempty"`
+		LineSections []*References `json:",omitempty"`
 	}{
 		Id:    situation.id,
 		Alias: (*Alias)(situation),
@@ -225,9 +224,6 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	}
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
-	}
-	if len(situation.ValidityPeriods) != 0 {
-		aux.ValidityPeriods = situation.ValidityPeriods
 	}
 
 	if len(situation.Affects) != 0 {

@@ -54,6 +54,7 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 
 	expected := `{
 "Origin":"test",
+"ValidityPeriods": null,
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222",
