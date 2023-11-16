@@ -127,16 +127,6 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	return siriGeneralMessage
 }
 
-func (builder *BroadcastGeneralMessageBuilder) setAffectKind(affect model.Affect) string {
-	switch affect.GetType() {
-	case model.SituationTypeLine:
-		return "LineRef"
-	case model.SituationTypeStopArea:
-		return "StopPointRef"
-	}
-	return ""
-}
-
 func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChannels []string, channel string) bool {
 	if (len(requestChannels) == 1 && requestChannels[0] == "") || len(requestChannels) == 0 {
 		return true
@@ -157,8 +147,9 @@ func (builder *BroadcastGeneralMessageBuilder) buildAffectedStopArea(message *si
 		logger.Log.Debugf("Unknown StopArea %s", affect.GetId())
 		return
 	}
+
 	affectedStopAreaRef := &siri.SIRIAffectedRef{
-		Kind: builder.setAffectKind(affect),
+		Kind: "StopPointRef",
 		Id:   affectedStopAreaId,
 	}
 	message.AffectedRefs = append(message.AffectedRefs, affectedStopAreaRef)
@@ -171,7 +162,7 @@ func (builder *BroadcastGeneralMessageBuilder) buildAffectedLine(message *siri.S
 		return
 	}
 	affectedLineRef := &siri.SIRIAffectedRef{
-		Kind: builder.setAffectKind(affect),
+		Kind: "LineRef",
 		Id:   affectedLineId,
 	}
 	message.AffectedRefs = append(message.AffectedRefs, affectedLineRef)
