@@ -466,7 +466,6 @@ func Test_ReceiveStateGM(t *testing.T) {
 	lineSectionReferences.SetReference("LastStop", model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
 	lineSectionReferences.SetReference("LinesRef", model.Reference{ObjectId: &objectid0, Type: "LineRef"})
 
-	situation.LineSections = append(situation.LineSections, &lineSectionReferences)
 	situation.Save()
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")

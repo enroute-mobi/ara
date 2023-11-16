@@ -52,8 +52,7 @@ type Situation struct {
 	Summary     *SituationTranslatedString `json:",omitempty"`
 	Description *SituationTranslatedString `json:",omitempty"`
 
-	Affects      []Affect `json:",omitempty"`
-	LineSections []*References
+	Affects []Affect `json:",omitempty"`
 }
 
 // SubTypes of Affect
@@ -207,10 +206,8 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		ObjectIDs  ObjectIDs  `json:",omitempty"`
 		RecordedAt *time.Time `json:",omitempty"`
 		*Alias
-		Id           SituationId
-		Affects      []Affect      `json:",omitempty"`
-		References   []*Reference  `json:",omitempty"`
-		LineSections []*References `json:",omitempty"`
+		Id      SituationId
+		Affects []Affect `json:",omitempty"`
 	}{
 		Id:    situation.id,
 		Alias: (*Alias)(situation),
@@ -219,9 +216,7 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	if !situation.ObjectIDs().Empty() {
 		aux.ObjectIDs = situation.ObjectIDs()
 	}
-	if len(situation.LineSections) != 0 {
-		aux.LineSections = situation.LineSections
-	}
+
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
 	}
