@@ -320,30 +320,28 @@ func Test_setAffectedLine(t *testing.T) {
 	line.Save()
 
 	var TestCases = []struct {
-		LineRef             string
-		expectedEventAffect []model.Affect
-		message             string
+		LineRef              string
+		expectedAffectedLine *model.AffectedLine
+		message              string
 	}{
 		{
-			LineRef:             "dummy",
-			expectedEventAffect: nil,
-			message:             "Should not create an AffectedLine for unknown Line",
+			LineRef:              "dummy",
+			expectedAffectedLine: nil,
+			message:              "Should not create an AffectedLine for unknown Line",
 		},
 		{
 			LineRef: "lineRef1",
-			expectedEventAffect: []model.Affect{
-				&model.AffectedLine{
-					LineId: line.Id(),
-				},
+			expectedAffectedLine: &model.AffectedLine{
+				LineId: line.Id(),
 			},
 			message: "Should create an AffectedLine for known Line",
 		},
 	}
+
 	for _, tt := range TestCases {
-		event := &model.SituationUpdateEvent{}
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
-		builder.setAffectedLine(event, tt.LineRef)
-		assert.Equal(tt.expectedEventAffect, event.Affects, tt.message)
+		builder.setAffectedLine(tt.LineRef)
+		assert.Equal(tt.expectedAffectedLine, builder.affectedLines[model.LineId(line.Id())], tt.message)
 	}
 }
 
@@ -398,11 +396,11 @@ func Test_setAffectedDestination(t *testing.T) {
 	}
 
 	for _, tt := range TestCases {
-		event := &model.SituationUpdateEvent{}
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
 		affectedLine := model.NewAffectedLine()
 		affectedLine.LineId = line.Id()
-		builder.setAffectedDestination(event, tt.StopPointRef, affectedLine)
+		builder.affectedLines[line.Id()] = affectedLine
+		builder.setAffectedDestination(line.Id(), tt.StopPointRef)
 		assert.Equal(tt.expectedAffectedLine, affectedLine, tt.message)
 	}
 }
@@ -503,7 +501,6 @@ func Test_setAffectedSection(t *testing.T) {
 	}
 
 	for _, tt := range TestCases {
-		event := &model.SituationUpdateEvent{}
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
 		lineSection := LineSection{
 			LineRef:   tt.LineRef,
@@ -518,15 +515,15 @@ func Test_setAffectedSection(t *testing.T) {
 					&model.AffectedDestination{StopAreaId: firstStop.Id()},
 				},
 			}
-			event.Affects = append(event.Affects, existingAffectedLine)
+			builder.affectedLines[line.Id()] = existingAffectedLine
 		}
 
-		builder.setAffectedSection(event, lineSection)
+		builder.setAffectedSection(lineSection)
 
 		if tt.expectedAffectedLine == nil {
-			assert.Nil(event.Affects)
+			assert.Len(builder.affectedLines, 0)
 		} else {
-			assert.Equal(tt.expectedAffectedLine, event.Affects[0].(*model.AffectedLine), tt.message)
+			assert.Equal(tt.expectedAffectedLine, builder.affectedLines[line.Id()], tt.message)
 		}
 
 	}

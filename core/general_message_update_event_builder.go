@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"golang.org/x/exp/maps"
 )
 
 type GeneralMessageUpdateEventBuilder struct {
@@ -13,6 +14,7 @@ type GeneralMessageUpdateEventBuilder struct {
 
 	partner            *Partner
 	remoteObjectidKind string
+	affectedLines      map[model.LineId]*model.AffectedLine
 }
 
 type LineSection struct {
@@ -25,6 +27,7 @@ func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateE
 	return GeneralMessageUpdateEventBuilder{
 		partner:            partner,
 		remoteObjectidKind: partner.RemoteObjectIDKind(),
+		affectedLines:      make(map[model.LineId]*model.AffectedLine),
 	}
 }
 
@@ -135,7 +138,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *mode
 	event.Affects = append(event.Affects, affect)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(event *model.SituationUpdateEvent, lineRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string) {
 	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
 	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
 	if !ok {
@@ -143,16 +146,16 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(event *model.Si
 	}
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
-
-	event.Affects = append(event.Affects, affect)
+	builder.affectedLines[affect.LineId] = affect
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(event *model.SituationUpdateEvent, route string, affectedLine *model.AffectedLine) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string) {
 	affectedRoute := model.AffectedRoute{RouteRef: route}
-	affectedLine.AffectedRoutes = append(affectedLine.AffectedRoutes, &affectedRoute)
+	builder.affectedLines[model.LineId(lineId)].AffectedRoutes =
+		append(builder.affectedLines[model.LineId(lineId)].AffectedRoutes, &affectedRoute)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *model.SituationUpdateEvent, destination string, affectedLine *model.AffectedLine) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId model.LineId, destination string) {
 	destinationObjectId := model.NewObjectID(builder.remoteObjectidKind, destination)
 	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(destinationObjectId)
 	if !ok {
@@ -160,10 +163,11 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(event *m
 	}
 
 	affectedDestination := model.AffectedDestination{StopAreaId: stopArea.Id()}
-	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, &affectedDestination)
+	builder.affectedLines[model.LineId(lineId)].AffectedDestinations =
+		append(builder.affectedLines[model.LineId(lineId)].AffectedDestinations, &affectedDestination)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model.SituationUpdateEvent, section LineSection) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section LineSection) {
 	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, section.LineRef)
 	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
 	if !ok {
@@ -189,33 +193,34 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(event *model
 	}
 
 	// Fill already existing AffectedLine if exists
-	for pos, affect := range event.Affects {
-		if affect.GetType() == model.SituationTypeLine && affect.GetId() == model.ModelId(line.Id()) {
-			event.Affects[pos].(*model.AffectedLine).AffectedSections = append(
-				event.Affects[pos].(*model.AffectedLine).AffectedSections, affectedSection)
-			return
-		}
+	affectedLine, ok := builder.affectedLines[line.Id()]
+	if ok {
+		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
+		return
 	}
 
 	// otherwise create new AffectedLine
-	affectedLine := model.NewAffectedLine()
+	affectedLine = model.NewAffectedLine()
 	affectedLine.LineId = line.Id()
 	affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
-	event.Affects = append(event.Affects, affectedLine)
+	builder.affectedLines[line.Id()] = affectedLine
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 
 	for _, lineRef := range content.LineRef() {
-		builder.setAffectedLine(event, lineRef)
+		builder.setAffectedLine(lineRef)
 	}
 
-	if len(event.Affects) == 1 && event.Affects[0].GetType() == model.SituationTypeLine {
+	if len(builder.affectedLines) == 1 {
+		// get the LineId
+		lineId := maps.Keys(builder.affectedLines)[0]
+
 		for _, destination := range content.DestinationRef() {
-			builder.setAffectedDestination(event, destination, event.Affects[0].(*model.AffectedLine))
+			builder.setAffectedDestination(lineId, destination)
 		}
 		for _, route := range content.RouteRef() {
-			builder.setAffectedRoute(event, route, event.Affects[0].(*model.AffectedLine))
+			builder.setAffectedRoute(lineId, route)
 		}
 	}
 
@@ -226,7 +231,12 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 			LastStop:  section.LastStop(),
 		}
 
-		builder.setAffectedSection(event, lineSection)
+		builder.setAffectedSection(lineSection)
+	}
+
+	// Fill affectedLines
+	for _, affectedLine := range builder.affectedLines {
+		event.Affects = append(event.Affects, affectedLine)
 	}
 
 	for _, stopPointRef := range content.StopPointRef() {
