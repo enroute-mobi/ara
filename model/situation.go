@@ -63,7 +63,6 @@ type Affect interface {
 }
 
 type AffectedStopArea struct {
-	Type       SituationType
 	StopAreaId StopAreaId `json:",omitempty"`
 }
 
@@ -72,15 +71,14 @@ func (a AffectedStopArea) GetId() ModelId {
 }
 
 func (a AffectedStopArea) GetType() SituationType {
-	return a.Type
+	return SituationTypeStopArea
 }
 
 func NewAffectedStopArea() *AffectedStopArea {
-	return &AffectedStopArea{Type: "StopArea"}
+	return &AffectedStopArea{}
 }
 
 type AffectedLine struct {
-	Type                 SituationType
 	LineId               LineId                 `json:",omitempty"`
 	AffectedDestinations []*AffectedDestination `json:",omitempty"`
 	AffectedSections     []*AffectedSection     `json:",omitempty"`
@@ -105,11 +103,11 @@ func (a AffectedLine) GetId() ModelId {
 }
 
 func (a AffectedLine) GetType() SituationType {
-	return a.Type
+	return SituationTypeLine
 }
 
 func NewAffectedLine() *AffectedLine {
-	return &AffectedLine{Type: "Line"}
+	return &AffectedLine{}
 }
 
 type TimeRange struct {
@@ -175,6 +173,32 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 		situation.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 	return nil
+}
+
+func (affect AffectedStopArea) MarshalJSON() ([]byte, error) {
+	type Alias AffectedStopArea
+	aux := struct {
+		Type SituationType
+		Alias
+	}{
+		Type:  SituationTypeStopArea,
+		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
+}
+
+func (affect AffectedLine) MarshalJSON() ([]byte, error) {
+	type Alias AffectedLine
+	aux := struct {
+		Type SituationType
+		Alias
+	}{
+		Type:  SituationTypeLine,
+		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
 }
 
 func (situation *Situation) MarshalJSON() ([]byte, error) {

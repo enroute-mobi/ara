@@ -284,7 +284,6 @@ func Test_setAffectedStopArea(t *testing.T) {
 			StopPointRef: "stopPointRef1",
 			expectedEventAffect: []model.Affect{
 				&model.AffectedStopArea{
-					Type:       "StopArea",
 					StopAreaId: stopArea.Id(),
 				},
 			},
@@ -334,7 +333,6 @@ func Test_setAffectedLine(t *testing.T) {
 			LineRef: "lineRef1",
 			expectedEventAffect: []model.Affect{
 				&model.AffectedLine{
-					Type:   "Line",
 					LineId: line.Id(),
 				},
 			},
@@ -383,7 +381,6 @@ func Test_setAffectedDestination(t *testing.T) {
 		{
 			StopPointRef: "dummy",
 			expectedAffectedLine: &model.AffectedLine{
-				Type:   "Line",
 				LineId: line.Id(),
 			},
 			message: "Should not create an AffectedDestination for unknown StopArea",
@@ -391,7 +388,6 @@ func Test_setAffectedDestination(t *testing.T) {
 		{
 			StopPointRef: "destinationRef",
 			expectedAffectedLine: &model.AffectedLine{
-				Type:   "Line",
 				LineId: line.Id(),
 				AffectedDestinations: []*model.AffectedDestination{
 					&model.AffectedDestination{StopAreaId: stopArea.Id()},
@@ -481,7 +477,6 @@ func Test_setAffectedSection(t *testing.T) {
 			lastStop:             "lastStop",
 			existingAffectedLine: false,
 			expectedAffectedLine: &model.AffectedLine{
-				Type:   "Line",
 				LineId: line.Id(),
 				AffectedSections: []*model.AffectedSection{
 					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
@@ -495,7 +490,6 @@ func Test_setAffectedSection(t *testing.T) {
 			lastStop:             "lastStop",
 			existingAffectedLine: true,
 			expectedAffectedLine: &model.AffectedLine{
-				Type:   "Line",
 				LineId: line.Id(),
 				AffectedSections: []*model.AffectedSection{
 					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
@@ -519,7 +513,6 @@ func Test_setAffectedSection(t *testing.T) {
 
 		if tt.existingAffectedLine {
 			existingAffectedLine := &model.AffectedLine{
-				Type:   "Line",
 				LineId: line.Id(),
 				AffectedDestinations: []*model.AffectedDestination{
 					&model.AffectedDestination{StopAreaId: firstStop.Id()},
