@@ -433,7 +433,6 @@ func Test_ReceiveStateGM(t *testing.T) {
 	line.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.Save()
 	objectid1 := model.NewObjectID("_internal", "coicogn1")
 	stopArea.SetObjectID(objectid1)
 	stopArea.Save()
@@ -444,7 +443,6 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.Affects = append(situation.Affects, affectedStopArea)
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.Save()
 	objectid2 := model.NewObjectID("_internal", "coicogn2")
 	stopArea2.SetObjectID(objectid2)
 	stopArea2.Save()
