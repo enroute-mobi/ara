@@ -26,7 +26,6 @@
 				<ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFGeneralMessageStructure">
 					<ns3:LineRef>lineRef1</ns3:LineRef>
-					<ns3:LineRef>lineRef2</ns3:LineRef>
 					<ns3:StopPointRef>stopPointRef1</ns3:StopPointRef>
 					<ns3:StopPointRef>stopPointRef2</ns3:StopPointRef>
 					<ns3:JourneyPatternRef>journeyPatternRef1</ns3:JourneyPatternRef>

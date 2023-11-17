@@ -17,20 +17,101 @@ type Message struct {
 	NumberOfCharPerLine int    `json:",omitempty"`
 }
 
+const (
+	SituationReportTypeGeneral  ReportType    = "general"
+	SituationReportTypeIncident ReportType    = "incident"
+	SituationTypeLine           SituationType = "Line"
+	SituationTypeStopArea       SituationType = "StopArea"
+)
+
+type ReportType string
+type SituationType string
+
+type SituationTranslatedString struct {
+	DefaultValue string            `json:",omitempty"`
+	Translations map[string]string `json:",omitempty"`
+}
+
 type Situation struct {
-	RecordedAt time.Time
-	ValidUntil time.Time
-	model      Model
+	model Model
 	ObjectIDConsumer
-	id           SituationId
-	ProducerRef  string `json:",omitempty"`
-	Channel      string `json:",omitempty"`
-	Format       string `json:",omitempty"`
-	Origin       string
-	Messages     []*Message
-	LineSections []*References
-	References   []*Reference
-	Version      int `json:",omitempty"`
+	id     SituationId
+	Origin string
+
+	RecordedAt time.Time
+	Version    int `json:",omitempty"`
+
+	ValidityPeriods []*TimeRange
+
+	Keywords   []string   `json:",omitempty"`
+	ReportType ReportType `json:",omitempty"`
+
+	ProducerRef string `json:",omitempty"`
+	Format      string `json:",omitempty"`
+
+	Summary     *SituationTranslatedString `json:",omitempty"`
+	Description *SituationTranslatedString `json:",omitempty"`
+
+	Affects []Affect `json:",omitempty"`
+}
+
+// SubTypes of Affect
+type Affect interface {
+	GetType() SituationType
+	GetId() ModelId
+}
+
+type AffectedStopArea struct {
+	StopAreaId StopAreaId `json:",omitempty"`
+}
+
+func (a AffectedStopArea) GetId() ModelId {
+	return ModelId(a.StopAreaId)
+}
+
+func (a AffectedStopArea) GetType() SituationType {
+	return SituationTypeStopArea
+}
+
+func NewAffectedStopArea() *AffectedStopArea {
+	return &AffectedStopArea{}
+}
+
+type AffectedLine struct {
+	LineId               LineId                 `json:",omitempty"`
+	AffectedDestinations []*AffectedDestination `json:",omitempty"`
+	AffectedSections     []*AffectedSection     `json:",omitempty"`
+	AffectedRoutes       []*AffectedRoute       `json:",omitempty"`
+}
+
+type AffectedDestination struct {
+	StopAreaId StopAreaId
+}
+
+type AffectedSection struct {
+	FirstStop StopAreaId
+	LastStop  StopAreaId
+}
+
+type AffectedRoute struct {
+	RouteRef string
+}
+
+func (a AffectedLine) GetId() ModelId {
+	return ModelId(a.LineId)
+}
+
+func (a AffectedLine) GetType() SituationType {
+	return SituationTypeLine
+}
+
+func NewAffectedLine() *AffectedLine {
+	return &AffectedLine{}
+}
+
+type TimeRange struct {
+	StartTime time.Time `json:",omitempty"`
+	EndTime   time.Time `json:",omitempty"`
 }
 
 func NewSituation(model Model) *Situation {
@@ -46,16 +127,6 @@ func (situation *Situation) Id() SituationId {
 	return situation.id
 }
 
-func (situation *Situation) FindReferenceByObjectId(obj *ObjectID) (*Reference, bool) {
-	for _, ref := range situation.References {
-		if ref.ObjectId.String() == obj.String() {
-			return ref, true
-		}
-	}
-
-	return &Reference{}, false
-}
-
 func (situation *Situation) Save() (ok bool) {
 	ok = situation.model.Situations().Save(situation)
 	return
@@ -66,19 +137,67 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 
 	aux := &struct {
 		ObjectIDs map[string]string
+		Affects   []json.RawMessage
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
 	}
+
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
 	}
-
+	if aux.Affects != nil {
+		for _, v := range aux.Affects {
+			var affectedSubtype = struct {
+				Type SituationType
+			}{}
+			err = json.Unmarshal(v, &affectedSubtype)
+			if err != nil {
+				return err
+			}
+			switch affectedSubtype.Type {
+			case "StopArea":
+				a := NewAffectedStopArea()
+				json.Unmarshal(v, a)
+				situation.Affects = append(situation.Affects, a)
+			case "Line":
+				l := NewAffectedLine()
+				json.Unmarshal(v, l)
+				situation.Affects = append(situation.Affects, l)
+			}
+		}
+	}
 	if aux.ObjectIDs != nil {
 		situation.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
 	}
 	return nil
+}
+
+func (affect AffectedStopArea) MarshalJSON() ([]byte, error) {
+	type Alias AffectedStopArea
+	aux := struct {
+		Type SituationType
+		Alias
+	}{
+		Type:  SituationTypeStopArea,
+		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
+}
+
+func (affect AffectedLine) MarshalJSON() ([]byte, error) {
+	type Alias AffectedLine
+	aux := struct {
+		Type SituationType
+		Alias
+	}{
+		Type:  SituationTypeLine,
+		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
 }
 
 func (situation *Situation) MarshalJSON() ([]byte, error) {
@@ -86,12 +205,9 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	aux := struct {
 		ObjectIDs  ObjectIDs  `json:",omitempty"`
 		RecordedAt *time.Time `json:",omitempty"`
-		ValidUntil *time.Time `json:",omitempty"`
 		*Alias
-		Id           SituationId
-		Messages     []*Message    `json:",omitempty"`
-		References   []*Reference  `json:",omitempty"`
-		LineSections []*References `json:",omitempty"`
+		Id      SituationId
+		Affects []Affect `json:",omitempty"`
 	}{
 		Id:    situation.id,
 		Alias: (*Alias)(situation),
@@ -100,23 +216,48 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 	if !situation.ObjectIDs().Empty() {
 		aux.ObjectIDs = situation.ObjectIDs()
 	}
-	if len(situation.Messages) != 0 {
-		aux.Messages = situation.Messages
-	}
-	if len(situation.References) != 0 {
-		aux.References = situation.References
-	}
-	if len(situation.LineSections) != 0 {
-		aux.LineSections = situation.LineSections
-	}
+
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
 	}
-	if !situation.ValidUntil.IsZero() {
-		aux.ValidUntil = &situation.ValidUntil
+
+	if len(situation.Affects) != 0 {
+		aux.Affects = situation.Affects
 	}
 
 	return json.Marshal(&aux)
+}
+
+func (situation *Situation) GMValidUntil() time.Time {
+	if len(situation.ValidityPeriods) == 0 {
+		return time.Time{}
+	}
+	return situation.ValidityPeriods[0].EndTime
+}
+
+func (situation *Situation) GetGMChannel() (string, bool) {
+	switch {
+	case situation.containsKeyword("Perturbation"):
+		return "Perturbation", true
+	case situation.containsKeyword("Information"):
+		return "Information", true
+	case situation.containsKeyword("Commercial"):
+		return "Commercial", true
+	default:
+		return "", false
+	}
+}
+
+func (situation *Situation) containsKeyword(str string) bool {
+	if len(situation.Keywords) == 0 {
+		return false
+	}
+	for _, v := range situation.Keywords {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
 
 type MemorySituations struct {

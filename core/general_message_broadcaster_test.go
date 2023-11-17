@@ -87,17 +87,27 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster = NewFakeGeneralMessageBroadcaster(connector.(*SIRIGeneralMessageSubscriptionBroadcaster))
 
 	situation := referential.Model().Situations().New()
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 
 	objectid := model.NewObjectID("internal", string(situation.Id()))
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
-	objectid2 := model.NewObjectID("SituationResource", "Situation")
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+	objectid2 := model.NewObjectID("internal", "value")
+	stopArea.SetObjectID(objectid2)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
+
+	objectid3 := model.NewObjectID("SituationResource", "Situation")
 
 	reference := model.Reference{
-		ObjectId: &objectid2,
+		ObjectId: &objectid3,
 		Type:     "Situation",
 	}
 

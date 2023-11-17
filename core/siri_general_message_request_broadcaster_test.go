@@ -30,11 +30,18 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-soap.xml")
@@ -89,11 +96,17 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	situation.Origin = "partner"
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-soap.xml")
@@ -138,20 +151,36 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 
 	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
-	situation.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
+	situation.Keywords = []string{"Perturbation"}
 	situation.SetObjectID(objectid)
-	routeReference := model.NewReference(model.NewObjectID("internal", "value"))
-	routeReference.Type = "RouteRef"
-	situation.References = append(situation.References, routeReference)
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.SetObjectID(objectid)
+	stopArea.Save()
+
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
-	objectid2 := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:25:LOC")
+	objectid2 := model.NewObjectID("objectidKind", "2")
 	situation2 := referential.Model().Situations().New()
-	situation2.ValidUntil = referential.Clock().Now().Add(5 * time.Minute)
+	situation2.ValidityPeriods = []*model.TimeRange{period}
+	situation2.Keywords = []string{"Perturbation"}
 	situation2.SetObjectID(objectid2)
-	lineReference := model.NewReference(model.NewObjectID("objectidKind", "LineRef"))
-	lineReference.Type = "LineRef"
-	situation2.References = append(situation.References, lineReference)
+
+	stopArea1 := referential.Model().StopAreas().New()
+	objectId2 := model.NewObjectID("objectidKind", "DepartureStopArea")
+	stopArea1.SetObjectID(objectId2)
+	stopArea1.Save()
+
+	affectedLine := model.NewAffectedLine()
+	affectedLine.LineId = line.Id()
+	affectedDestination := &model.AffectedDestination{StopAreaId: stopArea1.Id()}
+	affectedLine.AffectedDestinations = append(affectedLine.AffectedDestinations, affectedDestination)
+	situation2.Affects = append(situation2.Affects, affectedLine)
 	situation2.Save()
 
 	file, err := os.Open("testdata/generalmessage-request-lineref-soap.xml")

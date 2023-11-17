@@ -23,12 +23,10 @@ type SIRIGeneralMessageRequest struct {
 
 	InfoChannelRef []string
 
-	LineRef           []string
-	StopPointRef      []string
-	JourneyPatternRef []string
-	DestinationRef    []string
-	RouteRef          []string
-	GroupOfLinesRef   []string
+	LineRef        []string
+	StopPointRef   []string
+	DestinationRef []string
+	RouteRef       []string
 }
 
 func NewSIRIGeneralMessageRequest(

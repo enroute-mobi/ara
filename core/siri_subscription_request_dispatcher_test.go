@@ -433,33 +433,32 @@ func Test_ReceiveStateGM(t *testing.T) {
 	line.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.Save()
 	objectid1 := model.NewObjectID("_internal", "coicogn1")
-
-	situation.References = append(situation.References, &model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
-
 	stopArea.SetObjectID(objectid1)
 	stopArea.Save()
 
-	stopArea = referential.Model().StopAreas().New()
-	stopArea.Save()
+	affectedStopArea := model.NewAffectedStopArea()
+	affectedStopArea.StopAreaId = stopArea.Id()
+
+	situation.Affects = append(situation.Affects, affectedStopArea)
+
+	stopArea2 := referential.Model().StopAreas().New()
 	objectid2 := model.NewObjectID("_internal", "coicogn2")
+	stopArea2.SetObjectID(objectid2)
+	stopArea2.Save()
 
-	situation.References = append(situation.References, &model.Reference{ObjectId: &objectid2, Type: "StopPointRef"})
-
-	stopArea.SetObjectID(objectid2)
-	stopArea.Save()
+	affectedStopArea2 := model.NewAffectedStopArea()
+	affectedStopArea2.StopAreaId = stopArea2.Id()
+	situation.Affects = append(situation.Affects, affectedStopArea2)
 
 	objectid3 := model.NewObjectID("_internal", string(situation.Id()))
-	situation.Channel = "Mondial"
-	situation.ValidUntil = fakeClock.Now().Add(10 * time.Minute)
-	message := &model.Message{
-		Content:             "Le content",
-		Type:                "Le Type",
-		NumberOfLines:       1,
-		NumberOfCharPerLine: 10,
+	situation.Keywords = []string{"Perturbation"}
+	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
+	situation.ValidityPeriods = []*model.TimeRange{period}
+
+	situation.Description = &model.SituationTranslatedString{
+		DefaultValue: "Le content",
 	}
-	situation.Messages = append(situation.Messages, message)
 	situation.SetObjectID(objectid3)
 
 	lineSectionReferences := model.NewReferences()
@@ -467,7 +466,6 @@ func Test_ReceiveStateGM(t *testing.T) {
 	lineSectionReferences.SetReference("LastStop", model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
 	lineSectionReferences.SetReference("LinesRef", model.Reference{ObjectId: &objectid0, Type: "LineRef"})
 
-	situation.LineSections = append(situation.LineSections, &lineSectionReferences)
 	situation.Save()
 
 	file, _ := os.Open("testdata/generalmessagesubscription-request-soap.xml")

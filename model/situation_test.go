@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Situation_Id(t *testing.T) {
@@ -17,47 +18,117 @@ func Test_Situation_Id(t *testing.T) {
 }
 
 func Test_Situation_MarshalJSON(t *testing.T) {
+	assert := assert.New(t)
 	situation := Situation{
 		id:     "6ba7b814-9dad-11d1-0-00c04fd430c8",
 		Origin: "test",
 	}
-	situation.Messages = append(situation.Messages, &Message{Content: "Joyeux Noel", Type: "Un Type"})
-	expected := `{"Origin":"test","Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Messages":[{"MessageText":"Joyeux Noel","MessageType":"Un Type"}]}`
-	jsonBytes, err := situation.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
+
+	situation.Description = &SituationTranslatedString{
+		DefaultValue: "Joyeux Noel",
+	}
+	situation.Summary = &SituationTranslatedString{
+		DefaultValue: "Noel",
 	}
 
-	jsonString := string(jsonBytes)
-	if jsonString != expected {
-		t.Errorf("Situation.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
+	affectStopArea := NewAffectedStopArea()
+	affectStopArea.StopAreaId = "259344234"
+	situation.Affects = append(situation.Affects, affectStopArea)
+
+	affectLine := NewAffectedLine()
+	affectLine.LineId = "222"
+	affectDestinationId := "333"
+
+	affectedDestination := &AffectedDestination{StopAreaId: StopAreaId(affectDestinationId)}
+	affectLine.AffectedDestinations = append(affectLine.AffectedDestinations, affectedDestination)
+	affectedSectionFirstStopId := "firstStop"
+	affectedSectionLastStopId := "lastStop"
+	affectedSection := &AffectedSection{
+		FirstStop: StopAreaId(affectedSectionFirstStopId),
+		LastStop:  StopAreaId(affectedSectionLastStopId),
 	}
+	affectLine.AffectedSections = append(affectLine.AffectedSections, affectedSection)
+	affectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
+	affectLine.AffectedRoutes = append(affectLine.AffectedRoutes, affectedRoute)
+	situation.Affects = append(situation.Affects, affectLine)
+
+	expected := `{
+"Origin":"test",
+"ValidityPeriods": null,
+"Affects":[
+{"Type":"StopArea","StopAreaId":"259344234"},
+{"Type":"Line","LineId":"222",
+"AffectedDestinations":[{"StopAreaId":"333"}],
+"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
+"AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
+],
+"Description":{"DefaultValue":"Joyeux Noel"},
+"Summary":{"DefaultValue":"Noel"},
+"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+
+	jsonBytes, err := situation.MarshalJSON()
+	assert.Nil(err)
+	assert.JSONEq(expected, string(jsonBytes))
 }
 
 func Test_Situation_UnmarshalJSON(t *testing.T) {
+	assert := assert.New(t)
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
-  }`
+"Origin":"test",
+"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"Affects":[
+{"Type":"StopArea","StopAreaId":"259344234"},
+{"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}],
+"AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
+"AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
+],
+"Description":{"DefaultValue":"Joyeux Noel"},
+"Summary":{"DefaultValue":"Noel"},
+"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 
-	situation := Situation{}
+	situation := &Situation{}
 	err := json.Unmarshal([]byte(text), &situation)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(err)
 
 	expectedObjectIds := []ObjectID{
 		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
 		NewObjectID("hastus", "sqypis"),
 	}
 
+	expectedSmmary := &SituationTranslatedString{
+		DefaultValue: "Noel",
+	}
+	expectedDescription := &SituationTranslatedString{
+		DefaultValue: "Joyeux Noel",
+	}
+
+	expectedAffectedStopArea := NewAffectedStopArea()
+	expectedAffectedStopArea.StopAreaId = "259344234"
+
+	expectedAffectedLine := NewAffectedLine()
+	expectedAffectedLine.LineId = "222"
+	affectedDestination := &AffectedDestination{StopAreaId: StopAreaId("333")}
+	expectedAffectedLine.AffectedDestinations = append(expectedAffectedLine.AffectedDestinations, affectedDestination)
+
+	affectedSection := &AffectedSection{
+		FirstStop: StopAreaId("firstStop"),
+		LastStop:  StopAreaId("lastStop"),
+	}
+	expectedAffectedLine.AffectedSections = append(expectedAffectedLine.AffectedSections, affectedSection)
+
+	expectedAffectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
+	expectedAffectedLine.AffectedRoutes = append(expectedAffectedLine.AffectedRoutes, expectedAffectedRoute)
+
+	assert.Equal(expectedSmmary, situation.Summary)
+	assert.Equal(expectedDescription, situation.Description)
+	assert.Len(situation.Affects, 2)
+	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
+	assert.Equal(expectedAffectedLine, situation.Affects[1])
+
 	for _, expectedObjectId := range expectedObjectIds {
 		objectId, found := situation.ObjectID(expectedObjectId.Kind())
-		if !found {
-			t.Errorf("Missing situation ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
-		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong situation ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
-		}
+		assert.True(found)
+		assert.Equal(expectedObjectId, objectId)
 	}
 }
 

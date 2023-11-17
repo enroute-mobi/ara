@@ -81,6 +81,38 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Description\[([^\]]+)\]/
+      name = $1
+      attributes["Description"] ||= {}
+      attributes["Description"][name] = value
+      attributes.delete key
+    end
+
+    if key =~ /Summary\[([^\]]+)\]/
+      name = $1
+      attributes["Summary"] ||= {}
+      attributes["Summary"][name] = value
+      attributes.delete key
+    end
+
+    # Situation ValidityPeriods is an array of TimeRange
+    # Format: | ValidityPeriods[0]#StartTime | 2017-01-01T13:00:00.000Z |
+    #         | ValidityPeriods[0]#EndTime   | 2017-01-02T15:00:00.000Z |
+    if key =~ /ValidityPeriods\[(\d+)\]#(\S+)/
+      period_number = Regexp.last_match(1).to_i
+      attribute = Regexp.last_match(2).to_s
+
+      attributes['ValidityPeriods'] ||= []
+
+      until attributes['ValidityPeriods'].length >= period_number + 1
+        attributes['ValidityPeriods'] << {}
+      end
+
+      attributes['ValidityPeriods'][period_number][attribute.to_s] = value
+
+      attributes.delete key
+    end
+
     # Situation References are an array of Reference
     # Format: | Reference[0] | Kind:ObjectId |
     if key =~ /References\[(\d+)\]/
@@ -110,6 +142,33 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections|AffectedRoutes)\[(\d+)])?(/((FirstStop|LastStop)|StopAreaId|RouteRef))?}
+      raw_attribute = Regexp.last_match(0).to_s
+      attribute = Regexp.last_match(2).to_s
+      subaffect = Regexp.last_match(4).to_s
+      index = Regexp.last_match(5).to_i
+      stop_type = Regexp.last_match(7).to_s
+
+      attributes['Affects'] ||= []
+      case attribute
+      when 'StopArea', 'Line'
+        attributes['Affects'] << {
+          'Type' => attribute,
+          "#{attribute}Id" => value
+        }
+      else
+        model, id = attribute.split('=')
+        attributes['Affects'].map do |affect|
+          next if affect['Type'] != model && affect["#{model}Id"] != id
+
+          affect[subaffect] ||= []
+          affect[subaffect][index] ||= {}
+          affect[subaffect][index][stop_type] = value
+        end
+      end
+      attributes.delete raw_attribute
+    end
+    
     if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2
@@ -174,6 +233,8 @@ def has_attributes(response_array, attributes)
     case value
     when Float
       value = a_value_within(0.00001).of(value)
+    when Array
+      value = match_array(value)
     else
       value
     end

@@ -17,13 +17,11 @@ type XMLGeneralMessageRequest struct {
 	LightRequestXMLStructure
 
 	// Filters
-	infoChannelRef    []string
-	lineRef           []string
-	stopPointRef      []string
-	journeyPatternRef []string
-	destinationRef    []string
-	routeRef          []string
-	groupOfLinesRef   []string
+	infoChannelRef []string
+	lineRef        []string
+	stopPointRef   []string
+	destinationRef []string
+	routeRef       []string
 }
 
 func NewXMLGetGeneralMessage(node xml.Node) *XMLGetGeneralMessage {
@@ -58,16 +56,6 @@ func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
 	return request.infoChannelRef
 }
 
-func (request *XMLGeneralMessageRequest) GroupOfLinesRef() []string {
-	if len(request.groupOfLinesRef) == 0 {
-		nodes := request.findNodes("GroupOfLinesRef")
-		for _, groupOfLinesRef := range nodes {
-			request.groupOfLinesRef = append(request.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-		}
-	}
-	return request.groupOfLinesRef
-}
-
 func (request *XMLGeneralMessageRequest) RouteRef() []string {
 	if len(request.routeRef) == 0 {
 		nodes := request.findNodes("RouteRef")
@@ -86,16 +74,6 @@ func (request *XMLGeneralMessageRequest) DestinationRef() []string {
 		}
 	}
 	return request.destinationRef
-}
-
-func (request *XMLGeneralMessageRequest) JourneyPatternRef() []string {
-	if len(request.journeyPatternRef) == 0 {
-		nodes := request.findNodes("JourneyPatternRef")
-		for _, journeyPatternRef := range nodes {
-			request.journeyPatternRef = append(request.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
-		}
-	}
-	return request.journeyPatternRef
 }
 
 func (request *XMLGeneralMessageRequest) StopPointRef() []string {

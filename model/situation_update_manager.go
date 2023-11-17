@@ -1,6 +1,8 @@
 package model
 
-import "bitbucket.org/enroute-mobi/ara/clock"
+import (
+	"bitbucket.org/enroute-mobi/ara/clock"
+)
 
 type SituationUpdateManager struct {
 	clock.ClockConsumer
@@ -35,12 +37,14 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.Version = event.Version
 		situation.ProducerRef = event.ProducerRef
 
-		situation.References = event.SituationAttributes.References
-		situation.LineSections = event.SituationAttributes.LineSections
-		situation.Messages = event.SituationAttributes.Messages
-		situation.ValidUntil = event.SituationAttributes.ValidUntil
-		situation.Channel = event.SituationAttributes.Channel
-		situation.Format = event.SituationAttributes.Format
+		situation.Summary = event.Summary
+		situation.Description = event.Description
+
+		situation.ValidityPeriods = event.ValidityPeriods
+		situation.Keywords = event.Keywords
+		situation.ReportType = event.ReportType
+		situation.Format = event.Format
+		situation.Affects = event.Affects
 
 		situation.Save()
 	}

@@ -5,23 +5,20 @@ import "time"
 type SituationUpdateRequestId string
 
 type SituationUpdateEvent struct {
-	CreatedAt           time.Time
-	RecordedAt          time.Time
-	SituationObjectID   ObjectID
-	id                  SituationUpdateRequestId
-	Origin              string
-	ProducerRef         string
-	SituationAttributes SituationAttributes
-	Version             int
-}
-
-type SituationAttributes struct {
-	ValidUntil   time.Time
-	Format       string
-	Channel      string
-	References   []*Reference
-	LineSections []*References
-	Messages     []*Message
+	CreatedAt         time.Time
+	RecordedAt        time.Time
+	SituationObjectID ObjectID
+	id                SituationUpdateRequestId
+	Origin            string
+	Format            string
+	ProducerRef       string
+	ValidityPeriods   []*TimeRange
+	Keywords          []string
+	ReportType        ReportType
+	Version           int
+	Summary           *SituationTranslatedString
+	Description       *SituationTranslatedString
+	Affects           []Affect
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {
@@ -30,4 +27,24 @@ func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {
 
 func (event *SituationUpdateEvent) SetId(id SituationUpdateRequestId) {
 	event.id = id
+}
+
+func (event *SituationUpdateEvent) TestFindAffectByLineId(lineId LineId) (bool, *AffectedLine) {
+	for _, affect := range event.Affects {
+		if affect.GetType() == SituationTypeLine &&
+			affect.GetId() == ModelId(lineId) {
+			return true, affect.(*AffectedLine)
+		}
+	}
+	return false, nil
+}
+
+func (event *SituationUpdateEvent) TestFindAffectByStopAreaId(stopAreaId StopAreaId) (bool, *AffectedStopArea) {
+	for _, affect := range event.Affects {
+		if affect.GetType() == SituationTypeStopArea &&
+			affect.GetId() == ModelId(stopAreaId) {
+			return true, affect.(*AffectedStopArea)
+		}
+	}
+	return false, nil
 }

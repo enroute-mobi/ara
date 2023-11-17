@@ -40,12 +40,10 @@ type XMLGeneralMessage struct {
 type IDFGeneralMessageStructure struct {
 	XMLStructure
 
-	lineRef           []string
-	stopPointRef      []string
-	journeyPatternRef []string
-	destinationRef    []string
-	routeRef          []string
-	groupOfLinesRef   []string
+	lineRef        []string
+	stopPointRef   []string
+	destinationRef []string
+	routeRef       []string
 
 	lineSections []*IDFLineSectionStructure
 	messages     []*XMLMessage
@@ -201,16 +199,6 @@ func (visit *XMLGeneralMessage) Content() interface{} {
 	return visit.content
 }
 
-func (visit *IDFGeneralMessageStructure) GroupOfLinesRef() []string {
-	if len(visit.groupOfLinesRef) == 0 {
-		nodes := visit.findNodes("GroupOfLinesRef")
-		for _, groupOfLinesRef := range nodes {
-			visit.groupOfLinesRef = append(visit.groupOfLinesRef, strings.TrimSpace(groupOfLinesRef.NativeNode().Content()))
-		}
-	}
-	return visit.groupOfLinesRef
-}
-
 func (visit *IDFGeneralMessageStructure) RouteRef() []string {
 	if len(visit.routeRef) == 0 {
 		nodes := visit.findNodes("RouteRef")
@@ -229,16 +217,6 @@ func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 		}
 	}
 	return visit.destinationRef
-}
-
-func (visit *IDFGeneralMessageStructure) JourneyPatternRef() []string {
-	if len(visit.journeyPatternRef) == 0 {
-		nodes := visit.findNodes("JourneyPatternRef")
-		for _, journeyPatternRef := range nodes {
-			visit.journeyPatternRef = append(visit.journeyPatternRef, strings.TrimSpace(journeyPatternRef.NativeNode().Content()))
-		}
-	}
-	return visit.journeyPatternRef
 }
 
 func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
@@ -275,7 +253,13 @@ func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 	if len(visit.messages) == 0 {
 		nodes := visit.findNodes("Message")
 		for _, messageNode := range nodes {
-			visit.messages = append(visit.messages, NewXMLMessage(messageNode))
+			message := NewXMLMessage(messageNode)
+			// shortMessage should be inserted first
+			if message.MessageType() == "shortMessage" {
+				visit.messages = append([]*XMLMessage{message}, visit.messages...)
+			} else {
+				visit.messages = append(visit.messages, message)
+			}
 		}
 	}
 	return visit.messages

@@ -4,62 +4,59 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func completeEvent(objectid ObjectID, testTime time.Time) (event *SituationUpdateEvent) {
+	period := &TimeRange{EndTime: testTime}
+
 	event = &SituationUpdateEvent{
 		RecordedAt:        testTime,
 		SituationObjectID: objectid,
 		Version:           1,
 		ProducerRef:       "Ara",
+		ValidityPeriods:   []*TimeRange{period},
+		Keywords:          []string{"channel"},
 	}
 
-	message := &Message{
-		Content:             "Message Text",
-		Type:                "MessageType",
-		NumberOfLines:       2,
-		NumberOfCharPerLine: 20,
+	summary := &SituationTranslatedString{
+		DefaultValue: "Message Text",
 	}
 
-	event.SituationAttributes = SituationAttributes{
-		Format:     "format",
-		Channel:    "channel",
-		Messages:   []*Message{message},
-		ValidUntil: testTime,
-	}
-	event.SituationAttributes.References = append(event.SituationAttributes.References, &Reference{ObjectId: &objectid, Type: "type"})
+	event.Summary = summary
+	event.Format = "format"
 
 	return
 }
 
 func checkSituation(situation Situation, objectid ObjectID, testTime time.Time) bool {
-	message := &Message{
-		Content:             "Message Text",
-		Type:                "MessageType",
-		NumberOfLines:       2,
-		NumberOfCharPerLine: 20,
+	summary := &SituationTranslatedString{
+		DefaultValue: "Message Text",
 	}
 
+	period := &TimeRange{EndTime: testTime}
+
 	testSituation := Situation{
-		id:          situation.id,
-		Messages:    []*Message{message},
-		RecordedAt:  testTime,
-		ValidUntil:  testTime,
-		Format:      "format",
-		Channel:     "channel",
-		ProducerRef: "Ara",
-		Version:     1,
+		id:              situation.id,
+		Summary:         summary,
+		RecordedAt:      testTime,
+		ValidityPeriods: []*TimeRange{period},
+		Format:          "format",
+		Keywords:        []string{"channel"},
+		ProducerRef:     "Ara",
+		Version:         1,
 	}
 	testSituation.model = situation.model
 	testSituation.objectids = make(ObjectIDs)
 	testSituation.SetObjectID(objectid)
 	testSituation.SetObjectID(NewObjectID("_default", objectid.HashValue()))
-	testSituation.References = append(testSituation.References, &Reference{ObjectId: &objectid, Type: "type"})
 
 	return reflect.DeepEqual(situation, testSituation)
 }
 
 func Test_SituationUpdateManager_Update(t *testing.T) {
+	assert := assert.New(t)
 	objectid := NewObjectID("kind", "value")
 	testTime := time.Now()
 
@@ -74,12 +71,11 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	manager.Update([]*SituationUpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
-	if !checkSituation(updatedSituation, objectid, testTime) {
-		t.Errorf("Situation is not properly updated:\n got: %v\n event: %v", updatedSituation, event)
-	}
+	assert.True(checkSituation(updatedSituation, objectid, testTime))
 }
 
 func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
+	assert := assert.New(t)
 	objectid := NewObjectID("kind", "value")
 	testTime := time.Now()
 
@@ -87,7 +83,7 @@ func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 	situation := model.Situations().New()
 	situation.SetObjectID(objectid)
 	situation.RecordedAt = testTime
-	situation.Channel = "SituationChannel"
+	situation.Keywords = []string{"situationChannel"}
 	model.Situations().Save(&situation)
 
 	manager := newSituationUpdateManager(model)
@@ -95,15 +91,12 @@ func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 	manager.Update([]*SituationUpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
-	if checkSituation(updatedSituation, objectid, testTime) {
-		t.Errorf("Situation should not be updated:\n got: %v\n event: %v", updatedSituation, event)
-	}
-	if updatedSituation.Channel != "SituationChannel" {
-		t.Errorf("Situation Channel should not have been updated:\n got: %v\n want: SituationChannel", updatedSituation.Channel)
-	}
+	assert.False(checkSituation(updatedSituation, objectid, testTime), "Situation should not be updated")
+	assert.ElementsMatch(updatedSituation.Keywords, []string{"situationChannel"})
 }
 
 func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
+	assert := assert.New(t)
 	objectid := NewObjectID("kind", "value")
 	testTime := time.Now()
 
@@ -114,12 +107,7 @@ func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
 	manager.Update([]*SituationUpdateEvent{event})
 
 	situations := model.Situations().FindAll()
-	if len(situations) != 1 {
-		t.Fatalf("Should find 1 situation, got %v", len(situations))
-	}
-
+	assert.Len(situations, 1, "Should find 1 situation")
 	situation := situations[0]
-	if !checkSituation(situation, objectid, testTime) {
-		t.Errorf("Situation is not properly created:\n got: %v\n event: %v", situation, event)
-	}
+	assert.True(checkSituation(situation, objectid, testTime))
 }
