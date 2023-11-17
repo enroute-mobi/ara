@@ -28,3 +28,23 @@ func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {
 func (event *SituationUpdateEvent) SetId(id SituationUpdateRequestId) {
 	event.id = id
 }
+
+func (event *SituationUpdateEvent) TestFindAffectByLineId(lineId LineId) (bool, *AffectedLine) {
+	for _, affect := range event.Affects {
+		if affect.GetType() == SituationTypeLine &&
+			affect.GetId() == ModelId(lineId) {
+			return true, affect.(*AffectedLine)
+		}
+	}
+	return false, nil
+}
+
+func (event *SituationUpdateEvent) TestFindAffectByStopAreaId(stopAreaId StopAreaId) (bool, *AffectedStopArea) {
+	for _, affect := range event.Affects {
+		if affect.GetType() == SituationTypeStopArea &&
+			affect.GetId() == ModelId(stopAreaId) {
+			return true, affect.(*AffectedStopArea)
+		}
+	}
+	return false, nil
+}

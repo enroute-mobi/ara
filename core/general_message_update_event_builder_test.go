@@ -115,33 +115,39 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Nil(event.Summary)
 
 	affects := event.Affects
-	assert.Len(affects, 5, "Should have 5 affetcs: 3 affctedLines, 2 affectedStopAreas")
+	assert.Len(affects, 5, "Should have 5 affects: 3 affectedLines, 2 affectedStopAreas")
 
 	// Affected Lines
-	assert.Equal(model.SituationType("Line"), affects[0].GetType())
-	assert.Equal(model.ModelId(lineId), affects[0].GetId(), "Should be Id of lineRef1")
+	ok, affectedLine1 := event.TestFindAffectByLineId(lineId)
+	assert.True(ok)
 
-	assert.Equal(destinationRef1.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[0].StopAreaId)
-	assert.Equal(destinationRef2.Id(), affects[0].(*model.AffectedLine).AffectedDestinations[1].StopAreaId)
+	// AffectedDestinations for LineRef1
+	assert.Equal(destinationRef1.Id(), affectedLine1.AffectedDestinations[0].StopAreaId)
+	assert.Equal(destinationRef2.Id(), affectedLine1.AffectedDestinations[1].StopAreaId)
 
-	// AffectedSections
-	assert.Len(affects[0].(*model.AffectedLine).AffectedSections, 0, "Should have no affected section for lineRef1")
-	assert.Len(affects[1].(*model.AffectedLine).AffectedSections, 1, "Should have 1 affectedSection for lineSectionRef1 ")
-	assert.Len(affects[2].(*model.AffectedLine).AffectedSections, 1, "Should have 1 affecteSection for lineSection2")
+	// AffectedRoutes for LineRef1
+	assert.Equal("routeRef1", affectedLine1.AffectedRoutes[0].RouteRef)
+	assert.Equal("routeRef2", affectedLine1.AffectedRoutes[1].RouteRef)
 
-	affectedSectionLineSection1 := affects[1].(*model.AffectedLine).AffectedSections[0]
-	assert.Equal(firstStop1.Id(), affectedSectionLineSection1.FirstStop)
-	assert.Equal(lastStop1.Id(), affectedSectionLineSection1.LastStop)
+	// AffectedSections for LineSectionRef1
+	ok, affectedLineSection1 := event.TestFindAffectByLineId(lineSectionRef1.Id())
+	assert.True(ok)
+	assert.Len(affectedLineSection1.AffectedSections, 1, "Should have 1 affectedSection for lineSectionRef1 ")
+	assert.Equal(firstStop1.Id(), affectedLineSection1.AffectedSections[0].FirstStop)
+	assert.Equal(lastStop1.Id(), affectedLineSection1.AffectedSections[0].LastStop)
 
-	affectedSectionLineSection2 := affects[2].(*model.AffectedLine).AffectedSections[0]
-	assert.Equal(firstStop2.Id(), affectedSectionLineSection2.FirstStop)
-	assert.Equal(lastStop2.Id(), affectedSectionLineSection2.LastStop)
+	// AffectedSections for LineSectionRef2
+	ok, affectedLineSection2 := event.TestFindAffectByLineId(lineSectionRef2.Id())
+	assert.True(ok)
+	assert.Len(affectedLineSection2.AffectedSections, 1, "Should have 1 affectedSection for lineSectionRef2")
+	assert.Equal(firstStop2.Id(), affectedLineSection2.AffectedSections[0].FirstStop)
+	assert.Equal(lastStop2.Id(), affectedLineSection2.AffectedSections[0].LastStop)
 
 	// Affected StopAreas
-	assert.Equal(model.SituationType("StopArea"), affects[3].GetType())
-	assert.Equal(model.ModelId(stopAreaId), affects[3].GetId())
-	assert.Equal(model.SituationType("StopArea"), affects[4].GetType())
-	assert.Equal(model.ModelId(stopArea2Id), affects[4].GetId())
+	ok, _ = event.TestFindAffectByStopAreaId(stopAreaId)
+	assert.True(ok)
+	ok, _ = event.TestFindAffectByStopAreaId(stopArea2Id)
+	assert.True(ok)
 }
 
 func Test_setReportType(t *testing.T) {
