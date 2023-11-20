@@ -32,7 +32,7 @@ Feature: Support SIRI GeneralMessage by subscription
              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
              <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns5:RequestMessageRef>
              <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
+             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-6-00c04fd430c8</ns5:SubscriptionRef>
              <ns5:Status>true</ns5:Status>
              <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
          </ns5:ResponseStatus>
@@ -49,12 +49,20 @@ Feature: Support SIRI GeneralMessage by subscription
         | local_credential                | NINOXE:default        |
         | remote_objectid_kind            | internal              |
         | collect.filter_general_messages | true                  |
-        | collect.include_lines           | 1234                  |
+        | collect.include_lines           | NINOXE:Line::3:LOC    |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name                   | Test                            |
+        | ObjectIDs              | "internal":"NINOXE:Line::3:LOC" |
+        | CollectGeneralMessages | true                            |
+      And a StopArea exists with the following attributes:
+        | Name                   | Test                                    |
+        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | CollectGeneralMessages | true                                    |
+      And a StopArea exists with the following attributes:
+        | Name                   | Test                                    |
+        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | CollectGeneralMessages | true                                    |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
@@ -81,7 +89,7 @@ Feature: Support SIRI GeneralMessage by subscription
             <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
             <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-6-00c04fd430c8</ns5:SubscriptionRef>
             <ns3:Status>true</ns3:Status>
             <ns3:GeneralMessage>
                <ns3:RecordedAtTime>2017-03-01T03:30:06.000+01:00</ns3:RecordedAtTime>
@@ -111,12 +119,22 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
       """
     Then one Situation has the following attributes:
-        | ObjectIDs                    | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | Keywords                     | ["Commercial"]                            |
-        | ReportType                   | general                                   |
-        | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00                 |
-        | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00                 |
-        | Version                      | 2                                         |
+        | ObjectIDs                                                                       | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Keywords                                                                        | ["Commercial"]                            |
+        | ReportType                                                                      | general                                   |
+        | ValidityPeriods[0]#StartTime                                                    | 2017-03-01T03:30:06+01:00                 |
+        | ValidityPeriods[0]#EndTime                                                      | 2017-03-29T03:30:06+01:00                 |
+        | Version                                                                         | 2                                         |
+        | Affects[Line]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop    | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop   | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                                                         |
+      | Direction          | received                                                     |
+      | Status             | OK                                                           |
+      | Type               | NotifyGeneralMessage                                         |
+      | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
+      | Lines              | ["NINOXE:Line::3:LOC"]                                       |
 
   Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with

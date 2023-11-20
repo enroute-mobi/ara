@@ -15,6 +15,9 @@ type GeneralMessageUpdateEventBuilder struct {
 	partner            *Partner
 	remoteObjectidKind string
 	affectedLines      map[model.LineId]*model.AffectedLine
+
+	MonitoringRefs map[string]struct{}
+	LineRefs       map[string]struct{}
 }
 
 type LineSection struct {
@@ -28,6 +31,9 @@ func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateE
 		partner:            partner,
 		remoteObjectidKind: partner.RemoteObjectIDKind(),
 		affectedLines:      make(map[model.LineId]*model.AffectedLine),
+
+		MonitoringRefs: make(map[string]struct{}),
+		LineRefs:       make(map[string]struct{}),
 	}
 }
 
@@ -136,6 +142,9 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *mode
 	affect.StopAreaId = stopArea.Id()
 
 	event.Affects = append(event.Affects, affect)
+
+	// Logging
+	builder.MonitoringRefs[stopPointRefObjectId.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string) {
@@ -147,6 +156,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string)
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
 	builder.affectedLines[affect.LineId] = affect
+	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string) {
@@ -165,6 +175,9 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId m
 	affectedDestination := model.AffectedDestination{StopAreaId: stopArea.Id()}
 	builder.affectedLines[model.LineId(lineId)].AffectedDestinations =
 		append(builder.affectedLines[model.LineId(lineId)].AffectedDestinations, &affectedDestination)
+
+	// Logging
+	builder.MonitoringRefs[destinationObjectId.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section LineSection) {
@@ -204,6 +217,11 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 	affectedLine.LineId = line.Id()
 	affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
 	builder.affectedLines[line.Id()] = affectedLine
+
+	// Logging
+	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[firstStopObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[lastStopObjectId.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
