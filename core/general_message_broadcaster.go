@@ -160,9 +160,31 @@ func (gmb *GMBroadcaster) newBQEvent() *audit.BigQueryMessage {
 }
 
 func (gmb *GMBroadcaster) logSIRIGeneralMessageNotify(message *audit.BigQueryMessage, response *siri.SIRINotifyGeneralMessage) {
+	lineRefs := make(map[string]struct{})
+	monitoringRefs := make(map[string]struct{})
+
+	for _, message := range response.GeneralMessages {
+		for _, affectedRef := range message.AffectedRefs {
+			switch affectedRef.Kind {
+			case "LineRef":
+				lineRefs[affectedRef.Id] = struct{}{}
+			case "StopPointRef", "DestinationRef":
+				monitoringRefs[affectedRef.Id] = struct{}{}
+			}
+		}
+		for _, affectedLineSection := range message.LineSections {
+			lineRefs[affectedLineSection.LineRef] = struct{}{}
+			monitoringRefs[affectedLineSection.FirstStop] = struct{}{}
+			monitoringRefs[affectedLineSection.LastStop] = struct{}{}
+		}
+	}
+
 	message.RequestIdentifier = response.RequestMessageRef
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
+
+	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
+	message.Lines = GetModelReferenceSlice(lineRefs)
 
 	if !response.Status {
 		message.Status = "Error"

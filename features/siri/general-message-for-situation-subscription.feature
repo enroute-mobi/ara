@@ -245,13 +245,23 @@ Feature: Support SIRI GeneralMessage by subscription
         | ObjectIDs              | "internal":"1234" |
         | CollectGeneralMessages | true              |
     And a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
-      | Version                    | 1                                         |
-      | Keywords                   | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]  | a very very very long message             |
-      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | ObjectIDs                                                                           | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                 |
+      | Version                                                                             | 1                                         |
+      | Keywords                                                                            | ["Perturbation"]                          |
+      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                 |
+      | Description[DefaultValue]                                                           | a very very very long message             |
+      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+    And a StopArea exists with the following attributes:
+        | Name                   | Test                                    |
+        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | CollectGeneralMessages | true                                    |
+    And a StopArea exists with the following attributes:
+        | Name                   | Test                                    |
+        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | CollectGeneralMessages | true                                    |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
@@ -268,7 +278,7 @@ Feature: Support SIRI GeneralMessage by subscription
            <ServiceDeliveryInfo>
              <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
              <siri:ProducerRef>test</siri:ProducerRef>
-             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
              <siri:RequestMessageRef></siri:RequestMessageRef>
            </ServiceDeliveryInfo>
            <Notification>
@@ -280,7 +290,7 @@ Feature: Support SIRI GeneralMessage by subscription
                <siri:Status>true</siri:Status>
                <siri:GeneralMessage formatRef="STIF-IDF">
                  <siri:RecordedAtTime>2017-01-01T03:50:06.000+02:00</siri:RecordedAtTime>
-                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ItemIdentifier>
+                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ItemIdentifier>
                  <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
                  <siri:InfoMessageVersion>2</siri:InfoMessageVersion>
                  <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
@@ -288,6 +298,8 @@ Feature: Support SIRI GeneralMessage by subscription
                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>1234</siri:LineRef>
+                   <siri:DestinationRef>NINOXE:StopPoint:SP:12:LOC</siri:DestinationRef>
+                   <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                    <Message>
                      <MessageType>longMessage</MessageType>
                      <MessageText>an ANOTHER very very very long message</MessageText>
@@ -301,6 +313,13 @@ Feature: Support SIRI GeneralMessage by subscription
        </S:Body>
      </S:Envelope>
     """
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                                                         |
+      | Direction | sent                                                         |
+      | Status    | OK                                                           |
+      | Type      | NotifyGeneralMessage                                         |
+      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
+      | Lines     | ["1234"]                                                     |
 
   Scenario: Brodcast a GeneralMessage Notification when keywords does not contains Perturbation/Information/Commercial but ReportType is type incident should broadcast as Pertubation
     Given a SIRI server on "http://localhost:8090"
