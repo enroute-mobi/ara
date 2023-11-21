@@ -180,6 +180,13 @@ Feature: Support SIRI GeneralMessage for Situation
         </S:Body>
       </S:Envelope>
       """
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                                                         |
+      | Direction | received                                                     |
+      | Status    | OK                                                           |
+      | Type      | GeneralMessageRequest                                        |
+      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
+      | Lines     | ["NINOXE:Line:3:LOC"]                                        |
 
   Scenario: 3032 - Handle a GeneralMessage response (ServiceDelivery)
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with

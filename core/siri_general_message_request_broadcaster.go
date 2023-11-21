@@ -23,6 +23,9 @@ func NewSIRIGeneralMessageRequestBroadcaster(partner *Partner) *SIRIGeneralMessa
 }
 
 func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *sxml.XMLGetGeneralMessage, message *audit.BigQueryMessage) (*siri.SIRIGeneralMessageResponse, error) {
+	lineRefs := make(map[string]struct{})
+	monitoringRefs := make(map[string]struct{})
+
 	response := &siri.SIRIGeneralMessageResponse{
 		Address:                   connector.Partner().Address(),
 		ProducerRef:               connector.Partner().ProducerRef(),
@@ -35,6 +38,25 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *sxml.
 		message.Status = "Error"
 		message.ErrorDetails = response.SIRIGeneralMessageDelivery.ErrorString()
 	}
+
+	for _, message := range response.GeneralMessages {
+		for _, affectedRef := range message.AffectedRefs {
+			switch affectedRef.Kind {
+			case "LineRef":
+				lineRefs[affectedRef.Id] = struct{}{}
+			case "StopPointRef", "DestinationRef":
+				monitoringRefs[affectedRef.Id] = struct{}{}
+			}
+		}
+		for _, affectedLineSection := range message.LineSections {
+			lineRefs[affectedLineSection.LineRef] = struct{}{}
+			monitoringRefs[affectedLineSection.FirstStop] = struct{}{}
+			monitoringRefs[affectedLineSection.LastStop] = struct{}{}
+		}
+	}
+
+	message.Lines = GetModelReferenceSlice(lineRefs)
+	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
