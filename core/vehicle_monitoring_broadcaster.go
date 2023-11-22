@@ -184,7 +184,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				Monitored:          vj.Monitored,
 				Bearing:            vehicle.Bearing,
 				DriverRef:          vehicle.DriverRef,
-				Occupancy:          vj.Occupancy,
+				Occupancy:          vehicle.Occupancy,
 				OriginRef:          vm.connector.handleRef("OriginRef", vj.Origin, refs),
 				DestinationRef:     vm.connector.handleRef("DestinationRef", vj.Origin, refs),
 				JourneyPatternRef:  vm.connector.handleJourneyPatternRef(refs),

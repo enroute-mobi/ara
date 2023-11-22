@@ -182,7 +182,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 		Monitored:          vj.Monitored,
 		Bearing:            vehicle.Bearing,
 		DriverRef:          vehicle.DriverRef,
-		Occupancy:          vj.Occupancy,
+		Occupancy:          vehicle.Occupancy,
 		OriginRef:          connector.handleRef("OriginRef", vj.Origin, refs),
 		DestinationRef:     connector.handleRef("DestinationRef", vj.Origin, refs),
 		JourneyPatternRef:  connector.handleJourneyPatternRef(refs),

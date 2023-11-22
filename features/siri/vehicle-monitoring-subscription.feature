@@ -98,10 +98,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+      | Occupancy        | seatsAvailable                        |
     And a Vehicle exists with the following attributes:
       | ObjectIDs        | "internal": "Test:Vehicle:999:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | Occupancy        | manySeatsAvailable                 |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast       |
       | SubscriberRef     | Subscriber                       |
@@ -159,6 +161,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                       <siri:Latitude>5.678</siri:Latitude>
                     </siri:VehicleLocation>
                     <siri:Bearing>234</siri:Bearing>
+                    <siri:Occupancy>seatsAvailable</siri:Occupancy>
                   </siri:MonitoredVehicleJourney>
                 </siri:VehicleActivity>
                 <siri:VehicleActivity>
@@ -179,6 +182,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                       <siri:Latitude>8.678</siri:Latitude>
                     </siri:VehicleLocation>
                     <siri:Bearing>126</siri:Bearing>
+                    <siri:Occupancy>manySeatsAvailable</siri:Occupancy>
                     </siri:MonitoredVehicleJourney>
                   </siri:VehicleActivity>
               </siri:VehicleMonitoringDelivery>
