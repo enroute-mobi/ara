@@ -17,7 +17,8 @@
 						<siri:Longitude>{{ .VehicleLocation.Longitude }}</siri:Longitude>{{ end }}{{ if .VehicleLocation.Latitude }}
 						<siri:Latitude>{{ .VehicleLocation.Latitude }}</siri:Latitude>{{ end }}
 					</siri:VehicleLocation>{{ end }}{{ if .Bearing }}
-					<siri:Bearing>{{ .Bearing }}</siri:Bearing>{{ end }}{{ if .VehicleRef }}
+					<siri:Bearing>{{ .Bearing }}</siri:Bearing>{{ end }}{{ if .Occupancy }}
+					<siri:Occupancy>{{ .Occupancy }}</siri:Occupancy>{{ end }}{{ if .VehicleRef }}
 					<siri:VehicleRef>{{ .VehicleRef }}</siri:VehicleRef>{{ end }}{{ if .DriverRef }}
 					<siri:DriverRef>{{ .DriverRef }}</siri:DriverRef>{{ end }}
 				</siri:MonitoredVehicleJourney>

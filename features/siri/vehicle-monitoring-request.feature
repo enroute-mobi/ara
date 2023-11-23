@@ -166,6 +166,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Bearing          | 123                                |
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+      | Occupancy        | seatsAvailable                     |
    When I send this SIRI request
      """
      <?xml version='1.0' encoding='UTF-8'?> 
@@ -222,6 +223,7 @@ Feature: Support SIRI VehicleMonitoring by request
                       <siri:Latitude>5.678</siri:Latitude>
                     </siri:VehicleLocation>
                     <siri:Bearing>123</siri:Bearing>
+                    <siri:Occupancy>seatsAvailable</siri:Occupancy>
                   </siri:MonitoredVehicleJourney>
                 </siri:VehicleActivity>
               </siri:VehicleMonitoringDelivery>
