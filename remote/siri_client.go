@@ -47,6 +47,8 @@ type siriClientArguments struct {
 	acceptGzip       bool
 }
 
+var xmlRegex = regexp.MustCompile("^(application|text)/xml;charset=([ -~]+)")
+
 func NewSIRIClient(c *HTTPClient, set string) *SIRIClient {
 	return &SIRIClient{
 		httpClient:       c,
@@ -59,8 +61,7 @@ func (client *SIRIClient) remoteClient() *http.Client {
 }
 
 func (client *SIRIClient) responseFromFormat(body io.Reader, contentType string) io.Reader {
-	r, _ := regexp.Compile("^text/xml;charset=([ -~]+)")
-	s := r.FindStringSubmatch(contentType)
+	s := xmlRegex.FindStringSubmatch(contentType)
 	if len(s) == 0 {
 		return body
 	}
@@ -119,7 +120,7 @@ func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.N
 		return nil, siri.NewSiriError(strings.Join([]string{"SIRI CRITICAL: HTTP status ", strconv.Itoa(response.StatusCode)}, ""))
 	}
 
-	if !strings.Contains(response.Header.Get("Content-Type"), "text/xml") {
+	if !strings.Contains(response.Header.Get("Content-Type"), "/xml") {
 		return nil, siri.NewSiriError(fmt.Sprintf("SIRI CRITICAL: HTTP Content-Type %v", response.Header.Get("Content-Type")))
 	}
 
