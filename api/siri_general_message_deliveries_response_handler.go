@@ -29,7 +29,7 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(param
 
 	t := clock.DefaultClock().Now()
 
-	params.connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
+	collectedRefs := params.connector.(core.GeneralMessageSubscriptionCollector).HandleNotifyGeneralMessage(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
 
@@ -58,5 +58,7 @@ func (handler *SIRIGeneralMessageRequestDeliveriesResponseHandler) Respond(param
 		subs = append(subs, k)
 	}
 	params.message.SubscriptionIdentifiers = subs
+	params.message.Lines = collectedRefs.GetLines()
+	params.message.StopAreas = collectedRefs.GetStopAreas()
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }

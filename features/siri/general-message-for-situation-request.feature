@@ -180,6 +180,13 @@ Feature: Support SIRI GeneralMessage for Situation
         </S:Body>
       </S:Envelope>
       """
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                                                         |
+      | Direction | received                                                     |
+      | Status    | OK                                                           |
+      | Type      | GeneralMessageRequest                                        |
+      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
+      | Lines     | ["NINOXE:Line:3:LOC"]                                        |
 
   Scenario: 3032 - Handle a GeneralMessage response (ServiceDelivery)
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
@@ -275,6 +282,13 @@ Feature: Support SIRI GeneralMessage for Situation
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-7-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                                               |
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                                                                 |
+      | Direction | sent                                                                 |
+      | Status    | OK                                                                   |
+      | Type      | GeneralMessageRequest                                                |
+      | StopAreas | ["destinationRef1", "destinationRef2", "NINOXE:StopPoint:SP:24:LOC"] |
+      | Lines     | ["1234"]                                                             |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with

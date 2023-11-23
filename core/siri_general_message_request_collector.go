@@ -73,14 +73,15 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 
 	logXMLGeneralMessageResponse(message, xmlGeneralMessageResponse)
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
-	connector.setSituationUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
+
+	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
+	builder.SetGeneralMessageResponseUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
+
+	// Log VehicleRefs
+	message.Lines = GetModelReferenceSlice(builder.LineRefs)
+	message.StopAreas = GetModelReferenceSlice(builder.MonitoringRefs)
 
 	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
-}
-
-func (connector *SIRIGeneralMessageRequestCollector) setSituationUpdateEvents(situationEvents *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageResponse) {
-	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
-	builder.SetGeneralMessageResponseUpdateEvents(situationEvents, xmlResponse)
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {

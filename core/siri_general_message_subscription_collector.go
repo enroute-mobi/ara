@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type GeneralMessageSubscriptionCollector interface {
@@ -15,7 +16,7 @@ type GeneralMessageSubscriptionCollector interface {
 
 	RequestAllSituationsUpdate()
 	RequestSituationUpdate(kind string, requestedId model.ObjectID)
-	HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage)
+	HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) *CollectedRefs
 }
 
 type SIRIGeneralMessageSubscriptionCollector struct {
@@ -95,13 +96,14 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	newSubscription.CreateAndAddNewResource(ref)
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) (collectedRefs *CollectedRefs) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
 	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
 	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
 
+	collectedRefs = NewCollectedRefs()
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
@@ -123,12 +125,17 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 
 		builder.SetGeneralMessageDeliveryUpdateEvents(situationUpdateEvents, delivery, notify.ProducerRef())
 
+		maps.Copy(collectedRefs.LineRefs, builder.LineRefs)
+		maps.Copy(collectedRefs.MonitoringRefs, builder.MonitoringRefs)
+
 		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
 	}
 
 	for subId := range subToDelete {
 		CancelSubscription(subId, "GeneralMessageSubscriptionCollector", connector)
 	}
+
+	return collectedRefs
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(xmlResponse *sxml.XMLGeneralMessageDelivery) {
