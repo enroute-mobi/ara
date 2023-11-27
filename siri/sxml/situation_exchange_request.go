@@ -1,0 +1,38 @@
+package sxml
+
+import (
+	"github.com/jbowtie/gokogiri"
+	"github.com/jbowtie/gokogiri/xml"
+)
+
+type XMLGetSituationExchange struct {
+	XMLSituationExchangeRequest
+
+	requestorRef string
+}
+
+type XMLSituationExchangeRequest struct {
+	LightRequestXMLStructure
+}
+
+func NewXMLGetSituationExchange(node xml.Node) *XMLGetSituationExchange {
+	xmlGetSituationExchange := &XMLGetSituationExchange{}
+	xmlGetSituationExchange.node = NewXMLNode(node)
+	return xmlGetSituationExchange
+}
+
+func NewXMLGetSituationExchangeFromContent(content []byte) (*XMLGetSituationExchange, error) {
+	doc, err := gokogiri.ParseXml(content)
+	if err != nil {
+		return nil, err
+	}
+	request := NewXMLGetSituationExchange(doc.Root().XmlNode)
+	return request, nil
+}
+
+func (request *XMLGetSituationExchange) RequestorRef() string {
+	if request.requestorRef == "" {
+		request.requestorRef = request.findStringChildContent("RequestorRef")
+	}
+	return request.requestorRef
+}
