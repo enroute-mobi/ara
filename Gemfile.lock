@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/siri-xsd.git
-  revision: b02d3e029e35d555b04b99ce0b9528d3b842dece
+  revision: dc4357d954269eae3050d2ff7c0d23da046dcb92
   specs:
     siri-xsd (0.1.0)
       listen
@@ -74,18 +74,18 @@ GEM
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.0218.1)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     minitest (5.19.0)
     multi_test (1.1.0)
     netrc (0.11.0)
-    nokogiri (1.15.3)
+    nokogiri (1.15.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     pg (1.5.3)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    racc (1.7.1)
+    racc (1.7.3)
     rake (13.0.6)
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)

@@ -57,7 +57,7 @@ module Siri
     attr_reader :content, :description
 
     def validator
-      @validator ||= Siri::Xsd::Validator.new
+      @validator ||= SIRI::XSD::Validator.new
     end
 
     def validate
