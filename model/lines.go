@@ -16,12 +16,12 @@ type Line struct {
 	model      Model
 	References References
 	ObjectIDConsumer
-	Attributes             Attributes
-	id                     LineId
-	Name                   string `json:",omitempty"`
-	Number                 string `json:",omitempty"`
-	origin                 string
-	CollectGeneralMessages bool
+	Attributes        Attributes
+	id                LineId
+	Name              string `json:",omitempty"`
+	Number            string `json:",omitempty"`
+	origin            string
+	CollectSituations bool
 }
 
 func NewLine(model Model) *Line {
@@ -239,8 +239,8 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 		if sl.Name.Valid {
 			line.Name = sl.Name.String
 		}
-		if sl.CollectGeneralMessages.Valid {
-			line.CollectGeneralMessages = sl.CollectGeneralMessages.Bool
+		if sl.CollectSituations.Valid {
+			line.CollectSituations = sl.CollectSituations.Bool
 		}
 
 		if sl.Number.Valid {

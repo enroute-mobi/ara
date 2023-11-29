@@ -126,7 +126,7 @@ func Test_LineController_Create(t *testing.T) {
 		t.Errorf("Line should be found after POST request")
 	}
 	lineMarshal, _ := line.MarshalJSON()
-	expected := `{"CollectGeneralMessages":false,"ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"ObjectId":{"lol":"lel"}}},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
+	expected := `{"CollectSituations":false,"ObjectIDs":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"ObjectId":{"lol":"lel"}}},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
 	if responseRecorder.Body.String() != string(expected) && string(lineMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
@@ -140,7 +140,7 @@ func Test_LineController_Index(t *testing.T) {
 	checkLineResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"CollectGeneralMessages":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	expected := `[{"CollectSituations":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
 	if responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

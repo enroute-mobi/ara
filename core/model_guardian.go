@@ -119,7 +119,7 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 		}
 		guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 
-		if sas[i].CollectGeneralMessages {
+		if sas[i].CollectSituations {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
@@ -146,7 +146,7 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 		line.NextCollect(now.Add(guardian.randDuration()))
 		line.Save()
 
-		if lines[i].CollectGeneralMessages {
+		if lines[i].CollectSituations {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(line.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}

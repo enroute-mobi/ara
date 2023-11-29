@@ -57,58 +57,58 @@ type SelectOperator struct {
 }
 
 type DatabaseStopArea struct {
-	LineIds                string         `db:"line_ids"`
-	ReferentialSlug        string         `db:"referential_slug"`
-	References             string         `db:"siri_references"`
-	Attributes             string         `db:"attributes"`
-	ModelName              string         `db:"model_name"`
-	Name                   string         `db:"name"`
-	ObjectIDs              string         `db:"object_ids"`
-	Id                     string         `db:"id"`
-	ReferentId             sql.NullString `db:"referent_id"`
-	ParentId               sql.NullString `db:"parent_id"`
-	CollectedAlways        bool           `db:"collected_always"`
-	CollectChildren        bool           `db:"collect_children"`
-	CollectGeneralMessages bool           `db:"collect_general_messages"`
+	LineIds           string         `db:"line_ids"`
+	ReferentialSlug   string         `db:"referential_slug"`
+	References        string         `db:"siri_references"`
+	Attributes        string         `db:"attributes"`
+	ModelName         string         `db:"model_name"`
+	Name              string         `db:"name"`
+	ObjectIDs         string         `db:"object_ids"`
+	Id                string         `db:"id"`
+	ReferentId        sql.NullString `db:"referent_id"`
+	ParentId          sql.NullString `db:"parent_id"`
+	CollectedAlways   bool           `db:"collected_always"`
+	CollectChildren   bool           `db:"collect_children"`
+	CollectSituations bool           `db:"collect_situations"`
 }
 
 type SelectStopArea struct {
-	Id                     string
-	ReferentialSlug        string `db:"referential_slug"`
-	ModelName              string `db:"model_name"`
-	Name                   sql.NullString
-	ObjectIDs              sql.NullString `db:"object_ids"`
-	ParentId               sql.NullString `db:"parent_id"`
-	ReferentId             sql.NullString `db:"referent_id"`
-	Attributes             sql.NullString
-	References             sql.NullString `db:"siri_references"`
-	LineIds                sql.NullString `db:"line_ids"`
-	CollectedAlways        sql.NullBool   `db:"collected_always"`
-	CollectChildren        sql.NullBool   `db:"collect_children"`
-	CollectGeneralMessages sql.NullBool   `db:"collect_general_messages"`
+	Id                string
+	ReferentialSlug   string `db:"referential_slug"`
+	ModelName         string `db:"model_name"`
+	Name              sql.NullString
+	ObjectIDs         sql.NullString `db:"object_ids"`
+	ParentId          sql.NullString `db:"parent_id"`
+	ReferentId        sql.NullString `db:"referent_id"`
+	Attributes        sql.NullString
+	References        sql.NullString `db:"siri_references"`
+	LineIds           sql.NullString `db:"line_ids"`
+	CollectedAlways   sql.NullBool   `db:"collected_always"`
+	CollectChildren   sql.NullBool   `db:"collect_children"`
+	CollectSituations sql.NullBool   `db:"collect_situations"`
 }
 
 type DatabaseLine struct {
-	Id                     string `db:"id"`
-	ReferentialSlug        string `db:"referential_slug"`
-	ModelName              string `db:"model_name"`
-	Name                   string `db:"name"`
-	ObjectIDs              string `db:"object_ids"`
-	Attributes             string `db:"attributes"`
-	References             string `db:"siri_references"`
-	CollectGeneralMessages bool   `db:"collect_general_messages"`
+	Id                string `db:"id"`
+	ReferentialSlug   string `db:"referential_slug"`
+	ModelName         string `db:"model_name"`
+	Name              string `db:"name"`
+	ObjectIDs         string `db:"object_ids"`
+	Attributes        string `db:"attributes"`
+	References        string `db:"siri_references"`
+	CollectSituations bool   `db:"collect_situations"`
 }
 
 type SelectLine struct {
-	Id                     string
-	ReferentialSlug        string `db:"referential_slug"`
-	ModelName              string `db:"model_name"`
-	Name                   sql.NullString
-	Number                 sql.NullString `db:"number"`
-	ObjectIDs              sql.NullString `db:"object_ids"`
-	Attributes             sql.NullString
-	References             sql.NullString `db:"siri_references"`
-	CollectGeneralMessages sql.NullBool   `db:"collect_general_messages"`
+	Id                string
+	ReferentialSlug   string `db:"referential_slug"`
+	ModelName         string `db:"model_name"`
+	Name              sql.NullString
+	Number            sql.NullString `db:"number"`
+	ObjectIDs         sql.NullString `db:"object_ids"`
+	Attributes        sql.NullString
+	References        sql.NullString `db:"siri_references"`
+	CollectSituations sql.NullBool   `db:"collect_situations"`
 }
 
 type DatabaseVehicleJourney struct {

@@ -23,7 +23,7 @@ func Test_Line_MarshalJSON(t *testing.T) {
 		Number: "L1",
 		id:     "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	expected := `{"Name":"Line","Number":"L1","CollectGeneralMessages":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+	expected := `{"Name":"Line","Number":"L1","CollectSituations":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 	jsonBytes, err := line.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
