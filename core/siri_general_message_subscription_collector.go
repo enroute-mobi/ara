@@ -106,6 +106,12 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	collectedRefs = NewCollectedRefs()
 	for _, delivery := range notify.GeneralMessagesDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
+
+		if subscriptionId == "" {
+			logger.Log.Debugf("Partner %s sent a NotifyGeneralMessage with an empty SubscriptionRef\n", connector.Partner().Slug())
+			continue
+		}
+
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
 			logger.Log.Printf("Partner %s sent a NotifyGeneralMessage to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)

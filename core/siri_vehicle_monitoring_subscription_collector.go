@@ -110,9 +110,14 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 	for _, delivery := range notify.VehicleMonitoringDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
+		if subscriptionId == "" {
+			logger.Log.Debugf("Partner %s sent a NotifyVehicleMonitoring with an empty SubscriptionRef\n", connector.Partner().Slug())
+			continue
+		}
+
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
-			logger.Log.Debugf("Partner %s sent a VehicleMonitoringNotify response to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
+			logger.Log.Debugf("Partner %s sent a NotifyVehicleMonitoring to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
 			subscriptionErrors[subscriptionId] = "Non existant subscription of id %s"
 			if !connector.deletedSubscriptions.AlreadySend(subscriptionId) {
 				subToDelete[subscriptionId] = struct{}{}
@@ -120,7 +125,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 			continue
 		}
 		if subscription.Kind() != VehicleMonitoringCollect {
-			logger.Log.Debugf("Partner %s sent a VehicleMonitoringNotify response to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
+			logger.Log.Debugf("Partner %s sent a NotifyVehicleMonitoring to a subscription with kind: %s\n", connector.Partner().Slug(), subscription.Kind())
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind VehicleMonitoringCollect"
 			continue
 		}
