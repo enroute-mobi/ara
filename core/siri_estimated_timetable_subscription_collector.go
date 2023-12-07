@@ -111,6 +111,11 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 	for _, delivery := range notify.EstimatedTimetableDeliveries() {
 		subscriptionId := delivery.SubscriptionRef()
 
+		if subscriptionId == "" {
+			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable with an empty SubscriptionRef\n", connector.Partner().Slug())
+			continue
+		}
+
 		subscription, ok := connector.Partner().Subscriptions().Find(SubscriptionId(subscriptionId))
 		if !ok {
 			logger.Log.Debugf("Partner %s sent a NotifyEstimatedTimetable to a non existant subscription of id: %s\n", connector.Partner().Slug(), subscriptionId)
