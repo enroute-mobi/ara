@@ -37,11 +37,11 @@
 								</siri:Sections>{{ end }}{{ end }}
 							</siri:AffectedLine>{{ end }}
 						</siri:AffectedNetwork>
-					</siri:Networks>
+					</siri:Networks>{{ if .AffectedStopPoints }}
 					<siri:StopPoints>{{ range .AffectedStopPoints }}
 						<siri:AffectedStopPoint>
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
 						</siri:AffectedStopPoint>{{ end }}
-					</siri:StopPoints>
+					</siri:StopPoints>{{ end }}
 				</siri:Affects>
 			</siri:PtSituationElement>{{ end }}
