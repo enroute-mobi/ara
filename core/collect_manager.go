@@ -287,9 +287,12 @@ func (manager *CollectManager) requestAllSituations() {
 			continue
 		}
 
-		requestConnector := partner.GeneralMessageRequestCollector()
+		generalMessageRequestConnector := partner.GeneralMessageRequestCollector()
+		situationExchangeRequestConnector := partner.SituationExchangeRequestCollector()
 		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
-		if requestConnector == nil && subscriptionConnector == nil {
+		if generalMessageRequestConnector == nil &&
+			subscriptionConnector == nil &&
+			situationExchangeRequestConnector == nil {
 			continue
 		}
 
@@ -298,7 +301,13 @@ func (manager *CollectManager) requestAllSituations() {
 			subscriptionConnector.RequestAllSituationsUpdate()
 			continue
 		}
-		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
+		if generalMessageRequestConnector != nil {
+			generalMessageRequestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
+		}
+		if situationExchangeRequestConnector != nil {
+			situationExchangeRequestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
+
+		}
 	}
 }
 
