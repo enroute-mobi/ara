@@ -29,5 +29,15 @@ module XML
         end
       end
     end
+
+    def raw_values(xpaths = [])
+      {}.tap do |values|
+        xpaths.each do |xpath|
+          node = REXML::XPath.first(@document, xpath)
+          xml_value = node.text if node
+          values[xpath] = xml_value
+        end
+      end
+    end
   end
 end

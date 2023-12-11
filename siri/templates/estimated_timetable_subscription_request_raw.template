@@ -1,0 +1,16 @@
+	<SubscriptionRequest>
+		<RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</RequestTimestamp>
+		<RequestorRef>{{.RequestorRef}}</RequestorRef>
+		<MessageIdentifier>{{.MessageIdentifier}}</MessageIdentifier>{{ if .ConsumerAddress }}
+		<ConsumerAddress>{{.ConsumerAddress}}</ConsumerAddress>{{end}}{{ range .Entries }}
+		<EstimatedTimetableSubscriptionRequest>
+			<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
+			<SubscriptionIdentifier>{{.SubscriptionIdentifier}}</SubscriptionIdentifier>
+			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>
+			<EstimatedTimetableRequest>
+				{{ .BuildEstimatedTimetableRequestXMLRaw }}
+			</EstimatedTimetableRequest>
+			<IncrementalUpdates>true</IncrementalUpdates>
+			<ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
+		</EstimatedTimetableSubscriptionRequest>{{end}}
+	</SubscriptionRequest>
