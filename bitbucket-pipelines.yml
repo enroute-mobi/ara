@@ -71,10 +71,12 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:1.1.3
+            - pipe: atlassian/datadog-send-event:2.2.0
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
+                PAYLOAD: >
+                  { "source_type_name": "BITBUCKET", "tags":["env:test","app:ara","repository:ara"] }
 
       - step:
           name: Deploy to staging
@@ -90,10 +92,12 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:1.1.3
+            - pipe: atlassian/datadog-send-event:2.2.0
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
+                PAYLOAD: >
+                  { "source_type_name": "BITBUCKET", "tags":["env:staging","app:ara","repository:ara"] }
 
       - step:
           name: Deploy to production
@@ -109,7 +113,9 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:1.1.3
+            - pipe: atlassian/datadog-send-event:2.2.0
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
+                PAYLOAD: >
+                  { "source_type_name": "BITBUCKET", "tags":["env:production","app:ara","repository:ara"] }
