@@ -58,7 +58,7 @@ class SIRIServer
           when 'SOAP'
             res.body = soap_checkstatus_response(request_message_identifiers)
           when 'raw'
-            res.body = raw_checkstatus_response(uri, request_message_identifiers)
+            res.body = raw_checkstatus_response(request_message_identifiers)
           else
             raise "Unknown envelope #{@envelope}"
           end
@@ -108,27 +108,17 @@ class SIRIServer
   end
 
   def raw_checkstatus_response(request_message_identifiers)
-    %Q(<?xml version='1.0' encoding='utf-8'?>
-<ns8:CheckStatusResponse xmlns:ns3="http://www.siri.org.uk/siri"
-                             xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                             xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                             xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                             xmlns:ns7="http://scma/siri"
-                             xmlns:ns8="http://wsdl.siri.org.uk"
-                             xmlns:ns9="http://wsdl.siri.org.uk/siri">
-  <CheckStatusAnswerInfo>
-    <ns3:ResponseTimestamp>2016-09-22T07:58:34.000+02:00</ns3:ResponseTimestamp>
-    <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
-    <ns3:Address>#{@url}</ns3:Address>
-    <ns3:ResponseMessageIdentifier>c464f588-5128-46c8-ac3f-8b8a465692ab</ns3:ResponseMessageIdentifier>
-    <ns3:RequestMessageRef>#{request_message_identifiers.first}</ns3:RequestMessageRef>
-    </CheckStatusAnswerInfo>
-    <Answer>
-      <ns3:Status>true</ns3:Status>
-      <ns3:ServiceStartedTime>#{@service_started_at}</ns3:ServiceStartedTime>
-    </Answer>
-    <AnswerExtension/>
-  </ns8:CheckStatusResponse>)
+    %(<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+<CheckStatusResponse>
+    <ResponseTimestamp>2016-09-22T07:58:34.000+02:00</ResponseTimestamp>
+    <ProducerRef>NINOXE:default</ProducerRef>
+    <ResponseMessageIdentifier>c464f588-5128-46c8-ac3f-8b8a465692ab</ResponseMessageIdentifier>
+    <RequestMessageRef>#{request_message_identifiers.first}</RequestMessageRef>
+    <Status>true</Status>
+    <ServiceStartedTime>#{@service_started_at}</ServiceStartedTime>
+</CheckStatusResponse>
+</Siri>)
   end
 
   def soap_checkstatus_response(request_message_identifiers)
