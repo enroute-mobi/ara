@@ -41,10 +41,10 @@ type SIRIClient struct {
 }
 
 type siriClientArguments struct {
-	request          Request
-	requestType      requestType
-	expectedResponse string
-	acceptGzip       bool
+	request           Request
+	requestType       requestType
+	expectedResponses []string
+	acceptGzip        bool
 }
 
 var xmlRegex = regexp.MustCompile("^(application|text)/xml;charset=([ -~]+)")
@@ -142,7 +142,7 @@ func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.N
 	if err != nil {
 		return nil, err
 	}
-	return envelope.BodyOrError(args.expectedResponse)
+	return envelope.BodyOrError(args.expectedResponses)
 }
 
 func (client *SIRIClient) getURL(requestType requestType) string {
@@ -172,10 +172,10 @@ func getTimeOut(rt requestType) time.Duration {
 
 func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*sxml.XMLCheckStatusResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "CheckStatusResponse",
-		requestType:      CHECK_STATUS,
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"CheckStatusResponse"},
+		requestType:       CHECK_STATUS,
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -187,9 +187,9 @@ func (client *SIRIClient) CheckStatus(request *siri.SIRICheckStatusRequest) (*sx
 
 func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryRequest) (*sxml.XMLStopPointsDiscoveryResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "StopPointsDiscoveryResponse",
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"StopPointsDiscoveryResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -201,9 +201,9 @@ func (client *SIRIClient) StopDiscovery(request *siri.SIRIStopPointsDiscoveryReq
 
 func (client *SIRIClient) LineDiscovery(request *siri.SIRILinesDiscoveryRequest) (*sxml.XMLLinesDiscoveryResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "LinesDiscoveryResponse",
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"LinesDiscoveryResponse", "LinesDelivery"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -215,9 +215,9 @@ func (client *SIRIClient) LineDiscovery(request *siri.SIRILinesDiscoveryRequest)
 
 func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequest) (*sxml.XMLStopMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "GetStopMonitoringResponse",
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"GetStopMonitoringResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -229,9 +229,9 @@ func (client *SIRIClient) StopMonitoring(request *siri.SIRIGetStopMonitoringRequ
 
 func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessageRequest) (*sxml.XMLGeneralMessageResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "GetGeneralMessageResponse",
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"GetGeneralMessageResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -243,9 +243,9 @@ func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessag
 
 func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*sxml.XMLVehicleMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		expectedResponse: "GetVehicleMonitoringResponse",
-		acceptGzip:       true,
+		request:           request,
+		expectedResponses: []string{"GetVehicleMonitoringResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -257,10 +257,10 @@ func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitori
 
 func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		requestType:      SUBSCRIPTION,
-		expectedResponse: "SubscribeResponse",
-		acceptGzip:       true,
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -271,10 +271,10 @@ func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonit
 
 func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		requestType:      SUBSCRIPTION,
-		expectedResponse: "SubscribeResponse",
-		acceptGzip:       true,
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -285,10 +285,10 @@ func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMe
 
 func (client *SIRIClient) EstimatedTimetableSubscription(request *siri.SIRIEstimatedTimetableSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		requestType:      SUBSCRIPTION,
-		expectedResponse: "SubscribeResponse",
-		acceptGzip:       true,
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -299,10 +299,10 @@ func (client *SIRIClient) EstimatedTimetableSubscription(request *siri.SIRIEstim
 
 func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicleMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		requestType:      SUBSCRIPTION,
-		expectedResponse: "SubscribeResponse",
-		acceptGzip:       true,
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err
@@ -313,10 +313,10 @@ func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicl
 
 func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*sxml.XMLDeleteSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
-		request:          request,
-		requestType:      SUBSCRIPTION,
-		expectedResponse: "DeleteSubscriptionResponse",
-		acceptGzip:       true,
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"DeleteSubscriptionResponse"},
+		acceptGzip:        true,
 	})
 	if err != nil {
 		return nil, err

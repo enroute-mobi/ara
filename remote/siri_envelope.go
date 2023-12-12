@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
@@ -111,8 +112,8 @@ func (envelope *SIRIEnvelope) Body() xml.Node {
 	return envelope.body
 }
 
-func (envelope *SIRIEnvelope) BodyOrError(expectedResponse string) (xml.Node, error) {
-	if envelope.BodyType() == expectedResponse {
+func (envelope *SIRIEnvelope) BodyOrError(expectedResponsess []string) (xml.Node, error) {
+	if slices.Contains(expectedResponsess, envelope.BodyType()) {
 		return envelope.body, nil
 	}
 	if envelope.BodyType() == "Fault" {

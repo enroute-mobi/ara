@@ -276,3 +276,34 @@ Feature: Support SIRI LinesDiscovery
         </S:Body>
       </S:Envelope>
       """
+
+  @ARA-1410 @siri-valid
+  Scenario: RAW LinesDiscovery collect
+    Given a raw SIRI server waits LinesRequest request on "http://localhost:8090" to respond with
+      """
+<?xml version="1.0" encoding="UTF-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+ <LinesDelivery>
+  <ResponseTimestamp>2004-12-17T09:30:47-05:00</ResponseTimestamp>
+  <Status>true</Status>
+  <AnnotatedLineRef>
+   <LineRef>NINOXE:Line:BP:6:LOC</LineRef>
+   <LineName>Ligne 6</LineName>
+   <Monitored>true</Monitored>
+  </AnnotatedLineRef>
+  <AnnotatedLineRef>
+   <LineRef>NINOXE:Line:BP:7:LOC</LineRef>
+   <LineName>Ligne 7</LineName>
+   <Monitored>true</Monitored>
+  </AnnotatedLineRef>
+ </LinesDelivery>
+</Siri>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-lines-discovery-request-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | remote_objectid_kind | internal              |
+      | siri.envelope        | raw                   |
+    And a minute has passed
+    Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
+    And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
