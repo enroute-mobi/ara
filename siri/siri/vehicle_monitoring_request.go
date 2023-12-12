@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -49,5 +50,14 @@ func (request *SIRIVehicleMonitoringRequest) BuildVehicleMonitoringRequestXML() 
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
+}
+
+func (request *SIRIVehicleMonitoringRequest) BuildVehicleMonitoringRequestXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "vehicle_monitoring_request_raw.template", request); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return strings.TrimSpace(buffer.String()), nil
 }

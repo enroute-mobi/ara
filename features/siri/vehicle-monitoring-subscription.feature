@@ -903,3 +903,137 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
       Then the VehicleJourney "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
       | DirectionType | inbound |
+
+  @ARA-1414 @siri-valid
+  Scenario: RAW VehicleMonitoring subscription collect should send VehicleMonitoringSubscriptionRequest to partner
+   Given a raw SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | siri.envelope         | raw                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And 20 seconds have passed
+   Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
+     | //LineRef | RLA_Bus:Line::05:LOC |
+
+  @ARA-1414 @siri-valid
+  Scenario: Create Ara models after a RAW VehicleMonitoringDelivery in a subscription
+    Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+     <?xml version="1.0" encoding="utf-8"?>
+     <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+     <SubscriptionResponse>
+             <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+             <ResponderRef>NINOXE:default</ResponderRef>
+             <ResponseStatus>
+                 <ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ResponseTimestamp>
+                 <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
+                 <Status>true</Status>
+                 <ValidUntil>2016-09-22T08:01:20.227+02:00</ValidUntil>
+             </ResponseStatus>
+             <ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ServiceStartedTime>
+     </SubscriptionResponse>
+     </Siri>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-vehicle-monitoring-subscription-collector] and the following settings:
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | NINOXE:default                 |
+      | remote_objectid_kind               | internal                       |
+      | siri.envelope                      | raw                            |
+    And 30 seconds have passed
+    And a Line exists with the following attributes:
+      | Name      | Test                   |
+      | ObjectIDs | "internal": "testLine" |
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringCollect     |
+      | ReferenceArray[0] | Line, "internal": "testLine" |
+    And a minute has passed
+    And show me ara subscriptions for partner "test"
+    When I send this SIRI request
+      """
+     <?xml version='1.0' encoding='utf-8'?>
+     <Siri xmlns='http://www.siri.org.uk/siri'>
+       <ServiceDelivery>
+         <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+         <ProducerRef>NINOXE:default</ProducerRef>
+         <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+         <VehicleMonitoringDelivery>
+           <ResponseTimestamp>2022-06-25T15:08:14.940+02:00</ResponseTimestamp>
+           <SubscriberRef>subscriber</SubscriberRef>
+           <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
+           <Status>true</Status>
+           <VehicleActivity>
+             <RecordedAtTime>2022-06-25T15:08:14.928+02:00</RecordedAtTime>
+             <ItemIdentifier>108</ItemIdentifier>
+             <ValidUntilTime>2022-06-25T16:08:14.928+02:00</ValidUntilTime>
+             <VehicleMonitoringRef>108</VehicleMonitoringRef>
+             <ProgressBetweenStops>
+               <LinkDistance>340.0</LinkDistance>
+               <Percentage>73.0</Percentage>
+             </ProgressBetweenStops>
+             <MonitoredVehicleJourney>
+               <LineRef>testLine</LineRef>
+               <DirectionRef>Aller</DirectionRef>
+               <FramedVehicleJourneyRef>
+                 <DataFrameRef>NAVINEO:DataFrame::1.0:LOC</DataFrameRef>
+                 <DatedVehicleJourneyRef>RDMANTOIS:VehicleJourney::6628652:LOC</DatedVehicleJourneyRef>
+               </FramedVehicleJourneyRef>
+               <JourneyPatternRef>RDMANTOIS:JourneyPattern::LCP37:LOC</JourneyPatternRef>
+               <JourneyPatternName>LCP37</JourneyPatternName>
+               <PublishedLineName>testLine</PublishedLineName>
+               <DirectionName>Aller</DirectionName>
+               <OperatorRef>OPERYORDM:Operator::OPERYORDM:LOC</OperatorRef>
+               <OriginRef>50000037</OriginRef>
+               <OriginName>Port Fouquet</OriginName>
+               <DestinationRef>50000031</DestinationRef>
+               <DestinationName>Mantes la Jolie Gare routière - Quai 2</DestinationName>
+               <Monitored>true</Monitored>
+               <VehicleLocation srsName="2154">
+                 <Coordinates>603204 6878517</Coordinates>
+               </VehicleLocation>
+               <Bearing>171.0</Bearing>
+               <VehicleRef>TRANSDEV:Vehicle::1501:LOC</VehicleRef>
+               <MonitoredCall>
+                 <StopPointRef>50000016</StopPointRef>
+                 <Order>9</Order>
+                 <StopPointName>Hôpital F. Quesnay</StopPointName>
+                 <VehicleAtStop>false</VehicleAtStop>
+                 <DestinationDisplay>MantesLJ Gare</DestinationDisplay>
+                 <AimedArrivalTime>2022-06-25T15:05:00.000+02:00</AimedArrivalTime>
+                 <ExpectedArrivalTime>2022-06-25T15:08:27.000+02:00</ExpectedArrivalTime>
+                 <ArrivalStatus>onTime</ArrivalStatus>
+                 <AimedDepartureTime>2022-06-25T15:05:00.000+02:00</AimedDepartureTime>
+                 <ExpectedDepartureTime>2022-06-25T15:08:27.000+02:00</ExpectedDepartureTime>
+                 <DepartureStatus>onTime</DepartureStatus>
+               </MonitoredCall>
+             </MonitoredVehicleJourney>
+             <Extensions/>
+           </VehicleActivity>
+         </VehicleMonitoringDelivery>
+       </ServiceDelivery>
+     </Siri>
+      """
+      Then one Vehicle has the following attributes:
+        | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
+        | Bearing   |                                    171.0 |
+        | Latitude  |                        48.99927561424598 |
+        | Longitude |                       1.6770970859674874 |
+      Then an audit event should exist with these attributes:
+        | Type            | NotifyVehicleMonitoring                   |
+        | Protocol        | siri                                      |
+        | Direction       | received                                  |
+        | Status          | OK                                        |
+        | Partner         | test                                      |
+        | Vehicles        | ["TRANSDEV:Vehicle::1501:LOC"]            |
+        | VehicleJourneys | ["RDMANTOIS:VehicleJourney::6628652:LOC"] |
+        | StopAreas       | ["50000016"]                              |
+        | Lines           | ["testLine"]                              |
