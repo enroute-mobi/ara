@@ -104,6 +104,17 @@ func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 func (envelope *SIRIEnvelope) BodyType() string {
 	if envelope.bodyType == "" {
 		envelope.bodyType = envelope.body.Name()
+		if envelope.bodyType == "ServiceDelivery" {
+			xpath := fmt.Sprintf(".//*[contains(local-name(), '%s')]", "Delivery")
+			node, err := envelope.body.Search(xpath)
+			if err != nil {
+				return ""
+			}
+			if len(node) == 0 {
+				return ""
+			}
+			envelope.bodyType = node[0].Name()
+		}
 	}
 	return strings.Replace(envelope.bodyType, "Request", "", -1)
 }

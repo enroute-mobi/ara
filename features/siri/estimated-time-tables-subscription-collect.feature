@@ -442,3 +442,122 @@ Feature: Support SIRI EstimatedTimetable
       | VehicleAtStop              | false                                     |
       | ArrivalStatus              | Delayed                                   |
       | Schedule[expected]#Arrival | 2017-01-01T15:10:01Z                      |
+
+  @ARA-1411 @siri-valid
+  Scenario: RAW EstimatedTimetable subscription collect should send EstimatedTimetableSubscriptionRequest to partner
+   Given a raw SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_objectid_kind  | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | siri.envelope         | raw                   |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name      | Test 1                             |
+      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+   And a minute has passed
+   And 20 seconds have passed
+   Then the SIRI server should have received a raw EstimatedTimetableSubscriptionRequest request with:
+     | //LineRef | RLA_Bus:Line::05:LOC |
+
+  @ARA-1411 @siri-valid
+  Scenario: Create ara models after a RAW EstimatedTimetableDelivery in a subscription
+    Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+<SubscriptionResponse>
+        <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+        <ResponderRef>NINOXE:default</ResponderRef>
+        <ResponseStatus>
+            <ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ResponseTimestamp>
+            <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
+            <Status>true</Status>
+            <ValidUntil>2016-09-22T08:01:20.227+02:00</ValidUntil>
+        </ResponseStatus>
+        <ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ServiceStartedTime>
+</SubscriptionResponse>
+</Siri>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url           | http://localhost:8090 |
+      | remote_credential    | test                  |
+      | local_credential     | NINOXE:default        |
+      | remote_objectid_kind | internal              |
+      | siri.envelope        | raw                   |
+    And 30 seconds have passed
+    And a Line exists with the following attributes:
+      | Name      | Test                            |
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableCollect             |
+      | SubscriberRef     | subscriber                            |
+      | ExternalId        | externalId                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a minute has passed
+    When I send this SIRI request
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri'>
+ <ServiceDelivery>
+    <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+    <ProducerRef>NINOXE:default</ProducerRef>
+    <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</ResponseMessageIdentifier>
+    <EstimatedTimetableDelivery>
+      <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+      <SubscriberRef>subscriber</SubscriberRef>
+      <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
+      <Status>true</Status>
+      <EstimatedJourneyVersionFrame>
+        <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
+        <EstimatedVehicleJourney>
+          <LineRef>NINOXE:Line:3:LOC</LineRef>
+          <DirectionRef>Aller</DirectionRef>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
+          <DestinationRef>ThisIsTheEnd</DestinationRef>
+          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+          <EstimatedCalls>
+            <EstimatedCall>
+              <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+              <Order>4</Order>
+              <StopPointName>Test</StopPointName>
+              <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
+              <ArrivalStatus>delayed</ArrivalStatus>
+            </EstimatedCall>
+          </EstimatedCalls>
+        </EstimatedVehicleJourney>
+      </EstimatedJourneyVersionFrame>
+    </EstimatedTimetableDelivery>
+ </ServiceDelivery>
+</Siri>
+      """
+    And 30 seconds have passed
+    Then one VehicleJourney has the following attributes:
+      | ObjectIDs     | "internal": "NINOXE:VehicleJourney:201" |
+      | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
+      | DirectionType | Aller                                   |
+      | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
+    And one StopArea has the following attributes:
+      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name      | Test                                     |
+      | Id        | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+    And one StopVisit has the following attributes:
+      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201-4" |
+      | PassageOrder               | 4                                         |
+      | ArrivalStatus              | delayed                                   |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8         |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                           |
+      | Direction       | received                       |
+      | Status          | OK                             |
+      | Type            | NotifyEstimatedTimetable       |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"] |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201"]  |
+      | Lines           | ["NINOXE:Line:3:LOC"]          |

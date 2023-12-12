@@ -12,7 +12,9 @@ def send_siri_request(request, attributes = {})
   response = RestClient.post siri_path(attributes), request, {content_type: :xml}
   save_siri_messages request: request, response: response.body
 
-  Siri::Validator.create(response.body, "response sent to client").log
+  if response.body != ''
+    Siri::Validator.create(response.body, "response sent to client").log
+  end
 
   @last_siri_request = request
   @last_siri_response = response.body
@@ -203,14 +205,18 @@ Then(/^the SIRI server should have received a CheckStatus request with the paylo
   expect(normalized_xml(last_siri_request).strip).to eq(normalized_xml(expected_xml).strip)
 end
 
-Then(/^the (?:"([^"]*)" )?SIRI server should have received a \S+ request with:$/) do |name, attributes|
+Then(/^the (?:"([^"]*)" )?SIRI server should have received a (raw)? (\S+) request with:$/) do |name, envelope, _request, attributes|
   name ||= "default"
   last_siri_request = SIRIServer.find(name).requests.last.body
 
   document = XML::Document.new(last_siri_request)
 
   expected_values = attributes.rows_hash
-  actual_values = document.values(expected_values.keys)
+  actual_values = if envelope == 'raw'
+                    document.raw_values(expected_values.keys)
+                  else
+                    document.values(expected_values.keys)
+                  end
 
   expect(actual_values).to eq(expected_values)
 end
