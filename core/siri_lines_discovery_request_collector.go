@@ -73,7 +73,7 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 	response, err := connector.Partner().SIRIClient().LineDiscovery(request)
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
 	if err != nil {
-		e := fmt.Sprintf("Error during StopDiscovery: %v", err)
+		e := fmt.Sprintf("Error during LinesDiscovery: %v", err)
 
 		message.Status = "Error"
 		message.ErrorDetails = e
