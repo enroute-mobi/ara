@@ -16,8 +16,8 @@ import (
 /* CSV Structure
 
 operator,Id,ModelName,Name,ObjectIDs
-stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectGeneralMessages
-line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectGeneralMessages
+stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
+line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectSituations
 vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
 stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 
@@ -265,11 +265,11 @@ func (loader *Loader) handleStopArea(record []string) error {
 		}
 	}
 
-	var collectGeneralMessages bool
+	var collectSituations bool
 	if record[12] != "" {
-		collectGeneralMessages, err = strconv.ParseBool(record[12])
+		collectSituations, err = strconv.ParseBool(record[12])
 		if err != nil {
-			parseErrors.Add("CollectGeneralMessages", err)
+			parseErrors.Add("CollectSituations", err)
 		}
 	}
 
@@ -309,7 +309,7 @@ func (loader *Loader) handleStopArea(record []string) error {
 		record[9],
 		collectedAlways,
 		collectChildren,
-		collectGeneralMessages,
+		collectSituations,
 	)
 	loader.stopAreas = append(loader.stopAreas, values...)
 	loader.bulkCounter[STOP_AREA]++
@@ -331,7 +331,7 @@ func (loader *Loader) insertStopAreas() {
 		loader.bulkCounter[STOP_AREA] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, object_ids, line_ids, attributes, siri_references, collected_always, collect_children, collect_general_messages) VALUES %v;",
+	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, object_ids, line_ids, attributes, siri_references, collected_always, collect_children, collect_situations) VALUES %v;",
 		string(loader.stopAreas[:len(loader.stopAreas)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -357,11 +357,11 @@ func (loader *Loader) handleLine(record []string) error {
 	var err error
 	parseErrors := ComplexError{}
 
-	var collectGeneralMessages bool
+	var collectSituations bool
 	if record[7] != "" {
-		collectGeneralMessages, err = strconv.ParseBool(record[7])
+		collectSituations, err = strconv.ParseBool(record[7])
 		if err != nil {
-			parseErrors.Add("CollectGeneralMessages", err)
+			parseErrors.Add("CollectSituations", err)
 		}
 	}
 
@@ -386,7 +386,7 @@ func (loader *Loader) handleLine(record []string) error {
 		record[4],
 		record[5],
 		record[6],
-		collectGeneralMessages,
+		collectSituations,
 		number,
 	)
 	loader.lines = append(loader.lines, values...)
@@ -409,7 +409,7 @@ func (loader *Loader) insertLines() {
 		loader.bulkCounter[LINE] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_general_messages, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_situations, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("lines", err)

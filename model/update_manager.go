@@ -54,7 +54,7 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 		stopArea = manager.model.StopAreas().New()
 
 		stopArea.SetObjectID(event.ObjectId)
-		stopArea.CollectGeneralMessages = true
+		stopArea.CollectSituations = true
 
 		stopArea.Name = event.Name
 		stopArea.CollectedAlways = event.CollectedAlways
@@ -99,7 +99,7 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 		line.SetObjectID(event.ObjectId)
 		line.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
 
-		line.CollectGeneralMessages = true
+		line.CollectSituations = true
 
 		line.Name = event.Name
 

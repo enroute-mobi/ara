@@ -245,9 +245,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_credential    | ineo                  |
       | remote_objectid_kind | internal              |
     And a Line exists with the following attributes:
-      | Name                   | Test              |
-      | ObjectIDs              | "internal":"1234" |
-      | CollectGeneralMessages | true              |
+      | Name              | Test              |
+      | ObjectIDs         | "internal":"1234" |
+      | CollectSituations | true              |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -352,9 +352,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_credential    | ineo                  |
       | remote_objectid_kind | external              |
     And a Line exists with the following attributes:
-      | Name                   | Test              |
-      | ObjectIDs              | "external":"1234" |
-      | CollectGeneralMessages | true              |
+      | Name              | Test              |
+      | ObjectIDs         | "external":"1234" |
+      | CollectSituations | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
@@ -383,9 +383,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | local_credential     | NINOXE:default |
       | remote_objectid_kind | external       |
     And a Line exists with the following attributes:
-      | Name                   | Test              |
-      | ObjectIDs              | "external":"1234" |
-      | CollectGeneralMessages | true              |
+      | Name              | Test              |
+      | ObjectIDs         | "external":"1234" |
+      | CollectSituations | true              |
     And a minute has passed
     And a minute has passed
     When I send this SIRI request
@@ -488,9 +488,9 @@ Feature: Support SIRI GeneralMessage for Situation
         | collect.include_lines           | 1234                  |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name              | Test              |
+        | ObjectIDs         | "internal":"1234" |
+        | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
     Then the SIRI server should receive this response
@@ -531,9 +531,9 @@ Feature: Support SIRI GeneralMessage for Situation
         | collect.filter_general_messages | true                  |
       And 30 seconds have passed
       And a StopArea exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name              | Test              |
+        | ObjectIDs         | "internal":"1234" |
+        | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
     Then the SIRI server should receive this response

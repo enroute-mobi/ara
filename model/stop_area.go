@@ -19,19 +19,19 @@ type StopArea struct {
 	model          Model
 	References     References
 	ObjectIDConsumer
-	Origins                *StopAreaOrigins
-	Attributes             Attributes
-	ReferentId             StopAreaId `json:",omitempty"`
-	id                     StopAreaId
-	ParentId               StopAreaId `json:",omitempty"`
-	Name                   string
-	LineIds                StopAreaLineIds `json:"Lines,omitempty"`
-	Latitude               float64         `json:",omitempty"`
-	Longitude              float64         `json:",omitempty"`
-	CollectChildren        bool
-	CollectGeneralMessages bool
-	CollectedAlways        bool
-	Monitored              bool
+	Origins           *StopAreaOrigins
+	Attributes        Attributes
+	ReferentId        StopAreaId `json:",omitempty"`
+	id                StopAreaId
+	ParentId          StopAreaId `json:",omitempty"`
+	Name              string
+	LineIds           StopAreaLineIds `json:"Lines,omitempty"`
+	Latitude          float64         `json:",omitempty"`
+	Longitude         float64         `json:",omitempty"`
+	CollectChildren   bool
+	CollectSituations bool
+	CollectedAlways   bool
+	Monitored         bool
 }
 
 func NewStopArea(model Model) *StopArea {
@@ -56,23 +56,23 @@ func (stopArea *StopArea) copy() *StopArea {
 			nextCollectAt: stopArea.nextCollectAt,
 			collectedAt:   stopArea.collectedAt,
 		},
-		ObjectIDConsumer:       stopArea.ObjectIDConsumer.Copy(),
-		model:                  stopArea.model,
-		id:                     stopArea.id,
-		ParentId:               stopArea.ParentId,
-		ReferentId:             stopArea.ReferentId,
-		CollectedUntil:         stopArea.CollectedUntil,
-		CollectedAlways:        stopArea.CollectedAlways,
-		CollectGeneralMessages: stopArea.CollectGeneralMessages,
-		Monitored:              stopArea.Monitored,
-		Origins:                stopArea.Origins.Copy(),
-		Name:                   stopArea.Name,
-		LineIds:                stopArea.LineIds.Copy(),
-		CollectChildren:        stopArea.CollectChildren,
-		Attributes:             stopArea.Attributes.Copy(),
-		References:             stopArea.References.Copy(),
-		Longitude:              stopArea.Longitude,
-		Latitude:               stopArea.Latitude,
+		ObjectIDConsumer:  stopArea.ObjectIDConsumer.Copy(),
+		model:             stopArea.model,
+		id:                stopArea.id,
+		ParentId:          stopArea.ParentId,
+		ReferentId:        stopArea.ReferentId,
+		CollectedUntil:    stopArea.CollectedUntil,
+		CollectedAlways:   stopArea.CollectedAlways,
+		CollectSituations: stopArea.CollectSituations,
+		Monitored:         stopArea.Monitored,
+		Origins:           stopArea.Origins.Copy(),
+		Name:              stopArea.Name,
+		LineIds:           stopArea.LineIds.Copy(),
+		CollectChildren:   stopArea.CollectChildren,
+		Attributes:        stopArea.Attributes.Copy(),
+		References:        stopArea.References.Copy(),
+		Longitude:         stopArea.Longitude,
+		Latitude:          stopArea.Latitude,
 	}
 }
 
@@ -463,8 +463,8 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 		if sa.CollectChildren.Valid {
 			stopArea.CollectChildren = sa.CollectChildren.Bool
 		}
-		if sa.CollectGeneralMessages.Valid {
-			stopArea.CollectGeneralMessages = sa.CollectGeneralMessages.Bool
+		if sa.CollectSituations.Valid {
+			stopArea.CollectSituations = sa.CollectSituations.Bool
 		}
 
 		if sa.LineIds.Valid && len(sa.LineIds.String) > 0 {

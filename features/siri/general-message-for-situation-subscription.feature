@@ -52,17 +52,17 @@ Feature: Support SIRI GeneralMessage by subscription
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name                   | Test                            |
-        | ObjectIDs              | "internal":"NINOXE:Line::3:LOC" |
-        | CollectGeneralMessages | true                            |
+        | Name              | Test                            |
+        | ObjectIDs         | "internal":"NINOXE:Line::3:LOC" |
+        | CollectSituations | true                            |
       And a StopArea exists with the following attributes:
-        | Name                   | Test                                    |
-        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectGeneralMessages | true                                    |
+        | Name              | Test                                    |
+        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | CollectSituations | true                                    |
       And a StopArea exists with the following attributes:
-        | Name                   | Test                                    |
-        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-        | CollectGeneralMessages | true                                    |
+        | Name              | Test                                    |
+        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | CollectSituations | true                                    |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
@@ -241,9 +241,9 @@ Feature: Support SIRI GeneralMessage by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name              | Test              |
+        | ObjectIDs         | "internal":"1234" |
+        | CollectSituations | true              |
     And a Situation exists with the following attributes:
       | ObjectIDs                                                                           | "internal" : "NINOXE:GeneralMessage:27_1" |
       | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                 |
@@ -255,13 +255,13 @@ Feature: Support SIRI GeneralMessage by subscription
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
     And a StopArea exists with the following attributes:
-        | Name                   | Test                                    |
-        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectGeneralMessages | true                                    |
+        | Name              | Test                                    |
+        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | CollectSituations | true                                    |
     And a StopArea exists with the following attributes:
-        | Name                   | Test                                    |
-        | ObjectIDs              | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-        | CollectGeneralMessages | true                                    |
+        | Name              | Test                                    |
+        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | CollectSituations | true                                    |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
@@ -334,9 +334,9 @@ Feature: Support SIRI GeneralMessage by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+      | Name              | Test              |
+      | ObjectIDs         | "internal":"1234" |
+      | CollectSituations | true              |
     And a Situation exists with the following attributes:
       | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
@@ -449,7 +449,7 @@ Feature: Support SIRI GeneralMessage by subscription
 #       And a Line exists with the following attributes:
 #         | Name                   | Test              |
 #         | ObjectIDs              | "internal":"1234" |
-#         | CollectGeneralMessages | true              |
+#         | CollectSituations | true              |
 #       And 10 seconds have passed
 #       And 5 seconds have passed
 #       And the SIRI server has received a Subscribe request
@@ -500,7 +500,7 @@ Feature: Support SIRI GeneralMessage by subscription
 #       And a StopArea exists with the following attributes:
 #         | Name                   | Test              |
 #         | ObjectIDs              | "internal":"1234" |
-#         | CollectGeneralMessages | true              |
+#         | CollectSituations | true              |
 #       And 10 seconds have passed
 #       And 5 seconds have passed
 #       And the SIRI server has received a Subscribe request
@@ -667,9 +667,9 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_objectid_kind               | internal              |
        | broadcast.subscriptions.persistent | true                  |
       And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name              | Test              |
+        | ObjectIDs         | "internal":"1234" |
+        | CollectSituations | true              |
     And a minute has passed
     When I send this SIRI request
       """
@@ -838,9 +838,9 @@ Feature: Support SIRI GeneralMessage by subscription
       | siri.soap.empty_response_on_notification | true                  |
     And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name                   | Test              |
-        | ObjectIDs              | "internal":"1234" |
-        | CollectGeneralMessages | true              |
+        | Name              | Test              |
+        | ObjectIDs         | "internal":"1234" |
+        | CollectSituations | true              |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
