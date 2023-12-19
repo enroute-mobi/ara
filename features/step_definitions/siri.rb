@@ -205,14 +205,15 @@ Then(/^the SIRI server should have received a CheckStatus request with the paylo
   expect(normalized_xml(last_siri_request).strip).to eq(normalized_xml(expected_xml).strip)
 end
 
-Then(/^the (?:"([^"]*)" )?SIRI server should have received a (raw)? (\S+) request with:$/) do |name, envelope, _request, attributes|
+Then(/^the (?:"([^"]*)" )?SIRI server should have received a( raw)? (\S+) request with:$/) do |name, envelope, _request, attributes|
   name ||= "default"
+
   last_siri_request = SIRIServer.find(name).requests.last.body
 
   document = XML::Document.new(last_siri_request)
 
   expected_values = attributes.rows_hash
-  actual_values = if envelope == 'raw'
+  actual_values = if envelope
                     document.raw_values(expected_values.keys)
                   else
                     document.values(expected_values.keys)
