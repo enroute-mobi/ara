@@ -126,6 +126,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
+	var subIDs []string
 	for messageIdentifier, requestedResource := range resourcesToRequest {
 		entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
 			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
@@ -134,6 +135,7 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		}
 		entry.MessageIdentifier = messageIdentifier
 		entry.RequestTimestamp = subscriber.Clock().Now()
+		subIDs = append(subIDs, entry.SubscriptionIdentifier)
 		switch requestedResource.kind {
 		case "Line":
 			entry.LineRef = []string{requestedResource.objectId.Value()}
@@ -154,7 +156,8 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	message.RequestRawMessage, _ = gmRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
 	message.StopAreas = stopPointRefList
-	message.SubscriptionIdentifiers = lineRefList
+	message.Lines = lineRefList
+	message.SubscriptionIdentifiers = subIDs
 
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.Partner().SIRIClient().GeneralMessageSubscription(gmRequest)
