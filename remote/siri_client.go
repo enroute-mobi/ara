@@ -241,6 +241,20 @@ func (client *SIRIClient) SituationMonitoring(request *siri.SIRIGetGeneralMessag
 	return generalMessage, nil
 }
 
+func (client *SIRIClient) SituationExchangeMonitoring(request *siri.SIRIGetSituationExchangeRequest) (*sxml.XMLSituationExchangeResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:           request,
+		expectedResponses: []string{"GetSituationExchangeResponse"},
+		acceptGzip:        true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	situationExchange := sxml.NewXMLSituationExchangeResponse(node)
+	return situationExchange, nil
+}
+
 func (client *SIRIClient) VehicleMonitoring(request *siri.SIRIGetVehicleMonitoringRequest) (*sxml.XMLVehicleMonitoringResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,

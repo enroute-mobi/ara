@@ -480,6 +480,14 @@ func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
 	return
 }
 
+func (partner *Partner) SituationExchangeRequestCollector() SituationExchangeRequestCollector {
+	client, ok := partner.connectors[SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR]
+	if ok {
+		return client.(SituationExchangeRequestCollector)
+	}
+	return nil
+}
+
 func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCollector {
 	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR]
 	if ok {
