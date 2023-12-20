@@ -2,9 +2,11 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/sym01/htmlsanitizer"
 	"golang.org/x/exp/maps"
 )
 
@@ -94,8 +96,14 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessages(messages []*sxml.XMLMessage, event *model.SituationUpdateEvent) {
+	sanitizer := htmlsanitizer.NewHTMLSanitizer()
 	for _, xmlMessage := range messages {
-		builder.buildSituationAndDescriptionFromMessage(xmlMessage.MessageType(), xmlMessage.MessageText(), event)
+		sanitizedMessageText, err := sanitizer.Sanitize([]byte(xmlMessage.MessageText()))
+		if err != nil {
+			logger.Log.Debugf("Cannot sanitize xml message: %v", err)
+			continue
+		}
+		builder.buildSituationAndDescriptionFromMessage(xmlMessage.MessageType(), string(sanitizedMessageText), event)
 	}
 }
 
@@ -105,19 +113,9 @@ func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFro
 		event.Summary = &model.SituationTranslatedString{
 			DefaultValue: messageText,
 		}
-	case "longMessage":
+	default:
 		event.Description = &model.SituationTranslatedString{
 			DefaultValue: messageText,
-		}
-	default:
-		if event.Summary == nil && len(messageText) < 160 {
-			event.Summary = &model.SituationTranslatedString{
-				DefaultValue: messageText,
-			}
-		} else {
-			event.Description = &model.SituationTranslatedString{
-				DefaultValue: messageText,
-			}
 		}
 	}
 }

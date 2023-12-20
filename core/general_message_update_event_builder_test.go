@@ -193,15 +193,15 @@ func Test_buildSituationAndDescriptionFromMessage(t *testing.T) {
 			message: "should set description for longMessage type",
 		},
 		{
-			summary:     nil,
-			messageType: "dummy",
-			messageText: "A message < 160 characters",
-			expectedSummary: &model.SituationTranslatedString{
-				DefaultValue: "A message < 160 characters",
+			summary:         nil,
+			messageType:     "dummy",
+			messageText:     "A message with less than 160 characters and an emoji ⚠",
+			expectedSummary: nil,
+			expectedDescription: &model.SituationTranslatedString{
+				DefaultValue: "A message with less than 160 characters and an emoji ⚠",
 			},
-			expectedDescription: nil,
-			message: `for messageType other than shortMessage/longMessage
-should set summary if summary is not defined and text lenght < 160`,
+			message: `for messageType other than shortMessage
+should set description`,
 		},
 		{
 			summary:     nil,
@@ -225,14 +225,14 @@ should set description if summary is not defined and text lenght > 160`,
 				DefaultValue: "An existing summary ...",
 			},
 			messageType: "textOnly",
-			messageText: "A message < 160 characters",
+			messageText: "A message with less than 160 characters",
 			expectedSummary: &model.SituationTranslatedString{
 				DefaultValue: "An existing summary ...",
 			},
 			expectedDescription: &model.SituationTranslatedString{
-				DefaultValue: "A message < 160 characters",
+				DefaultValue: "A message with less than 160 characters",
 			},
-			message: `When messageType is other than shortMessage/longMessage
+			message: `When messageType is other than shortMessage
 and summary is already defined, should keep existing summary and create description`,
 		},
 	}

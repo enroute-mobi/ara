@@ -75,6 +75,7 @@ require (
 	github.com/richardartoul/molecule v1.0.1-0.20221107223329-32cfee06a052 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.7.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
+	github.com/sym01/htmlsanitizer v1.1.0 // indirect
 	github.com/tinylib/msgp v1.1.9 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
