@@ -54,6 +54,8 @@ type Code struct {
 	value     string
 }
 
+type ObjectId Code
+
 func NewCode(codeSpace, value string) Code {
 	return Code{
 		codeSpace,
@@ -87,6 +89,30 @@ func (code *Code) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]string{
 		code.codeSpace: code.value,
 	})
+}
+
+func (objectId *ObjectId) UnmarshalJSON(data []byte) error {
+	var aux map[string]string
+
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+
+	if aux == nil {
+		return nil
+	}
+
+	if len(aux) > 1 {
+		return errors.New("Code should look like KIND:VALUE")
+	}
+
+	for codeSpace, value := range aux {
+		objectId.codeSpace = codeSpace
+		objectId.value = value
+	}
+
+	return nil
 }
 
 func (code *Code) UnmarshalJSON(data []byte) error {
