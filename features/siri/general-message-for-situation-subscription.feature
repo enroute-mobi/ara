@@ -101,7 +101,7 @@ Feature: Support SIRI GeneralMessage by subscription
                <ns3:ValidUntilTime>2017-03-29T03:30:06.000+01:00</ns3:ValidUntilTime>
                <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFGeneralMessageStructure">
                   <Message>
-                    <MessageType>longMessage</MessageType>
+                    <MessageType>textOnly</MessageType>
                     <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                   </Message>
                   <LineSection>
@@ -301,7 +301,7 @@ Feature: Support SIRI GeneralMessage by subscription
                    <siri:DestinationRef>NINOXE:StopPoint:SP:12:LOC</siri:DestinationRef>
                    <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                    <Message>
-                     <MessageType>longMessage</MessageType>
+                     <MessageType>textOnly</MessageType>
                      <MessageText>an ANOTHER very very very long message</MessageText>
                    </Message>
                  </siri:Content>
@@ -377,7 +377,7 @@ Feature: Support SIRI GeneralMessage by subscription
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>1234</siri:LineRef>
                    <Message>
-                     <MessageType>longMessage</MessageType>
+                     <MessageType>textOnly</MessageType>
                      <MessageText>a very very very long message</MessageText>
                    </Message>
                  </siri:Content>
