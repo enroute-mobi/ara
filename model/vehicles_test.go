@@ -26,11 +26,11 @@ func Test_Vehicle_MarshalJSON(t *testing.T) {
 		Latitude:         3.4,
 		Bearing:          5.6,
 	}
-	vehicle.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	vehicle.SetObjectID(objectid)
+	vehicle.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	vehicle.SetCode(code)
 
-	expected := `{"ObjectIDs":{"kind":"value"},"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+	expected := `{"Codes":{"codeSpace":"value"},"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 	jsonBytes, err := vehicle.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -74,8 +74,8 @@ func Test_Vehicle_UnmarshalJSON(t *testing.T) {
 func Test_Vehicle_Save(t *testing.T) {
 	model := NewMemoryModel()
 	vehicle := model.Vehicles().New()
-	objectid := NewObjectID("kind", "value")
-	vehicle.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicle.SetCode(code)
 
 	if vehicle.model != model {
 		t.Errorf("New vehicle model should be MemoryVehicle model")
@@ -90,9 +90,9 @@ func Test_Vehicle_Save(t *testing.T) {
 		t.Errorf("New vehicle should be found in MemoryVehicle")
 	}
 
-	_, ok = model.Vehicles().FindByObjectId(objectid)
+	_, ok = model.Vehicles().FindByCode(code)
 	if !ok {
-		t.Errorf("New vehicle should be found by objectId")
+		t.Errorf("New vehicle should be found by code")
 	}
 }
 
@@ -104,8 +104,8 @@ func Test_Vehicle_Save_WithNextStopVisitId(t *testing.T) {
 	stopVisit := model.StopVisits().New()
 	stopVisit.Save()
 
-	objectid := NewObjectID("kind", "value")
-	vehicle.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicle.SetCode(code)
 	vehicle.NextStopVisitId = stopVisit.Id()
 	ok := vehicle.Save()
 	assert.True(ok)
@@ -125,9 +125,9 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 	stopVisit1 := model.StopVisits().New()
 	stopVisit1.Save()
 
-	objectid := NewObjectID("kind", "value")
-	vehicleA.SetObjectID(objectid)
-	vehicleB.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicleA.SetCode(code)
+	vehicleB.SetCode(code)
 
 	vehicleA.NextStopVisitId = stopVisit1.Id()
 	ok = vehicleA.Save()
@@ -154,29 +154,29 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
 }
 
-func Test_Vehicle_ObjectId(t *testing.T) {
+func Test_Vehicle_Code(t *testing.T) {
 	vehicle := Vehicle{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	vehicle.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	vehicle.SetObjectID(objectid)
+	vehicle.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	vehicle.SetCode(code)
 
-	foundObjectId, ok := vehicle.ObjectID("kind")
+	foundCode, ok := vehicle.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = vehicle.ObjectID("wrongkind")
+	_, ok = vehicle.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(vehicle.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", vehicle.ObjectIDs())
+	if len(vehicle.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", vehicle.Codes())
 	}
 }
 
@@ -246,8 +246,8 @@ func Test_MemoryVehicles_FindAll(t *testing.T) {
 func Test_MemoryVehicles_Delete(t *testing.T) {
 	vehicles := NewMemoryVehicles()
 	existingVehicle := vehicles.New()
-	objectid := NewObjectID("kind", "value")
-	existingVehicle.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingVehicle.SetCode(code)
 	vehicles.Save(existingVehicle)
 
 	vehicles.Delete(existingVehicle)
@@ -256,9 +256,9 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted vehicle should not be findable")
 	}
-	_, ok = vehicles.FindByObjectId(objectid)
+	_, ok = vehicles.FindByCode(code)
 	if ok {
-		t.Errorf("Deleted vehicle should not be findable by objectid")
+		t.Errorf("Deleted vehicle should not be findable by code")
 	}
 }
 
@@ -271,8 +271,8 @@ func Test_MemoryVehicles_Delete_WithNextStopVisitId(t *testing.T) {
 	stopVisit := model.StopVisits().New()
 	stopVisit.Save()
 
-	objectid := NewObjectID("kind", "value")
-	vehicle.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicle.SetCode(code)
 	vehicle.NextStopVisitId = stopVisit.Id()
 
 	vehicle.Save()
@@ -294,8 +294,8 @@ func Test_Save_BiqQuery(t *testing.T) {
 	vehicles := NewMemoryVehicles()
 	vehicles.model = m
 	v := vehicles.New()
-	objectid := NewObjectID("kind", "value")
-	v.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	v.SetCode(code)
 	v.Latitude = 1.0
 	vehicles.Save(v)
 

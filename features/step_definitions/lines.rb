@@ -19,10 +19,10 @@ When(/^a Line is created (?:in Referential "([^"]+)" )?with the following attrib
   end
 end
 
-When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
+When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, code, referential|
   response = RestClient.get lines_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   responseArray = JSON.parse(response.body)
-  expectedLine = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+  expectedLine = responseArray.find{|a| a["Codes"][kind] == code }
 
   RestClient.delete line_path(expectedLine["Id"]), {:Authorization => "Token token=#{$token}"}
 end

@@ -15,7 +15,7 @@ type GeneralMessageUpdateEventBuilder struct {
 	uuid.UUIDConsumer
 
 	partner            *Partner
-	remoteObjectidKind string
+	remoteCodeSpace string
 	affectedLines      map[model.LineId]*model.AffectedLine
 
 	MonitoringRefs map[string]struct{}
@@ -31,7 +31,7 @@ type LineSection struct {
 func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateEventBuilder {
 	return GeneralMessageUpdateEventBuilder{
 		partner:            partner,
-		remoteObjectidKind: partner.RemoteObjectIDKind(),
+		remoteCodeSpace: partner.RemoteCodeSpace(),
 		affectedLines:      make(map[model.LineId]*model.AffectedLine),
 
 		MonitoringRefs: make(map[string]struct{}),
@@ -70,7 +70,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 		Origin:            string(builder.partner.Slug()),
 		CreatedAt:         builder.Clock().Now(),
 		RecordedAt:        xmlGeneralMessageEvent.RecordedAtTime(),
-		SituationObjectID: model.NewObjectID(builder.remoteObjectidKind, xmlGeneralMessageEvent.InfoMessageIdentifier()),
+		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlGeneralMessageEvent.InfoMessageIdentifier()),
 		Version:           xmlGeneralMessageEvent.InfoMessageVersion(),
 		ProducerRef:       producerRef,
 	}
@@ -131,8 +131,8 @@ func (builder *GeneralMessageUpdateEventBuilder) setReportType(infoChannelRef st
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *model.SituationUpdateEvent, stopPointRef string) {
-	stopPointRefObjectId := model.NewObjectID(builder.remoteObjectidKind, stopPointRef)
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(stopPointRefObjectId)
+	stopPointRefCode := model.NewCode(builder.remoteCodeSpace, stopPointRef)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(stopPointRefCode)
 	if !ok {
 		return
 	}
@@ -142,19 +142,19 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *mode
 	event.Affects = append(event.Affects, affect)
 
 	// Logging
-	builder.MonitoringRefs[stopPointRefObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[stopPointRefCode.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
 	builder.affectedLines[affect.LineId] = affect
-	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
+	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string) {
@@ -164,8 +164,8 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.L
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId model.LineId, destination string) {
-	destinationObjectId := model.NewObjectID(builder.remoteObjectidKind, destination)
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(destinationObjectId)
+	destinationCode := model.NewCode(builder.remoteCodeSpace, destination)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(destinationCode)
 	if !ok {
 		return
 	}
@@ -175,25 +175,25 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId m
 		append(builder.affectedLines[model.LineId(lineId)].AffectedDestinations, &affectedDestination)
 
 	// Logging
-	builder.MonitoringRefs[destinationObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[destinationCode.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section LineSection) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, section.LineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, section.LineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
 
 	firstStopRef := section.FirstStop
-	firstStopObjectId := model.NewObjectID(builder.remoteObjectidKind, firstStopRef)
-	firstStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(firstStopObjectId)
+	firstStopCode := model.NewCode(builder.remoteCodeSpace, firstStopRef)
+	firstStopArea, ok := builder.partner.Model().StopAreas().FindByCode(firstStopCode)
 	if !ok {
 		return
 	}
 	lastStopRef := section.LastStop
-	lastStopObjectId := model.NewObjectID(builder.remoteObjectidKind, lastStopRef)
-	lastStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(lastStopObjectId)
+	lastStopCode := model.NewCode(builder.remoteCodeSpace, lastStopRef)
+	lastStopArea, ok := builder.partner.Model().StopAreas().FindByCode(lastStopCode)
 	if !ok {
 		return
 	}
@@ -217,9 +217,9 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 	builder.affectedLines[line.Id()] = affectedLine
 
 	// Logging
-	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
-	builder.MonitoringRefs[firstStopObjectId.Value()] = struct{}{}
-	builder.MonitoringRefs[lastStopObjectId.Value()] = struct{}{}
+	builder.LineRefs[LineRefCode.Value()] = struct{}{}
+	builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
+	builder.MonitoringRefs[lastStopCode.Value()] = struct{}{}
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {

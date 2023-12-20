@@ -4,38 +4,38 @@ Feature: Support SIRI StopPointsDiscovery
     Given a Referential "test" is created
 
   @ARA-1095
-  Scenario: Handle a SIRI StopPointsDiscovery request with ReferentID having wrong remoteObjectID kind
+  Scenario: Handle a SIRI StopPointsDiscovery request with ReferentID having wrong remoteCode kind
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
       | local_url            | address  |
     And a Line exists with the following attributes:
       | Name      | Line 1                          |
-      | ObjectIDs | "internal":"STIF:Line::C00272:" |
+      | Codes | "internal":"STIF:Line::C00272:" |
     And a Line exists with the following attributes:
       | Name      | Line 2                          |
-      | ObjectIDs | "internal":"STIF:Line::C00273:" |
+      | Codes | "internal":"STIF:Line::C00273:" |
     And a StopArea exists with the following attributes:
       | Name      | Stop1Referent                                                             |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:11:LOC"                                  |
+      | Codes | "internal": "NINOXE:StopPoint:BP:11:LOC"                                  |
       | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name       | Stop2                                    |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:SP:22:LOC" |
+      | Codes  | "internal": "NINOXE:StopPoint:SP:22:LOC" |
       | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"]    |
       | ReferentID | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
     And a StopArea exists with the following attributes:
       | Name      | Stop3Referent                                                              |
-      | ObjectIDs | "wrong": "NINOXE:StopPoint:BP:33:LOC"                                      |
+      | Codes | "wrong": "NINOXE:StopPoint:BP:33:LOC"                                      |
       | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name       | Stop4                                    |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
+      | Codes  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
       | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
       | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8        |
     And a StopArea exists with the following attributes:
       | Name       | Stop5                                    |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
+      | Codes  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
       | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"]    |
       | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8        |
     When I send this SIRI request
@@ -103,38 +103,38 @@ Feature: Support SIRI StopPointsDiscovery
   Scenario: Handle a SIRI StopPointsDiscovery request with ReferentID
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
       | local_url            | address  |
     And a Line exists with the following attributes:
       | Name      | Line 1                          |
-      | ObjectIDs | "internal":"STIF:Line::C00272:" |
+      | Codes | "internal":"STIF:Line::C00272:" |
     And a Line exists with the following attributes:
       | Name      | Line 2                          |
-      | ObjectIDs | "internal":"STIF:Line::C00273:" |
+      | Codes | "internal":"STIF:Line::C00273:" |
     And a Line exists with the following attributes:
       | Name      | Line 3                          |
-      | ObjectIDs | "internal":"STIF:Line::C00274:" |
+      | Codes | "internal":"STIF:Line::C00274:" |
     And a StopArea exists with the following attributes:
       | Name      | Stop1Referent                                                                                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:11:LOC"                                                                       |
+      | Codes | "internal": "NINOXE:StopPoint:BP:11:LOC"                                                                       |
       | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name       | Stop2                                 |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:SP:22:LOC"  |
+      | Codes  | "internal": "NINOXE:StopPoint:SP:22:LOC"  |
       | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
       | ReferentID | 6ba7b814-9dad-11d1-5-00c04fd430c8     |
     And a StopArea exists with the following attributes:
       | Name       | Stop3Referent                                                              |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:BP:33:LOC"                                   |
+      | Codes  | "internal": "NINOXE:StopPoint:BP:33:LOC"                                   |
       | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name       | Stop4                                    |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
+      | Codes  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
       | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
       | ReferentID | 6ba7b814-9dad-11d1-7-00c04fd430c8        |
     And a StopArea exists with the following attributes:
       | Name       | Stop5                                    |
-      | ObjectIDs  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
+      | Codes  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
       | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
     When I send this SIRI request
       """
@@ -202,27 +202,27 @@ Feature: Support SIRI StopPointsDiscovery
   Scenario: 2464 3292 - Handle a SIRI StopPointsDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
       | local_url            | address  |
     And a Line exists with the following attributes:
       | Name      | Line 1                          |
-      | ObjectIDs | "internal":"STIF:Line::C00272:" |
+      | Codes | "internal":"STIF:Line::C00272:" |
     And a Line exists with the following attributes:
       | Name      | Line 2                          |
-      | ObjectIDs | "internal":"STIF:Line::C00273:" |
+      | Codes | "internal":"STIF:Line::C00273:" |
     And a Line exists with the following attributes:
       | Name      | Line 3                          |
-      | ObjectIDs | "internal":"STIF:Line::C00274:" |
+      | Codes | "internal":"STIF:Line::C00274:" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                                                      |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
+      | Codes | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
       | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:16:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:16:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test 3                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:7:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:BP:7:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
     When I send this SIRI request
       """
@@ -309,7 +309,7 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
@@ -398,12 +398,12 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8090      |
       | remote_credential                 | test                       |
-      | remote_objectid_kind              | internal                   |
+      | remote_code_space              | internal                   |
       | collect.use_discovered_stop_areas | true                       |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091      |
       | remote_credential                 | test                       |
-      | remote_objectid_kind              | internal                   |
+      | remote_code_space              | internal                   |
       | collect.use_discovered_stop_areas | true                       |
     When 2 minutes have passed
     And 2 minutes have passed
@@ -496,19 +496,19 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8090 |
       | remote_credential                 | test                  |
-      | remote_objectid_kind              | internal              |
+      | remote_code_space              | internal              |
       | collect.use_discovered_stop_areas | true                  |
       | collect.priority                  | 2                     |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091 |
       | remote_credential                 | test                  |
-      | remote_objectid_kind              | internal              |
+      | remote_code_space              | internal              |
       | collect.exclude_stop_areas        | StopArea:A            |
       | collect.priority                  | 1                     |
       | collect.use_discovered_stop_areas | true                  |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | ObjectIDs | "internal": "StopArea:A" |
+      | Codes | "internal": "StopArea:A" |
       | Monitored | true                     |
 
 
@@ -602,23 +602,23 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8090 |
       | remote_credential                 | test                  |
-      | remote_objectid_kind              | internal              |
+      | remote_code_space              | internal              |
       | collect.exclude_lines             | Test:line:1:LOC       |
       | collect.priority                  | 1                     |
       | collect.use_discovered_stop_areas | true                  |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091 |
       | remote_credential                 | test                  |
-      | remote_objectid_kind              | internal              |
+      | remote_code_space              | internal              |
       | collect.priority                  | 2                     |
       | collect.use_discovered_stop_areas | true                  |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | ObjectIDs | "internal": "StopArea:A"   |
+      | Codes | "internal": "StopArea:A"   |
       | Monitored | true                       |
 
   @ARA-1298 @siri-valid
-  Scenario: StopPointsDiscovery collect with Partner remote_objectid_kind changed
+  Scenario: StopPointsDiscovery collect with Partner remote_code_space changed
     Given a SIRI server waits StopPointsDiscovery request on "http://localhost:8090" to respond with
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -650,14 +650,14 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
     And a minute has passed
     Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
     And a StopArea "internal":"NINOXE:StopPoint:BP:7:LOC" should exist
     And the Partner "test" is updated with the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
-      | remote_objectid_kind | external              |
+      | remote_code_space | external              |
     And a SIRI server waits StopPointsDiscovery request on "http://localhost:8090" to respond with
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -693,30 +693,30 @@ Feature: Support SIRI StopPointsDiscovery
     And a StopArea "external":"NINOXE:StopPoint:BP:7:LOC" should exist
 
   @ARA-1298 @siri-valid
-  Scenario: Handle a SIRI StopPointsDiscovery request with Partner remote_objectid_kind changed
+  Scenario: Handle a SIRI StopPointsDiscovery request with Partner remote_code_space changed
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
       | local_url            | address  |
     And a Line exists with the following attributes:
       | Name      | Line 1                          |
-      | ObjectIDs | "internal":"STIF:Line::C00272:" |
+      | Codes | "internal":"STIF:Line::C00272:" |
     And a Line exists with the following attributes:
       | Name      | Line 2                          |
-      | ObjectIDs | "internal":"STIF:Line::C00273:" |
+      | Codes | "internal":"STIF:Line::C00273:" |
     And a Line exists with the following attributes:
       | Name      | Line 3                          |
-      | ObjectIDs | "external":"STIF:Line::C00274:"         |
+      | Codes | "external":"STIF:Line::C00274:"         |
     And a StopArea exists with the following attributes:
       | Name      | Test                                                                      |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
+      | Codes | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
       | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:16:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:16:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test 3                                  |
-      | ObjectIDs | "external": "NINOXE:StopPoint:BP:7:LOC" |
+      | Codes | "external": "NINOXE:StopPoint:BP:7:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
     When I send this SIRI request
       """
@@ -764,7 +764,7 @@ Feature: Support SIRI StopPointsDiscovery
       """
     And the Partner "test" is updated with the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
       | local_url            | address  |
     And a minute has passed
     When I send this SIRI request

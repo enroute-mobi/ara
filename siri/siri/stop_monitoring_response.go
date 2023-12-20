@@ -56,7 +56,7 @@ type SIRIMonitoredStopVisit struct {
 	OriginName             string
 	DestinationName        string
 	DirectionType          string
-	StopAreaObjectId       string
+	StopAreaCode       string
 	DataFrameRef           string
 	Occupancy              string
 	Bearing                float64

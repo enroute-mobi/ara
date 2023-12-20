@@ -41,19 +41,19 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":           ts.URL,
-		"remote_objectid_kind": "test kind",
+		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	situation := partners.Model().Situations().New()
-	objectid := model.NewObjectID("test kind", "test value")
-	situation.SetObjectID(objectid)
+	code := model.NewCode("test kind", "test value")
+	situation.SetCode(code)
 	partners.Model().Situations().Save(&situation)
 
 	line := partners.Model().Lines().New()
-	lineObjectID := model.NewObjectID("test kind", "line value")
-	line.SetObjectID(lineObjectID)
+	lineCode := model.NewCode("test kind", "line value")
+	line.SetCode(lineCode)
 	partners.Model().Lines().Save(line)
 
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
@@ -77,12 +77,12 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner should have three errors when remote_url and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner should have three errors when remote_url and remote_code_space aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
 		"remote_url":           "remote_url",
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 		"remote_credential":    "remote_credential",
 	}
 	apiPartner.Validate()

@@ -52,9 +52,9 @@ func (sva *StopVisitArchiver) Archive() {
 		longTermStopVisitEvent.VehicleJourneyOriginName = vj.OriginName
 		longTermStopVisitEvent.VehicleJourneyDestinationName = vj.DestinationName
 
-		for _, obj := range vj.objectids {
+		for _, obj := range vj.codes {
 			code := &audit.Code{
-				Kind:  obj.kind,
+				Kind:  obj.codeSpace,
 				Value: obj.value,
 			}
 			longTermStopVisitEvent.VehicleJourneyCodes = append(longTermStopVisitEvent.VehicleJourneyCodes, *code)
@@ -68,9 +68,9 @@ func (sva *StopVisitArchiver) Archive() {
 		if vj.Line() != nil {
 			longTermStopVisitEvent.LineName = vj.Line().Name
 			longTermStopVisitEvent.LineNumber = vj.Line().Number
-			for _, obj := range vj.Line().objectids {
+			for _, obj := range vj.Line().codes {
 				code := &audit.Code{
-					Kind:  obj.kind,
+					Kind:  obj.codeSpace,
 					Value: obj.value,
 				}
 				longTermStopVisitEvent.LineCodes = append(longTermStopVisitEvent.LineCodes, *code)
@@ -82,9 +82,9 @@ func (sva *StopVisitArchiver) Archive() {
 		}
 	}
 
-	for _, obj := range sa.objectids {
+	for _, obj := range sa.codes {
 		code := &audit.Code{
-			Kind:  obj.kind,
+			Kind:  obj.codeSpace,
 			Value: obj.value,
 		}
 		longTermStopVisitEvent.StopAreaCodes = append(longTermStopVisitEvent.StopAreaCodes, *code)

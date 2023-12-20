@@ -9,13 +9,13 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
 
@@ -25,13 +25,13 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should not have received a GetVehicleMonitoring request
 
@@ -41,34 +41,34 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url                       | http://localhost:8090 |
       | remote_credential                | test                  |
-      | remote_objectid_kind             | internal              |
+      | remote_code_space             | internal              |
       | collect.include_lines            | RLA_Bus:Line::05:LOC  |
       | local_credential                 | ara                   |
       | collect.persistent               | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
 
   @siri-valid @ARA-1234
-  Scenario: Handle a SIRI VehicleMonitoring request with fallback on generic connector remote_objectid_kind
+  Scenario: Handle a SIRI VehicleMonitoring request with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                      | test     |
-      | remote_objectid_kind                                                  | internal |
-      | siri-vehicle-monitoring-request-broadcaster.remote_objectid_kind      | other    |
+      | remote_code_space                                                  | internal |
+      | siri-vehicle-monitoring-request-broadcaster.remote_code_space      | other    |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "other": "Test:Line:3:LOC" |
+      | Codes | "other": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes        | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -143,22 +143,22 @@ Feature: Support SIRI VehicleMonitoring by request
     """
 
   @siri-valid @ARA-1234
-  Scenario: Handle a SIRI VehicleMonitoring request with multiple connector setting siri-vehicle-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Handle a SIRI VehicleMonitoring request with multiple connector setting siri-vehicle-monitoring-request-broadcaster.vehicle_journey_remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                         | test          |
-      | remote_objectid_kind                                                     | internal      |
-      | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_objectid_kind | other, other2 |
+      | remote_code_space                                                     | internal      |
+      | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space | other, other2 |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes        | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -235,21 +235,21 @@ Feature: Support SIRI VehicleMonitoring by request
       """
 
   @siri-valid @ARA-1234
-  Scenario: Handle a SIRI VehicleMonitoring request with unmatching objectid kind
+  Scenario: Handle a SIRI VehicleMonitoring request with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential     | test  |
-     | remote_objectid_kind | wrong |
+     | remote_code_space | wrong |
    Given a Line exists with the following attributes:
-     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Codes | "internal": "Test:Line:3:LOC" |
      | Name      | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+     | Codes        | "other": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
      | Longitude        | 1.234                              |
@@ -321,31 +321,31 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Send all the vehicles in respond to a SIRI VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_objectid_kind  | internal |
+      | remote_code_space  | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
       | Name                                  | Passage 33                                |
-      | ObjectIDs                             | "internal": "Test:VehicleJourney:202:LOC" |
+      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
       | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                             | true                                      |
-      | Reference[DestinationRef]#ObjectId    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#ObjectId         | "internal": "Test:StopPoint:Origin"       |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
       | OriginName                            | Origin Name                               |
       | DestinationName                       | Destination Name                          |
       | DirectionName                         | Direction Name                            |
       | DirectionType                         | outbound                                  |
       | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -357,7 +357,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -369,7 +369,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -517,31 +517,31 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_objectid_kind  | internal |
+      | remote_code_space  | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
       | Name                                  | Passage 33                                |
-      | ObjectIDs                             | "internal": "Test:VehicleJourney:202:LOC" |
+      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
       | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                             | true                                      |
-      | Reference[DestinationRef]#ObjectId    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#ObjectId         | "internal": "Test:StopPoint:Origin"       |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
       | OriginName                            | Origin Name                               |
       | DestinationName                       | Destination Name                          |
       | DirectionName                         | Direction Name                            |
       | DirectionType                         | outbound                                  |
       | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -553,7 +553,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -565,7 +565,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -657,21 +657,21 @@ Feature: Support SIRI VehicleMonitoring by request
         | VehicleJourneys   | ["Test:VehicleJourney:201:LOC"]                                  |
 
   @siri-valid @ARA-1384
-  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with unmatching objectid kind
+  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential     | test     |
-     | remote_objectid_kind | internal |
+     | remote_code_space | internal |
    Given a Line exists with the following attributes:
-     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Codes | "internal": "Test:Line:3:LOC" |
      | Name      | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+     | Codes        | "other": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
      | Longitude        | 1.234                              |
@@ -743,18 +743,18 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Handle a SIRI VehicleMonitoring request without Vehicle or Line filter should return an Error
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential     | test     |
-     | remote_objectid_kind | internal |
+     | remote_code_space | internal |
    Given a Line exists with the following attributes:
-     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Codes | "internal": "Test:Line:3:LOC" |
      | Name      | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+     | Codes        | "internal": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
      | Longitude        | 1.234                                 |
@@ -822,22 +822,22 @@ Feature: Support SIRI VehicleMonitoring by request
         | ErrorDetails      | VehicleMonitoringRequest must have one LineRef OR one VehicleRef |
 
   @siri-valid @ARA-1234
-  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_objectid_kind
+  Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                      | test     |
-      | remote_objectid_kind                                                  | internal |
-      | siri-vehicle-monitoring-request-broadcaster.remote_objectid_kind      | other    |
+      | remote_code_space                                                  | internal |
+      | siri-vehicle-monitoring-request-broadcaster.remote_code_space      | other    |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "other": "Test:Line:3:LOC" |
+      | Codes | "other": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes        | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -982,30 +982,30 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | Name      | Carabacel                                     |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       | Name      | Test 1                             |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#ObjectId         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
+      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
       | OriginName                            | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#ObjectId    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
       | DestinationName                       | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
       | Monitored                             | false                                             |
     And one Vehicle has the following attributes:
-      | ObjectIDs      | "internal": "RLA290"          |
+      | Codes      | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1094,30 +1094,30 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | Name      | Carabacel                                     |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       | Name      | Test 1                             |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#ObjectId         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
+      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
       | OriginName                            | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#ObjectId    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
       | DestinationName                       | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
       | Monitored                             | false                                             |
     And one Vehicle has the following attributes:
-      | ObjectIDs      | "internal": "RLA290"          |
+      | Codes      | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1197,31 +1197,31 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url               | http://localhost:8090 |
       | remote_credential        | test                  |
-      | remote_objectid_kind     | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines    | RLA_Bus:Line::05:LOC  |
       | collect.default_srs_name | EPSG:2154             |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | Name      | Carabacel                                     |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       | Name      | Test 1                             |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#ObjectId         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
+      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
       | OriginName                            | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#ObjectId    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
       | DestinationName                       | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
       | Monitored                             | false                                             |
     And one Vehicle has the following attributes:
-      | ObjectIDs      | "internal": "RLA290"          |
+      | Codes      | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1301,23 +1301,23 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | Codes | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | Name      | Carabacel                                     |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | ObjectIDs        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | PassageOrder     | 6                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
@@ -1325,7 +1325,7 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one Vehicle has the following attributes:
-      | ObjectIDs        | "internal": "RLA290"              |
+      | Codes        | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1402,39 +1402,39 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | Codes | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | Name      | Carabacel                                     |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "RLA_Bus:StopPoint:BP:CAL05:LOC" |
+      | Codes | "internal": "RLA_Bus:StopPoint:BP:CAL05:LOC" |
       | Name      | Vieux Port                                   |
       # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | ObjectIDs        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | PassageOrder     | 6                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
       # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | ObjectIDs        | "internal": "RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC"    |
+      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC"    |
       | PassageOrder     | 7                                                      |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8                      |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
       # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "RLA290"              |
+      | Codes        | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1443,7 +1443,7 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then the Vehicle "6ba7b814-9dad-11d1-9-00c04fd430c8" has the following attributes:
-      | ObjectIDs        | "internal": "RLA290"              |
+      | Codes        | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
@@ -1519,50 +1519,50 @@ Feature: Support SIRI VehicleMonitoring by request
 </soap:Envelope>
       """
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "RLA_Bus:Line::05:LOC" |
+      | Codes | "external": "RLA_Bus:Line::05:LOC" |
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
     And a minute has passed
     And a minute has passed
     Then the SIRI server should not have received a GetVehicleMonitoring request
     And the Partner "test" is updated with the following settings:
       | remote_url           | http://localhost:8090 |
-      | remote_objectid_kind | external              |
+      | remote_code_space | external              |
       | remote_credential    | test                  |
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received 1 GetVehicleMonitoring request
 
   @siri-valid @ARA-1298
-  Scenario: Handle a SIRI VehicleMonitoring request with Partner remote_objectid_kind changed
+  Scenario: Handle a SIRI VehicleMonitoring request with Partner remote_code_space changed
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_objectid_kind  | internal |
+      | remote_code_space  | internal |
       | sort_payload_for_test | true     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
       # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "Test:Line:A:BUS:LOC" |
+      | Codes | "external": "Test:Line:A:BUS:LOC" |
       | Name      | Ligne A Bus                       |
       # Id 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | ObjectIDs | "external": "Test:VehicleJourney:201:LOC" |
+      | Codes | "external": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
       | Monitored | true                                      |
       # Id 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
       | Name                                  | Passage 33                                |
-      | ObjectIDs                             | "internal": "Test:VehicleJourney:202:LOC" |
+      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
       | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                             | true                                      |
-      | Reference[DestinationRef]#ObjectId    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#ObjectId         | "internal": "Test:StopPoint:Origin"       |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
       | OriginName                            | Origin Name                               |
       | DestinationName                       | Destination Name                          |
       | DirectionName                         | Direction Name                            |
@@ -1570,7 +1570,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
       # Id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1582,7 +1582,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "external": "Test:Vehicle:2:LOC"  |
+      | Codes        | "external": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1672,7 +1672,7 @@ Feature: Support SIRI VehicleMonitoring by request
     """
     And the Partner "test" is updated with the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     And a minute has passed
     When I send this SIRI request
       """

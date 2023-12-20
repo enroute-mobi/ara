@@ -80,7 +80,7 @@ func Test_OperatorController_Delete(t *testing.T) {
 func Test_OperatorController_Update(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Name":"OperatorName",
-                  "Objectid": { "Kind": "value" }}`)
+                  "Code": { "CodeSpace": "value" }}`)
 	operator, responseRecorder, referential := prepareOperatorRequest("PUT", true, body, t)
 
 	// Check response

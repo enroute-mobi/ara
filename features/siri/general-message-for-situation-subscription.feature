@@ -47,26 +47,26 @@ Feature: Support SIRI GeneralMessage by subscription
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_objectid_kind            | internal              |
+        | remote_code_space            | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name              | Test                            |
-        | ObjectIDs         | "internal":"NINOXE:Line::3:LOC" |
+        | Codes         | "internal":"NINOXE:Line::3:LOC" |
         | CollectSituations | true                            |
       And a StopArea exists with the following attributes:
         | Name              | Test                                    |
-        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
         | CollectSituations | true                                    |
       And a StopArea exists with the following attributes:
         | Name              | Test                                    |
-        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | Codes         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
         | CollectSituations | true                                    |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
-        | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Codes                  | "internal" : "NINOXE:GeneralMessage:27_1" |
         | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
         | Version                    | 1                                         |
         | Keywords                   | ["Perturbation"]                          |
@@ -119,7 +119,7 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
       """
     Then one Situation has the following attributes:
-        | ObjectIDs                                                                       | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Codes                                                                       | "internal" : "NINOXE:GeneralMessage:27_1" |
         | Keywords                                                                        | ["Commercial"]                            |
         | ReportType                                                                      | general                                   |
         | ValidityPeriods[0]#StartTime                                                    | 2017-03-01T03:30:06+01:00                 |
@@ -179,12 +179,12 @@ Feature: Support SIRI GeneralMessage by subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind | GeneralMessageCollect |
     And a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "2"          |
+      | Codes                  | "internal" : "2"          |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00 |
       | Version                    | 1                         |
       | Channel                    | Perturbations             |
@@ -234,7 +234,7 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | GeneralMessageBroadcast                     |
       | ExternalId        | externalId                                  |
@@ -242,10 +242,10 @@ Feature: Support SIRI GeneralMessage by subscription
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
         | Name              | Test              |
-        | ObjectIDs         | "internal":"1234" |
+        | Codes         | "internal":"1234" |
         | CollectSituations | true              |
     And a Situation exists with the following attributes:
-      | ObjectIDs                                                                           | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | Codes                                                                           | "internal" : "NINOXE:GeneralMessage:27_1" |
       | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                 |
       | Version                                                                             | 1                                         |
       | Keywords                                                                            | ["Perturbation"]                          |
@@ -256,11 +256,11 @@ Feature: Support SIRI GeneralMessage by subscription
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
     And a StopArea exists with the following attributes:
         | Name              | Test                                    |
-        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
         | CollectSituations | true                                    |
     And a StopArea exists with the following attributes:
         | Name              | Test                                    |
-        | ObjectIDs         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+        | Codes         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
         | CollectSituations | true                                    |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
@@ -327,7 +327,7 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | GeneralMessageBroadcast                     |
       | ExternalId        | externalId                                  |
@@ -335,10 +335,10 @@ Feature: Support SIRI GeneralMessage by subscription
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | ObjectIDs         | "internal":"1234" |
+      | Codes         | "internal":"1234" |
       | CollectSituations | true              |
     And a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | Codes                  | "internal" : "NINOXE:GeneralMessage:27_1" |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
       | Version                    | 1                                         |
       | Keywords                   | ["Other"]                                 |
@@ -398,7 +398,7 @@ Feature: Support SIRI GeneralMessage by subscription
 #       | remote_url           | http://localhost:8090 |
 #       | remote_credential    | test                  |
 #       | local_credential     | NINOXE:default        |
-#       | remote_objectid_kind | internal              |
+#       | remote_code_space | internal              |
 #     And 30 seconds have passed
 #     And 30 seconds have passed
 #     And 5 seconds have passed
@@ -443,12 +443,12 @@ Feature: Support SIRI GeneralMessage by subscription
 #         | remote_url                      | http://localhost:8090 |
 #         | remote_credential               | test                  |
 #         | local_credential                | NINOXE:default        |
-#         | remote_objectid_kind            | internal              |
+#         | remote_code_space            | internal              |
 #         | collect.filter_general_messages | true                  |
 #       And 30 seconds have passed
 #       And a Line exists with the following attributes:
 #         | Name                   | Test              |
-#         | ObjectIDs              | "internal":"1234" |
+#         | Codes              | "internal":"1234" |
 #         | CollectSituations | true              |
 #       And 10 seconds have passed
 #       And 5 seconds have passed
@@ -494,13 +494,13 @@ Feature: Support SIRI GeneralMessage by subscription
 #         | remote_url                      | http://localhost:8090 |
 #         | remote_credential               | test                  |
 #         | local_credential                | NINOXE:default        |
-#         | remote_objectid_kind            | internal              |
+#         | remote_code_space            | internal              |
 #         | collect.filter_general_messages | true                  |
 #       And 30 seconds have passed
 #       And a StopArea exists with the following attributes:
 #         | Name                   | Test              |
-#         | ObjectIDs              | "internal":"1234" |
-#         | CollectSituations | true              |
+#         | Codes              | "internal":"1234" |
+#         | CollectGeneralMessages | true              |
 #       And 10 seconds have passed
 #       And 5 seconds have passed
 #       And the SIRI server has received a Subscribe request
@@ -544,7 +544,7 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     When I send this SIRI request
       """
     <?xml version='1.0' encoding='utf-8'?>
@@ -664,11 +664,11 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_url                         | http://localhost:8090 |
        | remote_credential                  | test                  |
        | local_credential                   | NINOXE:default        |
-       | remote_objectid_kind               | internal              |
+       | remote_code_space               | internal              |
        | broadcast.subscriptions.persistent | true                  |
       And a Line exists with the following attributes:
         | Name              | Test              |
-        | ObjectIDs         | "internal":"1234" |
+        | Codes             | "internal":"1234" |
         | CollectSituations | true              |
     And a minute has passed
     When I send this SIRI request
@@ -741,11 +741,11 @@ Feature: Support SIRI GeneralMessage by subscription
       """
     Then No Subscription exists with the following attributes:
       | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
-      | Kind            | GeneralMessageBroadcast           |
+      | Kind       | GeneralMessageBroadcast           |
       | ExternalId      | 1                                 |
     Then one Subscription exists with the following attributes:
       | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | Kind            | GeneralMessageBroadcast           |
+      | Kind       | GeneralMessageBroadcast           |
       | ExternalId      | 1                                 |
     When I send this SIRI request
     """
@@ -832,19 +832,19 @@ Feature: Support SIRI GeneralMessage by subscription
       | remote_url                               | http://localhost:8090 |
       | remote_credential                        | test                  |
       | local_credential                         | NINOXE:default        |
-      | remote_objectid_kind                     | internal              |
+      | remote_code_space                     | internal              |
       | collect.filter_general_messages          | true                  |
       | collect.include_lines                    | 1234                  |
       | siri.soap.empty_response_on_notification | true                  |
     And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name              | Test              |
-        | ObjectIDs         | "internal":"1234" |
+        | Codes             | "internal":"1234" |
         | CollectSituations | true              |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
-        | ObjectIDs               | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Codes               | "internal" : "NINOXE:GeneralMessage:27_1" |
         | RecordedAt              | 2017-01-01T03:30:06+02:00                 |
         | Version                 | 1                                         |
         | Channel                 | Perturbations                             |
@@ -898,7 +898,7 @@ Feature: Support SIRI GeneralMessage by subscription
    </S:Envelope>
       """
     Then a Situation exists with the following attributes:
-        | ObjectIDs | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Codes | "internal" : "NINOXE:GeneralMessage:27_1" |
         | Channel   | Commercial                                |
     And I should receive this SIRI response
       """
@@ -953,12 +953,12 @@ Feature: Support SIRI GeneralMessage by subscription
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_objectid_kind            | internal              |
+        | remote_code_space            | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And a Line exists with the following attributes:
         | Name              | Test                            |
-        | ObjectIDs         | "internal":"NINOXE:Line::3:LOC" |
+        | Codes         | "internal":"NINOXE:Line::3:LOC" |
         | CollectSituations | true                            |
       And a Subscription exist with the following attributes:
         | Kind              | GeneralMessageCollect                  |

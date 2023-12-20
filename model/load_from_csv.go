@@ -15,11 +15,11 @@ import (
 
 /* CSV Structure
 
-operator,Id,ModelName,Name,ObjectIDs
-stop_area,Id,ParentId,ReferentId,ModelName,Name,ObjectIDs,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
-line,Id,ModelName,Name,ObjectIDs,Attributes,References,CollectSituations
-vehicle_journey,Id,ModelName,Name,ObjectIDs,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
-stop_visit,Id,ModelName,ObjectIDs,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
+operator,Id,ModelName,Name,Codes
+stop_area,Id,ParentId,ReferentId,ModelName,Name,Codes,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
+line,Id,ModelName,Name,Codes,Attributes,References,CollectSituations
+vehicle_journey,Id,ModelName,Name,Codes,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
+stop_visit,Id,ModelName,Codes,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -226,7 +226,7 @@ func (loader *Loader) insertOperators() {
 		loader.bulkCounter[OPERATOR] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_name,name,object_ids) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
+	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_name,name,codes) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("operators", err)
@@ -331,7 +331,7 @@ func (loader *Loader) insertStopAreas() {
 		loader.bulkCounter[STOP_AREA] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, object_ids, line_ids, attributes, siri_references, collected_always, collect_children, collect_situations) VALUES %v;",
+	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, codes, line_ids, attributes, siri_references, collected_always, collect_children, collect_situations) VALUES %v;",
 		string(loader.stopAreas[:len(loader.stopAreas)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -409,7 +409,7 @@ func (loader *Loader) insertLines() {
 		loader.bulkCounter[LINE] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,object_ids,attributes,siri_references,collect_situations, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,codes,attributes,siri_references,collect_situations, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("lines", err)
@@ -474,7 +474,7 @@ func (loader *Loader) insertVehicleJourneys() {
 		loader.bulkCounter[VEHICLE_JOURNEY] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,object_ids,line_id,origin_name,destination_name,attributes,siri_references, direction_type) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
+	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,codes,line_id,origin_name,destination_name,attributes,siri_references, direction_type) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
 
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -547,7 +547,7 @@ func (loader *Loader) insertStopVisits() {
 		loader.bulkCounter[STOP_VISIT] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_name,object_ids,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
+	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_name,codes,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("stopVisits", err)

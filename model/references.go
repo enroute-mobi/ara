@@ -23,7 +23,7 @@ func (references *References) GetSiriReferences() map[string]string {
 
 	references.mutex.RLock()
 	for k, v := range references.ref {
-		sref[k] = v.ObjectId.Value()
+		sref[k] = v.Code.Value()
 	}
 	references.mutex.RUnlock()
 	return sref
@@ -56,20 +56,20 @@ func (references *References) Set(key string, value Reference) {
 	if value == emptyRef {
 		return
 	}
-	if value.ObjectId.Kind() == "" || value.ObjectId.Value() == "" {
+	if value.Code.CodeSpace() == "" || value.Code.Value() == "" {
 		return
 	}
 	references.ref[key] = value
 }
 
-func (references *References) SetObjectId(key string, obj ObjectID) {
+func (references *References) SetCode(key string, obj Code) {
 	references.mutex.Lock()
 	defer references.mutex.Unlock()
 
-	if obj.Kind() == "" || obj.Value() == "" {
+	if obj.CodeSpace() == "" || obj.Value() == "" {
 		return
 	}
-	references.ref[key] = Reference{ObjectId: &obj}
+	references.ref[key] = Reference{Code: &obj}
 }
 
 func (references *References) IsEmpty() bool {
@@ -86,10 +86,10 @@ func (references *References) Copy() References {
 		newReferences.ref[key] = Reference{
 			Type: value.Type,
 		}
-		if value.ObjectId != nil {
-			objectid := NewObjectID(value.ObjectId.Kind(), value.ObjectId.Value())
+		if value.Code != nil {
+			code := NewCode(value.Code.CodeSpace(), value.Code.Value())
 			tmp := newReferences.ref[key]
-			tmp.ObjectId = &objectid
+			tmp.Code = &code
 			newReferences.ref[key] = tmp
 		}
 	}

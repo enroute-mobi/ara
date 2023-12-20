@@ -32,15 +32,15 @@ func prepare_SIRILiteStopMonitoringRequestCollector(t *testing.T, responseFilePa
 
 	settings := map[string]string{
 		"remote_url":           ts.URL,
-		"remote_objectid_kind": "test kind",
+		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	// Create StopArea with ObjectId
+	// Create StopArea with Code
 	stopArea := partners.Model().StopAreas().New()
-	objectid := model.NewObjectID("test kind", "test value")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("test kind", "test value")
+	stopArea.SetCode(code)
 	partners.Model().StopAreas().Save(stopArea)
 
 	siriLiteStopMonitoringRequestCollector := NewSIRILiteStopMonitoringRequestCollector(partner)
@@ -64,9 +64,9 @@ func Test_SIRILiteStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testin
 	assert.NotEmpty(updateEvents)
 	assert.Equal(4, len(updateEvents), "4 update events")
 
-	var eventKinds []model.EventKind
+	var eventCodeSpaces []model.EventKind
 	for i := range updateEvents {
-		eventKinds = append(eventKinds, updateEvents[i].EventKind())
+		eventCodeSpaces = append(eventCodeSpaces, updateEvents[i].EventKind())
 	}
 
 	expectedEventKinds := []model.EventKind{
@@ -75,7 +75,7 @@ func Test_SIRILiteStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testin
 		model.VEHICLE_JOURNEY_EVENT,
 		model.STOP_VISIT_EVENT}
 
-	assert.ElementsMatch(expectedEventKinds, eventKinds,
+	assert.ElementsMatch(expectedEventKinds, eventCodeSpaces,
 		"Should have 1 StopArea, 1 Line, 1 VehicleJourney, 1 StopVisit")
 
 	stopVisitEvent := findSVEvent(updateEvents, "SNCF_ACCES_CLOUD:Item::41178_133528:LOC")

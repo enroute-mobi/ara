@@ -34,9 +34,9 @@ type FakeGeneralMessageSubscriber struct {
 }
 
 type resourceToRequest struct {
-	subId    SubscriptionId
-	objectId model.ObjectID
-	kind     string
+	subId SubscriptionId
+	code  model.Code
+	kind  string
 }
 
 func NewFakeGeneralMessageSubscriber(connector *SIRIGeneralMessageSubscriptionCollector) SIRIGeneralMessageSubscriber {
@@ -99,14 +99,14 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 
 	resourcesToRequest := make(map[string]*resourceToRequest)
 	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByObjectIDCopy() {
+		for _, resource := range subscription.ResourcesByCodeCopy() {
 			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
 				resourcesToRequest[messageIdentifier] = &resourceToRequest{
-					subId:    subscription.id,
-					objectId: *(resource.Reference.ObjectId),
-					kind:     resource.Reference.Type,
+					subId: subscription.id,
+					code:  *(resource.Reference.Code),
+					kind:  resource.Reference.Type,
 				}
 			}
 		}
@@ -138,11 +138,11 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 		subIDs = append(subIDs, entry.SubscriptionIdentifier)
 		switch requestedResource.kind {
 		case "Line":
-			entry.LineRef = []string{requestedResource.objectId.Value()}
-			lineRefList = append(lineRefList, requestedResource.objectId.Value())
+			entry.LineRef = []string{requestedResource.code.Value()}
+			lineRefList = append(lineRefList, requestedResource.code.Value())
 		case "StopArea":
-			entry.StopPointRef = []string{requestedResource.objectId.Value()}
-			stopPointRefList = append(stopPointRefList, requestedResource.objectId.Value())
+			entry.StopPointRef = []string{requestedResource.code.Value()}
+			stopPointRefList = append(stopPointRefList, requestedResource.code.Value())
 		}
 
 		if subscriber.connector.Partner().GeneralMessageRequestVersion22() {
@@ -188,14 +188,14 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			logger.Log.Debugf("Response for unknown subscription %v", requestedResource.subId)
 			continue
 		}
-		resource := subscription.Resource(requestedResource.objectId)
+		resource := subscription.Resource(requestedResource.code)
 		if resource == nil { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription resource %v", requestedResource.objectId.String())
+			logger.Log.Debugf("Response for unknown subscription resource %v", requestedResource.code.String())
 			continue
 		}
 
 		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedResource.objectId.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedResource.code.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
 			resource.RetryCount++
 			message.Status = "Error"
 			continue
@@ -216,7 +216,7 @@ func (subscriber *GMSubscriber) incrementRetryCountFromMap(resourcesToRequest ma
 		if !ok { // Should never happen
 			continue
 		}
-		resource := subscription.Resource(requestedResource.objectId)
+		resource := subscription.Resource(requestedResource.code)
 		if resource == nil { // Should never happen
 			continue
 		}

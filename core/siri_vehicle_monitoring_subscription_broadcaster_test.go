@@ -25,7 +25,7 @@ func Test_VehicleMonitoringBroadcaster_Create_Events(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -38,11 +38,11 @@ func Test_VehicleMonitoringBroadcaster_Create_Events(t *testing.T) {
 	line := referential.Model().Lines().New()
 	line.Save()
 
-	objectid := model.NewObjectID("internal", string(line.Id()))
-	line.SetObjectID(objectid)
+	code := model.NewCode("internal", string(line.Id()))
+	line.SetCode(code)
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "Line",
 	}
 

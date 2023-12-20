@@ -20,7 +20,7 @@ type TripUpdatesBroadcaster struct {
 	state.Startable
 	connector
 
-	vjRemoteObjectidKinds []string
+	vjRemoteCodeSpaces []string
 	cache                 *cache.CachedItem
 }
 
@@ -31,7 +31,7 @@ func (factory *TripUpdatesBroadcasterFactory) CreateConnector(partner *Partner) 
 }
 
 func (factory *TripUpdatesBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 }
 
 func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
@@ -42,8 +42,8 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 }
 
 func (connector *TripUpdatesBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(GTFS_RT_TRIP_UPDATES_BROADCASTER)
-	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.cache = cache.NewCachedItem("TripUpdates", connector.partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 }
 
@@ -56,7 +56,7 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
 
 func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	stopVisits := connector.partner.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
-	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
+	linesCode := make(map[model.VehicleJourneyId]model.Code)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 
 	for i := range stopVisits {
@@ -65,7 +65,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			logger.Log.Debugf("Can't find StopArea %v of StopVisit %v", stopVisits[i].StopAreaId, stopVisits[i].Id())
 			continue
 		}
-		saId, ok := sa.ObjectID(connector.remoteObjectidKind)
+		saId, ok := sa.Code(connector.remoteCodeSpace)
 		if !ok {
 			continue
 		}
@@ -73,30 +73,30 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 		feedEntity, ok := feedEntities[stopVisits[i].VehicleJourneyId]
 		// If we don't already have a tripUpdate with the VehicleJourney we create one
 		if !ok {
-			// Fetch all needed models and objectids
+			// Fetch all needed models and codes
 			vj, ok := connector.partner.Model().VehicleJourneys().Find(stopVisits[i].VehicleJourneyId)
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
+			vjId, ok := vj.CodeWithFallback(connector.vjRemoteCodeSpaces)
 			if !ok {
 				continue
 			}
 
 			var routeId string
-			lineObjectid, ok := linesObjectId[vj.Id()]
+			lineCode, ok := linesCode[vj.Id()]
 			if !ok {
 				l, ok := connector.partner.Model().Lines().Find(vj.LineId)
 				if !ok {
 					continue
 				}
-				lineObjectid, ok = l.ObjectID(connector.remoteObjectidKind)
+				lineCode, ok = l.Code(connector.remoteCodeSpace)
 				if !ok {
 					continue
 				}
-				linesObjectId[stopVisits[i].VehicleJourneyId] = lineObjectid
+				linesCode[stopVisits[i].VehicleJourneyId] = lineCode
 			}
-			routeId = lineObjectid.Value()
+			routeId = lineCode.Value()
 			tripId := vjId.Value()
 			// Fill the tripDescriptor
 			tripDescriptor := &gtfs.TripDescriptor{

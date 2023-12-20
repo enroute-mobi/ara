@@ -17,7 +17,7 @@ type VehicleMonitoringUpdateEventBuilder struct {
 	uuid.UUIDConsumer
 
 	partner            *Partner
-	remoteObjectidKind string
+	remoteCodeSpace string
 
 	vehicleMonitoringUpdateEvents *VehicleMonitoringUpdateEvents
 }
@@ -36,7 +36,7 @@ type VehicleMonitoringUpdateEvents struct {
 func NewVehicleMonitoringUpdateEventBuilder(partner *Partner) VehicleMonitoringUpdateEventBuilder {
 	return VehicleMonitoringUpdateEventBuilder{
 		partner:                       partner,
-		remoteObjectidKind:            partner.RemoteObjectIDKind(),
+		remoteCodeSpace:            partner.RemoteCodeSpace(),
 		vehicleMonitoringUpdateEvents: newVehicleMonitoringUpdateEvents(),
 	}
 }
@@ -58,14 +58,14 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	origin := string(builder.partner.Slug())
 
 	// StopAreas
-	stopAreaObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlVehicleActivity.StopPointRef())
+	stopAreaCode := model.NewCode(builder.remoteCodeSpace, xmlVehicleActivity.StopPointRef())
 
 	_, ok := builder.vehicleMonitoringUpdateEvents.StopAreas[xmlVehicleActivity.StopPointRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
 			Origin:   origin,
-			ObjectId: stopAreaObjectId,
+			Code: stopAreaCode,
 			Name:     xmlVehicleActivity.StopPointName(),
 		}
 
@@ -74,14 +74,14 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 
 	// Lines
-	lineObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlVehicleActivity.LineRef())
+	lineCode := model.NewCode(builder.remoteCodeSpace, xmlVehicleActivity.LineRef())
 
 	_, ok = builder.vehicleMonitoringUpdateEvents.Lines[xmlVehicleActivity.LineRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
 			Origin:   origin,
-			ObjectId: lineObjectId,
+			Code: lineCode,
 			Name:     xmlVehicleActivity.PublishedLineName(),
 		}
 
@@ -90,14 +90,14 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 
 	// VehicleJourneys
-	vjObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlVehicleActivity.DatedVehicleJourneyRef())
+	vjCode := model.NewCode(builder.remoteCodeSpace, xmlVehicleActivity.DatedVehicleJourneyRef())
 
 	_, ok = builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			ObjectId:        vjObjectId,
-			LineObjectId:    lineObjectId,
+			Code:        vjCode,
+			LineCode:    lineCode,
 			OriginRef:       xmlVehicleActivity.OriginRef(),
 			OriginName:      xmlVehicleActivity.OriginName(),
 			DestinationRef:  xmlVehicleActivity.DestinationRef(),
@@ -106,7 +106,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Monitored:       xmlVehicleActivity.Monitored(),
 			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 			SiriXML:      &xmlVehicleActivity.XMLMonitoredVehicleJourney,
 		}
 
@@ -117,16 +117,16 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	// Vehicles
 	_, ok = builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.VehicleRef()]
 	if !ok {
-		vObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlVehicleActivity.VehicleRef())
+		vCode := model.NewCode(builder.remoteCodeSpace, xmlVehicleActivity.VehicleRef())
 		bearing, _ := strconv.ParseFloat(xmlVehicleActivity.Bearing(), 64)
 		linkDistance, _ := strconv.ParseFloat(xmlVehicleActivity.LinkDistance(), 64)
 		percentage, _ := strconv.ParseFloat(xmlVehicleActivity.Percentage(), 64)
 
 		vEvent := &model.VehicleUpdateEvent{
 			Origin:                 origin,
-			ObjectId:               vObjectId,
-			StopAreaObjectId:       stopAreaObjectId,
-			VehicleJourneyObjectId: vjObjectId,
+			Code:               vCode,
+			StopAreaCode:       stopAreaCode,
+			VehicleJourneyCode: vjCode,
 			DriverRef:              xmlVehicleActivity.DriverRef(),
 			Bearing:                bearing,
 			LinkDistance:           linkDistance,

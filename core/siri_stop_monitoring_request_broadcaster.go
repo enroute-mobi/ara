@@ -30,18 +30,18 @@ func NewSIRIStopMonitoringRequestBroadcaster(partner *Partner) *SIRIStopMonitori
 }
 
 func (connector *SIRIStopMonitoringRequestBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_STOP_MONITORING_REQUEST_BROADCASTER)
 }
 func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery(request *sxml.XMLStopMonitoringRequest) siri.SIRIStopMonitoringDelivery {
-	objectid := model.NewObjectID(connector.remoteObjectidKind, request.MonitoringRef())
-	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
+	code := model.NewCode(connector.remoteCodeSpace, request.MonitoringRef())
+	stopArea, ok := connector.partner.Model().StopAreas().FindByCode(code)
 	if !ok {
 		return siri.SIRIStopMonitoringDelivery{
 			RequestMessageRef:  request.MessageIdentifier(),
 			Status:             false,
 			ResponseTimestamp:  connector.Clock().Now(),
 			ErrorType:          "InvalidDataReferencesError",
-			ErrorText:          fmt.Sprintf("StopArea not found: '%s'", objectid.Value()),
+			ErrorText:          fmt.Sprintf("StopArea not found: '%s'", code.Value()),
 			MonitoringRef:      request.MonitoringRef(),
 			VehicleJourneyRefs: make(map[string]struct{}),
 		}
@@ -65,8 +65,8 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Prepare StopVisit Selectors
 	selectors := []model.StopVisitSelector{}
 	if request.LineRef() != "" {
-		lineSelectorObjectid := model.NewObjectID(connector.remoteObjectidKind, request.LineRef())
-		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorObjectid))
+		lineSelectorCode := model.NewCode(connector.remoteCodeSpace, request.LineRef())
+		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorCode))
 	}
 	if request.PreviewInterval() != 0 {
 		duration := request.PreviewInterval()
@@ -139,7 +139,7 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) RequestStopArea(request *
 }
 
 func (factory *SIRIStopMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

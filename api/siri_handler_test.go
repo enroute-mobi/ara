@@ -33,7 +33,7 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 	settings := map[string]string{
 		"remote_url":                             "",
 		"remote_credential":                      "",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                      "codeSpace",
 		"local_credential":                       "Ara",
 		"local_url":                              "http://ara",
 		"generators.message_identifier":          "Ara:Message::%{uuid}:LOC",
@@ -283,7 +283,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
-		"objectidValue",
+		"codeValue",
 		"Ara",
 		clock.DefaultClock().Now()).BuildXML()
 	if err != nil {
@@ -293,17 +293,17 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	server, referential := siriHandler_PrepareServer("")
 	stopArea := referential.Model().StopAreas().New()
-	objectid := model.NewObjectID("objectidKind", "objectidValue")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "codeValue")
+	stopArea.SetCode(code)
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.SetCode(code)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Monitored = true
 	vehicleJourney.Save()
@@ -311,21 +311,21 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "second"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "second"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
-	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "first"))
+	stopVisit2.SetCode(model.NewCode("codeSpace", "first"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
 	pastStopVisit.StopAreaId = stopArea.Id()
 	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
-	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "past"))
+	pastStopVisit.SetCode(model.NewCode("codeSpace", "past"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
 
@@ -385,17 +385,17 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 	server, referential := siriHandler_PrepareServer("")
 	stopArea := referential.Model().StopAreas().New()
-	objectid := model.NewObjectID("objectidKind", "stopArea1")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "stopArea1")
+	stopArea.SetCode(code)
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.SetCode(code)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Monitored = true
 	vehicleJourney.Save()
@@ -403,36 +403,36 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "second"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "second"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
-	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "first"))
+	stopVisit2.SetCode(model.NewCode("codeSpace", "first"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
 	pastStopVisit.StopAreaId = stopArea.Id()
 	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
-	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "past"))
+	pastStopVisit.SetCode(model.NewCode("codeSpace", "past"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	objectid2 := model.NewObjectID("objectidKind", "stopArea2")
-	stopArea2.SetObjectID(objectid2)
+	code2 := model.NewCode("codeSpace", "stopArea2")
+	stopArea2.SetCode(code2)
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line2 := referential.Model().Lines().New()
-	line2.SetObjectID(objectid2)
+	line2.SetCode(code2)
 	line2.Save()
 
 	vehicleJourney2 := referential.Model().VehicleJourneys().New()
-	vehicleJourney2.SetObjectID(objectid2)
+	vehicleJourney2.SetCode(code2)
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Monitored = true
 	vehicleJourney2.Save()
@@ -440,14 +440,14 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	stopVisit3 := referential.Model().StopVisits().New()
 	stopVisit3.StopAreaId = stopArea2.Id()
 	stopVisit3.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
-	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "third"))
+	stopVisit3.SetCode(model.NewCode("codeSpace", "third"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.Save()
 
 	stopVisit4 := referential.Model().StopVisits().New()
 	stopVisit4.StopAreaId = stopArea2.Id()
 	stopVisit4.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
-	stopVisit4.SetObjectID(model.NewObjectID("objectidKind", "fourth"))
+	stopVisit4.SetCode(model.NewCode("codeSpace", "fourth"))
 	stopVisit4.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit4.Save()
 
@@ -585,13 +585,13 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	objectid := model.NewObjectID("objectidKind", "stopArea1")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "stopArea1")
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	objectid2 := model.NewObjectID("objectidKind", "stopArea2")
-	stopArea2.SetObjectID(objectid2)
+	code2 := model.NewCode("codeSpace", "stopArea2")
+	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
 	siriHandler_Request(server, buffer, t)
@@ -648,37 +648,37 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	server, referential := siriHandler_PrepareServer("")
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetObjectID(model.NewObjectID("objectidKind", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("codeSpace", "stopArea2"))
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
-	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.Model().VehicleJourneys().New()
-	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
-	pastStopVisit.SetObjectID(model.NewObjectID("objectidKind", "pastStopVisit"))
+	pastStopVisit.SetCode(model.NewCode("codeSpace", "pastStopVisit"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.StopAreaId = stopArea.Id()
 	pastStopVisit.PassageOrder = 0
@@ -688,7 +688,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	pastStopVisit.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -698,7 +698,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
-	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "stopVisit2"))
+	stopVisit2.SetCode(model.NewCode("codeSpace", "stopVisit2"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.StopAreaId = stopArea2.Id()
 	stopVisit2.PassageOrder = 2
@@ -708,7 +708,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit2.Save()
 
 	stopVisit3 := referential.Model().StopVisits().New()
-	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea.Id()
 	stopVisit3.PassageOrder = 1
@@ -812,17 +812,17 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	server, referential := siriHandler_PrepareServer("")
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	line3 := referential.Model().Lines().New()
-	line3.SetObjectID(model.NewObjectID("objectidKind2", "NINOXE:Line:4:LOC"))
+	line3.SetCode(model.NewCode("codeSpace2", "NINOXE:Line:4:LOC"))
 	line3.Name = "lineName3"
 	line3.Save()
 

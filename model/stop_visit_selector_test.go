@@ -41,13 +41,13 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 }
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
-	objectid := NewObjectID("kind", "value")
-	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(objectid)})
+	code := NewCode("codeSpace", "value")
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(code)})
 
 	model := NewMemoryModel()
 
 	line := model.Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := model.VehicleJourneys().New()
@@ -62,9 +62,9 @@ func Test_StopVisitSelectorByLine(t *testing.T) {
 		t.Errorf("Selector should return true, got false")
 	}
 
-	objectid2 := NewObjectID("kind", "value2")
+	code2 := NewCode("codeSpace", "value2")
 	line2 := model.Lines().New()
-	line2.SetObjectID(objectid2)
+	line2.SetCode(code2)
 	line2.Save()
 
 	vehicleJourney2 := model.VehicleJourneys().New()
@@ -83,15 +83,15 @@ func Test_StopVisitSelectorByLine(t *testing.T) {
 func Test_CompositeStopVisitSelector(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
-	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(objectid), StopVisitSelectorByTime(startTime, endTime)})
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(code), StopVisitSelectorByTime(startTime, endTime)})
 
 	model := NewMemoryModel()
 
 	// Good VehicleJourney
 	line := model.Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := model.VehicleJourneys().New()
@@ -115,9 +115,9 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	}
 
 	// Wrong Line
-	objectid2 := NewObjectID("kind", "value2")
+	code2 := NewCode("codeSpace", "value2")
 	line2 := model.Lines().New()
-	line2.SetObjectID(objectid2)
+	line2.SetCode(code2)
 	line2.Save()
 
 	vehicleJourney2 := model.VehicleJourneys().New()

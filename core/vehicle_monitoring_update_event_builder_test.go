@@ -27,7 +27,7 @@ func getvm(t *testing.T, filePath string) *sxml.XMLVehicleMonitoringResponse {
 	return response
 }
 
-func Test_Vehicle_ObjectID_With_VehicleRef(t *testing.T) {
+func Test_Vehicle_Code_With_VehicleRef(t *testing.T) {
 	vm := getvm(t, "testdata/vm_response_soap.xml")
 	mvj := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0].XMLMonitoredVehicleJourney
 
@@ -36,7 +36,7 @@ func Test_Vehicle_ObjectID_With_VehicleRef(t *testing.T) {
 	}
 }
 
-func Test_Vehicle_ObjectID_Without_VehicleRef_With_VehicleMonitoringRef(t *testing.T) {
+func Test_Vehicle_Code_Without_VehicleRef_With_VehicleMonitoringRef(t *testing.T) {
 	vm := getvm(t, "testdata/vm_response_soap2.xml")
 	mvj := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0].XMLMonitoredVehicleJourney
 

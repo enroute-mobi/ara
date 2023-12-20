@@ -35,7 +35,7 @@ type FakeVehicleMonitoringSubscriber struct {
 
 type lineToRequest struct {
 	subID SubscriptionId
-	lID   model.ObjectID
+	lID   model.Code
 }
 
 func NewFakeVehicleMonitoringSubscriber(connector *SIRIVehicleMonitoringSubscriptionCollector) SIRIVehicleMonitoringSubscriber {
@@ -97,12 +97,12 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 
 	linesToRequest := make(map[string]*lineToRequest)
 	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByObjectIDCopy() {
+		for _, resource := range subscription.ResourcesByCodeCopy() {
 			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				linesToRequest[messageIdentifier] = &lineToRequest{
 					subID: subscription.id,
-					lID:   *(resource.Reference.ObjectId),
+					lID:   *(resource.Reference.Code),
 				}
 			}
 		}

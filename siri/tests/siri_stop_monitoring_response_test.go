@@ -68,7 +68,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>lineRef</siri:LineRef>
 					<siri:FramedVehicleJourneyRef>
 						<siri:DataFrameRef>2016-09-21</siri:DataFrameRef>
-						<siri:DatedVehicleJourneyRef>vehicleJourney#ObjectID</siri:DatedVehicleJourneyRef>
+						<siri:DatedVehicleJourneyRef>vehicleJourney#Code</siri:DatedVehicleJourneyRef>
 					</siri:FramedVehicleJourneyRef>
 					<siri:PublishedLineName>lineName</siri:PublishedLineName>
 					<siri:OperatorRef>OperatorRef</siri:OperatorRef>
@@ -123,7 +123,7 @@ func Test_SIRIStopMonitoringResponse_BuildXML(t *testing.T) {
 	siriMonitoredStopVisit.References["StopVisitReferences"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"] = make(map[string]string)
 	siriMonitoredStopVisit.Attributes["VehicleJourneyAttributes"]["Delay"] = "30"
-	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#ObjectID"
+	siriMonitoredStopVisit.DatedVehicleJourneyRef = "vehicleJourney#Code"
 	siriMonitoredStopVisit.References["StopVisitReferences"]["OperatorRef"] = "OperatorRef"
 	siriMonitoredStopVisit.References["VehicleJourney"]["DestinationRef"] = "NINOXE:StopPoint:SP:62:LOC"
 

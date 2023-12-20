@@ -36,7 +36,7 @@ func Test_StopVisit_MarshalJSON(t *testing.T) {
 
 func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
     "StopAreaId": "6ba7b814-9dad-11d1-1-00c04fd430c8",
     "VehicleJourneyId": "6ba7b814-9dad-11d1-2-00c04fd430c8",
     "PassageOrder": 10
@@ -48,18 +48,18 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedObjectIds := []ObjectID{
-		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewObjectID("hastus", "sqypis"),
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
 	}
 
-	for _, expectedObjectId := range expectedObjectIds {
-		objectId, found := stopVisit.ObjectID(expectedObjectId.Kind())
+	for _, expectedCode := range expectedCodes {
+		code, found := stopVisit.Code(expectedCode.CodeSpace())
 		if !found {
-			t.Errorf("Missing StopVisit ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+			t.Errorf("Missing StopVisit Code '%s' after UnmarshalJSON()", expectedCode.CodeSpace())
 		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong StopVisit ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		if !reflect.DeepEqual(expectedCode, code) {
+			t.Errorf("Wrong StopVisit Code after UnmarshalJSON():\n got: %s\n want: %s", code, expectedCode)
 		}
 	}
 
@@ -79,8 +79,8 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 func Test_StopVisit_Save(t *testing.T) {
 	model := NewMemoryModel()
 	stopVisit := model.StopVisits().New()
-	objectid := NewObjectID("kind", "value")
-	stopVisit.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
 	if stopVisit.model != model {
@@ -95,9 +95,9 @@ func Test_StopVisit_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("New StopVisit should be found in memoryStopVisits")
 	}
-	_, ok = model.StopVisits().FindByObjectId(objectid)
+	_, ok = model.StopVisits().FindByCode(code)
 	if !ok {
-		t.Errorf("New StopVisit should be found by objectid in memoryStopVisits")
+		t.Errorf("New StopVisit should be found by code in memoryStopVisits")
 	}
 	foundStopVisits := model.StopVisits().FindByVehicleJourneyId("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if len(foundStopVisits) == 0 || foundStopVisits[0].Id() != stopVisit.id {
@@ -105,29 +105,29 @@ func Test_StopVisit_Save(t *testing.T) {
 	}
 }
 
-func Test_StopVisit_ObjectId(t *testing.T) {
+func Test_StopVisit_Code(t *testing.T) {
 	stopVisit := StopVisit{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	stopVisit.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	stopVisit.SetObjectID(objectid)
+	stopVisit.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	stopVisit.SetCode(code)
 
-	foundObjectId, ok := stopVisit.ObjectID("kind")
+	foundCode, ok := stopVisit.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = stopVisit.ObjectID("wrongkind")
+	_, ok = stopVisit.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(stopVisit.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", stopVisit.ObjectIDs())
+	if len(stopVisit.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", stopVisit.Codes())
 	}
 }
 
@@ -213,8 +213,8 @@ func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
 func Test_MemoryStopVisits_Delete(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 	existingStopVisit := stopVisits.New()
-	objectid := NewObjectID("kind", "value")
-	existingStopVisit.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingStopVisit.SetCode(code)
 	stopVisits.Save(existingStopVisit)
 
 	stopVisits.Delete(existingStopVisit)
@@ -223,9 +223,9 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted StopVisit should not be findable")
 	}
-	_, ok = stopVisits.FindByObjectId(objectid)
+	_, ok = stopVisits.FindByCode(code)
 	if ok {
-		t.Errorf("New StopVisit should not be findable by objectid")
+		t.Errorf("New StopVisit should not be findable by code")
 	}
 }
 
@@ -239,13 +239,13 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug:  "referential",
 		ModelName:        "2017-01-01",
-		ObjectIDs:        `{"internal":"value"}`,
+		Codes:            `{"internal":"value"}`,
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Schedules:        `[{"Kind":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
+		Schedules:        `[{"CodeSpace":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
 		PassageOrder:     1,
 		Attributes:       "{}",
-		References:       `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		References:       `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseStopVisit, "stop_visits")
@@ -276,14 +276,14 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	if stopVisit.id != stopVisitId {
 		t.Errorf("Wrong Id:\n got: %v\n expected: %v", stopVisit.id, stopVisitId)
 	}
-	if objectid, ok := stopVisit.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	if code, ok := stopVisit.Code("internal"); !ok || code.Value() != "value" {
+		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 	if stopVisit.PassageOrder != 1 {
 		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", stopVisit.PassageOrder)
 	}
-	if ref, ok := stopVisit.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
+	if ref, ok := stopVisit.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
 	}
 	svs := stopVisit.Schedules.Schedule("expected")
 	if svs == nil {

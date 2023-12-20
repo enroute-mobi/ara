@@ -32,11 +32,11 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	// Create the vehicleJourney
 	model.VehicleJourneys().SetUUIDGenerator(generator)
 	vehicleJourney := model.VehicleJourneys().New()
-	objectid := NewObjectID("kind", "value")
-	vehicleJourney.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
-	expected := `{"ObjectIDs":{"kind":"value"},"Monitored":false,"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","StopVisits":["6ba7b814-9dad-11d1-0-00c04fd430c8"]}`
+	expected := `{"Codes":{"codeSpace":"value"},"Monitored":false,"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","StopVisits":["6ba7b814-9dad-11d1-0-00c04fd430c8"]}`
 	jsonBytes, err := vehicleJourney.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +50,7 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 
 func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
     "LineId": "6ba7b814-9dad-11d1-1-00c04fd430c8"
 	}`
 
@@ -60,18 +60,18 @@ func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedObjectIds := []ObjectID{
-		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewObjectID("hastus", "sqypis"),
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
 	}
 
-	for _, expectedObjectId := range expectedObjectIds {
-		objectId, found := vehicleJourney.ObjectID(expectedObjectId.Kind())
+	for _, expectedCode := range expectedCodes {
+		code, found := vehicleJourney.Code(expectedCode.CodeSpace())
 		if !found {
-			t.Errorf("Missing VehicleJourney ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+			t.Errorf("Missing VehicleJourney Code '%s' after UnmarshalJSON()", expectedCode.CodeSpace())
 		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong VehicleJourney ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		if !reflect.DeepEqual(expectedCode, code) {
+			t.Errorf("Wrong VehicleJourney Code after UnmarshalJSON():\n got: %s\n want: %s", code, expectedCode)
 		}
 	}
 
@@ -83,8 +83,8 @@ func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
 func Test_VehicleJourney_Save(t *testing.T) {
 	model := NewMemoryModel()
 	vehicleJourney := model.VehicleJourneys().New()
-	objectid := NewObjectID("kind", "value")
-	vehicleJourney.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	vehicleJourney.SetCode(code)
 
 	if vehicleJourney.model != model {
 		t.Errorf("New vehicleJourney model should be memoryVehicleJourneys model")
@@ -98,35 +98,35 @@ func Test_VehicleJourney_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("New VehicleJourney should be found in memoryVehicleJourneys")
 	}
-	_, ok = model.VehicleJourneys().FindByObjectId(objectid)
+	_, ok = model.VehicleJourneys().FindByCode(code)
 	if !ok {
-		t.Errorf("New VehicleJourney should be found by objectid in memoryVehicleJourneys")
+		t.Errorf("New VehicleJourney should be found by code in memoryVehicleJourneys")
 	}
 }
 
-func Test_VehicleJourney_ObjectId(t *testing.T) {
+func Test_VehicleJourney_Code(t *testing.T) {
 	vehicleJourney := VehicleJourney{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	vehicleJourney.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	vehicleJourney.SetCode(code)
 
-	foundObjectId, ok := vehicleJourney.ObjectID("kind")
+	foundCode, ok := vehicleJourney.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = vehicleJourney.ObjectID("wrongkind")
+	_, ok = vehicleJourney.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(vehicleJourney.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", vehicleJourney.ObjectIDs())
+	if len(vehicleJourney.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", vehicleJourney.Codes())
 	}
 }
 
@@ -198,8 +198,8 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	existingVehicleJourney := vehicleJourneys.New()
-	objectid := NewObjectID("kind", "value")
-	existingVehicleJourney.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingVehicleJourney.SetCode(code)
 	vehicleJourneys.Save(existingVehicleJourney)
 
 	vehicleJourneys.SetFullVehicleJourneyBySubscriptionId("subscription1", existingVehicleJourney.id)
@@ -209,8 +209,8 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 	_, ok := vehicleJourneys.Find(existingVehicleJourney.Id())
 	assert.False(ok, "Deleted VehicleJourney should not be findable")
 
-	_, ok = vehicleJourneys.FindByObjectId(objectid)
-	assert.False(ok, "Deleted VehicleJourney should not be findable by objectid")
+	_, ok = vehicleJourneys.FindByCode(code)
+	assert.False(ok, "Deleted VehicleJourney should not be findable by code")
 
 	ok = vehicleJourneys.FullVehicleJourneyExistBySubscriptionId("subscription1", existingVehicleJourney.id)
 	assert.False(ok, "Deleted VehicleJourney should not exist in full broadcasted list for subscription 1")
@@ -231,10 +231,10 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "vehicleJourney",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Attributes:      "{}",
-		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseVehicleJourney, "vehicle_journeys")
@@ -268,13 +268,13 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 	if vehicleJourney.Name != "vehicleJourney" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: vehicleJourney", vehicleJourney.Name)
 	}
-	if objectid, ok := vehicleJourney.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	if code, ok := vehicleJourney.Code("internal"); !ok || code.Value() != "value" {
+		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 	if vehicleJourney.LineId != "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" {
 		t.Errorf("Wrong LineId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", vehicleJourney.LineId)
 	}
-	if ref, ok := vehicleJourney.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
+	if ref, ok := vehicleJourney.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
 	}
 }

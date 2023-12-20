@@ -33,14 +33,14 @@ func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopMonitoringSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewSIRIStopMonitoringSubscriptionCollector(partner *Partner) *SIRIStopMonitoringSubscriptionCollector {
 	connector := &SIRIStopMonitoringSubscriptionCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -65,17 +65,17 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 		return
 	}
 
-	stopAreaObjectid, ok := stopArea.ObjectID(connector.remoteObjectidKind)
+	stopAreaCode, ok := stopArea.Code(connector.remoteCodeSpace)
 	if !ok {
-		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), connector.remoteObjectidKind)
+		logger.Log.Debugf("Requested stopArea %v doesn't have a code with codeSpace %v", request.StopAreaId(), connector.remoteCodeSpace)
 		return
 	}
 
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectid.String(), StopMonitoringCollect)
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(stopAreaCode.String(), StopMonitoringCollect)
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
-			resource := subscription.Resource(stopAreaObjectid)
+			resource := subscription.Resource(stopAreaCode)
 			if resource == nil { // Should never happen
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
@@ -90,7 +90,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	// Else we find or create a subscription to add the resource
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	ref := model.Reference{
-		ObjectId: &stopAreaObjectid,
+		Code: &stopAreaCode,
 		Type:     "StopArea",
 	}
 
@@ -130,15 +130,15 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			continue
 		}
 
-		originStopAreaObjectId := model.ObjectID{}
+		originStopAreaCode := model.Code{}
 		resource := subscription.UniqueResource()
 		if resource != nil {
-			originStopAreaObjectId = *resource.Reference.ObjectId
+			originStopAreaCode = *resource.Reference.Code
 		} else if delivery.MonitoringRef() != "" {
-			originStopAreaObjectId = model.NewObjectID(connector.remoteObjectidKind, delivery.MonitoringRef())
+			originStopAreaCode = model.NewCode(connector.remoteCodeSpace, delivery.MonitoringRef())
 		}
 
-		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaObjectId)
+		builder := NewStopMonitoringUpdateEventBuilder(connector.partner, originStopAreaCode)
 		builder.SetUpdateEvents(delivery.XMLMonitoredStopVisits())
 		builder.SetStopVisitCancellationEvents(delivery)
 		updateEvents = builder.UpdateEvents()

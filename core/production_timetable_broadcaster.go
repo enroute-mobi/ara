@@ -136,7 +136,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			// Handle StopPointRef
 			stopArea, stopAreaId, ok := ptt.connector.stopPointRef(stopVisit.StopAreaId)
 			if !ok {
-				logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+				logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct Code", stopVisit.Id())
 				continue
 			}
 
@@ -151,13 +151,13 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			if !ok {
 				continue
 			}
-			lineObjectId, ok := line.ObjectID(ptt.connector.remoteObjectidKind)
+			lineCode, ok := line.Code(ptt.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
 
 			// Find the Resource
-			resource := sub.Resource(lineObjectId)
+			resource := sub.Resource(lineCode)
 			if resource == nil {
 				continue
 			}
@@ -166,7 +166,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			datedTTVersionFrame, ok := lines[LineDirection{Id: line.Id(), Direction: vehicleJourney.DirectionType}]
 			if !ok {
 				datedTTVersionFrame = &siri.SIRIDatedTimetableVersionFrame{
-					LineRef:        lineObjectId.Value(),
+					LineRef:        lineCode.Value(),
 					DirectionType:  ptt.connector.directionType(vehicleJourney.DirectionType),
 					RecordedAtTime: currentTime,
 					Attributes:     vehicleJourney.Attributes,
@@ -179,18 +179,18 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 			// Get the DatedVehicleJourney
 			datedVehicleJourney, ok := vehicleJourneys[vehicleJourney.Id()]
 			if !ok {
-				// Handle vehicleJourney Objectid
-				vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(ptt.connector.vjRemoteObjectidKinds)
+				// Handle vehicleJourney Code
+				vehicleJourneyId, ok := vehicleJourney.CodeWithFallback(ptt.connector.vjRemoteCodeSpaces)
 				var datedVehicleJourneyRef string
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()
 				} else {
-					defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+					defaultCode, ok := vehicleJourney.Code("_default")
 					if !ok {
 						continue
 					}
 					referenceGenerator := ptt.connector.Partner().ReferenceIdentifierGenerator()
-					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 				}
 
 				datedVehicleJourney = &siri.SIRIDatedVehicleJourney{
@@ -283,22 +283,22 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) stopPointRef(st
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
+	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
 	if ok {
-		return stopPointRef, stopPointRefObjectId.Value(), true
+		return stopPointRef, stopPointRefCode.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentObjectId, ok := referent.ObjectID(connector.remoteObjectidKind)
+		referentCode, ok := referent.Code(connector.remoteCodeSpace)
 		if ok {
-			return referent, referentObjectId.Value(), true
+			return referent, referentCode.Value(), true
 		}
 	}
 	parent, ok := stopPointRef.Parent()
 	if ok {
-		parentObjectId, ok := parent.ObjectID(connector.remoteObjectidKind)
+		parentCode, ok := parent.Code(connector.remoteCodeSpace)
 		if ok {
-			return parent, parentObjectId.Value(), true
+			return parent, parentCode.Value(), true
 		}
 	}
 
@@ -312,16 +312,16 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) dataFrameRef() 
 
 func (connector *SIRIProductionTimetableSubscriptionBroadcaster) operatorRef(stopVisit *model.StopVisit) string {
 	operatorRef, ok := stopVisit.Reference("OperatorRef")
-	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
+	if !ok || operatorRef == (model.Reference{}) || operatorRef.Code == nil {
 		return ""
 	}
-	operator, ok := connector.Partner().Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := connector.Partner().Model().Operators().FindByCode(*operatorRef.Code)
 	if !ok {
-		return operatorRef.ObjectId.Value()
+		return operatorRef.Code.Value()
 	}
-	obj, ok := operator.ObjectID(connector.remoteObjectidKind)
+	obj, ok := operator.Code(connector.remoteCodeSpace)
 	if !ok {
-		return operatorRef.ObjectId.Value()
+		return operatorRef.Code.Value()
 	}
 
 	return obj.Value()

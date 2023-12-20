@@ -37,7 +37,7 @@ func Test_Line_MarshalJSON(t *testing.T) {
 
 func Test_Line_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
   }`
 
 	line := Line{}
@@ -46,18 +46,18 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedObjectIds := []ObjectID{
-		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewObjectID("hastus", "sqypis"),
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
 	}
 
-	for _, expectedObjectId := range expectedObjectIds {
-		objectId, found := line.ObjectID(expectedObjectId.Kind())
+	for _, expectedCode := range expectedCodes {
+		code, found := line.Code(expectedCode.CodeSpace())
 		if !found {
-			t.Errorf("Missing Line ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+			t.Errorf("Missing Line Code '%s' after UnmarshalJSON()", expectedCode.CodeSpace())
 		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong Line ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		if !reflect.DeepEqual(expectedCode, code) {
+			t.Errorf("Wrong Line Code after UnmarshalJSON():\n got: %s\n want: %s", code, expectedCode)
 		}
 	}
 }
@@ -65,8 +65,8 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 func Test_Line_Save(t *testing.T) {
 	model := NewMemoryModel()
 	line := model.Lines().New()
-	objectid := NewObjectID("kind", "value")
-	line.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	line.SetCode(code)
 
 	if line.model != model {
 		t.Errorf("New line model should be memoryLines model")
@@ -80,35 +80,35 @@ func Test_Line_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("New Line should be found in memoryLines")
 	}
-	_, ok = model.Lines().FindByObjectId(objectid)
+	_, ok = model.Lines().FindByCode(code)
 	if !ok {
-		t.Errorf("New Line should be found by objectid in memoryLines")
+		t.Errorf("New Line should be found by code in memoryLines")
 	}
 }
 
-func Test_Line_ObjectId(t *testing.T) {
+func Test_Line_Code(t *testing.T) {
 	line := Line{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	line.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	line.SetObjectID(objectid)
+	line.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	line.SetCode(code)
 
-	foundObjectId, ok := line.ObjectID("kind")
+	foundCode, ok := line.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = line.ObjectID("wrongkind")
+	_, ok = line.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(line.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", line.ObjectIDs())
+	if len(line.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", line.Codes())
 	}
 }
 
@@ -178,8 +178,8 @@ func Test_MemoryLines_FindAll(t *testing.T) {
 func Test_MemoryLines_Delete(t *testing.T) {
 	lines := NewMemoryLines()
 	existingLine := lines.New()
-	objectid := NewObjectID("kind", "value")
-	existingLine.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingLine.SetCode(code)
 	lines.Save(existingLine)
 
 	lines.Delete(existingLine)
@@ -188,9 +188,9 @@ func Test_MemoryLines_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted Line should not be findable")
 	}
-	_, ok = lines.FindByObjectId(objectid)
+	_, ok = lines.FindByCode(code)
 	if ok {
-		t.Errorf("Deleted Line should not be findable by objectid")
+		t.Errorf("Deleted Line should not be findable by code")
 	}
 }
 
@@ -204,9 +204,9 @@ func Test_MemoryLines_Load(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "line",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		Attributes:      "{}",
-		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 
 	Database.AddTableWithName(databaseLine, "lines")
@@ -240,10 +240,10 @@ func Test_MemoryLines_Load(t *testing.T) {
 	if line.Name != "line" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: line", line.Name)
 	}
-	if objectid, ok := line.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	if code, ok := line.Code("internal"); !ok || code.Value() != "value" {
+		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
-	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
+	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
 	}
 }

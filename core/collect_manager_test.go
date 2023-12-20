@@ -16,24 +16,24 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	referentials.Save(referential)
 
 	stopArea := referential.Model().StopAreas().New()
-	saObjectid := model.NewObjectID("kind", "saValue")
-	stopArea.SetObjectID(saObjectid)
+	saCode := model.NewCode("codeSpace", "saValue")
+	stopArea.SetCode(saCode)
 	stopArea.Save()
 
 	vj := referential.Model().VehicleJourneys().New()
-	vjObjectid := model.NewObjectID("kind", "vjValue")
-	vj.SetObjectID(vjObjectid)
+	vjCode := model.NewCode("codeSpace", "vjValue")
+	vj.SetCode(vjCode)
 	vj.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	objectid := model.NewObjectID("kind", "value")
-	stopVisit.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "value")
+	stopVisit.SetCode(code)
 	stopVisit.Save()
 
 	event := &model.StopVisitUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       saObjectid,
-		VehicleJourneyObjectId: vjObjectid,
+		Code:               code,
+		StopAreaCode:       saCode,
+		VehicleJourneyCode: vjCode,
 		DepartureStatus:        model.STOP_VISIT_DEPARTURE_ONTIME,
 		ArrivalStatus:          model.STOP_VISIT_ARRIVAL_ARRIVED,
 		Schedules:              model.NewStopVisitSchedules(),
@@ -57,7 +57,7 @@ func Test_CollectManager_StopAreaMonitored(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")
 	stopArea.Monitored = true
-	stopArea.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea.SetCode(model.NewCode("test", "value"))
 	stopArea.Save()
 
 	referential.CollectManager().HandlePartnerStatusChange("partner", false)
@@ -92,14 +92,14 @@ func Test_CollectManager_StopAreaMonitoredWithReferent(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")
 	stopArea.Monitored = true
-	stopArea.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea.SetCode(model.NewCode("test", "value"))
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.Origins.NewOrigin("partner2")
 	stopArea2.ReferentId = stopArea.Id()
 	stopArea2.Monitored = true
-	stopArea2.SetObjectID(model.NewObjectID("test", "value"))
+	stopArea2.SetCode(model.NewCode("test", "value"))
 	stopArea2.Save()
 
 	referential.CollectManager().HandlePartnerStatusChange("partner2", false)

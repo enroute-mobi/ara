@@ -132,7 +132,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			// Handle StopPointRef
 			stopArea, stopAreaId, ok := ett.connector.stopPointRef(stopVisit.StopAreaId)
 			if !ok {
-				logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+				logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct Code", stopVisit.Id())
 				continue
 			}
 
@@ -147,13 +147,13 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			if !ok {
 				continue
 			}
-			lineObjectId, ok := line.ObjectID(ett.connector.remoteObjectidKind)
+			lineCode, ok := line.Code(ett.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
 
 			// Find the Resource
-			resource := sub.Resource(lineObjectId)
+			resource := sub.Resource(lineCode)
 			if resource == nil {
 				continue
 			}
@@ -172,22 +172,22 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			// Get the EstiatedVehicleJourney
 			estimatedVehicleJourney, ok := vehicleJourneys[vehicleJourney.Id()]
 			if !ok {
-				// Handle vehicleJourney Objectid
-				vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(ett.connector.vjRemoteObjectidKinds)
+				// Handle vehicleJourney Code
+				vehicleJourneyId, ok := vehicleJourney.CodeWithFallback(ett.connector.vjRemoteCodeSpaces)
 				var datedVehicleJourneyRef string
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()
 				} else {
-					defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+					defaultCode, ok := vehicleJourney.Code("_default")
 					if !ok {
 						continue
 					}
 					referenceGenerator := ett.connector.Partner().ReferenceIdentifierGenerator()
-					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 				}
 
 				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
-					LineRef:                lineObjectId.Value(),
+					LineRef:                lineCode.Value(),
 					DirectionType:          ett.connector.directionType(vehicleJourney.DirectionType),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           ett.connector.dataFrameRef(),
@@ -209,7 +209,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 				for _, sv := range ett.connector.Partner().Model().StopVisits().FindByVehicleJourneyId(vehicleJourney.Id()) {
 					sa, saId, ok := ett.connector.stopPointRef(sv.StopAreaId)
 					if !ok {
-						logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+						logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct Code", stopVisit.Id())
 						continue
 					}
 					ett.connector.buildCall(sv, sa, saId, estimatedVehicleJourney)
@@ -318,22 +318,22 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) stopPointRef(sto
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
+	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
 	if ok {
-		return stopPointRef, stopPointRefObjectId.Value(), true
+		return stopPointRef, stopPointRefCode.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentObjectId, ok := referent.ObjectID(connector.remoteObjectidKind)
+		referentCode, ok := referent.Code(connector.remoteCodeSpace)
 		if ok {
-			return referent, referentObjectId.Value(), true
+			return referent, referentCode.Value(), true
 		}
 	}
 	parent, ok := stopPointRef.Parent()
 	if ok {
-		parentObjectId, ok := parent.ObjectID(connector.remoteObjectidKind)
+		parentCode, ok := parent.Code(connector.remoteCodeSpace)
 		if ok {
-			return parent, parentObjectId.Value(), true
+			return parent, parentCode.Value(), true
 		}
 	}
 	return &model.StopArea{}, "", false
@@ -361,38 +361,38 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) getEstimatedVehi
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
 		ref, ok := vehicleJourney.Reference(refType)
-		if !ok || ref == (model.Reference{}) || ref.ObjectId == nil {
+		if !ok || ref == (model.Reference{}) || ref.Code == nil {
 			continue
 		}
 		if refType == "DestinationRef" && connector.noDestinationRefRewrite(vehicleJourney.Origin) {
-			references[refType] = ref.ObjectId.Value()
+			references[refType] = ref.Code.Value()
 			continue
 		}
-		if foundStopArea, ok := connector.Partner().Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
-			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		if foundStopArea, ok := connector.Partner().Model().StopAreas().FindByCode(*ref.Code); ok {
+			obj, ok := foundStopArea.ReferentOrSelfCode(connector.remoteCodeSpace)
 			if ok {
 				references[refType] = obj.Value()
 				continue
 			}
 		}
 		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
-		defaultObjectID := model.NewObjectID(connector.remoteObjectidKind, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
-		references[refType] = defaultObjectID.Value()
+		defaultCode := model.NewCode(connector.remoteCodeSpace, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
+		references[refType] = defaultCode.Value()
 	}
 
 	// Handle OperatorRef
 	operatorRef, ok := stopVisit.Reference("OperatorRef")
-	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
+	if !ok || operatorRef == (model.Reference{}) || operatorRef.Code == nil {
 		return references
 	}
-	operator, ok := connector.Partner().Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := connector.Partner().Model().Operators().FindByCode(*operatorRef.Code)
 	if !ok {
-		references["OperatorRef"] = operatorRef.ObjectId.Value()
+		references["OperatorRef"] = operatorRef.Code.Value()
 		return references
 	}
-	obj, ok := operator.ObjectID(connector.remoteObjectidKind)
+	obj, ok := operator.Code(connector.remoteCodeSpace)
 	if !ok {
-		references["OperatorRef"] = operatorRef.ObjectId.Value()
+		references["OperatorRef"] = operatorRef.Code.Value()
 		return references
 	}
 	references["OperatorRef"] = obj.Value()

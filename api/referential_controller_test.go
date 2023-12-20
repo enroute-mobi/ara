@@ -156,7 +156,7 @@ func Test_ReferentialController_Update(t *testing.T) {
 
 	// Settings must be set
 	assert.Equal(4*time.Hour, updatedReferential.ModelRefreshTime())
-	expectedLoggerStopAreas := []model.ObjectID{model.NewObjectID("stif", "STIF:StopPoint:Q:473947:")}
+	expectedLoggerStopAreas := []model.Code{model.NewCode("stif", "STIF:StopPoint:Q:473947:")}
 	assert.Equal(expectedLoggerStopAreas, updatedReferential.LoggerVerboseStopAreas())
 }
 
@@ -319,10 +319,10 @@ func Test_ReferentialController_Reload(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "1984-04-04",
 		Name:            "stopArea",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:       `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
-		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 		CollectedAlways: true,
 		CollectChildren: true,
 	}

@@ -105,7 +105,7 @@ func (connector *SIRIGeneralMessageRequestCollector) newBQEvent() *audit.BigQuer
 }
 
 func (factory *SIRIGeneralMessageRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

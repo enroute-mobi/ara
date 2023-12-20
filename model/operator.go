@@ -11,7 +11,7 @@ import (
 type OperatorId string
 
 type Operator struct {
-	ObjectIDConsumer
+	CodeConsumer
 
 	model Model
 
@@ -24,7 +24,7 @@ func NewOperator(model Model) *Operator {
 		model: model,
 	}
 
-	operator.objectids = make(ObjectIDs)
+	operator.codes = make(Codes)
 	return operator
 }
 
@@ -49,7 +49,7 @@ func (operator *Operator) MarshalJSON() ([]byte, error) {
 	type Alias Operator
 
 	aux := struct {
-		ObjectIDs ObjectIDs `json:",omitempty"`
+		Codes Codes `json:",omitempty"`
 		*Alias
 		Id OperatorId
 	}{
@@ -57,8 +57,8 @@ func (operator *Operator) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(operator),
 	}
 
-	if !operator.ObjectIDs().Empty() {
-		aux.ObjectIDs = operator.ObjectIDs()
+	if !operator.Codes().Empty() {
+		aux.Codes = operator.Codes()
 	}
 
 	return json.Marshal(&aux)
@@ -67,7 +67,7 @@ func (operator *Operator) MarshalJSON() ([]byte, error) {
 func (operator *Operator) UnmarshalJSON(data []byte) error {
 	type Alias Operator
 	aux := &struct {
-		ObjectIDs map[string]string
+		Codes map[string]string
 		*Alias
 	}{
 		Alias: (*Alias)(operator),
@@ -77,8 +77,8 @@ func (operator *Operator) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		operator.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		operator.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	return nil
@@ -91,7 +91,7 @@ type MemoryOperators struct {
 	mutex *sync.RWMutex
 
 	byIdentifier map[OperatorId]*Operator
-	byObjectId   *ObjectIdIndex
+	byCode   *CodeIndex
 }
 
 type Operators interface {
@@ -99,7 +99,7 @@ type Operators interface {
 
 	New() *Operator
 	Find(OperatorId) (*Operator, bool)
-	FindByObjectId(ObjectID) (*Operator, bool)
+	FindByCode(Code) (*Operator, bool)
 	FindAll() []*Operator
 	Save(*Operator) bool
 	Delete(*Operator) bool
@@ -109,7 +109,7 @@ func NewMemoryOperators() *MemoryOperators {
 	return &MemoryOperators{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[OperatorId]*Operator),
-		byObjectId:   NewObjectIdIndex(),
+		byCode:   NewCodeIndex(),
 	}
 }
 
@@ -139,11 +139,11 @@ func (manager *MemoryOperators) FindAll() (operators []*Operator) {
 	return
 }
 
-func (manager *MemoryOperators) FindByObjectId(objectid ObjectID) (*Operator, bool) {
+func (manager *MemoryOperators) FindByCode(code Code) (*Operator, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[OperatorId(id)].copy(), true
 	}
@@ -159,7 +159,7 @@ func (manager *MemoryOperators) Save(operator *Operator) bool {
 	}
 	operator.model = manager.model
 	manager.byIdentifier[operator.Id()] = operator
-	manager.byObjectId.Index(operator)
+	manager.byCode.Index(operator)
 
 	manager.mutex.Unlock()
 	return true
@@ -169,7 +169,7 @@ func (manager *MemoryOperators) Delete(operator *Operator) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, operator.Id())
-	manager.byObjectId.Delete(ModelId(operator.id))
+	manager.byCode.Delete(ModelId(operator.id))
 
 	manager.mutex.Unlock()
 	return true
@@ -193,13 +193,13 @@ func (manager *MemoryOperators) Load(referentialSlug string) error {
 			operator.Name = so.Name.String
 		}
 
-		if so.ObjectIDs.Valid && len(so.ObjectIDs.String) > 0 {
-			objectIdMap := make(map[string]string)
-			if err = json.Unmarshal([]byte(so.ObjectIDs.String), &objectIdMap); err != nil {
+		if so.Codes.Valid && len(so.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(so.Codes.String), &codeMap); err != nil {
 				return err
 			}
 
-			operator.objectids = NewObjectIDsFromMap(objectIdMap)
+			operator.codes = NewCodesFromMap(codeMap)
 		}
 		manager.Save(operator)
 	}

@@ -95,7 +95,7 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 		resources := subscription.Resources(subscription.Clock().Now())
 		// sort the map to ensure consistency with the tests
 		sort.Slice(resources, func(i, j int) bool {
-			return resources[i].Reference.ObjectId.Value() < resources[j].Reference.ObjectId.Value()
+			return resources[i].Reference.Code.Value() < resources[j].Reference.Code.Value()
 		})
 
 		for k, resource := range resources {

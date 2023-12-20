@@ -18,7 +18,7 @@ type SIRIVehicleMonitoringSubscriptionBroadcaster struct {
 	connector
 
 	dataFrameGenerator           *idgen.IdentifierGenerator
-	vjRemoteObjectidKinds        []string
+	vjRemoteCodeSpaces        []string
 	vehicleMonitoringBroadcaster VehicleMonitoringBroadcaster
 	toBroadcast                  map[SubscriptionId][]model.VehicleId
 
@@ -35,15 +35,15 @@ func (factory *SIRIVehicleMonitoringSubscriptionBroadcasterFactory) CreateConnec
 }
 
 func (factory *SIRIVehicleMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIVehicleMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIVehicleMonitoringSubscriptionBroadcaster {
 	connector := &SIRIVehicleMonitoringSubscriptionBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
-	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
@@ -106,7 +106,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) HandleSubscriptio
 		connector.fillOptions(sub, request)
 
 		for _, r := range resources {
-			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			line, ok := connector.Partner().Model().Lines().FindByCode(*r.Reference.Code)
 			if !ok {
 				continue
 			}
@@ -138,19 +138,19 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkLines(vm *sx
 	// check for subscription to all lines
 	if len(vm.Lines()) == 0 {
 		var lv []string
-		//find all lines corresponding to the remoteObjectidKind
+		//find all lines corresponding to the remoteCodeSpace
 		for _, line := range connector.Partner().Model().Lines().FindAll() {
-			lineObjectID, ok := line.ObjectID(connector.remoteObjectidKind)
+			lineCode, ok := line.Code(connector.remoteCodeSpace)
 			if ok {
-				lv = append(lv, lineObjectID.Value())
+				lv = append(lv, lineCode.Value())
 				continue
 			}
 		}
 
 		for _, lineValue := range lv {
-			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
+			lineCode := model.NewCode(connector.remoteCodeSpace, lineValue)
 			ref := model.Reference{
-				ObjectId: &lineObjectID,
+				Code: &lineCode,
 				Type:     "Line",
 			}
 			r := NewResource(ref)
@@ -163,8 +163,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkLines(vm *sx
 
 	for _, lineId := range vm.Lines() {
 
-		lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
+		lineCode := model.NewCode(connector.remoteCodeSpace, lineId)
+		_, ok := connector.Partner().Model().Lines().FindByCode(lineCode)
 
 		if !ok {
 			lineIds = append(lineIds, lineId)
@@ -172,7 +172,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkLines(vm *sx
 		}
 
 		ref := model.Reference{
-			ObjectId: &lineObjectID,
+			Code: &lineCode,
 			Type:     "Line",
 		}
 
@@ -226,7 +226,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkEvent(vId mo
 		return
 	}
 
-	lineObj, ok := line.ObjectID(connector.remoteObjectidKind)
+	lineObj, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}

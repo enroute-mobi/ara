@@ -39,26 +39,26 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	settings := map[string]string{
 		"local_url":            "http://example.com/test/siri",
 		"remote_url":           ts.URL,
-		"remote_objectid_kind": "test_kind",
+		"remote_code_space": "test_kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	objectid := model.NewObjectID("test_kind", "value")
+	code := model.NewCode("test_kind", "value")
 	situation := referential.Model().Situations().New()
-	situation.SetObjectID(objectid)
+	situation.SetCode(code)
 	situation.Save()
 
 	line := partners.Model().Lines().New()
-	lineObjectID := model.NewObjectID("test_kind", "line value")
-	line.SetObjectID(lineObjectID)
+	lineCode := model.NewCode("test_kind", "line value")
+	line.SetCode(lineCode)
 	partners.Model().Lines().Save(line)
 
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.SetGeneralMessageSubscriber(NewFakeGeneralMessageSubscriber(connector))
 
-	connector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID)
+	connector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
 	connector.Start()
 
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
@@ -89,7 +89,7 @@ func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
 	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
-		"remote_objectid_kind":               "test_kind",
+		"remote_code_space":               "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)

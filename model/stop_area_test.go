@@ -56,7 +56,7 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 func Test_StopArea_UnmarshalJSON(t *testing.T) {
 	text := `{
     "Name":"Test",
-    "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
     "Lines": ["1234","5678"]
   }`
 
@@ -70,18 +70,18 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 		t.Errorf("Wrong StopArea Name after UnmarshalJSON():\n got: %s\n want: %s", stopArea.Name, expected)
 	}
 
-	expectedObjectIds := []ObjectID{
-		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewObjectID("hastus", "sqypis"),
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
 	}
 
-	for _, expectedObjectId := range expectedObjectIds {
-		objectId, found := stopArea.ObjectID(expectedObjectId.Kind())
+	for _, expectedCode := range expectedCodes {
+		code, found := stopArea.Code(expectedCode.CodeSpace())
 		if !found {
-			t.Errorf("Missing StopArea ObjectId '%s' after UnmarshalJSON()", expectedObjectId.Kind())
+			t.Errorf("Missing StopArea Code '%s' after UnmarshalJSON()", expectedCode.CodeSpace())
 		}
-		if !reflect.DeepEqual(expectedObjectId, objectId) {
-			t.Errorf("Wrong StopArea ObjectId after UnmarshalJSON():\n got: %s\n want: %s", objectId, expectedObjectId)
+		if !reflect.DeepEqual(expectedCode, code) {
+			t.Errorf("Wrong StopArea Code after UnmarshalJSON():\n got: %s\n want: %s", code, expectedCode)
 		}
 	}
 
@@ -93,8 +93,8 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 func Test_StopArea_Save(t *testing.T) {
 	model := NewMemoryModel()
 	stopArea := model.StopAreas().New()
-	objectid := NewObjectID("kind", "value")
-	stopArea.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	stopArea.SetCode(code)
 
 	if stopArea.model != model {
 		t.Errorf("New stopArea model should be memoryStopAreas model")
@@ -109,35 +109,35 @@ func Test_StopArea_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("New StopArea should be found in memoryStopAreas")
 	}
-	_, ok = model.StopAreas().FindByObjectId(objectid)
+	_, ok = model.StopAreas().FindByCode(code)
 	if !ok {
-		t.Errorf("New StopArea should be found by objectid in memoryStopAreas")
+		t.Errorf("New StopArea should be found by code in memoryStopAreas")
 	}
 }
 
-func Test_StopArea_ObjectId(t *testing.T) {
+func Test_StopArea_Code(t *testing.T) {
 	stopArea := StopArea{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	stopArea.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	stopArea.SetObjectID(objectid)
+	stopArea.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	stopArea.SetCode(code)
 
-	foundObjectId, ok := stopArea.ObjectID("kind")
+	foundCode, ok := stopArea.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = stopArea.ObjectID("wrongkind")
+	_, ok = stopArea.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(stopArea.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", stopArea.ObjectIDs())
+	if len(stopArea.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", stopArea.Codes())
 	}
 }
 
@@ -207,8 +207,8 @@ func Test_MemoryStopAreas_FindAll(t *testing.T) {
 func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	existingStopArea := stopAreas.New()
-	objectid := NewObjectID("kind", "value")
-	existingStopArea.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingStopArea.SetCode(code)
 	stopAreas.Save(existingStopArea)
 
 	stopAreas.Delete(existingStopArea)
@@ -217,9 +217,9 @@ func Test_MemoryStopAreas_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted StopArea should not be findable")
 	}
-	_, ok = stopAreas.FindByObjectId(objectid)
+	_, ok = stopAreas.FindByCode(code)
 	if ok {
-		t.Errorf("Deleted StopArea should not be findable by objectid")
+		t.Errorf("Deleted StopArea should not be findable by code")
 	}
 }
 
@@ -306,10 +306,10 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		},
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
-		References:      `{"Ref":{"Type":"Ref","ObjectId":{"kind":"value"}}}`,
+		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 		CollectedAlways: true,
 		CollectChildren: true,
 	}
@@ -351,8 +351,8 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if stopArea.Name != "stopArea" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: stopArea", stopArea.Name)
 	}
-	if objectid, ok := stopArea.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	if code, ok := stopArea.Code("internal"); !ok || code.Value() != "value" {
+		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 	if !stopArea.CollectedAlways {
 		t.Errorf("Wrong CollectedAlways:\n got: %v\n expected: true", stopArea.CollectedAlways)
@@ -370,7 +370,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	if stopArea.LineIds[0] != "d0eebc99-9c0b" || stopArea.LineIds[1] != "e0eebc99-9c0b" {
 		t.Errorf("Wrong LineIds:\n got: %v\n expected: [d0eebc99-9c0b,e0eebc99-9c0b]", stopArea.LineIds)
 	}
-	if ref, ok := stopArea.Reference("Ref"); !ok || ref.Type != "Ref" || ref.ObjectId.Kind() != "kind" || ref.ObjectId.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and ObjectId: \"kind:value\"", ref)
+	if ref, ok := stopArea.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
 	}
 }

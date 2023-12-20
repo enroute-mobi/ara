@@ -33,14 +33,14 @@ func (factory *SIRIEstimatedTimetableSubscriptionCollectorFactory) CreateConnect
 }
 
 func (factory *SIRIEstimatedTimetableSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewSIRIEstimatedTimetableSubscriptionCollector(partner *Partner) *SIRIEstimatedTimetableSubscriptionCollector {
 	connector := &SIRIEstimatedTimetableSubscriptionCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -65,18 +65,18 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) RequestLineUpdate(
 		return
 	}
 
-	lineObjectid, ok := line.ObjectID(connector.remoteObjectidKind)
+	lineCode, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
-		logger.Log.Debugf("Requested line %v doesn't have and objectId of kind %v", request.LineId(), connector.remoteObjectidKind)
+		logger.Log.Debugf("Requested line %v doesn't have a code with codeSpace %v", request.LineId(), connector.remoteCodeSpace)
 		return
 	}
 
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByResourceId(lineObjectid.String(), EstimatedTimetableCollect)
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(lineCode.String(), EstimatedTimetableCollect)
 
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
-			resource := subscription.Resource(lineObjectid)
+			resource := subscription.Resource(lineCode)
 			if resource == nil { // Should never happen
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
@@ -91,7 +91,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) RequestLineUpdate(
 	// Else we find or create a subscription to add the resource
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(EstimatedTimetableCollect)
 	ref := model.Reference{
-		ObjectId: &lineObjectid,
+		Code: &lineCode,
 		Type:     "Line",
 	}
 

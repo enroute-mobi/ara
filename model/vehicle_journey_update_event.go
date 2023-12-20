@@ -8,15 +8,15 @@ type VehicleJourneyUpdateEvent struct {
 	references      *References
 	SiriXML         *sxml.XMLMonitoredVehicleJourney
 	attributes      Attributes
-	ObjectId        ObjectID
-	LineObjectId    ObjectID
+	Code        Code
+	LineCode    Code
 	Direction       string
 	DestinationName string
 	DestinationRef  string
 	DirectionType   string
 	Occupancy       string
 	OriginName      string
-	ObjectidKind    string
+	CodeSpace    string
 	OriginRef       string
 	Origin          string
 	Monitored       bool
@@ -82,8 +82,8 @@ func (ue *VehicleJourneyUpdateEvent) References() References {
 		return *ue.references
 	}
 
-	ue.references.SetObjectId("PlaceRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.PlaceRef()))
-	ue.references.SetObjectId("JourneyPatternRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.JourneyPatternRef()))
-	ue.references.SetObjectId("RouteRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.RouteRef()))
+	ue.references.SetCode("PlaceRef", NewCode(ue.CodeSpace, ue.SiriXML.PlaceRef()))
+	ue.references.SetCode("JourneyPatternRef", NewCode(ue.CodeSpace, ue.SiriXML.JourneyPatternRef()))
+	ue.references.SetCode("RouteRef", NewCode(ue.CodeSpace, ue.SiriXML.RouteRef()))
 	return *ue.references
 }

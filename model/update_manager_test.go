@@ -14,30 +14,30 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = vj.Id()
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.PassageOrder = 5
 	stopVisit.Save()
 
 	vehicle := model.Vehicles().New()
-	vehicle.SetObjectID(objectid)
+	vehicle.SetCode(code)
 	vehicle.LineId = l.Id()
 	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
@@ -46,9 +46,9 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 	manager := newUpdateManager(model)
 
 	event := &VehicleUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 		NextStopPointOrder:     5,
 	}
 
@@ -63,30 +63,30 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = vj.Id()
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.PassageOrder = 6
 	stopVisit.Save()
 
 	vehicle := model.Vehicles().New()
-	vehicle.SetObjectID(objectid)
+	vehicle.SetCode(code)
 	vehicle.LineId = l.Id()
 	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
@@ -95,9 +95,9 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 	manager := newUpdateManager(model)
 
 	event := &VehicleUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 		NextStopPointOrder:     5,
 	}
 
@@ -112,30 +112,30 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = vj.Id()
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.PassageOrder = 6
 	stopVisit.Save()
 
 	vehicle := model.Vehicles().New()
-	vehicle.SetObjectID(objectid)
+	vehicle.SetCode(code)
 	vehicle.LineId = l.Id()
 	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
@@ -144,9 +144,9 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 	manager := newUpdateManager(model)
 
 	event := &VehicleUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 	}
 
 	manager.Update(event)
@@ -160,37 +160,37 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 	assert := assert.New(t)
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = vj.Id()
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.PassageOrder = 6
 	stopVisit.Save()
 
 	stopVisit1 := model.StopVisits().New()
-	stopVisit1.SetObjectID(objectid)
+	stopVisit1.SetCode(code)
 	stopVisit1.VehicleJourneyId = vj.Id()
 	stopVisit1.StopAreaId = sa.Id()
 	stopVisit1.PassageOrder = 7
 	stopVisit1.Save()
 
 	vehicle := model.Vehicles().New()
-	vehicle.SetObjectID(objectid)
+	vehicle.SetCode(code)
 	vehicle.LineId = l.Id()
 	vehicle.StopAreaId = sa.Id()
 	vehicle.VehicleJourneyId = vj.Id()
@@ -199,9 +199,9 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 	manager := newUpdateManager(model)
 
 	event := &VehicleUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 	}
 
 	manager.Update(event)
@@ -213,33 +213,33 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	manager := newUpdateManager(model)
 
 	event := &StopVisitUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
 		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
-	updatedStopVisit, ok := model.StopVisits().FindByObjectId(objectid)
+	updatedStopVisit, ok := model.StopVisits().FindByCode(code)
 	if !ok {
 		t.Fatalf("StopVisit should be created")
 	}
@@ -260,30 +260,30 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 
 func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.Save()
 
 	manager := newUpdateManager(model)
 
 	event := &StopVisitUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       objectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       code,
+		VehicleJourneyCode: code,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
 		Schedules:              NewStopVisitSchedules(),
@@ -307,70 +307,70 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 }
 
 func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
-	emptyObjectid := NewObjectID("kind", "")
+	emptyCode := NewCode("codeSpace", "")
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	manager := newUpdateManager(model)
 
 	event := &StopVisitUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       emptyObjectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       emptyCode,
+		VehicleJourneyCode: code,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
 		Schedules:              NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
-	_, ok := model.StopVisits().FindByObjectId(objectid)
+	_, ok := model.StopVisits().FindByCode(code)
 	if ok {
 		t.Fatalf("StopVisit should not be created")
 	}
 }
 
 func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
-	emptyObjectid := NewObjectID("kind", "")
+	emptyCode := NewCode("codeSpace", "")
 
 	model := NewMemoryModel()
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	vj := model.VehicleJourneys().New()
-	vj.SetObjectID(objectid)
+	vj.SetCode(code)
 	vj.LineId = l.Id()
 	vj.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.Save()
 
 	manager := newUpdateManager(model)
 
 	event := &StopVisitUpdateEvent{
-		ObjectId:               objectid,
-		StopAreaObjectId:       emptyObjectid,
-		VehicleJourneyObjectId: objectid,
+		Code:               code,
+		StopAreaCode:       emptyCode,
+		VehicleJourneyCode: code,
 		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
 		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
 		Schedules:              NewStopVisitSchedules(),
@@ -435,25 +435,25 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 
 	model := NewMemoryModel()
 	manager := newUpdateManager(model)
-	objectid := NewObjectID("kind", "value")
+	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
-	sa.SetObjectID(objectid)
+	sa.SetCode(code)
 	sa.Save()
 
 	l := model.Lines().New()
-	l.SetObjectID(objectid)
+	l.SetCode(code)
 	l.Save()
 
 	stopVisit := model.StopVisits().New()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.StopAreaId = sa.Id()
 	stopVisit.collected = true
 	stopVisit.Save()
 
 	time := time.Now()
 
-	manager.Update(NewNotCollectedUpdateEvent(objectid, time))
+	manager.Update(NewNotCollectedUpdateEvent(code, time))
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
 
 	assert.Equal(updatedStopVisit.ArrivalStatus, STOP_VISIT_ARRIVAL_ARRIVED)
@@ -475,7 +475,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "vehicleJourney",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:       `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Attributes:      "{}",
 		References:      `{}`,
@@ -520,10 +520,10 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 
 	manager := newUpdateManager(model)
 
-	objectid := NewObjectID("internal", "value")
+	code := NewCode("internal", "value")
 	event := &VehicleJourneyUpdateEvent{
-		ObjectidKind: "internal",
-		ObjectId:     objectid,
+		CodeSpace: "internal",
+		Code:     code,
 		SiriXML:      &response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0].XMLMonitoredVehicleJourney,
 	}
 

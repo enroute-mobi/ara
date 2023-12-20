@@ -25,7 +25,7 @@ type SIRILiteStopMonitoringRequestCollectorFactory struct{}
 
 func NewSIRILiteStopMonitoringRequestCollector(partner *Partner) *SIRILiteStopMonitoringRequestCollector {
 	connector := &SIRILiteStopMonitoringRequestCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
@@ -40,10 +40,10 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 		return
 	}
 
-	objectidKind := connector.remoteObjectidKind
-	objectid, ok := stopArea.ObjectID(objectidKind)
+	codeSpace := connector.remoteCodeSpace
+	code, ok := stopArea.Code(codeSpace)
 	if !ok {
-		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
+		logger.Log.Debugf("Requested stopArea %v doesn't have a code with codeSpace %v", request.StopAreaId(), codeSpace)
 		return
 	}
 
@@ -52,7 +52,7 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 
 	startTime := connector.Clock().Now()
 
-	dest, err := connector.Partner().SIRILiteClient().StopMonitoring(objectid.Value())
+	dest, err := connector.Partner().SIRILiteClient().StopMonitoring(code.Value())
 	if err != nil {
 		e := fmt.Sprintf("Error during LiteStopMonitoring request: %v", err)
 
@@ -61,10 +61,10 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 		return
 	}
 	message.ProcessingTime = connector.Clock().Since(startTime).Seconds()
-	message.RequestRawMessage = fmt.Sprintf("MonitoringRef=%s", objectid.Value())
+	message.RequestRawMessage = fmt.Sprintf("MonitoringRef=%s", code.Value())
 	logSIRILiteStopMonitoringResponse(message, dest)
 
-	builder := NewLiteStopMonitoringUpdateEventBuilder(connector.partner, objectid)
+	builder := NewLiteStopMonitoringUpdateEventBuilder(connector.partner, code)
 	for _, delivery := range dest.Siri.ServiceDelivery.StopMonitoringDelivery {
 		if delivery.Status == "false" {
 			continue
@@ -82,19 +82,19 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 	connector.broadcastUpdateEvents(&updateEvents)
 
 	// Set all StopVisits not in the response not collected
-	monitoredStopVisits := []model.ObjectID{}
+	monitoredStopVisits := []model.Code{}
 
 	for stopPointRef, events := range updateEvents.StopVisits {
-		sa, ok := connector.partner.Model().StopAreas().FindByObjectId(model.NewObjectID(objectidKind, stopPointRef))
+		sa, ok := connector.partner.Model().StopAreas().FindByCode(model.NewCode(codeSpace, stopPointRef))
 		if !ok {
 			continue
 		}
 
 		svs := connector.partner.Model().StopVisits().FindMonitoredByOriginByStopAreaId(sa.Id(), string(connector.Partner().Slug()))
 		for i := range svs {
-			objectid, ok := svs[i].ObjectID(objectidKind)
+			code, ok := svs[i].Code(codeSpace)
 			if ok {
-				monitoredStopVisits = append(monitoredStopVisits, objectid)
+				monitoredStopVisits = append(monitoredStopVisits, code)
 			}
 		}
 		connector.broadcastNotCollectedEvents(events, monitoredStopVisits, dest.Siri.ServiceDelivery.ResponseTimestamp)
@@ -128,11 +128,11 @@ func (connector *SIRILiteStopMonitoringRequestCollector) broadcastUpdateEvent(ev
 	}
 }
 
-func (connector *SIRILiteStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID, t time.Time) {
-	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
-		if _, ok := events[stopVisitObjectID.Value()]; !ok {
-			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
-			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitObjectID, t))
+func (connector *SIRILiteStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitCodes []model.Code, t time.Time) {
+	for _, stopVisitCode := range collectedStopVisitCodes {
+		if _, ok := events[stopVisitCode.Value()]; !ok {
+			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitCode)
+			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitCode, t))
 		}
 	}
 }
@@ -152,7 +152,7 @@ func (connector *SIRILiteStopMonitoringRequestCollector) newBQEvent() *audit.Big
 }
 
 func (factory *SIRILiteStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

@@ -13,14 +13,14 @@ func Test_ReferentialSettings_LoggerVerboseStopAreas(t *testing.T) {
 	referentialSettings := NewReferentialSettings()
 	referentialSettings.SetSetting("logger.verbose.stop_areas", "stif:STIF:StopPoint:Q:2342:")
 
-	objectIds := referentialSettings.LoggerVerboseStopAreas()
+	codes := referentialSettings.LoggerVerboseStopAreas()
 
-	assert.NotEmpty(objectIds)
-	assert.Equal(1, len(objectIds), "Should return a single ObjectID for the moment")
+	assert.NotEmpty(codes)
+	assert.Equal(1, len(codes), "Should return a single Code for the moment")
 
-	objectId := objectIds[0]
-	assert.Equal("stif", objectId.Kind(), "ObjectId kind should be 'stif'")
-	assert.Equal("STIF:StopPoint:Q:2342:", objectId.Value(), "ObjectId kind should be 'STIF:StopPoint:Q:2342:'")
+	code := codes[0]
+	assert.Equal("stif", code.CodeSpace(), "Code kind should be 'stif'")
+	assert.Equal("STIF:StopPoint:Q:2342:", code.Value(), "Code kind should be 'STIF:StopPoint:Q:2342:'")
 }
 
 func Test_ReferentialSettings_LoggerVerboseStopAreas_WithWrongValue(t *testing.T) {
@@ -29,8 +29,8 @@ func Test_ReferentialSettings_LoggerVerboseStopAreas_WithWrongValue(t *testing.T
 	referentialSettings := NewReferentialSettings()
 	referentialSettings.s["logger.verbose.stop_areas"] = "wrong"
 
-	objectIds := referentialSettings.LoggerVerboseStopAreas()
-	assert.Empty(objectIds)
+	codes := referentialSettings.LoggerVerboseStopAreas()
+	assert.Empty(codes)
 }
 
 func Test_ReferentialSettings_LoggerDebugStopAreas_WithoutValue(t *testing.T) {
@@ -38,8 +38,8 @@ func Test_ReferentialSettings_LoggerDebugStopAreas_WithoutValue(t *testing.T) {
 
 	referentialSettings := NewReferentialSettings()
 
-	objectIds := referentialSettings.LoggerVerboseStopAreas()
-	assert.Empty(objectIds)
+	codes := referentialSettings.LoggerVerboseStopAreas()
+	assert.Empty(codes)
 }
 
 func Test_ModelRefreshTime_Without_setting(t *testing.T) {

@@ -19,7 +19,7 @@ type VehicleJourney struct {
 	References References
 	model      Model
 	Attributes Attributes
-	ObjectIDConsumer
+	CodeConsumer
 	LineId                  LineId `json:",omitempty"`
 	Name                    string `json:",omitempty"`
 	id                      VehicleJourneyId
@@ -38,7 +38,7 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 		Attributes: NewAttributes(),
 		References: NewReferences(),
 	}
-	vehicleJourney.objectids = make(ObjectIDs)
+	vehicleJourney.codes = make(Codes)
 	return vehicleJourney
 }
 
@@ -71,7 +71,7 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
 	aux := struct {
-		ObjectIDs  ObjectIDs            `json:",omitempty"`
+		Codes  Codes            `json:",omitempty"`
 		Attributes Attributes           `json:",omitempty"`
 		References map[string]Reference `json:",omitempty"`
 		*Alias
@@ -82,8 +82,8 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(vehicleJourney),
 	}
 
-	if !vehicleJourney.ObjectIDs().Empty() {
-		aux.ObjectIDs = vehicleJourney.ObjectIDs()
+	if !vehicleJourney.Codes().Empty() {
+		aux.Codes = vehicleJourney.Codes()
 	}
 	if !vehicleJourney.Attributes.IsEmpty() {
 		aux.Attributes = vehicleJourney.Attributes
@@ -121,7 +121,7 @@ func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	type Alias VehicleJourney
 	aux := &struct {
-		ObjectIDs  map[string]string
+		Codes  map[string]string
 		References map[string]Reference
 		*Alias
 	}{
@@ -132,8 +132,8 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		vehicleJourney.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		vehicleJourney.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -154,7 +154,7 @@ type MemoryVehicleJourneys struct {
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleJourneyId]*VehicleJourney
-	byObjectId        *ObjectIdIndex
+	byCode        *CodeIndex
 	byLine            *Index
 	byBroadcastedFull map[string]map[VehicleJourneyId]struct{}
 }
@@ -164,7 +164,7 @@ type VehicleJourneys interface {
 
 	New() *VehicleJourney
 	Find(VehicleJourneyId) (*VehicleJourney, bool)
-	FindByObjectId(objectid ObjectID) (*VehicleJourney, bool)
+	FindByCode(code Code) (*VehicleJourney, bool)
 	FindByLineId(LineId) []*VehicleJourney
 	FullVehicleJourneyExistBySubscriptionId(string, VehicleJourneyId) bool
 	FindAll() []*VehicleJourney
@@ -180,7 +180,7 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	return &MemoryVehicleJourneys{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
-		byObjectId:        NewObjectIdIndex(),
+		byCode:        NewCodeIndex(),
 		byLine:            NewIndex(extractor),
 		byBroadcastedFull: make(map[string]map[VehicleJourneyId]struct{}),
 	}
@@ -226,11 +226,11 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney
 	return &VehicleJourney{}, false
 }
 
-func (manager *MemoryVehicleJourneys) FindByObjectId(objectid ObjectID) (*VehicleJourney, bool) {
+func (manager *MemoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[VehicleJourneyId(id)].copy(), true
 	}
@@ -273,7 +273,7 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 
 	vehicleJourney.model = manager.model
 	manager.byIdentifier[vehicleJourney.Id()] = vehicleJourney
-	manager.byObjectId.Index(vehicleJourney)
+	manager.byCode.Index(vehicleJourney)
 	manager.byLine.Index(vehicleJourney)
 
 	return true
@@ -288,7 +288,7 @@ func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, id)
-	manager.byObjectId.Delete(ModelId(id))
+	manager.byCode.Delete(ModelId(id))
 	manager.byLine.Delete(ModelId(id))
 	for subscriptionId, vehicleJourneyIds := range manager.byBroadcastedFull {
 		delete(vehicleJourneyIds, id)
@@ -340,12 +340,12 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 			vehicleJourney.References.SetReferences(references)
 		}
 
-		if vj.ObjectIDs.Valid && len(vj.ObjectIDs.String) > 0 {
-			objectIdMap := make(map[string]string)
-			if err = json.Unmarshal([]byte(vj.ObjectIDs.String), &objectIdMap); err != nil {
+		if vj.Codes.Valid && len(vj.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(vj.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			vehicleJourney.objectids = NewObjectIDsFromMap(objectIdMap)
+			vehicleJourney.codes = NewCodesFromMap(codeMap)
 		}
 
 		manager.Save(vehicleJourney)

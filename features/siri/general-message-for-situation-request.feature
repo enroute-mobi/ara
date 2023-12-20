@@ -6,7 +6,7 @@ Feature: Support SIRI GeneralMessage for Situation
   @ARA-1362
   Scenario: 3797 - Do not ignore Situations associated to other keywords than Commercial/Perturbation/Information
     Given a Situation exists with the following attributes:
-      | ObjectIDs                  | "internal" : "1"                                  |
+      | Codes                  | "internal" : "1"                                  |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                         |
       | Version                    | 1                                                 |
       | Keywords                   | ["Others"]                                        |
@@ -15,11 +15,11 @@ Feature: Support SIRI GeneralMessage for Situation
       | Description[DefaultValue]  | We can broadcast Other situations with ReportType |
       | Affects[Line]              | 6ba7b814-9dad-11d1-2-00c04fd430c8                 |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | TestPartner |
-      | remote_objectid_kind | internal    |
+      | remote_code_space | internal    |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -86,7 +86,7 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | ObjectIDs                                                                           | "external" : "test"                                                        |
+      | Codes                                                                           | "external" : "test"                                                        |
       | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                                                  |
       | Version                                                                             | 1                                                                          |
       | Keywords                                                                            | ["Commercial"]                                                             |
@@ -100,17 +100,17 @@ Feature: Support SIRI GeneralMessage for Situation
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                                               |
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
+      | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test last stop                           |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
-      | remote_objectid_kind | external       |
+      | remote_code_space | external       |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -248,31 +248,31 @@ Feature: Support SIRI GeneralMessage for Situation
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | ObjectIDs         | "internal":"1234" |
+      | Codes         | "internal":"1234" |
       | CollectSituations | true              |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test1                         |
-      | ObjectIDs | "internal": "destinationRef1" |
+      | Codes | "internal": "destinationRef1" |
     And a StopArea exists with the following attributes:
       | Name      | Test2                         |
-      | ObjectIDs | "internal": "destinationRef2" |
+      | Codes | "internal": "destinationRef2" |
     And a StopArea exists with the following attributes:
       | Name      | firstStop                                |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | lastStop                                 |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:26:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:26:LOC" |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs                                                                          | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
+      | Codes                                                                          | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                                                  |
       | Version                                                                            | 1                                                                          |
       | Keywords                                                                           | ["Commercial"]                                                             |
@@ -345,7 +345,7 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
     And a Situation exists with the following attributes:
-      | ObjectIDs                  | "external" : "NINOXE:GeneralMessage:27_1"                                  |
+      | Codes                  | "external" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
       | Channel                    | Commercial                                                                 |
@@ -355,16 +355,16 @@ Feature: Support SIRI GeneralMessage for Situation
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ineo                  |
-      | remote_objectid_kind | external              |
+      | remote_code_space | external              |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | ObjectIDs         | "external":"1234" |
+      | Codes         | "external":"1234" |
       | CollectSituations | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | ObjectIDs                    | "external" : "NINOXE:GeneralMessage:27_1"                                         |
+      | Codes                    | "external" : "NINOXE:GeneralMessage:27_1"                                         |
       | RecordedAt                   | 2017-01-01T03:35:00+02:00                                                         |
       | Version                      | 2                                                                                 |
       | Keywords                     | ["Commercial"]                                                                    |
@@ -376,7 +376,7 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3882 - GeneralMessageResponse empty with an expired Situation
     Given a Situation exists with the following attributes:
-      | ObjectIDs                  | "external" : "test"                                                        |
+      | Codes                  | "external" : "test"                                                        |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
       | Channel                    | Perturbation                                                               |
@@ -386,10 +386,10 @@ Feature: Support SIRI GeneralMessage for Situation
       | Description[DefaultValue]  | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
       | local_credential     | NINOXE:default |
-      | remote_objectid_kind | external       |
+      | remote_code_space | external       |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | ObjectIDs         | "external":"1234" |
+      | Codes         | "external":"1234" |
       | CollectSituations | true              |
     And a minute has passed
     And a minute has passed
@@ -451,7 +451,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And 30 seconds have passed
     And the SIRI server has received a GetGeneralMessage request
@@ -488,13 +488,13 @@ Feature: Support SIRI GeneralMessage for Situation
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_objectid_kind            | internal              |
+        | remote_code_space            | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | 1234                  |
       And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name              | Test              |
-        | ObjectIDs         | "internal":"1234" |
+        | Codes         | "internal":"1234" |
         | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
@@ -532,12 +532,12 @@ Feature: Support SIRI GeneralMessage for Situation
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_objectid_kind            | internal              |
+        | remote_code_space            | internal              |
         | collect.filter_general_messages | true                  |
       And 30 seconds have passed
       And a StopArea exists with the following attributes:
         | Name              | Test              |
-        | ObjectIDs         | "internal":"1234" |
+        | Codes         | "internal":"1234" |
         | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request

@@ -92,8 +92,8 @@ func (partner *APIPartner) ValidatePresenceOfLocalCredentials() bool {
 	return true
 }
 
-func (partner *APIPartner) ValidatePresenceOfRemoteObjectIdKind() bool {
-	return partner.ValidatePresenceOfSetting(s.REMOTE_OBJECTID_KIND)
+func (partner *APIPartner) ValidatePresenceOfRemoteCodeSpace() bool {
+	return partner.ValidatePresenceOfSetting(s.REMOTE_CODE_SPACE)
 }
 
 func (partner *APIPartner) ValidatePresenceOfRemoteCredentials() bool {

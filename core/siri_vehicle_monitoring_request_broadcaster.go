@@ -22,8 +22,8 @@ type SIRIVehicleMonitoringRequestBroadcaster struct {
 
 	connector
 
-	vjRemoteObjectidKinds      []string
-	vehicleRemoteObjectidKinds []string
+	vjRemoteCodeSpaces      []string
+	vehicleRemoteCodeSpaces []string
 }
 
 type SIRIVehicleMonitoringRequestBroadcasterFactory struct{}
@@ -36,9 +36,9 @@ func NewSIRIVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRIVehicleMo
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) Start() {
-	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
-	connector.vehicleRemoteObjectidKinds = connector.partner.VehicleRemoteObjectIDKindWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(request *sxml.XMLGetVehicleMonitoring, message *audit.BigQueryMessage) (siriResponse *siri.SIRIVehicleMonitoringResponse) {
@@ -98,12 +98,12 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehicle(vehicleRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {
-	objectid := model.NewObjectID(connector.remoteObjectidKind, vehicleRef)
-	vehicle, ok := connector.partner.Model().Vehicles().FindByObjectId(objectid)
+	code := model.NewCode(connector.remoteCodeSpace, vehicleRef)
+	vehicle, ok := connector.partner.Model().Vehicles().FindByCode(code)
 	if !ok {
 		delivery.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
-			ErrorText: fmt.Sprintf("Vehicle %v not found", objectid.Value()),
+			ErrorText: fmt.Sprintf("Vehicle %v not found", code.Value()),
 		}
 		message.Status = "Error"
 		message.ErrorDetails = delivery.ErrorCondition.ErrorText
@@ -118,20 +118,20 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehicle(vehicleRef 
 	if !ok {
 		return
 	}
-	lineObjectId, ok := line.ObjectID(objectid.Kind())
+	lineCode, ok := line.Code(code.CodeSpace())
 	if !ok {
 		return
 	}
-	connector.buildVehicleActivity(delivery, line, lineObjectId.Value(), vehicle)
+	connector.buildVehicleActivity(delivery, line, lineCode.Value(), vehicle)
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef(lineRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {
-	objectid := model.NewObjectID(connector.remoteObjectidKind, lineRef)
-	line, ok := connector.partner.Model().Lines().FindByObjectId(objectid)
+	code := model.NewCode(connector.remoteCodeSpace, lineRef)
+	line, ok := connector.partner.Model().Lines().FindByCode(code)
 	if !ok {
 		delivery.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
-			ErrorText: fmt.Sprintf("Line %v not found", objectid.Value()),
+			ErrorText: fmt.Sprintf("Line %v not found", code.Value()),
 		}
 		message.Status = "Error"
 		message.ErrorDetails = delivery.ErrorCondition.ErrorText
@@ -149,7 +149,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(delivery *siri.SIRIVehicleMonitoringDelivery, line *model.Line, lineRef string, vehicle *model.Vehicle) {
-	vehicleId, ok := vehicle.ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
+	vehicleId, ok := vehicle.CodeWithFallback(connector.vehicleRemoteCodeSpaces)
 	if !ok {
 		return
 	}
@@ -207,18 +207,18 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
-	vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
+	vehicleJourneyId, ok := vehicleJourney.CodeWithFallback(connector.vjRemoteCodeSpaces)
 
 	var dataVehicleJourneyRef string
 	if ok {
 		dataVehicleJourneyRef = vehicleJourneyId.Value()
 	} else {
-		defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+		defaultCode, ok := vehicleJourney.Code("_default")
 		if !ok {
 			return "", false
 		}
 		dataVehicleJourneyRef =
-			connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+			connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -252,8 +252,8 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleProgressBetweenS
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternRef(refs model.References) string {
 	journeyPatternRef, ok := refs.Get("JourneyPatternRef")
 	if ok {
-		if connector.remoteObjectidKind == journeyPatternRef.ObjectId.Kind() {
-			return journeyPatternRef.ObjectId.Value()
+		if connector.remoteCodeSpace == journeyPatternRef.Code.CodeSpace() {
+			return journeyPatternRef.Code.Value()
 		}
 	}
 
@@ -263,8 +263,8 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternRe
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternName(refs model.References) string {
 	journeyPatternName, ok := refs.Get("JourneyPatternName")
 	if ok {
-		if connector.remoteObjectidKind == journeyPatternName.ObjectId.Kind() {
-			return journeyPatternName.ObjectId.Value()
+		if connector.remoteCodeSpace == journeyPatternName.Code.CodeSpace() {
+			return journeyPatternName.Code.Value()
 		}
 	}
 
@@ -273,7 +273,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternNa
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleRef(refType, origin string, references model.References) string {
 	reference, ok := references.Get(refType)
-	if !ok || reference.ObjectId == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
+	if !ok || reference.Code == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
 		return ""
 	}
 	return connector.resolveStopAreaRef(reference)
@@ -290,9 +290,9 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) noDestinationRefRewrit
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) resolveStopAreaRef(reference model.Reference) string {
-	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	stopArea, ok := connector.partner.Model().StopAreas().FindByCode(*reference.Code)
 	if ok {
-		obj, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		obj, ok := stopArea.ReferentOrSelfCode(connector.remoteCodeSpace)
 		if ok {
 			return obj.Value()
 		}
@@ -301,7 +301,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) resolveStopAreaRef(ref
 }
 
 func (factory *SIRIVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

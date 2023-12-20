@@ -9,16 +9,16 @@ Feature: Subscription Management
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
-      | Kind                  | StopMonitoringBroadcast                            |
+      | CodeSpace                  | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | SubscribeResourcesNow | true                                               |
     And show me ara subscriptions for partner "test"
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
-      | Kind                  | StopMonitoringBroadcast                            |
+      | CodeSpace                  | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
@@ -43,9 +43,9 @@ Feature: Subscription Management
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
-      | Kind                  | StopMonitoringBroadcast                            |
+      | CodeSpace                  | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | ReferenceArray[1]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |

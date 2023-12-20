@@ -11,9 +11,9 @@ type SituationExchangeUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner            *Partner
-	remoteObjectidKind string
-	affectedLines      map[model.LineId]*model.AffectedLine
+	partner         *Partner
+	remoteCodeSpace string
+	affectedLines   map[model.LineId]*model.AffectedLine
 
 	MonitoringRefs map[string]struct{}
 	LineRefs       map[string]struct{}
@@ -21,9 +21,9 @@ type SituationExchangeUpdateEventBuilder struct {
 
 func NewSituationExchangeUpdateEventBuilder(partner *Partner) SituationExchangeUpdateEventBuilder {
 	return SituationExchangeUpdateEventBuilder{
-		partner:            partner,
-		remoteObjectidKind: partner.RemoteObjectIDKind(),
-		affectedLines:      make(map[model.LineId]*model.AffectedLine),
+		partner:         partner,
+		remoteCodeSpace: partner.RemoteCodeSpace(),
+		affectedLines:   make(map[model.LineId]*model.AffectedLine),
 
 		MonitoringRefs: make(map[string]struct{}),
 		LineRefs:       make(map[string]struct{}),
@@ -50,12 +50,12 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 
 	situationEvent := &model.SituationUpdateEvent{
-		Origin:            string(builder.partner.Slug()),
-		CreatedAt:         builder.Clock().Now(),
-		RecordedAt:        xmlSituation.RecordedAtTime(),
-		SituationObjectID: model.NewObjectID(builder.remoteObjectidKind, xmlSituation.SituationNumber()),
-		Version:           xmlSituation.Version(),
-		ProducerRef:       producerRef,
+		Origin:        string(builder.partner.Slug()),
+		CreatedAt:     builder.Clock().Now(),
+		RecordedAt:    xmlSituation.RecordedAtTime(),
+		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlSituation.SituationNumber()),
+		Version:       xmlSituation.Version(),
+		ProducerRef:   producerRef,
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 
@@ -85,8 +85,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedStopArea(event *model.SituationUpdateEvent, stopPointRef string) {
-	stopPointRefObjectId := model.NewObjectID(builder.remoteObjectidKind, stopPointRef)
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(stopPointRefObjectId)
+	stopPointRefCode := model.NewCode(builder.remoteCodeSpace, stopPointRef)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(stopPointRefCode)
 	if !ok {
 		return
 	}
@@ -96,24 +96,24 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedStopArea(event *m
 	event.Affects = append(event.Affects, affect)
 
 	// Logging
-	builder.MonitoringRefs[stopPointRefObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[stopPointRefCode.Value()] = struct{}{}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedLine(lineRef string) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
 	builder.affectedLines[affect.LineId] = affect
-	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
+	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedRoute(lineRef string, route string) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
@@ -123,14 +123,14 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedRoute(lineRef str
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedDestination(lineRef string, destination string) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
 
-	destinationObjectId := model.NewObjectID(builder.remoteObjectidKind, destination)
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(destinationObjectId)
+	destinationCode := model.NewCode(builder.remoteCodeSpace, destination)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(destinationCode)
 	if !ok {
 		return
 	}
@@ -140,25 +140,25 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedDestination(lineR
 		append(builder.affectedLines[model.LineId(line.Id())].AffectedDestinations, &affectedDestination)
 
 	// Logging
-	builder.MonitoringRefs[destinationObjectId.Value()] = struct{}{}
+	builder.MonitoringRefs[destinationCode.Value()] = struct{}{}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef string, section *sxml.XMLAffectedSection) {
-	LineRefObjectId := model.NewObjectID(builder.remoteObjectidKind, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByObjectId(LineRefObjectId)
+	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
 		return
 	}
 
 	firstStopRef := section.FirstStop()
-	firstStopObjectId := model.NewObjectID(builder.remoteObjectidKind, firstStopRef)
-	firstStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(firstStopObjectId)
+	firstStopCode := model.NewCode(builder.remoteCodeSpace, firstStopRef)
+	firstStopArea, ok := builder.partner.Model().StopAreas().FindByCode(firstStopCode)
 	if !ok {
 		return
 	}
 	lastStopRef := section.LastStop()
-	lastStopObjectId := model.NewObjectID(builder.remoteObjectidKind, lastStopRef)
-	lastStopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(lastStopObjectId)
+	lastStopCode := model.NewCode(builder.remoteCodeSpace, lastStopRef)
+	lastStopArea, ok := builder.partner.Model().StopAreas().FindByCode(lastStopCode)
 	if !ok {
 		return
 	}
@@ -172,8 +172,8 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef s
 	affectedLine, ok := builder.affectedLines[line.Id()]
 	if ok {
 		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
-		builder.MonitoringRefs[firstStopObjectId.Value()] = struct{}{}
-		builder.MonitoringRefs[lastStopObjectId.Value()] = struct{}{}
+		builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
+		builder.MonitoringRefs[lastStopCode.Value()] = struct{}{}
 		return
 	}
 
@@ -184,9 +184,9 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef s
 	builder.affectedLines[line.Id()] = affectedLine
 
 	// Logging
-	builder.LineRefs[LineRefObjectId.Value()] = struct{}{}
-	builder.MonitoringRefs[firstStopObjectId.Value()] = struct{}{}
-	builder.MonitoringRefs[lastStopObjectId.Value()] = struct{}{}
+	builder.LineRefs[LineRefCode.Value()] = struct{}{}
+	builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
+	builder.MonitoringRefs[lastStopCode.Value()] = struct{}{}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffect(event *model.SituationUpdateEvent, xmlAffect *sxml.XMLAffect) {

@@ -22,13 +22,13 @@ const (
 
 	PARTNER_MAX_RETRY = "partner.status.maximum_retry"
 
-	REMOTE_CREDENTIAL                    = "remote_credential"
-	REMOTE_OBJECTID_KIND                 = "remote_objectid_kind"
-	VEHICLE_REMOTE_OBJECTID_KIND         = "vehicle_remote_objectid_kind"
-	VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND = "vehicle_journey_remote_objectid_kind"
-	REMOTE_URL                           = "remote_url"
-	NOTIFICATIONS_REMOTE_URL             = "notifications.remote_url"
-	SUBSCRIPTIONS_REMOTE_URL             = "subscriptions.remote_url"
+	REMOTE_CREDENTIAL                 = "remote_credential"
+	REMOTE_CODE_SPACE                 = "remote_code_space"
+	VEHICLE_REMOTE_CODE_SPACE         = "vehicle_remote_code_space"
+	VEHICLE_JOURNEY_REMOTE_CODE_SPACE = "vehicle_journey_remote_code_space"
+	REMOTE_URL                        = "remote_url"
+	NOTIFICATIONS_REMOTE_URL          = "notifications.remote_url"
+	SUBSCRIPTIONS_REMOTE_URL          = "subscriptions.remote_url"
 
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
@@ -81,33 +81,33 @@ type PartnerSettings struct {
 
 	collectSettings *CollectSettings
 
-	credentials                    			string
-	rateLimit                      			float64
-	gtfsTTL                        			time.Duration
-	gtfsCacheTimeout               			time.Duration
-	siriCredentialHeader           			string
-	siriEnvelopeType               			string
+	credentials                         string
+	rateLimit                           float64
+	gtfsTTL                             time.Duration
+	gtfsCacheTimeout                    time.Duration
+	siriCredentialHeader                string
+	siriEnvelopeType                    string
 	siriSoapEmptyResponseOnNotification bool
-	httpClientOAuth                			*remote.HTTPClientOAuth
-	recordedCallsDuration          			time.Duration
-	producerRef                    			string
-	address                        			string
-	linePublishedName              			string
-	passageOrder                   			string
-	envelopeType                   			string
-	collectPriority                			int
-	defaultSRSName                 			string
-	noDestinationRefRewritingFrom  			[]string
-	noDataFrameRefRewritingFrom    			[]string
-	rewriteJourneyPatternRef       			bool
-	gzipGtfs                       			bool
-	generalMessageRequestVersion22 			bool
-	collectFilteredGeneralMessages 			bool
-	ignoreStopWithoutLine          			bool
-	discoveryInterval              			time.Duration
-	cacheTimeouts                  			sync.Map
-	siriDirectionTypeInbound       			string
-	siriDirectionTypeOutbound      			string
+	httpClientOAuth                     *remote.HTTPClientOAuth
+	recordedCallsDuration               time.Duration
+	producerRef                         string
+	address                             string
+	linePublishedName                   string
+	passageOrder                        string
+	envelopeType                        string
+	collectPriority                     int
+	defaultSRSName                      string
+	noDestinationRefRewritingFrom       []string
+	noDataFrameRefRewritingFrom         []string
+	rewriteJourneyPatternRef            bool
+	gzipGtfs                            bool
+	generalMessageRequestVersion22      bool
+	collectFilteredGeneralMessages      bool
+	ignoreStopWithoutLine               bool
+	discoveryInterval                   time.Duration
+	cacheTimeouts                       sync.Map
+	siriDirectionTypeInbound            string
+	siriDirectionTypeOutbound           string
 
 	maximumCheckstatusRetry          int
 	subscriptionMaximumResources     int
@@ -121,19 +121,19 @@ type PartnerSettings struct {
 	referenceStopAreaIdentifierGenerator *idgen.IdentifierGenerator
 	subscriptionIdentifierGenerator      *idgen.IdentifierGenerator
 
-	remoteObjectIDKinds sync.Map
-	remoteObjectIDKind  string
+	remoteCodeSpaces sync.Map
+	remoteCodeSpace  string
 
 	httpClientOptions remote.HTTPClientOptions
 
 	sortPayloadForTest                  bool
 	ignoreTerminateSubscriptionsRequest bool
 
-	vehicleRemoteObjectIDKinds            []string
-	vehicleRemoteObjectIDKindsByConnector sync.Map
+	vehicleRemoteCodeSpaces            []string
+	vehicleRemoteCodeSpacesByConnector sync.Map
 
-	vehicleJourneyRemoteObjectIDKinds            []string
-	vehicleJourneyRemoteObjectIDKindsByConnector sync.Map
+	vehicleJourneyRemoteCodeSpaces            []string
+	vehicleJourneyRemoteCodeSpacesByConnector sync.Map
 
 	// ! Never use these values outside SettingsDefinition()
 	originalSettings map[string]string
@@ -158,7 +158,7 @@ func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string
 }
 
 func (s *PartnerSettings) parseSettings(settings map[string]string) {
-	s.setRemoteObjectIDKinds(settings)
+	s.setRemoteCodeSpaces(settings)
 	s.setCredentials(settings)
 	s.setRateLimit(settings)
 	s.setGtfsTTL(settings)
@@ -192,8 +192,8 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setCacheTimeouts(settings)
 	s.setSortPayloadForTest(settings)
 
-	s.setVehicleRemoteObjectIDKindWithFallback(settings)
-	s.setVehicleJourneyRemoteObjectIDKindWithFallback(settings)
+	s.setVehicleRemoteCodeSpaceWithFallback(settings)
+	s.setVehicleJourneyRemoteCodeSpaceWithFallback(settings)
 
 	s.setIgnoreTerminateSubscriptionsRequest(settings)
 	s.setIdentifierGenerators(settings)
@@ -236,10 +236,10 @@ func (s *PartnerSettings) RateLimit() float64 {
 	return s.rateLimit
 }
 
-func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
-	r, _ := regexp.Compile(`(.+)\.remote_objectid_kind`)
+func (s *PartnerSettings) setRemoteCodeSpaces(settings map[string]string) {
+	r, _ := regexp.Compile(`(.+)\.remote_code_space`)
 
-	// xxxx.remote_objectid_kind = dummy -> xxxx = dummy
+	// xxxx.remote_code_space = dummy -> xxxx = dummy
 	for key, value := range settings {
 		if len(value) == 0 {
 			continue
@@ -251,32 +251,32 @@ func (s *PartnerSettings) setRemoteObjectIDKinds(settings map[string]string) {
 		}
 
 		connectorName := matches[1]
-		s.remoteObjectIDKinds.Store(connectorName, value)
+		s.remoteCodeSpaces.Store(connectorName, value)
 	}
 
-	s.remoteObjectIDKind = settings[REMOTE_OBJECTID_KIND]
+	s.remoteCodeSpace = settings[REMOTE_CODE_SPACE]
 }
 
-func (s *PartnerSettings) RemoteObjectIDKind(optionalConnectorName ...string) string {
+func (s *PartnerSettings) RemoteCodeSpace(optionalConnectorName ...string) string {
 	if len(optionalConnectorName) == 1 {
 		connectorName := optionalConnectorName[0]
 
-		value, ok := s.remoteObjectIDKinds.Load(connectorName)
+		value, ok := s.remoteCodeSpaces.Load(connectorName)
 		if ok {
 			return value.(string)
 		}
 	}
 
-	return s.remoteObjectIDKind
+	return s.remoteCodeSpace
 }
 
-func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settings map[string]string) {
-	// xxxx.vehicle_journey_remote_objectid_kind
-	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND))
+func (s *PartnerSettings) setVehicleJourneyRemoteCodeSpaceWithFallback(settings map[string]string) {
+	// xxxx.vehicle_journey_remote_code_space
+	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_JOURNEY_REMOTE_CODE_SPACE))
 
-	s.vehicleJourneyRemoteObjectIDKinds = trimedSlice(settings[VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND])
+	s.vehicleJourneyRemoteCodeSpaces = trimedSlice(settings[VEHICLE_JOURNEY_REMOTE_CODE_SPACE])
 
-	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
+	// xxxx.vehicle_journey_remote_code_space = dummy -> xxxx = dummy
 	for key, value := range settings {
 		if len(value) == 0 {
 			continue
@@ -287,37 +287,37 @@ func (s *PartnerSettings) setVehicleJourneyRemoteObjectIDKindWithFallback(settin
 			continue
 		}
 
-		var connectorRemoteObjectIDKinds []string
-		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, trimedSlice(value)...)
-		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, s.vehicleJourneyRemoteObjectIDKinds...)
+		var connectorRemoteCodeSpaces []string
+		connectorRemoteCodeSpaces = append(connectorRemoteCodeSpaces, trimedSlice(value)...)
+		connectorRemoteCodeSpaces = append(connectorRemoteCodeSpaces, s.vehicleJourneyRemoteCodeSpaces...)
 
 		// "a,b,c" -> [a,b,c]
 
 		connectorName := matches[1]
-		s.vehicleJourneyRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
+		s.vehicleJourneyRemoteCodeSpacesByConnector.Store(connectorName, connectorRemoteCodeSpaces)
 	}
 }
 
-func (s *PartnerSettings) VehicleJourneyRemoteObjectIDKindWithFallback(connectorName string) []string {
-	value, ok := s.vehicleJourneyRemoteObjectIDKindsByConnector.Load(connectorName)
+func (s *PartnerSettings) VehicleJourneyRemoteCodeSpaceWithFallback(connectorName string) []string {
+	value, ok := s.vehicleJourneyRemoteCodeSpacesByConnector.Load(connectorName)
 	if ok {
 		return value.([]string)
 	}
 
-	if len(s.vehicleJourneyRemoteObjectIDKinds) > 0 {
-		return s.vehicleJourneyRemoteObjectIDKinds
+	if len(s.vehicleJourneyRemoteCodeSpaces) > 0 {
+		return s.vehicleJourneyRemoteCodeSpaces
 	}
 
-	return []string{s.RemoteObjectIDKind(connectorName)}
+	return []string{s.RemoteCodeSpace(connectorName)}
 }
 
-func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[string]string) {
-	// xxxx.vehicle_journey_remote_objectid_kind
-	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_REMOTE_OBJECTID_KIND))
+func (s *PartnerSettings) setVehicleRemoteCodeSpaceWithFallback(settings map[string]string) {
+	// xxxx.vehicle_journey_remote_code_space
+	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_REMOTE_CODE_SPACE))
 
-	s.vehicleRemoteObjectIDKinds = trimedSlice(settings[VEHICLE_REMOTE_OBJECTID_KIND])
+	s.vehicleRemoteCodeSpaces = trimedSlice(settings[VEHICLE_REMOTE_CODE_SPACE])
 
-	// xxxx.vehicle_journey_remote_objectid_kind = dummy -> xxxx = dummy
+	// xxxx.vehicle_journey_remote_code_space = dummy -> xxxx = dummy
 	for key, value := range settings {
 		if len(value) == 0 {
 			continue
@@ -328,28 +328,28 @@ func (s *PartnerSettings) setVehicleRemoteObjectIDKindWithFallback(settings map[
 			continue
 		}
 
-		var connectorRemoteObjectIDKinds []string
-		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, trimedSlice(value)...)
-		connectorRemoteObjectIDKinds = append(connectorRemoteObjectIDKinds, s.vehicleRemoteObjectIDKinds...)
+		var connectorRemoteCodeSpaces []string
+		connectorRemoteCodeSpaces = append(connectorRemoteCodeSpaces, trimedSlice(value)...)
+		connectorRemoteCodeSpaces = append(connectorRemoteCodeSpaces, s.vehicleRemoteCodeSpaces...)
 
 		// "a,b,c" -> [a,b,c]
 
 		connectorName := matches[1]
-		s.vehicleRemoteObjectIDKindsByConnector.Store(connectorName, connectorRemoteObjectIDKinds)
+		s.vehicleRemoteCodeSpacesByConnector.Store(connectorName, connectorRemoteCodeSpaces)
 	}
 }
 
-func (s *PartnerSettings) VehicleRemoteObjectIDKindWithFallback(connectorName string) []string {
-	value, ok := s.vehicleRemoteObjectIDKindsByConnector.Load(connectorName)
+func (s *PartnerSettings) VehicleRemoteCodeSpaceWithFallback(connectorName string) []string {
+	value, ok := s.vehicleRemoteCodeSpacesByConnector.Load(connectorName)
 	if ok {
 		return value.([]string)
 	}
 
-	if len(s.vehicleRemoteObjectIDKinds) > 0 {
-		return s.vehicleRemoteObjectIDKinds
+	if len(s.vehicleRemoteCodeSpaces) > 0 {
+		return s.vehicleRemoteCodeSpaces
 	}
 
-	return []string{s.RemoteObjectIDKind(connectorName)}
+	return []string{s.RemoteCodeSpace(connectorName)}
 }
 
 func (s *PartnerSettings) setGtfsTTL(settings map[string]string) {

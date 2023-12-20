@@ -78,7 +78,7 @@ func Test_VehicleJourneyController_Delete(t *testing.T) {
 
 func Test_VehicleJourneyController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	vehicleJourney, responseRecorder, referential := prepareVehicleJourneyRequest("PUT", true, body, t)
 
 	// Check response
@@ -110,7 +110,7 @@ func Test_VehicleJourneyController_Show(t *testing.T) {
 
 func Test_VehicleJourneyController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareVehicleJourneyRequest("POST", false, body, t)
 
 	// Check response
@@ -146,17 +146,17 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 	ref := core.NewMemoryReferentials().New("test")
 
 	vehicleJourney := ref.Model().VehicleJourneys().New()
-	objectid := model.NewObjectID("kind", "value")
-	vehicleJourney.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "value")
+	vehicleJourney.SetCode(code)
 	ref.Model().VehicleJourneys().Save(vehicleJourney)
 
 	controller := &VehicleJourneyController{
 		referential: ref,
 	}
 
-	_, ok := controller.findVehicleJourney("kind:value")
+	_, ok := controller.findVehicleJourney("codeSpace:value")
 	if !ok {
-		t.Error("Can't find VehicleJourney by ObjectId")
+		t.Error("Can't find VehicleJourney by Code")
 	}
 
 	_, ok = controller.findVehicleJourney(string(vehicleJourney.Id()))

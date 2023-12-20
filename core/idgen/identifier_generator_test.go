@@ -7,7 +7,7 @@ import (
 )
 
 func Test_IdentifierGenerator_NewIdentifier(t *testing.T) {
-	generator := NewIdentifierGenerator("%{type}:%{uuid}:%{default}:%{id}:%{uuid}:%{objectid}", uuid.NewFakeUUIDGenerator())
+	generator := NewIdentifierGenerator("%{type}:%{uuid}:%{default}:%{id}:%{uuid}:%{code}", uuid.NewFakeUUIDGenerator())
 	attributes := IdentifierAttributes{
 		Id:   "iD",
 		Type: "Tp",

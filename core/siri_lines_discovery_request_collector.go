@@ -29,7 +29,7 @@ func (factory *SIRILinesDiscoveryRequestCollectorFactory) CreateConnector(partne
 }
 
 func (factory *SIRILinesDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
@@ -43,7 +43,7 @@ func NewSIRILinesDiscoveryRequestCollector(partner *Partner) *SIRILinesDiscovery
 }
 
 func (connector *SIRILinesDiscoveryRequestCollector) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace()
 }
 
 func (connector *SIRILinesDiscoveryRequestCollector) SetSubscriber(subscriber UpdateSubscriber) {
@@ -94,7 +94,7 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 		event := model.NewLineUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(connector.remoteObjectidKind, annotatedLine.LineRef())
+		event.Code = model.NewCode(connector.remoteCodeSpace, annotatedLine.LineRef())
 		event.Name = annotatedLine.LineName()
 
 		connector.broadcastUpdateEvent(event)

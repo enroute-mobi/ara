@@ -37,7 +37,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 		"remote_credential":    "external",
 		"local_credential":     "local",
 		"remote_url":           ts.URL,
@@ -64,11 +64,11 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	line := referential.Model().Lines().New()
 	line.Save()
 
-	objectid := model.NewObjectID("internal", string(line.Id()))
-	line.SetObjectID(objectid)
+	code := model.NewCode("internal", string(line.Id()))
+	line.SetCode(code)
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "Line",
 	}
 
@@ -80,30 +80,30 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
-	operatorObjectid := model.NewObjectID("test", "1234")
+	operatorCode := model.NewCode("test", "1234")
 	operatorRef := model.Reference{
-		ObjectId: &operatorObjectid,
+		Code: &operatorCode,
 		Type:     "OperatorRef",
 	}
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.LineId = line.Id()
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 	stopVisit.References.SetReference("OperatorRef", operatorRef)
 	stopVisit.StopAreaId = stopArea.Id()
 
 	operator := referential.Model().Operators().New()
-	operator.SetObjectID(operatorObjectid)
-	operator.SetObjectID(model.NewObjectID("internal", "123456789"))
+	operator.SetCode(operatorCode)
+	operator.SetCode(model.NewCode("internal", "123456789"))
 	operator.Save()
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...

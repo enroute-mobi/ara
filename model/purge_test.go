@@ -14,7 +14,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
-		ObjectIDs:       "{}",
+		Codes:       "{}",
 		LineIds:         "[]",
 		Attributes:      "{}",
 		References:      "{}",
@@ -39,7 +39,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "line",
-		ObjectIDs:       "{}",
+		Codes:       "{}",
 		Attributes:      "{}",
 		References:      "{}",
 	}
@@ -64,7 +64,7 @@ func fill_purifier_test_db(t *testing.T) {
 		Name:            "vehicleJourney",
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		DirectionType:   "",
-		ObjectIDs:       "{}",
+		Codes:       "{}",
 		Attributes:      "{}",
 		References:      "{}",
 	}
@@ -88,7 +88,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ModelName:        "2017-01-01",
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		ObjectIDs:        "{}",
+		Codes:        "{}",
 		Schedules:        "[]",
 		Attributes:       "{}",
 		References:       "{}",
@@ -111,7 +111,7 @@ func fill_purifier_test_db(t *testing.T) {
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		Name:            "operator",
-		ObjectIDs:       "{}",
+		Codes:       "{}",
 		ModelName:       "2017-01-01",
 	}
 

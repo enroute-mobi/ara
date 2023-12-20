@@ -34,14 +34,14 @@ func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) CreateConnector
 }
 
 func (factory *SIRIStopMonitoringSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIStopMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIStopMonitoringSubscriptionBroadcaster {
 	connector := &SIRIStopMonitoringSubscriptionBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
@@ -103,11 +103,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model
 
 	vj, _ := connector.partner.Model().VehicleJourneys().Find(sv.VehicleJourneyId)
 
-	for _, stopAreaObjectId := range connector.partner.Model().StopAreas().FindAscendantsWithObjectIdKind(sv.StopAreaId, connector.remoteObjectidKind) {
-		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaObjectId.String(), StopMonitoringBroadcast)
+	for _, stopAreaCode := range connector.partner.Model().StopAreas().FindAscendantsWithCodeSpace(sv.StopAreaId, connector.remoteCodeSpace) {
+		subs := connector.partner.Subscriptions().FindByResourceId(stopAreaCode.String(), StopMonitoringBroadcast)
 
 		for _, sub := range subs {
-			resource := sub.Resource(stopAreaObjectId)
+			resource := sub.Resource(stopAreaCode)
 			if resource == nil || resource.SubscribedUntil.Before(connector.Clock().Now()) {
 				continue
 			}
@@ -134,7 +134,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model
 }
 
 func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
-	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
+	obj, ok := stopArea.Code(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}
@@ -185,11 +185,11 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		monitoringRefs = append(monitoringRefs, sm.MonitoringRef())
 
-		objectid := model.NewObjectID(connector.remoteObjectidKind, sm.MonitoringRef())
-		sa, ok := connector.partner.Model().StopAreas().FindByObjectId(objectid)
+		code := model.NewCode(connector.remoteCodeSpace, sm.MonitoringRef())
+		sa, ok := connector.partner.Model().StopAreas().FindByCode(code)
 		if !ok {
 			rs.ErrorType = "InvalidDataReferencesError"
-			rs.ErrorText = fmt.Sprintf("StopArea not found: '%s'", objectid.Value())
+			rs.ErrorText = fmt.Sprintf("StopArea not found: '%s'", code.Value())
 			resps = append(resps, rs)
 
 			message.Status = "Error"
@@ -219,7 +219,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.SetExternalId(sm.SubscriptionIdentifier())
 
 		ref := model.Reference{
-			ObjectId: &objectid,
+			Code: &code,
 			Type:     "StopArea",
 		}
 
@@ -229,7 +229,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		connector.fillOptions(sub, r, request, sm)
 		if sm.LineRef() != "" {
-			sub.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", connector.remoteObjectidKind, sm.LineRef()))
+			sub.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", connector.remoteCodeSpace, sm.LineRef()))
 		}
 
 		rs.Status = true
@@ -297,7 +297,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscri
 		logger.Log.Debugf("The LineRef Setting hasn't been stored in the correct format: %v", lineRef)
 		return "", false
 	}
-	line, ok := connector.partner.Model().Lines().FindByObjectId(model.NewObjectID(kindValue[0], kindValue[1]))
+	line, ok := connector.partner.Model().Lines().FindByCode(model.NewCode(kindValue[0], kindValue[1]))
 	if !ok {
 		return "", true
 	}

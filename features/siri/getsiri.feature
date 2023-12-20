@@ -6,17 +6,17 @@ Feature: Support SIRI GetSIRI
   Scenario: 2462 - Handle a SIRI GetSIRIService request with several StopMonitorings
     Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
-      | remote_objectid_kind | internal         |
+      | remote_code_space | internal         |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                |
-      | ObjectIDs | "internal": "boaarle" |
+      | Codes | "internal": "boaarle" |
       | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 415                       |
-      | ObjectIDs | "internal": "CdF:Line::415:LOC" |
+      | Codes | "internal": "CdF:Line::415:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
@@ -24,7 +24,7 @@ Feature: Support SIRI GetSIRI
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "internal": "SIRI:34852540"       |
+      | Codes                     | "internal": "SIRI:34852540"       |
       | PassageOrder                  | 44                                |
       | RecordedAt                    | 2017-01-12T10:52:46.042+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00     |
@@ -36,26 +36,26 @@ Feature: Support SIRI GetSIRI
       | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
-      | ObjectIDs | "internal": "cladebr" |
+      | Codes | "internal": "cladebr" |
       | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 475                       |
-      | ObjectIDs | "internal": "CdF:Line::475:LOC" |
+      | Codes | "internal": "CdF:Line::475:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                             | "internal": "5CAR621689196575"                |
+      | Codes                             | "internal": "5CAR621689196575"                |
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                             | true                                          |
       | DestinationName                       | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | DirectionType                         | cladebr                                       |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
-      | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |
+      | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
+      | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "internal": "SIRI:34863800"       |
+      | Codes                     | "internal": "SIRI:34863800"       |
       | PassageOrder                  | 11                                |
       | RecordedAt                    | 2017-01-12T10:52:46.050+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00     |
@@ -197,17 +197,17 @@ Feature: Support SIRI GetSIRI
   Scenario: 2481 - Handle a GetSIRIService request with a StopMonitoring request on a unknown StopArea
     Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
-      | remote_objectid_kind | internal         |
+      | remote_code_space | internal         |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                |
-      | ObjectIDs | "internal": "boaarle" |
+      | Codes | "internal": "boaarle" |
       | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 415                       |
-      | ObjectIDs | "internal": "CdF:Line::415:LOC" |
+      | Codes | "internal": "CdF:Line::415:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
@@ -215,7 +215,7 @@ Feature: Support SIRI GetSIRI
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "internal": "SIRI:34852540"       |
+      | Codes                     | "internal": "SIRI:34852540"       |
       | PassageOrder                  | 44                                |
       | RecordedAt                    | 2017-01-12T10:52:46.042+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00     |
@@ -227,25 +227,25 @@ Feature: Support SIRI GetSIRI
       | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
-      | ObjectIDs | "internal": "cladebr" |
+      | Codes | "internal": "cladebr" |
     And a Line exists with the following attributes:
       | Name      | Ligne 475                       |
-      | ObjectIDs | "internal": "CdF:Line::475:LOC" |
+      | Codes | "internal": "CdF:Line::475:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                             | "internal": "5CAR621689196575"                |
+      | Codes                             | "internal": "5CAR621689196575"                |
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Attribute[DestinationName]            | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | DirectionType                         | cladebr                                       |
       | Attribute[Monitored]                  | true                                          |
-      | Reference[JourneyPatternRef]#ObjectId | "internal": "CdF:JourneyPattern::L475P53:LOC" |
-      | Reference[DestinationRef]#ObjectId    | "internal": "parorle"                         |
+      | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
+      | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "internal": "SIRI:34863800"       |
+      | Codes                     | "internal": "SIRI:34863800"       |
       | PassageOrder                  | 11                                |
       | RecordedAt                    | 2017-01-12T10:52:46.050+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00     |
@@ -347,20 +347,20 @@ Feature: Support SIRI GetSIRI
       """
 
   @ARA-1298
-  Scenario: Handle a SIRI GetSIRIService request  with Partner remote_objectid_kind changed
+  Scenario: Handle a SIRI GetSIRIService request  with Partner remote_code_space changed
     Given a SIRI Partner "test" exists with connectors [siri-service-request-broadcaster,siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | RATPDEV:Concerto |
-      | remote_objectid_kind | internal         |
+      | remote_code_space | internal         |
     And a StopArea exists with the following attributes:
       | Name      | Test 1                |
-      | ObjectIDs | "internal": "boaarle" |
+      | Codes | "internal": "boaarle" |
       | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 415                       |
-      | ObjectIDs | "internal": "CdF:Line::415:LOC" |
+      | Codes | "internal": "CdF:Line::415:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
@@ -368,7 +368,7 @@ Feature: Support SIRI GetSIRI
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "internal": "SIRI:34852540"       |
+      | Codes                     | "internal": "SIRI:34852540"       |
       | PassageOrder                  | 44                                |
       | RecordedAt                    | 2017-01-12T10:52:46.042+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00     |
@@ -380,26 +380,26 @@ Feature: Support SIRI GetSIRI
       | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
-      | ObjectIDs | "external": "cladebr"         |
+      | Codes | "external": "cladebr"         |
       | Monitored | true                  |
     And a Line exists with the following attributes:
       | Name      | Ligne 475                       |
-      | ObjectIDs | "external": "CdF:Line::475:LOC" |
+      | Codes | "external": "CdF:Line::475:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                             | "external": "5CAR621689196575"                |
+      | Codes                             | "external": "5CAR621689196575"                |
       | LineId                                | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                             | true                                          |
       | DestinationName                       | PARIS - Porte d'Orléans                       |
       | Attribute[DirectionName]              | Aller                                         |
       | DirectionType                         | cladebr                                       |
-      | Reference[JourneyPatternRef]#ObjectId | "external": "CdF:JourneyPattern::L475P53:LOC" |
-      | Reference[DestinationRef]#ObjectId    | "external": "parorle"                         |
+      | Reference[JourneyPatternRef]#Code | "external": "CdF:JourneyPattern::L475P53:LOC" |
+      | Reference[DestinationRef]#Code    | "external": "parorle"                         |
     And a StopVisit exists with the following attributes:
       | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | ObjectIDs                     | "external": "SIRI:34863800"       |
+      | Codes                     | "external": "SIRI:34863800"       |
       | PassageOrder                  | 11                                |
       | RecordedAt                    | 2017-01-12T10:52:46.050+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00     |
@@ -486,7 +486,7 @@ Feature: Support SIRI GetSIRI
       """
     And the Partner "test" is updated with the following settings:
       | local_credential     | RATPDEV:Concerto |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     When I send this SIRI request
     """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">

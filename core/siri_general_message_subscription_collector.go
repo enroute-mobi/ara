@@ -15,7 +15,7 @@ type GeneralMessageSubscriptionCollector interface {
 	state.Startable
 
 	RequestAllSituationsUpdate()
-	RequestSituationUpdate(kind string, requestedId model.ObjectID)
+	RequestSituationUpdate(kind string, requestedId model.Code)
 	HandleNotifyGeneralMessage(notify *sxml.XMLNotifyGeneralMessage) *CollectedRefs
 }
 
@@ -34,14 +34,14 @@ func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIGeneralMessageSubscriptionCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMessageSubscriptionCollector {
 	connector := &SIRIGeneralMessageSubscriptionCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
@@ -60,16 +60,16 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUpdate() {
-	obj := model.NewObjectID("generalMessageCollect", "all")
+	obj := model.NewCode("generalMessageCollect", "all")
 	connector.RequestSituationUpdate("all", obj)
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedObjectId model.ObjectID) {
+func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate(kind string, requestedCode model.Code) {
 	// Try to find a Subscription with the resource
-	subscriptions := connector.partner.Subscriptions().FindByResourceId(requestedObjectId.String(), GeneralMessageCollect)
+	subscriptions := connector.partner.Subscriptions().FindByResourceId(requestedCode.String(), GeneralMessageCollect)
 	if len(subscriptions) > 0 {
 		for _, subscription := range subscriptions {
-			resource := subscription.Resource(requestedObjectId)
+			resource := subscription.Resource(requestedCode)
 			if resource == nil { // Should never happen
 				logger.Log.Debugf("Can't find resource in subscription after Subscriptions#FindByResourceId")
 				return
@@ -84,7 +84,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) RequestSituationUpdate
 	// Else we find or create a subscription to add the resource
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(GeneralMessageCollect)
 	ref := model.Reference{
-		ObjectId: &requestedObjectId,
+		Code: &requestedCode,
 	}
 	switch kind {
 	case SITUATION_UPDATE_REQUEST_LINE:
@@ -152,8 +152,8 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 	}
 
 	for _, cancellation := range xmlGmCancellations {
-		obj := model.NewObjectID(connector.remoteObjectidKind, cancellation.InfoMessageIdentifier())
-		situation, ok := connector.partner.Model().Situations().FindByObjectId(obj)
+		obj := model.NewCode(connector.remoteCodeSpace, cancellation.InfoMessageIdentifier())
+		situation, ok := connector.partner.Model().Situations().FindByCode(obj)
 		if ok {
 			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())
 			connector.partner.Model().Situations().Delete(&situation)

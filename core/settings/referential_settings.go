@@ -55,26 +55,26 @@ func (rs *ReferentialSettings) ModelPersistenceDuration() (d time.Duration, ok b
 	return -d, true
 }
 
-var loggerObjectId = regexp.MustCompile(`^([^:]+):(.*)$`)
+var loggerCode = regexp.MustCompile(`^([^:]+):(.*)$`)
 
-func (rs *ReferentialSettings) LoggerVerboseStopAreas() []model.ObjectID {
+func (rs *ReferentialSettings) LoggerVerboseStopAreas() []model.Code {
 	rs.m.RLock()
 	setting, ok := rs.s[LOGGER_VERBOSE_STOP_AREAS]
 	rs.m.RUnlock()
 
 	if !ok {
-		return []model.ObjectID{}
+		return []model.Code{}
 	}
 
-	parsedSetting := loggerObjectId.FindStringSubmatch(setting)
+	parsedSetting := loggerCode.FindStringSubmatch(setting)
 	if len(parsedSetting) == 0 {
-		return []model.ObjectID{}
+		return []model.Code{}
 	}
 
 	kind := parsedSetting[1]
 	value := parsedSetting[2]
 
-	return []model.ObjectID{model.NewObjectID(kind, value)}
+	return []model.Code{model.NewCode(kind, value)}
 }
 
 func (rs *ReferentialSettings) ModelRefreshTime() (d time.Duration) {

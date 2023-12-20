@@ -8,7 +8,7 @@ import (
 type ModelId string
 
 type ModelInstance interface {
-	ObjectIDConsumerInterface
+	CodeConsumerInterface
 
 	modelId() ModelId
 }

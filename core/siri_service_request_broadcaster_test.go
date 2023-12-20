@@ -20,7 +20,7 @@ func Test_SIRISiriServiceRequestBroadcaster_NoConnectors(t *testing.T) {
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
 
-	settings := map[string]string{"remote_objectid_kind": "objectidKind"}
+	settings := map[string]string{"remote_code_space": "codeSpace"}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SERVICE_REQUEST_BROADCASTER}
 	partner.RefreshConnectors()
@@ -98,7 +98,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                   "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -114,24 +114,24 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequests(t *testing.T) {
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
-	objectid := model.NewObjectID("objectidKind", "boaarle")
+	code := model.NewCode("codeSpace", "boaarle")
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	line := referential.model.Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -191,7 +191,7 @@ func Test_SIRISiriServiceRequestBroadcaster_HandleRequestsStopAreaNotFound(t *te
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                   "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -249,15 +249,15 @@ func Test_SIRIServiceRequestBroadcasterFactory_Validate(t *testing.T) {
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner should have errors when local_credential and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner should have errors when local_credential and remote_code_space aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 		"local_credential":     "local_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_objectid_kind are set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_code_space are set, got: %v", apiPartner.Errors)
 	}
 }

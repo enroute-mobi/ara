@@ -15,7 +15,7 @@ type BroadcastGeneralMessageBuilder struct {
 
 	partner            *Partner
 	referenceGenerator *idgen.IdentifierGenerator
-	remoteObjectidKind string
+	remoteCodeSpace    string
 	lineRef            map[string]struct{}
 	stopPointRef       map[string]struct{}
 
@@ -26,7 +26,7 @@ func NewBroadcastGeneralMessageBuilder(partner *Partner, connector string) *Broa
 	return &BroadcastGeneralMessageBuilder{
 		partner:            partner,
 		referenceGenerator: partner.ReferenceIdentifierGenerator(),
-		remoteObjectidKind: partner.RemoteObjectIDKind(connector),
+		remoteCodeSpace:    partner.RemoteCodeSpace(connector),
 		lineRef:            make(map[string]struct{}),
 		stopPointRef:       make(map[string]struct{}),
 	}
@@ -74,15 +74,15 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	}
 
 	var infoMessageIdentifier string
-	objectid, present := situation.ObjectID(builder.remoteObjectidKind)
+	code, present := situation.Code(builder.remoteCodeSpace)
 	if present {
-		infoMessageIdentifier = objectid.Value()
+		infoMessageIdentifier = code.Value()
 	} else {
-		objectid, present = situation.ObjectID("_default")
+		code, present = situation.Code("_default")
 		if !present {
 			return nil
 		}
-		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: objectid.Value()})
+		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
 	}
 
 	siriGeneralMessage := &siri.SIRIGeneralMessage{
@@ -210,11 +210,11 @@ func (builder *BroadcastGeneralMessageBuilder) resolveAffectedLineRef(affect mod
 	if !ok {
 		return "", false
 	}
-	lineObjectId, ok := line.ObjectID(builder.remoteObjectidKind)
+	lineCode, ok := line.Code(builder.remoteCodeSpace)
 	if !ok {
 		return "", false
 	}
-	return lineObjectId.Value(), true
+	return lineCode.Value(), true
 }
 
 func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(stopAreaId model.StopAreaId) (string, bool) {
@@ -222,11 +222,11 @@ func (builder *BroadcastGeneralMessageBuilder) resolveStopAreaRef(stopAreaId mod
 	if !ok {
 		return "", false
 	}
-	stopAreaObjectId, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
+	stopAreaCode, ok := stopArea.ReferentOrSelfCode(builder.remoteCodeSpace)
 	if !ok {
 		return "", false
 	}
-	return stopAreaObjectId.Value(), true
+	return stopAreaCode.Value(), true
 }
 
 func (builder *BroadcastGeneralMessageBuilder) checkAffectFilter(affectedRefs []*siri.SIRIAffectedRef) bool {

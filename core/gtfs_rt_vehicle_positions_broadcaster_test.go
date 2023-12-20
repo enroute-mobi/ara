@@ -17,7 +17,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -25,27 +25,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("objectidKind", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("codeSpace", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("objectidKind", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("codeSpace", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("objectidKind", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("codeSpace", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456
@@ -54,8 +54,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	vehicle.Save()
 
 	vehicle2 := referential.model.Vehicles().New()
-	vId2 := model.NewObjectID("objectidKind", "vId2")
-	vehicle2.SetObjectID(vId2)
+	vId2 := model.NewCode("codeSpace", "vId2")
+	vehicle2.SetCode(vId2)
 	vehicle2.VehicleJourneyId = vehicleJourney.Id()
 	vehicle2.LineId = line.Id()
 	vehicle2.Longitude = 3.45678
@@ -113,7 +113,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -121,27 +121,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("WRONG_KIND", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("WRONG_KIND", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("objectidKind", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("codeSpace", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("objectidKind", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("codeSpace", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456
@@ -150,8 +150,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	vehicle.Save()
 
 	vehicle2 := referential.model.Vehicles().New()
-	vId2 := model.NewObjectID("objectidKind", "vId2")
-	vehicle2.SetObjectID(vId2)
+	vId2 := model.NewCode("codeSpace", "vId2")
+	vehicle2.SetCode(vId2)
 	vehicle2.VehicleJourneyId = vehicleJourney.Id()
 	vehicle2.LineId = line.Id()
 	vehicle2.Longitude = 3.45678
@@ -174,7 +174,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -182,27 +182,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("objectidKind", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("codeSpace", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("WRONG_ID", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("WRONG_ID", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("objectidKind", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("codeSpace", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456
@@ -211,8 +211,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	vehicle.Save()
 
 	vehicle2 := referential.model.Vehicles().New()
-	vId2 := model.NewObjectID("objectidKind", "vId2")
-	vehicle2.SetObjectID(vId2)
+	vId2 := model.NewCode("codeSpace", "vId2")
+	vehicle2.SetCode(vId2)
 	vehicle2.VehicleJourneyId = vehicleJourney.Id()
 	vehicle2.LineId = line.Id()
 	vehicle2.Longitude = 3.45678
@@ -235,7 +235,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -243,27 +243,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("objectidKind", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("codeSpace", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("objectidKind", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("codeSpace", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("WRONG_ID", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("WRONG_ID", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456
@@ -272,8 +272,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	vehicle.Save()
 
 	vehicle2 := referential.model.Vehicles().New()
-	vId2 := model.NewObjectID("objectidKind", "vId2")
-	vehicle2.SetObjectID(vId2)
+	vId2 := model.NewCode("codeSpace", "vId2")
+	vehicle2.SetCode(vId2)
 	vehicle2.VehicleJourneyId = vehicleJourney.Id()
 	vehicle2.LineId = line.Id()
 	vehicle2.Longitude = 3.45678
@@ -300,8 +300,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
-		"gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind": "WRONG_ID",
+		"remote_code_space": "codeSpace",
+		"gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space": "WRONG_ID",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -309,27 +309,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("objectidKind", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("codeSpace", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("objectidKind", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("codeSpace", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("WRONG_ID", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("WRONG_ID", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456
@@ -338,8 +338,8 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	vehicle.Save()
 
 	vehicle2 := referential.model.Vehicles().New()
-	vId2 := model.NewObjectID("objectidKind", "vId2")
-	vehicle2.SetObjectID(vId2)
+	vId2 := model.NewCode("codeSpace", "vId2")
+	vehicle2.SetCode(vId2)
 	vehicle2.VehicleJourneyId = vehicleJourney.Id()
 	vehicle2.LineId = line.Id()
 	vehicle2.Longitude = 3.45678
@@ -365,7 +365,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -373,27 +373,27 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewObjectID("objectidKind", "lId")
-	line.SetObjectID(lId)
+	lId := model.NewCode("codeSpace", "lId")
+	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewObjectID("objectidKind", "vjId")
-	vehicleJourney.SetObjectID(vjId)
+	vjId := model.NewCode("codeSpace", "vjId")
+	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	svId1 := model.NewObjectID("objectidKind", "svId1")
-	stopVisit.SetObjectID(svId1)
+	svId1 := model.NewCode("codeSpace", "svId1")
+	stopVisit.SetCode(svId1)
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
 	stopVisit.PassageOrder = 1
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewObjectID("objectidKind", "vId")
-	vehicle.SetObjectID(vId)
+	vId := model.NewCode("codeSpace", "vId")
+	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
 	vehicle.Longitude = 1.23456

@@ -70,7 +70,7 @@ type connector struct {
 	clock.ClockConsumer
 
 	partner            *Partner
-	remoteObjectidKind string
+	remoteCodeSpace string
 }
 
 func (c *connector) Partner() *Partner {

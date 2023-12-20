@@ -54,8 +54,8 @@ func Test_Operator_UnmarshalJSON(t *testing.T) {
 func Test_Operator_Save(t *testing.T) {
 	model := NewMemoryModel()
 	operator := model.Operators().New()
-	objectid := NewObjectID("kind", "value")
-	operator.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	operator.SetCode(code)
 
 	if operator.model != model {
 		t.Errorf("New operator model should be MemoryOperator model")
@@ -71,29 +71,29 @@ func Test_Operator_Save(t *testing.T) {
 	}
 }
 
-func Test_Operator_ObjectId(t *testing.T) {
+func Test_Operator_Code(t *testing.T) {
 	operator := Operator{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	operator.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	operator.SetObjectID(objectid)
+	operator.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	operator.SetCode(code)
 
-	foundObjectId, ok := operator.ObjectID("kind")
+	foundCode, ok := operator.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = operator.ObjectID("wrongkind")
+	_, ok = operator.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(operator.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", operator.ObjectIDs())
+	if len(operator.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", operator.Codes())
 	}
 }
 
@@ -163,8 +163,8 @@ func Test_MemoryOperators_FindAll(t *testing.T) {
 func Test_MemoryOperators_Delete(t *testing.T) {
 	operators := NewMemoryOperators()
 	existingOperator := operators.New()
-	objectid := NewObjectID("kind", "value")
-	existingOperator.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingOperator.SetCode(code)
 	operators.Save(existingOperator)
 
 	operators.Delete(existingOperator)
@@ -184,13 +184,13 @@ func Test_MemoryOperators_Load(t *testing.T) {
 		Id              string `db:"id"`
 		ReferentialSlug string `db:"referential_slug"`
 		Name            string `db:"name"`
-		ObjectIDs       string `db:"object_ids"`
+		Codes           string `db:"codes"`
 		ModelName       string `db:"model_name"`
 	}{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		Name:            "operator",
-		ObjectIDs:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		ModelName:       "2017-01-01",
 	}
 
@@ -226,7 +226,7 @@ func Test_MemoryOperators_Load(t *testing.T) {
 	if operator.Name != "operator" {
 		t.Errorf("Wrong Name:\n got: %v\n expected: operator", operator.Name)
 	}
-	if objectid, ok := operator.ObjectID("internal"); !ok || objectid.Value() != "value" {
-		t.Errorf("Wrong ObjectID:\n got: %v:%v\n expected: \"internal\":\"value\"", objectid.Kind(), objectid.Value())
+	if code, ok := operator.Code("internal"); !ok || code.Value() != "value" {
+		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 }

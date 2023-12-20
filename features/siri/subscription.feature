@@ -9,7 +9,7 @@ Feature: Support SIRI subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
       | ExternalId        | ExternalId                                         |
@@ -46,7 +46,7 @@ Feature: Support SIRI subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ara                   |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
       | ExternalId        | ExternalId                                         |
@@ -116,7 +116,7 @@ Feature: Support SIRI subscription
       | remote_url                                            | http://localhost:8090 |
       | remote_credential                                     | ara                   |
       | local_credential                                      | NINOXE:default        |
-      | remote_objectid_kind                                  | internal              |
+      | remote_code_space                                  | internal              |
       | broadcast.siri.ignore_terminate_subscription_requests | true                  |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
@@ -195,7 +195,7 @@ Feature: Support SIRI subscription
       | remote_url                                            | http://localhost:8090 |
       | remote_credential                                     | ara                   |
       | local_credential                                      | NINOXE:default        |
-      | remote_objectid_kind                                  | internal              |
+      | remote_code_space                                  | internal              |
       | siri.envelope                                         | raw                   |
       | broadcast.siri.ignore_terminate_subscription_requests | true                  |
     And a Subscription exist with the following attributes:
@@ -282,7 +282,7 @@ Feature: Support SIRI subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ara                   |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast           |
@@ -342,7 +342,7 @@ Feature: Support SIRI subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ara                   |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast           |
@@ -391,7 +391,7 @@ Feature: Support SIRI subscription
       | remote_url           | http://localhost:8090 |
       | remote_credential    | ara                   |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
       | siri.envelope        | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast            |
@@ -462,13 +462,13 @@ Feature: Support SIRI subscription
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
       | local_credential      | NINOXE:default        |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | siri.envelope         | raw                   |
       | collect.include_lines | NINOXE:Line:3:LOC     |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name   | Test                            |
+      | Codes  | "internal": "NINOXE:Line:3:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |

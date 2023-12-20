@@ -14,9 +14,9 @@ func Test_NewReferences(t *testing.T) {
 
 func Test_References_Set(t *testing.T) {
 	references := NewReferences()
-	obj := NewObjectID("kind", "value")
+	obj := NewCode("codeSpace", "value")
 
-	reference := Reference{ObjectId: &obj}
+	reference := Reference{Code: &obj}
 	references.Set("key", reference)
 
 	if len(references.ref) != 1 {

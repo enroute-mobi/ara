@@ -35,7 +35,7 @@ type FakeStopMonitoringSubscriber struct {
 
 type saToRequest struct {
 	subId SubscriptionId
-	saId  model.ObjectID
+	saId  model.Code
 }
 
 func NewFakeStopMonitoringSubscriber(connector *SIRIStopMonitoringSubscriptionCollector) SIRIStopMonitoringSubscriber {
@@ -97,12 +97,12 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 
 	stopAreasToRequest := make(map[string]*saToRequest)
 	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByObjectIDCopy() {
+		for _, resource := range subscription.ResourcesByCodeCopy() {
 			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
 				stopAreasToRequest[messageIdentifier] = &saToRequest{
 					subId: subscription.id,
-					saId:  *(resource.Reference.ObjectId),
+					saId:  *(resource.Reference.Code),
 				}
 			}
 		}

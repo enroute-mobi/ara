@@ -1,18 +1,20 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Reference struct {
-	ObjectId *ObjectID `json:",omitempty"`
-	Type     string    `json:",omitempty"`
+	Code *Code  `json:",omitempty"`
+	Type string `json:",omitempty"`
 }
 
-func NewReference(objectId ObjectID) *Reference {
-	return &Reference{ObjectId: &objectId}
+func NewReference(code Code) *Reference {
+	return &Reference{Code: &code}
 }
 
 func (reference *Reference) GetSha1() string {
-	return reference.ObjectId.HashValue()
+	return reference.Code.HashValue()
 }
 
 func (reference *Reference) UnmarshalJSON(data []byte) error {

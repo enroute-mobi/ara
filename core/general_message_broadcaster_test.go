@@ -11,6 +11,7 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
@@ -23,7 +24,7 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
@@ -34,15 +35,15 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 
 	situation := referential.Model().Situations().New()
 
-	objectid := model.NewObjectID("internal", string(situation.Id()))
-	situation.SetObjectID(objectid)
+	code := model.NewCode("internal", string(situation.Id()))
+	situation.SetCode(code)
 
 	reference := model.Reference{
-		ObjectId: &objectid,
-		Type:     "Situation",
+		Code: &code,
+		Type: "Situation",
 	}
 
-	subs := partner.Subscriptions().New("kind")
+	subs := partner.Subscriptions().New("")
 	subs.Save()
 	subs.CreateAndAddNewResource(reference)
 	subs.Save()
@@ -57,6 +58,7 @@ func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 }
 
 func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
+	assert := assert.New(t)
 	// Create a test http server
 
 	response := []byte{}
@@ -74,9 +76,9 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
-		"local_credential":     "external",
-		"remote_url":           ts.URL,
+		"remote_code_space": "internal",
+		"local_credential":  "external",
+		"remote_url":        ts.URL,
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
@@ -91,24 +93,24 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.Keywords = []string{"Perturbation"}
 
-	objectid := model.NewObjectID("internal", string(situation.Id()))
-	situation.SetObjectID(objectid)
+	code := model.NewCode("internal", string(situation.Id()))
+	situation.SetCode(code)
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
-	objectid2 := model.NewObjectID("internal", "value")
-	stopArea.SetObjectID(objectid2)
+	code2 := model.NewCode("internal", "value")
+	stopArea.SetCode(code2)
 	stopArea.Save()
 
 	affectedStopArea := model.NewAffectedStopArea()
 	affectedStopArea.StopAreaId = stopArea.Id()
 	situation.Affects = append(situation.Affects, affectedStopArea)
 
-	objectid3 := model.NewObjectID("SituationResource", "Situation")
+	code3 := model.NewCode("SituationResource", "Situation")
 
 	reference := model.Reference{
-		ObjectId: &objectid3,
-		Type:     "Situation",
+		Code: &code3,
+		Type: "Situation",
 	}
 
 	subscription := partner.Subscriptions().FindOrCreateByKind("GeneralMessageBroadcast")
@@ -121,7 +123,8 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIGeneralMessageSubscriptionBroadcaster).generalMessageBroadcaster.Start()
 
-	notify, _ := sxml.NewXMLNotifyGeneralMessageFromContent(response)
+	notify, err := sxml.NewXMLNotifyGeneralMessageFromContent(response)
+	assert.Nil(err)
 	delivery := notify.GeneralMessagesDeliveries()
 
 	if len(delivery) != 1 {

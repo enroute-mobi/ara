@@ -34,7 +34,7 @@ func NewSIRIVehicleMonitoringRequestCollector(partner *Partner) *SIRIVehicleMoni
 }
 
 func (connector *SIRIVehicleMonitoringRequestCollector) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace()
 }
 
 func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(request *VehicleUpdateRequest) {
@@ -44,10 +44,10 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 		return
 	}
 
-	objectidKind := connector.remoteObjectidKind
-	objectid, ok := line.ObjectID(objectidKind)
+	codeSpace := connector.remoteCodeSpace
+	code, ok := line.Code(codeSpace)
 	if !ok {
-		logger.Log.Debugf("Requested line %v doesn't have and objectId of kind %v", request.LineId(), objectidKind)
+		logger.Log.Debugf("Requested line %v doesn't have a code with codeSpace %v", request.LineId(), codeSpace)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) RequestVehicleUpdate(req
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
 	siriVehicleMonitoringRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
-	siriVehicleMonitoringRequest.LineRef = objectid.Value()
+	siriVehicleMonitoringRequest.LineRef = code.Value()
 	siriVehicleMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 
 	connector.logSIRIVehicleMonitoringRequest(message, siriVehicleMonitoringRequest)
@@ -130,7 +130,7 @@ func (connector *SIRIVehicleMonitoringRequestCollector) newBQEvent() *audit.BigQ
 }
 
 func (factory *SIRIVehicleMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

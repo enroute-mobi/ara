@@ -29,7 +29,7 @@ func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) CreateConnector(p
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 
@@ -43,7 +43,7 @@ func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPoint
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace()
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestCollector) SetSubscriber(subscriber UpdateSubscriber) {
@@ -87,7 +87,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	}
 
 	stopPointRefs := []string{}
-	idKind := connector.remoteObjectidKind
+	idCodeSpace := connector.remoteCodeSpace
 	partner := string(connector.Partner().Slug())
 
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {
@@ -95,7 +95,7 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 		event := model.NewStopAreaUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(idKind, annotatedStopPoint.StopPointRef())
+		event.Code = model.NewCode(idCodeSpace, annotatedStopPoint.StopPointRef())
 		event.Name = annotatedStopPoint.StopName()
 		event.CollectedAlways = true
 

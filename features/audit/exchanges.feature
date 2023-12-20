@@ -11,7 +11,7 @@ Feature: Audit API exchanges
     And a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
       | remote_url            | http://localhost:8090      |
       | remote_credential     | test                       |
-      | remote_objectid_kind  | internal                   |
+      | remote_code_space  | internal                   |
     When a minute has passed
     Then an audit event should exist with these attributes:
       | NewStatus   | up            |
@@ -77,7 +77,7 @@ Feature: Audit API exchanges
     And a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
     When a minute has passed
     Then an audit event should exist with these attributes:
       | Type               | CheckStatusRequest    |
@@ -120,11 +120,11 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | remote_credential              |
       | local_credential                   | local_credential               |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
       | Name      | Test                                      |
-      | ObjectIDs | "internal": "enRoute:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "enRoute:StopPoint:SP:24:LOC" |
     When I wait that a Subscription has been created with the following attributes:
       | Kind      | StopMonitoringCollect |
     Then an audit event should exist with these attributes:
@@ -173,7 +173,7 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | remote_credential              |
       | local_credential                   | local_credential               |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
     When I send this SIRI request to the Referential "test"
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -308,13 +308,13 @@ Feature: Audit API exchanges
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
        | siri.envelope        | raw                   |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Codes | "internal": "NINOXE:Line:A:BUS" |
       | Name      | Ligne A Bus                     |
     When I send this SIRI request
       """
@@ -350,26 +350,26 @@ Feature: Audit API exchanges
        | remote_url                         | http://localhost:8090 |
        | remote_credential                  | ara                   |
        | local_credential                   | test                  |
-       | remote_objectid_kind               | internal              |
+       | remote_code_space               | internal              |
        | siri.envelope                      | raw                   |
        | broadcast.subscriptions.persistent | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast            |
       | ExternalId        | SpecialExternalId                      |
@@ -448,11 +448,11 @@ Feature: Audit API exchanges
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     And a minute has passed
     And a minute has passed
     And  an audit event should exist with these attributes:
@@ -468,7 +468,7 @@ Feature: Audit API exchanges
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | test                  |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -573,16 +573,16 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
       | siri.direction_type                | Aller,Retour                   |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringCollect                              |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -591,7 +591,7 @@ Feature: Audit API exchanges
       | ReferenceArray[1] | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                              |
-      | ObjectIDs                | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                   | 6ba7b814-9dad-11d1-c-00c04fd430c8       |
       | Monitored                | true                                    |
       | Attribute[DirectionName] | A Direction Name                        |
@@ -766,15 +766,15 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     And a Line exists with the following attributes:
       | Name      | Test1                  |
-      | ObjectIDs | "internal": "testLine1" |
+      | Codes | "internal": "testLine1" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -913,7 +913,7 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
       Then one Vehicle has the following attributes:
-        | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
         | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
         | Bearing   |                                    171.0 |
         | Latitude  |                        48.99927561424598 |
@@ -973,14 +973,14 @@ Feature: Audit API exchanges
       | remote_url           | http://localhost:8090 |
       | remote_credential    | test                  |
       | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
     And a Line exists with the following attributes:
       | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:4:LOC" |
+      | Codes | "internal": "NINOXE:Line:4:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |

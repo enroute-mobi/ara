@@ -34,7 +34,7 @@ type SituationTranslatedString struct {
 
 type Situation struct {
 	model Model
-	ObjectIDConsumer
+	CodeConsumer
 	id     SituationId
 	Origin string
 
@@ -119,7 +119,7 @@ func NewSituation(model Model) *Situation {
 		model: model,
 	}
 
-	situation.objectids = make(ObjectIDs)
+	situation.codes = make(Codes)
 	return situation
 }
 
@@ -136,8 +136,8 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 	type Alias Situation
 
 	aux := &struct {
-		ObjectIDs map[string]string
-		Affects   []json.RawMessage
+		Codes   map[string]string
+		Affects []json.RawMessage
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
@@ -168,8 +168,8 @@ func (situation *Situation) UnmarshalJSON(data []byte) error {
 			}
 		}
 	}
-	if aux.ObjectIDs != nil {
-		situation.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 	return nil
 }
@@ -203,7 +203,7 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 func (situation *Situation) MarshalJSON() ([]byte, error) {
 	type Alias Situation
 	aux := struct {
-		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		Codes      Codes      `json:",omitempty"`
 		RecordedAt *time.Time `json:",omitempty"`
 		*Alias
 		Id      SituationId
@@ -213,8 +213,8 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(situation),
 	}
 
-	if !situation.ObjectIDs().Empty() {
-		aux.ObjectIDs = situation.ObjectIDs()
+	if !situation.Codes().Empty() {
+		aux.Codes = situation.Codes()
 	}
 
 	if !situation.RecordedAt.IsZero() {
@@ -275,7 +275,7 @@ type Situations interface {
 
 	New() Situation
 	Find(id SituationId) (Situation, bool)
-	FindByObjectId(objectid ObjectID) (Situation, bool)
+	FindByCode(code Code) (Situation, bool)
 	FindAll() []Situation
 	Save(situation *Situation) bool
 	Delete(situation *Situation) bool
@@ -317,13 +317,13 @@ func (manager *MemorySituations) FindAll() (situations []Situation) {
 	return
 }
 
-func (manager *MemorySituations) FindByObjectId(objectid ObjectID) (Situation, bool) {
+func (manager *MemorySituations) FindByCode(code Code) (Situation, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	for _, situation := range manager.byIdentifier {
-		situationObjectId, _ := situation.ObjectID(objectid.Kind())
-		if situationObjectId.Value() == objectid.Value() {
+		situationCode, _ := situation.Code(code.CodeSpace())
+		if situationCode.Value() == code.Value() {
 			return *situation, true
 		}
 	}

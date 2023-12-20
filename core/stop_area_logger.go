@@ -14,12 +14,12 @@ func NewStopAreaLogger(referential *Referential, stopArea *model.StopArea) *Stop
 
 	// debug or not ?
 	verbose := false
-	for _, stopAreaObjectId := range referential.LoggerVerboseStopAreas() {
-		objectId, ok := stopArea.ObjectID(stopAreaObjectId.Kind())
+	for _, stopAreaCode := range referential.LoggerVerboseStopAreas() {
+		code, ok := stopArea.Code(stopAreaCode.CodeSpace())
 		if !ok {
 			continue
 		}
-		if objectId.Value() == stopAreaObjectId.Value() {
+		if code.Value() == stopAreaCode.Value() {
 			verbose = true
 			break
 		}

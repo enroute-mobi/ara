@@ -26,8 +26,8 @@ func NewStopAreaController(referential *core.Referential) ControllerInterface {
 func (controller *StopAreaController) findStopArea(identifier string) (*model.StopArea, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().StopAreas().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().StopAreas().FindByCode(code)
 	}
 	return controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
 }
@@ -84,10 +84,10 @@ func (controller *StopAreaController) Update(response http.ResponseWriter, ident
 		return
 	}
 
-	for _, obj := range stopArea.ObjectIDs() {
-		sa, ok := controller.referential.Model().StopAreas().FindByObjectId(obj)
+	for _, obj := range stopArea.Codes() {
+		sa, ok := controller.referential.Model().StopAreas().FindByCode(obj)
 		if ok && sa.Id() != stopArea.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have a code %v", sa.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -113,10 +113,10 @@ func (controller *StopAreaController) Create(response http.ResponseWriter, body 
 		return
 	}
 
-	for _, obj := range stopArea.ObjectIDs() {
-		sa, ok := controller.referential.Model().StopAreas().FindByObjectId(obj)
+	for _, obj := range stopArea.Codes() {
+		sa, ok := controller.referential.Model().StopAreas().FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have an objectid %v", sa.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: stopArea %v already have a code %v", sa.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}

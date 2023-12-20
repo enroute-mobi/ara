@@ -13,18 +13,18 @@ type StopMonitoringUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	originStopAreaObjectId model.ObjectID
+	originStopAreaCode model.Code
 	partner                *Partner
-	remoteObjectidKind     string
+	remoteCodeSpace     string
 
 	stopMonitoringUpdateEvents *CollectUpdateEvents
 }
 
-func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) StopMonitoringUpdateEventBuilder {
+func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaCode model.Code) StopMonitoringUpdateEventBuilder {
 	return StopMonitoringUpdateEventBuilder{
-		originStopAreaObjectId:     originStopAreaObjectId,
+		originStopAreaCode:     originStopAreaCode,
 		partner:                    partner,
-		remoteObjectidKind:         partner.RemoteObjectIDKind(),
+		remoteCodeSpace:         partner.RemoteCodeSpace(),
 		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }
@@ -33,18 +33,18 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	origin := string(builder.partner.Slug())
 
 	// StopAreas
-	stopAreaObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitEvent.StopPointRef())
+	stopAreaCode := model.NewCode(builder.remoteCodeSpace, xmlStopVisitEvent.StopPointRef())
 
 	_, ok := builder.stopMonitoringUpdateEvents.StopAreas[xmlStopVisitEvent.StopPointRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
 			Origin:   origin,
-			ObjectId: stopAreaObjectId,
+			Code: stopAreaCode,
 			Name:     xmlStopVisitEvent.StopPointName(),
 		}
-		if builder.originStopAreaObjectId.Value() != "" && stopAreaObjectId.String() != builder.originStopAreaObjectId.String() {
-			event.ParentObjectId = builder.originStopAreaObjectId
+		if builder.originStopAreaCode.Value() != "" && stopAreaCode.String() != builder.originStopAreaCode.String() {
+			event.ParentCode = builder.originStopAreaCode
 		}
 
 		builder.stopMonitoringUpdateEvents.StopAreas[xmlStopVisitEvent.StopPointRef()] = event
@@ -52,14 +52,14 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	}
 
 	// Lines
-	lineObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitEvent.LineRef())
+	lineCode := model.NewCode(builder.remoteCodeSpace, xmlStopVisitEvent.LineRef())
 
 	_, ok = builder.stopMonitoringUpdateEvents.Lines[xmlStopVisitEvent.LineRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
 			Origin:   origin,
-			ObjectId: lineObjectId,
+			Code: lineCode,
 			Name:     xmlStopVisitEvent.PublishedLineName(),
 		}
 
@@ -68,14 +68,14 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	}
 
 	// VehicleJourneys
-	vjObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitEvent.DatedVehicleJourneyRef())
+	vjCode := model.NewCode(builder.remoteCodeSpace, xmlStopVisitEvent.DatedVehicleJourneyRef())
 
 	_, ok = builder.stopMonitoringUpdateEvents.VehicleJourneys[xmlStopVisitEvent.DatedVehicleJourneyRef()]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			ObjectId:        vjObjectId,
-			LineObjectId:    lineObjectId,
+			Code:        vjCode,
+			LineCode:    lineCode,
 			OriginRef:       xmlStopVisitEvent.OriginRef(),
 			OriginName:      xmlStopVisitEvent.OriginName(),
 			DirectionType:   builder.directionRef(xmlStopVisitEvent.DirectionRef()),
@@ -84,7 +84,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			Monitored:       xmlStopVisitEvent.Monitored(),
 			Occupancy:       model.NormalizedOccupancyName(xmlStopVisitEvent.Occupancy()),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 			SiriXML:      &xmlStopVisitEvent.XMLMonitoredVehicleJourney,
 		}
 
@@ -93,15 +93,15 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	}
 
 	// StopVisits
-	stopVisitObjectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitEvent.ItemIdentifier())
+	stopVisitCode := model.NewCode(builder.remoteCodeSpace, xmlStopVisitEvent.ItemIdentifier())
 
 	_, ok = builder.stopMonitoringUpdateEvents.StopVisits[xmlStopVisitEvent.StopPointRef()][xmlStopVisitEvent.ItemIdentifier()]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
 			Origin:                 origin,
-			ObjectId:               stopVisitObjectId,
-			StopAreaObjectId:       stopAreaObjectId,
-			VehicleJourneyObjectId: vjObjectId,
+			Code:               stopVisitCode,
+			StopAreaCode:       stopAreaCode,
+			VehicleJourneyCode: vjCode,
 			DataFrameRef:           xmlStopVisitEvent.DataFrameRef(),
 			PassageOrder:           xmlStopVisitEvent.Order(),
 			Monitored:              xmlStopVisitEvent.Monitored(),
@@ -111,7 +111,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			RecordedAt:             xmlStopVisitEvent.RecordedAt(),
 			Schedules:              model.NewStopVisitSchedules(),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 			SiriXML:      xmlStopVisitEvent,
 		}
 
@@ -162,7 +162,7 @@ func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(
 	for _, xmlStopVisitCancellationEvent := range delivery.XMLMonitoredStopVisitCancellations() {
 		builder.stopMonitoringUpdateEvents.MonitoringRefs[xmlStopVisitCancellationEvent.MonitoringRef()] = struct{}{}
 
-		objectId := model.NewObjectID(builder.remoteObjectidKind, xmlStopVisitCancellationEvent.ItemRef())
+		code := model.NewCode(builder.remoteCodeSpace, xmlStopVisitCancellationEvent.ItemRef())
 
 		var recordedAt time.Time
 		if t := xmlStopVisitCancellationEvent.RecordedAt(); !t.IsZero() {
@@ -170,7 +170,7 @@ func (builder *StopMonitoringUpdateEventBuilder) SetStopVisitCancellationEvents(
 		} else {
 			recordedAt = delivery.ResponseTimestamp()
 		}
-		builder.stopMonitoringUpdateEvents.Cancellations = append(builder.stopMonitoringUpdateEvents.Cancellations, model.NewNotCollectedUpdateEvent(objectId, recordedAt))
+		builder.stopMonitoringUpdateEvents.Cancellations = append(builder.stopMonitoringUpdateEvents.Cancellations, model.NewNotCollectedUpdateEvent(code, recordedAt))
 	}
 }
 

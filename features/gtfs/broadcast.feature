@@ -4,21 +4,21 @@ Feature: Support GTFS-RT feeds
 
   Scenario: Provide a public GTFS-RT feed
     Given a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" without token
     Then I should receive a GTFS-RT response
 
   Scenario: Provide a authenticated GTFS-RT feed
     Given a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
 
   Scenario: Provide a authenticated GTFS-RT feed (multiple credentials)
     Given a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
       | local_credentials    | secret1,secret2 |
-      | remote_objectid_kind | internal        |
+      | remote_code_space | internal        |
     When I send a GTFS-RT request to the Referential "test" with token "secret1"
     Then I should receive a GTFS-RT response
     When I send a GTFS-RT request to the Referential "test" with token "secret2"
@@ -27,33 +27,33 @@ Feature: Support GTFS-RT feeds
   Scenario: Forbid authorized request on GTFS-RT feed (no token)
     Given a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" without token
     Then I should not receive a GTFS-RT but an unauthorized client error status
 
   Scenario: Forbid authorized request on GTFS-RT feed (wrong token)
     Given a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "wrong"
     Then I should not receive a GTFS-RT but an unauthorized client error status
 
   Scenario: Retrieve Vehicle Positions
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "4567" |
+      | Codes | "internal": "4567" |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -63,38 +63,38 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
 
   @ARA-872
-  Scenario: Retrieve Vehicle Positions with unmatching objectid kind
+  Scenario: Retrieve Vehicle Positions with unmatching code kind
     Given a Line exists with the following attributes:
       | Name      | Test            |
-      | ObjectIDs | "other": "1234" |
+      | Codes | "other": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "3456"                   |
+      | Codes        | "other": "3456"                   |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should not contain Vehicle Positions
 
   @ARA-872
-  Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind
+  Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "3456"                   |
+      | Codes        | "other": "3456"                   |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential                                                   | secret   |
-      | remote_objectid_kind                                               | internal |
-      | gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_objectid_kind | other    |
+      | remote_code_space                                               | internal |
+      | gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -103,20 +103,20 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
 
   @ARA-1044
-  Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "other": "2345"                   |
+      | Codes | "other": "2345"                   |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential                                                           | secret   |
-      | remote_objectid_kind                                                       | internal |
-      | gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_objectid_kind | other    |
+      | remote_code_space                                                       | internal |
+      | gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -125,20 +125,20 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
 
   @ARA-1044
-  Scenario: Retrieve Vehicle Positions with multiple setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Retrieve Vehicle Positions with multiple setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "other": "2345"                   |
+      | Codes | "other": "2345"                   |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential                                                           | secret        |
-      | remote_objectid_kind                                                       | internal      |
-      | gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_objectid_kind | other, other2 |
+      | remote_code_space                                                       | internal      |
+      | gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space | other, other2 |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -147,20 +147,20 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
 
   @ARA-1044
-  Scenario: Retrieve Vehicle Positions with global setting vehicle_remote_objectid_kind
+  Scenario: Retrieve Vehicle Positions with global setting vehicle_remote_code_space
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "3456"                   |
+      | Codes        | "other": "3456"                   |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential             | secret   |
-      | remote_objectid_kind         | internal |
-      | vehicle_remote_objectid_kind | other    |
+      | remote_code_space         | internal |
+      | vehicle_remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -172,17 +172,17 @@ Feature: Support GTFS-RT feeds
   Scenario: Retrieve Vehicle Positions with fallback on generic connector settings
     Given a Line exists with the following attributes:
       | Name      | Test            |
-      | ObjectIDs | "other": "1234" |
+      | Codes | "other": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "other": "2345"                   |
+      | Codes | "other": "2345"                   |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "3456"                   |
+      | Codes        | "other": "3456"                   |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential                                           | secret   |
-      | remote_objectid_kind                                       | internal |
-      | gtfs-rt-vehicle-positions-broadcaster.remote_objectid_kind | other    |
+      | remote_code_space                                       | internal |
+      | gtfs-rt-vehicle-positions-broadcaster.remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -194,17 +194,17 @@ Feature: Support GTFS-RT feeds
   Scenario: Retrieve Vehicle Positions with OccupancyStatus
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Occupancy        | fewSeatsAvailable                 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -285,13 +285,13 @@ Feature: Support GTFS-RT feeds
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector, gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | local_credential      | secret                |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     And I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -303,34 +303,34 @@ Feature: Support GTFS-RT feeds
       | stop_id    | RLA_Bus:StopPoint:BP:PASTO8:LOC     |
 
   @ARA-1298
-  Scenario: Retrieve Vehicle Positions with Partner remote_objectid_kind changed
+  Scenario: Retrieve Vehicle Positions with Partner remote_code_space changed
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "external": "external:1234" |
+      | Codes | "external": "external:1234" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "external": "external:2345"       |
+      | Codes | "external": "external:2345"       |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "4567" |
+      | Codes | "internal": "4567" |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "external": "external:4567" |
+      | Codes | "external": "external:4567" |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "external": "external:3456"       |
+      | Codes        | "external": "external:3456"       |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential              | secret   |
-      | remote_objectid_kind          | internal |
+      | remote_code_space          | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -340,7 +340,7 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
     When the Partner "test" is updated with the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     And show me ara vehicle_journeys
     Then I should receive a GTFS-RT response
@@ -351,56 +351,56 @@ Feature: Support GTFS-RT feeds
       | route_id   | external:1234 |
 
   @ARA-1298
-  Scenario: Retrieve Tip Updates with Partner remote_objectid_kind changed
+  Scenario: Retrieve Tip Updates with Partner remote_code_space changed
     Given a Line exists with the following attributes:
       | Name      | Test               |
-      | ObjectIDs | "internal": "1234" |
+      | Codes | "internal": "1234" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "internal": "2345"                |
+      | Codes | "internal": "2345"                |
       | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "4567" |
+      | Codes | "internal": "4567" |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "3456"                |
+      | Codes        | "internal": "3456"                |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "2345-4567-4"          |
+      | Codes                       | "internal": "2345-4567-4"          |
       | PassageOrder                    | 4                                  |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleAtStop                   | true                               |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival        | 2017-01-01T14:55:00.000+02:00      |
       | Schedule[actual]#Departure      | 2017-01-01T14:59:00.000+02:00      |
       | DepartureStatus                 | onTime                             |
       | ArrivalStatus                   | onTime                             |
     And a Line exists with the following attributes:
       | Name      | Test                        |
-      | ObjectIDs | "external": "external:1234" |
+      | Codes | "external": "external:1234" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs | "external": "external:2345"       |
+      | Codes | "external": "external:2345"       |
       | LineId    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "external": "external:4567" |
+      | Codes | "external": "external:4567" |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "external": "external:3456"         |
+      | Codes        | "external": "external:3456"         |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "external": "external:2345-4567-4"          |
+      | Codes                       | "external": "external:2345-4567-4"          |
       | PassageOrder                    | 4                                           |
       | StopAreaId                      | 6ba7b814-9dad-11d1-8-00c04fd430c8           |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8           |
       | VehicleAtStop                   | true                                        |
-      | Reference[OperatorRef]#ObjectId | "external": "external:CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code | "external": "external:CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival        | 2017-01-01T14:55:00.000+02:00               |
       | Schedule[actual]#Departure      | 2017-01-01T14:59:00.000+02:00               |
       | DepartureStatus                 | onTime                                      |
       | ArrivalStatus                   | onTime                                      |
     And a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Trip Update with these attributes:
@@ -408,7 +408,7 @@ Feature: Support GTFS-RT feeds
       | route_id   | 1234 |
     When the Partner "test" is updated with the following settings:
       | local_credential     | secret   |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Trip Update with these attributes:

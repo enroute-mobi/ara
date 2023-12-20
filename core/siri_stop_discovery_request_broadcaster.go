@@ -25,7 +25,7 @@ func NewSIRIStopDiscoveryRequestBroadcaster(partner *Partner) *SIRIStopPointsDis
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_STOP_POINTS_DISCOVERY_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *sxml.XMLStopPointsDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRIStopPointsDiscoveryResponse, error) {
@@ -42,16 +42,16 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			continue
 		}
 
-		objectID, ok := sas[i].SPDObjectId(connector.remoteObjectidKind)
-		if !ok || objectID.Value() == "" {
+		code, ok := sas[i].SPDCode(connector.remoteCodeSpace)
+		if !ok || code.Value() == "" {
 			continue
 		}
 
-		annotedStopPointMap[objectID.Value()] = struct{}{}
+		annotedStopPointMap[code.Value()] = struct{}{}
 
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
 			StopName:     sas[i].Name,
-			StopPointRef: objectID.Value(),
+			StopPointRef: code.Value(),
 			Monitored:    true,
 			TimingPoint:  true,
 		}
@@ -60,11 +60,11 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			objectid, ok := lines[i].ObjectID(connector.remoteObjectidKind)
+			code, ok := lines[i].Code(connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
-			annotedStopPoint.Lines = append(annotedStopPoint.Lines, objectid.Value())
+			annotedStopPoint.Lines = append(annotedStopPoint.Lines, code.Value())
 		}
 		if len(annotedStopPoint.Lines) == 0 && connector.partner.IgnoreStopWithoutLine() {
 			continue
@@ -82,7 +82,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 }
 
 func (factory *SIRIStopPointsDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

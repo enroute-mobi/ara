@@ -26,8 +26,8 @@ func NewSituationController(referential *core.Referential) ControllerInterface {
 func (controller *SituationController) findSituation(identifier string) (model.Situation, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().Situations().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().Situations().FindByCode(code)
 	}
 	return controller.referential.Model().Situations().Find(model.SituationId(identifier))
 }

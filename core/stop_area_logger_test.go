@@ -11,31 +11,31 @@ func Test_NewStopAreaLogger(t *testing.T) {
 	assert := assert.New(t)
 
 	referential := referentials.New("default")
-	referential.SetSetting("logger.verbose.stop_areas", "kind:value")
+	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
 
 	memoryModel := model.NewMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
-	objectid := model.NewObjectID("kind", "value")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "value")
+	stopArea.SetCode(code)
 
 	logger := NewStopAreaLogger(referential, stopArea)
 	assert.True(logger.IsVerbose(), "StopAreaLogger should be in verbose")
 }
 
-func Test_NewStopAreaLogger_WithMultipleObjectIds(t *testing.T) {
+func Test_NewStopAreaLogger_WithMultipleCodes(t *testing.T) {
 	assert := assert.New(t)
 
 	referential := referentials.New("default")
-	referential.SetSetting("logger.verbose.stop_areas", "kind:value")
+	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
 
 	memoryModel := model.NewMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
-	objectid := model.NewObjectID("kind", "value")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "value")
+	stopArea.SetCode(code)
 
-	stopArea.SetObjectID(model.NewObjectID("second", "value"))
+	stopArea.SetCode(model.NewCode("second", "value"))
 
 	logger := NewStopAreaLogger(referential, stopArea)
 	assert.True(logger.IsVerbose(), "StopAreaLogger should be in verbose")
@@ -45,13 +45,13 @@ func Test_NewStopAreaLogger_NoMatch(t *testing.T) {
 	assert := assert.New(t)
 
 	referential := referentials.New("default")
-	referential.SetSetting("logger.debug.stop_areas", "kind:value")
+	referential.SetSetting("logger.debug.stop_areas", "codeSpace:value")
 
 	memoryModel := model.NewMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
-	objectid := model.NewObjectID("no", "match")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("no", "match")
+	stopArea.SetCode(code)
 
 	logger := NewStopAreaLogger(referential, stopArea)
 	assert.False(logger.IsVerbose(), "StopAreaLogger should not be in verbose")

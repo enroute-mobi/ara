@@ -26,8 +26,8 @@ func NewVehicleJourneyController(referential *core.Referential) ControllerInterf
 func (controller *VehicleJourneyController) findVehicleJourney(identifier string) (*model.VehicleJourney, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().VehicleJourneys().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().VehicleJourneys().FindByCode(code)
 	}
 	return controller.referential.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 }
@@ -79,10 +79,10 @@ func (controller *VehicleJourneyController) Update(response http.ResponseWriter,
 		return
 	}
 
-	for _, obj := range vehicleJourney.ObjectIDs() {
-		vj, ok := controller.referential.Model().VehicleJourneys().FindByObjectId(obj)
+	for _, obj := range vehicleJourney.Codes() {
+		vj, ok := controller.referential.Model().VehicleJourneys().FindByCode(obj)
 		if ok && vj.Id() != vehicleJourney.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have a code %v", vj.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -108,10 +108,10 @@ func (controller *VehicleJourneyController) Create(response http.ResponseWriter,
 		return
 	}
 
-	for _, obj := range vehicleJourney.ObjectIDs() {
-		vj, ok := controller.referential.Model().VehicleJourneys().FindByObjectId(obj)
+	for _, obj := range vehicleJourney.Codes() {
+		vj, ok := controller.referential.Model().VehicleJourneys().FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have an objectid %v", vj.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicleJourney %v already have a code %v", vj.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
