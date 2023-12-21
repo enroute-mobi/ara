@@ -33,6 +33,7 @@ type HTTPClientOAuth struct {
 	ClientID     string
 	ClientSecret string
 	TokenURL     string
+	Scopes       []string
 }
 
 type HTTPClientUrls struct {
@@ -98,6 +99,7 @@ func httpClient(opts HTTPClientOptions) (c *http.Client) {
 		ClientID:     opts.OAuth.ClientID,
 		ClientSecret: opts.OAuth.ClientSecret,
 		TokenURL:     opts.OAuth.TokenURL,
+		Scopes:       opts.OAuth.Scopes,
 	}
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, c)
