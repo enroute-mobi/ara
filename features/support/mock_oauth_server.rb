@@ -58,8 +58,17 @@ class OAUTHServer
     "#{@options['client_id']}:#{@options['client_secret']}"
   end
 
+  def expected_scopes
+    @options['scopes']&.split(',')&.join('+')&.to_s
+  end
+
   def expected_body
-    'grant_type=client_credentials'
+    body = 'grant_type=client_credentials'
+    if !expected_scopes.nil?
+      body = body + '&' + expected_scopes
+    end
+
+    body
   end
 
   def start

@@ -62,6 +62,7 @@ const (
 	OAUTH_CLIENT_ID     = "remote_authentication.oauth.client_id"
 	OAUTH_CLIENT_SECRET = "remote_authentication.oauth.client_secret"
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
+	OAUTH_SCOPES        = "remote_authentication.oauth.scopes"
 
 	SIRI_ENVELOPE                                         = "siri.envelope"
 	SIRI_LINE_PUBLISHED_NAME                              = "siri.line.published_name"
@@ -713,12 +714,16 @@ func (s *PartnerSettings) setHttpClientOAuth(settings map[string]string) {
 	clientId, clientIdFound := settings[OAUTH_CLIENT_ID]
 	clientSecret, clientSecretFound := settings[OAUTH_CLIENT_SECRET]
 	tokenURL, tokenURLFound := settings[OAUTH_TOKEN_URL]
+	scopes, scopesFound := settings[OAUTH_SCOPES]
 
 	if clientIdFound && clientSecretFound && tokenURLFound {
 		s.httpClientOAuth = &remote.HTTPClientOAuth{
 			ClientID:     clientId,
 			ClientSecret: clientSecret,
 			TokenURL:     tokenURL,
+		}
+		if scopesFound {
+			s.httpClientOAuth.Scopes = strings.Split(scopes, ",")
 		}
 	} else {
 		s.httpClientOAuth = nil
