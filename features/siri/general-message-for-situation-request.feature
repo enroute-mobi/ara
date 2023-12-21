@@ -71,7 +71,7 @@ Feature: Support SIRI GeneralMessage for Situation
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                    <Message>
-                     <MessageType>longMessage</MessageType>
+                     <MessageType>textOnly</MessageType>
                      <MessageText>We can broadcast Other situations with ReportType</MessageText>
                    </Message>
                  </siri:Content>
@@ -91,6 +91,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | Version                                                                             | 1                                                                          |
       | Keywords                                                                            | ["Commercial"]                                                             |
       | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                                                  |
+      | Summary[DefaultValue]                                                               | Carte abonnement                                                           |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
@@ -168,7 +169,11 @@ Feature: Support SIRI GeneralMessage for Situation
                       <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     </siri:LineSection>
                     <Message>
-                      <MessageType>longMessage</MessageType>
+                      <MessageType>shortMessage</MessageType>
+                      <MessageText>Carte abonnement</MessageText>
+                    </Message>
+                    <Message>
+                      <MessageType>textOnly</MessageType>
                       <MessageText>La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
                     </Message>
                   </siri:Content>

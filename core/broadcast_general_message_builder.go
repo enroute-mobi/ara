@@ -113,16 +113,19 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		return nil
 	}
 
-	var siriMessage siri.SIRIMessage
 	if situation.Summary != nil {
-		siriMessage.Content = situation.Summary.DefaultValue
-		siriMessage.Type = "shortMessage"
-		siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, &siriMessage)
+		siriMessage := &siri.SIRIMessage{
+			Content: situation.Summary.DefaultValue,
+			Type:    "shortMessage",
+		}
+		siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 	}
 	if situation.Description != nil {
-		siriMessage.Content = situation.Description.DefaultValue
-		siriMessage.Type = "longMessage"
-		siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, &siriMessage)
+		siriMessage := &siri.SIRIMessage{
+			Content: situation.Description.DefaultValue,
+			Type:    "textOnly",
+		}
+		siriGeneralMessage.Messages = append(siriGeneralMessage.Messages, siriMessage)
 	}
 	return siriGeneralMessage
 }
