@@ -224,7 +224,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
 
-	for _, lineRef := range content.LineRef() {
+	for _, lineRef := range content.LineRefs() {
 		builder.setAffectedLine(lineRef)
 	}
 
