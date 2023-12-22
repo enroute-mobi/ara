@@ -30,7 +30,7 @@ Feature: Support SIRI GeneralMessage by subscription
          xmlns:ns6="http://wsdl.siri.org.uk/siri">
          <ns5:ResponseStatus>
              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-             <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns5:RequestMessageRef>
+             <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns5:RequestMessageRef>
              <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
              <ns5:SubscriptionRef>6ba7b814-9dad-11d1-6-00c04fd430c8</ns5:SubscriptionRef>
              <ns5:Status>true</ns5:Status>
@@ -54,6 +54,10 @@ Feature: Support SIRI GeneralMessage by subscription
       And a Line exists with the following attributes:
         | Name              | Test                            |
         | Codes         | "internal":"NINOXE:Line::3:LOC" |
+        | CollectSituations | true                            |
+      And a Line exists with the following attributes:
+        | Name              | Test                            |
+        | Codes             | "internal":"NINOXE:Line::4:LOC" |
         | CollectSituations | true                            |
       And a StopArea exists with the following attributes:
         | Name              | Test                                    |
@@ -89,7 +93,7 @@ Feature: Support SIRI GeneralMessage by subscription
             <ns3:ResponseTimestamp>2017-03-29T16:47:53.039+02:00</ns3:ResponseTimestamp>
             <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-6-00c04fd430c8</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-7-00c04fd430c8</ns5:SubscriptionRef>
             <ns3:Status>true</ns3:Status>
             <ns3:GeneralMessage>
                <ns3:RecordedAtTime>2017-03-01T03:30:06.000+01:00</ns3:RecordedAtTime>
@@ -100,6 +104,7 @@ Feature: Support SIRI GeneralMessage by subscription
                <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
                <ns3:ValidUntilTime>2017-03-29T03:30:06.000+01:00</ns3:ValidUntilTime>
                <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFGeneralMessageStructure">
+               <LineRef>NINOXE:Line::3:LOC</LineRef>
                   <Message>
                     <MessageType>textOnly</MessageType>
                     <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
@@ -111,6 +116,23 @@ Feature: Support SIRI GeneralMessage by subscription
                   </LineSection>
                </ns3:Content>
             </ns3:GeneralMessage>
+            <ns3:GeneralMessage>
+               <ns3:RecordedAtTime>2017-03-01T03:30:06.000+01:00</ns3:RecordedAtTime>
+               <ns3:ItemIdentifier>3477</ns3:ItemIdentifier>
+               <ns3:InfoMessageIdentifier>NINOXE:GeneralMessage:27_2</ns3:InfoMessageIdentifier>
+               <ns3:InfoMessageVersion>2</ns3:InfoMessageVersion>
+               <ns3:formatRef>STIF-IDF</ns3:formatRef>
+               <ns3:InfoChannelRef>Commercial</ns3:InfoChannelRef>
+               <ns3:ValidUntilTime>2017-03-29T03:30:06.000+01:00</ns3:ValidUntilTime>
+               <ns3:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns9:IDFGeneralMessageStructure">
+               <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+                  <Message>
+                    <MessageType>textOnly</MessageType>
+                    <MessageText xml:lang="NL">carte d'abonnement</MessageText>
+                  </Message>
+                  <LineRef>NINOXE:Line::4:LOC</LineRef>
+               </ns3:Content>
+            </ns3:GeneralMessage>
          </ns3:GeneralMessageDelivery>
        </Notification>
        <SiriExtension/>
@@ -119,22 +141,31 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
       """
     Then one Situation has the following attributes:
-        | Codes                                                                       | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | Keywords                                                                        | ["Commercial"]                            |
-        | ReportType                                                                      | general                                   |
-        | ValidityPeriods[0]#StartTime                                                    | 2017-03-01T03:30:06+01:00                 |
-        | ValidityPeriods[0]#EndTime                                                      | 2017-03-29T03:30:06+01:00                 |
-        | Version                                                                         | 2                                         |
-        | Affects[Line]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop    | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop   | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
+        | Codes                                                                         | "internal" : "NINOXE:GeneralMessage:27_1" |
+        | Keywords                                                                      | ["Commercial"]                            |
+        | ReportType                                                                    | general                                   |
+        | ValidityPeriods[0]#StartTime                                                  | 2017-03-01T03:30:06+01:00                 |
+        | ValidityPeriods[0]#EndTime                                                    | 2017-03-29T03:30:06+01:00                 |
+        | Version                                                                       | 2                                         |
+        | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+    Then one Situation has the following attributes:
+      | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
+      | Keywords                     | ["Commercial"]                            |
+      | ReportType                   | general                                   |
+      | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00                 |
+      | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00                 |
+      | Version                      | 2                                         |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Affects[Line]                | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
     And an audit event should exist with these attributes:
-      | Protocol           | siri                                                         |
-      | Direction          | received                                                     |
-      | Status             | OK                                                           |
-      | Type               | NotifyGeneralMessage                                         |
-      | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
-      | Lines              | ["NINOXE:Line::3:LOC"]                                       |
+      | Protocol  | siri                                                         |
+      | Direction | received                                                     |
+      | Status    | OK                                                           |
+      | Type      | NotifyGeneralMessage                                         |
+      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
+      | Lines     | ["NINOXE:Line::3:LOC", "NINOXE:Line::4:LOC"]                 |
 
   Scenario: 3865 - Manage a InfoMessageCancellation
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with

@@ -212,15 +212,12 @@ Feature: Support SIRI GeneralMessage for Situation
                 <siri:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</siri:ResponseTimestamp>
                 <siri:Status>true</siri:Status>
                 <siri:GeneralMessage formatRef="FRANCE">
-                  <siri:RecordedAtTime>
-                  2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
                   <siri:ItemIdentifier>3477</siri:ItemIdentifier>
-                  <siri:InfoMessageIdentifier>
-                  NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
                   <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
                   <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
-                  <siri:ValidUntilTime>
-                  2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
+                  <siri:ValidUntilTime>2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
                   <siri:Content>
                    <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                    <siri:LineRef>1234</siri:LineRef>
@@ -238,6 +235,22 @@ Feature: Support SIRI GeneralMessage for Situation
                     </Message>
                   </siri:Content>
                 </siri:GeneralMessage>
+                <siri:GeneralMessage formatRef="FRANCE">
+                  <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>3478</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_2</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content>
+                    <siri:LineRef>5678</siri:LineRef>
+                    <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                    <Message>
+                      <MessageType>longMessage</MessageType>
+                      <MessageText xml:lang="NL">carte d'abonnement</MessageText>
+                    </Message>
+                  </siri:Content>
+                </siri:GeneralMessage>
               </siri:GeneralMessageDelivery>
             </Answer>
             <AnswerExtension />
@@ -251,7 +264,11 @@ Feature: Support SIRI GeneralMessage for Situation
       | remote_code_space | internal              |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | Codes         | "internal":"1234" |
+      | Codes             | "internal":"1234" |
+      | CollectSituations | true              |
+    And a Line exists with the following attributes:
+      | Name              | Test              |
+      | Codes             | "internal":"5678" |
       | CollectSituations | true              |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
@@ -280,20 +297,31 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidityPeriods[0]#StartTime                                                       | 2017-03-29T03:30:06+02:00                                                  |
       | ValidityPeriods[0]#EndTime                                                         | 2017-03-29T20:50:06+02:00                                                  |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[1]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-7-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[1]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-7-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                                               |
+    Then one Situation has the following attributes:
+      | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
+      | RecordedAt                   | 2017-03-29T03:30:06+02:00                 |
+      | Version                      | 1                                         |
+      | Keywords                     | ["Commercial"]                            |
+      | ProducerRef                  | NINOXE:default                            |
+      | ValidityPeriods[0]#StartTime | 2017-03-29T03:30:06+02:00                 |
+      | ValidityPeriods[0]#EndTime   | 2017-03-29T20:50:06+02:00                 |
+      | Description[DefaultValue]    | carte d'abonnement                        |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
+      | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
     And an audit event should exist with these attributes:
-      | Protocol  | siri                                                                 |
-      | Direction | sent                                                                 |
-      | Status    | OK                                                                   |
-      | Type      | GeneralMessageRequest                                                |
-      | StopAreas | ["destinationRef1", "destinationRef2", "NINOXE:StopPoint:SP:24:LOC"] |
-      | Lines     | ["1234"]                                                             |
+      | Protocol  | siri                                                                                                                        |
+      | Direction | sent                                                                                                                        |
+      | Status    | OK                                                                                                                          |
+      | Type      | GeneralMessageRequest                                                                                                       |
+      | StopAreas | ["destinationRef1", "destinationRef2", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC", "NINOXE:StopPoint:SP:26:LOC"] |
+      | Lines     | ["1234", "5678"]                                                                                                            |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with

@@ -345,9 +345,10 @@ func Test_setAffectedLine(t *testing.T) {
 	}
 
 	for _, tt := range TestCases {
+		affectedLines := make(map[model.LineId]*model.AffectedLine)
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
-		builder.setAffectedLine(tt.LineRef)
-		assert.Equal(tt.expectedAffectedLine, builder.affectedLines[model.LineId(line.Id())], tt.message)
+		builder.setAffectedLine(tt.LineRef, affectedLines)
+		assert.Equal(tt.expectedAffectedLine, affectedLines[model.LineId(line.Id())], tt.message)
 	}
 }
 
@@ -403,10 +404,11 @@ func Test_setAffectedDestination(t *testing.T) {
 
 	for _, tt := range TestCases {
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		affectedLines := make(map[model.LineId]*model.AffectedLine)
 		affectedLine := model.NewAffectedLine()
 		affectedLine.LineId = line.Id()
-		builder.affectedLines[line.Id()] = affectedLine
-		builder.setAffectedDestination(line.Id(), tt.StopPointRef)
+		affectedLines[line.Id()] = affectedLine
+		builder.setAffectedDestination(line.Id(), tt.StopPointRef, affectedLines)
 		assert.Equal(tt.expectedAffectedLine, affectedLine, tt.message)
 	}
 }
@@ -508,6 +510,7 @@ func Test_setAffectedSection(t *testing.T) {
 
 	for _, tt := range TestCases {
 		builder := NewGeneralMessageUpdateEventBuilder(partner)
+		affectedLines := make(map[model.LineId]*model.AffectedLine)
 		lineSection := LineSection{
 			LineRef:   tt.LineRef,
 			FirstStop: tt.firstStop,
@@ -521,15 +524,15 @@ func Test_setAffectedSection(t *testing.T) {
 					&model.AffectedDestination{StopAreaId: firstStop.Id()},
 				},
 			}
-			builder.affectedLines[line.Id()] = existingAffectedLine
+			affectedLines[line.Id()] = existingAffectedLine
 		}
 
-		builder.setAffectedSection(lineSection)
+		builder.setAffectedSection(lineSection, affectedLines)
 
 		if tt.expectedAffectedLine == nil {
-			assert.Len(builder.affectedLines, 0)
+			assert.Len(affectedLines, 0)
 		} else {
-			assert.Equal(tt.expectedAffectedLine, builder.affectedLines[line.Id()], tt.message)
+			assert.Equal(tt.expectedAffectedLine, affectedLines[line.Id()], tt.message)
 		}
 
 	}
