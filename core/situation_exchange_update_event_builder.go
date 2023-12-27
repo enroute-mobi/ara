@@ -48,12 +48,13 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 
 	situationEvent := &model.SituationUpdateEvent{
-		Origin:        string(builder.partner.Slug()),
-		CreatedAt:     builder.Clock().Now(),
-		RecordedAt:    xmlSituation.RecordedAtTime(),
-		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlSituation.SituationNumber()),
-		Version:       xmlSituation.Version(),
-		ProducerRef:   producerRef,
+		Origin:         string(builder.partner.Slug()),
+		CreatedAt:      builder.Clock().Now(),
+		RecordedAt:     xmlSituation.RecordedAtTime(),
+		SituationCode:  model.NewCode(builder.remoteCodeSpace, xmlSituation.SituationNumber()),
+		Version:        xmlSituation.Version(),
+		ProducerRef:    producerRef,
+		ParticipantRef: xmlSituation.ParticipantRef(),
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 

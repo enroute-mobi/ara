@@ -91,6 +91,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ValidityPeriods: situation.ValidityPeriods,
 		Keywords:        strings.Join(situation.Keywords, " "),
 		ReportType:      situation.ReportType,
+		ParticipantRef:  situation.ParticipantRef,
 	}
 
 	if situation.Description != nil {

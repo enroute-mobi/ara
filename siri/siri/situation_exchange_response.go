@@ -40,6 +40,7 @@ type SIRIPtSituationElement struct {
 	ValidityPeriods []*model.TimeRange
 	Keywords        string
 	ReportType      model.ReportType
+	ParticipantRef  string
 	Summary         string
 	Description     string
 

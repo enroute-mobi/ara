@@ -49,8 +49,9 @@ type Situation struct {
 	ProducerRef string `json:",omitempty"`
 	Format      string `json:",omitempty"`
 
-	Summary     *SituationTranslatedString `json:",omitempty"`
-	Description *SituationTranslatedString `json:",omitempty"`
+	ParticipantRef string                     `json:",omitempty"`
+	Summary        *SituationTranslatedString `json:",omitempty"`
+	Description    *SituationTranslatedString `json:",omitempty"`
 
 	Affects []Affect `json:",omitempty"`
 }

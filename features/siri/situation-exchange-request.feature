@@ -10,6 +10,7 @@ Feature: Support SIRI Situation Exchange by request
       | Version                                                                             | 1                                             |
       | Keywords                                                                            | ["Commercial", "Test"]                        |
       | ReportType                                                                          | general                                       |
+      | ParticipantRef                                                                      | "535"                                          |
       | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
@@ -69,6 +70,7 @@ Feature: Support SIRI Situation Exchange by request
                 <siri:Situations>
                 <siri:PtSituationElement>
                     <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:ParticipantRef>535</siri:ParticipantRef>
                     <siri:SituationNumber>test</siri:SituationNumber>
                     <siri:Version>1</siri:Version>
                     <siri:Source>
@@ -208,6 +210,7 @@ Feature: Support SIRI Situation Exchange by request
                 <siri:Situations>
                 <siri:PtSituationElement>
                     <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:ParticipantRef>535</siri:ParticipantRef>
                     <siri:SituationNumber>test</siri:SituationNumber>
                     <siri:Version>1</siri:Version>
                     <siri:Source>
@@ -309,6 +312,7 @@ Feature: Support SIRI Situation Exchange by request
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
       | ReportType                                                                         | general                                       |
+      | ParticipantRef                                                                     | "535"                                          |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |

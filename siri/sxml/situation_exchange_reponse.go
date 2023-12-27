@@ -34,8 +34,9 @@ type XMLPtSituationElement struct {
 
 	validityPeriods []*XMLValidityPeriod
 
-	summary     string
-	description string
+	participantRef string
+	summary        string
+	description    string
 
 	affects []*XMLAffect
 }
@@ -220,6 +221,13 @@ func (v *XMLValidityPeriod) EndTime() time.Time {
 		v.endTime = v.findTimeChildContent("EndTime")
 	}
 	return v.endTime
+}
+
+func (visit *XMLPtSituationElement) ParticipantRef() string {
+	if visit.participantRef == "" {
+		visit.participantRef = visit.findStringChildContent("ParticipantRef")
+	}
+	return visit.participantRef
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

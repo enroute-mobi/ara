@@ -12,6 +12,7 @@ type SituationUpdateEvent struct {
 	Origin          string
 	Format          string
 	ProducerRef     string
+	ParticipantRef  string
 	ValidityPeriods []*TimeRange
 	Keywords        []string
 	ReportType      ReportType

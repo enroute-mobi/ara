@@ -36,6 +36,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.RecordedAt = event.RecordedAt
 		situation.Version = event.Version
 		situation.ProducerRef = event.ProducerRef
+		situation.ParticipantRef = event.ParticipantRef
 
 		situation.Summary = event.Summary
 		situation.Description = event.Description

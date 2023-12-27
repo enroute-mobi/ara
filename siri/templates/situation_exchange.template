@@ -1,5 +1,6 @@
 <siri:PtSituationElement>
-				<siri:CreationTime>{{ .CreationTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:CreationTime>{{ if .SituationNumber }}
+				<siri:CreationTime>{{ .CreationTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:CreationTime>{{ if .ParticipantRef }}
+				<siri:ParticipantRef>{{ .ParticipantRef }}</siri:ParticipantRef>{{ end }}{{ if .SituationNumber }}
 				<siri:SituationNumber>{{ .SituationNumber }}</siri:SituationNumber>{{ end }}
 				<siri:Version>{{ .Version }}</siri:Version>
 				<siri:Source>
