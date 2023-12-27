@@ -92,6 +92,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		Keywords:        strings.Join(situation.Keywords, " "),
 		ReportType:      situation.ReportType,
 		ParticipantRef:  situation.ParticipantRef,
+		VersionedAtTime: situation.VersionedAt,
 	}
 
 	if situation.Description != nil {

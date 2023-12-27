@@ -55,6 +55,7 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		Version:        xmlSituation.Version(),
 		ProducerRef:    producerRef,
 		ParticipantRef: xmlSituation.ParticipantRef(),
+		VersionedAt:    xmlSituation.VersionedAtime(),
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 

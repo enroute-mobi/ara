@@ -37,6 +37,7 @@ type SIRIPtSituationElement struct {
 	CreationTime    time.Time
 	SituationNumber string
 	Version         int
+	VersionedAtTime time.Time
 	ValidityPeriods []*model.TimeRange
 	Keywords        string
 	ReportType      model.ReportType

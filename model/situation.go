@@ -41,6 +41,7 @@ type Situation struct {
 	RecordedAt time.Time
 	Version    int `json:",omitempty"`
 
+	VersionedAt     time.Time
 	ValidityPeriods []*TimeRange
 
 	Keywords   []string   `json:",omitempty"`
@@ -204,8 +205,9 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 func (situation *Situation) MarshalJSON() ([]byte, error) {
 	type Alias Situation
 	aux := struct {
-		Codes      Codes      `json:",omitempty"`
-		RecordedAt *time.Time `json:",omitempty"`
+		Codes       Codes      `json:",omitempty"`
+		RecordedAt  *time.Time `json:",omitempty"`
+		VersionedAt *time.Time `json:",omitempty"`
 		*Alias
 		Id      SituationId
 		Affects []Affect `json:",omitempty"`
@@ -220,6 +222,10 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
+	}
+
+	if !situation.VersionedAt.IsZero() {
+		aux.VersionedAt = &situation.VersionedAt
 	}
 
 	if len(situation.Affects) != 0 {

@@ -28,10 +28,10 @@ type XMLPtSituationElement struct {
 
 	version Int
 
-	keywords       []string
-	reportType     string
-	recordedAtTime time.Time
-
+	keywords        []string
+	reportType      string
+	recordedAtTime  time.Time
+	versionedAtTime time.Time
 	validityPeriods []*XMLValidityPeriod
 
 	participantRef string
@@ -165,6 +165,13 @@ func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
 		visit.recordedAtTime = visit.findTimeChildContent("CreationTime")
 	}
 	return visit.recordedAtTime
+}
+
+func (visit *XMLPtSituationElement) VersionedAtime() time.Time {
+	if visit.versionedAtTime.IsZero() {
+		visit.versionedAtTime = visit.findTimeChildContent("VersionedAtTime")
+	}
+	return visit.versionedAtTime
 }
 
 func (visit *XMLPtSituationElement) SituationNumber() string {

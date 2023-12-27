@@ -41,6 +41,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.Summary = event.Summary
 		situation.Description = event.Description
 
+		situation.VersionedAt = event.VersionedAt
 		situation.ValidityPeriods = event.ValidityPeriods
 		situation.Keywords = event.Keywords
 		situation.ReportType = event.ReportType
