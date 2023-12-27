@@ -41,8 +41,9 @@ type Situation struct {
 	RecordedAt time.Time
 	Version    int `json:",omitempty"`
 
-	VersionedAt     time.Time
-	ValidityPeriods []*TimeRange
+	VersionedAt        time.Time
+	ValidityPeriods    []*TimeRange
+	PublicationWindows []*TimeRange
 
 	Progress   SituationProgress `json:",omitempty"`
 	Keywords   []string          `json:",omitempty"`

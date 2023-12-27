@@ -85,6 +85,16 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		situationEvent.ValidityPeriods = append(situationEvent.ValidityPeriods, period)
 	}
 
+	for _, publicationWindow := range xmlSituation.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		situationEvent.PublicationWindows = append(
+			situationEvent.PublicationWindows,
+			window)
+	}
 	for _, affect := range xmlSituation.Affects() {
 		builder.setAffect(situationEvent, affect)
 	}

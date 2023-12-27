@@ -15,6 +15,8 @@ Feature: Support SIRI Situation Exchange by request
       | Progress                                                                            | published                                     |
       | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                                     | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                                       | 2017-09-25T01:00:00+02:00                     |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
@@ -84,6 +86,10 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
+                    <siri:PublicationWindow>
+                      <siri:StartTime>2017-09-01T01:00:00.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
+                    </siri:PublicationWindow>
                     <siri:UndefinedReason/>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
@@ -226,6 +232,10 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
+                    <siri:PublicationWindow>
+                      <siri:StartTime>2017-09-01T01:00:00.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
+                    </siri:PublicationWindow>
                     <siri:UndefinedReason/>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
@@ -323,6 +333,8 @@ Feature: Support SIRI Situation Exchange by request
       | Progress                                                                           | published                                     |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                                      | 2017-09-25T01:00:00+02:00                     |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-4-00c04fd430c8             |

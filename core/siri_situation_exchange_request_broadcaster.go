@@ -85,15 +85,16 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	}
 
 	ptSituationElement := &siri.SIRIPtSituationElement{
-		SituationNumber: situationNumber,
-		CreationTime:    situation.RecordedAt,
-		Version:         situation.Version,
-		ValidityPeriods: situation.ValidityPeriods,
-		Keywords:        strings.Join(situation.Keywords, " "),
-		ReportType:      situation.ReportType,
-		ParticipantRef:  situation.ParticipantRef,
-		VersionedAtTime: situation.VersionedAt,
-		Progress:        situation.Progress,
+		SituationNumber:    situationNumber,
+		CreationTime:       situation.RecordedAt,
+		Version:            situation.Version,
+		ValidityPeriods:    situation.ValidityPeriods,
+		PublicationWindows: situation.PublicationWindows,
+		Keywords:           strings.Join(situation.Keywords, " "),
+		ReportType:         situation.ReportType,
+		ParticipantRef:     situation.ParticipantRef,
+		VersionedAtTime:    situation.VersionedAt,
+		Progress:           situation.Progress,
 	}
 
 	if situation.Description != nil {

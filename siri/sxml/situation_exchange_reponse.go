@@ -28,11 +28,12 @@ type XMLPtSituationElement struct {
 
 	version Int
 
-	keywords        []string
-	reportType      string
-	recordedAtTime  time.Time
-	versionedAtTime time.Time
-	validityPeriods []*XMLValidityPeriod
+	keywords           []string
+	reportType         string
+	recordedAtTime     time.Time
+	versionedAtTime    time.Time
+	validityPeriods    []*XMLPeriod
+	publicationWindows []*XMLPeriod
 
 	progress       string
 	participantRef string
@@ -42,7 +43,7 @@ type XMLPtSituationElement struct {
 	affects []*XMLAffect
 }
 
-type XMLValidityPeriod struct {
+type XMLPeriod struct {
 	XMLStructure
 
 	startTime time.Time
@@ -73,10 +74,10 @@ func NewXMLAffect(node XMLNode) *XMLAffect {
 	return xmlAffect
 }
 
-func NewXMLValidityPeriod(node XMLNode) *XMLValidityPeriod {
-	xmlValidityPeriod := &XMLValidityPeriod{}
-	xmlValidityPeriod.node = node
-	return xmlValidityPeriod
+func NewXMLPeriod(node XMLNode) *XMLPeriod {
+	xmlPeriod := &XMLPeriod{}
+	xmlPeriod.node = node
+	return xmlPeriod
 }
 
 func NewXMLAffectedSection(node XMLNode) *XMLAffectedSection {
@@ -205,26 +206,38 @@ func (visit *XMLPtSituationElement) ReportType() string {
 	return visit.reportType
 }
 
-func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLValidityPeriod {
+func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
+	if visit.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := visit.findNodes("PublicationWindow")
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		visit.publicationWindows = publicationWindows
+	}
+	return visit.publicationWindows
+}
+
+func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 	if visit.validityPeriods == nil {
-		validityPeriods := []*XMLValidityPeriod{}
+		validityPeriods := []*XMLPeriod{}
 		nodes := visit.findNodes("ValidityPeriod")
 		for _, node := range nodes {
-			validityPeriods = append(validityPeriods, NewXMLValidityPeriod(node))
+			validityPeriods = append(validityPeriods, NewXMLPeriod(node))
 		}
 		visit.validityPeriods = validityPeriods
 	}
 	return visit.validityPeriods
 }
 
-func (v *XMLValidityPeriod) StartTime() time.Time {
+func (v *XMLPeriod) StartTime() time.Time {
 	if v.startTime.IsZero() {
 		v.startTime = v.findTimeChildContent("StartTime")
 	}
 	return v.startTime
 }
 
-func (v *XMLValidityPeriod) EndTime() time.Time {
+func (v *XMLPeriod) EndTime() time.Time {
 	if v.endTime.IsZero() {
 		v.endTime = v.findTimeChildContent("EndTime")
 	}

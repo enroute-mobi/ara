@@ -43,6 +43,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 
 		situation.VersionedAt = event.VersionedAt
 		situation.ValidityPeriods = event.ValidityPeriods
+		situation.PublicationWindows = event.PublicationWindows
 		situation.Keywords = event.Keywords
 		situation.ReportType = event.ReportType
 		situation.Progress = event.Progress

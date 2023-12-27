@@ -11,7 +11,11 @@
 				<siri:ValidityPeriod>{{ if not .StartTime.IsZero }}
 					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
 					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
-				</siri:ValidityPeriod>{{ end }}{{ end }}
+				</siri:ValidityPeriod>{{ end }}{{ end }}{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+				<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+				</siri:PublicationWindow>{{ end }}{{ end }}
 				<siri:UndefinedReason />{{ if .ReportType }}
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ if .Summary }}
