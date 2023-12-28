@@ -12,6 +12,7 @@ Feature: Support SIRI Situation Exchange by request
       | ReportType                                                                          | general                                       |
       | ParticipantRef                                                                      | "535"                                         |
       | VersionedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                                            | published                                     |
       | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
@@ -78,6 +79,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:SourceType>directReport</siri:SourceType>
                     </siri:Source>
                     <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>published</siri:Progress>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
@@ -219,6 +221,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:SourceType>directReport</siri:SourceType>
                     </siri:Source>
                     <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>published</siri:Progress>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
@@ -317,6 +320,7 @@ Feature: Support SIRI Situation Exchange by request
       | ReportType                                                                         | general                                       |
       | ParticipantRef                                                                     | "535"                                         |
       | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                                           | published                                     |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |

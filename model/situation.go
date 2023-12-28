@@ -44,8 +44,9 @@ type Situation struct {
 	VersionedAt     time.Time
 	ValidityPeriods []*TimeRange
 
-	Keywords   []string   `json:",omitempty"`
-	ReportType ReportType `json:",omitempty"`
+	Progress   SituationProgress `json:",omitempty"`
+	Keywords   []string          `json:",omitempty"`
+	ReportType ReportType        `json:",omitempty"`
 
 	ProducerRef string `json:",omitempty"`
 	Format      string `json:",omitempty"`

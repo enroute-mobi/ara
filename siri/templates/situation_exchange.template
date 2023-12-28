@@ -6,7 +6,8 @@
 				<siri:Source>
 					<siri:SourceType>directReport</siri:SourceType>
 				</siri:Source>{{ if not .VersionedAtTime.IsZero }}
-				<siri:VersionedAtTime>{{ .VersionedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:VersionedAtTime>{{ end }}{{ if .ValidityPeriods }}{{ range .ValidityPeriods }}
+				<siri:VersionedAtTime>{{ .VersionedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:VersionedAtTime>{{ end }}{{ if .Progress }}
+				<siri:Progress>{{ .Progress }}</siri:Progress>{{ end }}{{ if .ValidityPeriods }}{{ range .ValidityPeriods }}
 				<siri:ValidityPeriod>{{ if not .StartTime.IsZero }}
 					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
 					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}

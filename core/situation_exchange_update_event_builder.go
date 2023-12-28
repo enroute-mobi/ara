@@ -61,6 +61,14 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 
 	situationEvent.Keywords = append(situationEvent.Keywords, xmlSituation.Keywords()...)
 	situationEvent.ReportType = model.ReportType(xmlSituation.ReportType())
+
+	var progress model.SituationProgress
+	if err := progress.FromString(xmlSituation.Progress()); err == nil {
+		situationEvent.Progress = progress
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
 	situationEvent.Summary = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Summary(),
 	}

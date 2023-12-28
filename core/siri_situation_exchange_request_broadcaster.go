@@ -93,6 +93,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ReportType:      situation.ReportType,
 		ParticipantRef:  situation.ParticipantRef,
 		VersionedAtTime: situation.VersionedAt,
+		Progress:        situation.Progress,
 	}
 
 	if situation.Description != nil {

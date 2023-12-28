@@ -16,6 +16,7 @@ type SituationUpdateEvent struct {
 	VersionedAt     time.Time
 	ValidityPeriods []*TimeRange
 	Keywords        []string
+	Progress        SituationProgress
 	ReportType      ReportType
 	Version         int
 	Summary         *SituationTranslatedString
