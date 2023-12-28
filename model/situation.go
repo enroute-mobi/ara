@@ -46,6 +46,7 @@ type Situation struct {
 	PublicationWindows []*TimeRange
 
 	Progress    SituationProgress   `json:",omitempty"`
+	Severity    SituationSeverity   `json:",omitempty"`
 	Keywords    []string            `json:",omitempty"`
 	ReportType  ReportType          `json:",omitempty"`
 	AlertCause  SituationAlertCause `json:",omitempty"`

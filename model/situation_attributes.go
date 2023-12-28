@@ -4,6 +4,36 @@ import (
 	"fmt"
 )
 
+type SituationSeverity string
+
+const (
+	SituationSeverityNoImpact   SituationSeverity = "noImpact"
+	SituationSeverityVerySlight SituationSeverity = "verySlight"
+	SituationSeveritySlight     SituationSeverity = "slight"
+	SituationSeverityNormal     SituationSeverity = "normal"
+	SituationSeveritySevere     SituationSeverity = "severe"
+	SituationSeverityVerySevere SituationSeverity = "verySevere"
+)
+
+func (severity *SituationSeverity) FromString(s string) error {
+	switch SituationSeverity(s) {
+	case SituationSeverityNoImpact:
+		fallthrough
+	case SituationSeverityVerySlight:
+		fallthrough
+	case SituationSeveritySlight:
+		fallthrough
+	case SituationSeverityNormal:
+		fallthrough
+	case SituationSeveritySevere:
+		fallthrough
+	case SituationSeverityVerySevere:
+		*severity = SituationSeverity(s)
+		return nil
+	}
+	return fmt.Errorf("invalid severity %s", s)
+}
+
 type SituationProgress string
 
 const (

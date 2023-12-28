@@ -70,6 +70,13 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		logger.Log.Debugf("%v", err)
 	}
 
+	var severity model.SituationSeverity
+	if err := severity.FromString(xmlSituation.Severity()); err == nil {
+		situationEvent.Severity = severity
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
 	situationEvent.Summary = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Summary(),
 	}

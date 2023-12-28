@@ -18,6 +18,7 @@ Feature: Support SIRI Situation Exchange by request
       | PublicationWindows[0]#StartTime                                                     | 2017-09-01T01:00:00+02:00                     |
       | PublicationWindows[0]#EndTime                                                       | 2017-09-25T01:00:00+02:00                     |
       | AlertCause                                                                          | maintenanceWork                               |
+      | Severity                                                                            | normal                                        |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
@@ -92,6 +93,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
                     </siri:PublicationWindow>
                     <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Severity>normal</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
@@ -238,6 +240,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
                     </siri:PublicationWindow>
                     <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Severity>slight</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
@@ -284,6 +287,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
                     <siri:UndefinedReason/>
+                    <siri:Severity>noImpact</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test2</siri:Keywords>
                     <siri:Description>carte d'abonnement</siri:Description>
@@ -332,6 +336,7 @@ Feature: Support SIRI Situation Exchange by request
       | ParticipantRef                                                                     | "535"                                         |
       | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
       | Progress                                                                           | published                                     |
+      | Severity                                                                           | slight                                        |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |
@@ -350,6 +355,7 @@ Feature: Support SIRI Situation Exchange by request
       | Version                      | 5                                 |
       | Keywords                     | ["Commercial", "Test2"]           |
       | ReportType                   | general                           |
+      | Severity                     | noImpact                          |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
       | Description[DefaultValue]    | carte d'abonnement                |

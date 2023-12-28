@@ -44,6 +44,7 @@ type SIRIPtSituationElement struct {
 	Progress           model.SituationProgress
 	Keywords           string
 	ReportType         model.ReportType
+	Severity           model.SituationSeverity
 	ParticipantRef     string
 	Summary            string
 	Description        string

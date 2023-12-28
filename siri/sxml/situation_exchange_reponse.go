@@ -37,6 +37,7 @@ type XMLPtSituationElement struct {
 	publicationWindows []*XMLPeriod
 
 	progress       string
+	severity       string
 	participantRef string
 	summary        string
 	description    string
@@ -250,6 +251,13 @@ func (v *XMLPeriod) EndTime() time.Time {
 		v.endTime = v.findTimeChildContent("EndTime")
 	}
 	return v.endTime
+}
+
+func (visit *XMLPtSituationElement) Severity() string {
+	if visit.severity == "" {
+		visit.severity = visit.findStringChildContent("Severity")
+	}
+	return visit.severity
 }
 
 func (visit *XMLPtSituationElement) Progress() string {

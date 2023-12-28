@@ -19,6 +19,7 @@ type SituationUpdateEvent struct {
 	Keywords           []string
 	AlertCause         SituationAlertCause
 	Progress           SituationProgress
+	Severity           SituationSeverity
 	ReportType         ReportType
 	Version            int
 	Summary            *SituationTranslatedString
