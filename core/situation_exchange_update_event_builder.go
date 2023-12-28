@@ -2,6 +2,7 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -74,6 +75,13 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 	situationEvent.Description = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Description(),
+	}
+
+	var alertCause model.SituationAlertCause
+	if err := alertCause.FromString(xmlSituation.AlertCause()); err == nil {
+		situationEvent.AlertCause = alertCause
+	} else {
+		logger.Log.Debugf("%v", err)
 	}
 
 	for _, validityPeriod := range xmlSituation.ValidityPeriods() {

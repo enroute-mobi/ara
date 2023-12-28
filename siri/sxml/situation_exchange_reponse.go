@@ -30,6 +30,7 @@ type XMLPtSituationElement struct {
 
 	keywords           []string
 	reportType         string
+	alertCause         string
 	recordedAtTime     time.Time
 	versionedAtTime    time.Time
 	validityPeriods    []*XMLPeriod
@@ -149,6 +150,13 @@ func (s *XMLPtSituationElement) Description() string {
 		s.description = s.findStringChildContent("Description")
 	}
 	return s.description
+}
+
+func (s *XMLPtSituationElement) AlertCause() string {
+	if s.alertCause == "" {
+		s.alertCause = s.findStringChildContent("AlertCause")
+	}
+	return s.alertCause
 }
 
 func (response *XMLSituationExchangeResponse) ErrorString() string {

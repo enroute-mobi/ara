@@ -40,6 +40,7 @@ type SIRIPtSituationElement struct {
 	VersionedAtTime    time.Time
 	ValidityPeriods    []*model.TimeRange
 	PublicationWindows []*model.TimeRange
+	AlertCause         model.SituationAlertCause
 	Progress           model.SituationProgress
 	Keywords           string
 	ReportType         model.ReportType

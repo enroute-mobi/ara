@@ -17,6 +17,7 @@ type SituationUpdateEvent struct {
 	ValidityPeriods    []*TimeRange
 	PublicationWindows []*TimeRange
 	Keywords           []string
+	AlertCause         SituationAlertCause
 	Progress           SituationProgress
 	ReportType         ReportType
 	Version            int

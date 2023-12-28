@@ -45,12 +45,12 @@ type Situation struct {
 	ValidityPeriods    []*TimeRange
 	PublicationWindows []*TimeRange
 
-	Progress   SituationProgress `json:",omitempty"`
-	Keywords   []string          `json:",omitempty"`
-	ReportType ReportType        `json:",omitempty"`
-
-	ProducerRef string `json:",omitempty"`
-	Format      string `json:",omitempty"`
+	Progress    SituationProgress   `json:",omitempty"`
+	Keywords    []string            `json:",omitempty"`
+	ReportType  ReportType          `json:",omitempty"`
+	AlertCause  SituationAlertCause `json:",omitempty"`
+	ProducerRef string              `json:",omitempty"`
+	Format      string              `json:",omitempty"`
 
 	ParticipantRef string                     `json:",omitempty"`
 	Summary        *SituationTranslatedString `json:",omitempty"`

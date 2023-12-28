@@ -15,8 +15,9 @@
 				<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
 					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
 					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
-				</siri:PublicationWindow>{{ end }}{{ end }}
-				<siri:UndefinedReason />{{ if .ReportType }}
+				</siri:PublicationWindow>{{ end }}{{ end }}{{ if .AlertCause }}
+				<siri:AlertCause>{{ .AlertCause }}</siri:AlertCause>{{ else }}
+				<siri:UndefinedReason />{{ end }}{{ if .ReportType }}
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ if .Summary }}
 				<siri:Summary>{{ .Summary}}</siri:Summary>{{ end }}{{ if .Description}}

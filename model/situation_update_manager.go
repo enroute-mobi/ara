@@ -46,6 +46,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.PublicationWindows = event.PublicationWindows
 		situation.Keywords = event.Keywords
 		situation.ReportType = event.ReportType
+		situation.AlertCause = event.AlertCause
 		situation.Progress = event.Progress
 		situation.Format = event.Format
 		situation.Affects = event.Affects
