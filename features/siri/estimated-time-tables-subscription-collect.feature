@@ -473,6 +473,7 @@ Feature: Support SIRI EstimatedTimetable
         <ResponderRef>NINOXE:default</ResponderRef>
         <ResponseStatus>
             <ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ResponseTimestamp>
+            <RequestMessageRef>{LastRequestMessageRef}</RequestMessageRef>
             <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
             <Status>true</Status>
             <ValidUntil>2016-09-22T08:01:20.227+02:00</ValidUntil>
@@ -497,6 +498,9 @@ Feature: Support SIRI EstimatedTimetable
       | ExternalId        | externalId                            |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
     And a minute has passed
+    Then one Subscription exists with the following attributes:
+      | Kind                      | EstimatedTimetableCollect |
+      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z    |
     When I send this SIRI request
       """
 <?xml version='1.0' encoding='utf-8'?>
