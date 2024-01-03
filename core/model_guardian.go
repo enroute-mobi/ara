@@ -188,13 +188,14 @@ func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
 	m := guardian.referential.Model()
 
 	svs := m.StopVisits().UnsafeFindAll()
-	persistence, ok := guardian.referential.ModelPersistenceDuration()
+	persistence := guardian.referential.ModelPersistenceDuration()
 	vjs := make(map[model.VehicleJourneyId]struct{})
 
 	child.SetTag("stop_visits_count", len(svs))
 	for i := range svs {
-		if ok && svs[i].ReferenceTime().Before(guardian.Clock().Now().Add(persistence)) {
+		if svs[i].ReferenceTime().Before(guardian.Clock().Now().Add(persistence)) {
 			vjs[svs[i].VehicleJourneyId] = struct{}{}
+			logger.Log.Debugf("Referential persistence deleting StopVisit Id %s with Reference time %s", svs[i].Id(), svs[i].ReferenceTime().String())
 			m.StopVisits().Delete(svs[i])
 			continue
 		}

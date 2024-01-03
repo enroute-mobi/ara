@@ -70,3 +70,32 @@ func Test_ModelRefreshTime_Abov_30seconds(t *testing.T) {
 	duration := referentialSettings.ModelRefreshTime()
 	assert.Equalf(40*time.Second, duration, "should set duration at 40 seconds")
 }
+
+func Test_ModelPersistence_Default(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+	duration := -referentialSettings.ModelPersistenceDuration()
+	assert.Equal(DEFAULT_MODEL_PERSISTENCE, duration, `should set
+default duration to default model persistence time`)
+}
+
+func Test_ModelPersistence_WithSetting(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+	referentialSettings.s["model.persistence"] = "5h"
+	duration := -referentialSettings.ModelPersistenceDuration()
+	assert.Equal(5*time.Hour, duration, `should set default duration
+to 5 hours`)
+}
+
+func Test_ModelPersistence_WithNegativeSetting(t *testing.T) {
+	assert := assert.New(t)
+
+	referentialSettings := NewReferentialSettings()
+	referentialSettings.s["model.persistence"] = "-2h"
+	duration := -referentialSettings.ModelPersistenceDuration()
+	assert.Equal(DEFAULT_MODEL_PERSISTENCE, duration, `should set
+default duration to default model persistence time`)
+}

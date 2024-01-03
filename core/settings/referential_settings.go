@@ -15,6 +15,7 @@ const (
 	LOGGER_VERBOSE_STOP_AREAS  = "logger.verbose.stop_areas"
 	DEFAULT_MODEL_REFRESH_TIME = 50 * time.Second
 	MINIMUM_MODEL_REFRESH_TIME = 30 * time.Second
+	DEFAULT_MODEL_PERSISTENCE  = 3 * time.Hour
 )
 
 type ReferentialSettings struct {
@@ -41,18 +42,19 @@ func (rs *ReferentialSettings) NextReloadAtSetting() (hour, minute int) {
 	return
 }
 
-func (rs *ReferentialSettings) ModelPersistenceDuration() (d time.Duration, ok bool) {
+func (rs *ReferentialSettings) ModelPersistenceDuration() (d time.Duration) {
 	rs.m.RLock()
 	mp, ok := rs.s[MODEL_PERSISTENCE]
 	rs.m.RUnlock()
 	if !ok {
-		return
+		return -DEFAULT_MODEL_PERSISTENCE
 	}
+
 	d, _ = time.ParseDuration(mp)
 	if d < 0 {
-		d = 0
+		d = DEFAULT_MODEL_PERSISTENCE
 	}
-	return -d, true
+	return -d
 }
 
 var loggerCode = regexp.MustCompile(`^([^:]+):(.*)$`)
