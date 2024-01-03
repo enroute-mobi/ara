@@ -325,8 +325,8 @@ Feature: Support SIRI StopMonitoring by request
                 <siri:Order>4</siri:Order>
                 <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
                 <siri:VehicleAtStop>false</siri:VehicleAtStop>
-                <siri:AimedArrivalTime>2016-09-22T07:54:00.000+02:00</siri:AimedArrivalTime>
-                <siri:ActualArrivalTime>2016-09-22T07:54:00.000+02:00</siri:ActualArrivalTime>
+                <siri:AimedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:AimedArrivalTime>
+                <siri:ActualArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ActualArrivalTime>
                 <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
                 <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
                 <siri:ArrivalStopAssignment>
@@ -420,8 +420,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:OriginName>Magicien Noir</siri:OriginName>
               <siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
               <siri:DestinationName>Cimetière des Sauvages</siri:DestinationName>
-              <siri:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</siri:OriginAimedDepartureTime>
-              <siri:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</siri:DestinationAimedArrivalTime>
+              <siri:OriginAimedDepartureTime>2017-01-01T12:50:00.000+02:00</siri:OriginAimedDepartureTime>
+              <siri:DestinationAimedArrivalTime>2017-01-01T13:02:00.000+02:00</siri:DestinationAimedArrivalTime>
               <siri:Monitored>true</siri:Monitored>
               <siri:ProgressRate>normalProgress</siri:ProgressRate>
               <siri:Delay>P0Y0M0DT0H0M0.000S</siri:Delay>
@@ -432,8 +432,8 @@ Feature: Support SIRI StopMonitoring by request
                 <siri:Order>4</siri:Order>
                 <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
                 <siri:VehicleAtStop>false</siri:VehicleAtStop>
-                <siri:AimedArrivalTime>2016-09-22T07:54:00.000+02:00</siri:AimedArrivalTime>
-                <siri:ActualArrivalTime>2016-09-22T07:54:00.000+02:00</siri:ActualArrivalTime>
+                <siri:AimedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:AimedArrivalTime>
+                <siri:ActualArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ActualArrivalTime>
                 <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
                 <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
                 <siri:ArrivalStopAssignment>
@@ -471,8 +471,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:OriginName>Magicien Noir</siri:OriginName>
               <siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
               <siri:DestinationName>Cimetière des Sauvages</siri:DestinationName>
-              <siri:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</siri:OriginAimedDepartureTime>
-              <siri:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</siri:DestinationAimedArrivalTime>
+              <siri:OriginAimedDepartureTime>2017-01-01T12:50:00.000+02:00</siri:OriginAimedDepartureTime>
+              <siri:DestinationAimedArrivalTime>2016-01-01T13:02:00.000+02:00</siri:DestinationAimedArrivalTime>
               <siri:Monitored>true</siri:Monitored>
               <siri:ProgressRate>normalProgress</siri:ProgressRate>
               <siri:Delay>P0Y0M0DT0H0M0.000S</siri:Delay>
@@ -483,8 +483,8 @@ Feature: Support SIRI StopMonitoring by request
                 <siri:Order>5</siri:Order>
                 <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
                 <siri:VehicleAtStop>false</siri:VehicleAtStop>
-                <siri:AimedArrivalTime>2016-09-22T07:54:00.000+02:00</siri:AimedArrivalTime>
-                <siri:ActualArrivalTime>2016-09-22T07:54:00.000+02:00</siri:ActualArrivalTime>
+                <siri:AimedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:AimedArrivalTime>
+                <siri:ActualArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ActualArrivalTime>
                 <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
                 <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
                 <siri:ArrivalStopAssignment>

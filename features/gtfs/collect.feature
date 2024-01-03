@@ -181,20 +181,23 @@ Feature: Collect realtime data via GTFS-RT feeds
       | Codes | "internal": "Trip:A"              |
       | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "Trip:A-1"            |
-      | PassageOrder     | 1                                 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | StopAreaId       | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes                      | "internal": "Trip:A-1"            |
+      | PassageOrder               | 1                                 |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Schedule[expected]#Arrival | 2017-01-01T12:50:00+01:00         |
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "Trip:A-2"            |
-      | PassageOrder     | 2                                 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Codes                      | "internal": "Trip:A-2"            |
+      | PassageOrder               | 2                                 |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Schedule[expected]#Arrival | 2017-01-01T12:55:00+01:00         |
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "Trip:A-3"            |
-      | PassageOrder     | 3                                 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Codes                      | "internal": "Trip:A-3"            |
+      | PassageOrder               | 3                                 |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Schedule[expected]#Arrival | 2017-01-01T13:00:00+01:00         |
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_code_space | internal              |
@@ -361,10 +364,11 @@ Feature: Collect realtime data via GTFS-RT feeds
       | Codes | "internal": "1234" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "270856-1234"         |
-      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Codes                   | "internal": "270856-1234"         |
+      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Schedule[aimed]#Arrival | 2017-01-01T12:55:00.000+02:00     |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
@@ -413,25 +417,27 @@ Feature: Collect realtime data via GTFS-RT feeds
       | Codes | "internal": "1234" |
       # 6ba7b814-9dad-11d1-1-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "270856"              |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes  | "internal": "270856"              |
+      | LineId | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       # 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a StopArea exists with the following attributes:
       | Codes | "internal": "1234" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "270856-1234-6"       |
-      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | PassageOrder     | 6                                 |
+      | Codes                   | "internal": "270856-1234-6"       |
+      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | PassageOrder            | 6                                 |
+      | Schedule[aimed]#Arrival | 2017-01-01T12:55:00.000+02:00     |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "270856-1234-22"      |
-      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | LineId           | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | PassageOrder     | 22                                |
+      | Codes                   | "internal": "270856-1234-22"      |
+      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | PassageOrder            | 22                                |
+      | Schedule[aimed]#Arrival | 2017-01-01T13:55:00.000+02:00     |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
