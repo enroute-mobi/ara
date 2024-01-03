@@ -301,7 +301,7 @@ func (client *SIRIClient) EstimatedTimetableSubscription(request *siri.SIRIEstim
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,
 		requestType:       SUBSCRIPTION,
-		expectedResponses: []string{"SubscribeResponse"},
+		expectedResponses: []string{"SubscribeResponse", "SubscriptionResponse"},
 		acceptGzip:        true,
 	})
 	if err != nil {
