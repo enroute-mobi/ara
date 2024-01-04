@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type SIRIEstimatedTimetableSubscriber interface {
@@ -146,11 +147,19 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
 	for _, responseStatus := range response.ResponseStatus() {
-		subId, ok := requestMessageRefToSub[responseStatus.RequestMessageRef()]
-		if !ok {
-			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
-			continue
+		var subId string
+		var ok bool
+
+		if len(requestMessageRefToSub) != 1 {
+			subId, ok = requestMessageRefToSub[responseStatus.RequestMessageRef()]
+			if !ok {
+				logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
+				continue
+			}
+		} else { // Skip RequestMessageRef validation for single Subscription
+			subId = maps.Values(requestMessageRefToSub)[0]
 		}
+
 		_, ok = linesToRequest[subId]
 		if !ok { // Should never happen
 			logger.Log.Debugf("Error in ETT Subscription Collector, no lines to request for subscription %v", subId)

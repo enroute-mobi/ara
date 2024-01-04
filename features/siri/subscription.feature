@@ -438,3 +438,44 @@ Feature: Support SIRI subscription
       | internal | NINOXE:Line:A:BUS  |
       | internal | NINOXE:Line:3:LOC  |
       | internal | NINOXE:Line:C:Tram |
+
+  @ARA-1432 @siri-valid
+  Scenario: Accept response to an EstimatedTimetable subscripτion with only one Subscription with missingg RequestMessageRef in ResponseStatus
+    Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+<?xml version="1.0" encoding="utf-8"?>
+<Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
+<SubscriptionResponse>
+        <ResponseTimestamp>2017-01-01T12:01:00.000Z</ResponseTimestamp>
+        <ResponderRef>NINOXE:default</ResponderRef>
+        <ResponseStatus>
+            <ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ResponseTimestamp>
+            <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
+            <Status>true</Status>
+            <ValidUntil>2016-09-22T08:01:20.227+02:00</ValidUntil>
+        </ResponseStatus>
+        <ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ServiceStartedTime>
+</SubscriptionResponse>
+</Siri>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | local_credential      | NINOXE:default        |
+      | remote_objectid_kind  | internal              |
+      | siri.envelope         | raw                   |
+      | collect.include_lines | NINOXE:Line:3:LOC     |
+    And 30 seconds have passed
+    And a Line exists with the following attributes:
+      | Name      | Test                            |
+      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableCollect             |
+      | SubscriberRef     | subscriber                            |
+      | ExternalId        | externalId                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a minute has passed
+    And a minute has passed
+    Then one Subscription exists with the following attributes:
+      | Kind                      | EstimatedTimetableCollect |
+      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z    |
