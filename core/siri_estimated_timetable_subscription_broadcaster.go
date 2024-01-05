@@ -18,7 +18,7 @@ type SIRIEstimatedTimetableSubscriptionBroadcaster struct {
 	connector
 
 	dataFrameGenerator            *idgen.IdentifierGenerator
-	vjRemoteObjectidKinds         []string
+	vjRemoteCodeSpaces         []string
 	estimatedTimetableBroadcaster EstimatedTimetableBroadcaster
 	toBroadcast                   map[SubscriptionId][]model.StopVisitId
 	notMonitored                  map[SubscriptionId]map[string]struct{}
@@ -36,15 +36,15 @@ func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) CreateConne
 }
 
 func (factory *SIRIEstimatedTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIEstimatedTimetableSubscriptionBroadcaster(partner *Partner) *SIRIEstimatedTimetableSubscriptionBroadcaster {
 	connector := &SIRIEstimatedTimetableSubscriptionBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
-	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
@@ -107,7 +107,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 		connector.fillOptions(sub, request)
 
 		for _, r := range resources {
-			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			line, ok := connector.Partner().Model().Lines().FindByCode(*r.Reference.Code)
 			if !ok {
 				continue
 			}
@@ -142,19 +142,19 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *
 	// check for subscription to all lines
 	if len(ett.Lines()) == 0 {
 		var lv []string
-		//find all lines corresponding to the remoteObjectidKind
+		//find all lines corresponding to the remoteCodeSpace
 		for _, line := range connector.Partner().Model().Lines().FindAll() {
-			lineObjectID, ok := line.ObjectID(connector.remoteObjectidKind)
+			lineCode, ok := line.Code(connector.remoteCodeSpace)
 			if ok {
-				lv = append(lv, lineObjectID.Value())
+				lv = append(lv, lineCode.Value())
 				continue
 			}
 		}
 
 		for _, lineValue := range lv {
-			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
+			lineCode := model.NewCode(connector.remoteCodeSpace, lineValue)
 			ref := model.Reference{
-				ObjectId: &lineObjectID,
+				Code: &lineCode,
 				Type:     "Line",
 			}
 			r := NewResource(ref)
@@ -167,8 +167,8 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *
 
 	for _, lineId := range ett.Lines() {
 
-		lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
+		lineCode := model.NewCode(connector.remoteCodeSpace, lineId)
+		_, ok := connector.Partner().Model().Lines().FindByCode(lineCode)
 
 		if !ok {
 			lineIds = append(lineIds, lineId)
@@ -176,7 +176,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkLines(ett *
 		}
 
 		ref := model.Reference{
-			ObjectId: &lineObjectID,
+			Code: &lineCode,
 			Type:     "Line",
 		}
 
@@ -235,7 +235,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	lineObj, ok := line.ObjectID(connector.remoteObjectidKind)
+	lineObj, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}
@@ -280,7 +280,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) addStopVisit(sub
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkStopAreaEvent(stopArea *model.StopArea) {
-	obj, ok := stopArea.ObjectID(connector.remoteObjectidKind)
+	obj, ok := stopArea.Code(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}

@@ -26,8 +26,8 @@ func NewVehicleController(referential *core.Referential) ControllerInterface {
 func (controller *VehicleController) findVehicle(identifier string) (*model.Vehicle, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().Vehicles().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().Vehicles().FindByCode(code)
 	}
 	return controller.referential.Model().Vehicles().Find(model.VehicleId(identifier))
 }
@@ -84,10 +84,10 @@ func (controller *VehicleController) Update(response http.ResponseWriter, identi
 		return
 	}
 
-	for _, obj := range vehicle.ObjectIDs() {
-		v, ok := controller.referential.Model().Vehicles().FindByObjectId(obj)
+	for _, obj := range vehicle.Codes() {
+		v, ok := controller.referential.Model().Vehicles().FindByCode(obj)
 		if ok && v.Id() != vehicle.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have an objectid %v", v.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have a code %v", v.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -113,10 +113,10 @@ func (controller *VehicleController) Create(response http.ResponseWriter, body [
 		return
 	}
 
-	for _, obj := range vehicle.ObjectIDs() {
-		v, ok := controller.referential.Model().Vehicles().FindByObjectId(obj)
+	for _, obj := range vehicle.Codes() {
+		v, ok := controller.referential.Model().Vehicles().FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have an objectid %v", v.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: vehicle %v already have a code %v", v.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}

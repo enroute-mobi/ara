@@ -42,15 +42,15 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 
 	settings := map[string]string{
 		"remote_url":           ts.URL,
-		"remote_objectid_kind": "test kind",
+		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	// Create StopArea with ObjectId
+	// Create StopArea with Code
 	stopArea := partners.Model().StopAreas().New()
-	objectid := model.NewObjectID("test kind", "test value")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("test kind", "test value")
+	stopArea.SetCode(code)
 	partners.Model().StopAreas().Save(stopArea)
 
 	siriStopMonitoringRequestCollector := NewSIRIStopMonitoringRequestCollector(partner)
@@ -90,8 +90,8 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 	if expected := model.STOP_VISIT_DEPARTURE_ONTIME; stopVisitEvent.DepartureStatus != expected {
 		t.Errorf("Wrong DepartureStatuts for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.DepartureStatus)
 	}
-	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.ObjectId.Value() != expected {
-		t.Errorf("Wrong ObjectID for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.ObjectId.Value())
+	if expected := "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3"; stopVisitEvent.Code.Value() != expected {
+		t.Errorf("Wrong Code for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Code.Value())
 	}
 	// Aimed schedule
 	schedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED)
@@ -122,7 +122,7 @@ func findSVEvent(events []model.UpdateEvent, ref string) *model.StopVisitUpdateE
 		if !ok {
 			continue
 		}
-		if svEvent.ObjectId.Value() == ref {
+		if svEvent.Code.Value() == ref {
 			return svEvent
 		}
 	}
@@ -149,12 +149,12 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner should have three errors when remote_url and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner should have three errors when remote_url and remote_code_space aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
 		"remote_url":           "remote_url",
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 		"remote_credential":    "remote_credential",
 	}
 	apiPartner.Validate()

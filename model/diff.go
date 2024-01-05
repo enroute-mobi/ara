@@ -9,8 +9,8 @@ import (
 )
 
 var timeType = reflect.TypeOf(time.Time{})
-var objectIDConsumerType = reflect.TypeOf(ObjectIDConsumer{})
-var objectIDType = reflect.TypeOf(ObjectID{})
+var codeConsumerType = reflect.TypeOf(CodeConsumer{})
+var codeType = reflect.TypeOf(Code{})
 
 type visit struct {
 	a1  unsafe.Pointer
@@ -128,14 +128,14 @@ func deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool) bool {
 	case reflect.Ptr:
 		return deepValueEqual(v1.Elem(), v2.Elem(), visited)
 	case reflect.Struct:
-		if v1.Type() == objectIDConsumerType {
-			t1 := v1.Interface().(ObjectIDConsumer)
-			t2 := v2.Interface().(ObjectIDConsumer)
-			return deepValueEqual(reflect.ValueOf(t1.ObjectIDs()), reflect.ValueOf(t2.ObjectIDs()), visited)
-		} else if v1.Type() == objectIDType {
-			t1 := v1.Interface().(ObjectID)
-			t2 := v2.Interface().(ObjectID)
-			return t1.kind == t2.Kind() && t1.Value() == t2.Value()
+		if v1.Type() == codeConsumerType {
+			t1 := v1.Interface().(CodeConsumer)
+			t2 := v2.Interface().(CodeConsumer)
+			return deepValueEqual(reflect.ValueOf(t1.Codes()), reflect.ValueOf(t2.Codes()), visited)
+		} else if v1.Type() == codeType {
+			t1 := v1.Interface().(Code)
+			t2 := v2.Interface().(Code)
+			return t1.codeSpace == t2.codeSpace && t1.Value() == t2.Value()
 		} else if v1.Type() == timeType {
 			// Special case for time - we ignore the time zone.
 			t1 := v1.Interface().(time.Time)

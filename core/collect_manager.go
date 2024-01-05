@@ -124,11 +124,11 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			continue
 		}
 
-		partnerKind := partner.RemoteObjectIDKind()
+		partnerCodeSpace := partner.RemoteCodeSpace()
 
-		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
+		stopAreaCode, ok := stopArea.Code(partnerCodeSpace)
 		if !ok {
-			localLogger.Printf("No ObjectId matching Partner ObjectIdKind (%s)", partnerKind)
+			localLogger.Printf("No Code matching Partner CodeSpace (%s)", partnerCodeSpace)
 			continue
 		}
 
@@ -138,14 +138,14 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			if !ok {
 				continue
 			}
-			lineObjectID, ok := line.ObjectID(partnerKind)
+			lineCode, ok := line.Code(partnerCodeSpace)
 			if !ok {
 				continue
 			}
-			lineIds[lineObjectID.Value()] = struct{}{}
+			lineIds[lineCode.Value()] = struct{}{}
 		}
 
-		if partner.CanCollect(stopAreaObjectID.Value(), lineIds) {
+		if partner.CanCollect(stopAreaCode.Value(), lineIds) {
 			localLogger.Printf("RequestStopAreaUpdate %v", request.StopAreaId())
 
 			if subscriptionCollector != nil {
@@ -189,14 +189,14 @@ func (manager *CollectManager) UpdateLine(ctx context.Context, request *LineUpda
 			continue
 		}
 
-		partnerKind := partner.RemoteObjectIDKind()
+		partnerCodeSpace := partner.RemoteCodeSpace()
 
-		lineObjectID, ok := line.ObjectID(partnerKind)
+		lineCode, ok := line.Code(partnerCodeSpace)
 		if !ok {
 			continue
 		}
 
-		if !partner.CanCollectLine(lineObjectID.Value()) {
+		if !partner.CanCollectLine(lineCode.Value()) {
 			continue
 		}
 		logger.Log.Debugf("RequestLineUpdate with LineId %v", request.LineId())
@@ -234,14 +234,14 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 			continue
 		}
 
-		partnerKind := partner.RemoteObjectIDKind()
+		partnerCodeSpace := partner.RemoteCodeSpace()
 
-		lineObjectID, ok := line.ObjectID(partnerKind)
+		lineCode, ok := line.Code(partnerCodeSpace)
 		if !ok {
 			continue
 		}
 
-		if !partner.CanCollectLine(lineObjectID.Value()) {
+		if !partner.CanCollectLine(lineCode.Value()) {
 			continue
 		}
 		logger.Log.Debugf("RequestVehicleUpdate with LineId %v", request.LineId())
@@ -266,7 +266,7 @@ func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.Situ
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	switch request.Kind() {
+	switch request.CodeSpace() {
 	case SITUATION_UPDATE_REQUEST_ALL:
 		manager.requestAllSituations()
 	case SITUATION_UPDATE_REQUEST_LINE:
@@ -333,23 +333,23 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 			continue
 		}
 
-		partnerKind := partner.RemoteObjectIDKind()
+		partnerCodeSpace := partner.RemoteCodeSpace()
 
-		lineObjectID, ok := line.ObjectID(partnerKind)
+		lineCode, ok := line.Code(partnerCodeSpace)
 		if !ok {
 			continue
 		}
 
-		if !partner.CanCollectLine(lineObjectID.Value()) {
+		if !partner.CanCollectLine(lineCode.Value()) {
 			continue
 		}
 
-		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", lineObjectID.Value(), partner.Slug())
+		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", lineCode.Value(), partner.Slug())
 		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID)
+			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
 			return
 		}
-		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineObjectID.Value())
+		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode.Value())
 		return
 	}
 	// logger.Log.Debugf("Can't find a partner to request filtered Situations for Line %v", requestedId)
@@ -377,9 +377,9 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 			continue
 		}
 
-		partnerKind := partner.RemoteObjectIDKind()
+		partnerCodeSpace := partner.RemoteCodeSpace()
 
-		stopAreaObjectID, ok := stopArea.ObjectID(partnerKind)
+		stopAreaCode, ok := stopArea.Code(partnerCodeSpace)
 		if !ok {
 			continue
 		}
@@ -390,23 +390,23 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 			if !ok {
 				continue
 			}
-			lineObjectID, ok := line.ObjectID(partnerKind)
+			lineCode, ok := line.Code(partnerCodeSpace)
 			if !ok {
 				continue
 			}
-			lineIds[lineObjectID.Value()] = struct{}{}
+			lineIds[lineCode.Value()] = struct{}{}
 		}
 
-		if !partner.CanCollect(stopAreaObjectID.Value(), lineIds) {
+		if !partner.CanCollect(stopAreaCode.Value(), lineIds) {
 			continue
 		}
 
-		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", stopAreaObjectID.Value(), partner.Slug())
+		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", stopAreaCode.Value(), partner.Slug())
 		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaObjectID)
+			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode)
 			return
 		}
-		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaObjectID.Value())
+		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode.Value())
 		return
 	}
 	// logger.Log.Debugf("Can't find a partner to request filtered Situations for StopArea %v", requestedId)

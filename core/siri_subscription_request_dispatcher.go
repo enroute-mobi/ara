@@ -23,7 +23,7 @@ type SIRISubscriptionRequestDispatcher struct {
 }
 
 func (factory *SIRISubscriptionRequestDispatcherFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

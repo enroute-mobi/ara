@@ -182,10 +182,10 @@ func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStop
 }
 
 func (smb *SMBroadcaster) findResource(stopAreaId model.StopAreaId, sub *Subscription) (string, *SubscribedResource, bool) {
-	for _, objectid := range smb.connector.Partner().Model().StopAreas().FindAscendantsWithObjectIdKind(stopAreaId, smb.connector.remoteObjectidKind) {
-		resource := sub.Resource(objectid)
+	for _, code := range smb.connector.Partner().Model().StopAreas().FindAscendantsWithCodeSpace(stopAreaId, smb.connector.remoteCodeSpace) {
+		resource := sub.Resource(code)
 		if resource != nil {
-			return objectid.Value(), resource, true
+			return code.Value(), resource, true
 		}
 	}
 	return "", nil, false

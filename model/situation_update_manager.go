@@ -21,7 +21,7 @@ func newSituationUpdateManager(model Model) *SituationUpdateManager {
 
 func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 	for _, event := range events {
-		situation, ok := manager.model.Situations().FindByObjectId(event.SituationObjectID)
+		situation, ok := manager.model.Situations().FindByCode(event.SituationCode)
 		if ok && situation.RecordedAt == event.RecordedAt {
 			continue
 		}
@@ -29,8 +29,8 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		if !ok {
 			situation = manager.model.Situations().New()
 			situation.Origin = event.Origin
-			situation.SetObjectID(event.SituationObjectID)
-			situation.SetObjectID(NewObjectID("_default", event.SituationObjectID.HashValue()))
+			situation.SetCode(event.SituationCode)
+			situation.SetCode(NewCode("_default", event.SituationCode.HashValue()))
 		}
 
 		situation.RecordedAt = event.RecordedAt

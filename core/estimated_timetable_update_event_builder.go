@@ -18,7 +18,7 @@ type EstimatedTimetableUpdateEventBuilder struct {
 
 	partner            *Partner
 	referenceGenerator *idgen.IdentifierGenerator
-	remoteObjectidKind string
+	remoteCodeSpace string
 	origin             string
 
 	updateEvents *CollectUpdateEvents
@@ -28,7 +28,7 @@ func NewEstimatedTimetableUpdateEventBuilder(partner *Partner) EstimatedTimetabl
 	return EstimatedTimetableUpdateEventBuilder{
 		partner:            partner,
 		referenceGenerator: partner.ReferenceIdentifierGenerator(),
-		remoteObjectidKind: partner.RemoteObjectIDKind(),
+		remoteCodeSpace: partner.RemoteCodeSpace(),
 		origin:             string(partner.Slug()),
 		updateEvents:       NewCollectUpdateEvents(),
 	}
@@ -36,14 +36,14 @@ func NewEstimatedTimetableUpdateEventBuilder(partner *Partner) EstimatedTimetabl
 
 func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimatedJourneyVersionFrame *sxml.XMLEstimatedJourneyVersionFrame) {
 	// Lines
-	lineObjectId := model.NewObjectID(builder.remoteObjectidKind, estimatedJourneyVersionFrame.LineRef())
+	lineCode := model.NewCode(builder.remoteCodeSpace, estimatedJourneyVersionFrame.LineRef())
 
 	_, ok := builder.updateEvents.Lines[estimatedJourneyVersionFrame.LineRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
 			Origin:   builder.origin,
-			ObjectId: lineObjectId,
+			Code: lineCode,
 			// Name:     estimatedJourneyVersionFrame.PublishedLineName(),
 		}
 
@@ -52,14 +52,14 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 	}
 
 	// VehicleJourneys
-	vjObjectId := model.NewObjectID(builder.remoteObjectidKind, estimatedJourneyVersionFrame.DatedVehicleJourneyRef())
+	vjCode := model.NewCode(builder.remoteCodeSpace, estimatedJourneyVersionFrame.DatedVehicleJourneyRef())
 
 	_, ok = builder.updateEvents.VehicleJourneys[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:       builder.origin,
-			ObjectId:     vjObjectId,
-			LineObjectId: lineObjectId,
+			Code:     vjCode,
+			LineCode: lineCode,
 			OriginRef:    estimatedJourneyVersionFrame.OriginRef(),
 			// OriginName:      estimatedJourneyVersionFrame.OriginName(),
 			DirectionType:  builder.directionRef(estimatedJourneyVersionFrame.DirectionRef()),
@@ -68,7 +68,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 			Monitored: true,
 			// Occupancy: model.NormalizedOccupancyName(estimatedJourneyVersionFrame.Occupancy()),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 			// SiriXML:      &estimatedJourneyVersionFrame.XMLMonitoredVehicleJourney,
 		}
 
@@ -77,23 +77,23 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 	}
 
 	for _, call := range estimatedJourneyVersionFrame.EstimatedCalls() {
-		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
+		builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
 	}
 	for _, call := range estimatedJourneyVersionFrame.RecordedCalls() {
-		builder.handleCall(vjObjectId, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
+		builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
 	}
 }
 
-func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model.ObjectID, recordedAt time.Time, datedVehicleJourneyRef string, call *sxml.XMLCall) {
+func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjCode model.Code, recordedAt time.Time, datedVehicleJourneyRef string, call *sxml.XMLCall) {
 	// StopAreas
-	stopAreaObjectId := model.NewObjectID(builder.remoteObjectidKind, call.StopPointRef())
+	stopAreaCode := model.NewCode(builder.remoteCodeSpace, call.StopPointRef())
 
 	_, ok := builder.updateEvents.StopAreas[call.StopPointRef()]
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
 			Origin:   builder.origin,
-			ObjectId: stopAreaObjectId,
+			Code: stopAreaCode,
 			Name:     call.StopPointName(),
 		}
 
@@ -103,15 +103,15 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model
 
 	// StopVisits
 	stopVisitId := fmt.Sprintf("%s-%s", datedVehicleJourneyRef, strconv.Itoa(call.Order()))
-	stopVisitObjectId := model.NewObjectID(builder.remoteObjectidKind, stopVisitId)
+	stopVisitCode := model.NewCode(builder.remoteCodeSpace, stopVisitId)
 
 	_, ok = builder.updateEvents.StopVisits[call.StopPointRef()][stopVisitId]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
 			Origin:                 builder.origin,
-			ObjectId:               stopVisitObjectId,
-			StopAreaObjectId:       stopAreaObjectId,
-			VehicleJourneyObjectId: vjObjectId,
+			Code:               stopVisitCode,
+			StopAreaCode:       stopAreaCode,
+			VehicleJourneyCode: vjCode,
 			// DataFrameRef:           call.DataFrameRef(),
 			PassageOrder:    call.Order(),
 			Monitored:       true,
@@ -121,7 +121,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjObjectId model
 			RecordedAt:      recordedAt,
 			Schedules:       model.NewStopVisitSchedules(),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 		}
 
 		if !call.AimedDepartureTime().IsZero() || !call.AimedArrivalTime().IsZero() {

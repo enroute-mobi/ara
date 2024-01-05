@@ -6,18 +6,18 @@ Feature: Support SIRI VehicleMonitoring
   Scenario: Handle a SIRI Lite VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+      | Codes        | "internal": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
       | Longitude        | 1.234                                 |
@@ -76,25 +76,25 @@ Feature: Support SIRI VehicleMonitoring
   Scenario: Send the correct vehicles to a SIRI Lite VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:2:LOC" |
+      | Codes | "internal": "Test:Line:2:LOC" |
       | Name      | Ligne 2 Metro                 |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 33                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:202:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:202:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
       | Monitored | true                                      |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -103,7 +103,7 @@ Feature: Support SIRI VehicleMonitoring
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Longitude        | 1.345                             |
@@ -157,23 +157,23 @@ Feature: Support SIRI VehicleMonitoring
   Scenario: Send all the vehicles to a SIRI Lite VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_objectid_kind  | internal |
+      | remote_code_space  | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 33                                |
-      | ObjectIDs | "internal": "Test:VehicleJourney:202:LOC" |
+      | Codes | "internal": "Test:VehicleJourney:202:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -182,7 +182,7 @@ Feature: Support SIRI VehicleMonitoring
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -191,7 +191,7 @@ Feature: Support SIRI VehicleMonitoring
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -281,21 +281,21 @@ Feature: Support SIRI VehicleMonitoring
       """
 
   @ARTA-1040
-  Scenario: Handle a SIRI Lite VehicleMonitoring request StopMonitoring request with unmatching objectid kind
+  Scenario: Handle a SIRI Lite VehicleMonitoring request StopMonitoring request with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential     | test  |
-     | remote_objectid_kind | wrong |
+     | remote_code_space | wrong |
    Given a Line exists with the following attributes:
-     | ObjectIDs | "internal": "Test:Line:3:LOC" |
+     | Codes | "internal": "Test:Line:3:LOC" |
      | Name      | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+     | Codes        | "other": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
      | Longitude        | 1.234                              |
@@ -334,22 +334,22 @@ Feature: Support SIRI VehicleMonitoring
       """
 
   @ARA-1044
-  Scenario: Handle a SIRI Lite VehicleMonitoring request with multiple connector setting siri-lite-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Handle a SIRI Lite VehicleMonitoring request with multiple connector setting siri-lite-stop-monitoring-request-broadcaster.vehicle_journey_remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                              | test          |
-      | remote_objectid_kind                                                          | internal      |
-      | siri-lite-vehicle-monitoring-request-broadcaster.vehicle_remote_objectid_kind | other, other2 |
+      | remote_code_space                                                          | internal      |
+      | siri-lite-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space | other, other2 |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes        | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -411,22 +411,22 @@ Feature: Support SIRI VehicleMonitoring
         | VehicleJourneys | ["Test:VehicleJourney:201:LOC"] |
 
   @ARA-1044
-  Scenario: Handle a SIRI Lite VehicleMonitoring request with fallback on generic connector remote_objectid_kind
+  Scenario: Handle a SIRI Lite VehicleMonitoring request with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                      | test     |
-      | remote_objectid_kind                                                  | internal |
-      | siri-lite-vehicle-monitoring-request-broadcaster.remote_objectid_kind | other    |
+      | remote_code_space                                                  | internal |
+      | siri-lite-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
     Given a Line exists with the following attributes:
-      | ObjectIDs | "other": "Test:Line:3:LOC" |
+      | Codes | "other": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes        | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |

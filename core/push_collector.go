@@ -33,13 +33,13 @@ func (factory *PushCollectorFactory) CreateConnector(partner *Partner) Connector
 }
 
 func (factory *PushCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func NewPushCollector(partner *Partner) *PushCollector {
 	connector := &PushCollector{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
 	connector.subscriber = manager.BroadcastUpdateEvent
@@ -91,7 +91,7 @@ func (pc *PushCollector) handleStopAreas(sas []*em.ExternalStopArea) (stopAreas 
 		event := model.NewStopAreaUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, sa.GetObjectid())
+		event.Code = model.NewCode(pc.remoteCodeSpace, sa.GetObjectid())
 		event.Name = sa.GetName()
 		event.CollectedAlways = true
 		event.Longitude = sa.GetLongitude()
@@ -112,7 +112,7 @@ func (pc *PushCollector) handleLines(lines []*em.ExternalLine) (lineIds []string
 		event := model.NewLineUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, l.GetObjectid())
+		event.Code = model.NewCode(pc.remoteCodeSpace, l.GetObjectid())
 		event.Name = l.GetName()
 
 		lineIds = append(lineIds, l.GetObjectid())
@@ -150,8 +150,8 @@ func (pc *PushCollector) handleVehicleJourneys(vjs []*em.ExternalVehicleJourney)
 		event := model.NewVehicleJourneyUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, vj.GetObjectid())
-		event.LineObjectId = model.NewObjectID(pc.remoteObjectidKind, vj.GetLineRef())
+		event.Code = model.NewCode(pc.remoteCodeSpace, vj.GetObjectid())
+		event.LineCode = model.NewCode(pc.remoteCodeSpace, vj.GetLineRef())
 		event.OriginRef = vj.GetOriginRef()
 		event.OriginName = vj.GetOriginName()
 		event.DestinationRef = vj.GetDestinationRef()
@@ -176,9 +176,9 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		}
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetObjectid())
-		event.StopAreaObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetStopAreaRef())
-		event.VehicleJourneyObjectId = model.NewObjectID(pc.remoteObjectidKind, sv.GetVehicleJourneyRef())
+		event.Code = model.NewCode(pc.remoteCodeSpace, sv.GetObjectid())
+		event.StopAreaCode = model.NewCode(pc.remoteCodeSpace, sv.GetStopAreaRef())
+		event.VehicleJourneyCode = model.NewCode(pc.remoteCodeSpace, sv.GetVehicleJourneyRef())
 		event.Monitored = sv.GetMonitored()
 		event.PassageOrder = int(sv.GetPassageOrder())
 		event.ArrivalStatus = model.SetStopVisitArrivalStatus(sv.GetArrivalStatus())
@@ -197,8 +197,8 @@ func (pc *PushCollector) handleVehicles(vs []*em.ExternalVehicle) (vehicles []st
 		event := model.NewVehicleUpdateEvent()
 
 		event.Origin = partner
-		event.ObjectId = model.NewObjectID(pc.remoteObjectidKind, v.GetObjectid())
-		event.VehicleJourneyObjectId = model.NewObjectID(pc.remoteObjectidKind, v.GetVehicleJourneyRef())
+		event.Code = model.NewCode(pc.remoteCodeSpace, v.GetObjectid())
+		event.VehicleJourneyCode = model.NewCode(pc.remoteCodeSpace, v.GetVehicleJourneyRef())
 		event.Longitude = v.GetLongitude()
 		event.Latitude = v.GetLatitude()
 		event.Bearing = v.GetBearing()

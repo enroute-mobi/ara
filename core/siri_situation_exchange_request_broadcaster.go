@@ -32,7 +32,7 @@ func NewSIRISituationExchangeRequestBroadcaster(partner *Partner) *SIRISituation
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_SITUATION_EXCHANGE_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) Situations(request *sxml.XMLGetSituationExchange, message *audit.BigQueryMessage) *siri.SIRISituationExchangeResponse {
@@ -72,16 +72,16 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	}
 
 	var situationNumber string
-	objectid, present := situation.ObjectID(connector.remoteObjectidKind)
+	code, present := situation.Code(connector.remoteCodeSpace)
 	if present {
-		situationNumber = objectid.Value()
+		situationNumber = code.Value()
 	} else {
-		objectid, present = situation.ObjectID("_default")
+		code, present = situation.Code("_default")
 		if !present {
-			logger.Log.Debugf("Unknown ObjectId for Situation %s", situation.Id())
+			logger.Log.Debugf("Unknown Code for Situation %s", situation.Id())
 			return
 		}
-		situationNumber = connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: objectid.Value()})
+		situationNumber = connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
 	}
 
 	ptSituationElement := &siri.SIRIPtSituationElement{
@@ -137,16 +137,16 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affe
 		logger.Log.Debugf("Unknown Line %s", affect.GetId())
 		return
 	}
-	lineObjectId, ok := line.ObjectID(connector.remoteObjectidKind)
+	lineCode, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
-		logger.Log.Debugf("Unknown Line ObjectId %s", connector.remoteObjectidKind)
+		logger.Log.Debugf("Unknown Line Code %s", connector.remoteCodeSpace)
 		return
 	}
 
 	affectedLine := siri.AffectedLine{
-		LineRef: lineObjectId.Value(),
+		LineRef: lineCode.Value(),
 	}
-	delivery.LineRefs[lineObjectId.Value()] = struct{}{}
+	delivery.LineRefs[lineCode.Value()] = struct{}{}
 
 	for _, affectedDestination := range affect.(*model.AffectedLine).AffectedDestinations {
 		affectedDestinationRef, ok := connector.resolveStopAreaRef(model.StopAreaId(affectedDestination.StopAreaId))
@@ -196,11 +196,11 @@ func (connector *SIRISituationExchangeRequestBroadcaster) resolveStopAreaRef(sto
 	if !ok {
 		return "", false
 	}
-	stopAreaObjectId, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+	stopAreaCode, ok := stopArea.ReferentOrSelfCode(connector.remoteCodeSpace)
 	if !ok {
 		return "", false
 	}
-	return stopAreaObjectId.Value(), true
+	return stopAreaCode.Value(), true
 }
 
 func (factory *SIRISituationExchangeRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {
@@ -208,6 +208,6 @@ func (factory *SIRISituationExchangeRequestBroadcasterFactory) CreateConnector(p
 }
 
 func (factory *SIRISituationExchangeRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }

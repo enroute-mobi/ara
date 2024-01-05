@@ -36,7 +36,7 @@ func Test_StopMonitoring_Without_Order(t *testing.T) {
 	assert := assert.New(t)
 
 	p := NewPartner()
-	obj := model.NewObjectID("Kind", "STIF:StopPoint:Q:41178:")
+	obj := model.NewCode("CodeSpace", "STIF:StopPoint:Q:41178:")
 
 	builder := NewLiteStopMonitoringUpdateEventBuilder(p, obj)
 	sm := getsmlite(t, "testdata/stopmonitoring-lite-without-order.json")

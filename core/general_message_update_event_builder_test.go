@@ -33,71 +33,71 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	// StopPointRef
-	objectid := model.NewObjectID("remote_objectid_kind", "stopPointRef1")
+	code := model.NewCode("remote_code_space", "stopPointRef1")
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 	stopAreaId := stopArea.Id()
 
-	objectid2 := model.NewObjectID("remote_objectid_kind", "stopPointRef2")
+	code2 := model.NewCode("remote_code_space", "stopPointRef2")
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetObjectID(objectid2)
+	stopArea2.SetCode(code2)
 	stopArea2.Save()
 	stopArea2Id := stopArea2.Id()
 
 	// LineRef
-	objectid3 := model.NewObjectID("remote_objectid_kind", "lineRef1")
+	code3 := model.NewCode("remote_code_space", "lineRef1")
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid3)
+	line.SetCode(code3)
 	line.Save()
 	lineId := line.Id()
 
 	// Destinations
-	objectid4 := model.NewObjectID("remote_objectid_kind", "destinationRef1")
+	code4 := model.NewCode("remote_code_space", "destinationRef1")
 	destinationRef1 := referential.Model().StopAreas().New()
-	destinationRef1.SetObjectID(objectid4)
+	destinationRef1.SetCode(code4)
 	destinationRef1.Save()
 
-	objectid5 := model.NewObjectID("remote_objectid_kind", "destinationRef2")
+	code5 := model.NewCode("remote_code_space", "destinationRef2")
 	destinationRef2 := referential.Model().StopAreas().New()
-	destinationRef2.SetObjectID(objectid5)
+	destinationRef2.SetCode(code5)
 	destinationRef2.Save()
 
 	// LineSections
-	objectid6 := model.NewObjectID("remote_objectid_kind", "lineSectionRef1")
+	code6 := model.NewCode("remote_code_space", "lineSectionRef1")
 	lineSectionRef1 := referential.Model().Lines().New()
-	lineSectionRef1.SetObjectID(objectid6)
+	lineSectionRef1.SetCode(code6)
 	lineSectionRef1.Save()
 
-	objectid7 := model.NewObjectID("remote_objectid_kind", "firstStop1")
+	code7 := model.NewCode("remote_code_space", "firstStop1")
 	firstStop1 := referential.Model().StopAreas().New()
-	firstStop1.SetObjectID(objectid7)
+	firstStop1.SetCode(code7)
 	firstStop1.Save()
 
-	objectid8 := model.NewObjectID("remote_objectid_kind", "lastStop1")
+	code8 := model.NewCode("remote_code_space", "lastStop1")
 	lastStop1 := referential.Model().StopAreas().New()
-	lastStop1.SetObjectID(objectid8)
+	lastStop1.SetCode(code8)
 	lastStop1.Save()
 
-	objectid9 := model.NewObjectID("remote_objectid_kind", "lineSectionRef2")
+	code9 := model.NewCode("remote_code_space", "lineSectionRef2")
 	lineSectionRef2 := referential.Model().Lines().New()
-	lineSectionRef2.SetObjectID(objectid9)
+	lineSectionRef2.SetCode(code9)
 	lineSectionRef2.Save()
 
-	objectid10 := model.NewObjectID("remote_objectid_kind", "firstStop2")
+	code10 := model.NewCode("remote_code_space", "firstStop2")
 	firstStop2 := referential.Model().StopAreas().New()
-	firstStop2.SetObjectID(objectid10)
+	firstStop2.SetCode(code10)
 	firstStop2.Save()
 
-	objectid11 := model.NewObjectID("remote_objectid_kind", "lastStop2")
+	code11 := model.NewCode("remote_code_space", "lastStop2")
 	lastStop2 := referential.Model().StopAreas().New()
-	lastStop2.SetObjectID(objectid11)
+	lastStop2.SetCode(code11)
 	lastStop2.Save()
 
 	// Building
@@ -266,14 +266,14 @@ func Test_setAffectedStopArea(t *testing.T) {
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	objectid := model.NewObjectID("remote_objectid_kind", "stopPointRef1")
+	code := model.NewCode("remote_code_space", "stopPointRef1")
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	var TestCases = []struct {
@@ -315,14 +315,14 @@ func Test_setAffectedLine(t *testing.T) {
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	objectid := model.NewObjectID("remote_objectid_kind", "lineRef1")
+	code := model.NewCode("remote_code_space", "lineRef1")
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	var TestCases = []struct {
@@ -362,19 +362,19 @@ func Test_setAffectedDestination(t *testing.T) {
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	objectid := model.NewObjectID("remote_objectid_kind", "destinationRef")
+	code := model.NewCode("remote_code_space", "destinationRef")
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
-	objectid2 := model.NewObjectID("remote_objectid_kind", "lineRef")
+	code2 := model.NewCode("remote_code_space", "lineRef")
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid2)
+	line.SetCode(code2)
 	line.Save()
 
 	var TestCases = []struct {
@@ -422,24 +422,24 @@ func Test_setAffectedSection(t *testing.T) {
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	objectid := model.NewObjectID("remote_objectid_kind", "firstStop")
+	code := model.NewCode("remote_code_space", "firstStop")
 	firstStop := referential.Model().StopAreas().New()
-	firstStop.SetObjectID(objectid)
+	firstStop.SetCode(code)
 	firstStop.Save()
 
-	objectid1 := model.NewObjectID("remote_objectid_kind", "lastStop")
+	code1 := model.NewCode("remote_code_space", "lastStop")
 	lastStop := referential.Model().StopAreas().New()
-	lastStop.SetObjectID(objectid1)
+	lastStop.SetCode(code1)
 	lastStop.Save()
 
-	objectid2 := model.NewObjectID("remote_objectid_kind", "lineRef")
+	code2 := model.NewCode("remote_code_space", "lineRef")
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid2)
+	line.SetCode(code2)
 	line.Save()
 
 	var TestCases = []struct {

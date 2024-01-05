@@ -74,10 +74,10 @@ type BigQueryMessage struct {
 	ResponseSize            int64               `bigquery:"response_size"`
 	ProcessingTime          float64             `bigquery:"processing_time"`          // in seconds
 	SubscriptionIdentifiers []string            `bigquery:"subscription_identifiers"` // array of ids
-	StopAreas               []string            `bigquery:"stop_areas"`               // array of objectid values
-	Lines                   []string            `bigquery:"lines"`                    // array of objectid values
+	StopAreas               []string            `bigquery:"stop_areas"`               // array of code values
+	Lines                   []string            `bigquery:"lines"`                    // array of code values
 	Vehicles                []string            `bigquery:"vehicles"`
-	VehicleJourneys         []string            `bigquery:"vehicle_journeys"` // array of objectid values
+	VehicleJourneys         []string            `bigquery:"vehicle_journeys"` // array of code values
 }
 
 func (bq *BigQueryMessage) EventType() string        { return BQ_MESSAGE }

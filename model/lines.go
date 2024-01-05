@@ -15,7 +15,7 @@ type Line struct {
 	Collectable
 	model      Model
 	References References
-	ObjectIDConsumer
+	CodeConsumer
 	Attributes        Attributes
 	id                LineId
 	Name              string `json:",omitempty"`
@@ -31,7 +31,7 @@ func NewLine(model Model) *Line {
 		References: NewReferences(),
 	}
 
-	line.objectids = make(ObjectIDs)
+	line.codes = make(Codes)
 	return line
 }
 
@@ -62,7 +62,7 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	type Alias Line
 	aux := struct {
 		*Alias
-		ObjectIDs     ObjectIDs            `json:",omitempty"`
+		Codes         Codes                `json:",omitempty"`
 		NextCollectAt *time.Time           `json:",omitempty"`
 		CollectedAt   *time.Time           `json:",omitempty"`
 		Attributes    Attributes           `json:",omitempty"`
@@ -73,8 +73,8 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(line),
 	}
 
-	if !line.ObjectIDs().Empty() {
-		aux.ObjectIDs = line.ObjectIDs()
+	if !line.Codes().Empty() {
+		aux.Codes = line.Codes()
 	}
 	if !line.nextCollectAt.IsZero() {
 		aux.NextCollectAt = &line.nextCollectAt
@@ -97,7 +97,7 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	type Alias Line
 
 	aux := &struct {
-		ObjectIDs  map[string]string
+		Codes      map[string]string
 		References map[string]Reference
 		*Alias
 	}{
@@ -109,8 +109,8 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		line.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		line.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -140,7 +140,7 @@ type MemoryLines struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
-	byObjectId   *ObjectIdIndex
+	byCode       *CodeIndex
 }
 
 type Lines interface {
@@ -148,7 +148,7 @@ type Lines interface {
 
 	New() *Line
 	Find(LineId) (*Line, bool)
-	FindByObjectId(ObjectID) (*Line, bool)
+	FindByCode(Code) (*Line, bool)
 	FindAll() []*Line
 	Save(*Line) bool
 	Delete(*Line) bool
@@ -158,7 +158,7 @@ func NewMemoryLines() *MemoryLines {
 	return &MemoryLines{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
-		byObjectId:   NewObjectIdIndex(),
+		byCode:       NewCodeIndex(),
 	}
 }
 
@@ -177,11 +177,11 @@ func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
 	return &Line{}, false
 }
 
-func (manager *MemoryLines) FindByObjectId(objectid ObjectID) (*Line, bool) {
+func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[LineId(id)].copy(), true
 	}
@@ -210,7 +210,7 @@ func (manager *MemoryLines) Save(line *Line) bool {
 
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
-	manager.byObjectId.Index(line)
+	manager.byCode.Index(line)
 
 	return true
 }
@@ -220,7 +220,7 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
-	manager.byObjectId.Delete(ModelId(line.id))
+	manager.byCode.Delete(ModelId(line.id))
 
 	return true
 }
@@ -260,12 +260,12 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 			line.References.SetReferences(references)
 		}
 
-		if sl.ObjectIDs.Valid && len(sl.ObjectIDs.String) > 0 {
-			objectIdMap := make(map[string]string)
-			if err = json.Unmarshal([]byte(sl.ObjectIDs.String), &objectIdMap); err != nil {
+		if sl.Codes.Valid && len(sl.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sl.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			line.objectids = NewObjectIDsFromMap(objectIdMap)
+			line.codes = NewCodesFromMap(codeMap)
 		}
 
 		manager.Save(line)

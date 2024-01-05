@@ -35,8 +35,8 @@ func NewScheduledStopVisitController(referential *core.Referential) ControllerIn
 func (controller *StopVisitController) findStopVisit(identifier string) (*model.StopVisit, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.svs.FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.svs.FindByCode(code)
 	}
 	return controller.svs.Find(model.StopVisitId(identifier))
 }
@@ -126,10 +126,10 @@ func (controller *StopVisitController) Update(response http.ResponseWriter, iden
 		return
 	}
 
-	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := controller.svs.FindByObjectId(obj)
+	for _, obj := range stopVisit.Codes() {
+		sv, ok := controller.svs.FindByCode(obj)
 		if ok && sv.Id() != stopVisit.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have a code %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -153,10 +153,10 @@ func (controller *StopVisitController) Create(response http.ResponseWriter, body
 		return
 	}
 
-	for _, obj := range stopVisit.ObjectIDs() {
-		sv, ok := controller.svs.FindByObjectId(obj)
+	for _, obj := range stopVisit.Codes() {
+		sv, ok := controller.svs.FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have an objectid %v", sv.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: stopVisit %v already have a code %v", sv.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}

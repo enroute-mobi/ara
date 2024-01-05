@@ -92,7 +92,7 @@ func Test_StopVisitController_Delete(t *testing.T) {
 
 func Test_StopVisitController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	stopVisit, responseRecorder, referential := prepareStopVisitRequest("PUT", true, body, t)
 
 	// Check response
@@ -124,7 +124,7 @@ func Test_StopVisitController_Show(t *testing.T) {
 
 func Test_StopVisitController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareStopVisitRequest("POST", false, body, t)
 
 	// Check response
@@ -160,17 +160,17 @@ func Test_StopVisitController_Index(t *testing.T) {
 func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	ref := core.NewMemoryReferentials().New("test")
 	stopVisit := ref.Model().StopVisits().New()
-	objectid := model.NewObjectID("kind", "stif:value")
-	stopVisit.SetObjectID(objectid)
+	code := model.NewCode("codeSpace", "stif:value")
+	stopVisit.SetCode(code)
 	ref.Model().StopVisits().Save(stopVisit)
 
 	controller := &StopVisitController{
 		svs: ref.Model().StopVisits(),
 	}
 
-	_, ok := controller.findStopVisit("kind:stif:value")
+	_, ok := controller.findStopVisit("codeSpace:stif:value")
 	if !ok {
-		t.Error("Can't find StopVisit by ObjectId")
+		t.Error("Can't find StopVisit by Code")
 	}
 
 	_, ok = controller.findStopVisit(string(stopVisit.Id()))

@@ -19,7 +19,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind":          "test",
+		"remote_code_space":          "test",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -28,36 +28,36 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	connector.Start()
 
 	line := referential.Model().Lines().New()
-	lineObjectId := model.NewObjectID("test", "1234")
-	line.SetObjectID(lineObjectId)
+	lineCode := model.NewCode("test", "1234")
+	line.SetCode(lineCode)
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	lineObjectId2 := model.NewObjectID("test", "5678")
-	line2.SetObjectID(lineObjectId2)
+	lineCode2 := model.NewCode("test", "5678")
+	line2.SetCode(lineCode2)
 	line2.Save()
 
 	line3 := referential.Model().Lines().New()
-	lineObjectId3 := model.NewObjectID("_default", "5678")
-	line3.SetObjectID(lineObjectId3)
+	lineCode3 := model.NewCode("_default", "5678")
+	line3.SetCode(lineCode3)
 	line3.Save()
 
 	line4 := referential.Model().Lines().New()
-	lineObjectId4 := model.NewObjectID("test", "91011")
-	line4.SetObjectID(lineObjectId4)
+	lineCode4 := model.NewCode("test", "91011")
+	line4.SetCode(lineCode4)
 	line4.SetOrigin("partner")
 	line4.Save()
 
 	firstStopArea := referential.Model().StopAreas().New()
-	firstObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:1:LOC")
-	firstStopArea.SetObjectID(firstObjectID)
+	firstCode := model.NewCode("test", "NINOXE:StopPoint:SP:1:LOC")
+	firstStopArea.SetCode(firstCode)
 	firstStopArea.Name = "First"
 	firstStopArea.LineIds = []model.LineId{line.Id(), line3.Id(), line4.Id()}
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()
-	secondObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:2:LOC")
-	secondStopArea.SetObjectID(secondObjectID)
+	secondCode := model.NewCode("test", "NINOXE:StopPoint:SP:2:LOC")
+	secondStopArea.SetCode(secondCode)
 	secondStopArea.Name = "Second"
 	secondStopArea.LineIds = []model.LineId{line2.Id()}
 	secondStopArea.Save()
@@ -95,8 +95,8 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	if response.AnnotatedStopPoints[0].StopName != "First" {
 		t.Errorf("AnnotatedStopPoints StopName is wrong:\n got: %v\n want: First", response.AnnotatedStopPoints[0].StopName)
 	}
-	if response.AnnotatedStopPoints[0].StopPointRef != firstObjectID.Value() {
-		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
+	if response.AnnotatedStopPoints[0].StopPointRef != firstCode.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstCode.Value())
 	}
 	if !response.AnnotatedStopPoints[0].Monitored {
 		t.Errorf("AnnotatedStopPoints Monitored is false, should be true")
@@ -111,8 +111,8 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	if response.AnnotatedStopPoints[1].StopName != "Second" {
 		t.Errorf("AnnotatedStopPoints StopName is wrong:\n got: %v\n want: Second", response.AnnotatedStopPoints[1].StopName)
 	}
-	if response.AnnotatedStopPoints[1].StopPointRef != secondObjectID.Value() {
-		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[1].StopPointRef, secondObjectID.Value())
+	if response.AnnotatedStopPoints[1].StopPointRef != secondCode.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[1].StopPointRef, secondCode.Value())
 	}
 }
 
@@ -122,7 +122,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind":          "test",
+		"remote_code_space":          "test",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -131,35 +131,35 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	connector.Start()
 
 	line := referential.Model().Lines().New()
-	lineObjectId := model.NewObjectID("test", "1234")
-	line.SetObjectID(lineObjectId)
+	lineCode := model.NewCode("test", "1234")
+	line.SetCode(lineCode)
 	line.Save()
 
 	firstStopArea := referential.Model().StopAreas().New()
-	firstObjectID := model.NewObjectID("test_incorrect", "NINOXE:StopPoint:SP:1:LOC")
-	firstStopArea.SetObjectID(firstObjectID)
+	firstCode := model.NewCode("test_incorrect", "NINOXE:StopPoint:SP:1:LOC")
+	firstStopArea.SetCode(firstCode)
 	firstStopArea.Name = "First"
 	firstStopArea.LineIds = []model.LineId{line.Id()}
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()
-	secondObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:2:LOC")
-	secondStopArea.SetObjectID(secondObjectID)
+	secondCode := model.NewCode("test", "NINOXE:StopPoint:SP:2:LOC")
+	secondStopArea.SetCode(secondCode)
 	secondStopArea.Name = "Second"
 	secondStopArea.LineIds = []model.LineId{line.Id()}
 	secondStopArea.Save()
 
 	thirdStopArea := referential.Model().StopAreas().New()
-	thirdObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:3:LOC")
-	thirdStopArea.SetObjectID(thirdObjectID)
+	thirdCode := model.NewCode("test", "NINOXE:StopPoint:SP:3:LOC")
+	thirdStopArea.SetCode(thirdCode)
 	thirdStopArea.ReferentId = secondStopArea.Id()
 	thirdStopArea.Name = "Third"
 	thirdStopArea.LineIds = []model.LineId{line.Id()}
 	thirdStopArea.Save()
 
 	fourthStopArea := referential.Model().StopAreas().New()
-	fourthObjectID := model.NewObjectID("test", "NINOXE:StopPoint:SP:4:LOC")
-	fourthStopArea.SetObjectID(fourthObjectID)
+	fourthCode := model.NewCode("test", "NINOXE:StopPoint:SP:4:LOC")
+	fourthStopArea.SetCode(fourthCode)
 	fourthStopArea.ReferentId = firstStopArea.Id()
 	fourthStopArea.Name = "Fourth"
 	fourthStopArea.LineIds = []model.LineId{line.Id()}
@@ -192,11 +192,11 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 		t.Fatalf("AnnotatedStopPoints lenght is wrong:\n got: %v\n want: 2\n%v", len(response.AnnotatedStopPoints), response.AnnotatedStopPoints)
 	}
 
-	if response.AnnotatedStopPoints[0].StopPointRef != secondObjectID.Value() {
-		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
+	if response.AnnotatedStopPoints[0].StopPointRef != secondCode.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstCode.Value())
 	}
 
-	if response.AnnotatedStopPoints[1].StopPointRef != fourthObjectID.Value() {
-		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstObjectID.Value())
+	if response.AnnotatedStopPoints[1].StopPointRef != fourthCode.Value() {
+		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstCode.Value())
 	}
 }

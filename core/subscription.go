@@ -39,7 +39,7 @@ type Subscription struct {
 
 	SubscriberRef string
 
-	resourcesByObjectID map[string]*SubscribedResource
+	resourcesByCode     map[string]*SubscribedResource
 	subscriptionOptions map[string]string
 }
 
@@ -57,7 +57,7 @@ func (subscription *Subscription) SetDefinition(apisub *APISubscription) {
 	subscription.kind = apisub.Kind
 	subscription.SubscriberRef = apisub.SubscriberRef
 	for _, ref := range apisub.References {
-		if ref.ObjectId != nil {
+		if ref.Code != nil {
 			subscription.CreateAndAddNewResource(ref)
 		}
 	}
@@ -106,10 +106,10 @@ func (subscription *Subscription) Delete() (ok bool) {
 	return
 }
 
-func (subscription *Subscription) ResourcesByObjectIDCopy() map[string]*SubscribedResource {
+func (subscription *Subscription) ResourcesByCodeCopy() map[string]*SubscribedResource {
 	m := make(map[string]*SubscribedResource)
 	subscription.RLock()
-	for k, v := range subscription.resourcesByObjectID {
+	for k, v := range subscription.resourcesByCode {
 		m[k] = v
 	}
 	subscription.RUnlock()
@@ -120,7 +120,7 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	resources := make([]*SubscribedResource, 0)
 
 	subscription.RLock()
-	for _, resource := range subscription.resourcesByObjectID {
+	for _, resource := range subscription.resourcesByCode {
 		resources = append(resources, resource)
 	}
 	subscription.RUnlock()
@@ -139,9 +139,9 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResource {
+func (subscription *Subscription) Resource(obj model.Code) *SubscribedResource {
 	subscription.RLock()
-	sub, present := subscription.resourcesByObjectID[obj.String()]
+	sub, present := subscription.resourcesByCode[obj.String()]
 	subscription.RUnlock()
 	if !present {
 		return nil
@@ -151,12 +151,12 @@ func (subscription *Subscription) Resource(obj model.ObjectID) *SubscribedResour
 
 func (subscription *Subscription) UniqueResource() (r *SubscribedResource) {
 	subscription.RLock()
-	if len(subscription.resourcesByObjectID) != 1 {
+	if len(subscription.resourcesByCode) != 1 {
 		subscription.RUnlock()
 		return
 	}
 
-	for _, ressource := range subscription.resourcesByObjectID {
+	for _, ressource := range subscription.resourcesByCode {
 		r = ressource
 	}
 
@@ -166,7 +166,7 @@ func (subscription *Subscription) UniqueResource() (r *SubscribedResource) {
 
 func (subscription *Subscription) Resources(now time.Time) (ressources []*SubscribedResource) {
 	subscription.RLock()
-	for _, ressource := range subscription.resourcesByObjectID {
+	for _, ressource := range subscription.resourcesByCode {
 		if ressource.SubscribedUntil.After(subscription.Clock().Now()) {
 			ressources = append(ressources, ressource)
 		}
@@ -181,12 +181,12 @@ func (subscription *Subscription) AddNewResource(resource *SubscribedResource) {
 		subscription.subscribed = true
 	}
 	subscription.Lock()
-	subscription.resourcesByObjectID[resource.Reference.ObjectId.String()] = resource
+	subscription.resourcesByCode[resource.Reference.Code.String()] = resource
 	subscription.Unlock()
 }
 
 func (subscription *Subscription) CreateAndAddNewResource(reference model.Reference) *SubscribedResource {
-	logger.Log.Debugf("Create subscribed resource for %v", reference.ObjectId.String())
+	logger.Log.Debugf("Create subscribed resource for %v", reference.Code.String())
 
 	resource := SubscribedResource{
 		subscription:     subscription,
@@ -196,7 +196,7 @@ func (subscription *Subscription) CreateAndAddNewResource(reference model.Refere
 		resourcesOptions: make(map[string]string),
 	}
 	subscription.Lock()
-	subscription.resourcesByObjectID[reference.ObjectId.String()] = &resource
+	subscription.resourcesByCode[reference.Code.String()] = &resource
 	subscription.Unlock()
 
 	subscription.manager.Index(subscription)
@@ -206,13 +206,13 @@ func (subscription *Subscription) CreateAndAddNewResource(reference model.Refere
 
 func (subscription *Subscription) DeleteResource(key string) {
 	subscription.Lock()
-	delete(subscription.resourcesByObjectID, key)
+	delete(subscription.resourcesByCode, key)
 	subscription.Unlock()
 }
 
 func (subscription *Subscription) ResourcesLen() (i int) {
 	subscription.RLock()
-	i = len(subscription.resourcesByObjectID)
+	i = len(subscription.resourcesByCode)
 	subscription.RUnlock()
 	return
 }

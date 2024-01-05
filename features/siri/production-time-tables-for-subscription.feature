@@ -10,65 +10,65 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url            | http://localhost:8090 |
        | remote_credential     | ara                   |
        | local_credential      | test                  |
-       | remote_objectid_kind  | internal              |
+       | remote_code_space  | internal              |
        | siri.envelope         | raw                   |
        | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32 inbound                      |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
       | Attribute[VehicleMode]             | bus                                     | 
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32 outbound                     |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:202" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:202" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisAnotherTheEnd"         |
+      | Reference[DestinationRef]#Code | "external": "ThisAnotherTheEnd"         |
       | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 1                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 2                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:20:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 1                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:30:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 2                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:40:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
@@ -203,40 +203,40 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | ara                   |
        | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
        | siri.passage_order   | visit_number          |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | Aller                                   |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |  
     And a minute has passed
     And I send this SIRI request
@@ -351,40 +351,40 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url            | http://localhost:8090 |
        | remote_credential     | ara                   |
        | local_credential      | test                  |
-       | remote_objectid_kind  | internal              |
+       | remote_code_space  | internal              |
        | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | Aller                                   |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T17:00:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
@@ -499,43 +499,43 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url               | http://localhost:8090 |
        | remote_credential        | ara                   |
        | local_credential         | test                  |
-       | remote_objectid_kind     | internal              |
+       | remote_code_space     | internal              |
        | siri.envelope            | raw                   |
        | siri.line.published_name | number                |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
       | Number    | L3M                             |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
       | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
@@ -629,42 +629,42 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url            | http://localhost:8090 |
        | remote_credential     | ara                   |
        | local_credential      | test                  |
-       | remote_objectid_kind  | internal              |
+       | remote_code_space  | internal              |
        | siri.envelope         | raw                   |
        | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
       | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T17:00:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
@@ -759,51 +759,51 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url            | http://localhost:8090 |
        | remote_credential     | ara                   |
        | local_credential      | test                  |
-       | remote_objectid_kind  | internal              |
+       | remote_code_space  | internal              |
        | siri.envelope         | raw                   |
        | sort_payload_for_test | true                  |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
       | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
     # ScheduleStopVisit with unknown VehicleJourneyId
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-1" |
       | PassageOrder                    | 6                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-30-00c04fd430c8                                   |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T17:00:00.000Z                                             |
 
     And a minute has passed
@@ -898,25 +898,25 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | ara                   |
        | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
        | siri.envelope        | raw                   |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
     And a minute has passed
     And I send this SIRI request
       """
@@ -967,47 +967,47 @@ Feature: Support SIRI ProductionTimetable by subscription
       """
 
   @ARA-1107
-  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with StopArea having a Parent with Partner ObjectiId
+  Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with StopArea having a Parent with Partner Code
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-production-timetable-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | ara                   |
        | local_credential     | test                  |
-       | remote_objectid_kind | didok                 |
+       | remote_code_space | didok                 |
        | siri.envelope        | raw                   |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-2-00c04fd430c8"
       | Name      | Parent                                             |
-      | ObjectIDs | "didok": "fr:1:StopPlace:OURA2:StopArea:log351672" |
+      | Codes | "didok": "fr:1:StopPlace:OURA2:StopArea:log351672" |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-3-00c04fd430c8"
       | Name      | Child                                 |
-      | ObjectIDs | "internal": "vlgabon1"                |
+      | Codes | "internal": "vlgabon1"                |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
       | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
     And a Line exists with the following attributes:
     # "6ba7b814-9dad-11d1-4-00c04fd430c8"
-      | ObjectIDs | "didok": "NINOXE:Line:3:LOC"    |
+      | Codes | "didok": "NINOXE:Line:3:LOC"    |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
     # "6ba7b814-9dad-11d1-5-00c04fd430c8"
       | Name                               | Passage 32                           |
-      | ObjectIDs                          | "didok": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "didok": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8    |
       | DirectionType                      | outbound                             |
-      | Reference[DestinationRef]#ObjectId | "internal": "ThisIsTheEnd"           |
+      | Reference[DestinationRef]#Code | "internal": "ThisIsTheEnd"           |
     And a ScheduledStopVisit exists with the following attributes:
     # "6ba7b814-9dad-11d1-6-00c04fd430c8"
       | PassageOrder                    | 4                                  |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8  |
       | VehicleAtStop                   | false                              |
-      | Reference[OperatorRef]#ObjectId | "didok": "CdF:Company::410:LOC"    |
+      | Reference[OperatorRef]#Code | "didok": "CdF:Company::410:LOC"    |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z           |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-7-00c04fd430c8"
       | Name      | Other                                              |
-      | ObjectIDs | "didok": "fr:1:StopPlace:OTHER:StopArea:log351672" |
+      | Codes | "didok": "fr:1:StopPlace:OTHER:StopArea:log351672" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]              |
     And a ScheduledStopVisit exists with the following attributes:
     # "6ba7b814-9dad-11d1-8-00c04fd430c8"
@@ -1015,7 +1015,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       | StopAreaId                      | 6ba7b814-9dad-11d1-7-00c04fd430c8  |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8  |
       | VehicleAtStop                   | false                              |
-      | Reference[OperatorRef]#ObjectId | "didok": "CdF:Company::410:LOC"    |
+      | Reference[OperatorRef]#Code | "didok": "CdF:Company::410:LOC"    |
       | Schedule[aimed]#Arrival         | 2017-01-01T16:00:00.000Z           |
     And a minute has passed
     And I send this SIRI request
@@ -1108,25 +1108,25 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | ara                   |
        | local_credential     | test                  |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
        | siri.envelope        | raw                   |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32                              |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
     And a minute has passed
     And I send this SIRI request
       """
@@ -1179,66 +1179,66 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url            | http://localhost:8090             |
        | remote_credential     | ara                               |
        | local_credential      | test                              |
-       | remote_objectid_kind  | internal                          |
+       | remote_code_space  | internal                          |
        | siri.envelope         | raw                               |
        | sort_payload_for_test | true                              |
        | siri.direction_type   | ch:1:Direction:R,ch:1:Direction:H |
     And a StopArea exists with the following attributes:
       | Name      | Test 24                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a StopArea exists with the following attributes:
       | Name      | Test 25                                  |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32 inbound                      |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | inbound                                 |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisIsTheEnd"              |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
       | Attribute[VehicleMode]             | bus                                     | 
     And a VehicleJourney exists with the following attributes:
       | Name                               | Passage 32 outbound                     |
-      | ObjectIDs                          | "internal": "NINOXE:VehicleJourney:202" |
+      | Codes                          | "internal": "NINOXE:VehicleJourney:202" |
       | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#ObjectId | "external": "ThisAnotherTheEnd"         |
+      | Reference[DestinationRef]#Code | "external": "ThisAnotherTheEnd"         |
       | Attribute[VehicleMode]             | bus                                     |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 1                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:00:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 2                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-5-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:20:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-1" |
       | PassageOrder                    | 1                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:30:00.000Z                                             |
     And a ScheduledStopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-1" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                    | 2                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | false                                                                |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival         | 2017-01-01T15:40:00.000Z                                             |
     And a minute has passed
     And I send this SIRI request
@@ -1345,7 +1345,7 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url                         | http://localhost:8090 |
        | remote_credential                  | test                  |
        | local_credential                   | NINOXE:default        |
-       | remote_objectid_kind               | internal              |
+       | remote_code_space               | internal              |
        | siri.envelope                      | raw                   |
        | broadcast.subscriptions.persistent | true                  |
     And a minute has passed

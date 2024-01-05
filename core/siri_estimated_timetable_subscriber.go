@@ -79,14 +79,14 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 
 	linesToRequest := make(map[string][]string)
 	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByObjectIDCopy() {
+		for _, resource := range subscription.ResourcesByCodeCopy() {
 			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
 				mid := subscriber.connector.Partner().NewMessageIdentifier()
 				if len(linesToRequest[string(subscription.id)]) == 0 {
 					requestMessageRefToSub[mid] = string(subscription.id)
 					subToRequestMessageRef[string(subscription.id)] = mid
 				}
-				linesToRequest[string(subscription.id)] = append(linesToRequest[string(subscription.id)], resource.Reference.ObjectId.Value())
+				linesToRequest[string(subscription.id)] = append(linesToRequest[string(subscription.id)], resource.Reference.Code.Value())
 			}
 		}
 	}
@@ -172,7 +172,7 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 			continue
 		}
 		for _, line := range linesToRequest[subId] {
-			resource := subscription.Resource(model.NewObjectID(subscriber.connector.remoteObjectidKind, line))
+			resource := subscription.Resource(model.NewCode(subscriber.connector.remoteCodeSpace, line))
 			if resource == nil { // Should never happen
 				logger.Log.Debugf("Response for unknown subscription resource %v", line)
 				continue
@@ -203,7 +203,7 @@ func (subscriber *ETTSubscriber) incrementRetryCountFromMap(linesToRequest map[s
 			continue
 		}
 		for _, l := range requestedLines {
-			resource := subscription.Resource(model.NewObjectID(subscriber.connector.remoteObjectidKind, l))
+			resource := subscription.Resource(model.NewCode(subscriber.connector.remoteCodeSpace, l))
 			if resource == nil { // Should never happen
 				continue
 			}

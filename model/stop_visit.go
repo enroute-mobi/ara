@@ -20,7 +20,7 @@ type StopVisit struct {
 	References  References
 	Attributes  Attributes
 	Schedules   *StopVisitSchedules
-	ObjectIDConsumer
+	CodeConsumer
 	VehicleJourneyId VehicleJourneyId         `json:",omitempty"`
 	StopAreaId       StopAreaId               `json:",omitempty"`
 	ArrivalStatus    StopVisitArrivalStatus   `json:",omitempty"`
@@ -40,7 +40,7 @@ func NewStopVisit(model Model) *StopVisit {
 		Attributes: NewAttributes(),
 		References: NewReferences(),
 	}
-	stopVisit.objectids = make(ObjectIDs)
+	stopVisit.codes = make(Codes)
 	return stopVisit
 }
 
@@ -50,7 +50,7 @@ func (stopVisit *StopVisit) modelId() ModelId {
 
 func (stopVisit *StopVisit) copy() *StopVisit {
 	return &StopVisit{
-		ObjectIDConsumer: stopVisit.ObjectIDConsumer.Copy(),
+		CodeConsumer:     stopVisit.CodeConsumer.Copy(),
 		model:            stopVisit.model,
 		Origin:           stopVisit.Origin,
 		id:               stopVisit.id,
@@ -130,7 +130,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	type Alias StopVisit
 	aux := struct {
 		References map[string]Reference `json:",omitempty"`
-		ObjectIDs  ObjectIDs            `json:",omitempty"`
+		Codes      Codes                `json:",omitempty"`
 		*Alias
 		CollectedAt *time.Time `json:",omitempty"`
 		RecordedAt  *time.Time `json:",omitempty"`
@@ -144,8 +144,8 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		Alias:     (*Alias)(stopVisit),
 	}
 
-	if !stopVisit.ObjectIDs().Empty() {
-		aux.ObjectIDs = stopVisit.ObjectIDs()
+	if !stopVisit.Codes().Empty() {
+		aux.Codes = stopVisit.Codes()
 	}
 	if !stopVisit.Attributes.IsEmpty() {
 		aux.Attributes = stopVisit.Attributes
@@ -172,7 +172,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	type Alias StopVisit
 	aux := &struct {
 		CollectedAt time.Time
-		ObjectIDs   map[string]string
+		Codes       map[string]string
 		References  map[string]Reference
 		*Alias
 		Schedules []StopVisitSchedule
@@ -185,8 +185,8 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		stopVisit.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		stopVisit.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -246,7 +246,7 @@ type MemoryStopVisits struct {
 
 	mutex                             *sync.RWMutex
 	byIdentifier                      map[StopVisitId]*StopVisit
-	byObjectId                        *ObjectIdIndex
+	byCode                            *CodeIndex
 	byStopArea                        *Index
 	byVehicleJourney                  *Index
 	byVehicleJourneyIdAndPassageOrder map[vehicleJourneyStopVisitOrder]StopVisitId
@@ -264,7 +264,7 @@ type StopVisits interface {
 
 	New() *StopVisit
 	Find(StopVisitId) (*StopVisit, bool)
-	FindByObjectId(ObjectID) (*StopVisit, bool)
+	FindByCode(Code) (*StopVisit, bool)
 	FindByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	FindByVehicleJourneyIdAndStopVisitOrder(VehicleJourneyId, int) *StopVisit
 	VehicleJourneyHasStopVisits(VehicleJourneyId) bool
@@ -290,7 +290,7 @@ func NewMemoryStopVisits() *MemoryStopVisits {
 	return &MemoryStopVisits{
 		mutex:                             &sync.RWMutex{},
 		byIdentifier:                      make(map[StopVisitId]*StopVisit),
-		byObjectId:                        NewObjectIdIndex(),
+		byCode:                            NewCodeIndex(),
 		byStopArea:                        NewIndex(stopExtractor),
 		byVehicleJourney:                  NewIndex(vjExtractor),
 		byVehicleJourneyIdAndPassageOrder: make(map[vehicleJourneyStopVisitOrder]StopVisitId),
@@ -312,11 +312,11 @@ func (manager *MemoryStopVisits) Find(id StopVisitId) (*StopVisit, bool) {
 	return &StopVisit{}, false
 }
 
-func (manager *MemoryStopVisits) FindByObjectId(objectid ObjectID) (*StopVisit, bool) {
+func (manager *MemoryStopVisits) FindByCode(code Code) (*StopVisit, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[StopVisitId(id)].copy(), true
 	}
@@ -512,7 +512,7 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
-	manager.byObjectId.Index(stopVisit)
+	manager.byCode.Index(stopVisit)
 	manager.byStopArea.Index(stopVisit)
 	manager.byVehicleJourney.Index(stopVisit)
 	manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
@@ -536,7 +536,7 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopVisit.id)
-	manager.byObjectId.Delete(ModelId(stopVisit.id))
+	manager.byCode.Delete(ModelId(stopVisit.id))
 	manager.byStopArea.Delete(ModelId(stopVisit.id))
 	manager.byVehicleJourney.Delete(ModelId(stopVisit.id))
 	delete(manager.byVehicleJourneyIdAndPassageOrder, vehicleJourneyStopVisitOrder{
@@ -583,12 +583,12 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 			stopVisit.References.SetReferences(references)
 		}
 
-		if sv.ObjectIDs.Valid && len(sv.ObjectIDs.String) > 0 {
-			objectIdMap := make(map[string]string)
-			if err = json.Unmarshal([]byte(sv.ObjectIDs.String), &objectIdMap); err != nil {
+		if sv.Codes.Valid && len(sv.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sv.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			stopVisit.objectids = NewObjectIDsFromMap(objectIdMap)
+			stopVisit.codes = NewCodesFromMap(codeMap)
 		}
 
 		if sv.Schedules.Valid && len(sv.Schedules.String) > 0 {

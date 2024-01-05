@@ -5,7 +5,7 @@ Feature: Support SIRI Situation Exchange by request
   @siri-valid @ARA-1342
   Scenario: Handle a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
-      | ObjectIDs                                                                           | "external" : "test"                           |
+      | Codes                                                                               | "external" : "test"                           |
       | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                     |
       | Version                                                                             | 1                                             |
       | Keywords                                                                            | ["Commercial", "Test"]                        |
@@ -20,17 +20,17 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                  |
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Codes | "external": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                   |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | Test last stop                           |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name  | Test last stop                           |
+      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
-      | local_credential     | NINOXE:default |
-      | remote_objectid_kind | external       |
+      | local_credential  | NINOXE:default |
+      | remote_code_space | external       |
     When I send this SIRI request
       """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -132,8 +132,8 @@ Feature: Support SIRI Situation Exchange by request
   @siri-valid @ARA-1342
   Scenario: Handle a SIRI SituationExchange request without any situation
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
-      | local_credential     | NINOXE:default |
-      | remote_objectid_kind | external       |
+      | local_credential  | NINOXE:default |
+      | remote_code_space | external       |
     When I send this SIRI request
       """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -261,35 +261,35 @@ Feature: Support SIRI Situation Exchange by request
       </S:Envelope>
       """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-situation-exchange-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ineo                  |
-      | remote_objectid_kind | external              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
+      | remote_code_space | external              |
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Codes | "external": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                   |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | Test last stop                           |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name  | Test last stop                           |
+      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
     And a minute has passed
     When a minute has passed
     Then one Situation has the following attributes:
-      | ObjectIDs                                                                           | "external" : "test"                           |
-      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                     |
-      | Version                                                                             | 1                                             |
-      | Keywords                                                                            | ["Commercial", "Test"]                        |
-      | ReportType                                                                          | general                                       |
-      | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
-      | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
-      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop       | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop        | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                  |
-      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Codes                                                                              | "external" : "test"                           |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
+      | Version                                                                            | 1                                             |
+      | Keywords                                                                           | ["Commercial", "Test"]                        |
+      | ReportType                                                                         | general                                       |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
+      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |
@@ -304,13 +304,13 @@ Feature: Support SIRI Situation Exchange by request
     And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received 1 GetSituationExchange request

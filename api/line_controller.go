@@ -26,8 +26,8 @@ func NewLineController(referential *core.Referential) ControllerInterface {
 func (controller *LineController) findLine(identifier string) (*model.Line, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().Lines().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().Lines().FindByCode(code)
 	}
 	return controller.referential.Model().Lines().Find(model.LineId(identifier))
 }
@@ -80,10 +80,10 @@ func (controller *LineController) Update(response http.ResponseWriter, identifie
 		return
 	}
 
-	for _, obj := range line.ObjectIDs() {
-		l, ok := controller.referential.Model().Lines().FindByObjectId(obj)
+	for _, obj := range line.Codes() {
+		l, ok := controller.referential.Model().Lines().FindByCode(obj)
 		if ok && l.Id() != line.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have a code %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -109,10 +109,10 @@ func (controller *LineController) Create(response http.ResponseWriter, body []by
 		return
 	}
 
-	for _, obj := range line.ObjectIDs() {
-		l, ok := controller.referential.Model().Lines().FindByObjectId(obj)
+	for _, obj := range line.Codes() {
+		l, ok := controller.referential.Model().Lines().FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: line %v already have an objectid %v", l.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: line %v already have a code %v", l.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}

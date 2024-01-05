@@ -28,7 +28,7 @@ func NewSIRILinesDiscoveryRequestBroadcaster(partner *Partner) *SIRILinesDiscove
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLinesDiscoveryRequest, message *audit.BigQueryMessage) (*siri.SIRILinesDiscoveryResponse, error) {
@@ -45,14 +45,14 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLi
 			continue
 		}
 
-		objectID, ok := lines[i].ObjectID(connector.remoteObjectidKind)
+		code, ok := lines[i].Code(connector.remoteCodeSpace)
 		if !ok {
 			continue
 		}
 
 		annotedLine := &siri.SIRIAnnotatedLine{
 			LineName:  lines[i].Name,
-			LineRef:   objectID.Value(),
+			LineRef:   code.Value(),
 			Monitored: true,
 		}
 		annotedLineArray = append(annotedLineArray, annotedLine.LineRef)
@@ -68,7 +68,7 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLi
 }
 
 func (factory *SIRILinesDiscoveryRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

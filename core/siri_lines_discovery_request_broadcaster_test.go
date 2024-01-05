@@ -19,7 +19,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_objectid_kind":          "test",
+		"remote_code_space":          "test",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -29,14 +29,14 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 
 	line := referential.Model().Lines().New()
 	line.Name = "line1"
-	lineObjectId := model.NewObjectID("test", "1234")
-	line.SetObjectID(lineObjectId)
+	lineCode := model.NewCode("test", "1234")
+	line.SetCode(lineCode)
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
 	line2.Name = "line2"
-	line2ObjectId := model.NewObjectID("test2", "1234")
-	line2.SetObjectID(line2ObjectId)
+	line2Code := model.NewCode("test2", "1234")
+	line2.SetCode(line2Code)
 	line2.Save()
 
 	file, err := os.Open("testdata/stoppointdiscovery-request-soap.xml")
@@ -72,8 +72,8 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	if response.AnnotatedLines[0].LineName != "line1" {
 		t.Errorf("AnnotatedLines LineName is wrong:\n got: %v\n want: line1", response.AnnotatedLines[0].LineName)
 	}
-	if response.AnnotatedLines[0].LineRef != lineObjectId.Value() {
-		t.Errorf("AnnotatedLines LineRef is wrong:\n got: %v\n want: %v", response.AnnotatedLines[0].LineRef, lineObjectId.Value())
+	if response.AnnotatedLines[0].LineRef != lineCode.Value() {
+		t.Errorf("AnnotatedLines LineRef is wrong:\n got: %v\n want: %v", response.AnnotatedLines[0].LineRef, lineCode.Value())
 	}
 	if !response.AnnotatedLines[0].Monitored {
 		t.Errorf("AnnotatedLines Monitored is false, should be true")

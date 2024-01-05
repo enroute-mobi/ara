@@ -23,7 +23,7 @@ type SIRIEstimatedTimetableRequestBroadcaster struct {
 
 	useVisitNumber        bool
 	dataFrameGenerator    *idgen.IdentifierGenerator
-	vjRemoteObjectidKinds []string
+	vjRemoteCodeSpaces []string
 }
 
 type SIRIEstimatedTimetableRequestBroadcasterFactory struct{}
@@ -38,8 +38,8 @@ func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimate
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
-	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
+	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER)
 
 	switch connector.partner.PartnerSettings.SIRIPassageOrder() {
 	case "visit_number":
@@ -96,10 +96,10 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 
 	// SIRIEstimatedJourneyVersionFrame
 	for _, lineId := range request.Lines() {
-		lineObjectId := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		line, ok := connector.partner.Model().Lines().FindByObjectId(lineObjectId)
+		lineCode := model.NewCode(connector.remoteCodeSpace, lineId)
+		line, ok := connector.partner.Model().Lines().FindByCode(lineCode)
 		if !ok {
-			logger.Log.Debugf("Cannot find requested line Estimated Time Table with id %v at %v", lineObjectId.String(), connector.Clock().Now())
+			logger.Log.Debugf("Cannot find requested line Estimated Time Table with id %v at %v", lineCode.String(), connector.Clock().Now())
 			continue
 		}
 
@@ -110,23 +110,23 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 		// SIRIEstimatedVehicleJourney
 		vjs := connector.partner.Model().VehicleJourneys().FindByLineId(line.Id())
 		for i := range vjs {
-			// Handle vehicleJourney Objectid
-			vehicleJourneyId, ok := vjs[i].ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
+			// Handle vehicleJourney Code
+			vehicleJourneyId, ok := vjs[i].CodeWithFallback(connector.vjRemoteCodeSpaces)
 			var datedVehicleJourneyRef string
 			if ok {
 				datedVehicleJourneyRef = vehicleJourneyId.Value()
 			} else {
-				defaultObjectID, ok := vjs[i].ObjectID("_default")
+				defaultCode, ok := vjs[i].Code("_default")
 				if !ok {
-					logger.Log.Debugf("Vehicle journey with id %v does not have a proper objectid at %v", vehicleJourneyId, connector.Clock().Now())
+					logger.Log.Debugf("Vehicle journey with id %v does not have a proper code at %v", vehicleJourneyId, connector.Clock().Now())
 					continue
 				}
 				referenceGenerator := connector.Partner().ReferenceIdentifierGenerator()
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 			}
 
 			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
-				LineRef:                lineObjectId.Value(),
+				LineRef:                lineCode.Value(),
 				DirectionType:          vjs[i].DirectionType,
 				DatedVehicleJourneyRef: datedVehicleJourneyRef,
 				DataFrameRef:           connector.dataFrameRef(),
@@ -148,7 +148,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 				// Handle StopPointRef
 				stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId)
 				if !ok {
-					logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct ObjectID", svs[i].Id())
+					logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct Code", svs[i].Id())
 					continue
 				}
 
@@ -214,15 +214,15 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) stopPointRef(stopArea
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(connector.remoteObjectidKind)
+	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
 	if ok {
-		return stopPointRef, stopPointRefObjectId.Value(), true
+		return stopPointRef, stopPointRefCode.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentObjectId, ok := referent.ObjectID(connector.remoteObjectidKind)
+		referentCode, ok := referent.Code(connector.remoteCodeSpace)
 		if ok {
-			return referent, referentObjectId.Value(), true
+			return referent, referentCode.Value(), true
 		}
 	}
 	return &model.StopArea{}, "", false
@@ -250,23 +250,23 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedVehicleJo
 
 	for _, refType := range []string{"OriginRef", "DestinationRef"} {
 		ref, ok := vehicleJourney.Reference(refType)
-		if !ok || ref == (model.Reference{}) || ref.ObjectId == nil {
+		if !ok || ref == (model.Reference{}) || ref.Code == nil {
 			continue
 		}
 		if refType == "DestinationRef" && connector.noDestinationRefRewrite(origin) {
-			references[refType] = ref.ObjectId.Value()
+			references[refType] = ref.Code.Value()
 			continue
 		}
-		if foundStopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(*ref.ObjectId); ok {
-			obj, ok := foundStopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		if foundStopArea, ok := connector.partner.Model().StopAreas().FindByCode(*ref.Code); ok {
+			obj, ok := foundStopArea.ReferentOrSelfCode(connector.remoteCodeSpace)
 			if ok {
 				references[refType] = obj.Value()
 				continue
 			}
 		}
 		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
-		defaultObjectID := model.NewObjectID(connector.remoteObjectidKind, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
-		references[refType] = defaultObjectID.Value()
+		defaultCode := model.NewCode(connector.remoteCodeSpace, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
+		references[refType] = defaultCode.Value()
 	}
 
 	return references
@@ -292,24 +292,24 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) resolveOperatorRef(re
 	}
 
 	operatorRef, ok := stopVisit.Reference("OperatorRef")
-	if !ok || operatorRef == (model.Reference{}) || operatorRef.ObjectId == nil {
+	if !ok || operatorRef == (model.Reference{}) || operatorRef.Code == nil {
 		return
 	}
-	operator, ok := connector.partner.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := connector.partner.Model().Operators().FindByCode(*operatorRef.Code)
 	if !ok {
-		refs["OperatorRef"] = operatorRef.ObjectId.Value()
+		refs["OperatorRef"] = operatorRef.Code.Value()
 		return
 	}
-	obj, ok := operator.ObjectID(connector.remoteObjectidKind)
+	obj, ok := operator.Code(connector.remoteCodeSpace)
 	if !ok {
-		refs["OperatorRef"] = operatorRef.ObjectId.Value()
+		refs["OperatorRef"] = operatorRef.Code.Value()
 		return
 	}
 	refs["OperatorRef"] = obj.Value()
 }
 
 func (factory *SIRIEstimatedTimetableRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 

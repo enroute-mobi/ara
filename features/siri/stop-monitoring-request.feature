@@ -58,7 +58,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
       | remote_url                       | http://localhost:8090   |
       | remote_credential                | test                    |
-      | remote_objectid_kind             | internal                |
+      | remote_code_space             | internal                |
       | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
       | collect.subscriptions.persistent | true                    |
       | local_credential                 | toto                    |
@@ -66,11 +66,11 @@ Feature: Support SIRI StopMonitoring by request
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                |
-      | ObjectIDs | "internal": "STIF:StopPoint:Q:41178:" |
+      | Codes | "internal": "STIF:StopPoint:Q:41178:" |
     # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
     When a minute has passed
     Then one StopVisit has the following attributes:
-      | ObjectIDs                 | "internal": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC" |
+      | Codes                 | "internal": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC" |
       | ArrivalStatus             | onTime                                                |
       | DepartureStatus           | onTime                                                |
       | DataFrameRef              | any                                                   |
@@ -78,9 +78,9 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                | 6ba7b814-9dad-11d1-2-00c04fd430c8                     |
       | VehicleAtStop             | false                                                 |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "STIF:Line::C01740:" |
+      | Codes | "internal": "STIF:Line::C01740:" |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs       | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC" |
+      | Codes       | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC" |
       | DestinationName | Gare Saint-Lazare                                                                       |
       | Monitored       | true                                                                                    |
     And an audit event should exist with these attributes:
@@ -165,7 +165,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
       | remote_url                       | http://localhost:8090   |
       | remote_credential                | test                    |
-      | remote_objectid_kind             | internal                |
+      | remote_code_space             | internal                |
       | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
       | collect.subscriptions.persistent | true                    |
       | local_credential                 | toto                    |
@@ -173,10 +173,10 @@ Feature: Support SIRI StopMonitoring by request
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                |
-      | ObjectIDs | "internal": "STIF:StopPoint:Q:41178:" |
+      | Codes | "internal": "STIF:StopPoint:Q:41178:" |
     When a minute has passed
     Then one StopVisit has the following attributes:
-      | ObjectIDs                 | "internal": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC" |
+      | Codes                 | "internal": "SNCF_ACCES_CLOUD:Item::41178_133528:LOC" |
       | ArrivalStatus             | onTime                                                |
       | DepartureStatus           | onTime                                                |
       | DataFrameRef              | any                                                   |
@@ -184,9 +184,9 @@ Feature: Support SIRI StopMonitoring by request
       | StopAreaId                | 6ba7b814-9dad-11d1-2-00c04fd430c8                     |
       | VehicleAtStop             | false                                                 |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "STIF:Line::C01740:" |
+      | Codes | "internal": "STIF:Line::C01740:" |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs       | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC" |
+      | Codes       | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC" |
       | DestinationName | Gare Saint-Lazare                                                                       |
       | Monitored       | true                                                                                    |
     And an audit event should exist with these attributes:
@@ -199,7 +199,7 @@ Feature: Support SIRI StopMonitoring by request
       | RequestRawMessage  | MonitoringRef=STIF:StopPoint:Q:41178:                              |
 
   @ARA-1240
-  Scenario: Handle a missing StopVisit ItemIdentifier in collect by using SIRI Lite Stop Monitoring should use DatedVehicleJourneyRef and Order to build ObjectID
+  Scenario: Handle a missing StopVisit ItemIdentifier in collect by using SIRI Lite Stop Monitoring should use DatedVehicleJourneyRef and Order to build Code
     Given a lite SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
     """
 {
@@ -252,7 +252,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
       | remote_url                       | http://localhost:8090   |
       | remote_credential                | test                    |
-      | remote_objectid_kind             | internal                |
+      | remote_code_space             | internal                |
       | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
       | collect.subscriptions.persistent | true                    |
       | local_credential                 | toto                    |
@@ -260,10 +260,10 @@ Feature: Support SIRI StopMonitoring by request
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                |
-      | ObjectIDs | "internal": "STIF:StopPoint:Q:41178:" |
+      | Codes | "internal": "STIF:StopPoint:Q:41178:" |
     When a minute has passed
     Then one StopVisit has the following attributes:
-      | ObjectIDs                 | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC-6" |
+      | Codes                 | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC-6" |
 
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
@@ -346,22 +346,22 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder | 4                                                                    |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
     And an audit event should exist with these attributes:
       | Protocol           | siri                          |
       | Direction          | sent                          |
@@ -504,50 +504,50 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder | 4                                                                    |
     And one StopVisit has the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3" |
+      | Codes    | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3" |
       | PassageOrder | 5                                                                    |
     And one Line has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
 
   Scenario: Handle a SIRI StopMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name            | Passage 32                              |
-      | ObjectIDs       | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes       | "internal": "NINOXE:VehicleJourney:201" |
       | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       | Attribute[DestinationDisplay]   | Cergy le haut & Arret <RER>                                                      |
     When I send this SIRI request
@@ -641,10 +641,10 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request on a 'empty' StopArea
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     When I send this SIRI request
       """
@@ -704,29 +704,29 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Destination                              |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:62:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:62:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Origin                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:42:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:42:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Via                                       |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:256:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:256:LOC" |
       | Monitored | true                                      |
     And a Line exists with the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
+      | Codes    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
       | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                              | "internal": "NINOXE:VehicleJourney:201"         |
+      | Codes                              | "internal": "NINOXE:VehicleJourney:201"         |
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
       | LineId                                 | 6ba7b814-9dad-11d1-6-00c04fd430c8               |
       | Monitored                              | true                                            |
@@ -752,15 +752,15 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#ObjectId     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | Reference[JourneyPatternRef]#ObjectId  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[OriginRef]#ObjectId          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | Reference[RouteRef]#ObjectId           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#ObjectId           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[DestinationRef]#Code     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[JourneyPatternRef]#Code  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[OriginRef]#Code          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Reference[RouteRef]#Code           | "internal": "NINOXE:Route:66:LOC"               |
+      | Reference[PlaceRef]#Code           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
-      | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                         | 4                                                                    |
       | RecordedAt                           | 2017-01-01T11:00:00.000Z                                             |
       | Schedule[actual]#Arrival             | 2017-01-01T13:00:00.000Z                                             |
@@ -783,33 +783,33 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
       | Attribute[NumberOfStopsAway]         | 1                                                                    |
       | Attribute[PlatformTraversal]         | false                                                                |
-      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
+      | Reference[OperatorRef]#Code      | "internal":"NINOXE:Company:15563880:LOC"                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:MonitoredStopVisit[1]/siri:RecordedAtTime                                                                            | 2017-01-01T11:00:00.000Z                                    | StopVisit#RecordedAt                                  |
-      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3      | StopVisit#ObjectID                                    |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                  | StopArea#ObjectID                                     |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                           | Line#ObjectID                                         |
+      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3      | StopVisit#Code                                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                  | StopArea#Code                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                           | Line#Code                                         |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                       | VehicleJourney#DirectionType                          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                           | Model#Date                                            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                   | VehicleJourney#ObjectID                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                           | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                   | VehicleJourney#Code                               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | NINOXE:JourneyPattern:3_42_62:LOC                           | VehicleJourney#Reference[JourneyPatternRef]#Code  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                        | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                         | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                               | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC | VehicleJourney#Reference[RouteRef]#ObjectId           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC | VehicleJourney#Reference[RouteRef]#Code           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                              | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                 | StopVisit#Reference[OperatorRef]#ObjectId             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                 | StopVisit#Reference[OperatorRef]#Code             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                           | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                   | VehicleJourney#Attribute[VehicleFeatureRef]           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                  | VehicleJourney#Reference[OriginRef]#ObjectId          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                  | VehicleJourney#Reference[OriginRef]#Code          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                   | Magicien Noir                                               | VehicleJourney#Attribute[OriginName]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceName                                           | Saint Bénédicte                                             | VehicleJourney#Attribute[ViaPlaceName]                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                 | VehicleJourney#Reference[PlaceRef]#ObjectId           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                  | VehicleJourney#Reference[DestinationRef]#ObjectId     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                 | VehicleJourney#Reference[PlaceRef]#Code           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                  | VehicleJourney#Reference[DestinationRef]#Code     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                      | VehicleJourney#Attribute[DestinationName]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                            | VehicleJourney#Name                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                                | VehicleJourney#Attribute[JourneyNote]                 |
@@ -826,7 +826,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InCongestion                                                 | false                                                       | VehicleJourney#Attribute[InCongestion]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:TrainNumber/siri:TrainNumberRef                              | 12345                                                       | VehicleJourney#Attribute[TrainNumberRef]              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:SituationRef                                                 | 1234556                                                     | TODO                                                  |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef                              | NINOXE:StopPoint:SP:24:LOC                                  | StopArea#ObjectID                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef                              | NINOXE:StopPoint:SP:24:LOC                                  | StopArea#Code                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:Order                                     | 4                                                           | StopVisit#PassageOrder                                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:VehicleAtStop                             | true                                                        | StopVisit#VehicleAtStop                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:PlatformTraversal                         | false                                                       | StopVisit#Attribute[PlatformTraversal]                |
@@ -852,30 +852,30 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request by returning all required attributes with the rewrite JourneyPatternRef setting
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                      | test     |
-      | remote_objectid_kind                  | internal |
+      | remote_code_space                  | internal |
       | broadcast.rewrite_journey_pattern_ref | true     |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Destination                              |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:62:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:62:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Origin                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:42:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:42:LOC" |
       | Monitored | true                                     |
     And a StopArea exists with the following attributes:
       | Name      | Via                                       |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:256:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:256:LOC" |
       | Monitored | true                                      |
     And a Line exists with the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
+      | Codes    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
       | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                              | "internal": "NINOXE:VehicleJourney:201"         |
+      | Codes                              | "internal": "NINOXE:VehicleJourney:201"         |
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
       | LineId                                 | 6ba7b814-9dad-11d1-6-00c04fd430c8               |
       | Monitored                              | true                                            |
@@ -901,15 +901,15 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[VehicleFeatureRef]           | longTrain                                       |
       | Attribute[VehicleMode]                 | bus                                             |
       | Attribute[ViaPlaceName]                | Saint Bénédicte                                 |
-      | Reference[DestinationRef]#ObjectId     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
-      | Reference[JourneyPatternRef]#ObjectId  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
-      | Reference[OriginRef]#ObjectId          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
-      | Reference[RouteRef]#ObjectId           | "internal": "NINOXE:Route:66:LOC"               |
-      | Reference[PlaceRef]#ObjectId           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
+      | Reference[DestinationRef]#Code     | "internal": "NINOXE:StopPoint:SP:62:LOC"        |
+      | Reference[JourneyPatternRef]#Code  | "internal": "NINOXE:JourneyPattern:3_42_62:LOC" |
+      | Reference[OriginRef]#Code          | "internal": "NINOXE:StopPoint:SP:42:LOC"        |
+      | Reference[RouteRef]#Code           | "internal": "NINOXE:Route:66:LOC"               |
+      | Reference[PlaceRef]#Code           | "internal": "NINOXE:StopPoint:SP:256:LOC"       |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
       | DepartureStatus                      | onTime                                                               |
-      | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                         | 4                                                                    |
       | RecordedAt                           | 2017-01-01T11:00:00.000Z                                             |
       | Schedule[actual]#Arrival             | 2017-01-01T13:00:00.000Z                                             |
@@ -932,33 +932,33 @@ Feature: Support SIRI StopMonitoring by request
       | Attribute[ExpectedHeadwayInterval]   | 5                                                                    |
       | Attribute[NumberOfStopsAway]         | 1                                                                    |
       | Attribute[PlatformTraversal]         | false                                                                |
-      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
+      | Reference[OperatorRef]#Code      | "internal":"NINOXE:Company:15563880:LOC"                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
     Then I should receive a SIRI GetStopMonitoringResponse with
       | //siri:MonitoredStopVisit[1]/siri:RecordedAtTime                                                                            | 2017-01-01T11:00:00.000Z                                             | StopVisit#RecordedAt                                  |
-      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3               | StopVisit#ObjectID                                    |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                           | StopArea#ObjectID                                     |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                                    | Line#ObjectID                                         |
+      | //siri:MonitoredStopVisit[1]/siri:ItemIdentifier                                                                            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3               | StopVisit#Code                                    |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoringRef                                                                             | NINOXE:StopPoint:SP:24:LOC                                           | StopArea#Code                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:LineRef                                                      | NINOXE:Line:3:LOC                                                    | Line#Code                                         |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionRef                                                 | Aller                                                                | VehicleJourney#DirectionType                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DataFrameRef                    | RATPDev:DataFrame::2017-01-01:LOC                                    | Model#Date                                            |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                            | VehicleJourney#ObjectID                               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#ObjectId  |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef          | NINOXE:VehicleJourney:201                                            | VehicleJourney#Code                               |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternRef                                            | RATPDev:JourneyPattern::775b650b33aa71eaa01222ccf88a68ce23b58eff:LOC | VehicleJourney#Reference[JourneyPatternRef]#Code  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyPatternName                                           | TEST                                                                 | VehicleJourney#Attribute[JourneyPatternName]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleMode                                                  | bus                                                                  | VehicleJourney#Attribute[VehicleMode]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:PublishedLineName                                            | Ligne 3 Metro                                                        | Line#Name                                             |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#ObjectId           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:RouteRef                                                     | RATPDev:Route::720c054714b4464d42970bda37a7edc5af8082cb:LOC          | VehicleJourney#Reference[RouteRef]#Code           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DirectionName                                                | Mago-Cime OMNI                                                       | VehicleJourney#Attribute[DirectionName]               |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                          | StopVisit#Reference[OperatorRef]#ObjectId             |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OperatorRef                                                  | NINOXE:Company:15563880:LOC                                          | StopVisit#Reference[OperatorRef]#Code             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ProductCategoryRef                                           | 0                                                                    | VehicleJourney#Attribute[ProductCategoryRef]          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:ServiceFeatureRef                                            | bus scolaire                                                         | VehicleJourney#Attribute[ServiceFeatureRef]           |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleFeatureRef                                            | longTrain                                                            | VehicleJourney#Attribute[VehicleFeatureRef]           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                           | VehicleJourney#Reference[OriginRef]#ObjectId          |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginRef                                                    | NINOXE:StopPoint:SP:42:LOC                                           | VehicleJourney#Reference[OriginRef]#Code          |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginName                                                   | Magicien Noir                                                        | VehicleJourney#Attribute[OriginName]                  |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceName                                           | Saint Bénédicte                                                      | VehicleJourney#Attribute[ViaPlaceName]                |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                          | VehicleJourney#Reference[PlaceRef]#ObjectId           |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                           | VehicleJourney#Reference[DestinationRef]#ObjectId     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:Via/siri:PlaceRef                                            | NINOXE:StopPoint:SP:256:LOC                                          | VehicleJourney#Reference[PlaceRef]#Code           |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                           | VehicleJourney#Reference[DestinationRef]#Code     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                               | VehicleJourney#Attribute[DestinationName]             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                                     | VehicleJourney#Name                                   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                                         | VehicleJourney#Attribute[JourneyNote]                 |
@@ -974,7 +974,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:InCongestion                                                 | false                                                                | VehicleJourney#Attribute[InCongestion]                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:TrainNumber/siri:TrainNumberRef                              | 12345                                                                | VehicleJourney#Attribute[TrainNumberRef]              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:SituationRef                                                 | 1234556                                                              | TODO                                                  |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef                              | NINOXE:StopPoint:SP:24:LOC                                           | StopArea#ObjectID                                     |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:StopPointRef                              | NINOXE:StopPoint:SP:24:LOC                                           | StopArea#Code                                     |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:Order                                     | 4                                                                    | StopVisit#PassageOrder                                |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:VehicleAtStop                             | true                                                                 | StopVisit#VehicleAtStop                               |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:PlatformTraversal                         | false                                                                | StopVisit#Attribute[PlatformTraversal]                |
@@ -1079,11 +1079,11 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "source" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | source                |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1                                  |
-      | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | CollectedAlways | false                                    |
     When a minute has passed
     Then the SIRI server should not have received a GetStopMonitoring request
@@ -1169,14 +1169,14 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "source" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url           | http://localhost:8090 |
       | remote_credential    | source                |
-      | remote_objectid_kind | internal              |
+      | remote_code_space | internal              |
     And a Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1                                  |
-      | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes       | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | MonitoredAlways | false                                    |
       | CollectedAlways | false                                    |
     When I send a SIRI GetStopMonitoring request with
@@ -1195,7 +1195,7 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: 2481 - Handle a SIRI StopMonitoring request on a unknown StopArea
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test    |
       | MonitoringRef | unknown |
@@ -1233,47 +1233,47 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request with descendants
       Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
         | local_credential     | test     |
-        | remote_objectid_kind | internal |
+        | remote_code_space | internal |
       And a StopArea exists with the following attributes:
         | Name      | Parent               |
-        | ObjectIDs | "internal": "parent" |
+        | Codes | "internal": "parent" |
         | Monitored | true                 |
       And a StopArea exists with the following attributes:
         | Name      | Child                             |
-        | ObjectIDs | "internal": "child"               |
+        | Codes | "internal": "child"               |
         | ParentId  | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
         | Monitored | true                              |
       And a Line exists with the following attributes:
-        | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+        | Codes | "internal": "NINOXE:Line:3:LOC" |
         | Name      | Ligne 3 Metro                   |
       And a Line exists with the following attributes:
-        | ObjectIDs | "internal": "NINOXE:Line:4:LOC" |
+        | Codes | "internal": "NINOXE:Line:4:LOC" |
         | Name      | Ligne 4 Metro                   |
       And a VehicleJourney exists with the following attributes:
         | Name      | Passage 32                              |
-        | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+        | Codes | "internal": "NINOXE:VehicleJourney:201" |
         | LineId    | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
         | Monitored | true                                    |
       And a VehicleJourney exists with the following attributes:
         | Name      | Passage 202                             |
-        | ObjectIDs | "internal": "NINOXE:VehicleJourney:202" |
+        | Codes | "internal": "NINOXE:VehicleJourney:202" |
         | LineId    | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
         | Monitored | true                                    |
       And a StopVisit exists with the following attributes:
-        | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+        | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
         | PassageOrder                    | 4                                                                    |
         | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+        | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       And a StopVisit exists with the following attributes:
-        | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-3" |
+        | Codes                       | "internal": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-3" |
         | PassageOrder                    | 4                                                                    |
         | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
         | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
         | VehicleAtStop                   | true                                                                 |
-        | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+        | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
         | Schedule[actual]#Arrival        | 2017-01-01T14:00:00.000Z                                             |
       When I send a SIRI GetStopMonitoring request with
         | RequestorRef  | test   |
@@ -1357,16 +1357,16 @@ Feature: Support SIRI StopMonitoring by request
       And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
         | remote_url                 | http://localhost:8090      |
         | remote_credential          | test                       |
-        | remote_objectid_kind       | internal                   |
+        | remote_code_space       | internal                   |
         | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
       And a minute has passed
       And a StopArea exists with the following attributes:
         | Name      | Test 1                                   |
-        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
         | ParentId  | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
       And a StopArea exists with the following attributes:
         | Name      | Test 2                                   |
-        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+        | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
       When a minute has passed
       Then the SIRI server should not have received a GetStopMonitoring request
 
@@ -1377,16 +1377,16 @@ Feature: Support SIRI StopMonitoring by request
       And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
         | remote_url                 | http://localhost:8090      |
         | remote_credential          | test                       |
-        | remote_objectid_kind       | internal                   |
+        | remote_code_space       | internal                   |
         | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
       And a minute has passed
       And a StopArea exists with the following attributes:
         | Name      | Test 1                                   |
-        | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+        | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
         | ParentId  | 6ba7b814-9dad-11d1-5-00c04fd430c8        |
       And a StopArea exists with the following attributes:
         | Name            | Test 2                                   |
-        | ObjectIDs       | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+        | Codes       | "internal": "NINOXE:StopPoint:SP:25:LOC" |
         | CollectChildren | true                                     |
       When a minute has passed
       Then the SIRI server should have received 1 GetStopMonitoring request
@@ -1394,30 +1394,30 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request with Operator
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
+      | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "external": "NINOXE:VehicleJourney:201" |
+      | Codes | "external": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "internalOperator"                                       |
+      | Reference[OperatorRef]#Code | "internal": "internalOperator"                                       |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     And an Operator exists with the following attributes:
       | Name      | Operator                                                    |
-      | ObjectIDs | "internal":"internalOperator","external":"externalOperator" |
+      | Codes | "internal":"internalOperator","external":"externalOperator" |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1499,32 +1499,32 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request with a not monitored StopArea
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     And a StopArea exists with the following attributes:
       | Name             | Test                                     |
-      | ObjectIDs        | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes        | "external": "NINOXE:StopPoint:SP:24:LOC" |
       | Origin[partner1] | false                                    |
       | Monitored        | false                                    |
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "NINOXE:Line:3:LOC" |
+      | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "external": "NINOXE:VehicleJourney:201" |
+      | Codes | "external": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "operator"                                               |
+      | Reference[OperatorRef]#Code | "internal": "operator"                                               |
       | Schedule[aimed]#Arrival         | 2017-01-01T13:00:00.000Z                                             |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:05.000Z                                             |
     And an Operator exists with the following attributes:
       | Name      | Operator                                                    |
-      | ObjectIDs | "internal":"internalOperator","external":"externalOperator" |
+      | Codes | "internal":"internalOperator","external":"externalOperator" |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1604,29 +1604,29 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   @ARA-1044
-  Scenario: Handle a SIRI StopMonitoring request with unmatching objectid kind
+  Scenario: Handle a SIRI StopMonitoring request with unmatching code kind
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test  |
-      | remote_objectid_kind | wrong |
+      | remote_code_space | wrong |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "other": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "other": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                 |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                 |
       | VehicleAtStop                   | true                                                              |
-      | Reference[OperatorRef]#ObjectId | "other": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "other": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                          |
     When I send this SIRI request
       """
@@ -1688,30 +1688,30 @@ Feature: Support SIRI StopMonitoring by request
       """
 
   @ARA-1044
-  Scenario: Handle a SIRI StopMonitoring request with global setting vehicle_journey_remote_objectid_kind
+  Scenario: Handle a SIRI StopMonitoring request with global setting vehicle_journey_remote_code_space
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                     | test     |
-      | remote_objectid_kind                 | internal |
-      | vehicle_journey_remote_objectid_kind | other    |
+      | remote_code_space                 | internal |
+      | vehicle_journey_remote_code_space | other    |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                           |
-      | ObjectIDs | "other": "NINOXE:VehicleJourney:201" |
+      | Codes | "other": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
@@ -1742,34 +1742,34 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#ObjectID |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#Code |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                  | Passage 32                | VehicleJourney#Name     |
 
   @ARA-1044
-  Scenario: Handle a SIRI StopMonitoring request with connector setting siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Handle a SIRI StopMonitoring request with connector setting siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_code_space
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                              | test     |
-      | remote_objectid_kind                                                          | internal |
-      | siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind | other    |
+      | remote_code_space                                                          | internal |
+      | siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_code_space | other    |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                           |
-      | ObjectIDs | "other": "NINOXE:VehicleJourney:201" |
+      | Codes | "other": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
@@ -1800,34 +1800,34 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#ObjectID |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#Code |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                  | Passage 32                | VehicleJourney#Name     |
 
   @ARA-1044
-  Scenario: Handle a SIRI StopMonitoring request with multiple connector setting siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind
+  Scenario: Handle a SIRI StopMonitoring request with multiple connector setting siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_code_space
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                              | test          |
-      | remote_objectid_kind                                                          | internal      |
-      | siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_objectid_kind | other, other2 |
+      | remote_code_space                                                          | internal      |
+      | siri-stop-monitoring-request-broadcaster.vehicle_journey_remote_code_space | other, other2 |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                           |
-      | ObjectIDs | "other": "NINOXE:VehicleJourney:201" |
+      | Codes | "other": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
     When I send this SIRI request
       """
@@ -1858,34 +1858,34 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#ObjectID |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#Code |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                  | Passage 32                | VehicleJourney#Name     |
 
   @ARA-1044
-  Scenario: Handle a SIRI StopMonitoring request with fallback on generic connector settings remote_objectid_kind
+  Scenario: Handle a SIRI StopMonitoring request with fallback on generic connector settings remote_code_space
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                                              | test     |
-      | remote_objectid_kind                                          | internal |
-      | siri-stop-monitoring-request-broadcaster.remote_objectid_kind | other    |
+      | remote_code_space                                          | internal |
+      | siri-stop-monitoring-request-broadcaster.remote_code_space | other    |
     And a StopArea exists with the following attributes:
       | Name      | Test                                  |
-      | ObjectIDs | "other": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "other": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                  |
     And a Line exists with the following attributes:
-      | ObjectIDs | "other": "NINOXE:Line:3:LOC" |
+      | Codes | "other": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                           |
-      | ObjectIDs | "other": "NINOXE:VehicleJourney:201" |
+      | Codes | "other": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
       | Monitored | true                                 |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "other": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "other": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                 |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                 |
       | VehicleAtStop                   | true                                                              |
-      | Reference[OperatorRef]#ObjectId | "other": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "other": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                          |
     When I send this SIRI request
       """
@@ -1916,25 +1916,25 @@ Feature: Support SIRI StopMonitoring by request
 </S:Envelope>
       """
     Then I should receive a SIRI GetStopMonitoringResponse with
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#ObjectID |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:FramedVehicleJourneyRef/siri:DatedVehicleJourneyRef | NINOXE:VehicleJourney:201 | VehicleJourney#Code |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                  | Passage 32                | VehicleJourney#Name     |
 
   @ARA-1101
   Scenario: Handle a SIRI StopMonitoring request with partner setting siri.direction_type should broadcast the DirectionRef with setting value
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test                              |
-      | remote_objectid_kind | internal                          |
+      | remote_code_space | internal                          |
       | siri.direction_type  | ch:1:Direction:R,ch:1:Direction:H |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
     And a Line exists with the following attributes:
-      | ObjectIDs    | "internal": "NINOXE:Line:3:LOC"           |
+      | Codes    | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
       | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | ObjectIDs                | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                | "internal": "NINOXE:VehicleJourney:201" |
       | Name                     | Magicien Noir - Cimetière (OMNI)        |
       | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored                | true                                    |
@@ -1943,14 +1943,14 @@ Feature: Support SIRI StopMonitoring by request
       | DirectionType            | inbound                                 |
     And a StopVisit exists with the following attributes:
       | ArrivalStatus                        | onTime                                                               |
-      | ObjectIDs                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                            | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                         | 4                                                                    |
       | RecordedAt                           | 2017-01-01T11:00:00.000Z                                             |
       | Schedule[expected]#Departure         | 2017-01-01T13:02:00.000Z                                             |
       | StopAreaId                           | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                     | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                        | true                                                                 |
-      | Reference[OperatorRef]#ObjectId      | "internal":"NINOXE:Company:15563880:LOC"                             |
+      | Reference[OperatorRef]#Code      | "internal":"NINOXE:Company:15563880:LOC"                             |
     When I send a SIRI GetStopMonitoring request with
       | RequestorRef  | test                       |
       | MonitoringRef | NINOXE:StopPoint:SP:24:LOC |
@@ -1963,12 +1963,12 @@ Feature: Support SIRI StopMonitoring by request
    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
      | remote_url                 | http://localhost:8090      |
      | remote_credential          | test                       |
-     | remote_objectid_kind       | internal                   |
+     | remote_code_space       | internal                   |
      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
    And a minute has passed
    And a StopArea exists with the following attributes:
      | Name      | Test 1                                   |
-     | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+     | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
    When a minute has passed
    Then the SIRI server should have received 1 GetStopMonitoring request
 
@@ -1978,12 +1978,12 @@ Feature: Support SIRI StopMonitoring by request
    And a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
      | remote_url                 | http://localhost:8090      |
      | remote_credential          | test                       |
-     | remote_objectid_kind       | internal                   |
+     | remote_code_space       | internal                   |
      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
    And a minute has passed
    And a StopArea exists with the following attributes:
      | Name      | Test 1                                   |
-     | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+     | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
    When a minute has passed
    And the SIRI server should not have received a GetStopMonitoring request
 
@@ -1993,13 +1993,13 @@ Feature: Support SIRI StopMonitoring by request
     And a Partner "test" exists with connectors [siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_objectid_kind       | internal                   |
+      | remote_code_space       | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
       | collect.persistent         | true                       |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name      | Test 1                                   |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     When a minute has passed
     Then the SIRI server should have received 1 GetStopMonitoring request
 
@@ -2007,33 +2007,33 @@ Feature: Support SIRI StopMonitoring by request
   Scenario: Handle a SIRI StopMonitoring request with the StopVisit beeing the next Stop Visit of a Vehicle should boradcast vehicle information
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
       # 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                              |
-      | ObjectIDs | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes | "internal": "NINOXE:VehicleJourney:201" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | Monitored | true                                    |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "RLA290"              |
+      | Codes        | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -2126,38 +2126,38 @@ Feature: Support SIRI StopMonitoring by request
       """
  
   @ARA-1298
-  Scenario: Handle a SIRI StopMonitoring request with Partner remote_objectid_kind changed
+  Scenario: Handle a SIRI StopMonitoring request with Partner remote_code_space changed
     Given a SIRI Partner "test" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | internal |
+      | remote_code_space | internal |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | Monitored | true                                     |
       # "Id":"6ba7b814-9dad-11d1-2-00c04fd430c8"
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
-      | ObjectIDs | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
       | Monitored | true                                     |
       # "Id":"6ba7b814-9dad-11d1-3-00c04fd430c8"
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
       # "Id":"6ba7b814-9dad-11d1-4-00c04fd430c8"
     And a Line exists with the following attributes:
-      | ObjectIDs | "external": "Test:Line:A:BUS:LOC" |
+      | Codes | "external": "Test:Line:A:BUS:LOC" |
       | Name      | Ligne A Bus                       |
       # "Id":"6ba7b814-9dad-11d1-5-00c04fd430c8"
     And a VehicleJourney exists with the following attributes:
       | Name            | Passage 32                              |
-      | ObjectIDs       | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes       | "internal": "NINOXE:VehicleJourney:201" |
       | LineId          | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
     And a VehicleJourney exists with the following attributes:
       | Name            | Passage 33 external                     |
-      | ObjectIDs       | "external": "NINOXE:VehicleJourney:202" |
+      | Codes       | "external": "NINOXE:VehicleJourney:202" |
       | LineId          | 6ba7b814-9dad-11d1-5-00c04fd430c8       |
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
@@ -2166,22 +2166,22 @@ Feature: Support SIRI StopMonitoring by request
     And I see ara stop_areas
     And I see ara vehicle_journeys
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                    | 4                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       | Attribute[DestinationDisplay]   | Cergy le haut & Arret <RER>                                          |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                       | "external": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-5" |
+      | Codes                       | "external": "NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:25:LOC-5" |
       | PassageOrder                    | 5                                                                    |
       | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8                                    |
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
-      | Reference[OperatorRef]#ObjectId | "internal": "CdF:Company::410:LOC"                                   |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[actual]#Arrival        | 2017-01-01T13:00:00.000Z                                             |
       | Attribute[DestinationDisplay]   | Montfermeil                                                          |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
@@ -2266,7 +2266,7 @@ Feature: Support SIRI StopMonitoring by request
       """
     And the Partner "test" is updated with the following settings:
       | local_credential     | test     |
-      | remote_objectid_kind | external |
+      | remote_code_space | external |
     When I send this SIRI request
       """
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"

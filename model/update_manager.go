@@ -45,15 +45,15 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 }
 
 func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
-	if event.ObjectId.Value() == "" { // Avoid creating a StopArea with an empty objectid
+	if event.Code.Value() == "" { // Avoid creating a StopArea with an empty code
 		return
 	}
 
-	stopArea, found := manager.model.StopAreas().FindByObjectId(event.ObjectId)
+	stopArea, found := manager.model.StopAreas().FindByCode(event.Code)
 	if !found {
 		stopArea = manager.model.StopAreas().New()
 
-		stopArea.SetObjectID(event.ObjectId)
+		stopArea.SetCode(event.Code)
 		stopArea.CollectSituations = true
 
 		stopArea.Name = event.Name
@@ -62,8 +62,8 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 		stopArea.Latitude = event.Latitude
 	}
 
-	if stopArea.ParentId == "" && event.ParentObjectId.Value() != "" {
-		parentSA, _ := manager.model.StopAreas().FindByObjectId(event.ParentObjectId)
+	if stopArea.ParentId == "" && event.ParentCode.Value() != "" {
+		parentSA, _ := manager.model.StopAreas().FindByCode(event.ParentCode)
 		stopArea.ParentId = parentSA.Id()
 	}
 
@@ -88,16 +88,16 @@ func (manager *UpdateManager) updateMonitoredStopArea(stopAreaId StopAreaId, par
 }
 
 func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
-	if event.ObjectId.Value() == "" { // Avoid creating a Line with an empty objectid
+	if event.Code.Value() == "" { // Avoid creating a Line with an empty code
 		return
 	}
 
-	line, found := manager.model.Lines().FindByObjectId(event.ObjectId)
+	line, found := manager.model.Lines().FindByCode(event.Code)
 	if !found {
 		line = manager.model.Lines().New()
 
-		line.SetObjectID(event.ObjectId)
-		line.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+		line.SetCode(event.Code)
+		line.SetCode(NewCode("_default", event.Code.HashValue()))
 
 		line.CollectSituations = true
 
@@ -112,23 +112,23 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 }
 
 func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEvent) {
-	if event.ObjectId.Value() == "" { // Avoid creating a VehicleJourney with an empty objectid
+	if event.Code.Value() == "" { // Avoid creating a VehicleJourney with an empty code
 		return
 	}
 
-	vj, found := manager.model.VehicleJourneys().FindByObjectId(event.ObjectId)
+	vj, found := manager.model.VehicleJourneys().FindByCode(event.Code)
 	if !found {
-		// LineObjectId
-		l, ok := manager.model.Lines().FindByObjectId(event.LineObjectId)
+		// LineCode
+		l, ok := manager.model.Lines().FindByCode(event.LineCode)
 		if !ok {
-			logger.Log.Debugf("VehicleJourney update event without corresponding line: %v", event.LineObjectId.String())
+			logger.Log.Debugf("VehicleJourney update event without corresponding line: %v", event.LineCode.String())
 			return
 		}
 
 		vj = manager.model.VehicleJourneys().New()
 
-		vj.SetObjectID(event.ObjectId)
-		vj.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+		vj.SetCode(event.Code)
+		vj.SetCode(NewCode("_default", event.Code.HashValue()))
 
 		vj.Origin = event.Origin
 		vj.Name = event.Attributes()["VehicleJourneyName"]
@@ -141,10 +141,10 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.References = event.References()
 	}
 
-	vj.References.SetObjectId("OriginRef", NewObjectID(event.ObjectId.Kind(), event.OriginRef))
+	vj.References.SetCode("OriginRef", NewCode(event.Code.CodeSpace(), event.OriginRef))
 	vj.OriginName = event.OriginName
 
-	vj.References.SetObjectId("DestinationRef", NewObjectID(event.ObjectId.Kind(), event.DestinationRef))
+	vj.References.SetCode("DestinationRef", NewCode(event.Code.CodeSpace(), event.DestinationRef))
 	vj.DestinationName = event.DestinationName
 
 	if event.Direction != "" { // Only used for Push collector
@@ -161,20 +161,20 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 }
 
 func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
-	if event.ObjectId.Value() == "" { // Avoid creating a StopVisit with an empty objectid
+	if event.Code.Value() == "" { // Avoid creating a StopVisit with an empty code
 		return
 	}
 
-	vj, ok := manager.model.VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
+	vj, ok := manager.model.VehicleJourneys().FindByCode(event.VehicleJourneyCode)
 	if !ok {
-		logger.Log.Debugf("StopVisit update event without corresponding vehicle journey: %v", event.VehicleJourneyObjectId.String())
+		logger.Log.Debugf("StopVisit update event without corresponding vehicle journey: %v", event.VehicleJourneyCode.String())
 		return
 	}
 
 	var sa *StopArea
 	var sv *StopVisit
-	if event.StopAreaObjectId.Value() == "" {
-		sv, ok = manager.model.StopVisits().FindByObjectId(event.ObjectId)
+	if event.StopAreaCode.Value() == "" {
+		sv, ok = manager.model.StopVisits().FindByCode(event.Code)
 		if !ok {
 			logger.Log.Debugf("Can't find Stopvisit from update event without stop area id")
 			return
@@ -185,18 +185,18 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			return
 		}
 	} else {
-		sa, ok = manager.model.StopAreas().FindByObjectId(event.StopAreaObjectId)
+		sa, ok = manager.model.StopAreas().FindByCode(event.StopAreaCode)
 		if !ok {
-			logger.Log.Debugf("StopVisit update event without corresponding stop area: %v", event.StopAreaObjectId.String())
+			logger.Log.Debugf("StopVisit update event without corresponding stop area: %v", event.StopAreaCode.String())
 			return
 		}
 
-		sv, ok = manager.model.StopVisits().FindByObjectId(event.ObjectId)
+		sv, ok = manager.model.StopVisits().FindByCode(event.Code)
 		if !ok {
 			sv = manager.model.StopVisits().New()
 
-			sv.SetObjectID(event.ObjectId)
-			sv.SetObjectID(NewObjectID("_default", event.ObjectId.HashValue()))
+			sv.SetCode(event.Code)
+			sv.SetCode(NewCode("_default", event.Code.HashValue()))
 
 			sv.StopAreaId = sa.Id()
 			sv.VehicleJourneyId = vj.Id()
@@ -277,15 +277,15 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 }
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
-	sa, _ := manager.model.StopAreas().FindByObjectId(event.StopAreaObjectId)
-	vj, _ := manager.model.VehicleJourneys().FindByObjectId(event.VehicleJourneyObjectId)
+	sa, _ := manager.model.StopAreas().FindByCode(event.StopAreaCode)
+	vj, _ := manager.model.VehicleJourneys().FindByCode(event.VehicleJourneyCode)
 	line := vj.Line()
 
-	vehicle, found := manager.model.Vehicles().FindByObjectId(event.ObjectId)
+	vehicle, found := manager.model.Vehicles().FindByCode(event.Code)
 	if !found {
 		vehicle = manager.model.Vehicles().New()
 
-		vehicle.SetObjectID(event.ObjectId)
+		vehicle.SetCode(event.Code)
 	}
 
 	if event.NextStopPointOrder != 0 {
@@ -335,7 +335,7 @@ func (manager *UpdateManager) updateStatus(event *StatusUpdateEvent) {
 }
 
 func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent) {
-	stopVisit, found := manager.model.StopVisits().FindByObjectId(event.ObjectId)
+	stopVisit, found := manager.model.StopVisits().FindByCode(event.Code)
 	if !found {
 		logger.Log.Debugf("StopVisitNotCollectedEvent on unknown StopVisit: %#v", event)
 		return
@@ -350,5 +350,5 @@ func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent)
 		}
 		sva.Archive()
 	}
-	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.ObjectId)
+	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.Code)
 }

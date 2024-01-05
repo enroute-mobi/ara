@@ -114,7 +114,7 @@ def model_attributes(table)
     end
 
     # Situation References are an array of Reference
-    # Format: | Reference[0] | Kind:ObjectId |
+    # Format: | Reference[0] | Kind:Code |
     if key =~ /References\[(\d+)\]/
       reference_number = $1.to_i
 
@@ -124,17 +124,17 @@ def model_attributes(table)
         attributes["References"] << {}
       end
 
-      kind, objectid = value.split(":",2)
-      attributes["References"][reference_number] = { "Type" => kind, "ObjectId" => JSON.parse(objectid) }
+      kind, code = value.split(":",2)
+      attributes["References"][reference_number] = { "Type" => kind, "Code" => JSON.parse(code) }
       attributes.delete key
     end
 
-    if key =~ /Reference\[([^\]]+)\]#(ObjectId|Id)/
+    if key =~ /Reference\[([^\]]+)\]#(Code|Id)/
       name = $1
       attribute = $2
       attributes["References"] ||= {}
 
-      if attribute == "ObjectId"
+      if attribute == "Code"
         value = JSON.parse("{ #{value} }")
       end
 
@@ -178,15 +178,15 @@ def model_attributes(table)
       values = value.split(',')
       attributes["References"][$1.to_i] = {
         "Type" => values[0],
-        "ObjectID" => JSON.parse("{ #{values[1]} }")
+        "Code" => JSON.parse("{ #{values[1]} }")
       }
 
       attributes.delete key
     end
   end
 
-  if objectids = (attributes["ObjectIDs"] || attributes["ObjectIDs"])
-    attributes["ObjectIDs"] = JSON.parse("{ #{objectids} }")
+  if codes = (attributes["Codes"] || attributes["Codes"])
+    attributes["Codes"] = JSON.parse("{ #{codes} }")
   end
 
   if settings = attributes["Settings"]
@@ -209,9 +209,9 @@ def api_attributes(json)
 
   attributes["Schedules"].sort_by!{ |s| s["Kind"] } if attributes["Schedules"]
 
-  # objectids = attributes["ObjectIDs"]
-  # if Array === objectids
-  #   attributes["ObjectIDs"] = Hash[objectids.map { |objectid| [objectid["Kind"], objectid["Value"]] }]
+  # codes = attributes["Codes"]
+  # if Array === codes
+  #   attributes["Codes"] = Hash[codes.map { |code| [code["Kind"], code["Value"]] }]
   # end
 
   attributes
@@ -220,14 +220,14 @@ end
 def has_attributes(response_array, attributes)
   parsed_attributes = model_attributes(attributes)
 
-  objectid_kind = parsed_attributes["ObjectIDs"].keys.first
-  objectid_value = parsed_attributes["ObjectIDs"][objectid_kind]
+  code_space = parsed_attributes["Codes"].keys.first
+  code_value = parsed_attributes["Codes"][code_space]
 
-  found_value = response_array.find{|a| a["ObjectIDs"][objectid_kind] == objectid_value}
+  found_value = response_array.find{|a| a["Codes"][code_space] == code_value}
 
   expect(found_value).not_to be_nil
 
-  parsed_attributes.delete("ObjectIDs")
+  parsed_attributes.delete("Codes")
 
   parsed_attributes = parsed_attributes.reduce({}) do |attributes, (key, value)|
     case value

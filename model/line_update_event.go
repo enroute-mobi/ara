@@ -3,7 +3,7 @@ package model
 type LineUpdateEvent struct {
 	Origin string
 
-	ObjectId ObjectID
+	Code Code
 	Name     string
 }
 

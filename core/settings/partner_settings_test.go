@@ -63,76 +63,76 @@ func Test_RateLimit(t *testing.T) {
 	assert.Equal(float64(100), partnerSettings.RateLimit())
 }
 
-func Test_RemoteObjectIDKind_Without_Connector(t *testing.T) {
+func Test_RemoteCodeSpace_Without_Connector(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		REMOTE_OBJECTID_KIND: "external",
+		REMOTE_CODE_SPACE: "external",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("external", partnerSettings.RemoteObjectIDKind())
+	assert.Equal("external", partnerSettings.RemoteCodeSpace())
 }
 
-func Test_RemoteObjectIDKind_With_Connector(t *testing.T) {
+func Test_RemoteCodeSpace_With_Connector(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"connector_name.remote_objectid_kind":  "external",
-		"connector_name1.remote_objectid_kind": "another",
+		"connector_name.remote_code_space":  "external",
+		"connector_name1.remote_code_space": "another",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("external", partnerSettings.RemoteObjectIDKind("connector_name"))
-	assert.Equal("another", partnerSettings.RemoteObjectIDKind("connector_name1"))
+	assert.Equal("external", partnerSettings.RemoteCodeSpace("connector_name"))
+	assert.Equal("another", partnerSettings.RemoteCodeSpace("connector_name1"))
 }
 
-func Test_VehicleJourneyRemoteObjectIDKindWithFallback(t *testing.T) {
+func Test_VehicleJourneyRemoteCodeSpaceWithFallback(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND: "external",
+		VEHICLE_JOURNEY_REMOTE_CODE_SPACE: "external",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal([]string{"external"}, partnerSettings.VehicleJourneyRemoteObjectIDKindWithFallback((VEHICLE_JOURNEY_REMOTE_OBJECTID_KIND)))
+	assert.Equal([]string{"external"}, partnerSettings.VehicleJourneyRemoteCodeSpaceWithFallback((VEHICLE_JOURNEY_REMOTE_CODE_SPACE)))
 }
 
-func Test_VehicleJourneyRemoteObjectIDKindWithFallback_With_Multiple_Connectors(t *testing.T) {
+func Test_VehicleJourneyRemoteCodeSpaceWithFallback_With_Multiple_Connectors(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"connector_name.vehicle_journey_remote_objectid_kind":  "external",
-		"connector_name1.vehicle_journey_remote_objectid_kind": "another",
+		"connector_name.vehicle_journey_remote_code_space":  "external",
+		"connector_name1.vehicle_journey_remote_code_space": "another",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal([]string{"external"}, partnerSettings.VehicleJourneyRemoteObjectIDKindWithFallback("connector_name"))
-	assert.Equal([]string{"another"}, partnerSettings.VehicleJourneyRemoteObjectIDKindWithFallback("connector_name1"))
+	assert.Equal([]string{"external"}, partnerSettings.VehicleJourneyRemoteCodeSpaceWithFallback("connector_name"))
+	assert.Equal([]string{"another"}, partnerSettings.VehicleJourneyRemoteCodeSpaceWithFallback("connector_name1"))
 }
 
-func Test_VehicleRemoteObjectIDKindWithFallback(t *testing.T) {
+func Test_VehicleRemoteCodeSpaceWithFallback(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		VEHICLE_REMOTE_OBJECTID_KIND: "external",
+		VEHICLE_REMOTE_CODE_SPACE: "external",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal([]string{"external"}, partnerSettings.VehicleRemoteObjectIDKindWithFallback((VEHICLE_REMOTE_OBJECTID_KIND)))
+	assert.Equal([]string{"external"}, partnerSettings.VehicleRemoteCodeSpaceWithFallback((VEHICLE_REMOTE_CODE_SPACE)))
 }
 
-func Test_VehicleRemoteObjectIDKindWithFallback_With_Multiple_Connectors(t *testing.T) {
+func Test_VehicleRemoteCodeSpaceWithFallback_With_Multiple_Connectors(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"connector_name.vehicle_remote_objectid_kind":  "external",
-		"connector_name1.vehicle_remote_objectid_kind": "another",
+		"connector_name.vehicle_remote_code_space":  "external",
+		"connector_name1.vehicle_remote_code_space": "another",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal([]string{"external"}, partnerSettings.VehicleRemoteObjectIDKindWithFallback("connector_name"))
-	assert.Equal([]string{"another"}, partnerSettings.VehicleRemoteObjectIDKindWithFallback("connector_name1"))
+	assert.Equal([]string{"external"}, partnerSettings.VehicleRemoteCodeSpaceWithFallback("connector_name"))
+	assert.Equal([]string{"another"}, partnerSettings.VehicleRemoteCodeSpaceWithFallback("connector_name1"))
 }
 
 func Test_GtfsTTLBelow30Seconds(t *testing.T) {

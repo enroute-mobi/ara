@@ -75,7 +75,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 	text := `{
 "Origin":"test",
-"ObjectIDs": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}],
@@ -90,9 +90,9 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	err := json.Unmarshal([]byte(text), &situation)
 	assert.Nil(err)
 
-	expectedObjectIds := []ObjectID{
-		NewObjectID("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewObjectID("hastus", "sqypis"),
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
 	}
 
 	expectedSmmary := &SituationTranslatedString{
@@ -125,18 +125,18 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
 	assert.Equal(expectedAffectedLine, situation.Affects[1])
 
-	for _, expectedObjectId := range expectedObjectIds {
-		objectId, found := situation.ObjectID(expectedObjectId.Kind())
+	for _, expectedCode := range expectedCodes {
+		code, found := situation.Code(expectedCode.CodeSpace())
 		assert.True(found)
-		assert.Equal(expectedObjectId, objectId)
+		assert.Equal(expectedCode, code)
 	}
 }
 
 func Test_Situation_Save(t *testing.T) {
 	model := NewMemoryModel()
 	situation := model.Situations().New()
-	objectid := NewObjectID("kind", "value")
-	situation.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	situation.SetCode(code)
 
 	if situation.model != model {
 		t.Errorf("New situation model should be MemorySituation model")
@@ -152,29 +152,29 @@ func Test_Situation_Save(t *testing.T) {
 	}
 }
 
-func Test_Situation_ObjectId(t *testing.T) {
+func Test_Situation_Code(t *testing.T) {
 	situation := Situation{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
-	situation.objectids = make(ObjectIDs)
-	objectid := NewObjectID("kind", "value")
-	situation.SetObjectID(objectid)
+	situation.codes = make(Codes)
+	code := NewCode("codeSpace", "value")
+	situation.SetCode(code)
 
-	foundObjectId, ok := situation.ObjectID("kind")
+	foundCode, ok := situation.Code("codeSpace")
 	if !ok {
-		t.Errorf("ObjectID should return true if ObjectID exists")
+		t.Errorf("Code should return true if Code exists")
 	}
-	if foundObjectId.Value() != objectid.Value() {
-		t.Errorf("ObjectID should return a correct ObjectID:\n got: %v\n want: %v", foundObjectId, objectid)
+	if foundCode.Value() != code.Value() {
+		t.Errorf("Code should return a correct Code:\n got: %v\n want: %v", foundCode, code)
 	}
 
-	_, ok = situation.ObjectID("wrongkind")
+	_, ok = situation.Code("wrongkind")
 	if ok {
-		t.Errorf("ObjectID should return false if ObjectID doesn't exist")
+		t.Errorf("Code should return false if Code doesn't exist")
 	}
 
-	if len(situation.ObjectIDs()) != 1 {
-		t.Errorf("ObjectIDs should return an array with set ObjectIDs, got: %v", situation.ObjectIDs())
+	if len(situation.Codes()) != 1 {
+		t.Errorf("Codes should return an array with set Codes, got: %v", situation.Codes())
 	}
 }
 
@@ -244,8 +244,8 @@ func Test_MemorySituations_FindAll(t *testing.T) {
 func Test_MemorySituations_Delete(t *testing.T) {
 	situations := NewMemorySituations()
 	existingSituation := situations.New()
-	objectid := NewObjectID("kind", "value")
-	existingSituation.SetObjectID(objectid)
+	code := NewCode("codeSpace", "value")
+	existingSituation.SetCode(code)
 	situations.Save(&existingSituation)
 
 	situations.Delete(&existingSituation)

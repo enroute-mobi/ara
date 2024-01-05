@@ -21,28 +21,28 @@ func Test_PTT_checklines(t *testing.T) {
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"local_url":            "http://ara",
-		"remote_objectid_kind": "objectidKind",
+		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := newSIRIProductionTimetableSubscriptionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	line3 := referential.model.Lines().New()
-	line3.SetObjectID(model.NewObjectID("AnotherObjectidKind", "NINOXE:Line:A:BUS"))
+	line3.SetCode(model.NewCode("AnotherCodeSpace", "NINOXE:Line:A:BUS"))
 	line3.Name = "lineName3"
 	line3.Save()
 
-	// test request for subscription to all Lines having the same remote_objectid_kind
+	// test request for subscription to all Lines having the same remote_code_space
 	request := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +
@@ -71,7 +71,7 @@ func Test_PTT_checklines(t *testing.T) {
 	assert.Equal(len(lines), 2)
 	assert.Equal(len(unknownLines), 0)
 
-	// test subscription to a Line not having the same remote_objectid_kind
+	// test subscription to a Line not having the same remote_code_space
 	request1 := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +
@@ -100,7 +100,7 @@ func Test_PTT_checklines(t *testing.T) {
 	assert.Equal(len(lines1), 0)
 	assert.Equal(len(unknownLines1), 1)
 
-	// test subscription to multiple Lines with both remote_objectid_kind from partner and unknown remote_objectid_kind
+	// test subscription to multiple Lines with both remote_code_space from partner and unknown remote_code_space
 	request2 := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +

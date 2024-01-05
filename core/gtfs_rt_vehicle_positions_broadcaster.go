@@ -13,8 +13,8 @@ type VehiclePositionBroadcaster struct {
 	state.Startable
 	connector
 
-	vjRemoteObjectidKinds      []string
-	vehicleRemoteObjectidKinds []string
+	vjRemoteCodeSpaces      []string
+	vehicleRemoteCodeSpaces []string
 	cache                      *cache.CachedItem
 }
 
@@ -25,7 +25,7 @@ func (factory *VehiclePositionBroadcasterFactory) CreateConnector(partner *Partn
 }
 
 func (factory *VehiclePositionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 }
 
 func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster {
@@ -36,9 +36,9 @@ func NewVehiclePositionBroadcaster(partner *Partner) *VehiclePositionBroadcaster
 }
 
 func (connector *VehiclePositionBroadcaster) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-	connector.vjRemoteObjectidKinds = connector.partner.VehicleJourneyRemoteObjectIDKindWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-	connector.vehicleRemoteObjectidKinds = connector.partner.VehicleRemoteObjectIDKindWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
+	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	connector.cache = cache.NewCachedItem("VehiclePositions", connector.partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
 }
 
@@ -52,11 +52,11 @@ func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) 
 
 func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
 	vehicles := connector.partner.Model().Vehicles().FindAll()
-	linesObjectId := make(map[model.VehicleJourneyId]model.ObjectID)
+	linesCode := make(map[model.VehicleJourneyId]model.Code)
 	trips := make(map[model.VehicleJourneyId]*gtfs.TripDescriptor)
 
 	for i := range vehicles {
-		vehicleId, ok := vehicles[i].ObjectIDWithFallback(connector.vehicleRemoteObjectidKinds)
+		vehicleId, ok := vehicles[i].CodeWithFallback(connector.vehicleRemoteCodeSpaces)
 		if !ok {
 			continue
 		}
@@ -64,30 +64,30 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		trip, ok := trips[vehicles[i].VehicleJourneyId]
 		// If we don't already have a tripUpdate with the VehicleJourney we create one
 		if !ok {
-			// Fetch all needed models and objectids
+			// Fetch all needed models and codes
 			vj, ok := connector.partner.Model().VehicleJourneys().Find(vehicles[i].VehicleJourneyId)
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.ObjectIDWithFallback(connector.vjRemoteObjectidKinds)
+			vjId, ok := vj.CodeWithFallback(connector.vjRemoteCodeSpaces)
 			if !ok {
 				continue
 			}
 
 			var routeId string
-			lineObjectid, ok := linesObjectId[vj.Id()]
+			lineCode, ok := linesCode[vj.Id()]
 			if !ok {
 				l, ok := connector.partner.Model().Lines().Find(vj.LineId)
 				if !ok {
 					continue
 				}
-				lineObjectid, ok = l.ObjectID(connector.remoteObjectidKind)
+				lineCode, ok = l.Code(connector.remoteCodeSpace)
 				if !ok {
 					continue
 				}
-				linesObjectId[vehicles[i].VehicleJourneyId] = lineObjectid
+				linesCode[vehicles[i].VehicleJourneyId] = lineCode
 			}
-			routeId = lineObjectid.Value()
+			routeId = lineCode.Value()
 
 			// Fill the tripDescriptor
 			tripId := vjId.Value()
@@ -137,7 +137,7 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 		// Fill StopId, but as it's uptionnal we just fill it if we can find it
 		sa, ok := connector.partner.Model().StopAreas().Find(vehicles[i].StopAreaId)
 		if ok {
-			saId, ok := sa.ObjectID(connector.remoteObjectidKind)
+			saId, ok := sa.Code(connector.remoteCodeSpace)
 			if ok {
 				id := saId.Value()
 				feedEntity.Vehicle.StopId = &id

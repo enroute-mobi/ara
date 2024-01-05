@@ -20,10 +20,10 @@ When(/^a Situation is created (?:in Referential "([^"]+)" )?with the following a
   end
 end
 
-When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, objectid, referential|
+When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, code, referential|
   response = RestClient.get situations_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
   responseArray = JSON.parse(response.body)
-  expectedSituation = responseArray.find{|a| a["ObjectIDs"][kind] == objectid }
+  expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
 
   RestClient.delete situation_path(expectedSituation["Id"]), {:Authorization => "Token token=#{$token}"}
 end

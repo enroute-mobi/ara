@@ -14,7 +14,7 @@ import (
 type GtfsRequestCollectorFactory struct{}
 
 func (factory *GtfsRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfLightRemoteCredentials()
 }
 
@@ -25,7 +25,7 @@ func (factory *GtfsRequestCollectorFactory) CreateConnector(partner *Partner) Co
 type GtfsRequestCollector struct {
 	connector
 
-	remoteObjectidKind string
+	remoteCodeSpace string
 	origin             string
 
 	ttl        time.Duration
@@ -46,7 +46,7 @@ func (connector *GtfsRequestCollector) Start() {
 	logger.Log.Debugf("Start GtfsRequestCollector")
 
 	connector.ttl = connector.Partner().GtfsTTL()
-	connector.remoteObjectidKind = connector.Partner().RemoteObjectIDKind()
+	connector.remoteCodeSpace = connector.Partner().RemoteCodeSpace()
 	connector.origin = string(connector.Partner().Slug())
 	connector.stop = make(chan struct{})
 	go connector.run()
@@ -113,12 +113,12 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 	if trip == nil {
 		return
 	}
-	vjObjectId := connector.handleTrip(events, trip) // returns the vj objectid
+	vjCode := connector.handleTrip(events, trip) // returns the vj code
 
 	for _, stu := range t.GetStopTimeUpdate() {
 		sid := stu.GetStopId()
-		svid := fmt.Sprintf("%v-%v", vjObjectId.Value(), connector.handleStopSequence(stu))
-		stopAreaObjectId := model.NewObjectID(connector.remoteObjectidKind, sid)
+		svid := fmt.Sprintf("%v-%v", vjCode.Value(), connector.handleStopSequence(stu))
+		stopAreaCode := model.NewCode(connector.remoteCodeSpace, sid)
 
 		if sid != "" {
 			_, ok := events.StopAreas[sid]
@@ -126,7 +126,7 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 				// CollectedAlways is false by default
 				event := &model.StopAreaUpdateEvent{
 					Origin:   connector.origin,
-					ObjectId: stopAreaObjectId,
+					Code: stopAreaCode,
 				}
 
 				events.StopAreas[sid] = event
@@ -135,12 +135,12 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 
 		_, ok := events.StopVisits[sid][svid]
 		if !ok {
-			stopVisitObjectId := model.NewObjectID(connector.remoteObjectidKind, svid)
+			stopVisitCode := model.NewCode(connector.remoteCodeSpace, svid)
 			svEvent := &model.StopVisitUpdateEvent{
 				Origin:                 connector.origin,
-				ObjectId:               stopVisitObjectId,
-				StopAreaObjectId:       stopAreaObjectId,
-				VehicleJourneyObjectId: vjObjectId,
+				Code:               stopVisitCode,
+				StopAreaCode:       stopAreaCode,
+				VehicleJourneyCode: vjCode,
 				PassageOrder:           connector.handleStopSequence(stu),
 				Monitored:              true,
 				RecordedAt:             connector.Clock().Now(),
@@ -178,17 +178,17 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 		return
 	}
 	occupancy := v.OccupancyStatus
-	vjObjectId := connector.handleTrip(events, trip, occupancy) // returns the vj objectid
+	vjCode := connector.handleTrip(events, trip, occupancy) // returns the vj code
 
 	vid := v.GetVehicle().GetId()
 	_, ok := events.Vehicles[vid]
 	if !ok {
-		vObjectId := model.NewObjectID(connector.remoteObjectidKind, vid)
+		vCode := model.NewCode(connector.remoteCodeSpace, vid)
 		p := v.GetPosition()
 		event := &model.VehicleUpdateEvent{
-			ObjectId:               vObjectId,
-			StopAreaObjectId:       model.NewObjectID(connector.remoteObjectidKind, v.GetStopId()),
-			VehicleJourneyObjectId: vjObjectId,
+			Code:               vCode,
+			StopAreaCode:       model.NewCode(connector.remoteCodeSpace, v.GetStopId()),
+			VehicleJourneyCode: vjCode,
 			Longitude:              float64(p.GetLongitude()),
 			Latitude:               float64(p.GetLatitude()),
 			Bearing:                float64(p.GetBearing()),
@@ -199,19 +199,19 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 	}
 }
 
-// returns the vj objectid
-func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...*gtfs.VehiclePosition_OccupancyStatus) model.ObjectID {
+// returns the vj code
+func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, trip *gtfs.TripDescriptor, occupancy ...*gtfs.VehiclePosition_OccupancyStatus) model.Code {
 	rid := trip.GetRouteId()
 	tid := trip.GetTripId()
-	lineObjectId := model.NewObjectID(connector.remoteObjectidKind, rid)
-	vjObjectId := model.NewObjectID(connector.remoteObjectidKind, tid)
+	lineCode := model.NewCode(connector.remoteCodeSpace, rid)
+	vjCode := model.NewCode(connector.remoteCodeSpace, tid)
 
 	_, ok := events.Lines[rid]
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
 			Origin:   connector.origin,
-			ObjectId: lineObjectId,
+			Code: lineCode,
 		}
 
 		events.Lines[rid] = lineEvent
@@ -221,8 +221,8 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:       connector.origin,
-			ObjectId:     vjObjectId,
-			LineObjectId: lineObjectId,
+			Code:     vjCode,
+			LineCode: lineCode,
 			Monitored:    true,
 		}
 		if len(occupancy) != 0 {
@@ -232,7 +232,7 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 		events.VehicleJourneys[tid] = vjEvent
 	}
 
-	return vjObjectId
+	return vjCode
 }
 
 func (connector *GtfsRequestCollector) SetSubscriber(s UpdateSubscriber) {

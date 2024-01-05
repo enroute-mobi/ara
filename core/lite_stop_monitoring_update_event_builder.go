@@ -11,18 +11,18 @@ type LiteStopMonitoringUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	originStopAreaObjectId model.ObjectID
-	partner                *Partner
-	remoteObjectidKind     string
+	originStopAreaCode model.Code
+	partner            *Partner
+	remoteCodeSpace     string
 
 	stopMonitoringUpdateEvents *CollectUpdateEvents
 }
 
-func NewLiteStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaObjectId model.ObjectID) LiteStopMonitoringUpdateEventBuilder {
+func NewLiteStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaCode model.Code) LiteStopMonitoringUpdateEventBuilder {
 	return LiteStopMonitoringUpdateEventBuilder{
-		originStopAreaObjectId:     originStopAreaObjectId,
+		originStopAreaCode:         originStopAreaCode,
 		partner:                    partner,
-		remoteObjectidKind:         partner.RemoteObjectIDKind(),
+		remoteCodeSpace:             partner.RemoteCodeSpace(),
 		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }
@@ -38,18 +38,18 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 	stopPointRef := StopVisitEvent.GetStopPointRef()
 
 	// StopAreas
-	stopAreaObjectId := model.NewObjectID(builder.remoteObjectidKind, stopPointRef)
+	stopAreaCode := model.NewCode(builder.remoteCodeSpace, stopPointRef)
 
 	_, ok := builder.stopMonitoringUpdateEvents.StopAreas[stopPointRef]
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
-			Origin:   origin,
-			ObjectId: stopAreaObjectId,
-			Name:     StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.StopPointName,
+			Origin: origin,
+			Code:   stopAreaCode,
+			Name:   StopVisitEvent.MonitoredVehicleJourney.MonitoredCall.StopPointName,
 		}
-		if builder.originStopAreaObjectId.Value() != "" && stopAreaObjectId.String() != builder.originStopAreaObjectId.String() {
-			event.ParentObjectId = builder.originStopAreaObjectId
+		if builder.originStopAreaCode.Value() != "" && stopAreaCode.String() != builder.originStopAreaCode.String() {
+			event.ParentCode = builder.originStopAreaCode
 		}
 
 		builder.stopMonitoringUpdateEvents.StopAreas[stopPointRef] = event
@@ -57,14 +57,14 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 	}
 
 	// Lines
-	lineObjectId := model.NewObjectID(builder.remoteObjectidKind, StopVisitEvent.MonitoredVehicleJourney.LineRef)
+	lineCode := model.NewCode(builder.remoteCodeSpace, StopVisitEvent.MonitoredVehicleJourney.LineRef)
 
 	_, ok = builder.stopMonitoringUpdateEvents.Lines[StopVisitEvent.MonitoredVehicleJourney.LineRef]
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
-			Origin:   origin,
-			ObjectId: lineObjectId,
+			Origin: origin,
+			Code:   lineCode,
 		}
 
 		lineRef := StopVisitEvent.MonitoredVehicleJourney.LineRef
@@ -73,50 +73,50 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 	}
 
 	// VehicleJourneys
-	vehicleJourneyCode := StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
-	vehicleJourneyObjectId := model.NewObjectID(builder.remoteObjectidKind, vehicleJourneyCode)
+	vehicleJourneyRef := StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
+	vehicleJourneyCode := model.NewCode(builder.remoteCodeSpace, vehicleJourneyRef)
 
 	_, ok = builder.
 		stopMonitoringUpdateEvents.
-		VehicleJourneys[vehicleJourneyCode]
+		VehicleJourneys[vehicleJourneyRef]
 
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			ObjectId:        vehicleJourneyObjectId,
-			LineObjectId:    lineObjectId,
+			Code:            vehicleJourneyCode,
+			LineCode:        lineCode,
 			DestinationRef:  StopVisitEvent.MonitoredVehicleJourney.DestinationRef,
 			DestinationName: StopVisitEvent.MonitoredVehicleJourney.DestinationName,
 			Monitored:       true,
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 		}
 
-		builder.stopMonitoringUpdateEvents.VehicleJourneys[vehicleJourneyCode] = vjEvent
-		builder.stopMonitoringUpdateEvents.VehicleJourneyRefs[vehicleJourneyCode] = struct{}{}
+		builder.stopMonitoringUpdateEvents.VehicleJourneys[vehicleJourneyRef] = vjEvent
+		builder.stopMonitoringUpdateEvents.VehicleJourneyRefs[vehicleJourneyRef] = struct{}{}
 	}
 
 	// StopVisits
-	stopVisitObjectId := model.NewObjectID(builder.remoteObjectidKind, StopVisitEvent.GetItemIdentifier())
+	stopVisitCode := model.NewCode(builder.remoteCodeSpace, StopVisitEvent.GetItemIdentifier())
 
 	monitoredCall := StopVisitEvent.MonitoredVehicleJourney.MonitoredCall
 	_, ok = builder.stopMonitoringUpdateEvents.StopVisits[stopPointRef][StopVisitEvent.GetItemIdentifier()]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
-			Origin:                 origin,
-			ObjectId:               stopVisitObjectId,
-			StopAreaObjectId:       stopAreaObjectId,
-			VehicleJourneyObjectId: vehicleJourneyObjectId,
-			DataFrameRef:           StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef,
-			PassageOrder:           *monitoredCall.Order,
-			VehicleAtStop:          monitoredCall.VehicleAtStop,
-			ArrivalStatus:          model.SetStopVisitArrivalStatus(monitoredCall.ArrivalStatus),
-			DepartureStatus:        model.SetStopVisitDepartureStatus(monitoredCall.DepartureStatus),
-			RecordedAt:             StopVisitEvent.RecordedAtTime,
-			Schedules:              model.NewStopVisitSchedules(),
-			Monitored:              StopVisitEvent.GetMonitored(),
+			Origin:             origin,
+			Code:               stopVisitCode,
+			StopAreaCode:       stopAreaCode,
+			VehicleJourneyCode: vehicleJourneyCode,
+			DataFrameRef:       StopVisitEvent.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef,
+			PassageOrder:       *monitoredCall.Order,
+			VehicleAtStop:      monitoredCall.VehicleAtStop,
+			ArrivalStatus:      model.SetStopVisitArrivalStatus(monitoredCall.ArrivalStatus),
+			DepartureStatus:    model.SetStopVisitDepartureStatus(monitoredCall.DepartureStatus),
+			RecordedAt:         StopVisitEvent.RecordedAtTime,
+			Schedules:          model.NewStopVisitSchedules(),
+			Monitored:          StopVisitEvent.GetMonitored(),
 
-			ObjectidKind: builder.remoteObjectidKind,
+			CodeSpace: builder.remoteCodeSpace,
 		}
 
 		aimedDerpatureTime := monitoredCall.AimedDepartureTime

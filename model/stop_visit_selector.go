@@ -37,7 +37,7 @@ func StopVisitSelectByStopAreaId(stopAreaId StopAreaId) StopVisitSelector {
 	}
 }
 
-func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
+func StopVisitSelectorByLine(code Code) StopVisitSelector {
 	return func(stopVisit *StopVisit) bool {
 		vehicleJourney := stopVisit.VehicleJourney()
 		if vehicleJourney == nil {
@@ -47,9 +47,9 @@ func StopVisitSelectorByLine(objectid ObjectID) StopVisitSelector {
 		if line == nil {
 			return false
 		}
-		lineObjectid, ok := line.ObjectID(objectid.Kind())
+		lineCode, ok := line.Code(code.CodeSpace())
 		if ok {
-			return lineObjectid.Value() == objectid.Value()
+			return lineCode.Value() == code.Value()
 		}
 		return false
 	}

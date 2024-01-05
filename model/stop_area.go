@@ -18,7 +18,7 @@ type StopArea struct {
 	CollectedUntil time.Time
 	model          Model
 	References     References
-	ObjectIDConsumer
+	CodeConsumer
 	Origins           *StopAreaOrigins
 	Attributes        Attributes
 	ReferentId        StopAreaId `json:",omitempty"`
@@ -42,7 +42,7 @@ func NewStopArea(model Model) *StopArea {
 		References:      NewReferences(),
 		CollectedAlways: true,
 	}
-	stopArea.objectids = make(ObjectIDs)
+	stopArea.codes = make(Codes)
 	return stopArea
 }
 
@@ -56,7 +56,7 @@ func (stopArea *StopArea) copy() *StopArea {
 			nextCollectAt: stopArea.nextCollectAt,
 			collectedAt:   stopArea.collectedAt,
 		},
-		ObjectIDConsumer:  stopArea.ObjectIDConsumer.Copy(),
+		CodeConsumer:      stopArea.CodeConsumer.Copy(),
 		model:             stopArea.model,
 		id:                stopArea.id,
 		ParentId:          stopArea.ParentId,
@@ -84,7 +84,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	type Alias StopArea
 	aux := struct {
 		References     map[string]Reference `json:",omitempty"`
-		ObjectIDs      ObjectIDs            `json:",omitempty"`
+		Codes          Codes                `json:",omitempty"`
 		NextCollectAt  *time.Time           `json:",omitempty"`
 		CollectedAt    *time.Time           `json:",omitempty"`
 		CollectedUntil *time.Time           `json:",omitempty"`
@@ -96,8 +96,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(stopArea),
 	}
 
-	if !stopArea.ObjectIDs().Empty() {
-		aux.ObjectIDs = stopArea.ObjectIDs()
+	if !stopArea.Codes().Empty() {
+		aux.Codes = stopArea.Codes()
 	}
 	if !stopArea.Attributes.IsEmpty() {
 		aux.Attributes = stopArea.Attributes
@@ -121,7 +121,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	type Alias StopArea
 	aux := &struct {
-		ObjectIDs  map[string]string
+		Codes      map[string]string
 		References map[string]Reference
 		Origins    map[string]bool
 		*Alias
@@ -133,8 +133,8 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		stopArea.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		stopArea.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -176,38 +176,38 @@ func (stopArea *StopArea) Referent() (*StopArea, bool) {
 	return stopArea.model.StopAreas().Find(stopArea.ReferentId)
 }
 
-func (stopArea *StopArea) ReferentOrSelfObjectId(objectIDKind string) (ObjectID, bool) {
+func (stopArea *StopArea) ReferentOrSelfCode(codeSpace string) (Code, bool) {
 	ref, ok := stopArea.Referent()
 	if ok {
-		objectID, ok := ref.ObjectID(objectIDKind)
+		code, ok := ref.Code(codeSpace)
 		if ok {
-			return objectID, true
+			return code, true
 		}
 	}
-	objectID, ok := stopArea.ObjectID(objectIDKind)
+	code, ok := stopArea.Code(codeSpace)
 	if ok {
-		return objectID, true
+		return code, true
 	}
-	return ObjectID{}, false
+	return Code{}, false
 }
 
 /* Returns true if we need to send the StopArea in a SPD
-   We only send the StopArea if it has no referent with a correct objectIDKind.
+   We only send the StopArea if it has no referent with a correct codeSpace.
    If that's the case, we'll send the Referent instead
 */
-func (stopArea *StopArea) SPDObjectId(objectIDKind string) (ObjectID, bool) {
+func (stopArea *StopArea) SPDCode(codeSpace string) (Code, bool) {
 	ref, ok := stopArea.Referent()
 	if ok {
-		_, ok := ref.ObjectID(objectIDKind)
+		_, ok := ref.Code(codeSpace)
 		if ok {
-			return ObjectID{}, false
+			return Code{}, false
 		}
 	}
-	objectID, ok := stopArea.ObjectID(objectIDKind)
+	code, ok := stopArea.Code(codeSpace)
 	if ok {
-		return objectID, true
+		return code, true
 	}
-	return ObjectID{}, false
+	return Code{}, false
 }
 
 func (stopArea *StopArea) SetPartnerStatus(partner string, status bool) {
@@ -226,7 +226,7 @@ type MemoryStopAreas struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[StopAreaId]*StopArea
-	byObjectId   *ObjectIdIndex
+	byCode       *CodeIndex
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
@@ -236,13 +236,13 @@ type StopAreas interface {
 
 	New() *StopArea
 	Find(StopAreaId) (*StopArea, bool)
-	FindByObjectId(ObjectID) (*StopArea, bool)
+	FindByCode(Code) (*StopArea, bool)
 	FindByLineId(LineId) []*StopArea
 	FindByOrigin(string) []StopAreaId
 	FindAll() []*StopArea
 	FindFamily(StopAreaId) []StopAreaId
 	FindAscendants(StopAreaId) []*StopArea
-	FindAscendantsWithObjectIdKind(StopAreaId, string) []ObjectID
+	FindAscendantsWithCodeSpace(StopAreaId, string) []Code
 	Save(*StopArea) bool
 	Delete(*StopArea) bool
 }
@@ -251,7 +251,7 @@ func NewMemoryStopAreas() *MemoryStopAreas {
 	return &MemoryStopAreas{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
-		byObjectId:   NewObjectIdIndex(),
+		byCode:       NewCodeIndex(),
 	}
 }
 
@@ -270,11 +270,11 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (*StopArea, bool) {
 	return &StopArea{}, false
 }
 
-func (manager *MemoryStopAreas) FindByObjectId(objectid ObjectID) (*StopArea, bool) {
+func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[StopAreaId(id)].copy(), true
 	}
@@ -328,7 +328,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
-	manager.byObjectId.Index(stopArea)
+	manager.byCode.Index(stopArea)
 
 	manager.mutex.Unlock()
 
@@ -349,7 +349,7 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopArea.Id())
-	manager.byObjectId.Delete(ModelId(stopArea.id))
+	manager.byCode.Delete(ModelId(stopArea.id))
 
 	return true
 }
@@ -400,32 +400,32 @@ func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId) (stopAreas
 	return
 }
 
-func (manager *MemoryStopAreas) FindAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+func (manager *MemoryStopAreas) FindAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
 	manager.mutex.RLock()
 
-	stopAreaObjectIds = manager.findAscendantsWithObjectIdKind(stopAreaId, kind)
+	stopAreaCodes = manager.findAscendantsWithCodeSpace(stopAreaId, kind)
 
 	manager.mutex.RUnlock()
 
 	return
 }
 
-func (manager *MemoryStopAreas) findAscendantsWithObjectIdKind(stopAreaId StopAreaId, kind string) (stopAreaObjectIds []ObjectID) {
+func (manager *MemoryStopAreas) findAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
 	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}
 
-	id, ok := sa.ObjectID(kind)
+	id, ok := sa.Code(kind)
 	if ok {
-		stopAreaObjectIds = []ObjectID{id}
+		stopAreaCodes = []Code{id}
 	}
 
 	if sa.ParentId != "" {
-		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ParentId, kind)...)
+		stopAreaCodes = append(stopAreaCodes, manager.findAscendantsWithCodeSpace(sa.ParentId, kind)...)
 	}
 	if sa.ReferentId != "" {
-		stopAreaObjectIds = append(stopAreaObjectIds, manager.findAscendantsWithObjectIdKind(sa.ReferentId, kind)...)
+		stopAreaCodes = append(stopAreaCodes, manager.findAscendantsWithCodeSpace(sa.ReferentId, kind)...)
 	}
 
 	return
@@ -491,12 +491,12 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 			stopArea.References.SetReferences(references)
 		}
 
-		if sa.ObjectIDs.Valid && len(sa.ObjectIDs.String) > 0 {
-			objectIdMap := make(map[string]string)
-			if err = json.Unmarshal([]byte(sa.ObjectIDs.String), &objectIdMap); err != nil {
+		if sa.Codes.Valid && len(sa.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(sa.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			stopArea.objectids = NewObjectIDsFromMap(objectIdMap)
+			stopArea.codes = NewCodesFromMap(codeMap)
 		}
 
 		manager.Save(stopArea)

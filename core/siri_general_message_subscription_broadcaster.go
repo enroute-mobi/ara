@@ -31,7 +31,7 @@ func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) CreateConnector
 }
 
 func (factory *SIRIGeneralMessageSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
@@ -76,7 +76,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 		return
 	}
 
-	obj := model.NewObjectID("SituationResource", "Situation")
+	obj := model.NewCode("SituationResource", "Situation")
 	subs := connector.partner.Subscriptions().FindSubscriptionsByKind(GeneralMessageBroadcast)
 
 	for _, sub := range subs {
@@ -142,11 +142,11 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		sub.SetSubscriptionOption("StopPointRef", strings.Join(gm.StopPointRef(), ","))
 		sub.SetSubscriptionOption("MessageIdentifier", gm.MessageIdentifier())
 
-		obj := model.NewObjectID("SituationResource", "Situation")
+		obj := model.NewCode("SituationResource", "Situation")
 		r := sub.Resource(obj)
 		if r == nil {
 			ref := model.Reference{
-				ObjectId: &obj,
+				Code: &obj,
 				Type:     "Situation",
 			}
 			r = sub.CreateAndAddNewResource(ref)

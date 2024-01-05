@@ -26,7 +26,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
@@ -38,11 +38,11 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	objectid := model.NewObjectID("internal", string(stopArea.Id()))
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "StopArea",
 	}
 
@@ -72,7 +72,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -81,8 +81,8 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	referential.Partners().Save(partner)
 
 	stopArea := referential.Model().StopAreas().New()
-	objectid := model.NewObjectID("internal", string(stopArea.Id()))
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
@@ -90,7 +90,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	stopArea2.Save()
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "StopArea",
 	}
 
@@ -125,7 +125,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -134,12 +134,12 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 	referential.Partners().Save(partner)
 
 	stopArea := referential.Model().StopAreas().New()
-	objectid := model.NewObjectID("internal", string(stopArea.Id()))
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "StopArea",
 	}
 
@@ -150,8 +150,8 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 	sub.Save()
 
 	line := referential.Model().Lines().New()
-	line_objectid := model.NewObjectID("internal", "line")
-	line.SetObjectID(line_objectid)
+	line_code := model.NewCode("internal", "line")
+	line.SetCode(line_code)
 	line.Save()
 
 	vj := referential.Model().VehicleJourneys().New()
@@ -206,7 +206,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "internal",
+		"remote_code_space": "internal",
 		"local_credential":     "external",
 		"remote_url":           ts.URL,
 	}
@@ -223,22 +223,22 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	objectid := model.NewObjectID("internal", string(stopArea.Id()))
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
 
 	reference := model.Reference{
-		ObjectId: &objectid,
+		Code: &code,
 		Type:     "StopArea",
 	}
 
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.Save()
 
-	objectid2 := model.NewObjectID("internal", string(stopArea2.Id()))
-	stopArea2.SetObjectID(objectid2)
+	code2 := model.NewCode("internal", string(stopArea2.Id()))
+	stopArea2.SetCode(code2)
 
 	reference2 := model.Reference{
-		ObjectId: &objectid2,
+		Code: &code2,
 		Type:     "StopArea",
 	}
 
@@ -252,30 +252,30 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	subscription.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.LineId = line.Id()
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit.SetObjectID(objectid)
+	stopVisit.SetCode(code)
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit2.SetObjectID(model.NewObjectID("internal", string(stopArea.Id())))
+	stopVisit2.SetCode(model.NewCode("internal", string(stopArea.Id())))
 	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	stopVisit3 := referential.Model().StopVisits().New()
 	stopVisit3.StopAreaId = stopArea2.Id()
 	stopVisit3.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit3.SetObjectID(model.NewObjectID("internal", string(stopArea2.Id())))
+	stopVisit3.SetCode(model.NewCode("internal", string(stopArea2.Id())))
 	stopVisit3.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...

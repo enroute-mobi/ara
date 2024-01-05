@@ -23,8 +23,8 @@ type BroadcastStopMonitoringBuilder struct {
 	referenceGenerator            *idgen.IdentifierGenerator
 	stopAreareferenceGenerator    *idgen.IdentifierGenerator
 	dataFrameGenerator            *idgen.IdentifierGenerator
-	remoteObjectidKind            string
-	vjRemoteObjectidKinds         []string
+	remoteCodeSpace            string
+	vjRemoteCodeSpaces         []string
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
 	rewriteJourneyPatternRef      bool
@@ -36,8 +36,8 @@ func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *
 		referenceGenerator:            partner.ReferenceIdentifierGenerator(),
 		stopAreareferenceGenerator:    partner.ReferenceStopAreaIdentifierGenerator(),
 		dataFrameGenerator:            partner.DataFrameIdentifierGenerator(),
-		remoteObjectidKind:            partner.RemoteObjectIDKind(connectorName),
-		vjRemoteObjectidKinds:         partner.VehicleJourneyRemoteObjectIDKindWithFallback(connectorName),
+		remoteCodeSpace:            partner.RemoteCodeSpace(connectorName),
+		vjRemoteCodeSpaces:         partner.VehicleJourneyRemoteCodeSpaceWithFallback(connectorName),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
 		rewriteJourneyPatternRef:      partner.RewriteJourneyPatternRef(),
@@ -55,9 +55,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Line", stopVisit.Id())
 		return nil
 	}
-	lineObjectId, ok := line.ObjectID(builder.remoteObjectidKind)
+	lineCode, ok := line.Code(builder.remoteCodeSpace)
 	if !ok {
-		logger.Log.Printf("Ignore CancelledStopVisit %s with Line without correct ObjectID", stopVisit.Id())
+		logger.Log.Printf("Ignore CancelledStopVisit %s with Line without correct Code", stopVisit.Id())
 		return nil
 	}
 
@@ -75,7 +75,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		RecordedAtTime:         stopVisit.RecordedAt,
 		ItemRef:                itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
-		LineRef:                lineObjectId.Value(),
+		LineRef:                lineCode.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
 		PublishedLineName:      line.Name,
@@ -85,9 +85,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 }
 
 func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit *model.StopVisit) *siri.SIRIMonitoredStopVisit {
-	stopPointRef, stopPointRefObjectId, ok := builder.stopPointRef(stopVisit.StopAreaId)
+	stopPointRef, stopPointRefCode, ok := builder.stopPointRef(stopVisit.StopAreaId)
 	if !ok {
-		logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct ObjectID", stopVisit.Id())
+		logger.Log.Printf("Ignore StopVisit %v without StopArea or with StopArea without correct Code", stopVisit.Id())
 		return nil
 	}
 
@@ -101,9 +101,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
 		return nil
 	}
-	lineObjectId, ok := line.ObjectID(builder.remoteObjectidKind)
+	lineCode, ok := line.Code(builder.remoteCodeSpace)
 	if !ok {
-		logger.Log.Printf("Ignore StopVisit %s with Line without correct ObjectID", stopVisit.Id())
+		logger.Log.Printf("Ignore StopVisit %s with Line without correct Code", stopVisit.Id())
 		return nil
 	}
 
@@ -121,14 +121,14 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit := &siri.SIRIMonitoredStopVisit{
 		ItemIdentifier:         itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
-		StopPointRef:           stopPointRefObjectId,
+		StopPointRef:           stopPointRefCode,
 		StopPointName:          stopPointRef.Name,
 		VehicleJourneyName:     vehicleJourney.Name,
 		OriginName:             vehicleJourney.OriginName,
 		DestinationName:        vehicleJourney.DestinationName,
 		DirectionType:          builder.directionType(vehicleJourney.DirectionType),
 		Monitored:              vehicleJourney.Monitored,
-		LineRef:                lineObjectId.Value(),
+		LineRef:                lineCode.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
 		Occupancy:              vehicleJourney.Occupancy,
@@ -226,15 +226,15 @@ func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.Sto
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
-	stopPointRefObjectId, ok := stopPointRef.ObjectID(builder.remoteObjectidKind)
+	stopPointRefCode, ok := stopPointRef.Code(builder.remoteCodeSpace)
 	if ok {
-		return stopPointRef, stopPointRefObjectId.Value(), true
+		return stopPointRef, stopPointRefCode.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentObjectId, ok := referent.ObjectID(builder.remoteObjectidKind)
+		referentCode, ok := referent.Code(builder.remoteCodeSpace)
 		if ok {
-			return referent, referentObjectId.Value(), true
+			return referent, referentCode.Value(), true
 		}
 	}
 	return &model.StopArea{}, "", false
@@ -243,32 +243,32 @@ func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.Sto
 func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *model.StopVisit) (string, bool) {
 	var itemIdentifier string
 
-	stopVisitId, ok := stopVisit.ObjectID(builder.remoteObjectidKind)
+	stopVisitId, ok := stopVisit.Code(builder.remoteCodeSpace)
 	if ok {
 		itemIdentifier = stopVisitId.Value()
 	} else {
-		defaultObjectID, ok := stopVisit.ObjectID("_default")
+		defaultCode, ok := stopVisit.Code("_default")
 		if !ok {
-			logger.Log.Printf("Ignore StopVisit %s without default ObjectID", stopVisit.Id())
+			logger.Log.Printf("Ignore StopVisit %s without default Code", stopVisit.Id())
 			return "", false
 		}
-		itemIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: defaultObjectID.Value()})
+		itemIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: defaultCode.Value()})
 	}
 	return itemIdentifier, true
 }
 
 func (builder *BroadcastStopMonitoringBuilder) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
-	vehicleJourneyId, ok := vehicleJourney.ObjectIDWithFallback(builder.vjRemoteObjectidKinds)
+	vehicleJourneyId, ok := vehicleJourney.CodeWithFallback(builder.vjRemoteCodeSpaces)
 
 	var datedVehicleJourneyRef string
 	if ok {
 		datedVehicleJourneyRef = vehicleJourneyId.Value()
 	} else {
-		defaultObjectID, ok := vehicleJourney.ObjectID("_default")
+		defaultCode, ok := vehicleJourney.Code("_default")
 		if !ok {
 			return "", false
 		}
-		datedVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+		datedVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 	}
 	return datedVehicleJourneyRef, true
 }
@@ -278,16 +278,16 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 	if !ok {
 		return
 	}
-	operator, ok := builder.partner.Model().Operators().FindByObjectId(*operatorRef.ObjectId)
+	operator, ok := builder.partner.Model().Operators().FindByCode(*operatorRef.Code)
 	if !ok {
 		return
 	}
-	obj, ok := operator.ObjectID(builder.remoteObjectidKind)
+	obj, ok := operator.Code(builder.remoteCodeSpace)
 	if !ok {
 		return
 	}
 	ref, _ := references.Get("OperatorRef")
-	ref.ObjectId.SetValue(obj.Value())
+	ref.Code.SetValue(obj.Value())
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References, origin string) {
@@ -299,11 +299,11 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 		if !ok {
 			continue
 		}
-		reference.ObjectId.SetValue(builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
+		reference.Code.SetValue(builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
 	}
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
 		reference, ok := references.Get(refType)
-		if !ok || reference.ObjectId == nil || (refType == "DestinationRef" && builder.noDestinationRefRewrite(origin)) {
+		if !ok || reference.Code == nil || (refType == "DestinationRef" && builder.noDestinationRefRewrite(origin)) {
 			continue
 		}
 		builder.resolveStopAreaRef(&reference)
@@ -311,15 +311,15 @@ func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references mo
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *model.Reference) {
-	stopArea, ok := builder.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(*reference.Code)
 	if ok {
-		obj, ok := stopArea.ReferentOrSelfObjectId(builder.remoteObjectidKind)
+		obj, ok := stopArea.ReferentOrSelfCode(builder.remoteCodeSpace)
 		if ok {
-			reference.ObjectId.SetValue(obj.Value())
+			reference.Code.SetValue(obj.Value())
 			return
 		}
 	}
-	reference.ObjectId.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()}))
+	reference.Code.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()}))
 }
 
 func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin string) bool {

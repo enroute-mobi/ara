@@ -21,22 +21,22 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
-	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.Keywords = []string{"Perturbation"}
-	situation.SetObjectID(objectid)
+	situation.SetCode(code)
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	affectedStopArea := model.NewAffectedStopArea()
@@ -86,22 +86,22 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
-	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	situation.Origin = "partner"
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
-	situation.SetObjectID(objectid)
+	situation.SetCode(code)
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	affectedStopArea := model.NewAffectedStopArea()
@@ -138,7 +138,7 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -146,18 +146,18 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "LineRef"))
+	line.SetCode(model.NewCode("codeSpace", "LineRef"))
 	line.Save()
 
-	objectid := model.NewObjectID("objectidKind", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 	situation.Keywords = []string{"Perturbation"}
-	situation.SetObjectID(objectid)
+	situation.SetCode(code)
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	affectedStopArea := model.NewAffectedStopArea()
@@ -165,15 +165,15 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
-	objectid2 := model.NewObjectID("objectidKind", "2")
+	code2 := model.NewCode("codeSpace", "2")
 	situation2 := referential.Model().Situations().New()
 	situation2.ValidityPeriods = []*model.TimeRange{period}
 	situation2.Keywords = []string{"Perturbation"}
-	situation2.SetObjectID(objectid2)
+	situation2.SetCode(code2)
 
 	stopArea1 := referential.Model().StopAreas().New()
-	objectId2 := model.NewObjectID("objectidKind", "DepartureStopArea")
-	stopArea1.SetObjectID(objectId2)
+	code3 := model.NewCode("codeSpace", "DepartureStopArea")
+	stopArea1.SetCode(code3)
 	stopArea1.Save()
 
 	affectedLine := model.NewAffectedLine()
@@ -228,46 +228,46 @@ func Test_SIRIGeneralMessageRequestBroadcasterFactory_Validate(t *testing.T) {
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner should have errors when local_credential and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner should have errors when local_credential and remote_code_space aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
-		"local_credential":     "local_credential",
+		"remote_code_space": "remote_code_space",
+		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_objectid_kind are set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_code_space are set, got: %v", apiPartner.Errors)
 	}
 }
 
-func Test_SIRIGeneralMessageRequestBroadcaster_RemoteObjectIDKindAbsent(t *testing.T) {
+func Test_SIRIGeneralMessageRequestBroadcaster_RemoteCodeSpaceAbsent(t *testing.T) {
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-general-message-request-broadcaster.remote_objectid_kind": "",
-		"remote_objectid_kind": "Kind2",
+		"siri-general-message-request-broadcaster.remote_code_space": "",
+		"remote_code_space": "CodeSpace2",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "Kind2" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
+	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "CodeSpace2" {
+		t.Errorf("RemoteCodeSpace should be egals to CodeSpace2")
 	}
 }
 
-func Test_SIRIGeneralMessageBroadcaster_RemoteObjectIDKindPresent(t *testing.T) {
+func Test_SIRIGeneralMessageBroadcaster_RemoteCodeSpacePresent(t *testing.T) {
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-general-message-request-broadcaster.remote_objectid_kind": "Kind1",
-		"remote_objectid_kind": "Kind2",
+		"siri-general-message-request-broadcaster.remote_code_space": "CodeSpace1",
+		"remote_code_space": "CodeSpace2",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.partner.RemoteObjectIDKind(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "Kind1" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
+	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "CodeSpace1" {
+		t.Errorf("RemoteCodeSpace should be egals to CodeSpace1")
 	}
 }

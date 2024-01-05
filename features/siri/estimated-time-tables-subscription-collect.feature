@@ -9,13 +9,13 @@ Feature: Support SIRI EstimatedTimetable
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -27,13 +27,13 @@ Feature: Support SIRI EstimatedTimetable
     And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should not have received a EstimatedTimetableSubscriptionRequest request
@@ -44,14 +44,14 @@ Feature: Support SIRI EstimatedTimetable
     And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
       | remote_url                       | http://localhost:8090 |
       | remote_credential                | test                  |
-      | remote_objectid_kind             | internal              |
+      | remote_code_space                | internal              |
       | collect.include_lines            | RLA_Bus:Line::05:LOC  |
       | local_credential                 | ara                   |
       | collect.subscriptions.persistent | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 30 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -61,16 +61,16 @@ Feature: Support SIRI EstimatedTimetable
   Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should send EstimatedTimetableSubscriptionRequest to partner whith setting collect.persistent
    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_objectid_kind             | internal              |
-      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
-      | local_credential                 | ara                   |
-      | collect.persistent               | true                  |
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_code_space     | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -117,14 +117,14 @@ Feature: Support SIRI EstimatedTimetable
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Name  | Test                   |
+      | Codes | "internal": "testLine" |
     And 10 seconds have passed
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
@@ -137,14 +137,14 @@ Feature: Support SIRI EstimatedTimetable
       | local_url             | http://test           |
       | remote_credential     | test                  |
       | local_credential      | NINOXE:default        |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | Name      | Test1                   |
-      | ObjectIDs | "internal": "testLine1" |
+      | Name  | Test1                   |
+      | Codes | "internal": "testLine1" |
     And a Line exists with the following attributes:
-      | Name      | Test2                   |
-      | ObjectIDs | "internal": "testLine2" |
+      | Name  | Test2                   |
+      | Codes | "internal": "testLine2" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect     |
       | ExternalId        | ExternalId                    |
@@ -231,14 +231,14 @@ Feature: Support SIRI EstimatedTimetable
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name  | Test                            |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -293,16 +293,16 @@ Feature: Support SIRI EstimatedTimetable
       """
     And 30 seconds have passed
     Then one VehicleJourney has the following attributes:
-      | ObjectIDs     | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes         | "internal": "NINOXE:VehicleJourney:201" |
       | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | DirectionType | Aller                                   |
       | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
     And one StopArea has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name      | Test                                     |
-      | Id        | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Test                                     |
+      | Id    | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
     And one StopVisit has the following attributes:
-      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201-4" |
+      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | VehicleAtStop              | false                                     |
       | ArrivalStatus              | Delayed                                   |
@@ -359,25 +359,25 @@ Feature: Support SIRI EstimatedTimetable
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name  | Test                            |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | ObjectIDs                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a StopArea exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name      | Test                                     |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Test                                     |
     And a StopVisit exists with the following attributes:
-      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201-4" |
+      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | VehicleAtStop              | false                                     |
       | ArrivalStatus              | onTime                                    |
@@ -437,7 +437,7 @@ Feature: Support SIRI EstimatedTimetable
 </S:Envelope>
       """
     Then the StopVisit "internal:NINOXE:VehicleJourney:201-4" has the following attributes:
-      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201-4" |
+      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | VehicleAtStop              | false                                     |
       | ArrivalStatus              | Delayed                                   |
@@ -449,14 +449,14 @@ Feature: Support SIRI EstimatedTimetable
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
       | siri.envelope         | raw                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw EstimatedTimetableSubscriptionRequest request with:
@@ -483,15 +483,15 @@ Feature: Support SIRI EstimatedTimetable
 </Siri>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
-      | remote_objectid_kind | internal              |
-      | siri.envelope        | raw                   |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
+      | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Name  | Test                            |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -542,16 +542,16 @@ Feature: Support SIRI EstimatedTimetable
       """
     And 30 seconds have passed
     Then one VehicleJourney has the following attributes:
-      | ObjectIDs     | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes         | "internal": "NINOXE:VehicleJourney:201" |
       | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
       | DirectionType | Aller                                   |
       | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
     And one StopArea has the following attributes:
-      | ObjectIDs | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name      | Test                                     |
-      | Id        | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Test                                     |
+      | Id    | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
     And one StopVisit has the following attributes:
-      | ObjectIDs                  | "internal": "NINOXE:VehicleJourney:201-4" |
+      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | ArrivalStatus              | delayed                                   |
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |

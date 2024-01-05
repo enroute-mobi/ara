@@ -53,8 +53,8 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"local_credential":     "loc",
-		"remote_objectid_kind": "_internal",
+		"local_credential":  "loc",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{"push-collector"}
@@ -94,8 +94,8 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"local_credential":     "loc",
-		"remote_objectid_kind": "_internal",
+		"local_credential":  "loc",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{GTFS_RT_REQUEST_COLLECTOR}
@@ -136,9 +136,9 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"remote_url":           "une url",
-		"remote_objectid_kind": "_internal",
-		s.PARTNER_MAX_RETRY:    "1",
+		"remote_url":        "une url",
+		"remote_code_space": "_internal",
+		s.PARTNER_MAX_RETRY: "1",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{"siri-stop-monitoring-subscription-collector"}
@@ -151,20 +151,20 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.CollectedAlways = false
-	objectid := model.NewObjectID("_internal", "coicogn2")
-	stopArea.SetObjectID(objectid)
+	code := model.NewCode("_internal", "coicogn2")
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	objectid = model.NewObjectID("_internal", "stopvisit1")
-	stopVisit.SetObjectID(objectid)
+	code = model.NewCode("_internal", "stopvisit1")
+	stopVisit.SetCode(code)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Collected(time.Now())
 	stopVisit.Save()
 
-	objId := model.NewObjectID("_internal", "coicogn2")
+	objId := model.NewCode("_internal", "coicogn2")
 	ref := model.Reference{
-		ObjectId: &objId,
+		Code: &objId,
 
 		Type: "StopArea",
 	}

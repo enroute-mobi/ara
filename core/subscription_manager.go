@@ -67,7 +67,7 @@ func (manager *MemorySubscriptions) New(kind string) *Subscription {
 	subscription := &Subscription{
 		kind:                kind,
 		manager:             manager,
-		resourcesByObjectID: make(map[string]*SubscribedResource),
+		resourcesByCode:     make(map[string]*SubscribedResource),
 		subscriptionOptions: make(map[string]string),
 	}
 	subscription.Save()
@@ -145,7 +145,7 @@ func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscri
 			}
 
 			subscription.RLock()
-			_, ok = subscription.resourcesByObjectID[id]
+			_, ok = subscription.resourcesByCode[id]
 			subscription.RUnlock()
 
 			if !ok {
@@ -261,7 +261,7 @@ func (manager *MemorySubscriptions) Index(subscription *Subscription) {
 func (manager *MemorySubscriptions) unsafeIndex(subscription *Subscription) {
 	subscription.RLock()
 
-	for resourceId := range subscription.resourcesByObjectID {
+	for resourceId := range subscription.resourcesByCode {
 		kindAndResourceId := fmt.Sprintf("%s-%s", subscription.Kind(), resourceId)
 		subscriptionIdentifiers, found := manager.byKindAndResourceId[kindAndResourceId]
 
@@ -311,7 +311,7 @@ func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time
 	defer manager.mutex.Unlock()
 
 	for _, sub := range manager.byIdentifier {
-		for key, resource := range sub.ResourcesByObjectIDCopy() {
+		for key, resource := range sub.ResourcesByCodeCopy() {
 			if resource.SubscribedAt().After(time) || resource.SubscribedAt().IsZero() {
 				continue
 			}

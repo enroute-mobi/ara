@@ -26,7 +26,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
@@ -36,8 +36,8 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	line := referential.Model().Lines().New()
-	objectid := model.NewObjectID("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
-	line.SetObjectID(objectid)
+	code := model.NewCode("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
+	line.SetCode(code)
 	line.Save()
 
 	file, _ := os.Open("testdata/estimatedtimetable-request-soap.xml")
@@ -68,7 +68,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER}
@@ -78,8 +78,8 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	line := referential.Model().Lines().New()
-	objectid := model.NewObjectID("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
-	line.SetObjectID(objectid)
+	code := model.NewCode("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
+	line.SetCode(code)
 	line.Save()
 
 	file, _ := os.Open("testdata/productiontimetable-request.xml")
@@ -107,7 +107,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
@@ -119,9 +119,9 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	objectid := model.NewObjectID("_internal", "coicogn2")
+	code := model.NewCode("_internal", "coicogn2")
 
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	file, _ := os.Open("testdata/stopmonitoringsubscription-request-soap.xml")
@@ -141,10 +141,10 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 		t.Errorf("Wrong first ResponseStatus status want true got : %v", response.ResponseStatus[0].Status)
 	}
 
-	subs := partner.Subscriptions().FindByResourceId(objectid.String(), "StopMonitoringBroadcast")
+	subs := partner.Subscriptions().FindByResourceId(code.String(), "StopMonitoringBroadcast")
 
 	if len(subs) == 0 {
-		t.Fatalf("Should have been able to find the stopArea ressource : %v", objectid.String())
+		t.Fatalf("Should have been able to find the stopArea ressource : %v", code.String())
 	}
 
 	sub := subs[0]
@@ -161,7 +161,7 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
@@ -207,7 +207,7 @@ func Test_CancelSubscription(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
@@ -247,7 +247,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
@@ -309,9 +309,9 @@ func Test_ReceiveStateSM(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
-		"remote_credential":    "external",
-		"remote_url":           ts.URL,
+		"remote_code_space": "_internal",
+		"remote_credential": "external",
+		"remote_url":        ts.URL,
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -328,32 +328,32 @@ func Test_ReceiveStateSM(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	objectid := model.NewObjectID("_internal", "coicogn2")
+	code := model.NewCode("_internal", "coicogn2")
 
-	stopArea.SetObjectID(objectid)
+	stopArea.SetCode(code)
 	stopArea.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetObjectID(objectid)
+	line.SetCode(code)
 	line.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
 	vehicleJourney.LineId = line.Id()
-	vehicleJourney.SetObjectID(objectid)
+	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
-	objectid = model.NewObjectID("_internal", "value")
+	code = model.NewCode("_internal", "value")
 
 	sv1 := referential.Model().StopVisits().New()
-	sv1.SetObjectID(objectid)
+	sv1.SetCode(code)
 	sv1.StopAreaId = stopArea.Id()
 	sv1.VehicleJourneyId = vehicleJourney.Id()
 	sv1.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
 	sv1.Save()
 
-	objectid = model.NewObjectID("_internal", "value2")
+	code = model.NewCode("_internal", "value2")
 	sv2 := referential.Model().StopVisits().New()
-	sv2.SetObjectID(objectid)
+	sv2.SetCode(code)
 	sv2.StopAreaId = stopArea.Id()
 	sv2.VehicleJourneyId = vehicleJourney.Id()
 	sv2.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
@@ -410,9 +410,9 @@ func Test_ReceiveStateGM(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 
 	settings := map[string]string{
-		"remote_objectid_kind": "_internal",
-		"remote_credential":    "external",
-		"remote_url":           ts.URL,
+		"remote_code_space": "_internal",
+		"remote_credential": "external",
+		"remote_url":        ts.URL,
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -428,13 +428,13 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation := referential.Model().Situations().New()
 
 	line := referential.Model().Lines().New()
-	objectid0 := model.NewObjectID("_internal", "line1")
-	line.SetObjectID(objectid0)
+	code0 := model.NewCode("_internal", "line1")
+	line.SetCode(code0)
 	line.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	objectid1 := model.NewObjectID("_internal", "coicogn1")
-	stopArea.SetObjectID(objectid1)
+	code1 := model.NewCode("_internal", "coicogn1")
+	stopArea.SetCode(code1)
 	stopArea.Save()
 
 	affectedStopArea := model.NewAffectedStopArea()
@@ -443,15 +443,15 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.Affects = append(situation.Affects, affectedStopArea)
 
 	stopArea2 := referential.Model().StopAreas().New()
-	objectid2 := model.NewObjectID("_internal", "coicogn2")
-	stopArea2.SetObjectID(objectid2)
+	code2 := model.NewCode("_internal", "coicogn2")
+	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
 	affectedStopArea2 := model.NewAffectedStopArea()
 	affectedStopArea2.StopAreaId = stopArea2.Id()
 	situation.Affects = append(situation.Affects, affectedStopArea2)
 
-	objectid3 := model.NewObjectID("_internal", string(situation.Id()))
+	code3 := model.NewCode("_internal", string(situation.Id()))
 	situation.Keywords = []string{"Perturbation"}
 	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
@@ -459,12 +459,12 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.Description = &model.SituationTranslatedString{
 		DefaultValue: "Le content",
 	}
-	situation.SetObjectID(objectid3)
+	situation.SetCode(code3)
 
 	lineSectionReferences := model.NewReferences()
-	lineSectionReferences.SetReference("FirstStop", model.Reference{ObjectId: &objectid2, Type: "StopPointRef"})
-	lineSectionReferences.SetReference("LastStop", model.Reference{ObjectId: &objectid1, Type: "StopPointRef"})
-	lineSectionReferences.SetReference("LinesRef", model.Reference{ObjectId: &objectid0, Type: "LineRef"})
+	lineSectionReferences.SetReference("FirstStop", model.Reference{Code: &code2, Type: "StopPointRef"})
+	lineSectionReferences.SetReference("LastStop", model.Reference{Code: &code1, Type: "StopPointRef"})
+	lineSectionReferences.SetReference("LinesRef", model.Reference{Code: &code0, Type: "LineRef"})
 
 	situation.Save()
 
@@ -516,8 +516,8 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"remote_url":           "une url",
-		"remote_objectid_kind": "_internal",
+		"remote_url":        "une url",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -560,8 +560,8 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"remote_url":           "une url",
-		"remote_objectid_kind": "_internal",
+		"remote_url":        "une url",
+		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 

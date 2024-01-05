@@ -9,13 +9,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -27,13 +27,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should not have received a VehicleMonitoringSubscription request
@@ -44,14 +44,14 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url                       | http://localhost:8090 |
       | remote_credential                | test                  |
-      | remote_objectid_kind             | internal              |
+      | remote_code_space             | internal              |
       | collect.include_lines            | RLA_Bus:Line::05:LOC  |
       | local_credential                 | ara                   |
       | collect.subscriptions.persistent | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 30 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -63,14 +63,14 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url                       | http://localhost:8090 |
       | remote_credential                | test                  |
-      | remote_objectid_kind             | internal              |
+      | remote_code_space             | internal              |
       | collect.include_lines            | RLA_Bus:Line::05:LOC  |
       | local_credential                 | ara                   |
       | collect.persistent               | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -83,24 +83,24 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url            | http://localhost:8090 |
       | remote_credential     | Ara                   |
       | local_credential      | Subscriber            |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "Test:Line:3:LOC" |
+      | Codes | "internal": "Test:Line:3:LOC" |
       | Name      | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | ObjectIDs                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:201123:LOC" |
+      | Codes        | "internal": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
       | Occupancy        | seatsAvailable                        |
     And a Vehicle exists with the following attributes:
-      | ObjectIDs        | "internal": "Test:Vehicle:999:LOC" |
+      | Codes        | "internal": "Test:Vehicle:999:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Occupancy        | manySeatsAvailable                 |
@@ -209,7 +209,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | remote_url                        | http://localhost:8090 |
        | remote_credential                 | test                  |
        | local_credential                  | NINOXE:default        |
-       | remote_objectid_kind              | internal              |
+       | remote_code_space              | internal              |
        | broadcast.subscription_persistent | true                  |
     And a minute has passed
     When I send this SIRI request
@@ -326,7 +326,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a minute has passed
     When I send this SIRI request
       """
@@ -368,18 +368,18 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | SubscriptionIdentifiers | ["test1"]                            |
 
   @ARA-1236 @siri-valid
-  Scenario: Handle a SIRI VehicleMonitoring request for subscription for all existing lines in a referential only with same remote_objectid_kind
+  Scenario: Handle a SIRI VehicleMonitoring request for subscription for all existing lines in a referential only with same remote_code_space
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | ObjectIDs | "another": "NINOXE:Line:3:LOC"  |
+      | Codes | "another": "NINOXE:Line:3:LOC"  |
       | Name      | Ligne 3 Metro                   |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Codes | "internal": "NINOXE:Line:A:BUS" |
       | Name      | Ligne A Bus                     |
     And a minute has passed
     When I send this SIRI request
@@ -423,12 +423,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | ObjectIDs | "another": "NINOXE:Line:3:LOC"  |
+      | Codes | "another": "NINOXE:Line:3:LOC"  |
       | Name      | Ligne 3 Metro                   |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:A:BUS" |
+      | Codes | "internal": "NINOXE:Line:A:BUS" |
       | Name      | Ligne A Bus                     |
     And a minute has passed
     When I send this SIRI request
@@ -507,9 +507,9 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | remote_url           | http://localhost:8090 |
        | remote_credential    | test                  |
        | local_credential     | NINOXE:default        |
-       | remote_objectid_kind | internal              |
+       | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | ObjectIDs | "internal": "NINOXE:Line:3:LOC" |
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name      | Ligne 3 Metro                   |
     And a minute has passed
     When I send this SIRI request
@@ -621,10 +621,10 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     When a minute has passed
     And a minute has passed
     And a minute has passed
@@ -675,12 +675,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -764,7 +764,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
       And I see ara vehicles
       Then one Vehicle has the following attributes:
-        | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
         | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
         | Bearing   |                                    171.0 |
         | Latitude  |                        48.99927561424598 |
@@ -824,13 +824,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
       | siri.direction_type                | Aller, Retour                  |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -910,14 +910,14 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_objectid_kind  | internal              |
+      | remote_code_space  | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
       | siri.envelope         | raw                   |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name      | Test 1                             |
-      | ObjectIDs | "internal": "RLA_Bus:Line::05:LOC" |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
@@ -946,12 +946,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_objectid_kind               | internal                       |
+      | remote_code_space               | internal                       |
       | siri.envelope                      | raw                            |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Name      | Test                   |
-      | ObjectIDs | "internal": "testLine" |
+      | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -1022,7 +1022,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </Siri>
       """
       Then one Vehicle has the following attributes:
-        | ObjectIDs | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
         | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
         | Bearing   |                                    171.0 |
         | Latitude  |                        48.99927561424598 |

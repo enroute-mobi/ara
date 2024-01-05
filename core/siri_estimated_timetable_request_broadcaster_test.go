@@ -22,7 +22,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                   "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -31,42 +31,42 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetObjectID(model.NewObjectID("objectidKind", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("codeSpace", "stopArea2"))
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.model.Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	vehicleJourney3 := referential.model.VehicleJourneys().New()
-	vehicleJourney3.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney3"))
+	vehicleJourney3.SetCode(model.NewCode("codeSpace", "vehicleJourney3"))
 	vehicleJourney3.LineId = line2.Id()
 	vehicleJourney3.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -76,7 +76,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
-	stopVisit2.SetObjectID(model.NewObjectID("objectidKind", "stopVisit2"))
+	stopVisit2.SetCode(model.NewCode("codeSpace", "stopVisit2"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.StopAreaId = stopArea2.Id()
 	stopVisit2.PassageOrder = 2
@@ -86,7 +86,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit2.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
-	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea.Id()
 	stopVisit3.PassageOrder = 1
@@ -96,7 +96,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit3.Save()
 
 	stopVisit4 := referential.model.StopVisits().New()
-	stopVisit4.SetObjectID(model.NewObjectID("objectidKind", "stopVisit4"))
+	stopVisit4.SetCode(model.NewCode("codeSpace", "stopVisit4"))
 	stopVisit4.VehicleJourneyId = vehicleJourney3.Id()
 	stopVisit4.StopAreaId = stopArea.Id()
 	stopVisit4.PassageOrder = 1
@@ -188,7 +188,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_objectid_kind":                   "objectidKind",
+		"remote_code_space":                   "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -197,38 +197,38 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetObjectID(model.NewObjectID("objectidKind", "stopArea1"))
+	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetObjectID(model.NewObjectID("wrongObjectidKind", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("wrongCodeSpace", "stopArea2"))
 	stopArea2.ReferentId = stopArea.Id()
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.model.Lines().New()
-	line.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetObjectID(model.NewObjectID("objectidKind", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vehicleJourney.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	vehicleJourney2.SetObjectID(model.NewObjectID("objectidKind", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	stopVisit.SetObjectID(model.NewObjectID("objectidKind", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -238,7 +238,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	stopVisit.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
-	stopVisit3.SetObjectID(model.NewObjectID("objectidKind", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea2.Id()
 	stopVisit3.PassageOrder = 1
@@ -317,48 +317,48 @@ func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	apiPartner := partner.Definition()
 	apiPartner.Validate()
 	if apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner should have errors when local_credential and remote_objectid_kind aren't set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner should have errors when local_credential and remote_code_space aren't set, got: %v", apiPartner.Errors)
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_objectid_kind": "remote_objectid_kind",
+		"remote_code_space": "remote_code_space",
 		"local_credential":     "local_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {
-		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_objectid_kind are set, got: %v", apiPartner.Errors)
+		t.Errorf("apiPartner shouldn't have any error when local_credential and remote_code_space are set, got: %v", apiPartner.Errors)
 	}
 }
 
-func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindPresent(t *testing.T) {
+func Test_SIRIEstimatedTimetableBroadcaster_RemoteCodeSpacePresent(t *testing.T) {
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-estimated-timetable-request-broadcaster.remote_objectid_kind": "Kind1",
-		"remote_objectid_kind": "Kind2",
+		"siri-estimated-timetable-request-broadcaster.remote_code_space": "CodeSpace1",
+		"remote_code_space": "CodeSpace2",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 
-	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind1" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind1")
+	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "CodeSpace1" {
+		t.Errorf("RemoteCodeSpace should be egals to CodeSpace1")
 	}
 }
 
-func Test_SIRIEstimatedTimetableBroadcaster_RemoteObjectIDKindAbsent(t *testing.T) {
+func Test_SIRIEstimatedTimetableBroadcaster_RemoteCodeSpaceAbsent(t *testing.T) {
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-estimated-timetable-request-broadcaster.remote_objectid_kind": "",
-		"remote_objectid_kind": "Kind2",
+		"siri-estimated-timetable-request-broadcaster.remote_code_space": "",
+		"remote_code_space": "CodeSpace2",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.Start()
 
-	if connector.partner.RemoteObjectIDKind(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "Kind2" {
-		t.Errorf("RemoteObjectIDKind should be egals to Kind2")
+	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "CodeSpace2" {
+		t.Errorf("RemoteCodeSpace should be egals to CodeSpace2")
 	}
 }

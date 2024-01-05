@@ -55,7 +55,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) Start() {
-	connector.remoteObjectidKind = connector.partner.RemoteObjectIDKind()
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace()
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(request *StopAreaUpdateRequest) {
@@ -65,10 +65,10 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		return
 	}
 
-	objectidKind := connector.remoteObjectidKind
-	objectid, ok := stopArea.ObjectID(objectidKind)
+	codeSpace := connector.remoteCodeSpace
+	code, ok := stopArea.Code(codeSpace)
 	if !ok {
-		logger.Log.Debugf("Requested stopArea %v doesn't have and objectId of kind %v", request.StopAreaId(), objectidKind)
+		logger.Log.Debugf("Requested stopArea %v doesn't have a code with codeSpace %v", request.StopAreaId(), codeSpace)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
 	siriStopMonitoringRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
-	siriStopMonitoringRequest.MonitoringRef = objectid.Value()
+	siriStopMonitoringRequest.MonitoringRef = code.Value()
 	siriStopMonitoringRequest.RequestTimestamp = connector.Clock().Now()
 	siriStopMonitoringRequest.StopVisitTypes = "all"
 
@@ -99,7 +99,7 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 
 	logXMLStopMonitoringResponse(message, xmlStopMonitoringResponse)
 
-	builder := NewStopMonitoringUpdateEventBuilder(connector.partner, objectid)
+	builder := NewStopMonitoringUpdateEventBuilder(connector.partner, code)
 
 	for _, delivery := range xmlStopMonitoringResponse.StopMonitoringDeliveries() {
 		if !delivery.Status() {
@@ -119,19 +119,19 @@ func (connector *SIRIStopMonitoringRequestCollector) RequestStopAreaUpdate(reque
 	connector.broadcastUpdateEvents(&updateEvents)
 
 	// Set all StopVisits not in the response not collected
-	monitoredStopVisits := []model.ObjectID{}
+	monitoredStopVisits := []model.Code{}
 
 	for stopPointRef, events := range updateEvents.StopVisits {
-		sa, ok := connector.partner.Model().StopAreas().FindByObjectId(model.NewObjectID(objectidKind, stopPointRef))
+		sa, ok := connector.partner.Model().StopAreas().FindByCode(model.NewCode(codeSpace, stopPointRef))
 		if !ok {
 			continue
 		}
 
 		svs := connector.partner.Model().StopVisits().FindMonitoredByOriginByStopAreaId(sa.Id(), string(connector.Partner().Slug()))
 		for i := range svs {
-			objectid, ok := svs[i].ObjectID(objectidKind)
+			code, ok := svs[i].Code(codeSpace)
 			if ok {
-				monitoredStopVisits = append(monitoredStopVisits, objectid)
+				monitoredStopVisits = append(monitoredStopVisits, code)
 			}
 		}
 
@@ -165,11 +165,11 @@ func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvent(event 
 	}
 }
 
-func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitObjectIDs []model.ObjectID, t time.Time) {
-	for _, stopVisitObjectID := range collectedStopVisitObjectIDs {
-		if _, ok := events[stopVisitObjectID.Value()]; !ok {
-			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitObjectID)
-			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitObjectID, t))
+func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitCodes []model.Code, t time.Time) {
+	for _, stopVisitCode := range collectedStopVisitCodes {
+		if _, ok := events[stopVisitCode.Value()]; !ok {
+			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitCode)
+			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitCode, t))
 		}
 	}
 }
@@ -189,7 +189,7 @@ func (connector *SIRIStopMonitoringRequestCollector) newBQEvent() *audit.BigQuer
 }
 
 func (factory *SIRIStopMonitoringRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

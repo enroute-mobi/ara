@@ -19,7 +19,7 @@ type SIRIProductionTimetableSubscriptionBroadcaster struct {
 
 	dataFrameGenerator             *idgen.IdentifierGenerator
 	noDataFrameRefRewritingFrom    []string
-	vjRemoteObjectidKinds          []string
+	vjRemoteCodeSpaces          []string
 	productionTimetableBroadcaster SIRIProductionTimetableBroadcaster
 	toBroadcast                    map[SubscriptionId][]model.StopVisitId
 
@@ -36,15 +36,15 @@ func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) CreateConn
 }
 
 func (factory *SIRIProductionTimetableSubscriptionBroadcasterFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 	apiPartner.ValidatePresenceOfLocalCredentials()
 }
 
 func newSIRIProductionTimetableSubscriptionBroadcaster(partner *Partner) *SIRIProductionTimetableSubscriptionBroadcaster {
 	connector := &SIRIProductionTimetableSubscriptionBroadcaster{}
-	connector.remoteObjectidKind = partner.RemoteObjectIDKind(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
-	connector.vjRemoteObjectidKinds = partner.VehicleJourneyRemoteObjectIDKindWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
+	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.noDataFrameRefRewritingFrom = partner.NoDataFrameRefRewritingFrom()
 	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
@@ -116,7 +116,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) HandleSubscript
 		sub.SetSubscriptionOption("MessageIdentifier", request.MessageIdentifier())
 
 		for _, r := range resources {
-			line, ok := connector.Partner().Model().Lines().FindByObjectId(*r.Reference.ObjectId)
+			line, ok := connector.Partner().Model().Lines().FindByCode(*r.Reference.Code)
 			if !ok {
 				continue
 			}
@@ -139,19 +139,19 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 	// check for subscription to all lines
 	if len(ptt.Lines()) == 0 {
 		var lv []string
-		//find all lines corresponding to the remoteObjectidKind
+		//find all lines corresponding to the remoteCodeSpace
 		for _, line := range connector.Partner().Model().Lines().FindAll() {
-			lineObjectID, ok := line.ObjectID(connector.remoteObjectidKind)
+			lineCode, ok := line.Code(connector.remoteCodeSpace)
 			if ok {
-				lv = append(lv, lineObjectID.Value())
+				lv = append(lv, lineCode.Value())
 				continue
 			}
 		}
 
 		for _, lineValue := range lv {
-			lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineValue)
+			lineCode := model.NewCode(connector.remoteCodeSpace, lineValue)
 			ref := model.Reference{
-				ObjectId: &lineObjectID,
+				Code: &lineCode,
 				Type:     "Line",
 			}
 			r := NewResource(ref)
@@ -164,8 +164,8 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 
 	for _, lineId := range ptt.Lines() {
 
-		lineObjectID := model.NewObjectID(connector.remoteObjectidKind, lineId)
-		_, ok := connector.Partner().Model().Lines().FindByObjectId(lineObjectID)
+		lineCode := model.NewCode(connector.remoteCodeSpace, lineId)
+		_, ok := connector.Partner().Model().Lines().FindByCode(lineCode)
 
 		if !ok {
 			lineIds = append(lineIds, lineId)
@@ -173,7 +173,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 		}
 
 		ref := model.Reference{
-			ObjectId: &lineObjectID,
+			Code: &lineCode,
 			Type:     "Line",
 		}
 
@@ -221,7 +221,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkEvent(svId
 		return
 	}
 
-	lineObj, ok := line.ObjectID(connector.remoteObjectidKind)
+	lineObj, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}

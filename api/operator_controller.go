@@ -26,8 +26,8 @@ func NewOperatorController(referential *core.Referential) ControllerInterface {
 func (controller *OperatorController) findOperator(identifier string) (*model.Operator, bool) {
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
-		objectid := model.NewObjectID(foundStrings[1], foundStrings[2])
-		return controller.referential.Model().Operators().FindByObjectId(objectid)
+		code := model.NewCode(foundStrings[1], foundStrings[2])
+		return controller.referential.Model().Operators().FindByCode(code)
 	}
 	return controller.referential.Model().Operators().Find(model.OperatorId(identifier))
 }
@@ -79,10 +79,10 @@ func (controller *OperatorController) Update(response http.ResponseWriter, ident
 		return
 	}
 
-	for _, obj := range operator.ObjectIDs() {
-		o, ok := controller.referential.Model().Operators().FindByObjectId(obj)
+	for _, obj := range operator.Codes() {
+		o, ok := controller.referential.Model().Operators().FindByCode(obj)
 		if ok && o.Id() != operator.Id() {
-			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have a code %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}
@@ -108,10 +108,10 @@ func (controller *OperatorController) Create(response http.ResponseWriter, body 
 		return
 	}
 
-	for _, obj := range operator.ObjectIDs() {
-		o, ok := controller.referential.Model().Operators().FindByObjectId(obj)
+	for _, obj := range operator.Codes() {
+		o, ok := controller.referential.Model().Operators().FindByCode(obj)
 		if ok {
-			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have an objectid %v", o.Id(), obj.String()), http.StatusBadRequest)
+			http.Error(response, fmt.Sprintf("Invalid request: operator %v already have a code %v", o.Id(), obj.String()), http.StatusBadRequest)
 			return
 		}
 	}

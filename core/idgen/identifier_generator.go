@@ -49,8 +49,8 @@ func NewIdentifierGenerator(formatString string, uuidGenerator uuid.UUIDGenerato
 }
 
 func (generator *IdentifierGenerator) NewIdentifier(attributes IdentifierAttributes) string {
-	// default and objectid are legacy values, keep them for now for a smoother transition
-	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Id, "%{objectid}", attributes.Id)
+	// default and code are legacy values, keep them for now for a smoother transition
+	replacer := strings.NewReplacer("%{id}", attributes.Id, "%{type}", attributes.Type, "%{default}", attributes.Id, "%{code}", attributes.Id)
 	return generator.handleuuids(replacer.Replace(generator.formatString))
 }
 

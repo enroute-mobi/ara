@@ -78,9 +78,9 @@ func Test_Equal_Unexported(t *testing.T) {
 // 	attributes.Set("key", "value")
 
 // 	references := NewReferences()
-// 	obj := NewObjectID("kind", "value")
+// 	obj := NewCode("codeSpace", "value")
 
-// 	reference := Reference{ObjectId: &obj}
+// 	reference := Reference{Code: &obj}
 // 	references.Set("key", reference)
 
 // 	sa1 := &StopArea{

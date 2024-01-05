@@ -123,7 +123,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			if !ok {
 				continue
 			}
-			vehicleObjectId, ok := vehicle.ObjectID(vm.connector.remoteObjectidKind)
+			vehicleCode, ok := vehicle.Code(vm.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
@@ -134,18 +134,18 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				continue
 			}
 
-			// Handle vj Objectid
-			vjId, ok := vj.ObjectIDWithFallback(vm.connector.vjRemoteObjectidKinds)
+			// Handle vj Code
+			vjId, ok := vj.CodeWithFallback(vm.connector.vjRemoteCodeSpaces)
 			var datedVehicleJourneyRef string
 			if ok {
 				datedVehicleJourneyRef = vjId.Value()
 			} else {
-				defaultObjectID, ok := vj.ObjectID("_default")
+				defaultCode, ok := vj.Code("_default")
 				if !ok {
 					continue
 				}
 				referenceGenerator := vm.connector.Partner().ReferenceIdentifierGenerator()
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultObjectID.Value()})
+				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 			}
 
 			// Find the Line
@@ -153,14 +153,14 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			if !ok {
 				continue
 			}
-			lineObjectId, ok := line.ObjectID(vm.connector.remoteObjectidKind)
+			lineCode, ok := line.Code(vm.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
-			lineRef := lineObjectId.Value()
+			lineRef := lineCode.Value()
 
 			// Find the Resource
-			resource := sub.Resource(lineObjectId)
+			resource := sub.Resource(lineCode)
 			if resource == nil {
 				continue
 			}
@@ -170,7 +170,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			activity := &siri.SIRIVehicleActivity{
 				RecordedAtTime:       vehicle.RecordedAtTime,
 				ValidUntilTime:       vehicle.ValidUntilTime,
-				VehicleMonitoringRef: vehicleObjectId.Value(),
+				VehicleMonitoringRef: vehicleCode.Value(),
 				ProgressBetweenStops: vm.connector.handleProgressBetweenStops(vehicle),
 			}
 
@@ -219,7 +219,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleRef(refType, origin string, references model.References) string {
 	reference, ok := references.Get(refType)
-	if !ok || reference.ObjectId == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
+	if !ok || reference.Code == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
 		return ""
 	}
 	return connector.resolveStopAreaRef(reference)
@@ -236,9 +236,9 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) noDestinationRefR
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) resolveStopAreaRef(reference model.Reference) string {
-	stopArea, ok := connector.partner.Model().StopAreas().FindByObjectId(*reference.ObjectId)
+	stopArea, ok := connector.partner.Model().StopAreas().FindByCode(*reference.Code)
 	if ok {
-		obj, ok := stopArea.ReferentOrSelfObjectId(connector.remoteObjectidKind)
+		obj, ok := stopArea.ReferentOrSelfCode(connector.remoteCodeSpace)
 		if ok {
 			return obj.Value()
 		}
@@ -249,8 +249,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) resolveStopAreaRe
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatternRef(refs model.References) string {
 	journeyPatternRef, ok := refs.Get("JourneyPatternRef")
 	if ok {
-		if connector.remoteObjectidKind == journeyPatternRef.ObjectId.Kind() {
-			return journeyPatternRef.ObjectId.Value()
+		if connector.remoteCodeSpace == journeyPatternRef.Code.CodeSpace() {
+			return journeyPatternRef.Code.Value()
 		}
 	}
 
@@ -260,8 +260,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatt
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatternName(refs model.References) string {
 	journeyPatternName, ok := refs.Get("JourneyPatternName")
 	if ok {
-		if connector.remoteObjectidKind == journeyPatternName.ObjectId.Kind() {
-			return journeyPatternName.ObjectId.Value()
+		if connector.remoteCodeSpace == journeyPatternName.Code.CodeSpace() {
+			return journeyPatternName.Code.Value()
 		}
 	}
 

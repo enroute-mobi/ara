@@ -18,7 +18,7 @@ type Vehicle struct {
 	RecordedAtTime time.Time
 	ValidUntilTime time.Time `json:",omitempty"`
 	model          Model
-	ObjectIDConsumer
+	CodeConsumer
 	Attributes       Attributes
 	StopAreaId       StopAreaId       `json:",omitempty"`
 	Occupancy        string           `json:",omitempty"`
@@ -39,7 +39,7 @@ func NewVehicle(model Model) *Vehicle {
 		model:      model,
 		Attributes: NewAttributes(),
 	}
-	vehicle.objectids = make(ObjectIDs)
+	vehicle.codes = make(Codes)
 	return vehicle
 }
 
@@ -49,7 +49,7 @@ func (vehicle *Vehicle) modelId() ModelId {
 
 func (vehicle *Vehicle) copy() *Vehicle {
 	return &Vehicle{
-		ObjectIDConsumer: vehicle.ObjectIDConsumer.Copy(),
+		CodeConsumer:     vehicle.CodeConsumer.Copy(),
 		model:            vehicle.model,
 		id:               vehicle.id,
 		LineId:           vehicle.LineId,
@@ -88,7 +88,7 @@ func (vehicle *Vehicle) VehicleJourney() *VehicleJourney {
 func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	type Alias Vehicle
 	aux := struct {
-		ObjectIDs  ObjectIDs  `json:",omitempty"`
+		Codes      Codes      `json:",omitempty"`
 		Attributes Attributes `json:",omitempty"`
 		*Alias
 		Id VehicleId
@@ -97,8 +97,8 @@ func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 		Alias: (*Alias)(vehicle),
 	}
 
-	if !vehicle.ObjectIDs().Empty() {
-		aux.ObjectIDs = vehicle.ObjectIDs()
+	if !vehicle.Codes().Empty() {
+		aux.Codes = vehicle.Codes()
 	}
 	if !vehicle.Attributes.IsEmpty() {
 		aux.Attributes = vehicle.Attributes
@@ -110,7 +110,7 @@ func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 	type Alias Vehicle
 	aux := &struct {
-		ObjectIDs map[string]string
+		Codes map[string]string
 		*Alias
 	}{
 		Alias: (*Alias)(vehicle),
@@ -120,8 +120,8 @@ func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if aux.ObjectIDs != nil {
-		vehicle.ObjectIDConsumer.objectids = NewObjectIDsFromMap(aux.ObjectIDs)
+	if aux.Codes != nil {
+		vehicle.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
 	return nil
@@ -135,7 +135,7 @@ type MemoryVehicles struct {
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleId]*Vehicle
-	byObjectId        *ObjectIdIndex
+	byCode            *CodeIndex
 	byNextStopVisitId map[StopVisitId]VehicleId
 
 	broadcastEvent func(event VehicleBroadcastEvent)
@@ -146,7 +146,7 @@ type Vehicles interface {
 
 	New() *Vehicle
 	Find(VehicleId) (*Vehicle, bool)
-	FindByObjectId(ObjectID) (*Vehicle, bool)
+	FindByCode(Code) (*Vehicle, bool)
 	FindByLineId(LineId) []*Vehicle
 	FindByNextStopVisitId(StopVisitId) (*Vehicle, bool)
 	FindAll() []*Vehicle
@@ -158,7 +158,7 @@ func NewMemoryVehicles() *MemoryVehicles {
 	return &MemoryVehicles{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleId]*Vehicle),
-		byObjectId:        NewObjectIdIndex(),
+		byCode:            NewCodeIndex(),
 		byNextStopVisitId: make(map[StopVisitId]VehicleId),
 	}
 }
@@ -178,11 +178,11 @@ func (manager *MemoryVehicles) Find(id VehicleId) (*Vehicle, bool) {
 	return &Vehicle{}, false
 }
 
-func (manager *MemoryVehicles) FindByObjectId(objectid ObjectID) (*Vehicle, bool) {
+func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byObjectId.Find(objectid)
+	id, ok := manager.byCode.Find(code)
 	if ok {
 		return manager.byIdentifier[VehicleId(id)].copy(), true
 	}
@@ -251,7 +251,7 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
-	manager.byObjectId.Index(vehicle)
+	manager.byCode.Index(vehicle)
 
 	if vehicle.NextStopVisitId != StopVisitId("") {
 		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
@@ -276,7 +276,7 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 	vehicleEvent := &audit.BigQueryVehicleEvent{
 		Timestamp:      manager.Clock().Now(),
 		ID:             string(v.id),
-		ObjectIDs:      v.ObjectIDSlice(),
+		ObjectIDs:      v.CodeSlice(),
 		Longitude:      v.Longitude,
 		Latitude:       v.Latitude,
 		Bearing:        v.Bearing,
@@ -290,7 +290,7 @@ func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
-	manager.byObjectId.Delete(ModelId(vehicle.id))
+	manager.byCode.Delete(ModelId(vehicle.id))
 
 	return true
 }

@@ -90,7 +90,7 @@ func (connector *SIRISituationExchangeRequestCollector) newBQEvent() *audit.BigQ
 }
 
 func (factory *SIRISituationExchangeRequestCollectorFactory) Validate(apiPartner *APIPartner) {
-	apiPartner.ValidatePresenceOfRemoteObjectIdKind()
+	apiPartner.ValidatePresenceOfRemoteCodeSpace()
 	apiPartner.ValidatePresenceOfRemoteCredentials()
 }
 

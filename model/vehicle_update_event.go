@@ -7,9 +7,9 @@ import (
 type VehicleUpdateEvent struct {
 	ValidUntilTime         time.Time
 	RecordedAt             time.Time
-	ObjectId               ObjectID
-	StopAreaObjectId       ObjectID
-	VehicleJourneyObjectId ObjectID
+	Code               Code
+	StopAreaCode       Code
+	VehicleJourneyCode Code
 	Occupancy              string
 	DriverRef              string
 	Origin                 string

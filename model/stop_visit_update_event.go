@@ -12,10 +12,10 @@ type StopVisitUpdateEvent struct {
 	attributes             Attributes
 	SiriXML                *sxml.XMLMonitoredStopVisit
 	references             *References
-	VehicleJourneyObjectId ObjectID
-	StopAreaObjectId       ObjectID
-	ObjectId               ObjectID
-	ObjectidKind           string
+	VehicleJourneyCode Code
+	StopAreaCode       Code
+	Code               Code
+	CodeSpace           string
 	DepartureStatus        StopVisitDepartureStatus
 	ArrivalStatus          StopVisitArrivalStatus
 	DataFrameRef           string
@@ -72,7 +72,7 @@ func (ue *StopVisitUpdateEvent) References() References {
 		return *ue.references
 	}
 
-	ue.references.SetObjectId("OperatorRef", NewObjectID(ue.ObjectidKind, ue.SiriXML.OperatorRef()))
+	ue.references.SetCode("OperatorRef", NewCode(ue.CodeSpace, ue.SiriXML.OperatorRef()))
 
 	return *ue.references
 }
