@@ -42,7 +42,8 @@ type XMLPtSituationElement struct {
 	summary        string
 	description    string
 
-	affects []*XMLAffect
+	affects      []*XMLAffect
+	consequences []*XMLConsequence
 }
 
 type XMLPeriod struct {
@@ -68,6 +69,18 @@ type XMLAffectedSection struct {
 
 	firstStop string
 	lastStop  string
+}
+
+type XMLConsequence struct {
+	XMLStructure
+
+	periods []*XMLPeriod
+}
+
+func NewXMLConsequence(node XMLNode) *XMLConsequence {
+	xmlConsequence := &XMLConsequence{}
+	xmlConsequence.node = node
+	return xmlConsequence
 }
 
 func NewXMLAffect(node XMLNode) *XMLAffect {
@@ -272,6 +285,30 @@ func (visit *XMLPtSituationElement) ParticipantRef() string {
 		visit.participantRef = visit.findStringChildContent("ParticipantRef")
 	}
 	return visit.participantRef
+}
+
+func (visit *XMLPtSituationElement) Consequences() []*XMLConsequence {
+	if visit.consequences == nil {
+		consequences := []*XMLConsequence{}
+		nodes := visit.findNodes("Consequences")
+		for _, node := range nodes {
+			consequences = append(consequences, NewXMLConsequence(node))
+		}
+		visit.consequences = consequences
+	}
+	return visit.consequences
+}
+
+func (consequence *XMLConsequence) Periods() []*XMLPeriod {
+	if consequence.periods == nil {
+		periods := []*XMLPeriod{}
+		nodes := consequence.findNodes("Period")
+		for _, node := range nodes {
+			periods = append(periods, NewXMLPeriod(node))
+		}
+		consequence.periods = periods
+	}
+	return consequence.periods
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

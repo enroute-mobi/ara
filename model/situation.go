@@ -57,7 +57,12 @@ type Situation struct {
 	Summary        *SituationTranslatedString `json:",omitempty"`
 	Description    *SituationTranslatedString `json:",omitempty"`
 
-	Affects []Affect `json:",omitempty"`
+	Affects      []Affect       `json:",omitempty"`
+	Consequences []*Consequence `json:",omitempty"`
+}
+
+type Consequence struct {
+	Periods []*TimeRange `json:",omitempty"`
 }
 
 // SubTypes of Affect

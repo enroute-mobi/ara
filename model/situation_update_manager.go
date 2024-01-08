@@ -51,6 +51,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.Progress = event.Progress
 		situation.Format = event.Format
 		situation.Affects = event.Affects
+		situation.Consequences = event.Consequences
 
 		situation.Save()
 	}

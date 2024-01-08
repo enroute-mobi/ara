@@ -51,6 +51,8 @@ type SIRIPtSituationElement struct {
 
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
+
+	Consequences []*model.Consequence
 }
 
 type AffectedStopPoint struct {

@@ -114,7 +114,23 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setAffect(situationEvent, affect)
 	}
 
+	for _, consequence := range xmlSituation.Consequences() {
+		builder.setConsequence(situationEvent, consequence)
+	}
+
 	*event = append(*event, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {
+	consequence := &model.Consequence{}
+	for _, xmlPeriod := range xmlConsequence.Periods() {
+		period := &model.TimeRange{
+			StartTime: xmlPeriod.StartTime(),
+			EndTime:   xmlPeriod.EndTime(),
+		}
+		consequence.Periods = append(consequence.Periods, period)
+	}
+	situationEvent.Consequences = append(situationEvent.Consequences, consequence)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffectedStopArea(event *model.SituationUpdateEvent, stopPointRef string) {

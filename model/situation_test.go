@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -31,6 +32,7 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		DefaultValue: "Noel",
 	}
 
+	// Affects
 	affectStopArea := NewAffectedStopArea()
 	affectStopArea.StopAreaId = "259344234"
 	situation.Affects = append(situation.Affects, affectStopArea)
@@ -52,6 +54,18 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 	affectLine.AffectedRoutes = append(affectLine.AffectedRoutes, affectedRoute)
 	situation.Affects = append(situation.Affects, affectLine)
 
+	// Consequences
+	periodStartTime, _ := time.Parse(time.RFC3339, "2016-09-22T07:58:34+02:00")
+	periodEndTime, _ := time.Parse(time.RFC3339, "2017-09-22T10:11:34+02:00")
+	period := &TimeRange{
+		StartTime: periodStartTime,
+		EndTime:   periodEndTime,
+	}
+	var periods []*TimeRange
+	periods = append(periods, period)
+	consequence := &Consequence{Periods: periods}
+	situation.Consequences = append(situation.Consequences, consequence)
+
 	expected := `{
 "Origin":"test",
 "ValidityPeriods": null,
@@ -62,6 +76,9 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 "AffectedDestinations":[{"StopAreaId":"333"}],
 "AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
 "AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
+],
+"Consequences":[
+{"Periods":[{"StartTime":"2016-09-22T07:58:34+02:00","EndTime":"2017-09-22T10:11:34+02:00"}]}
 ],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},
@@ -82,6 +99,9 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 {"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}],
 "AffectedSections":[{"FirstStop":"firstStop","LastStop":"lastStop"}],
 "AffectedRoutes":[{"RouteRef":"Route:66:LOC"}]}
+],
+"Consequences":[
+{"Periods":[{"StartTime":"2016-09-22T07:58:34+02:00","EndTime":"2017-09-22T10:11:34+02:00"}]}
 ],
 "Description":{"DefaultValue":"Joyeux Noel"},
 "Summary":{"DefaultValue":"Noel"},

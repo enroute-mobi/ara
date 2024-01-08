@@ -25,6 +25,7 @@ type SituationUpdateEvent struct {
 	Summary            *SituationTranslatedString
 	Description        *SituationTranslatedString
 	Affects            []Affect
+	Consequences       []*Consequence
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {

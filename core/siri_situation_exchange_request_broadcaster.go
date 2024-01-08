@@ -97,6 +97,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		Progress:           situation.Progress,
 		AlertCause:         situation.AlertCause,
 		Severity:           situation.Severity,
+		Consequences:       situation.Consequences,
 	}
 
 	if situation.Description != nil {

@@ -52,5 +52,13 @@
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
 						</siri:AffectedStopPoint>{{ end }}
 					</siri:StopPoints>{{ end }}
-				</siri:Affects>
+				</siri:Affects>{{ if .Consequences }}
+				<siri:Consequences>{{ range .Consequences }}
+					<siri:Consequence>{{ if .Periods }}{{ range .Periods }}
+						<siri:Period>{{ if not .StartTime.IsZero }}
+							<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+							<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+						</siri:Period>{{ end }}{{ end }}
+					</siri:Consequence>{{ end }}
+				</siri:Consequences>{{ end }}
 			</siri:PtSituationElement>{{ end }}
