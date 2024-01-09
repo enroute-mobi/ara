@@ -29,6 +29,7 @@ Feature: Support SIRI Situation Exchange by request
     When the Situation "external":"test" is edited with a Consequence with the following attributes:
       | Periods[0]#StartTime | 2023-09-18T05:30:59Z |
       | Periods[0]#EndTime   | 2023-09-18T08:00:54Z |
+      | Severity             | verySlight           |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -136,6 +137,7 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
                           <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
                         </siri:Period>
+                        <siri:Severity>verySlight</siri:Severity>
                       </siri:Consequence>
                     </siri:Consequences>
                 </siri:PtSituationElement>
@@ -313,10 +315,11 @@ Feature: Support SIRI Situation Exchange by request
                     </siri:Affects>
                     <siri:Consequences>
                       <siri:Consequence>
-                          <siri:Period>
-                            <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
-                            <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>                              
-                          </siri:Period>
+                        <siri:Period>
+                          <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
+                          <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
+                        </siri:Period>
+                        <siri:Severity>verySlight</siri:Severity>
                       </siri:Consequence>
                     </siri:Consequences>
                 </siri:PtSituationElement>
@@ -382,6 +385,7 @@ Feature: Support SIRI Situation Exchange by request
     And the Situation "external":"test2" has a Consequence with the following attributes:
       | Periods[0]#StartTime | 2023-09-18T05:30:59Z |
       | Periods[0]#EndTime   | 2023-09-18T08:00:54Z |
+      | Severity             | verySlight           |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |

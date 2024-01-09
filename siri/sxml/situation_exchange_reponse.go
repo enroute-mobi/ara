@@ -74,7 +74,8 @@ type XMLAffectedSection struct {
 type XMLConsequence struct {
 	XMLStructure
 
-	periods []*XMLPeriod
+	periods  []*XMLPeriod
+	severity string
 }
 
 func NewXMLConsequence(node XMLNode) *XMLConsequence {
@@ -309,6 +310,13 @@ func (consequence *XMLConsequence) Periods() []*XMLPeriod {
 		consequence.periods = periods
 	}
 	return consequence.periods
+}
+
+func (consequence *XMLConsequence) Severity() string {
+	if consequence.severity == "" {
+		consequence.severity = consequence.findStringChildContent("Severity")
+	}
+	return consequence.severity
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

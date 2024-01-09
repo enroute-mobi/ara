@@ -58,7 +58,8 @@
 						<siri:Period>{{ if not .StartTime.IsZero }}
 							<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
 							<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
-						</siri:Period>{{ end }}{{ end }}
+						</siri:Period>{{ end }}{{ end }}{{ if .Severity }}
+						<siri:Severity>{{ .Severity }}</siri:Severity>{{ end }}
 					</siri:Consequence>{{ end }}
 				</siri:Consequences>{{ end }}
 			</siri:PtSituationElement>{{ end }}

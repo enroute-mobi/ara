@@ -130,6 +130,14 @@ func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEven
 		}
 		consequence.Periods = append(consequence.Periods, period)
 	}
+
+	var severity model.SituationSeverity
+	if err := severity.FromString(xmlConsequence.Severity()); err == nil {
+		consequence.Severity = severity
+	} else {
+		logger.Log.Debugf("Consequence: %v", err)
+	}
+
 	situationEvent.Consequences = append(situationEvent.Consequences, consequence)
 }
 

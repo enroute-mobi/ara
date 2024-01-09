@@ -62,7 +62,8 @@ type Situation struct {
 }
 
 type Consequence struct {
-	Periods []*TimeRange `json:",omitempty"`
+	Periods  []*TimeRange      `json:",omitempty"`
+	Severity SituationSeverity `json:",omitempty"`
 }
 
 // SubTypes of Affect
