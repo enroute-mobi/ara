@@ -2,6 +2,7 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -48,22 +49,46 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 
 	situationEvent := &model.SituationUpdateEvent{
-		Origin:        string(builder.partner.Slug()),
-		CreatedAt:     builder.Clock().Now(),
-		RecordedAt:    xmlSituation.RecordedAtTime(),
-		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlSituation.SituationNumber()),
-		Version:       xmlSituation.Version(),
-		ProducerRef:   producerRef,
+		Origin:         string(builder.partner.Slug()),
+		CreatedAt:      builder.Clock().Now(),
+		RecordedAt:     xmlSituation.RecordedAtTime(),
+		SituationCode:  model.NewCode(builder.remoteCodeSpace, xmlSituation.SituationNumber()),
+		Version:        xmlSituation.Version(),
+		ProducerRef:    producerRef,
+		ParticipantRef: xmlSituation.ParticipantRef(),
+		VersionedAt:    xmlSituation.VersionedAtime(),
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 
 	situationEvent.Keywords = append(situationEvent.Keywords, xmlSituation.Keywords()...)
 	situationEvent.ReportType = model.ReportType(xmlSituation.ReportType())
+
+	var progress model.SituationProgress
+	if err := progress.FromString(xmlSituation.Progress()); err == nil {
+		situationEvent.Progress = progress
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	var severity model.SituationSeverity
+	if err := severity.FromString(xmlSituation.Severity()); err == nil {
+		situationEvent.Severity = severity
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
 	situationEvent.Summary = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Summary(),
 	}
 	situationEvent.Description = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Description(),
+	}
+
+	var alertCause model.SituationAlertCause
+	if err := alertCause.FromString(xmlSituation.AlertCause()); err == nil {
+		situationEvent.AlertCause = alertCause
+	} else {
+		logger.Log.Debugf("%v", err)
 	}
 
 	for _, validityPeriod := range xmlSituation.ValidityPeriods() {
@@ -75,6 +100,16 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		situationEvent.ValidityPeriods = append(situationEvent.ValidityPeriods, period)
 	}
 
+	for _, publicationWindow := range xmlSituation.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		situationEvent.PublicationWindows = append(
+			situationEvent.PublicationWindows,
+			window)
+	}
 	for _, affect := range xmlSituation.Affects() {
 		builder.setAffect(situationEvent, affect)
 	}

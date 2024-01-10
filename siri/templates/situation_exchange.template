@@ -1,15 +1,24 @@
 <siri:PtSituationElement>
-				<siri:CreationTime>{{ .CreationTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:CreationTime>{{ if .SituationNumber }}
+				<siri:CreationTime>{{ .CreationTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:CreationTime>{{ if .ParticipantRef }}
+				<siri:ParticipantRef>{{ .ParticipantRef }}</siri:ParticipantRef>{{ end }}{{ if .SituationNumber }}
 				<siri:SituationNumber>{{ .SituationNumber }}</siri:SituationNumber>{{ end }}
 				<siri:Version>{{ .Version }}</siri:Version>
 				<siri:Source>
 					<siri:SourceType>directReport</siri:SourceType>
-				</siri:Source>{{ if .ValidityPeriods }}{{ range .ValidityPeriods }}
+				</siri:Source>{{ if not .VersionedAtTime.IsZero }}
+				<siri:VersionedAtTime>{{ .VersionedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:VersionedAtTime>{{ end }}{{ if .Progress }}
+				<siri:Progress>{{ .Progress }}</siri:Progress>{{ end }}{{ if .ValidityPeriods }}{{ range .ValidityPeriods }}
 				<siri:ValidityPeriod>{{ if not .StartTime.IsZero }}
 					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
 					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
-				</siri:ValidityPeriod>{{ end }}{{ end }}
-				<siri:UndefinedReason />{{ if .ReportType }}
+				</siri:ValidityPeriod>{{ end }}{{ end }}{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+				<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+				</siri:PublicationWindow>{{ end }}{{ end }}{{ if .AlertCause }}
+				<siri:AlertCause>{{ .AlertCause }}</siri:AlertCause>{{ else }}
+				<siri:UndefinedReason />{{ end }}{{ if .Severity }}
+				<siri:Severity>{{ .Severity }}</siri:Severity>{{ end }}{{ if .ReportType }}
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ if .Summary }}
 				<siri:Summary>{{ .Summary}}</siri:Summary>{{ end }}{{ if .Description}}

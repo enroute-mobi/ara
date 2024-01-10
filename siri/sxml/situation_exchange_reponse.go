@@ -28,19 +28,24 @@ type XMLPtSituationElement struct {
 
 	version Int
 
-	keywords       []string
-	reportType     string
-	recordedAtTime time.Time
+	keywords           []string
+	reportType         string
+	alertCause         string
+	recordedAtTime     time.Time
+	versionedAtTime    time.Time
+	validityPeriods    []*XMLPeriod
+	publicationWindows []*XMLPeriod
 
-	validityPeriods []*XMLValidityPeriod
-
-	summary     string
-	description string
+	progress       string
+	severity       string
+	participantRef string
+	summary        string
+	description    string
 
 	affects []*XMLAffect
 }
 
-type XMLValidityPeriod struct {
+type XMLPeriod struct {
 	XMLStructure
 
 	startTime time.Time
@@ -71,10 +76,10 @@ func NewXMLAffect(node XMLNode) *XMLAffect {
 	return xmlAffect
 }
 
-func NewXMLValidityPeriod(node XMLNode) *XMLValidityPeriod {
-	xmlValidityPeriod := &XMLValidityPeriod{}
-	xmlValidityPeriod.node = node
-	return xmlValidityPeriod
+func NewXMLPeriod(node XMLNode) *XMLPeriod {
+	xmlPeriod := &XMLPeriod{}
+	xmlPeriod.node = node
+	return xmlPeriod
 }
 
 func NewXMLAffectedSection(node XMLNode) *XMLAffectedSection {
@@ -148,6 +153,13 @@ func (s *XMLPtSituationElement) Description() string {
 	return s.description
 }
 
+func (s *XMLPtSituationElement) AlertCause() string {
+	if s.alertCause == "" {
+		s.alertCause = s.findStringChildContent("AlertCause")
+	}
+	return s.alertCause
+}
+
 func (response *XMLSituationExchangeResponse) ErrorString() string {
 	return fmt.Sprintf("%v: %v", response.errorType(), response.ErrorText())
 }
@@ -164,6 +176,13 @@ func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
 		visit.recordedAtTime = visit.findTimeChildContent("CreationTime")
 	}
 	return visit.recordedAtTime
+}
+
+func (visit *XMLPtSituationElement) VersionedAtime() time.Time {
+	if visit.versionedAtTime.IsZero() {
+		visit.versionedAtTime = visit.findTimeChildContent("VersionedAtTime")
+	}
+	return visit.versionedAtTime
 }
 
 func (visit *XMLPtSituationElement) SituationNumber() string {
@@ -196,30 +215,63 @@ func (visit *XMLPtSituationElement) ReportType() string {
 	return visit.reportType
 }
 
-func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLValidityPeriod {
+func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
+	if visit.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := visit.findNodes("PublicationWindow")
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		visit.publicationWindows = publicationWindows
+	}
+	return visit.publicationWindows
+}
+
+func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 	if visit.validityPeriods == nil {
-		validityPeriods := []*XMLValidityPeriod{}
+		validityPeriods := []*XMLPeriod{}
 		nodes := visit.findNodes("ValidityPeriod")
 		for _, node := range nodes {
-			validityPeriods = append(validityPeriods, NewXMLValidityPeriod(node))
+			validityPeriods = append(validityPeriods, NewXMLPeriod(node))
 		}
 		visit.validityPeriods = validityPeriods
 	}
 	return visit.validityPeriods
 }
 
-func (v *XMLValidityPeriod) StartTime() time.Time {
+func (v *XMLPeriod) StartTime() time.Time {
 	if v.startTime.IsZero() {
 		v.startTime = v.findTimeChildContent("StartTime")
 	}
 	return v.startTime
 }
 
-func (v *XMLValidityPeriod) EndTime() time.Time {
+func (v *XMLPeriod) EndTime() time.Time {
 	if v.endTime.IsZero() {
 		v.endTime = v.findTimeChildContent("EndTime")
 	}
 	return v.endTime
+}
+
+func (visit *XMLPtSituationElement) Severity() string {
+	if visit.severity == "" {
+		visit.severity = visit.findStringChildContent("Severity")
+	}
+	return visit.severity
+}
+
+func (visit *XMLPtSituationElement) Progress() string {
+	if visit.progress == "" {
+		visit.progress = visit.findStringChildContent("Progress")
+	}
+	return visit.progress
+}
+
+func (visit *XMLPtSituationElement) ParticipantRef() string {
+	if visit.participantRef == "" {
+		visit.participantRef = visit.findStringChildContent("ParticipantRef")
+	}
+	return visit.participantRef
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

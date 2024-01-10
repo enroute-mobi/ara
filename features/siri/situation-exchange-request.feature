@@ -10,8 +10,15 @@ Feature: Support SIRI Situation Exchange by request
       | Version                                                                             | 1                                             |
       | Keywords                                                                            | ["Commercial", "Test"]                        |
       | ReportType                                                                          | general                                       |
+      | ParticipantRef                                                                      | "535"                                         |
+      | VersionedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                                            | published                                     |
       | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                                     | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                                       | 2017-09-25T01:00:00+02:00                     |
+      | AlertCause                                                                          | maintenanceWork                               |
+      | Severity                                                                            | normal                                        |
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
@@ -69,16 +76,24 @@ Feature: Support SIRI Situation Exchange by request
                 <siri:Situations>
                 <siri:PtSituationElement>
                     <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:ParticipantRef>535</siri:ParticipantRef>
                     <siri:SituationNumber>test</siri:SituationNumber>
                     <siri:Version>1</siri:Version>
                     <siri:Source>
                       <siri:SourceType>directReport</siri:SourceType>
                     </siri:Source>
+                    <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>published</siri:Progress>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
-                    <siri:UndefinedReason/>
+                    <siri:PublicationWindow>
+                      <siri:StartTime>2017-09-01T01:00:00.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
+                    </siri:PublicationWindow>
+                    <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Severity>normal</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
@@ -208,16 +223,24 @@ Feature: Support SIRI Situation Exchange by request
                 <siri:Situations>
                 <siri:PtSituationElement>
                     <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:ParticipantRef>535</siri:ParticipantRef>
                     <siri:SituationNumber>test</siri:SituationNumber>
                     <siri:Version>1</siri:Version>
                     <siri:Source>
                       <siri:SourceType>directReport</siri:SourceType>
                     </siri:Source>
+                    <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>published</siri:Progress>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
-                    <siri:UndefinedReason/>
+                    <siri:PublicationWindow>
+                      <siri:StartTime>2017-09-01T01:00:00.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-09-25T01:00:00.000+02:00</siri:EndTime>
+                    </siri:PublicationWindow>
+                    <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Severity>slight</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
@@ -264,6 +287,7 @@ Feature: Support SIRI Situation Exchange by request
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
                     </siri:ValidityPeriod>
                     <siri:UndefinedReason/>
+                    <siri:Severity>noImpact</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test2</siri:Keywords>
                     <siri:Description>carte d'abonnement</siri:Description>
@@ -309,8 +333,15 @@ Feature: Support SIRI Situation Exchange by request
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
       | ReportType                                                                         | general                                       |
+      | ParticipantRef                                                                     | "535"                                         |
+      | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                                           | published                                     |
+      | Severity                                                                           | slight                                        |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                                      | 2017-09-25T01:00:00+02:00                     |
+      | AlertCause                                                                         | maintenanceWork                               |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
@@ -324,6 +355,7 @@ Feature: Support SIRI Situation Exchange by request
       | Version                      | 5                                 |
       | Keywords                     | ["Commercial", "Test2"]           |
       | ReportType                   | general                           |
+      | Severity                     | noImpact                          |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
       | Description[DefaultValue]    | carte d'abonnement                |

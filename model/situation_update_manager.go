@@ -36,13 +36,19 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.RecordedAt = event.RecordedAt
 		situation.Version = event.Version
 		situation.ProducerRef = event.ProducerRef
+		situation.ParticipantRef = event.ParticipantRef
 
 		situation.Summary = event.Summary
 		situation.Description = event.Description
 
+		situation.VersionedAt = event.VersionedAt
 		situation.ValidityPeriods = event.ValidityPeriods
+		situation.PublicationWindows = event.PublicationWindows
 		situation.Keywords = event.Keywords
 		situation.ReportType = event.ReportType
+		situation.AlertCause = event.AlertCause
+		situation.Severity = event.Severity
+		situation.Progress = event.Progress
 		situation.Format = event.Format
 		situation.Affects = event.Affects
 

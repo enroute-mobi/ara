@@ -34,14 +34,20 @@ type SIRISituationExchangeDelivery struct {
 }
 
 type SIRIPtSituationElement struct {
-	CreationTime    time.Time
-	SituationNumber string
-	Version         int
-	ValidityPeriods []*model.TimeRange
-	Keywords        string
-	ReportType      model.ReportType
-	Summary         string
-	Description     string
+	CreationTime       time.Time
+	SituationNumber    string
+	Version            int
+	VersionedAtTime    time.Time
+	ValidityPeriods    []*model.TimeRange
+	PublicationWindows []*model.TimeRange
+	AlertCause         model.SituationAlertCause
+	Progress           model.SituationProgress
+	Keywords           string
+	ReportType         model.ReportType
+	Severity           model.SituationSeverity
+	ParticipantRef     string
+	Summary            string
+	Description        string
 
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint

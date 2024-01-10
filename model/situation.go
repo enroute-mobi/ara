@@ -41,16 +41,21 @@ type Situation struct {
 	RecordedAt time.Time
 	Version    int `json:",omitempty"`
 
-	ValidityPeriods []*TimeRange
+	VersionedAt        time.Time
+	ValidityPeriods    []*TimeRange
+	PublicationWindows []*TimeRange
 
-	Keywords   []string   `json:",omitempty"`
-	ReportType ReportType `json:",omitempty"`
+	Progress    SituationProgress   `json:",omitempty"`
+	Severity    SituationSeverity   `json:",omitempty"`
+	Keywords    []string            `json:",omitempty"`
+	ReportType  ReportType          `json:",omitempty"`
+	AlertCause  SituationAlertCause `json:",omitempty"`
+	ProducerRef string              `json:",omitempty"`
+	Format      string              `json:",omitempty"`
 
-	ProducerRef string `json:",omitempty"`
-	Format      string `json:",omitempty"`
-
-	Summary     *SituationTranslatedString `json:",omitempty"`
-	Description *SituationTranslatedString `json:",omitempty"`
+	ParticipantRef string                     `json:",omitempty"`
+	Summary        *SituationTranslatedString `json:",omitempty"`
+	Description    *SituationTranslatedString `json:",omitempty"`
 
 	Affects []Affect `json:",omitempty"`
 }
@@ -203,8 +208,9 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 func (situation *Situation) MarshalJSON() ([]byte, error) {
 	type Alias Situation
 	aux := struct {
-		Codes      Codes      `json:",omitempty"`
-		RecordedAt *time.Time `json:",omitempty"`
+		Codes       Codes      `json:",omitempty"`
+		RecordedAt  *time.Time `json:",omitempty"`
+		VersionedAt *time.Time `json:",omitempty"`
 		*Alias
 		Id      SituationId
 		Affects []Affect `json:",omitempty"`
@@ -219,6 +225,10 @@ func (situation *Situation) MarshalJSON() ([]byte, error) {
 
 	if !situation.RecordedAt.IsZero() {
 		aux.RecordedAt = &situation.RecordedAt
+	}
+
+	if !situation.VersionedAt.IsZero() {
+		aux.VersionedAt = &situation.VersionedAt
 	}
 
 	if len(situation.Affects) != 0 {

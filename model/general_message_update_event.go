@@ -5,20 +5,26 @@ import "time"
 type SituationUpdateRequestId string
 
 type SituationUpdateEvent struct {
-	CreatedAt       time.Time
-	RecordedAt      time.Time
-	SituationCode   Code
-	id              SituationUpdateRequestId
-	Origin          string
-	Format          string
-	ProducerRef     string
-	ValidityPeriods []*TimeRange
-	Keywords        []string
-	ReportType      ReportType
-	Version         int
-	Summary         *SituationTranslatedString
-	Description     *SituationTranslatedString
-	Affects         []Affect
+	CreatedAt          time.Time
+	RecordedAt         time.Time
+	SituationCode      Code
+	id                 SituationUpdateRequestId
+	Origin             string
+	Format             string
+	ProducerRef        string
+	ParticipantRef     string
+	VersionedAt        time.Time
+	ValidityPeriods    []*TimeRange
+	PublicationWindows []*TimeRange
+	Keywords           []string
+	AlertCause         SituationAlertCause
+	Progress           SituationProgress
+	Severity           SituationSeverity
+	ReportType         ReportType
+	Version            int
+	Summary            *SituationTranslatedString
+	Description        *SituationTranslatedString
+	Affects            []Affect
 }
 
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {

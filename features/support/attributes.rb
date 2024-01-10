@@ -98,19 +98,25 @@ def model_attributes(table)
     # Situation ValidityPeriods is an array of TimeRange
     # Format: | ValidityPeriods[0]#StartTime | 2017-01-01T13:00:00.000Z |
     #         | ValidityPeriods[0]#EndTime   | 2017-01-02T15:00:00.000Z |
-    if key =~ /ValidityPeriods\[(\d+)\]#(\S+)/
-      period_number = Regexp.last_match(1).to_i
-      attribute = Regexp.last_match(2).to_s
+    #
+    # Situation PublicationWindows Periods is an array of TimeRange
+    # Format: | PublicationWindows[0]#StartTime | 2017-01-01T13:00:00.000Z |
+    #         | PublicationWIndows[0]#EndTime   | 2017-01-02T15:00:00.000Z |
+    if key =~ /(ValidityPeriods|PublicationWindows)\[(\d+)\]#(\S+)/
+      raw_attribute = Regexp.last_match(0).to_s
+      name = Regexp.last_match(1).to_s
+      period_number = Regexp.last_match(2).to_i
+      attribute = Regexp.last_match(3).to_s
 
-      attributes['ValidityPeriods'] ||= []
+      attributes[name] ||= []
 
-      until attributes['ValidityPeriods'].length >= period_number + 1
-        attributes['ValidityPeriods'] << {}
+      until attributes[name].length >= period_number + 1
+        attributes[name] << {}
       end
 
-      attributes['ValidityPeriods'][period_number][attribute.to_s] = value
+      attributes[name][period_number][attribute.to_s] = value
 
-      attributes.delete key
+      attributes.delete raw_attribute
     end
 
     # Situation References are an array of Reference
