@@ -14,9 +14,8 @@ type GeneralMessageUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner            *Partner
+	partner         *Partner
 	remoteCodeSpace string
-	affectedLines      map[model.LineId]*model.AffectedLine
 
 	MonitoringRefs map[string]struct{}
 	LineRefs       map[string]struct{}
@@ -30,9 +29,8 @@ type LineSection struct {
 
 func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateEventBuilder {
 	return GeneralMessageUpdateEventBuilder{
-		partner:            partner,
+		partner:         partner,
 		remoteCodeSpace: partner.RemoteCodeSpace(),
-		affectedLines:      make(map[model.LineId]*model.AffectedLine),
 
 		MonitoringRefs: make(map[string]struct{}),
 		LineRefs:       make(map[string]struct{}),
@@ -67,12 +65,12 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 	}
 
 	situationEvent := &model.SituationUpdateEvent{
-		Origin:            string(builder.partner.Slug()),
-		CreatedAt:         builder.Clock().Now(),
-		RecordedAt:        xmlGeneralMessageEvent.RecordedAtTime(),
+		Origin:        string(builder.partner.Slug()),
+		CreatedAt:     builder.Clock().Now(),
+		RecordedAt:    xmlGeneralMessageEvent.RecordedAtTime(),
 		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlGeneralMessageEvent.InfoMessageIdentifier()),
-		Version:           xmlGeneralMessageEvent.InfoMessageVersion(),
-		ProducerRef:       producerRef,
+		Version:       xmlGeneralMessageEvent.InfoMessageVersion(),
+		ProducerRef:   producerRef,
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 
@@ -145,7 +143,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedStopArea(event *mode
 	builder.MonitoringRefs[stopPointRefCode.Value()] = struct{}{}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string, affectedLines map[model.LineId]*model.AffectedLine) {
 	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
 	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
@@ -153,17 +151,17 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedLine(lineRef string)
 	}
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
-	builder.affectedLines[affect.LineId] = affect
+	affectedLines[affect.LineId] = affect
 	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string, affectedLines map[model.LineId]*model.AffectedLine) {
 	affectedRoute := model.AffectedRoute{RouteRef: route}
-	builder.affectedLines[model.LineId(lineId)].AffectedRoutes =
-		append(builder.affectedLines[model.LineId(lineId)].AffectedRoutes, &affectedRoute)
+	affectedLines[model.LineId(lineId)].AffectedRoutes =
+		append(affectedLines[model.LineId(lineId)].AffectedRoutes, &affectedRoute)
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId model.LineId, destination string) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId model.LineId, destination string, affectedLines map[model.LineId]*model.AffectedLine) {
 	destinationCode := model.NewCode(builder.remoteCodeSpace, destination)
 	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(destinationCode)
 	if !ok {
@@ -171,14 +169,14 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedDestination(lineId m
 	}
 
 	affectedDestination := model.AffectedDestination{StopAreaId: stopArea.Id()}
-	builder.affectedLines[model.LineId(lineId)].AffectedDestinations =
-		append(builder.affectedLines[model.LineId(lineId)].AffectedDestinations, &affectedDestination)
+	affectedLines[model.LineId(lineId)].AffectedDestinations =
+		append(affectedLines[model.LineId(lineId)].AffectedDestinations, &affectedDestination)
 
 	// Logging
 	builder.MonitoringRefs[destinationCode.Value()] = struct{}{}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section LineSection) {
+func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section LineSection, affectedLines map[model.LineId]*model.AffectedLine) {
 	LineRefCode := model.NewCode(builder.remoteCodeSpace, section.LineRef)
 	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
@@ -204,9 +202,13 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 	}
 
 	// Fill already existing AffectedLine if exists
-	affectedLine, ok := builder.affectedLines[line.Id()]
+	affectedLine, ok := affectedLines[line.Id()]
 	if ok {
 		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
+
+		// Logging
+		builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
+		builder.MonitoringRefs[lastStopCode.Value()] = struct{}{}
 		return
 	}
 
@@ -214,7 +216,7 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 	affectedLine = model.NewAffectedLine()
 	affectedLine.LineId = line.Id()
 	affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
-	builder.affectedLines[line.Id()] = affectedLine
+	affectedLines[line.Id()] = affectedLine
 
 	// Logging
 	builder.LineRefs[LineRefCode.Value()] = struct{}{}
@@ -223,20 +225,20 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffectedSection(section Line
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.SituationUpdateEvent, content *sxml.IDFGeneralMessageStructure) {
-
-	for _, lineRef := range content.LineRef() {
-		builder.setAffectedLine(lineRef)
+	affectedLines := make(map[model.LineId]*model.AffectedLine)
+	for _, lineRef := range content.LineRefs() {
+		builder.setAffectedLine(lineRef, affectedLines)
 	}
 
-	if len(builder.affectedLines) == 1 {
+	if len(affectedLines) == 1 {
 		// get the LineId
-		lineId := maps.Keys(builder.affectedLines)[0]
+		lineId := maps.Keys(affectedLines)[0]
 
 		for _, destination := range content.DestinationRef() {
-			builder.setAffectedDestination(lineId, destination)
+			builder.setAffectedDestination(lineId, destination, affectedLines)
 		}
 		for _, route := range content.RouteRef() {
-			builder.setAffectedRoute(lineId, route)
+			builder.setAffectedRoute(lineId, route, affectedLines)
 		}
 	}
 
@@ -247,16 +249,16 @@ func (builder *GeneralMessageUpdateEventBuilder) setAffects(event *model.Situati
 			LastStop:  section.LastStop(),
 		}
 
-		builder.setAffectedSection(lineSection)
+		builder.setAffectedSection(lineSection, affectedLines)
 	}
 
 	// Fill affectedLines
-	for _, affectedLine := range builder.affectedLines {
+	for _, affectedLine := range affectedLines {
 		event.Affects = append(event.Affects, affectedLine)
 	}
 
+	// Fill affectedStopAreas
 	for _, stopPointRef := range content.StopPointRef() {
 		builder.setAffectedStopArea(event, stopPointRef)
 	}
-
 }

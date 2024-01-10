@@ -50,7 +50,7 @@ type XMLValidityPeriod struct {
 type XMLAffect struct {
 	XMLStructure
 
-	lineRef              string
+	lineRefs             []string
 	affectedRoutes       []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
@@ -175,7 +175,7 @@ func (visit *XMLPtSituationElement) SituationNumber() string {
 
 func (visit *XMLPtSituationElement) Version() int {
 	if !visit.version.Defined {
-		visit.version.SetValueWithDefault(visit.findIntChildContent("InfoMessageVersion"), 1)
+		visit.version.SetValueWithDefault(visit.findIntChildContent("Version"), 1)
 	}
 	return visit.version.Value
 }
@@ -234,11 +234,14 @@ func (visit *XMLPtSituationElement) Affects() []*XMLAffect {
 	return visit.affects
 }
 
-func (a *XMLAffect) LineRef() string {
-	if a.lineRef == "" {
-		a.lineRef = a.findStringChildContent("LineRef")
+func (a *XMLAffect) LineRefs() []string {
+	if len(a.lineRefs) == 0 {
+		nodes := a.findNodes("LineRef")
+		for _, lineRef := range nodes {
+			a.lineRefs = append(a.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
+		}
 	}
-	return a.lineRef
+	return a.lineRefs
 }
 
 func (a *XMLAffect) AffectedRoutes() []string {

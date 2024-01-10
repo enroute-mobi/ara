@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"golang.org/x/exp/maps"
 )
 
 type SituationExchangeUpdateEventBuilder struct {
@@ -13,7 +14,6 @@ type SituationExchangeUpdateEventBuilder struct {
 
 	partner         *Partner
 	remoteCodeSpace string
-	affectedLines   map[model.LineId]*model.AffectedLine
 
 	MonitoringRefs map[string]struct{}
 	LineRefs       map[string]struct{}
@@ -23,10 +23,8 @@ func NewSituationExchangeUpdateEventBuilder(partner *Partner) SituationExchangeU
 	return SituationExchangeUpdateEventBuilder{
 		partner:         partner,
 		remoteCodeSpace: partner.RemoteCodeSpace(),
-		affectedLines:   make(map[model.LineId]*model.AffectedLine),
-
-		MonitoringRefs: make(map[string]struct{}),
-		LineRefs:       make(map[string]struct{}),
+		MonitoringRefs:  make(map[string]struct{}),
+		LineRefs:        make(map[string]struct{}),
 	}
 }
 
@@ -99,7 +97,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedStopArea(event *m
 	builder.MonitoringRefs[stopPointRefCode.Value()] = struct{}{}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) setAffectedLine(lineRef string) {
+func (builder *SituationExchangeUpdateEventBuilder) setAffectedLine(lineRef string, affectedLines map[model.LineId]*model.AffectedLine) {
 	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
 	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
 	if !ok {
@@ -107,28 +105,17 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedLine(lineRef stri
 	}
 	affect := model.NewAffectedLine()
 	affect.LineId = line.Id()
-	builder.affectedLines[affect.LineId] = affect
+	affectedLines[affect.LineId] = affect
 	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) setAffectedRoute(lineRef string, route string) {
-	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
-	if !ok {
-		return
-	}
+func (builder *SituationExchangeUpdateEventBuilder) setAffectedRoute(lineId model.LineId, route string, affectedLines map[model.LineId]*model.AffectedLine) {
 	affectedRoute := model.AffectedRoute{RouteRef: route}
-	builder.affectedLines[line.Id()].AffectedRoutes =
-		append(builder.affectedLines[line.Id()].AffectedRoutes, &affectedRoute)
+	affectedLines[lineId].AffectedRoutes =
+		append(affectedLines[lineId].AffectedRoutes, &affectedRoute)
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) setAffectedDestination(lineRef string, destination string) {
-	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
-	if !ok {
-		return
-	}
-
+func (builder *SituationExchangeUpdateEventBuilder) setAffectedDestination(lineId model.LineId, destination string, affectedLines map[model.LineId]*model.AffectedLine) {
 	destinationCode := model.NewCode(builder.remoteCodeSpace, destination)
 	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(destinationCode)
 	if !ok {
@@ -136,20 +123,14 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedDestination(lineR
 	}
 
 	affectedDestination := model.AffectedDestination{StopAreaId: stopArea.Id()}
-	builder.affectedLines[model.LineId(line.Id())].AffectedDestinations =
-		append(builder.affectedLines[model.LineId(line.Id())].AffectedDestinations, &affectedDestination)
+	affectedLines[lineId].AffectedDestinations =
+		append(affectedLines[lineId].AffectedDestinations, &affectedDestination)
 
 	// Logging
 	builder.MonitoringRefs[destinationCode.Value()] = struct{}{}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef string, section *sxml.XMLAffectedSection) {
-	LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
-	line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
-	if !ok {
-		return
-	}
-
+func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineId model.LineId, section *sxml.XMLAffectedSection, affectedLines map[model.LineId]*model.AffectedLine) {
 	firstStopRef := section.FirstStop()
 	firstStopCode := model.NewCode(builder.remoteCodeSpace, firstStopRef)
 	firstStopArea, ok := builder.partner.Model().StopAreas().FindByCode(firstStopCode)
@@ -168,8 +149,8 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef s
 		LastStop:  lastStopArea.Id(),
 	}
 
-	// Fill already existing AffectedLine if exists
-	affectedLine, ok := builder.affectedLines[line.Id()]
+	// Fill already existing AffectedLine
+	affectedLine, ok := affectedLines[lineId]
 	if ok {
 		affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
 		builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
@@ -177,38 +158,38 @@ func (builder *SituationExchangeUpdateEventBuilder) setAffectedSection(lineRef s
 		return
 	}
 
-	// otherwise create new AffectedLine
-	affectedLine = model.NewAffectedLine()
-	affectedLine.LineId = line.Id()
-	affectedLine.AffectedSections = append(affectedLine.AffectedSections, affectedSection)
-	builder.affectedLines[line.Id()] = affectedLine
-
 	// Logging
-	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 	builder.MonitoringRefs[firstStopCode.Value()] = struct{}{}
 	builder.MonitoringRefs[lastStopCode.Value()] = struct{}{}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setAffect(event *model.SituationUpdateEvent, xmlAffect *sxml.XMLAffect) {
-	lineRef := xmlAffect.LineRef()
+	affectedLines := make(map[model.LineId]*model.AffectedLine)
+	for _, lineRef := range xmlAffect.LineRefs() {
+		builder.setAffectedLine(lineRef, affectedLines)
+	}
 
-	builder.setAffectedLine(lineRef)
-	if len(builder.affectedLines) != 0 {
+	if len(affectedLines) == 1 {
+		// get the LineId
+		lineId := maps.Keys(affectedLines)[0]
+
 		for _, route := range xmlAffect.AffectedRoutes() {
-			builder.setAffectedRoute(lineRef, route)
+			builder.setAffectedRoute(lineId, route, affectedLines)
 		}
 		for _, section := range xmlAffect.AffectedSections() {
-			builder.setAffectedSection(lineRef, section)
+			builder.setAffectedSection(lineId, section, affectedLines)
 		}
 		for _, destination := range xmlAffect.AffectedDestinations() {
-			builder.setAffectedDestination(lineRef, destination)
+			builder.setAffectedDestination(lineId, destination, affectedLines)
 		}
 	}
 
-	for _, affectedLine := range builder.affectedLines {
+	// Fill affectedLines
+	for _, affectedLine := range affectedLines {
 		event.Affects = append(event.Affects, affectedLine)
 	}
 
+	// Fill affectedStopAreas
 	for _, stopPointRef := range xmlAffect.StopPoints() {
 		builder.setAffectedStopArea(event, stopPointRef)
 	}

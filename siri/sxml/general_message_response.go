@@ -229,7 +229,7 @@ func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
 	return visit.stopPointRef
 }
 
-func (visit *IDFGeneralMessageStructure) LineRef() []string {
+func (visit *IDFGeneralMessageStructure) LineRefs() []string {
 	if len(visit.lineRef) == 0 {
 		nodes := visit.findDirectChildrenNodes("LineRef")
 		for _, lineRef := range nodes {
