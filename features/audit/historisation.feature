@@ -363,8 +363,8 @@ Feature: Audit API exchanges
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T00:55:00.000+02:00                                        |
-      | Schedule[aimed]#Departure       | 2017-01-01T00:59:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T11:55:00.000+02:00                                        |
+      | Schedule[aimed]#Departure       | 2017-01-01T11:59:00.000+02:00                                        |
       | DepartureStatus                 | onTime                                                               |
       | ArrivalStatus                   | onTime                                                               |
       # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
@@ -372,10 +372,10 @@ Feature: Audit API exchanges
     And a minute has passed
     Then an audit event should exist with these attributes:
       | StopVisitUUID       | /{test-uuid}/                                                                            |
-      | AimedArrivalTime    | 2017-01-01T00:55:00+02:00                                                                |
-      | AimedDepartureTime  | 2017-01-01T00:59:00+02:00                                                                |
-      | ActualArrivalTime   | 2017-01-01T00:55:00+02:00                                                                |
-      | ActualDepartureTime | 2017-01-01T00:59:00+02:00                                                                |
+      | AimedArrivalTime    | 2017-01-01T11:55:00+02:00                                                                |
+      | AimedDepartureTime  | 2017-01-01T11:59:00+02:00                                                                |
+      | ActualArrivalTime   | 2017-01-01T11:55:00+02:00                                                                |
+      | ActualDepartureTime | 2017-01-01T11:59:00+02:00                                                                |
       | DepartureStatus     | departed                                                                                 |
       | ArrivalStatus       | arrived                                                                                  |
       | StopAreaName        | Mago-Cime OMNI                                                                           |
@@ -467,8 +467,8 @@ Feature: Audit API exchanges
       | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8                                    |
       | VehicleAtStop                   | true                                                                 |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
-      | Schedule[aimed]#Arrival         | 2017-01-01T00:55:00.000+02:00                                        |
-      | Schedule[aimed]#Departure       | 2017-01-01T00:59:00.000+02:00                                        |
+      | Schedule[aimed]#Arrival         | 2017-01-01T12:55:00.000+02:00                                        |
+      | Schedule[aimed]#Departure       | 2017-01-01T12:59:00.000+02:00                                        |
       | DepartureStatus                 | onTime                                                               |
       | ArrivalStatus                   | onTime                                                               |
     And a minute has passed
@@ -512,9 +512,9 @@ Feature: Audit API exchanges
     And a minute has passed
     Then an audit event should exist with these attributes:
       | StopVisitUUID       | /{test-uuid}/                                                                            |
-      | ActualArrivalTime   | 2017-01-01T00:55:00+02:00                                                                |
-      | AimedDepartureTime  | 2017-01-01T00:59:00+02:00                                                                |
-      | AimedArrivalTime    | 2017-01-01T00:55:00+02:00                                                                |
+      | ActualArrivalTime   | 2017-01-01T12:55:00+02:00                                                                |
+      | AimedDepartureTime  | 2017-01-01T12:59:00+02:00                                                               |
+      | AimedArrivalTime    | 2017-01-01T12:55:00+02:00                                                                |
       | DepartureStatus     | departed                                                                                 |
       | ArrivalStatus       | arrived                                                                                  |
       | StopAreaName        | Mago-Cime OMNI                                                                           |

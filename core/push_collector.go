@@ -17,13 +17,8 @@ type PushCollector struct {
 	svEvents        []model.UpdateEvent
 	vjOfIgnoredSv   map[string]struct{}
 	vjWithStopVisit map[string]struct{}
-	persistence     persistence
+	persistence     time.Duration
 	subscriber      UpdateSubscriber
-}
-
-type persistence struct {
-	p  time.Duration
-	ok bool
 }
 
 type PushCollectorFactory struct{}
@@ -58,7 +53,7 @@ func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
 }
 
 func (pc *PushCollector) refresh() {
-	pc.persistence.p, pc.persistence.ok = pc.partner.Referential().ModelPersistenceDuration()
+	pc.persistence = pc.partner.Referential().ModelPersistenceDuration()
 	pc.vjEvents = make(map[string]model.UpdateEvent)
 	pc.svEvents = []model.UpdateEvent{}
 	pc.vjOfIgnoredSv = make(map[string]struct{})
@@ -170,7 +165,7 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		event := model.NewStopVisitUpdateEvent()
 
 		handleSchedules(event.Schedules, sv.GetDepartureTimes(), sv.GetArrivalTimes())
-		if pc.persistence.ok && event.Schedules.ReferenceTime().Before(pc.Clock().Now().Add(pc.persistence.p)) {
+		if event.Schedules.ReferenceTime().Before(pc.Clock().Now().Add(pc.persistence)) {
 			pc.vjOfIgnoredSv[sv.GetVehicleJourneyRef()] = struct{}{} // Save vehicle journeys for which we didn't save at least 1 stop visit
 			continue
 		}
