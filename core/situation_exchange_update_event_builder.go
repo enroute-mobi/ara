@@ -159,6 +159,11 @@ func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEven
 		}
 	}
 
+	blocking := &model.Blocking{
+		JourneyPlanner: xmlConsequence.JourneyPlanner(),
+	}
+	consequence.Blocking = blocking
+
 	situationEvent.Consequences = append(situationEvent.Consequences, consequence)
 }
 

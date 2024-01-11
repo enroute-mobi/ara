@@ -34,6 +34,7 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Blocking[JourneyPlanner]                                                      | true                              |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -164,6 +165,9 @@ Feature: Support SIRI Situation Exchange by request
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
+                        <siri:Blocking>
+                          <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                        </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
                 </siri:PtSituationElement>
@@ -368,6 +372,9 @@ Feature: Support SIRI Situation Exchange by request
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
+                        <siri:Blocking>
+                          <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                        </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
                 </siri:PtSituationElement>
@@ -438,6 +445,7 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Blocking[JourneyPlanner]                                                      | true                              |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |

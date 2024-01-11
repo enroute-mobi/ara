@@ -65,6 +65,11 @@ type Consequence struct {
 	Periods  []*TimeRange      `json:",omitempty"`
 	Severity SituationSeverity `json:",omitempty"`
 	Affects  []Affect          `json:",omitempty"`
+	Blocking *Blocking         `json:",omitempty"`
+}
+
+type Blocking struct {
+	JourneyPlanner bool
 }
 
 // SubTypes of Affect

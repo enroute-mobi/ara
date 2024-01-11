@@ -89,7 +89,10 @@
 									<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
 								</siri:AffectedStopPoint>{{ end }}
 							</siri:StopPoints>{{ end }}
-						</siri:Affects>
+						</siri:Affects>{{ if .Blocking }}
+						<siri:Blocking>{{ if .Blocking.JourneyPlanner }}
+							<siri:JourneyPlanner>{{ .Blocking.JourneyPlanner }}</siri:JourneyPlanner>{{ end }}
+						</siri:Blocking>{{ end }}
 					</siri:Consequence>{{ end }}
 				</siri:Consequences>{{ end }}
 			</siri:PtSituationElement>{{ end }}

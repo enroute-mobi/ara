@@ -74,9 +74,10 @@ type XMLAffectedSection struct {
 type XMLConsequence struct {
 	XMLStructure
 
-	periods  []*XMLPeriod
-	severity string
-	affects  []*XMLAffect
+	periods        []*XMLPeriod
+	severity       string
+	affects        []*XMLAffect
+	journeyPlanner Bool
 }
 
 func NewXMLConsequence(node XMLNode) *XMLConsequence {
@@ -330,6 +331,13 @@ func (c *XMLConsequence) Affects() []*XMLAffect {
 		c.affects = affects
 	}
 	return c.affects
+}
+
+func (c *XMLConsequence) JourneyPlanner() bool {
+	if !c.journeyPlanner.Defined {
+		c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+	}
+	return c.journeyPlanner.Value
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

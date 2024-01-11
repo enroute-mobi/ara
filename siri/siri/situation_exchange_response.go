@@ -60,6 +60,7 @@ type Consequence struct {
 	Severity           model.SituationSeverity
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
+	Blocking           *model.Blocking
 }
 
 type AffectedStopPoint struct {

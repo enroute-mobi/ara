@@ -146,6 +146,10 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			}
 		}
 
+		if consequence.Blocking != nil {
+			c.Blocking = consequence.Blocking
+		}
+
 		ptSituationElement.Consequences = append(ptSituationElement.Consequences, c)
 	}
 

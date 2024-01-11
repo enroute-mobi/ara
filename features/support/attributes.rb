@@ -74,6 +74,13 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Blocking\[([^\]]+)\]/
+      name = $1
+      attributes["Blocking"] ||= {}
+      attributes["Blocking"][name] = value == "true" unless attributes["Blocking"].key?(name)
+      attributes.delete key
+    end
+
     if key =~ /Attribute\[([^\]]+)\]/
       name = $1
       attributes["Attributes"] ||= {}
