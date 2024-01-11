@@ -91,7 +91,8 @@
 							</siri:StopPoints>{{ end }}
 						</siri:Affects>{{ if .Blocking }}
 						<siri:Blocking>{{ if .Blocking.JourneyPlanner }}
-							<siri:JourneyPlanner>{{ .Blocking.JourneyPlanner }}</siri:JourneyPlanner>{{ end }}
+							<siri:JourneyPlanner>{{ .Blocking.JourneyPlanner }}</siri:JourneyPlanner>{{ end }}{{ if .Blocking.RealTime }}
+							<siri:RealTime>{{ .Blocking.RealTime }}</siri:RealTime>{{ end }}
 						</siri:Blocking>{{ end }}
 					</siri:Consequence>{{ end }}
 				</siri:Consequences>{{ end }}

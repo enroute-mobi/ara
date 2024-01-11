@@ -78,6 +78,7 @@ type XMLConsequence struct {
 	severity       string
 	affects        []*XMLAffect
 	journeyPlanner Bool
+	realTime       Bool
 }
 
 func NewXMLConsequence(node XMLNode) *XMLConsequence {
@@ -338,6 +339,13 @@ func (c *XMLConsequence) JourneyPlanner() bool {
 		c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
 	}
 	return c.journeyPlanner.Value
+}
+
+func (c *XMLConsequence) RealTime() bool {
+	if !c.realTime.Defined {
+		c.realTime.SetValue(c.findBoolChildContent("RealTime"))
+	}
+	return c.realTime.Value
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

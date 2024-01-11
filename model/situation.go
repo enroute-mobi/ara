@@ -70,6 +70,7 @@ type Consequence struct {
 
 type Blocking struct {
 	JourneyPlanner bool
+	RealTime       bool
 }
 
 // SubTypes of Affect

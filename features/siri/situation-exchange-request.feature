@@ -35,6 +35,7 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
+      | Blocking[RealTime]                                                            | true                              |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -167,6 +168,7 @@ Feature: Support SIRI Situation Exchange by request
                         </siri:Affects>
                         <siri:Blocking>
                           <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                          <siri:RealTime>true</siri:RealTime>
                         </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
@@ -374,6 +376,7 @@ Feature: Support SIRI Situation Exchange by request
                         </siri:Affects>
                         <siri:Blocking>
                           <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                          <siri:RealTime>true</siri:RealTime>
                         </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
@@ -446,6 +449,7 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
+      | Blocking[RealTime]                                                            | true                              |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |
