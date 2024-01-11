@@ -58,6 +58,7 @@ type SIRIPtSituationElement struct {
 type Consequence struct {
 	Periods            []*model.TimeRange
 	Severity           model.SituationSeverity
+	HasAffects         bool
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
 	Blocking           *model.Blocking

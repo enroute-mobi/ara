@@ -146,6 +146,9 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			}
 		}
 
+		if c.AffectedLines != nil || c.AffectedStopPoints != nil {
+			c.HasAffects = true
+		}
 		if consequence.Blocking != nil {
 			c.Blocking = consequence.Blocking
 		}
