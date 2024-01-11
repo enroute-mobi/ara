@@ -97,7 +97,6 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		Progress:           situation.Progress,
 		AlertCause:         situation.AlertCause,
 		Severity:           situation.Severity,
-		Consequences:       situation.Consequences,
 	}
 
 	if situation.Description != nil {
@@ -127,6 +126,15 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			)
 		}
 	}
+
+	for _, consequence := range situation.Consequences {
+		c := &siri.Consequence{
+			Periods:  consequence.Periods,
+			Severity: consequence.Severity,
+		}
+		ptSituationElement.Consequences = append(ptSituationElement.Consequences, c)
+	}
+
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
 }
 

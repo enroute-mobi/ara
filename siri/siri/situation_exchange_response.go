@@ -52,9 +52,13 @@ type SIRIPtSituationElement struct {
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
 
-	Consequences []*model.Consequence
+	Consequences []*Consequence
 }
 
+type Consequence struct {
+	Periods  []*model.TimeRange
+	Severity model.SituationSeverity
+}
 type AffectedStopPoint struct {
 	StopPointRef  string
 	StopPointName string
