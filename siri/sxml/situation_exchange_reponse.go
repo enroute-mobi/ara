@@ -77,6 +77,7 @@ type XMLConsequence struct {
 	periods        []*XMLPeriod
 	severity       string
 	affects        []*XMLAffect
+	hasBlocking    bool
 	journeyPlanner Bool
 	realTime       Bool
 }
@@ -334,15 +335,30 @@ func (c *XMLConsequence) Affects() []*XMLAffect {
 	return c.affects
 }
 
+func (c *XMLConsequence) HasBlocking() bool {
+	node := c.findNode("Blocking")
+	if node != nil {
+		c.hasBlocking = true
+	}
+	return c.hasBlocking
+}
+
 func (c *XMLConsequence) JourneyPlanner() bool {
 	if !c.journeyPlanner.Defined {
-		c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+		node := c.findNode("Blocking")
+		if node != nil {
+			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+		}
 	}
 	return c.journeyPlanner.Value
 }
 
 func (c *XMLConsequence) RealTime() bool {
 	if !c.realTime.Defined {
+		node := c.findNode("Blocking")
+		if node != nil {
+			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+		}
 		c.realTime.SetValue(c.findBoolChildContent("RealTime"))
 	}
 	return c.realTime.Value
