@@ -49,6 +49,7 @@ type SIRIPtSituationElement struct {
 	Summary            string
 	Description        string
 
+	HasAffects         bool
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
 

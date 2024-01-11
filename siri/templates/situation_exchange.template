@@ -22,7 +22,7 @@
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ if .Summary }}
 				<siri:Summary>{{ .Summary}}</siri:Summary>{{ end }}{{ if .Description}}
-				<siri:Description>{{ .Description }}</siri:Description>{{ end }}
+				<siri:Description>{{ .Description }}</siri:Description>{{ end }}{{ if .HasAffects }}
 				<siri:Affects>
 					<siri:Networks>
 						<siri:AffectedNetwork>{{ range .AffectedLines }}
@@ -52,7 +52,7 @@
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
 						</siri:AffectedStopPoint>{{ end }}
 					</siri:StopPoints>{{ end }}
-				</siri:Affects>{{ if .Consequences }}
+				</siri:Affects>{{ end }}{{ if .Consequences }}
 				<siri:Consequences>{{ range .Consequences }}
 					<siri:Consequence>{{ if .Periods }}{{ range .Periods }}
 						<siri:Period>{{ if not .StartTime.IsZero }}

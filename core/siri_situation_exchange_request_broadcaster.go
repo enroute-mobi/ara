@@ -125,6 +125,9 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 				affectedLine,
 			)
 		}
+		if ptSituationElement.AffectedLines != nil || ptSituationElement.AffectedStopPoints != nil {
+			ptSituationElement.HasAffects = true
+		}
 	}
 
 	for _, consequence := range situation.Consequences {
