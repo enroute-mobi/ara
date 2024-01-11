@@ -322,7 +322,7 @@ func (consequence *XMLConsequence) Severity() string {
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {
 	if visit.affects == nil {
 		affects := []*XMLAffect{}
-		nodes := visit.findNodes("Affects")
+		nodes := visit.findDirectChildrenNodes("Affects")
 		for _, node := range nodes {
 			affects = append(affects, NewXMLAffect(node))
 		}
