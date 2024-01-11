@@ -149,6 +149,16 @@ func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEven
 		logger.Log.Debugf("Consequence: %v", err)
 	}
 
+	for _, affect := range xmlConsequence.Affects() {
+		affectedModels := builder.buildAffect(affect)
+		for _, affectedLine := range affectedModels.affectedLines {
+			consequence.Affects = append(consequence.Affects, affectedLine)
+		}
+		for _, affectedStopAreas := range affectedModels.affectedStopAreas {
+			consequence.Affects = append(consequence.Affects, affectedStopAreas)
+		}
+	}
+
 	situationEvent.Consequences = append(situationEvent.Consequences, consequence)
 }
 

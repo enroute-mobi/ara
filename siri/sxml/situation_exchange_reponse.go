@@ -76,6 +76,7 @@ type XMLConsequence struct {
 
 	periods  []*XMLPeriod
 	severity string
+	affects  []*XMLAffect
 }
 
 func NewXMLConsequence(node XMLNode) *XMLConsequence {
@@ -317,6 +318,18 @@ func (consequence *XMLConsequence) Severity() string {
 		consequence.severity = consequence.findStringChildContent("Severity")
 	}
 	return consequence.severity
+}
+
+func (c *XMLConsequence) Affects() []*XMLAffect {
+	if c.affects == nil {
+		affects := []*XMLAffect{}
+		nodes := c.findNodes("Affects")
+		for _, node := range nodes {
+			affects = append(affects, NewXMLAffect(node))
+		}
+		c.affects = affects
+	}
+	return c.affects
 }
 
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {

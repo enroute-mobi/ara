@@ -132,6 +132,20 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			Periods:  consequence.Periods,
 			Severity: consequence.Severity,
 		}
+		for _, affect := range consequence.Affects {
+			switch affect.GetType() {
+			case model.SituationTypeStopArea:
+				affectedStopArea := connector.buildAffectedStopArea(
+					affect, ptSituationElement, delivery)
+				c.AffectedStopPoints = append(c.AffectedStopPoints, affectedStopArea)
+
+			case model.SituationTypeLine:
+				affectedLine := connector.buildAffectedLine(
+					affect, ptSituationElement, delivery)
+				c.AffectedLines = append(c.AffectedLines, affectedLine)
+			}
+		}
+
 		ptSituationElement.Consequences = append(ptSituationElement.Consequences, c)
 	}
 

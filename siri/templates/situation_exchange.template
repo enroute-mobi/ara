@@ -60,6 +60,36 @@
 							<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
 						</siri:Period>{{ end }}{{ end }}{{ if .Severity }}
 						<siri:Severity>{{ .Severity }}</siri:Severity>{{ end }}
+						<siri:Affects>
+							<siri:Networks>
+								<siri:AffectedNetwork>{{ range .AffectedLines }}
+									<siri:AffectedLine>
+										<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Destinations }}
+										<siri:Destinations>{{ range .Destinations }}
+											<siri:StopPlaceRef>{{ .StopPlaceRef }}</siri:StopPlaceRef>
+										</siri:Destinations>{{ end }}{{ end }}{{ if .Routes }}
+										<siri:Routes>{{ range .Routes }}
+											<siri:AffectedRoute>
+												<siri:RouteRef>{{ .RouteRef }}</siri:RouteRef>
+											</siri:AffectedRoute>
+										</siri:Routes>{{ end }}{{ end }}{{ if .Sections }}
+										<siri:Sections>{{ range .Sections }}
+											<siri:AffectedSection>
+												<siri:IndirectSectionRef>
+													<siri:FirstStopPointRef>{{ .FirstStopPointRef }}</siri:FirstStopPointRef>
+													<siri:LastStopPointRef>{{ .LastStopPointRef}}</siri:LastStopPointRef>
+												</siri:IndirectSectionRef>
+											</siri:AffectedSection>
+										</siri:Sections>{{ end }}{{ end }}
+									</siri:AffectedLine>{{ end }}
+								</siri:AffectedNetwork>
+							</siri:Networks>{{ if .AffectedStopPoints }}
+							<siri:StopPoints>{{ range .AffectedStopPoints }}
+								<siri:AffectedStopPoint>
+									<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
+								</siri:AffectedStopPoint>{{ end }}
+							</siri:StopPoints>{{ end }}
+						</siri:Affects>
 					</siri:Consequence>{{ end }}
 				</siri:Consequences>{{ end }}
 			</siri:PtSituationElement>{{ end }}
