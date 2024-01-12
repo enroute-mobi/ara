@@ -257,22 +257,24 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 		affectedStopAreas: make(map[model.StopAreaId]*model.AffectedStopArea),
 	}
 
-	for _, lineRef := range xmlAffect.LineRefs() {
-		builder.buildAffectedLine(lineRef, models.affectedLines)
-	}
-
-	if len(models.affectedLines) == 1 {
-		// get the LineId
-		lineId := maps.Keys(models.affectedLines)[0]
-
-		for _, route := range xmlAffect.AffectedRoutes() {
-			builder.buildAffectedRoute(lineId, route, models.affectedLines)
+	for _, xmlAffectedNetwork := range xmlAffect.AffectedNetworks() {
+		for _, lineRef := range xmlAffectedNetwork.LineRefs() {
+			builder.buildAffectedLine(lineRef, models.affectedLines)
 		}
-		for _, section := range xmlAffect.AffectedSections() {
-			builder.buildAffectedSection(lineId, section, models.affectedLines)
-		}
-		for _, destination := range xmlAffect.AffectedDestinations() {
-			builder.buildAffectedDestination(lineId, destination, models.affectedLines)
+
+		if len(models.affectedLines) == 1 {
+			// get the LineId
+			lineId := maps.Keys(models.affectedLines)[0]
+
+			for _, route := range xmlAffectedNetwork.AffectedRoutes() {
+				builder.buildAffectedRoute(lineId, route, models.affectedLines)
+			}
+			for _, section := range xmlAffectedNetwork.AffectedSections() {
+				builder.buildAffectedSection(lineId, section, models.affectedLines)
+			}
+			for _, destination := range xmlAffectedNetwork.AffectedDestinations() {
+				builder.buildAffectedDestination(lineId, destination, models.affectedLines)
+			}
 		}
 	}
 
