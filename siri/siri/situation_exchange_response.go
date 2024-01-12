@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -49,20 +50,23 @@ type SIRIPtSituationElement struct {
 	Summary            string
 	Description        string
 
-	HasAffects         bool
-	AffectedLines      []*AffectedLine
-	AffectedStopPoints []*AffectedStopPoint
+	HasAffects bool
+	SIRIAffects
 
 	Consequences []*Consequence
 }
 
-type Consequence struct {
-	Periods            []*model.TimeRange
-	Severity           model.SituationSeverity
-	HasAffects         bool
+type SIRIAffects struct {
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
-	Blocking           *model.Blocking
+}
+
+type Consequence struct {
+	Periods    []*model.TimeRange
+	Severity   model.SituationSeverity
+	HasAffects bool
+	SIRIAffects
+	Blocking *model.Blocking
 }
 
 type AffectedStopPoint struct {
@@ -106,7 +110,7 @@ func (response *SIRISituationExchangeResponse) BuildXML(envelopeType ...string) 
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }
 
 func (delivery *SIRISituationExchangeDelivery) BuildSituationExchangeDeliveryXML() (string, error) {
@@ -115,7 +119,7 @@ func (delivery *SIRISituationExchangeDelivery) BuildSituationExchangeDeliveryXML
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }
 
 func (message *SIRIPtSituationElement) BuildSituationExchangeXML() (string, error) {
@@ -124,5 +128,14 @@ func (message *SIRIPtSituationElement) BuildSituationExchangeXML() (string, erro
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
+}
+
+func (affects *SIRIAffects) BuildSituationAffectsXML() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "situation_affects.template", affects); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return strings.TrimSpace(buffer.String()), nil
 }
