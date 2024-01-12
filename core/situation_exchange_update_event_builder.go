@@ -276,8 +276,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 		}
 	}
 
-	for _, stopPointRef := range xmlAffect.StopPoints() {
-		builder.buildAffectedStopArea(stopPointRef, models.affectedStopAreas)
+	for _, xmlAffectedStopPoint := range xmlAffect.AffectedStopPoints() {
+		builder.buildAffectedStopArea(xmlAffectedStopPoint.StopPointRef(), models.affectedStopAreas)
 	}
 
 	affects = &models

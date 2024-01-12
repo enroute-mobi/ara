@@ -60,8 +60,19 @@ type XMLAffect struct {
 	affectedRoutes       []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
+	affectedStopPoints   []*XMLAffectedStopPoint
+}
 
-	stopPoints []string
+type XMLAffectedStopPoint struct {
+	XMLStructure
+
+	stopPointRef string
+}
+
+func NewXMLAffectedStopPoint(node XMLNode) *XMLAffectedStopPoint {
+	xmlAffectedStopPoint := &XMLAffectedStopPoint{}
+	xmlAffectedStopPoint.node = node
+	return xmlAffectedStopPoint
 }
 
 type XMLAffectedSection struct {
@@ -430,12 +441,24 @@ func (a *XMLAffect) AffectedDestinations() []string {
 	return a.affectedDestinations
 }
 
-func (a *XMLAffect) StopPoints() []string {
-	if len(a.stopPoints) == 0 {
-		nodes := a.findNodes("StopPointRef")
-		for _, stopPointRef := range nodes {
-			a.stopPoints = append(a.stopPoints, strings.TrimSpace(stopPointRef.NativeNode().Content()))
+func (a *XMLAffect) AffectedStopPoints() []*XMLAffectedStopPoint {
+	if len(a.affectedStopPoints) == 0 {
+		stopPointsNodes := a.findDirectChildrenNodes("StopPoints")
+		if stopPointsNodes != nil {
+			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
+			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			for _, affectedStopPoint := range nodes {
+				a.affectedStopPoints = append(a.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
+			}
 		}
+
 	}
-	return a.stopPoints
+	return a.affectedStopPoints
+}
+
+func (asp *XMLAffectedStopPoint) StopPointRef() string {
+	if asp.stopPointRef == "" {
+		asp.stopPointRef = asp.findStringChildContent("StopPointRef")
+	}
+	return asp.stopPointRef
 }
