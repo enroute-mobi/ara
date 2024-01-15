@@ -60,13 +60,25 @@ type XMLAffect struct {
 	affectedStopPoints []*XMLAffectedStopPoint
 }
 
+type XMLAffectedRoute struct {
+	XMLStructure
+
+	routeRef string
+}
+
+func NewXMLAffectedRoute(node XMLNode) *XMLAffectedRoute {
+	xmlAffectedRoute := &XMLAffectedRoute{}
+	xmlAffectedRoute.node = node
+	return xmlAffectedRoute
+}
+
 type XMLAffectedNetwork struct {
 	XMLStructure
 
 	lineRefs             []string
-	affectedRoutes       []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
+	affectedRoutes       []*XMLAffectedRoute
 }
 
 func NewXMLAffectedNetwork(node XMLNode) *XMLAffectedNetwork {
@@ -420,14 +432,21 @@ func (an *XMLAffectedNetwork) LineRefs() []string {
 	return an.lineRefs
 }
 
-func (an *XMLAffectedNetwork) AffectedRoutes() []string {
+func (an *XMLAffectedNetwork) AffectedRoutes() []*XMLAffectedRoute {
 	if len(an.affectedRoutes) == 0 {
-		nodes := an.findNodes("RouteRef")
-		for _, routeRef := range nodes {
-			an.affectedRoutes = append(an.affectedRoutes, strings.TrimSpace(routeRef.NativeNode().Content()))
+		nodes := an.findNodes("AffectedRoute")
+		for _, affectedRoute := range nodes {
+			an.affectedRoutes = append(an.affectedRoutes, NewXMLAffectedRoute(affectedRoute))
 		}
 	}
 	return an.affectedRoutes
+}
+
+func (ar *XMLAffectedRoute) RouteRef() string {
+	if ar.routeRef == "" {
+		ar.routeRef = ar.findStringChildContent("RouteRef")
+	}
+	return ar.routeRef
 }
 
 func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {

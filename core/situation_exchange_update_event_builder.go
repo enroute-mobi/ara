@@ -209,8 +209,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffectedLine(lineRef st
 	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) buildAffectedRoute(lineId model.LineId, route string, affectedLines map[model.LineId]*model.AffectedLine) {
-	affectedRoute := model.AffectedRoute{RouteRef: route}
+func (builder *SituationExchangeUpdateEventBuilder) buildAffectedRoute(lineId model.LineId, xmlAffectedRoute *sxml.XMLAffectedRoute, affectedLines map[model.LineId]*model.AffectedLine) {
+	affectedRoute := model.AffectedRoute{RouteRef: xmlAffectedRoute.RouteRef()}
 	affectedLines[lineId].AffectedRoutes =
 		append(affectedLines[lineId].AffectedRoutes, &affectedRoute)
 }
@@ -278,8 +278,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 			// get the LineId
 			lineId := maps.Keys(models.affectedLines)[0]
 
-			for _, route := range xmlAffectedNetwork.AffectedRoutes() {
-				builder.buildAffectedRoute(lineId, route, models.affectedLines)
+			for _, xmlAffectedRoute := range xmlAffectedNetwork.AffectedRoutes() {
+				builder.buildAffectedRoute(lineId, xmlAffectedRoute, models.affectedLines)
 			}
 			for _, section := range xmlAffectedNetwork.AffectedSections() {
 				builder.buildAffectedSection(lineId, section, models.affectedLines)

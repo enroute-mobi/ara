@@ -308,6 +308,9 @@ Feature: Support SIRI Situation Exchange by request
                               <siri:AffectedRoute>
                                 <siri:RouteRef>Route:66:LOC</siri:RouteRef>
                               </siri:AffectedRoute>
+                              <siri:AffectedRoute>
+                                <siri:RouteRef>Route:77:LOC</siri:RouteRef>
+                              </siri:AffectedRoute>
                             </siri:Routes>
                             <siri:Sections>
                               <siri:AffectedSection>
@@ -443,6 +446,7 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[1]/RouteRef         | Route:77:LOC                                  |
       | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
     Then one Situation has the following attributes:
       | Codes                        | "external" : "test2"              |
