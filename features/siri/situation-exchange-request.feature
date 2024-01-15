@@ -36,6 +36,8 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
       | Blocking[RealTime]                                                            | true                              |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -163,6 +165,11 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StopPoints>
                             <siri:AffectedStopPoint>
                               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                              <siri:Lines>
+                                <siri:AffectedLine>
+                                  <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                </siri:AffectedLine>
+                              </siri:Lines>
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
@@ -371,6 +378,14 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StopPoints>
                             <siri:AffectedStopPoint>
                               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                              <siri:Lines>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                              </siri:Lines>
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
@@ -450,6 +465,8 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
       | Blocking[RealTime]                                                            | true                              |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |

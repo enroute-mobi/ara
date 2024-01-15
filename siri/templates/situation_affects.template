@@ -24,7 +24,12 @@
 					</siri:Networks>{{ if .AffectedStopPoints }}
 					<siri:StopPoints>{{ range .AffectedStopPoints }}
 						<siri:AffectedStopPoint>
-							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
+							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .LineRefs }}
+							<siri:Lines>{{ range .LineRefs }}
+								<siri:AffectedLine>
+									<siri:LineRef>{{ . }}</siri:LineRef>
+								</siri:AffectedLine>{{ end }}
+							</siri:Lines>{{ end }}
 						</siri:AffectedStopPoint>{{ end }}
 					</siri:StopPoints>{{ end }}
 				</siri:Affects>

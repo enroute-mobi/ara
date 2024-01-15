@@ -174,6 +174,20 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(
 	delivery.MonitoringRefs[affectedStopAreaRef] = struct{}{}
 
 	affectedStopPoint = &siri.AffectedStopPoint{StopPointRef: affectedStopAreaRef}
+	for _, lineId := range affect.(*model.AffectedStopArea).LineIds {
+		line, ok := connector.partner.Model().Lines().Find(lineId)
+		if !ok {
+			logger.Log.Debugf("Unknown Line %s", affect.GetId())
+			continue
+		}
+		lineCode, ok := line.Code(connector.remoteCodeSpace)
+		if !ok {
+			logger.Log.Debugf("Unknown Line Code %s", connector.remoteCodeSpace)
+			continue
+		}
+		affectedStopPoint.LineRefs = append(affectedStopPoint.LineRefs, lineCode.Value())
+	}
+
 	return
 }
 

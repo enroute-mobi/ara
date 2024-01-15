@@ -81,6 +81,7 @@ type Affect interface {
 
 type AffectedStopArea struct {
 	StopAreaId StopAreaId `json:",omitempty"`
+	LineIds    []LineId   `json:",omitempty"`
 }
 
 func (a AffectedStopArea) GetId() ModelId {

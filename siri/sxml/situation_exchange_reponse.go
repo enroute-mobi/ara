@@ -79,6 +79,7 @@ type XMLAffectedStopPoint struct {
 	XMLStructure
 
 	stopPointRef string
+	lineRefs     []string
 }
 
 func NewXMLAffectedStopPoint(node XMLNode) *XMLAffectedStopPoint {
@@ -483,4 +484,14 @@ func (asp *XMLAffectedStopPoint) StopPointRef() string {
 		asp.stopPointRef = asp.findStringChildContent("StopPointRef")
 	}
 	return asp.stopPointRef
+}
+
+func (asp *XMLAffectedStopPoint) LineRefs() []string {
+	if len(asp.lineRefs) == 0 {
+		nodes := asp.findNodes("LineRef")
+		for _, lineRef := range nodes {
+			asp.lineRefs = append(asp.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
+		}
+	}
+	return asp.lineRefs
 }

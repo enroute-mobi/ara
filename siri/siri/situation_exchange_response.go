@@ -72,6 +72,7 @@ type Consequence struct {
 type AffectedStopPoint struct {
 	StopPointRef  string
 	StopPointName string
+	LineRefs      []string
 }
 
 type AffectedLine struct {
