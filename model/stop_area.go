@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -377,24 +378,32 @@ func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds [
 func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
-	stopAreas = manager.findAscendants(stopAreaId)
+	var count uint8
+
+	stopAreas = manager.findAscendants(stopAreaId, count)
 
 	manager.mutex.RUnlock()
 
 	return
 }
 
-func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId) (stopAreas []*StopArea) {
+func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId, count uint8) (stopAreas []*StopArea) {
+	if count >= 20 {
+		logger.Log.Printf("Loop in StopAreas when finding Ascendants: %v", stopAreaId)
+		return
+	}
+	count++
+
 	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
 	}
 	stopAreas = []*StopArea{sa.copy()}
 	if sa.ParentId != "" {
-		stopAreas = append(stopAreas, manager.findAscendants(sa.ParentId)...)
+		stopAreas = append(stopAreas, manager.findAscendants(sa.ParentId, count)...)
 	}
 	if sa.ReferentId != "" {
-		stopAreas = append(stopAreas, manager.findAscendants(sa.ReferentId)...)
+		stopAreas = append(stopAreas, manager.findAscendants(sa.ReferentId, count)...)
 	}
 
 	return
