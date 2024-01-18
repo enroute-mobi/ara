@@ -246,6 +246,13 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affe
 		route := &siri.SIRIAffectedRoute{
 			RouteRef: affectedRoute.RouteRef,
 		}
+
+		for _, stopArea := range affectedRoute.StopAreaIds {
+			stopAreaRef, ok := connector.resolveStopAreaRef(stopArea)
+			if ok {
+				route.StopPointRefs = append(route.StopPointRefs, stopAreaRef)
+			}
+		}
 		affectedLine.Routes = append(affectedLine.Routes, *route)
 	}
 

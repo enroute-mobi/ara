@@ -63,7 +63,8 @@ type XMLAffect struct {
 type XMLAffectedRoute struct {
 	XMLStructure
 
-	routeRef string
+	routeRef           string
+	affectedStopPoints []*XMLAffectedStopPoint
 }
 
 func NewXMLAffectedRoute(node XMLNode) *XMLAffectedRoute {
@@ -447,6 +448,20 @@ func (ar *XMLAffectedRoute) RouteRef() string {
 		ar.routeRef = ar.findStringChildContent("RouteRef")
 	}
 	return ar.routeRef
+}
+func (ar *XMLAffectedRoute) AffectedStopPoints() []*XMLAffectedStopPoint {
+	if len(ar.affectedStopPoints) == 0 {
+		stopPointsNodes := ar.findDirectChildrenNodes("StopPoints")
+		if stopPointsNodes != nil {
+			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
+			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			for _, affectedStopPoint := range nodes {
+				ar.affectedStopPoints = append(ar.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
+			}
+		}
+
+	}
+	return ar.affectedStopPoints
 }
 
 func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {

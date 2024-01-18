@@ -7,8 +7,13 @@
 									<siri:StopPlaceRef>{{ .StopPlaceRef }}</siri:StopPlaceRef>
 								</siri:Destinations>{{ end }}{{ end }}{{ if .Routes }}
 								<siri:Routes>{{ range .Routes }}
-									<siri:AffectedRoute>
-										<siri:RouteRef>{{ .RouteRef }}</siri:RouteRef>
+									<siri:AffectedRoute>{{ if .RouteRef }}
+										<siri:RouteRef>{{ .RouteRef }}</siri:RouteRef>{{ end }}{{ if .StopPointRefs }}
+										<siri:StopPoints>{{ range .StopPointRefs }}
+											<siri:AffectedStopPoint>
+												<siri:StopPointRef>{{ . }}</siri:StopPointRef>
+											</siri:AffectedStopPoint>{{ end }}
+										</siri:StopPoints>{{ end }}
 									</siri:AffectedRoute>
 								</siri:Routes>{{ end }}{{ end }}{{ if .Sections }}
 								<siri:Sections>{{ range .Sections }}

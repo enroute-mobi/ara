@@ -93,7 +93,8 @@ type SIRIAffectedSection struct {
 }
 
 type SIRIAffectedRoute struct {
-	RouteRef string
+	RouteRef      string
+	StopPointRefs []string
 }
 
 func (response *SIRISituationExchangeResponse) BuildXML(envelopeType ...string) (string, error) {

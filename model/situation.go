@@ -113,7 +113,8 @@ type AffectedSection struct {
 }
 
 type AffectedRoute struct {
-	RouteRef string
+	RouteRef    string       `json:",omitempty"`
+	StopAreaIds []StopAreaId `json:",omitempty"`
 }
 
 func (a AffectedLine) GetId() ModelId {
