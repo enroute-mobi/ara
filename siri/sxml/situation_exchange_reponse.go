@@ -42,7 +42,8 @@ type XMLPtSituationElement struct {
 	summary        string
 	description    string
 
-	affects []*XMLAffect
+	affects      []*XMLAffect
+	consequences []*XMLConsequence
 }
 
 type XMLPeriod struct {
@@ -55,12 +56,35 @@ type XMLPeriod struct {
 type XMLAffect struct {
 	XMLStructure
 
+	affectedNetworks   []*XMLAffectedNetwork
+	affectedStopPoints []*XMLAffectedStopPoint
+}
+
+type XMLAffectedNetwork struct {
+	XMLStructure
+
 	lineRefs             []string
 	affectedRoutes       []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
+}
 
-	stopPoints []string
+func NewXMLAffectedNetwork(node XMLNode) *XMLAffectedNetwork {
+	xmlAffectedNetwork := &XMLAffectedNetwork{}
+	xmlAffectedNetwork.node = node
+	return xmlAffectedNetwork
+}
+
+type XMLAffectedStopPoint struct {
+	XMLStructure
+
+	stopPointRef string
+}
+
+func NewXMLAffectedStopPoint(node XMLNode) *XMLAffectedStopPoint {
+	xmlAffectedStopPoint := &XMLAffectedStopPoint{}
+	xmlAffectedStopPoint.node = node
+	return xmlAffectedStopPoint
 }
 
 type XMLAffectedSection struct {
@@ -68,6 +92,23 @@ type XMLAffectedSection struct {
 
 	firstStop string
 	lastStop  string
+}
+
+type XMLConsequence struct {
+	XMLStructure
+
+	periods        []*XMLPeriod
+	severity       string
+	affects        []*XMLAffect
+	hasBlocking    bool
+	journeyPlanner Bool
+	realTime       Bool
+}
+
+func NewXMLConsequence(node XMLNode) *XMLConsequence {
+	xmlConsequence := &XMLConsequence{}
+	xmlConsequence.node = node
+	return xmlConsequence
 }
 
 func NewXMLAffect(node XMLNode) *XMLAffect {
@@ -274,10 +315,82 @@ func (visit *XMLPtSituationElement) ParticipantRef() string {
 	return visit.participantRef
 }
 
+func (visit *XMLPtSituationElement) Consequences() []*XMLConsequence {
+	if visit.consequences == nil {
+		consequences := []*XMLConsequence{}
+		nodes := visit.findNodes("Consequences")
+		for _, node := range nodes {
+			consequences = append(consequences, NewXMLConsequence(node))
+		}
+		visit.consequences = consequences
+	}
+	return visit.consequences
+}
+
+func (consequence *XMLConsequence) Periods() []*XMLPeriod {
+	if consequence.periods == nil {
+		periods := []*XMLPeriod{}
+		nodes := consequence.findNodes("Period")
+		for _, node := range nodes {
+			periods = append(periods, NewXMLPeriod(node))
+		}
+		consequence.periods = periods
+	}
+	return consequence.periods
+}
+
+func (consequence *XMLConsequence) Severity() string {
+	if consequence.severity == "" {
+		consequence.severity = consequence.findStringChildContent("Severity")
+	}
+	return consequence.severity
+}
+
+func (c *XMLConsequence) Affects() []*XMLAffect {
+	if c.affects == nil {
+		affects := []*XMLAffect{}
+		nodes := c.findNodes("Affects")
+		for _, node := range nodes {
+			affects = append(affects, NewXMLAffect(node))
+		}
+		c.affects = affects
+	}
+	return c.affects
+}
+
+func (c *XMLConsequence) HasBlocking() bool {
+	node := c.findNode("Blocking")
+	if node != nil {
+		c.hasBlocking = true
+	}
+	return c.hasBlocking
+}
+
+func (c *XMLConsequence) JourneyPlanner() bool {
+	if !c.journeyPlanner.Defined {
+		node := c.findNode("Blocking")
+		if node != nil {
+			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+		}
+	}
+	return c.journeyPlanner.Value
+}
+
+func (c *XMLConsequence) RealTime() bool {
+	if !c.realTime.Defined {
+		node := c.findNode("Blocking")
+		if node != nil {
+			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+		}
+		c.realTime.SetValue(c.findBoolChildContent("RealTime"))
+	}
+	return c.realTime.Value
+}
+
 func (visit *XMLPtSituationElement) Affects() []*XMLAffect {
 	if visit.affects == nil {
 		affects := []*XMLAffect{}
-		nodes := visit.findNodes("Affects")
+		nodes := visit.findDirectChildrenNodes("Affects")
 		for _, node := range nodes {
 			affects = append(affects, NewXMLAffect(node))
 		}
@@ -286,34 +399,44 @@ func (visit *XMLPtSituationElement) Affects() []*XMLAffect {
 	return visit.affects
 }
 
-func (a *XMLAffect) LineRefs() []string {
-	if len(a.lineRefs) == 0 {
-		nodes := a.findNodes("LineRef")
+func (a *XMLAffect) AffectedNetworks() []*XMLAffectedNetwork {
+	if len(a.affectedNetworks) == 0 {
+		nodes := a.findNodes("AffectedNetwork")
+		for _, affectedNetwork := range nodes {
+			a.affectedNetworks = append(a.affectedNetworks, NewXMLAffectedNetwork(affectedNetwork))
+		}
+	}
+	return a.affectedNetworks
+}
+
+func (an *XMLAffectedNetwork) LineRefs() []string {
+	if len(an.lineRefs) == 0 {
+		nodes := an.findNodes("LineRef")
 		for _, lineRef := range nodes {
-			a.lineRefs = append(a.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
+			an.lineRefs = append(an.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
 		}
 	}
-	return a.lineRefs
+	return an.lineRefs
 }
 
-func (a *XMLAffect) AffectedRoutes() []string {
-	if len(a.affectedRoutes) == 0 {
-		nodes := a.findNodes("RouteRef")
+func (an *XMLAffectedNetwork) AffectedRoutes() []string {
+	if len(an.affectedRoutes) == 0 {
+		nodes := an.findNodes("RouteRef")
 		for _, routeRef := range nodes {
-			a.affectedRoutes = append(a.affectedRoutes, strings.TrimSpace(routeRef.NativeNode().Content()))
+			an.affectedRoutes = append(an.affectedRoutes, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
 	}
-	return a.affectedRoutes
+	return an.affectedRoutes
 }
 
-func (a *XMLAffect) AffectedSections() []*XMLAffectedSection {
-	if len(a.affectedSections) == 0 {
-		nodes := a.findNodes("AffectedSection")
+func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {
+	if len(an.affectedSections) == 0 {
+		nodes := an.findNodes("AffectedSection")
 		for _, section := range nodes {
-			a.affectedSections = append(a.affectedSections, NewXMLAffectedSection(section))
+			an.affectedSections = append(an.affectedSections, NewXMLAffectedSection(section))
 		}
 	}
-	return a.affectedSections
+	return an.affectedSections
 }
 
 func (s *XMLAffectedSection) FirstStop() string {
@@ -330,22 +453,34 @@ func (s *XMLAffectedSection) LastStop() string {
 	return s.lastStop
 }
 
-func (a *XMLAffect) AffectedDestinations() []string {
-	if len(a.affectedDestinations) == 0 {
-		nodes := a.findNodes("StopPlaceRef")
+func (an *XMLAffectedNetwork) AffectedDestinations() []string {
+	if len(an.affectedDestinations) == 0 {
+		nodes := an.findNodes("StopPlaceRef")
 		for _, routeRef := range nodes {
-			a.affectedDestinations = append(a.affectedDestinations, strings.TrimSpace(routeRef.NativeNode().Content()))
+			an.affectedDestinations = append(an.affectedDestinations, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
 	}
-	return a.affectedDestinations
+	return an.affectedDestinations
 }
 
-func (a *XMLAffect) StopPoints() []string {
-	if len(a.stopPoints) == 0 {
-		nodes := a.findNodes("StopPointRef")
-		for _, stopPointRef := range nodes {
-			a.stopPoints = append(a.stopPoints, strings.TrimSpace(stopPointRef.NativeNode().Content()))
+func (a *XMLAffect) AffectedStopPoints() []*XMLAffectedStopPoint {
+	if len(a.affectedStopPoints) == 0 {
+		stopPointsNodes := a.findDirectChildrenNodes("StopPoints")
+		if stopPointsNodes != nil {
+			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
+			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			for _, affectedStopPoint := range nodes {
+				a.affectedStopPoints = append(a.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
+			}
 		}
+
 	}
-	return a.stopPoints
+	return a.affectedStopPoints
+}
+
+func (asp *XMLAffectedStopPoint) StopPointRef() string {
+	if asp.stopPointRef == "" {
+		asp.stopPointRef = asp.findStringChildContent("StopPointRef")
+	}
+	return asp.stopPointRef
 }

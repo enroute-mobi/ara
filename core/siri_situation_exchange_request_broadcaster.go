@@ -110,15 +110,59 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	for _, affect := range situation.Affects {
 		switch affect.GetType() {
 		case model.SituationTypeStopArea:
-			connector.buildAffectedStopArea(affect, ptSituationElement, delivery)
+			affectedStopArea := connector.buildAffectedStopArea(
+				affect, ptSituationElement, delivery)
+			ptSituationElement.AffectedStopPoints = append(
+				ptSituationElement.AffectedStopPoints,
+				affectedStopArea,
+			)
+
 		case model.SituationTypeLine:
-			connector.buildAffectedLine(affect, ptSituationElement, delivery)
+			affectedLine := connector.buildAffectedLine(
+				affect, ptSituationElement, delivery)
+			ptSituationElement.AffectedLines = append(
+				ptSituationElement.AffectedLines,
+				affectedLine,
+			)
+		}
+		if ptSituationElement.AffectedLines != nil || ptSituationElement.AffectedStopPoints != nil {
+			ptSituationElement.HasAffects = true
 		}
 	}
+
+	for _, consequence := range situation.Consequences {
+		c := &siri.Consequence{
+			Periods:  consequence.Periods,
+			Severity: consequence.Severity,
+		}
+		for _, affect := range consequence.Affects {
+			switch affect.GetType() {
+			case model.SituationTypeStopArea:
+				affectedStopArea := connector.buildAffectedStopArea(
+					affect, ptSituationElement, delivery)
+				c.AffectedStopPoints = append(c.AffectedStopPoints, affectedStopArea)
+
+			case model.SituationTypeLine:
+				affectedLine := connector.buildAffectedLine(
+					affect, ptSituationElement, delivery)
+				c.AffectedLines = append(c.AffectedLines, affectedLine)
+			}
+		}
+
+		if c.AffectedLines != nil || c.AffectedStopPoints != nil {
+			c.HasAffects = true
+		}
+		if consequence.Blocking != nil {
+			c.Blocking = consequence.Blocking
+		}
+
+		ptSituationElement.Consequences = append(ptSituationElement.Consequences, c)
+	}
+
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) (affectedStopPoint *siri.AffectedStopPoint) {
 	affect, _ = affect.(*model.AffectedStopArea)
 	affectedStopAreaRef, ok := connector.resolveStopAreaRef(model.StopAreaId(affect.GetId()))
 	if !ok {
@@ -126,27 +170,24 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(
 		return
 	}
 
-	affectedStopPoint := siri.AffectedStopPoint{
-		StopPointRef: affectedStopAreaRef,
-	}
-
-	ptSituationElement.AffectedStopPoints = append(ptSituationElement.AffectedStopPoints, &affectedStopPoint)
-
 	// Logging
 	delivery.MonitoringRefs[affectedStopAreaRef] = struct{}{}
+
+	affectedStopPoint = &siri.AffectedStopPoint{StopPointRef: affectedStopAreaRef}
+	return
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) *siri.AffectedLine {
 	affect, _ = affect.(*model.AffectedLine)
 	line, ok := connector.partner.Model().Lines().Find(model.LineId(affect.GetId()))
 	if !ok {
 		logger.Log.Debugf("Unknown Line %s", affect.GetId())
-		return
+		return nil
 	}
 	lineCode, ok := line.Code(connector.remoteCodeSpace)
 	if !ok {
 		logger.Log.Debugf("Unknown Line Code %s", connector.remoteCodeSpace)
-		return
+		return nil
 	}
 
 	affectedLine := siri.AffectedLine{
@@ -194,7 +235,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affe
 		affectedLine.Routes = append(affectedLine.Routes, *route)
 	}
 
-	ptSituationElement.AffectedLines = append(ptSituationElement.AffectedLines, &affectedLine)
+	return &affectedLine
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) resolveStopAreaRef(stopAreaId model.StopAreaId) (string, bool) {

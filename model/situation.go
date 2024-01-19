@@ -57,7 +57,20 @@ type Situation struct {
 	Summary        *SituationTranslatedString `json:",omitempty"`
 	Description    *SituationTranslatedString `json:",omitempty"`
 
-	Affects []Affect `json:",omitempty"`
+	Affects      []Affect       `json:",omitempty"`
+	Consequences []*Consequence `json:",omitempty"`
+}
+
+type Consequence struct {
+	Periods  []*TimeRange      `json:",omitempty"`
+	Severity SituationSeverity `json:",omitempty"`
+	Affects  []Affect          `json:",omitempty"`
+	Blocking *Blocking         `json:",omitempty"`
+}
+
+type Blocking struct {
+	JourneyPlanner bool
+	RealTime       bool
 }
 
 // SubTypes of Affect
@@ -135,6 +148,44 @@ func (situation *Situation) Id() SituationId {
 func (situation *Situation) Save() (ok bool) {
 	ok = situation.model.Situations().Save(situation)
 	return
+}
+
+func (c *Consequence) UnmarshalJSON(data []byte) error {
+	type Alias Consequence
+
+	aux := &struct {
+		Affects []json.RawMessage
+		*Alias
+	}{
+		Alias: (*Alias)(c),
+	}
+
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+	if aux.Affects != nil {
+		for _, v := range aux.Affects {
+			var affectedSubtype = struct {
+				Type SituationType
+			}{}
+			err = json.Unmarshal(v, &affectedSubtype)
+			if err != nil {
+				return err
+			}
+			switch affectedSubtype.Type {
+			case "StopArea":
+				a := NewAffectedStopArea()
+				json.Unmarshal(v, a)
+				c.Affects = append(c.Affects, a)
+			case "Line":
+				l := NewAffectedLine()
+				json.Unmarshal(v, l)
+				c.Affects = append(c.Affects, l)
+			}
+		}
+	}
+	return nil
 }
 
 func (situation *Situation) UnmarshalJSON(data []byte) error {

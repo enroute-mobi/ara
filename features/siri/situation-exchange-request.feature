@@ -26,6 +26,16 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                  |
+    When the Situation "external":"test" is edited with a Consequence with the following attributes:
+      | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
+      | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
+      | Severity                                                                      | verySlight                        |
+      | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Blocking[JourneyPlanner]                                                      | true                              |
+      | Blocking[RealTime]                                                            | true                              |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -127,6 +137,41 @@ Feature: Support SIRI Situation Exchange by request
                         </siri:AffectedStopPoint>
                       </siri:StopPoints>
                     </siri:Affects>
+                    <siri:Consequences>
+                      <siri:Consequence>
+                        <siri:Period>
+                          <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
+                          <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
+                        </siri:Period>
+                        <siri:Severity>verySlight</siri:Severity>
+                        <siri:Affects>
+                          <siri:Networks>
+                            <siri:AffectedNetwork>
+                              <siri:AffectedLine>
+                                <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                <siri:Sections>
+                                  <siri:AffectedSection>
+                                    <siri:IndirectSectionRef>
+                                      <siri:FirstStopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:FirstStopPointRef>
+                                      <siri:LastStopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:LastStopPointRef>
+                                    </siri:IndirectSectionRef>
+                                  </siri:AffectedSection>
+                                </siri:Sections>
+                              </siri:AffectedLine>
+                            </siri:AffectedNetwork>
+                          </siri:Networks>
+                          <siri:StopPoints>
+                            <siri:AffectedStopPoint>
+                              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                            </siri:AffectedStopPoint>
+                          </siri:StopPoints>
+                        </siri:Affects>
+                        <siri:Blocking>
+                          <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                          <siri:RealTime>true</siri:RealTime>
+                        </siri:Blocking>
+                      </siri:Consequence>
+                    </siri:Consequences>
                 </siri:PtSituationElement>
                 </siri:Situations>
               </siri:SituationExchangeDelivery>
@@ -300,6 +345,41 @@ Feature: Support SIRI Situation Exchange by request
                         </siri:AffectedNetwork>
                       </siri:Networks>
                     </siri:Affects>
+                    <siri:Consequences>
+                      <siri:Consequence>
+                        <siri:Period>
+                          <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
+                          <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
+                        </siri:Period>
+                        <siri:Severity>verySlight</siri:Severity>
+                        <siri:Affects>
+                          <siri:Networks>
+                            <siri:AffectedNetwork>
+                              <siri:AffectedLine>
+                                <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                <siri:Sections>
+                                  <siri:AffectedSection>
+                                    <siri:IndirectSectionRef>
+                                      <siri:FirstStopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:FirstStopPointRef>
+                                      <siri:LastStopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:LastStopPointRef>
+                                    </siri:IndirectSectionRef>
+                                  </siri:AffectedSection>
+                                </siri:Sections>
+                              </siri:AffectedLine>
+                            </siri:AffectedNetwork>
+                          </siri:Networks>
+                          <siri:StopPoints>
+                            <siri:AffectedStopPoint>
+                              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                            </siri:AffectedStopPoint>
+                          </siri:StopPoints>
+                        </siri:Affects>
+                        <siri:Blocking>
+                          <siri:JourneyPlanner>true</siri:JourneyPlanner>
+                          <siri:RealTime>true</siri:RealTime>
+                        </siri:Blocking>
+                      </siri:Consequence>
+                    </siri:Consequences>
                 </siri:PtSituationElement>
                 </siri:Situations>
               </siri:SituationExchangeDelivery>
@@ -360,6 +440,16 @@ Feature: Support SIRI Situation Exchange by request
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
       | Description[DefaultValue]    | carte d'abonnement                |
       | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+    And the Situation "external":"test2" has a Consequence with the following attributes:
+      | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
+      | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
+      | Severity                                                                      | verySlight                        |
+      | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Blocking[JourneyPlanner]                                                      | true                              |
+      | Blocking[RealTime]                                                            | true                              |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | sent                                                         |

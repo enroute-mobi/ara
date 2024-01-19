@@ -74,6 +74,13 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Blocking\[([^\]]+)\]/
+      name = $1
+      attributes["Blocking"] ||= {}
+      attributes["Blocking"][name] = value == "true" unless attributes["Blocking"].key?(name)
+      attributes.delete key
+    end
+
     if key =~ /Attribute\[([^\]]+)\]/
       name = $1
       attributes["Attributes"] ||= {}
@@ -102,7 +109,10 @@ def model_attributes(table)
     # Situation PublicationWindows Periods is an array of TimeRange
     # Format: | PublicationWindows[0]#StartTime | 2017-01-01T13:00:00.000Z |
     #         | PublicationWIndows[0]#EndTime   | 2017-01-02T15:00:00.000Z |
-    if key =~ /(ValidityPeriods|PublicationWindows)\[(\d+)\]#(\S+)/
+    # Situation Periods is an array of TimeRange
+    # Format: | Periods[0]#StartTime | 2017-01-01T13:00:00.000Z |
+    #         | Periods[0]#EndTime   | 2017-01-02T15:00:00.000Z |
+    if key =~ /(ValidityPeriods|PublicationWindows|Periods)\[(\d+)\]#(\S+)/
       raw_attribute = Regexp.last_match(0).to_s
       name = Regexp.last_match(1).to_s
       period_number = Regexp.last_match(2).to_i
