@@ -315,7 +315,7 @@ func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicl
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,
 		requestType:       SUBSCRIPTION,
-		expectedResponses: []string{"SubscribeResponse"},
+		expectedResponses: []string{"SubscribeResponse", "SubscriptionResponse"},
 		acceptGzip:        true,
 	})
 	if err != nil {

@@ -934,6 +934,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
              <ResponderRef>NINOXE:default</ResponderRef>
              <ResponseStatus>
                  <ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ResponseTimestamp>
+                 <RequestMessageRef>{LastRequestMessageRef}</RequestMessageRef>
                  <SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</SubscriptionRef>
                  <Status>true</Status>
                  <ValidUntil>2016-09-22T08:01:20.227+02:00</ValidUntil>
@@ -953,8 +954,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Name      | Test                   |
       | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
-      | Kind              | VehicleMonitoringCollect     |
-      | ReferenceArray[0] | Line, "internal": "testLine" |
+      | Kind                      | VehicleMonitoringCollect |
+      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z   |
     And a minute has passed
     And show me ara subscriptions for partner "test"
     When I send this SIRI request
