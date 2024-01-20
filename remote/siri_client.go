@@ -329,7 +329,7 @@ func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptio
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,
 		requestType:       SUBSCRIPTION,
-		expectedResponses: []string{"DeleteSubscriptionResponse"},
+		expectedResponses: []string{"DeleteSubscriptionResponse", "TerminateSubscriptionResponse"},
 		acceptGzip:        true,
 	})
 	if err != nil {

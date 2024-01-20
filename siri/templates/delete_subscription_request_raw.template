@@ -1,0 +1,7 @@
+<TerminateSubscriptionRequest>
+	<RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</RequestTimestamp>
+	<RequestorRef>{{.RequestorRef}}</RequestorRef>
+	<MessageIdentifier>{{ .MessageIdentifier }}</MessageIdentifier>{{ if .CancelAll }}
+	<All />{{ else }}
+	<SubscriptionRef>{{ .SubscriptionRef }}</SubscriptionRef>{{ end }}
+</TerminateSubscriptionRequest>
