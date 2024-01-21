@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_StopVisit_Id(t *testing.T) {
@@ -227,6 +229,33 @@ func Test_MemoryStopVisits_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("New StopVisit should not be findable by code")
 	}
+}
+
+func Test_MemoryStopVisits_DeleteMultiple(t *testing.T) {
+	assert := assert.New(t)
+
+	stopVisits := NewMemoryStopVisits()
+	stopVisit1 := stopVisits.New()
+	stopVisit2 := stopVisits.New()
+	code1 := NewCode("codeSpace", "value1")
+	code2 := NewCode("codeSpace", "value2")
+	stopVisit1.SetCode(code1)
+	stopVisit2.SetCode(code2)
+	stopVisits.Save(stopVisit1)
+	stopVisits.Save(stopVisit2)
+
+	toDelete := []*StopVisit{stopVisit1, stopVisit2}
+	stopVisits.DeleteMultiple(toDelete)
+
+	_, ok := stopVisits.Find(stopVisit1.Id())
+	assert.False(ok, "Deleted StopVisit1 should not be findable")
+	_, ok = stopVisits.Find(stopVisit2.Id())
+	assert.False(ok, "Deleted StopVisit1 should not be findable")
+
+	_, ok = stopVisits.FindByCode(code1)
+	assert.False(ok, "New StopVisit should not be findable by code1")
+	_, ok = stopVisits.FindByCode(code2)
+	assert.False(ok, "New StopVisit should not be findable by code2")
 }
 
 func Test_MemoryStopVisits_Load(t *testing.T) {

@@ -190,13 +190,13 @@ func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
 	svs := m.StopVisits().UnsafeFindAll()
 	persistence := guardian.referential.ModelPersistenceDuration()
 	vjs := make(map[model.VehicleJourneyId]struct{})
+	stopVisitstoDelete := []*model.StopVisit{}
 
 	child.SetTag("stop_visits_count", len(svs))
 	for i := range svs {
 		if svs[i].ReferenceTime().Before(guardian.Clock().Now().Add(persistence)) {
 			vjs[svs[i].VehicleJourneyId] = struct{}{}
-			logger.Log.Debugf("Referential persistence deleting StopVisit Id %s with Reference time %s", svs[i].Id(), svs[i].ReferenceTime().String())
-			m.StopVisits().Delete(svs[i])
+			stopVisitstoDelete = append(stopVisitstoDelete, svs[i])
 			continue
 		}
 
@@ -218,6 +218,9 @@ func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
 
 		}
 	}
+
+	logger.Log.Debugf("Referential persistence deleting %d StopVisits", len(stopVisitstoDelete))
+	m.StopVisits().DeleteMultiple(stopVisitstoDelete)
 
 	for id := range vjs {
 		if !m.StopVisits().VehicleJourneyHasStopVisits(id) {
