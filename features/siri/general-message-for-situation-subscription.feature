@@ -284,7 +284,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | Description[DefaultValue]                                                           | a very very very long message             |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
     And a StopArea exists with the following attributes:
         | Name              | Test                                    |
         | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |

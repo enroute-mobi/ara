@@ -72,6 +72,7 @@ type Consequence struct {
 type AffectedStopPoint struct {
 	StopPointRef  string
 	StopPointName string
+	LineRefs      []string
 }
 
 type AffectedLine struct {
@@ -92,7 +93,8 @@ type SIRIAffectedSection struct {
 }
 
 type SIRIAffectedRoute struct {
-	RouteRef string
+	RouteRef      string
+	StopPointRefs []string
 }
 
 func (response *SIRISituationExchangeResponse) BuildXML(envelopeType ...string) (string, error) {

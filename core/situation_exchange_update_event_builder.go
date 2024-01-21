@@ -170,7 +170,8 @@ func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEven
 	situationEvent.Consequences = append(situationEvent.Consequences, consequence)
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) buildAffectedStopArea(stopPointRef string, affectedStopAreas map[model.StopAreaId]*model.AffectedStopArea) {
+func (builder *SituationExchangeUpdateEventBuilder) buildAffectedStopArea(xmlAffectedStopPoint *sxml.XMLAffectedStopPoint, affectedStopAreas map[model.StopAreaId]*model.AffectedStopArea) {
+	stopPointRef := xmlAffectedStopPoint.StopPointRef()
 	stopPointRefCode := model.NewCode(builder.remoteCodeSpace, stopPointRef)
 	stopArea, ok := builder.partner.Model().StopAreas().FindByCode(stopPointRefCode)
 	if !ok {
@@ -178,6 +179,17 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffectedStopArea(stopPo
 	}
 	affect := model.NewAffectedStopArea()
 	affect.StopAreaId = stopArea.Id()
+
+	for _, lineRef := range xmlAffectedStopPoint.LineRefs() {
+		LineRefCode := model.NewCode(builder.remoteCodeSpace, lineRef)
+		line, ok := builder.partner.Model().Lines().FindByCode(LineRefCode)
+		if !ok {
+			logger.Log.Debugf("Unknown Line with code %s", LineRefCode.String())
+			continue
+		}
+		builder.LineRefs[LineRefCode.Value()] = struct{}{}
+		affect.LineIds = append(affect.LineIds, line.Id())
+	}
 
 	affectedStopAreas[affect.StopAreaId] = affect
 
@@ -197,10 +209,27 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffectedLine(lineRef st
 	builder.LineRefs[LineRefCode.Value()] = struct{}{}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) buildAffectedRoute(lineId model.LineId, route string, affectedLines map[model.LineId]*model.AffectedLine) {
-	affectedRoute := model.AffectedRoute{RouteRef: route}
-	affectedLines[lineId].AffectedRoutes =
-		append(affectedLines[lineId].AffectedRoutes, &affectedRoute)
+func (builder *SituationExchangeUpdateEventBuilder) buildAffectedRoute(lineId model.LineId, xmlAffectedRoute *sxml.XMLAffectedRoute, affectedLines map[model.LineId]*model.AffectedLine) {
+	affectedRoute := &model.AffectedRoute{}
+	if xmlAffectedRoute.RouteRef() != "" {
+		affectedRoute.RouteRef = xmlAffectedRoute.RouteRef()
+	}
+	for _, xmlAffectedStopPoint := range xmlAffectedRoute.AffectedStopPoints() {
+		stopPointRef := xmlAffectedStopPoint.StopPointRef()
+		stopPointRefCode := model.NewCode(builder.remoteCodeSpace, stopPointRef)
+		stopArea, ok := builder.partner.Model().StopAreas().FindByCode(stopPointRefCode)
+		if !ok {
+			continue
+
+		}
+		affectedRoute.StopAreaIds = append(affectedRoute.StopAreaIds, stopArea.Id())
+		builder.MonitoringRefs[stopPointRefCode.Value()] = struct{}{}
+	}
+
+	if affectedRoute != (&model.AffectedRoute{}) {
+		affectedLines[lineId].AffectedRoutes =
+			append(affectedLines[lineId].AffectedRoutes, affectedRoute)
+	}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) buildAffectedDestination(lineId model.LineId, destination string, affectedLines map[model.LineId]*model.AffectedLine) {
@@ -266,8 +295,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 			// get the LineId
 			lineId := maps.Keys(models.affectedLines)[0]
 
-			for _, route := range xmlAffectedNetwork.AffectedRoutes() {
-				builder.buildAffectedRoute(lineId, route, models.affectedLines)
+			for _, xmlAffectedRoute := range xmlAffectedNetwork.AffectedRoutes() {
+				builder.buildAffectedRoute(lineId, xmlAffectedRoute, models.affectedLines)
 			}
 			for _, section := range xmlAffectedNetwork.AffectedSections() {
 				builder.buildAffectedSection(lineId, section, models.affectedLines)
@@ -279,7 +308,7 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 	}
 
 	for _, xmlAffectedStopPoint := range xmlAffect.AffectedStopPoints() {
-		builder.buildAffectedStopArea(xmlAffectedStopPoint.StopPointRef(), models.affectedStopAreas)
+		builder.buildAffectedStopArea(xmlAffectedStopPoint, models.affectedStopAreas)
 	}
 
 	affects = &models

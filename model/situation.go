@@ -81,6 +81,7 @@ type Affect interface {
 
 type AffectedStopArea struct {
 	StopAreaId StopAreaId `json:",omitempty"`
+	LineIds    []LineId   `json:",omitempty"`
 }
 
 func (a AffectedStopArea) GetId() ModelId {
@@ -112,7 +113,8 @@ type AffectedSection struct {
 }
 
 type AffectedRoute struct {
-	RouteRef string
+	RouteRef    string       `json:",omitempty"`
+	StopAreaIds []StopAreaId `json:",omitempty"`
 }
 
 func (a AffectedLine) GetId() ModelId {

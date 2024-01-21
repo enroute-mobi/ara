@@ -158,13 +158,12 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections|AffectedRoutes)\[(\d+)])?(/((FirstStop|LastStop)|StopAreaId|RouteRef))?}
+    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections|AffectedRoutes|LineIds)\[(\d+)])?(/((FirstStop|LastStop)|StopAreaId\z|RouteRef|StopAreaIds))?}
       raw_attribute = Regexp.last_match(0).to_s
       attribute = Regexp.last_match(2).to_s
       subaffect = Regexp.last_match(4).to_s
       index = Regexp.last_match(5).to_i
       stop_type = Regexp.last_match(7).to_s
-
       attributes['Affects'] ||= []
       case attribute
       when 'StopArea', 'Line'
@@ -178,11 +177,19 @@ def model_attributes(table)
           next if affect['Type'] != model && affect["#{model}Id"] != id
 
           affect[subaffect] ||= []
-          affect[subaffect][index] ||= {}
-          affect[subaffect][index][stop_type] = value
+          if stop_type == 'StopAreaIds'
+            affect[subaffect][index]['StopAreaIds'] ||= []
+            affect[subaffect][index]['StopAreaIds'] << value
+          elsif stop_type != ""
+            affect[subaffect][index] ||= {}
+            affect[subaffect][index][stop_type] = value
+          else
+            affect[subaffect] ||= []
+            affect[subaffect][index] = value
+          end
         end
       end
-      attributes.delete raw_attribute
+      attributes.delete key
     end
     
     if key =~ /ReferenceArray\[(\d+)\]/

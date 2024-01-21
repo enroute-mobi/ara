@@ -95,7 +95,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                                               |

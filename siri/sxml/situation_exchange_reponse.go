@@ -60,13 +60,26 @@ type XMLAffect struct {
 	affectedStopPoints []*XMLAffectedStopPoint
 }
 
+type XMLAffectedRoute struct {
+	XMLStructure
+
+	routeRef           string
+	affectedStopPoints []*XMLAffectedStopPoint
+}
+
+func NewXMLAffectedRoute(node XMLNode) *XMLAffectedRoute {
+	xmlAffectedRoute := &XMLAffectedRoute{}
+	xmlAffectedRoute.node = node
+	return xmlAffectedRoute
+}
+
 type XMLAffectedNetwork struct {
 	XMLStructure
 
 	lineRefs             []string
-	affectedRoutes       []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
+	affectedRoutes       []*XMLAffectedRoute
 }
 
 func NewXMLAffectedNetwork(node XMLNode) *XMLAffectedNetwork {
@@ -79,6 +92,7 @@ type XMLAffectedStopPoint struct {
 	XMLStructure
 
 	stopPointRef string
+	lineRefs     []string
 }
 
 func NewXMLAffectedStopPoint(node XMLNode) *XMLAffectedStopPoint {
@@ -419,14 +433,35 @@ func (an *XMLAffectedNetwork) LineRefs() []string {
 	return an.lineRefs
 }
 
-func (an *XMLAffectedNetwork) AffectedRoutes() []string {
+func (an *XMLAffectedNetwork) AffectedRoutes() []*XMLAffectedRoute {
 	if len(an.affectedRoutes) == 0 {
-		nodes := an.findNodes("RouteRef")
-		for _, routeRef := range nodes {
-			an.affectedRoutes = append(an.affectedRoutes, strings.TrimSpace(routeRef.NativeNode().Content()))
+		nodes := an.findNodes("AffectedRoute")
+		for _, affectedRoute := range nodes {
+			an.affectedRoutes = append(an.affectedRoutes, NewXMLAffectedRoute(affectedRoute))
 		}
 	}
 	return an.affectedRoutes
+}
+
+func (ar *XMLAffectedRoute) RouteRef() string {
+	if ar.routeRef == "" {
+		ar.routeRef = ar.findStringChildContent("RouteRef")
+	}
+	return ar.routeRef
+}
+func (ar *XMLAffectedRoute) AffectedStopPoints() []*XMLAffectedStopPoint {
+	if len(ar.affectedStopPoints) == 0 {
+		stopPointsNodes := ar.findDirectChildrenNodes("StopPoints")
+		if stopPointsNodes != nil {
+			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
+			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			for _, affectedStopPoint := range nodes {
+				ar.affectedStopPoints = append(ar.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
+			}
+		}
+
+	}
+	return ar.affectedStopPoints
 }
 
 func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {
@@ -483,4 +518,14 @@ func (asp *XMLAffectedStopPoint) StopPointRef() string {
 		asp.stopPointRef = asp.findStringChildContent("StopPointRef")
 	}
 	return asp.stopPointRef
+}
+
+func (asp *XMLAffectedStopPoint) LineRefs() []string {
+	if len(asp.lineRefs) == 0 {
+		nodes := asp.findNodes("LineRef")
+		for _, lineRef := range nodes {
+			asp.lineRefs = append(asp.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
+		}
+	}
+	return asp.lineRefs
 }

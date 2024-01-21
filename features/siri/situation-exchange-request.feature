@@ -22,10 +22,12 @@ Feature: Support SIRI Situation Exchange by request
       | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId] | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                  |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]    | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]    | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
     When the Situation "external":"test" is edited with a Consequence with the following attributes:
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
@@ -36,6 +38,8 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
       | Blocking[RealTime]                                                            | true                              |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -45,6 +49,12 @@ Feature: Support SIRI Situation Exchange by request
     And a StopArea exists with the following attributes:
       | Name  | Test last stop                           |
       | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name  | Test 3534                            |
+      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+    And a StopArea exists with the following attributes:
+      | Name  | Test 3533                            |
+      | Codes | "external": "STIF:StopPoint:Q:3533:" |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
       | remote_code_space | external       |
@@ -75,7 +85,7 @@ Feature: Support SIRI Situation Exchange by request
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -118,6 +128,14 @@ Feature: Support SIRI Situation Exchange by request
                             <siri:Routes>
                               <siri:AffectedRoute>
                                 <siri:RouteRef>Route:66:LOC</siri:RouteRef>
+                                <siri:StopPoints>
+                                  <siri:AffectedStopPoint>
+                                    <siri:StopPointRef>STIF:StopPoint:Q:3534:</siri:StopPointRef>
+                                  </siri:AffectedStopPoint>
+                                  <siri:AffectedStopPoint>
+                                    <siri:StopPointRef>STIF:StopPoint:Q:3533:</siri:StopPointRef>
+                                  </siri:AffectedStopPoint>
+                                </siri:StopPoints>
                               </siri:AffectedRoute>
                             </siri:Routes>
                             <siri:Sections>
@@ -163,6 +181,11 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StopPoints>
                             <siri:AffectedStopPoint>
                               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                              <siri:Lines>
+                                <siri:AffectedLine>
+                                  <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                </siri:AffectedLine>
+                              </siri:Lines>
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
@@ -300,6 +323,17 @@ Feature: Support SIRI Situation Exchange by request
                             <siri:Routes>
                               <siri:AffectedRoute>
                                 <siri:RouteRef>Route:66:LOC</siri:RouteRef>
+                                <siri:StopPoints>
+                                   <siri:AffectedStopPoint>
+                                       <siri:StopPointRef>STIF:StopPoint:Q:3534:</siri:StopPointRef>
+                                   </siri:AffectedStopPoint>
+                                   <siri:AffectedStopPoint>
+                                       <siri:StopPointRef>STIF:StopPoint:Q:3533:</siri:StopPointRef>
+                                   </siri:AffectedStopPoint>
+                                 </siri:StopPoints>
+                              </siri:AffectedRoute>
+                              <siri:AffectedRoute>
+                                <siri:RouteRef>Route:77:LOC</siri:RouteRef>
                               </siri:AffectedRoute>
                             </siri:Routes>
                             <siri:Sections>
@@ -371,6 +405,14 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StopPoints>
                             <siri:AffectedStopPoint>
                               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                              <siri:Lines>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                              </siri:Lines>
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
                         </siri:Affects>
@@ -405,6 +447,12 @@ Feature: Support SIRI Situation Exchange by request
     And a StopArea exists with the following attributes:
       | Name  | Test last stop                           |
       | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name  | Test 3534                            |
+      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+    And a StopArea exists with the following attributes:
+      | Name  | Test 3533                            |
+      | Codes | "external": "STIF:StopPoint:Q:3533:" |
     And a minute has passed
     When a minute has passed
     Then one Situation has the following attributes:
@@ -428,6 +476,9 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[1]/RouteRef         | Route:77:LOC                                  |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]   | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]   | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
     Then one Situation has the following attributes:
       | Codes                        | "external" : "test2"              |
@@ -450,13 +501,15 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
       | Blocking[RealTime]                                                            | true                              |
+      | Affects[StopArea=6ba7b814-9dad-11d1-2-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And an audit event should exist with these attributes:
-      | Protocol  | siri                                                         |
-      | Direction | sent                                                         |
-      | Status    | OK                                                           |
-      | Type      | SituationExchangeRequest                                     |
-      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
-      | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                  |
+      | Protocol  | siri                                                                                                             |
+      | Direction | sent                                                                                                             |
+      | Status    | OK                                                                                                               |
+      | Type      | SituationExchangeRequest                                                                                         |
+      | StopAreas | ["STIF:StopPoint:Q:3534:", "STIF:StopPoint:Q:3533:", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
+      | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                                                      |
 
   @ARA-1397 @siri-valid
   Scenario: SituationExchange collect should send GetSituationExchange request to partner
