@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type SIRIVehicleMonitoringSubscriber interface {
@@ -163,26 +164,37 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
 	for _, responseStatus := range response.ResponseStatus() {
-		requestedLines, ok := linesToRequest[responseStatus.RequestMessageRef()]
-		if !ok {
-			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
-			continue
-		}
-		delete(linesToRequest, responseStatus.RequestMessageRef()) // See #4691
+		var requestedLine *lineToRequest
+		var requestMessageRef string
+		var ok bool
 
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedLines.subID)
+		if len(linesToRequest) != 1 {
+			requestedLine, ok = linesToRequest[responseStatus.RequestMessageRef()]
+			if !ok {
+				logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
+				continue
+			}
+			requestMessageRef = responseStatus.RequestMessageRef()
+		} else { // Skip RequestMessageRef validation for single Subscription
+			requestMessageRef = maps.Keys(linesToRequest)[0]
+			requestedLine = linesToRequest[requestMessageRef]
+		}
+
+		delete(linesToRequest, requestMessageRef) // See #4691
+
+		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedLine.subID)
 		if !ok { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription %v", requestedLines.subID)
+			logger.Log.Debugf("Response for unknown subscription %v", requestedLine.subID)
 			continue
 		}
-		resource := subscription.Resource(requestedLines.lID)
+		resource := subscription.Resource(requestedLine.lID)
 		if resource == nil { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription resource %v", requestedLines.lID.String())
+			logger.Log.Debugf("Response for unknown subscription resource %v", requestedLine.lID.String())
 			continue
 		}
 
 		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedLines.lID.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
+			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedLine.lID.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
 			resource.RetryCount++
 			message.Status = "Error"
 			continue
