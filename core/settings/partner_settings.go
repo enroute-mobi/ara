@@ -45,13 +45,15 @@ const (
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
-	BROADCAST_SUBSCRIPTIONS_PERSISTENT         = "broadcast.subscriptions.persistent"
-	BROADCAST_RECORDED_CALLS_DURATION          = "broadcast.recorded_calls.duration"
-	BROADCAST_REWRITE_JOURNEY_PATTERN_REF      = "broadcast.rewrite_journey_pattern_ref"
-	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM = "broadcast.no_destinationref_rewriting_from"
-	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM   = "broadcast.no_dataframeref_rewriting_from"
-	BROADCAST_GZIP_GTFS                        = "broadcast.gzip_gtfs"
-	BROADCAST_GTFS_CACHE_TIMEOUT               = "broadcast.gtfs.cache_timeout"
+	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
+	BROADCAST_RECORDED_CALLS_DURATION                     = "broadcast.recorded_calls.duration"
+	BROADCAST_REWRITE_JOURNEY_PATTERN_REF                 = "broadcast.rewrite_journey_pattern_ref"
+	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM            = "broadcast.no_destinationref_rewriting_from"
+	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM              = "broadcast.no_dataframeref_rewriting_from"
+	BROADCAST_GZIP_GTFS                                   = "broadcast.gzip_gtfs"
+	BROADCAST_GTFS_CACHE_TIMEOUT                          = "broadcast.gtfs.cache_timeout"
+	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
+	BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS              = "broadcast.siri.stop_monitoring.multiple_subscriptions"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
 	GENERAL_MESSAGE_REQUEST_2_2     = "generalMessageRequest.version2.2"
@@ -64,14 +66,13 @@ const (
 	OAUTH_TOKEN_URL     = "remote_authentication.oauth.token_url"
 	OAUTH_SCOPES        = "remote_authentication.oauth.scopes"
 
-	SIRI_ENVELOPE                                         = "siri.envelope"
-	SIRI_LINE_PUBLISHED_NAME                              = "siri.line.published_name"
-	SIRI_DIRECTION_TYPE                                   = "siri.direction_type"
-	SIRI_PASSAGE_ORDER                                    = "siri.passage_order"
-	SIRI_CREDENTIAL_HEADER                                = "siri.credential.header"
-	SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION              = "siri.soap.empty_response_on_notification"
-	DEFAULT_GTFS_TTL                                      = 30 * time.Second
-	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
+	SIRI_ENVELOPE                            = "siri.envelope"
+	SIRI_LINE_PUBLISHED_NAME                 = "siri.line.published_name"
+	SIRI_DIRECTION_TYPE                      = "siri.direction_type"
+	SIRI_PASSAGE_ORDER                       = "siri.passage_order"
+	SIRI_CREDENTIAL_HEADER                   = "siri.credential.header"
+	SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION = "siri.soap.empty_response_on_notification"
+	DEFAULT_GTFS_TTL                         = 30 * time.Second
 
 	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
 )
@@ -104,6 +105,7 @@ type PartnerSettings struct {
 	generalMessageRequestVersion22      bool
 	collectFilteredGeneralMessages      bool
 	ignoreStopWithoutLine               bool
+	smMultipleDeliveriesPerNotify       bool
 	discoveryInterval                   time.Duration
 	cacheTimeouts                       sync.Map
 	siriDirectionTypeInbound            string
@@ -191,6 +193,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setDiscoveryInterval(settings)
 	s.setCacheTimeouts(settings)
 	s.setSortPayloadForTest(settings)
+	s.setSmMultipleDeliveriesPerNotify(settings)
 
 	s.setVehicleRemoteCodeSpaceWithFallback(settings)
 	s.setVehicleJourneyRemoteCodeSpaceWithFallback(settings)
@@ -421,6 +424,15 @@ func (s *PartnerSettings) setSortPayloadForTest(settings map[string]string) {
 }
 func (s *PartnerSettings) SortPaylodForTest() bool {
 	return s.sortPayloadForTest
+}
+
+func (s *PartnerSettings) setSmMultipleDeliveriesPerNotify(settings map[string]string) {
+	m, _ := strconv.ParseBool(settings[BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS])
+	s.smMultipleDeliveriesPerNotify = m
+}
+
+func (s *PartnerSettings) SmMultipleDeliveriesPerNotify() bool {
+	return s.smMultipleDeliveriesPerNotify
 }
 
 func (s *PartnerSettings) setIgnoreTerminateSubscriptionsRequest(settings map[string]string) {

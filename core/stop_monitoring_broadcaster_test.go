@@ -43,7 +43,7 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	reference := model.Reference{
 		Code: &code,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	subs := partner.Subscriptions().New("kind")
@@ -91,7 +91,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 
 	reference := model.Reference{
 		Code: &code,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	subs := partner.Subscriptions().New("StopMonitoringBroadcast")
@@ -140,7 +140,7 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilt
 
 	reference := model.Reference{
 		Code: &code,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	sub := partner.Subscriptions().New("StopMonitoringBroadcast")
@@ -207,8 +207,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
 		"remote_code_space": "internal",
-		"local_credential":     "external",
-		"remote_url":           ts.URL,
+		"local_credential":  "external",
+		"remote_url":        ts.URL,
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -228,7 +228,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference := model.Reference{
 		Code: &code,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	stopArea2 := referential.Model().StopAreas().New()
@@ -239,7 +239,7 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference2 := model.Reference{
 		Code: &code2,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
@@ -328,5 +328,114 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	if len := len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast); len != 1 {
 		t.Errorf("1 stopVisit should need to be broadcasted %v", len)
+	}
+}
+
+func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
+
+	// Create a test http server
+	response := []byte{}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response, _ = io.ReadAll(r.Body)
+		w.Header().Add("Content-Type", "text/xml")
+	}))
+	defer ts.Close()
+
+	// Create a test referential
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.SetClock(fakeClock)
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	settings := map[string]string{
+		"broadcast.siri.stop_monitoring.multiple_subscriptions": "true",
+		"remote_code_space": "internal",
+		"local_credential":  "external",
+		"remote_url":        ts.URL,
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).SetClock(fakeClock)
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster = NewFakeStopMonitoringBroadcaster(connector.(*SIRIStopMonitoringSubscriptionBroadcaster))
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
+
+	reference := model.Reference{
+		Code: &code,
+		Type: "StopArea",
+	}
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.Save()
+
+	code2 := model.NewCode("internal", string(stopArea2.Id()))
+	stopArea2.SetCode(code2)
+
+	reference2 := model.Reference{
+		Code: &code2,
+		Type: "StopArea",
+	}
+
+	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
+	subscription.SubscriberRef = "subscriber"
+	subscription.SetExternalId("externalId")
+	subscription.CreateAndAddNewResource(reference)
+	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
+	subscription.Save()
+
+	subscription2 := partner.Subscriptions().New("StopMonitoringBroadcast")
+	subscription2.SubscriberRef = "subscriber"
+	subscription2.SetExternalId("externalId")
+	subscription2.CreateAndAddNewResource(reference2)
+	subscription2.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
+	subscription2.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetCode(code)
+	line.Save()
+
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.SetCode(code)
+	vehicleJourney.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.SetCode(code)
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea2.Id()
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.SetCode(model.NewCode("internal", string(stopArea2.Id())))
+	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
+	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
+	stopVisit.Save()
+	time.Sleep(10 * time.Millisecond)
+	stopVisit2.Save()
+
+	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
+
+	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
+	delivery := notify.StopMonitoringDeliveries()
+
+	if len(delivery) != 2 {
+		t.Errorf("Should have received 2 deliveries but got == %v", len(delivery))
 	}
 }
